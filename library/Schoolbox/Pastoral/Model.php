@@ -9,6 +9,7 @@ namespace Schoolbox\Pastoral;
 
 use Alaress_Date_Format;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -128,7 +129,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection|Access\Model[]
+     * @return null|GenericCollection|Access\Model[]
      */
     public function getAccess()
     {
@@ -440,7 +441,7 @@ class Model implements ISoftDeletable
 
         return $this->updatedAtDisplay;
     }
-    
+
     /**
      * @param User|null $modifiedByDisplay
      *
