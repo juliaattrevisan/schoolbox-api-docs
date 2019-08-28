@@ -401,13 +401,13 @@ class Processor
              * (probably from human error but who knows)
              */
             if (!$cache[$row['Role Type']][$row['Relation ID']]) {
-                $this->log("Relation between {$row['Relation ID']} and {$row['Student ID']}", '', "Skipped: Relation ID {$row['Relation ID']} doesn't exist");
+                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Relation ID {$row['Relation ID']} doesn't exist");
 
                 continue;
             }
 
             if (!$cache[Role::STUDENT][$row['Student ID']]) {
-                $this->log("Relation between {$row['Relation ID']} and {$row['Student ID']}", '', "Skipped: Student ID {$row['Student ID']} doesn't exist");
+                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Student ID {$row['Student ID']} doesn't exist");
 
                 continue;
             }
@@ -422,7 +422,7 @@ class Processor
 
             $this->relationMapper->save($relation);
 
-            $this->log("Created relation between {$row['Relation ID']} and {$row['Student ID']}", '', self::LOG_OK);
+            $this->log("Created relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', self::LOG_OK);
 
             /* These two humans have relations
              */
