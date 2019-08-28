@@ -16,6 +16,7 @@ use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
@@ -60,6 +61,14 @@ class Provisioner
      * @var UserMapper
      */
     protected $userMapper;
+
+    /**
+     * A user access mapper - this retrieves the permissions that an existing
+     * user has on groups.
+     *
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
 
     /**
      * A logger
@@ -112,7 +121,8 @@ class Provisioner
         ISync $externalUserSource,
         UserMapper $userMapper,
         CacheableLoggerInterface $logger,
-        Log\Mapper $logMapper
+        Log\Mapper $logMapper,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
@@ -121,6 +131,8 @@ class Provisioner
         $this->userMapper = $userMapper;
         $this->logger = $logger;
         $this->logMapper = $logMapper;
+        $userAccessMapper->setEventPropagator(new MockPropagator());
+        $this->userAccessMapper = $userAccessMapper;
     }
 
     /**
@@ -197,6 +209,7 @@ class Provisioner
                     /** @var User $internalUser */
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
+                        $internalUser->setAccessList($this->userAccessMapper->findAllForUser($internalUser));
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
