@@ -418,10 +418,9 @@ class AssessmentOnGroupCest
                     // The first capability's descriptors will have text, but no points.
                     // The second capability's descriptors will have points, but no text.
                     // The third capability's descriptors will have both text and points
-                    $descriptorText   = in_array($capIndex, [
-                        0,
-                        2
-                    ], true) ? "$capabilityName - $indicatorName - Level #$levelNameSuffix" : '';
+                    $descriptorText   = in_array($capIndex, [0, 2], true)
+                        ? "$capabilityName - $indicatorName - Level #$levelNameSuffix"
+                        : '';
                     $descriptorPoints = in_array($capIndex, [1, 2], true) ? $levelIndex : null;
 
                     $assessmentPayload->setRubricDescription(null, $indicatorId, $levelIndex, $descriptorText, $descriptorPoints);
