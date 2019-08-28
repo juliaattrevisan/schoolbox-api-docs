@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -110,6 +111,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($studentSubmission->getUpdatedAt())
                 ->setSubmittedAt($studentSubmission->getSubmittedAt());
 
+            if ($studentSubmission->getFiles() !== null) {
+                $response->setAllFiles(new GenericCollection(SingleFile\Model::class));
+            }
+
             foreach ($studentSubmission->getFiles() as $file) {
                 // Translate the file subobject
                 $responseFile = clone $file;
@@ -164,6 +169,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setOwner($domainObject->getSubmittedOnBehalfOf())
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setSubmittedAt($domainObject->getSubmittedAt());
+
+            if ($domainObject->getAllFiles() !== null) {
+                $dataModel->setFiles(new GenericCollection(SingleFile\Model::class));
+            }
 
             // Files
             foreach ($domainObject->getAllFiles() as $file) {
