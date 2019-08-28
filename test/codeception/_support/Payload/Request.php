@@ -11,15 +11,16 @@ namespace Payload;
  * Common implementation for all requests.
  *
  * A request encapsulates:
- * - The HTTP method used to sent the request
- * - A route that the request is sent to
- * - The HTTP referrer header
+ * - The HTTP method used to send the request
+ * - The URL the request is sent to
+ * - The HTTP referer header
  * - The request payload/form details
  *
- * Constructor params should align to the logical items that the system needs to generate the form.
+ * Constructor params should align to the logical items that the system requires to generate the form.
  */
 abstract class Request
 {
+    // TODO this is already logically declared in codeception.dist.yml, should re-used that value
     private const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
 
     private $headers = [
@@ -33,7 +34,7 @@ abstract class Request
 
     /**
      * Note that if you send a request as 'GET', then form params and query params are both 'GET' params.
-     * If you send the request as 'POST', they
+     * If you send the request as 'POST', they are considered distinct.
      * @var array
      */
     private $formParams = [];
@@ -73,7 +74,7 @@ abstract class Request
     abstract public function getMethod(): string;
 
     /**
-     * Returns the Schoolbox URL (without query params) to send this request to
+     * Returns the Schoolbox URL (including query params) to send this request to
      *
      * @return string
      */
@@ -120,7 +121,7 @@ abstract class Request
     }
 
     /**
-     * Unsets a post param if it exists
+     * Unsets a form param if it exists
      *
      * @param string $name
      */

@@ -33,7 +33,7 @@ class SchoolboxCli extends \Codeception\Module
     public $cliKernel;
 
     /**
-     * HOOK: used after configuration is loaded
+     * HOOK: executed after configuration is loaded
      *
      * Initializes the cli kernel so that we can use the dependency injector.
      */
@@ -45,7 +45,7 @@ class SchoolboxCli extends \Codeception\Module
             {
             }
         };
-        // TODO Expose kernel options as Helper config
+        // TODO Expose kernel options as Helper config in codeception.dist.yml
         $this->cliKernel = new \Schoolbox\Application\CliTool\Kernel(
             $app,
             [\Schoolbox\Application\CliTool\Kernel::OPTION_ERRORS => E_ALL]
