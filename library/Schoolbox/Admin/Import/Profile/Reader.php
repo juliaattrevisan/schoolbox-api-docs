@@ -160,6 +160,8 @@ class Reader implements \Iterator
         if (null !== $expectedColumns) {
             $this->expectedColumns = $expectedColumns;
 
+            /* Store it and use it as a template
+             */
             $this->template = array_fill_keys(array_map('strtolower', $expectedColumns), '');
 
             /* Find the column arrangement from the csv
@@ -239,13 +241,18 @@ class Reader implements \Iterator
     {
         $combined = array_combine($this->columnList, $this->currentRow);
 
+        /* We only care about the intersect between expectedColumns and csv columns
+         */
+        $intersect = array_intersect_key($combined, $this->template);
+
         /* array_merge(1, 2) so that the data from the csv is in the order denoted by the expected columns
          */
-        $merged = array_merge($this->template, $combined);
+        $merged = array_merge($this->template, $intersect);
 
-        /* array_combine again to use the expected columns' case, not the strtolowered version
+        /* Essentially array_combine again to use the expected columns' case, not the strtolowered version
          * the csv format, though wild, will transparently (and magically) look like it was in the right
-         * format the whole time
+         * format the whole time. We have to iterate manually in case expectedColumns isn't the same
+         * as what's in the csv (e.g. expectedColumns is a subset)
          */
         $this->currentRow = array_combine($this->expectedColumns, array_values($merged));
 

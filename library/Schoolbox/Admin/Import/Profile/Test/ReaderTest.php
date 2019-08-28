@@ -246,4 +246,69 @@ class ReaderTest extends TestCase
 
         $this->assertEquals($expected, $outcome);
     }
+
+
+    /**
+     * What happens when your expectedColumns is a subset of csv columns
+     * ie. users provided more data than we expected
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidColumnNames1()
+    {
+        $expectedColumns = ['External ID'];
+
+        $reader = new Reader(__DIR__ . '/provider.csv', false, $expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            ['External ID' => 'external id'], // header row
+            ['External ID' => '1'],
+            ['External ID' => '2'],
+            ['External ID' => '3'],
+            ['External ID' => '4'],
+            ['External ID' => '5'],
+            ['External ID' => '6'],
+            ['External ID' => '7'],
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+    /**
+     * What happens when you give it a whole bunch of columns that aren't
+     * in the source csv itself
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidColumnNames2()
+    {
+        $expectedColumns = ['catness evergreen'];
+
+        $reader = new Reader(__DIR__ . '/provider.csv', false, $expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            ['catness evergreen' => null], // header row
+            ['catness evergreen' => null],
+            ['catness evergreen' => null],
+            ['catness evergreen' => null],
+            ['catness evergreen' => null],
+            ['catness evergreen' => null],
+            ['catness evergreen' => null],
+            ['catness evergreen' => null],
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
 }
