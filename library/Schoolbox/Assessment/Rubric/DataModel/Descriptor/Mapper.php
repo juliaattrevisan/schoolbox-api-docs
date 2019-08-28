@@ -159,9 +159,7 @@ class Mapper extends Schoolbox\Mapper {
 
             // First time we've encountered this Level ?
             if (!$levels->getOffset($levelId)) {
-                $level = $levelMapper->hydrate($r, 'l');
-                $level->setDescriptors($this->createCollection());
-                $levels->setOffset($levelId, $level);
+                $levels->setOffset($levelId, $levelMapper->hydrate($r, 'l')->setDescriptors($this->createCollection()));
             }
             $level = $levels->getOffset($levelId);
 
