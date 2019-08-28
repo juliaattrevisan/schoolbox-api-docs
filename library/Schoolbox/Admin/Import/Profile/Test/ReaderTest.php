@@ -50,6 +50,7 @@ class ReaderTest extends TestCase
         $this->assertEquals($expected, $outcome);
     }
 
+
     /**
      * hasHeaderRow is false
      *
@@ -81,6 +82,90 @@ class ReaderTest extends TestCase
         $this->assertEquals($expected, $outcome);
     }
 
+
+    /**
+     * hasHeaderRow is false
+     * expected columns are declared
+     *
+     * ExpectedColumns mandates that the first row is used as a header against which
+     * to match values, even if hasHeaderRow is false.
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidHeaderRowExpectedColumns()
+    {
+        $expectedColumns = ['FirstName', 'LastName', 'Phone', 'Address', 'External ID'];
+
+        $reader = (new Reader(__DIR__ . '/provider.csv', false))
+            ->setExpectedColumns($expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            [
+                'FirstName' => 'firstname',
+                'LastName' => 'lastname',
+                'Phone' => 'phone',
+                'Address' => 'address',
+                'External ID' => 'external id'
+            ],
+            [
+                'FirstName' => 'alpha',
+                'LastName' => 'bravo',
+                'Phone' => 'delta',
+                'Address' => 'charlie',
+                'External ID' => '1'
+            ],
+            [
+                'FirstName' => 'red\'s',
+                'LastName' => 'green',
+                'Phone' => 'green',
+                'Address' => 'blue',
+                'External ID' => '2'
+            ],
+            [
+                'FirstName' => '',
+                'LastName' => 'missing',
+                'Phone' => '',
+                'Address' => '',
+                'External ID' => '3'
+            ],
+            [
+                'FirstName' => '',
+                'LastName' => '',
+                'Phone' => '',
+                'Address' => '',
+                'External ID' => '4'
+            ],
+            [
+                'FirstName' => 'whoa',
+                'LastName' => 'what',
+                'Phone' => 'here',
+                'Address' => 'happened',
+                'External ID' => '5'
+            ],
+            [
+                'FirstName' => 'heh',
+                'LastName' => 'niceuuu',
+                'Phone' => '',
+                'Address' => '',
+                'External ID' => '6'
+            ],
+            [
+                'FirstName' => 'hello',
+                'LastName' => '',
+                'Phone' => '',
+                'Address' => '',
+                'External ID' => '7'
+            ],
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
 
     /**
      * This is an example of when filldown is true
