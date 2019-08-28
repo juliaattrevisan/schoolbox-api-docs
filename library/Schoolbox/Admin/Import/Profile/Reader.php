@@ -77,6 +77,15 @@ class Reader implements \Iterator
      */
     private $filename;
 
+
+    /**
+     * This file has a header row
+     *
+     * @var bool
+     */
+    private $hasHeaderRow = false;
+
+
     /**
      * Optionally recycle previous non-null/non-empty column values
      *
@@ -125,12 +134,13 @@ class Reader implements \Iterator
      * Check that the filename/resource is valid
      * Die loudly if it's not
      *
-     * @param resource|string $filename        a path to file or a fopen'd file resource
-     * @param bool            $filldown        optionally recycle previous non-null/non-empty column values
+     * @param resource|string $filename a path to file or a fopen'd file resource
+     * @param bool            $hasHeaderRow
+     * @param bool            $filldown optionally recycle previous non-null/non-empty column values
      *
      * @throws \RuntimeException
      */
-    public function __construct($filename, bool $filldown = false)
+    public function __construct($filename, bool $hasHeaderRow, bool $filldown = false)
     {
         if (\is_resource($filename)) {
 
@@ -150,6 +160,11 @@ class Reader implements \Iterator
              */
             throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
         }
+
+        /* Remember whether the csv file had a header row or not
+         * (it affects rewind; rewind does not include headers when it's done)
+         */
+        $this->hasHeaderRow = $hasHeaderRow;
 
         /* Optionally recycle previous non-null/non-empty column values
          */
@@ -396,8 +411,11 @@ class Reader implements \Iterator
         $this->next();
 
         /* Get to the first row of actual data
+         * But only skip the header row if specified
          */
-        $this->next();
+        if ($this->hasHeaderRow) {
+            $this->next();
+        }
     }
 
 

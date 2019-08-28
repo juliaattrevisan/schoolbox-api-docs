@@ -195,7 +195,7 @@ class Processor
         $relationFiles = [];
 
         foreach($files as $file) {
-            $reader = new Reader($file->readStream());
+            $reader = new Reader($file->readStream(), true);
 
             /* Load the first row
              */
@@ -256,7 +256,7 @@ class Processor
      */
     private function processOne($contents): int
     {
-        $reader = new Reader($contents);
+        $reader = new Reader($contents, true);
 
         /* Load the first row
          */

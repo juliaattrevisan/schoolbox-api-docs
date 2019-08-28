@@ -30,7 +30,7 @@ class ReaderTest extends TestCase
      */
     public function testValidPersistentUnspecifiedColumns()
     {
-        $reader = new Reader(__DIR__ . '/provider.csv', true);
+        $reader = new Reader(__DIR__ . '/provider.csv', true, true);
 
         $outcome = [];
 
@@ -60,7 +60,7 @@ class ReaderTest extends TestCase
      */
     public function testValidTransientUnspecifiedColumns()
     {
-        $reader = new Reader(__DIR__ . '/provider.csv');
+        $reader = new Reader(__DIR__ . '/provider.csv', true);
 
         $outcome = [];
 
@@ -95,7 +95,7 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['FirstName', 'LastName', 'Phone', 'Address', 'External ID'];
 
-        $reader = (new Reader(__DIR__ . '/provider.csv', true))
+        $reader = (new Reader(__DIR__ . '/provider.csv', true, true))
             ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
@@ -169,7 +169,7 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['FirstName', 'LastName', 'Phone', 'Address', 'External ID'];
 
-        $reader = (new Reader(__DIR__ . '/provider.csv', false))
+        $reader = (new Reader(__DIR__ . '/provider.csv', true, false))
             ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
@@ -244,7 +244,7 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['External ID'];
 
-        $reader = (new Reader(__DIR__ . '/provider.csv', false))
+        $reader = (new Reader(__DIR__ . '/provider.csv', true, false))
             ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
@@ -276,7 +276,7 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['catness evergreen'];
 
-        $reader = (new Reader(__DIR__ . '/provider.csv', false))
+        $reader = (new Reader(__DIR__ . '/provider.csv', true, false))
             ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
