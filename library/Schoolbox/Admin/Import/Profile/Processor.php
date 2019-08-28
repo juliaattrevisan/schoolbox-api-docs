@@ -184,15 +184,14 @@ class Processor
      */
     public function __construct(array $files, IConnector $database)
     {
-        $this->files = $this->presortFiles($files);
-
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
         $this->studentProfileMapper = new Profile\Student\Mapper();
         $this->staffProfileMapper = new Profile\Staff\Mapper();
         $this->relationMapper = new Profile\Relation\Mapper();
-
         $this->database = $database;
+
+        $this->files = $this->presortFiles($files);
     }
 
 
@@ -260,7 +259,6 @@ class Processor
 
                 $this->log("Processing {$file['file']->getBasename()} complete", '', "{$n} rows");
             } catch (\InvalidArgumentException $e) {
-
                 $this->log($e->getMessage(), '', self::LOG_ERROR);
             }
         }
