@@ -80,6 +80,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create personal calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/calendar/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
             [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
@@ -113,6 +114,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create group calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/calendar/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
             [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
@@ -149,6 +151,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create campus calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/calendar/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
             [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
@@ -187,6 +190,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($eventPayload, true, 'Send request to modify personal calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/calendar/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
             [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
