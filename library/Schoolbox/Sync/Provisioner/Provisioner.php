@@ -231,30 +231,33 @@ class Provisioner
                         $action = 'create';
                     }
 
-                    $originalUser = clone $internalUser;
 
-//                    /* Deliberately empty $accessList so that Role-based
-//                     * permissions don't get saved in addition to the Group
-//                     * permissions that we can set
-//                     */
-//                    $preserved = $this->userAccessMapper->createCollection();
-//
-//                    $originalUser = clone $internalUser;
-//
-//
-//                    /* Don't blow away any UserAccess::ACCESS_FULL settings
-//                     */
-//                    foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-//                        if ($current->getAccessLevel() == UserAccess::ACCESS_FULL) {
-//                            $preserved->add($current);
-//
-//                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
-//                        }
-//                    }
-//
-//                    $internalUser->setAccessList($preserved);
-//
-//                    $commonContext['action'] = $action;
+                    // Keep a copy of the original user, for comparison
+                    $originalUser  = clone $internalUser;
+                    $oldAccessList = $this->formatAccessLevels($originalUser);
+
+
+                    /* Deliberately empty $accessList so that Role-based
+                     * permissions don't get saved in addition to the Group
+                     * permissions that we can set
+                     */
+                    $preserved = $this->userAccessMapper->createCollection();
+
+
+                    /* Don't blow away any UserAccess::ACCESS_FULL settings
+                     */
+                    foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
+                        /** @var UserAccess $current */
+                        if ($current->getAccessLevel() === UserAccess::ACCESS_FULL) {
+                            $preserved->add($current);
+
+                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
+                        }
+                    }
+
+                    $internalUser->setAccessList($preserved);
+
+                    $commonContext['action'] = $action;
 
 
                     // Run this user through the hydrators
@@ -275,11 +278,13 @@ class Provisioner
 
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
-                    // get a diff of the access list aswell
-                    if ($newGroups = count($internalUser->getAccessList()->diffBy($originalUser->getAccessList(), 'serviceIdentifier'))) {
+
+                    // get a diff of the access list as well
+                    $newAccessList = $this->formatAccessLevels($internalUser);
+                    if ($newAccessList !== $oldAccessList) {
                         $diff['accessList'] = [
-                            'old' => $this->formatAccessLevels($originalUser),
-                            'new' => $this->formatAccessLevels($internalUser),
+                            'old' => $oldAccessList,
+                            'new' => $newAccessList,
                         ];
                     }
 
