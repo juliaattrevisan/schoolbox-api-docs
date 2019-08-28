@@ -225,7 +225,7 @@ class Provisioner
                      * permissions don't get saved in addition to the Group
                      * permissions that we can set
                      */
-                    $preserved = new Collection();
+                    $preserved = $this->userAccessMapper->createCollection();
 
                     $originalUser = clone $internalUser;
 
