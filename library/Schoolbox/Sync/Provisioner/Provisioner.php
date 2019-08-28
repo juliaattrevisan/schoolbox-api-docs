@@ -280,7 +280,7 @@ class Provisioner
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
                     // get a diff of the access list as well
-                    $newAccessList = $this->formatAccessLevels($internalUser);
+                    $newAccessList = $this->formatAccessLevels($internalUser, $originalUser);
                     if ($newAccessList !== $oldAccessList) {
                         $diff['accessList'] = [
                             'old' => $oldAccessList,
@@ -447,13 +447,34 @@ class Provisioner
     /**
      * Format access levels in a user-readable manner
      *
-     * @param User $user
+     * @param User      $user
+     * @param User|null $previous
      * @return array
      */
-    private function formatAccessLevels(User $user): array
+    private function formatAccessLevels(User $user, ?User $previous = null): array
     {
-        // Take existing group access levels
+        // Final access levels:
+        // Original - removed + added
         $result = [];
+        if ($previous) {
+            foreach ($previous->getAccessList() as $access) {
+                if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
+                    $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
+                }
+            }
+        }
+
+
+        // Remove any groups in the remove list
+        foreach ($user->getUserAccessRemove() as $accessRemove) {
+            $existingAccess = $result[$accessRemove] ?? UserAccess::ACCESS_DENY;
+            if ($existingAccess < UserAccess::ACCESS_FULL) {
+                unset($result[$accessRemove]);
+            }
+        }
+
+
+        // Then add any groups in the add list
         foreach ($user->getAccessList() as $access) {
             if ($access->getService() === UserAccess::SERVICE_HOMEPAGE
                 && $access->getAccessLevel() < UserAccess::ACCESS_FULL
@@ -462,21 +483,13 @@ class Provisioner
             }
         }
 
-        // Remove any groups in the remove list
-        foreach ($user->getUserAccessRemove() as $accessRemove) {
-            unset($result[$accessRemove]);
-        }
 
         // Format it in a readable format
         ksort($result);
         $formattedResult = [];
         foreach ($result as $groupId => $accessLevel) {
-            $accessLevelString = '';
+            $accessLevelString = null;
             switch ($accessLevel) {
-                case UserAccess::ACCESS_FULL:
-                    $accessLevelString = 'full';
-                    break;
-
                 case UserAccess::ACCESS_WRITE:
                     $accessLevelString = 'write';
                     break;
@@ -485,11 +498,15 @@ class Provisioner
                     $accessLevelString = 'read';
                     break;
 
+                case UserAccess::ACCESS_FULL:
                 case UserAccess::ACCESS_DENY:
                 default:
+                    // Don't render
                     break;
             }
-            $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
+            if (isset($accessLevelString)) {
+                $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
+            }
         }
         return $formattedResult;
     }
