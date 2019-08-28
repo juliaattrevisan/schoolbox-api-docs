@@ -665,13 +665,13 @@ class Processor
              * (probably from human error but who knows)
              */
             if (!$cache[$row['Role Type']][$row['Relation ID']]) {
-                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Relation ID {$row['Relation ID']} doesn't exist");
+                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: {$row['Role Type']} {$row['Relation ID']} doesn't exist");
 
                 continue;
             }
 
             if (!$cache[Role::STUDENT][$row['Student ID']]) {
-                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Student ID {$row['Student ID']} doesn't exist");
+                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', 'Skipped: ' . Role::STUDENT . " {$row['Student ID']} doesn't exist");
 
                 continue;
             }
