@@ -19,6 +19,69 @@ use Schoolbox\Admin\Import\Profile\Reader;
 
 class ReaderTest extends TestCase
 {
+
+    /**
+     * hasHeaderRow is true
+     *
+     * rewind() skips past the header row to the first row of actual data
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidHasHeaderRow()
+    {
+        $reader = new Reader(__DIR__ . '/provider.csv', true);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            ['1', 'alpha', 'bravo', 'charlie', 'delta'],
+            ['2', 'red\'s', 'green', 'blue', 'green'],
+            ['3', '', 'missing', '', ''],
+            ['4', '', '', '', ''],
+            ['5', 'whoa', 'what', 'happened', 'here'],
+            ['6', 'heh', 'niceuuu', '', ''],
+            ['7', 'hello', '', '', '']
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+    /**
+     * hasHeaderRow is false
+     *
+     * All rows in the csv is considered data
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidNoHeaderRow()
+    {
+        $reader = new Reader(__DIR__ . '/provider.csv', false);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            ['external id', 'firstname', 'lastname', 'address', 'phone'],
+            ['1', 'alpha', 'bravo', 'charlie', 'delta'],
+            ['2', 'red\'s', 'green', 'blue', 'green'],
+            ['3', '', 'missing', '', ''],
+            ['4', '', '', '', ''],
+            ['5', 'whoa', 'what', 'happened', 'here'],
+            ['6', 'heh', 'niceuuu', '', ''],
+            ['7', 'hello', '', '', '']
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+
     /**
      * This is an example of when filldown is true
      * Column matching doesn't matter
