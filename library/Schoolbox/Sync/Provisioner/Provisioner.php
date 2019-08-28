@@ -212,7 +212,14 @@ class Provisioner
                         // Don't need to know about external DB access.
                         // UPS can't change or do anything with class membership
                         // as that comes from the SIS anyway.
-                        $internalUser->setAccessList($this->userAccessMapper->findAllForUser($internalUser, false));
+                        // Don't want to know about any permissions other than
+                        // group permissions, either: only group permissions can
+                        // be changed by UPS.
+                        $internalUser->setAccessList(
+                            $this->userAccessMapper
+                                ->findAllForUser($internalUser, false)
+                                ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+                        );
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
@@ -224,28 +231,30 @@ class Provisioner
                         $action = 'create';
                     }
 
-                    /* Deliberately empty $accessList so that Role-based
-                     * permissions don't get saved in addition to the Group
-                     * permissions that we can set
-                     */
-                    $preserved = $this->userAccessMapper->createCollection();
-
                     $originalUser = clone $internalUser;
 
-
-                    /* Don't blow away any UserAccess::ACCESS_FULL settings
-                     */
-                    foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-                        if ($current->getAccessLevel() == UserAccess::ACCESS_FULL) {
-                            $preserved->add($current);
-
-                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
-                        }
-                    }
-
-                    $internalUser->setAccessList($preserved);
-
-                    $commonContext['action'] = $action;
+//                    /* Deliberately empty $accessList so that Role-based
+//                     * permissions don't get saved in addition to the Group
+//                     * permissions that we can set
+//                     */
+//                    $preserved = $this->userAccessMapper->createCollection();
+//
+//                    $originalUser = clone $internalUser;
+//
+//
+//                    /* Don't blow away any UserAccess::ACCESS_FULL settings
+//                     */
+//                    foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
+//                        if ($current->getAccessLevel() == UserAccess::ACCESS_FULL) {
+//                            $preserved->add($current);
+//
+//                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
+//                        }
+//                    }
+//
+//                    $internalUser->setAccessList($preserved);
+//
+//                    $commonContext['action'] = $action;
 
 
                     // Run this user through the hydrators
