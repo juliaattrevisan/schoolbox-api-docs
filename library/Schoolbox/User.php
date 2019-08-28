@@ -245,8 +245,8 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
     public function __construct()
     {
-        // TODO. Remove global dependency
-        $this->config_loader = new ConfigLoader();
+        $this->role = new Role();
+        $this->config_loader = new ConfigLoader();  // TODO. Remove global dependency
     }
 
 
@@ -1136,6 +1136,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         if ($this->parentsLoaded) {
             return $this;
         }
+        $this->parents = new GenericCollection(self::class);
         if (null === $this->externalId) {
             return $this;
         }
