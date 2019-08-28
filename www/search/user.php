@@ -3,6 +3,7 @@
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Mail\AbstractMailer;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
@@ -182,7 +183,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
                 $classCode = (($subject['campusCode'] ?? '') !== '') ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
                 $code = new FolderCode();
                 $code->setCode($classCode);
-                $subject['folder'] = (new Folder())->setCodes(new Collection());
+                $subject['folder'] = (new Folder())->setCodes(new GenericCollection(FolderCode::class));
                 $subject['folder']->setName($subject['name'])->addCode($code);
             } else {
                 continue;
