@@ -22,6 +22,18 @@ class Processor
 {
 
     /**
+     * Status string for successful row processing
+     */
+    private const LOG_OK = 'OK';
+
+
+    /**
+     * Status string for some kind of error during processing
+     */
+    private const LOG_ERROR = 'Error';
+
+
+    /**
      * Columns in a Parent CSV
      */
     private const IMPORT_COLUMNS_PARENT = [
@@ -232,10 +244,14 @@ class Processor
     {
         foreach ($this->files as $file) {
             try {
-                $this->log[] = "Starting processing from {$file->getBasename()}";
+                $this->log("Starting processing {$file->getBasename()}", '', self::LOG_OK);
+
                 $n = $this->processOne($file->readStream());
-                $this->log[] = "Processed {$n} rows from {$file->getBasename()}";
+
+                $this->log("Processing {$file->getBasename()} complete", '', "{$n} rows");
             } catch (\InvalidArgumentException $e) {
+
+                $this->log($e->getMessage(), '', self::LOG_ERROR);
                 $this->log[] = $e->getMessage();
             }
         }
@@ -366,12 +382,14 @@ class Processor
              * (probably from human error but who knows)
              */
             if (!$cache[$data['Relation ID']]) {
-                $this->log[] = "Skipped relation between {$row['Relation ID']} and {$row['Student ID']}; {$row['Relation ID']} doesn't exist";
+                $this->log("Relation between {$row['Relation ID']} and {$row['Student ID']}", '', "Skipped: Relation ID {$row['Relation ID']} doesn't exist");
+
                 continue;
             }
 
             if (!$cache[$data['Student ID']]) {
-                $this->log[] = "Skipped relation between {$row['Relation ID']} and {$row['Student ID']}; {$row['Student ID']} doesn't exist";
+                $this->log("Relation between {$row['Relation ID']} and {$row['Student ID']}", '', "Skipped: Student ID {$row['Student ID']} doesn't exist");
+
                 continue;
             }
 
@@ -385,7 +403,7 @@ class Processor
 
             $this->relationMapper->save($relation);
 
-            $this->log[] = "Created relation between {$row['Relation ID']} and {$row['Student ID']}";
+            $this->log("Created relation between {$row['Relation ID']} and {$row['Student ID']}", '', self::LOG_OK);
 
             /* These two humans have relations
              */
@@ -526,7 +544,7 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->studentProfileMapper->save($studentProfile);
 
-            $this->log[] = "Created student profile for {$row['Firstname']} {$row['Surname']}";
+            $this->log('Created student profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
 
             $newIds[] = $baseProfile->getId();
         }
@@ -591,7 +609,7 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->staffProfileMapper->save($staffProfile);
 
-            $this->log[] = "Created staff profile for {$row['Firstname']} {$row['Surname']}";
+            $this->log('Created staff profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
 
             $newIds[] = $baseProfile->getId();
         }
@@ -652,7 +670,7 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->parentProfileMapper->save($parentProfile);
 
-            $this->log[] = "Created parent profile for {$row['Firstname']} {$row['Surname']}";
+            $this->log('Created parent profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
 
             $newIds[] = $baseProfile->getId();
         }
@@ -673,6 +691,24 @@ class Processor
     private function matches(array $row, array $expected): bool
     {
         return !\count(array_diff($row, $expected));
+    }
+
+
+    /**
+     * Log four pieces of data
+     *
+     * @param string $message
+     * @param string $person
+     * @param string $status
+     */
+    private function log(string $message, string $person, string $status)
+    {
+        $this->log[] = [
+            'timestamp' => \Alaress_Date_Format::now()->getTimeOnly(),
+            'message' => $message,
+            'person' => $person,
+            'status' => $status
+        ];
     }
 
 

@@ -12,11 +12,24 @@
     <div class="small-12 island">
         <h2 class="subheader">Import Results</h2>
         <section>
-            <ul class="information-list">
+            <table>
+                <thead>
+                    <th>Time</th>
+                    <th>Heading</th>
+                    <th>Person</th>
+                    <th>Import Result</th>
+                </thead>
+                <tbody>
                 {% for log in log %}
-                <li class="content">{{ log }}</li>
+                    <tr>
+                        <td>{{ log.timestamp }}</td>
+                        <td>{{ log.message }}</td>
+                        <td>{{ log.person }}</td>
+                        <td>{{ log.status }}</td>
+                    </tr>
                 {% endfor %}
-            </ul>
+                </tbody>
+            </table>
         </section>
     </div>
 </div>
