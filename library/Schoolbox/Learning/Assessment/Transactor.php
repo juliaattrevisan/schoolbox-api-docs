@@ -196,10 +196,9 @@ class Transactor
         }
 
         // TODO figure out what to do about this
-        $context   = $this->getAssessmentMapperProxy()->findById($this->getContextId());
         $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
-        return "/homepage/{$context->getId()}";
+        return "/homepage/{$this->assessment->getContext()->getId()}";
     }
 
      /* Getters/Setters
