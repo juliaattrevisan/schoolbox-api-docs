@@ -1,17 +1,22 @@
 <?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
 
+namespace Payload\Course\Import;
 
-namespace Payload;
+use Payload\Request;
 
-
-class CourseImport extends Base
+class CourseImport extends Request
 {
     private $course_spec_id;
     private $class_page_id;
     private $unit_count;
+
     public function __construct()
     {
-        Base::__construct();
         $this->course_spec_id = '??';
         $this->class_page_id = '??';
         $this->unit_count=0;

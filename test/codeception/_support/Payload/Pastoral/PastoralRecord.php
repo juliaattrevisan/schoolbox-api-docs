@@ -1,9 +1,13 @@
 <?php
-
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
 
 namespace Payload;
 
-class PastoralRecord extends Base
+class PastoralRecord extends Request
 {
 
     const BLOCKED = '0';
@@ -25,7 +29,6 @@ class PastoralRecord extends Base
 
     public function __construct()
     {
-        Base::__construct();
         $this->action='insert';
         $this->setPage('/pastoral/record/'.$this->action);
         $this->setReferer('/pastoral/student/??/record/'.$this->action);

@@ -1,17 +1,19 @@
 <?php
-
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
 
 namespace Payload;
 
-
 use Schoolbox\Comms\News\Querystring;
 
-class CreateNews extends Base
+class CreateNews extends Request
 {
 
     public function __construct()
     {
-        Base::__construct();
         $this->setPage('/news/create');
         $this->setReferer('/news/create');
         $this->setFormParam('returnUrl', Querystring::encode('/'));
