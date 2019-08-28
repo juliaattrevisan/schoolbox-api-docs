@@ -28,6 +28,7 @@ use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -232,7 +233,7 @@ class Controller extends Base
                 (Access::getInstance()->getFolderAccess($this->getUser(),$folderId) >= UserAccess::ACCESS_WRITE ||
                     $folderStrategy->canAudienceToAnyClassOrGroup($this->getUser()))
             ) {
-                $codec = new Audience\Segment\Codec($this->audienceMapper);
+                $codec = new Audience\Segment\Codec();
                 $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
 
                 $audienceSegment = new Audience\SegmentSelectizeOption(
@@ -303,8 +304,9 @@ class Controller extends Base
         /* Set YOU as the initial author
          * Otherwise, when a moderator edits your article, they might assume direct authorship instead
          */
-        $article = $this->newsMapper->createModel()->setAuthor($this->getUser());
-
+        $article = $this->newsMapper->createModel()
+                                    ->setAuthor($this->getUser())
+                                    ->setAudience(new GenericCollection(Audience\Model::class));
         $this->postUpdate($article);
     }
 
@@ -1207,7 +1209,7 @@ class Controller extends Base
     {
         $audienceSegments = [];
 
-        $codec = new Audience\Segment\Codec($this->audienceMapper);
+        $codec = new Audience\Segment\Codec();
 
         $translator = new Audience\Segment\Translator(
             $this->databaseInternal,
@@ -1443,7 +1445,7 @@ class Controller extends Base
      */
     private function updateArticleAudience(Model $article, string $selectizeAudienceSegments): void
     {
-        $codec = new Audience\Segment\Codec($this->audienceMapper);
+        $codec = new Audience\Segment\Codec();
         $article->setAudience($codec->decodeSelectizeValues($selectizeAudienceSegments));
         foreach ($article->getAudience() as $segment) {
             $segment->setCommsNewsArticle($article);
