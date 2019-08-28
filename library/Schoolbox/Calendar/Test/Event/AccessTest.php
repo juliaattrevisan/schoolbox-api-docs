@@ -64,7 +64,7 @@ class AccessTest extends TestCase
 
                 $mockUser = $this->getMockBuilder(User::class)->setMethods($overload)->getMock();
                 $mockUser->setId($id);
-                $mockUser->setAccessList(new Collection());
+                $mockUser->setAccessList(new GenericCollection(UserAccess::class));
 
                 return $mockUser;
             };
