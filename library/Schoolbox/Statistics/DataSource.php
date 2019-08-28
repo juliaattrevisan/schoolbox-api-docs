@@ -363,8 +363,8 @@ class DataSource
         $query = "
             SELECT          {$this->userMapper->getColumnString('u')},
                             {$this->userMapper->getJoinColumnString('role', 'ur')}
-            FROM            `{$this->userAccessMapper->getTable()}` AS ua
-            LEFT JOIN       {$this->userAccessMapper->getJoinSql('user', 'ua', 'u')}
+            FROM            {$this->userMapper->getTable()} AS u
+            LEFT JOIN       {$this->userMapper->getJoinSql('userAccess', 'u', 'ua')}
             LEFT JOIN       {$this->userMapper->getJoinSql('role', 'u', 'ur')}
             RIGHT JOIN      userGroups ug ON ug.cid = ua.sid
             LEFT JOIN       groups g ON u.group_id = g.id
@@ -422,8 +422,8 @@ class DataSource
 
         $query = "
             SELECT          COUNT(uid)
-            FROM            `{$this->userAccessMapper->getTable()}` AS ua
-            LEFT JOIN       {$this->userAccessMapper->getJoinSql('user', 'ua', 'u')}
+            FROM            {$this->userMapper->getTable()} AS u
+            LEFT JOIN       {$this->userMapper->getJoinSql('userAccess', 'u', 'ua')}
             LEFT JOIN       {$this->userAccessMapper->getJoinSql('user.role', 'u', 'ur')}
             RIGHT JOIN      userGroups ug ON ug.cid = ua.sid
             LEFT JOIN       groups g ON u.group_id = g.id
