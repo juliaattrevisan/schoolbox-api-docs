@@ -380,6 +380,8 @@ class Reader implements \Iterator
          */
         if (!\is_resource($this->fp)) {
             $this->fp = fopen($this->filename, 'r');
+        } else {
+            rewind($this->fp);
         }
 
         /* Read that first row

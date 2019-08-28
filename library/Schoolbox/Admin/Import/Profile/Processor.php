@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
-use Alaress\Csv\Reader;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Profile;
 
@@ -197,7 +196,6 @@ class Processor
 
         foreach($files as $file) {
             $reader = new Reader($file->readStream());
-            $reader->setLoadFromFirst(false);
 
             /* Load the first row
              */
@@ -259,7 +257,6 @@ class Processor
     private function processOne($contents): int
     {
         $reader = new Reader($contents);
-        $reader->setLoadFromFirst(false);
 
         /* Load the first row
          */
@@ -273,21 +270,29 @@ class Processor
 
             /* Process the Relations csv
              */
+            $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
+
             return $this->processRelation($reader);
         } elseif ($this->isStudentProfile($header)) {
 
             /* Process the Student Profile csv
              */
+            $reader->setExpectedColumns(self::IMPORT_COLUMNS_STUDENT);
+
             return $this->processStudentProfile($reader);
         } elseif ($this->isStaffProfile($header)) {
 
             /* Process the Staff Profile csv
              */
+            $reader->setExpectedColumns(self::IMPORT_COLUMNS_STAFF);
+
             return $this->processStaffProfile($reader);
         } elseif ($this->isParentProfile($header)) {
 
             /* Process the Parent Profile csv
              */
+            $reader->setExpectedColumns(self::IMPORT_COLUMNS_PARENT);
+
             return $this->processParentProfile($reader);
         }
 
@@ -352,8 +357,14 @@ class Processor
         /* Process each relation
          */
         $n = 0;
+        $i = 0;
 
-        foreach ($reader as $i => $row) {
+        foreach ($reader as $row) {
+            if (!$i) {
+                $i++;
+                continue;
+            }
+
             $data = array_combine(self::IMPORT_COLUMNS_RELATION, $row);
 
             /* Check that both relations exist. They might not exist because the
@@ -361,26 +372,26 @@ class Processor
              * (probably from human error but who knows)
              */
             if (!$cache[$data['Relation ID']]) {
-                $this->log[] = "Skipped relation between {$data['Relation ID']} and {$data['Student ID']}; {$data['Relation ID']} doesn't exist";
+                $this->log[] = "Skipped relation between {$row['Relation ID']} and {$row['Student ID']}; {$row['Relation ID']} doesn't exist";
                 continue;
             }
 
             if (!$cache[$data['Student ID']]) {
-                $this->log[] = "Skipped relation between {$data['Relation ID']} and {$data['Student ID']}; {$data['Student ID']} doesn't exist";
+                $this->log[] = "Skipped relation between {$row['Relation ID']} and {$row['Student ID']}; {$row['Student ID']} doesn't exist";
                 continue;
             }
 
             /* Otherwise both exist; build relation
              */
             $relation = $this->relationMapper->createModel()
-                ->setChildProfileId($cache[$data['Relation ID']])
-                ->setUserProfileId($cache[$data['Student ID']])
-                ->setType($data['Type'])
-                ->setEmergencyContact((bool)$data['Emergency Contact']);
+                ->setChildProfileId($cache[$row['Relation ID']])
+                ->setUserProfileId($cache[$row['Student ID']])
+                ->setType($row['Type'])
+                ->setEmergencyContact((bool)$row['Emergency Contact']);
 
             $this->relationMapper->save($relation);
 
-            $this->log[] = "Created relation between {$data['Relation ID']} and {$data['Student ID']}";
+            $this->log[] = "Created relation between {$row['Relation ID']} and {$row['Student ID']}";
 
             /* These two humans have relations
              */
@@ -479,51 +490,56 @@ class Processor
          */
         $newIds = [];
 
-        foreach ($reader as $i => $row) {
-            $data = array_combine(self::IMPORT_COLUMNS_STUDENT, $row);
+        $i = 0;
+
+        foreach ($reader as $row) {
+            if (!$i) {
+                $i++;
+                continue;
+            }
 
             $baseProfile = $this->baseProfileMapper->createModel()
-                ->setExternalId($data['External ID'])
-                ->setTitle($data['Title'])
-                ->setFirstname($data['Firstname'])
-                ->setLastname($data['Surname']);
+                ->setExternalId($row['External ID'])
+                ->setTitle($row['Title'])
+                ->setFirstname($row['Firstname'])
+                ->setLastname($row['Surname']);
 
             $studentProfile = $this->studentProfileMapper->createModel()
                 ->setDateOfBirth(\Alaress_Date_Format::now())
-                ->setUsername($data['Username'])
-                ->setEmail($data['Email'])
-                ->setGender($data['Gender'])
-                ->setHeadOfHouseId($data['Head of House ID'])
-                ->setHeadOfHouseName($data['Head of House Name'])
-                ->setHouseName($data['House'])
-                ->setFormName($data['Form'])
-                ->setFormTeacherId($data['Form Teacher ID'])
-                ->setFormTeacherName($data['Form Teacher Name'])
-                ->setTutorGroup($data['Tutor Group'])
-                ->setTutorTeacherId($data['Tutor Teacher ID'])
-                ->setTutorTeacherName($data['Tutor Teacher Name'])
-                ->setYearLevel($data['Year Level'])
-                ->setYearLevelCoordinatorId($data['Year Level Coordinator ID'])
-                ->setYearLevelCoordinatorName($data['Year Level Coordinator Name'])
-                ->setMobile($data['Mobile'])
-                ->setStudiesCode($data['Studies Code'])
-                ->setAlertMedical($data['Medical Alert'])
-                ->setAlertComment($data['Comment'])
-                ->setAlertMessage($data['Contact Alert'])
-                ->setAlertLegal($data['Legal Alert'])
-                ->setEnrolmentDate($data['Enrolment Date'] ? \Alaress_Date_Format::newFromTimestamp(strtotime($data['Enrolment Date'])) : null)
-                ->setLeavingDate($data['Leaving Date'] ? \Alaress_Date_Format::newFromTimestamp(strtotime($data['Leaving Date'])) : null)
-                ->setIb((bool)$data['IB'])
-                ->setIndividualLearningPlans((bool)$data['ILP'])
-                ->setEsl((bool)$data['ESL'])
-                ->setSpecialNeeds((bool)$data['Special Needs'])
-                ->setBoardingStatus((bool)$data['Boarding Status'])
+                ->setUsername($row['Username'])
+                ->setEmail($row['Email'])
+                ->setGender($row['Gender'])
+                ->setHeadOfHouseId($row['Head of House ID'])
+                ->setHeadOfHouseName($row['Head of House Name'])
+                ->setHouseName($row['House'])
+                ->setFormName($row['Form'])
+                ->setFormTeacherId($row['Form Teacher ID'])
+                ->setFormTeacherName($row['Form Teacher Name'])
+                ->setTutorGroup($row['Tutor Group'])
+                ->setTutorTeacherId($row['Tutor Teacher ID'])
+                ->setTutorTeacherName($row['Tutor Teacher Name'])
+                ->setYearLevel($row['Year Level'])
+                ->setYearLevelCoordinatorId($row['Year Level Coordinator ID'])
+                ->setYearLevelCoordinatorName($row['Year Level Coordinator Name'])
+                ->setMobile($row['Mobile'])
+                ->setStudiesCode($row['Studies Code'])
+                ->setAlertMedical($row['Medical Alert'])
+                ->setAlertComment($row['Comment'])
+                ->setAlertMessage($row['Contact Alert'])
+                ->setAlertLegal($row['Legal Alert'])
+                ->setEnrolmentDate($row['Enrolment Date'] ? \Alaress_Date_Format::newFromTimestamp(strtotime($row['Enrolment Date'])) : null)
+                ->setLeavingDate($row['Leaving Date'] ? \Alaress_Date_Format::newFromTimestamp(strtotime($row['Leaving Date'])) : null)
+                ->setIb((bool)$row['IB'])
+                ->setIndividualLearningPlans((bool)$row['ILP'])
+                ->setEsl((bool)$row['ESL'])
+                ->setSpecialNeeds((bool)$row['Special Needs'])
+                ->setBoardingStatus((bool)$row['Boarding Status'])
                 ->setBaseProfile($baseProfile);
 
             $this->baseProfileMapper->save($baseProfile);
             $this->studentProfileMapper->save($studentProfile);
 
-            $this->log[] = "Created student profile for {$data['Firstname']} {$data['Surname']}";
+            $this->log[] = "Created student profile for {$row['Firstname']} {$row['Surname']}";
 
             $newIds[] = $baseProfile->getId();
         }
@@ -566,31 +582,36 @@ class Processor
          */
         $newIds = [];
 
-        foreach ($reader as $i => $row) {
-            $data = array_combine(self::IMPORT_COLUMNS_STAFF, $row);
+        $i = 0;
+
+        foreach ($reader as $row) {
+            if (!$i) {
+                $i++;
+                continue;
+            }
 
             $baseProfile = $this->baseProfileMapper->createModel()
-                ->setExternalId($data['External ID'])
-                ->setTitle($data['Title'])
-                ->setFirstname($data['Firstname'])
-                ->setLastname($data['Surname']);
+                ->setExternalId($row['External ID'])
+                ->setTitle($row['Title'])
+                ->setFirstname($row['Firstname'])
+                ->setLastname($row['Surname']);
 
             $staffProfile = $this->staffProfileMapper->createModel()
-                ->setUsername($data['Username'])
-                ->setEmail($data['Email'])
-                ->setCategory($data['Staff Category'])
-                ->setPositionTitle($data['Position Title'])
-                ->setDepartment($data['Department'])
-                ->setPhone($data['Work Phone'])
-                ->setRoom($data['Room'])
-                ->setBuilding($data['Building'])
-                ->setCampusName($data['Campus'])
+                ->setUsername($row['Username'])
+                ->setEmail($row['Email'])
+                ->setCategory($row['Staff Category'])
+                ->setPositionTitle($row['Position Title'])
+                ->setDepartment($row['Department'])
+                ->setPhone($row['Work Phone'])
+                ->setRoom($row['Room'])
+                ->setBuilding($row['Building'])
+                ->setCampusName($row['Campus'])
                 ->setBaseProfile($baseProfile);
 
             $this->baseProfileMapper->save($baseProfile);
             $this->staffProfileMapper->save($staffProfile);
 
-            $this->log[] = "Created staff profile for {$data['Firstname']} {$data['Surname']}";
+            $this->log[] = "Created staff profile for {$row['Firstname']} {$row['Surname']}";
 
             $newIds[] = $baseProfile->getId();
         }
@@ -633,27 +654,32 @@ class Processor
          */
         $newIds = [];
 
-        foreach ($reader as $i => $row) {
-            $data = array_combine(self::IMPORT_COLUMNS_PARENT, $row);
+        $i = 0;
+
+        foreach ($reader as $row) {
+            if (!$i) {
+                $i++;
+                continue;
+            }
 
             $baseProfile = $this->baseProfileMapper->createModel()
-                ->setExternalId($data['External ID'])
-                ->setTitle($data['Title'])
-                ->setFirstname($data['Firstname'])
-                ->setLastname($data['Surname']);
+                ->setExternalId($row['External ID'])
+                ->setTitle($row['Title'])
+                ->setFirstname($row['Firstname'])
+                ->setLastname($row['Surname']);
 
             $parentProfile = $this->parentProfileMapper->createModel()
-                ->setMobile($data['Mobile'])
-                ->setPhoneHome($data['Home Phone'])
-                ->setPhoneWork($data['Work Phone'])
-                ->setUsername($data['Username'])
-                ->setEmail($data['Email'])
+                ->setMobile($row['Mobile'])
+                ->setPhoneHome($row['Home Phone'])
+                ->setPhoneWork($row['Work Phone'])
+                ->setUsername($row['Username'])
+                ->setEmail($row['Email'])
                 ->setBaseProfile($baseProfile);
 
             $this->baseProfileMapper->save($baseProfile);
             $this->parentProfileMapper->save($parentProfile);
 
-            $this->log[] = "Created parent profile for {$data['Firstname']} {$data['Surname']}";
+            $this->log[] = "Created parent profile for {$row['Firstname']} {$row['Surname']}";
 
             $newIds[] = $baseProfile->getId();
         }
