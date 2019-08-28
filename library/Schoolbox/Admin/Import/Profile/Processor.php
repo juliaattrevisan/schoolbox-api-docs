@@ -281,14 +281,7 @@ class Processor
      */
     private function processOne(Reader $reader, array $header): int
     {
-        if ($this->isRelation($header)) {
-
-            /* Process the Relations csv
-             */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
-
-            return $this->processRelation($reader);
-        } elseif ($this->isStudentProfile($header)) {
+       if ($this->isStudentProfile($header)) {
 
             /* Process the Student Profile csv
              */
@@ -309,124 +302,16 @@ class Processor
             $reader->setExpectedColumns(self::IMPORT_COLUMNS_PARENT);
 
             return $this->processParentProfile($reader);
-        }
+        } elseif ($this->isRelation($header)) {
+
+           /* Process the Relations csv
+            */
+           $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
+
+           return $this->processRelation($reader);
+       }
 
         throw new \InvalidArgumentException('Unknown header contents' . implode(', ', $header));
-    }
-
-
-    /**
-     * $row is the same as the expected columns of a Relations csv
-     *
-     * @param array $row
-     * @return bool
-     */
-    private function isRelation(array $row): bool
-    {
-        return $this->matches($row, self::IMPORT_COLUMNS_RELATION);
-    }
-
-
-    /**
-     * Process the Relations csv
-     *
-     * @param Reader $reader
-     * @return int number of rows processed
-     * @throws \Alaress\Database\Exception
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    private function processRelation(Reader $reader): int
-    {
-        /* Remember a set of (profile_id, external_id) tuples to save on db pounding
-         * while trying to derive relations between external_ids from csv
-         *
-         * Our schema creates relations between profile_ids, not external_ids
-         * so we might as well cache these to save on performance penalty
-         */
-        $statement = $this->database->prepareQuery('
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::PARENT .'" AS roleType 
-            FROM schoolbox.sis_user_profile profile
-            INNER JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
-            
-            UNION
-            
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STUDENT .'" AS roleType 
-            FROM schoolbox.sis_user_profile profile
-            INNER JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
-            
-            UNION
-            
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STAFF .'" AS roleType
-            FROM schoolbox.sis_user_profile profile
-            INNER JOIN sis_user_profile_staff staff ON profile.id = staff.sis_user_profile_id
-            
-            ORDER BY id
-        ');
-
-        $statement->execute();
-
-        /* Set hash lookup of (external_id, type) => sis_user_profile.id
-         * so we can quickly identify profile ids from their external ids
-         */
-        $cache = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $roleType = $row['roleType'];
-            $externalId = $row['externalId'];
-            $profileId = (int)$row['id'];
-
-            $cache[$roleType][$externalId] = $profileId;
-        }
-
-        /* Delete previous relations
-         * Without a primary key you just can't tell where one set ends and where another begins
-         */
-        $this->database->executeQuery('
-            DELETE FROM sis_user_profile_relation
-        ');
-
-        /* Process each relation
-         */
-        $n = 0;
-
-        foreach ($reader as $row) {
-
-            /* Check that both relations exist. They might not exist because the
-             * relation csv may contain data that wasn't in the other three files
-             * (probably from human error but who knows)
-             */
-            if (!$cache[$row['Role Type']][$row['Relation ID']]) {
-                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Relation ID {$row['Relation ID']} doesn't exist");
-
-                continue;
-            }
-
-            if (!$cache[Role::STUDENT][$row['Student ID']]) {
-                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Student ID {$row['Student ID']} doesn't exist");
-
-                continue;
-            }
-
-            /* Otherwise both exist; build relation
-             */
-            $relation = $this->relationMapper->createModel()
-                ->setChildProfileId($cache[Role::STUDENT][$row['Student ID']])
-                ->setUserProfileId($cache[$row['Role Type']][$row['Relation ID']])
-                ->setType($row['Type'])
-                ->setEmergencyContact((bool)$row['Emergency Contact']);
-
-            $this->relationMapper->save($relation);
-
-            $this->log("Created relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', self::LOG_OK);
-
-            /* These two humans have relations
-             */
-            $n++;
-        }
-
-        return $n;
     }
 
 
@@ -439,62 +324,6 @@ class Processor
     private function isStudentProfile(array $row): bool
     {
         return $this->matches($row, self::IMPORT_COLUMNS_STUDENT);
-    }
-
-
-    /**
-     * Delete everything in $previousIds
-     *
-     * @param string $table
-     * @param array $newIds
-     * @throws \Alaress\Database\Exception
-     */
-    private function removePreviousProfileIds(string $table, array $newIds): void
-    {
-        $ids = implode(', ', $newIds);
-
-        if (null !== $ids) {
-
-            /* Find the ids outside of $newIds
-             *
-             * These specific ids need to be removed from the collective set in sis_user_profile
-             * which may contain a whole bunch of other ids that should remain valid
-             *
-             * Remove these specific ids from $table
-             */
-            $previousIds = $this->database->executeQuery("
-                SELECT GROUP_CONCAT(sis_user_profile_id) AS previousIds 
-                FROM {$table}
-                WHERE sis_user_profile_id NOT IN ({$ids})
-            ")->fetch()['previousIds'];
-
-            /* If there were previous ids, remove 'em
-             */
-            if (null !== $previousIds) {
-
-                /* Remove from extension tables
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM {$table}
-                    WHERE sis_user_profile_id IN ({$previousIds});
-                ");
-
-                /* Remove from relation table
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM sis_user_profile_relation
-                    WHERE child_profile_id IN ({$previousIds})
-                    OR user_profile_id IN ({$previousIds});
-                ");
-
-                /* Remove from base profile table
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM sis_user_profile
-                    WHERE id IN ({$previousIds});
-                ");
-            }
-        }
     }
 
 
@@ -694,6 +523,177 @@ class Processor
         $this->removePreviousProfileIds($this->parentProfileMapper->getTable(), $newIds);
 
         return \count($newIds);
+    }
+
+
+    /**
+     * Delete everything in $previousIds
+     *
+     * @param string $table
+     * @param array $newIds
+     * @throws \Alaress\Database\Exception
+     */
+    private function removePreviousProfileIds(string $table, array $newIds): void
+    {
+        $ids = implode(', ', $newIds);
+
+        if (null !== $ids) {
+
+            /* Find the ids outside of $newIds
+             *
+             * These specific ids need to be removed from the collective set in sis_user_profile
+             * which may contain a whole bunch of other ids that should remain valid
+             *
+             * Remove these specific ids from $table
+             */
+            $previousIds = $this->database->executeQuery("
+                SELECT GROUP_CONCAT(sis_user_profile_id) AS previousIds 
+                FROM {$table}
+                WHERE sis_user_profile_id NOT IN ({$ids})
+            ")->fetch()['previousIds'];
+
+            /* If there were previous ids, remove 'em
+             */
+            if (null !== $previousIds) {
+
+                /* Remove from extension tables
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM {$table}
+                    WHERE sis_user_profile_id IN ({$previousIds});
+                ");
+
+                /* Remove from relation table
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM sis_user_profile_relation
+                    WHERE child_profile_id IN ({$previousIds})
+                    OR user_profile_id IN ({$previousIds});
+                ");
+
+                /* Remove from base profile table
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM sis_user_profile
+                    WHERE id IN ({$previousIds});
+                ");
+            }
+        }
+    }
+
+
+    /**
+     * $row is the same as the expected columns of a Relations csv
+     *
+     * @param array $row
+     * @return bool
+     */
+    private function isRelation(array $row): bool
+    {
+        return $this->matches($row, self::IMPORT_COLUMNS_RELATION);
+    }
+
+
+    /**
+     * Process the Relations csv
+     *
+     * @param Reader $reader
+     * @return int number of rows processed
+     * @throws \Alaress\Database\Exception
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function processRelation(Reader $reader): int
+    {
+        /* Remember a set of (profile_id, external_id) tuples to save on db pounding
+         * while trying to derive relations between external_ids from csv
+         *
+         * Our schema creates relations between profile_ids, not external_ids
+         * so we might as well cache these to save on performance penalty
+         */
+        $statement = $this->database->prepareQuery('
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::PARENT . '" AS roleType 
+            FROM schoolbox.sis_user_profile profile
+            INNER JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
+            
+            UNION
+            
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STUDENT . '" AS roleType 
+            FROM schoolbox.sis_user_profile profile
+            INNER JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
+            
+            UNION
+            
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STAFF . '" AS roleType
+            FROM schoolbox.sis_user_profile profile
+            INNER JOIN sis_user_profile_staff staff ON profile.id = staff.sis_user_profile_id
+            
+            ORDER BY id
+        ');
+
+        $statement->execute();
+
+        /* Set hash lookup of (external_id, type) => sis_user_profile.id
+         * so we can quickly identify profile ids from their external ids
+         */
+        $cache = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $roleType = $row['roleType'];
+            $externalId = $row['externalId'];
+            $profileId = (int)$row['id'];
+
+            $cache[$roleType][$externalId] = $profileId;
+        }
+
+        /* Delete previous relations
+         * Without a primary key you just can't tell where one set ends and where another begins
+         */
+        $this->database->executeQuery('
+            DELETE FROM sis_user_profile_relation
+        ');
+
+        /* Process each relation
+         */
+        $n = 0;
+
+        foreach ($reader as $row) {
+
+            /* Check that both relations exist. They might not exist because the
+             * relation csv may contain data that wasn't in the other three files
+             * (probably from human error but who knows)
+             */
+            if (!$cache[$row['Role Type']][$row['Relation ID']]) {
+                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Relation ID {$row['Relation ID']} doesn't exist");
+
+                continue;
+            }
+
+            if (!$cache[Role::STUDENT][$row['Student ID']]) {
+                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: Student ID {$row['Student ID']} doesn't exist");
+
+                continue;
+            }
+
+            /* Otherwise both exist; build relation
+             */
+            $relation = $this->relationMapper->createModel()
+                                             ->setChildProfileId($cache[Role::STUDENT][$row['Student ID']])
+                                             ->setUserProfileId($cache[$row['Role Type']][$row['Relation ID']])
+                                             ->setType($row['Type'])
+                                             ->setEmergencyContact((bool)$row['Emergency Contact']);
+
+            $this->relationMapper->save($relation);
+
+            $this->log("Created relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', self::LOG_OK);
+
+            /* These two humans have relations
+             */
+            $n++;
+        }
+
+        return $n;
     }
 
 
