@@ -54,6 +54,10 @@ class Homepage extends Base
         /** @var GenericCollection|Model[] $articles */
         $articles = $this->loadArticleByIds($articleIds, $params, $user)->indexBy($idProperty);
 
+        foreach ($articles as $article) {
+            $article->setAudience(new GenericCollection(Audience\Model::class));
+        }
+
         // Load audiences so module auth rules work in rendered templates
         $rootSegments = $this->audienceMapper->findForArticles($articles->getPropertyValues($idProperty));
 
