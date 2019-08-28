@@ -12,7 +12,6 @@ namespace Schoolbox;
 
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
-use DomainException;
 use House;
 use HouseResidential;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -203,15 +202,6 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      * @var string
      */
     private $calendarView = 'month';
-
-    /**
-     * A Collection of User objects who should be receiving email
-     * notifications about this User. These recipients are usually,
-     * but not necessarily, a parent of this User instance.
-     *
-     * @var Collection|self[]
-     */
-    private $emailRecipients;
 
     /**
      * Student's boarding status (only used if boarder leave module is enabled)
@@ -1183,78 +1173,6 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     }
 
     /**
-     * TODO this logic needs to go in the mapper. Or somewhere. Just not here!
-     *
-     * Find the email recipients for this user who should be notified whenever
-     * a comment is made, or when some other email-worthy action takes place
-     *
-     * At the moment it's private because nobody else is using this yet, but I
-     * think there are other places which do a similar thing - when those are
-     * ready to utilise findEmailRecipients, make this public or use the
-     * loadEmailRecipients() approach
-     *
-     * Migrated from Conversation.php
-     *
-     * @param self $user
-     *
-     * @return Collection|self[]
-     */
-    private function findEmailRecipients($user)
-    {
-        $parentRoles = RoleMapper::getInstance()->findByColumn(
-            'group_type',
-            Role::PARENT
-        )->getColumnValues('id');
-        $allRecipients            = new Collection();
-        $DEPRECATED_EXTERNAL_USER = new \External_User();
-        $emailArray               = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($user->getExternalId()));
-        if (is_array($emailArray) && count($emailArray)) {
-            foreach ($emailArray as $synergyId => $emailAddress) {
-                $thisRecipient = new Collection();
-                // if a synergy ID is available, and a valid user can be obtained from it, use that
-                if ($synergyId) {
-                    $thisRecipient = UserMapper::getInstance()->findByColumnList(
-                        array(
-                            'synergy_id' => $synergyId,
-                            'group_id'   => $parentRoles
-                        )
-                    );
-                }
-                if ($thisRecipient->count()) {
-                    /* This person has a Schoolbox account, so just use that
-                     */
-                    $recipient = $thisRecipient->first();
-                } else {
-                    /* Generate a dummy user object (which will still have a correct email address)
-                     *
-                     * This is used when someone is specified to receive emails, but doesn't
-                     * actually have a Schoolbox account. This is actually possible.
-                     */
-                    $recipient = new User();
-                    $recipient->setId(-1);
-                }
-                // override any email retrieved from schoolbox with the one from synergy
-                $recipient->setAltEmail($emailAddress);
-                /* Add him to the stack
-                 */
-                $allRecipients->add($recipient);
-            }
-        }
-        return $allRecipients;
-    }
-
-    /**
-     * Public alias for the Report Card approach
-     *
-     * @return void
-     */
-    public function loadEmailRecipients()
-    {
-        $this->setEmailRecipients($this->findEmailRecipients($this));
-    }
-
-
-    /**
      * Hide the sidenav
      */
     public function hideSidenav()
@@ -1306,30 +1224,6 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
     /* Getters/Setters
      */
-
-    /**
-     * Set recipients
-     *
-     * @param Collection|self[] $emailRecipients
-     *
-     * @return self
-     */
-    private function setEmailRecipients($emailRecipients)
-    {
-        $this->emailRecipients = $emailRecipients;
-        return $this;
-    }
-
-    /**
-     * Get recipients
-     *
-     * @return Collection|self[]
-     */
-    public function getEmailRecipients()
-    {
-        return $this->emailRecipients;
-    }
-
 
     /**
      * @param Collection|self[] $linkedUser
