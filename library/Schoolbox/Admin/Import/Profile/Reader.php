@@ -193,11 +193,17 @@ class Reader implements \Iterator
     /**
      * Read the header row from the csv and remember it
      */
-    private function readHeaderRow()
+    public function readHeaderRow()
     {
-        $this->rewind();
+        $currentLocation = ftell($this->fp);
 
-        return $this->currentRow;
+        rewind($this->fp);
+
+        $header = $this->loadRow();
+
+        fseek($this->fp, $currentLocation);
+
+        return $header;
     }
 
 

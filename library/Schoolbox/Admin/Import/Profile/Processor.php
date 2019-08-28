@@ -589,7 +589,7 @@ class Processor
                 $i++;
                 continue;
             }
-
+new \Alaress_Probe($reader->readHeaderRow());
             $baseProfile = $this->baseProfileMapper->createModel()
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
