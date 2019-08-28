@@ -5,13 +5,15 @@
  */
 /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocMissingThrowsInspection */
 declare(strict_types=1);
 
 namespace Helper;
 
 /**
  * This class instantiates a Schoolbox CliTool kernel. This enables Cests, Actors and Helpers to:
- * 1. Use the CliTool Kernel's DI to conveniently fetch services
+ * 1. Use the CliTool Kernel's DI to conveniently fetch ('grab' in codeception nomenclature) services
  * 2. Invoke native Schoolbox code in a production-like environment (eg Mappers)
  *
  * This class is responsible for providing low-level 'how' (as opposed to 'what') actions are performed.
@@ -20,13 +22,13 @@ namespace Helper;
  *
  * Note that we must use FQDN in our annotations because codeception copies them verbatim into the generated trait.
  *
+ * So that this class does not grow to be the size of schoolbox, these methods should return high-level services
+ * that enable Cests to fetch the data relevant to their scenarios.
+ *
  * @see https://codeception.com/docs/06-ModulesAndHelpers
- */
+  */
 class SchoolboxCli extends \Codeception\Module
 {
-    // TODO this is a page object responsibility
-    public const HOMEPAGE_COMPONENT_POSITION = ['left' => '1', 'right' => '2', 'top' => '3'];
-
     /** @var \Schoolbox\Application\CliTool\Kernel */
     public $cliKernel;
 
@@ -34,15 +36,6 @@ class SchoolboxCli extends \Codeception\Module
      * HOOK: used after configuration is loaded
      *
      * Initializes the cli kernel so that we can use the dependency injector.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     * @throws \UnexpectedValueException
-     * @throws \Aura\Di\Exception
-     * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Di\Exception\ServiceNotObject
-     * @throws \Schoolbox\External\Exception
      */
     public function _initialize(): void
     {
@@ -63,10 +56,8 @@ class SchoolboxCli extends \Codeception\Module
      * Returns Schoolbox's internal DB connection
      *
      * @return \Alaress\Database\Connector\IConnector
-     * @throws \RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getDatabaseInternal(): \Alaress\Database\Connector\IConnector
+    public function grabDatabaseInternal(): \Alaress\Database\Connector\IConnector
     {
         return $this->cliKernel->get('databaseInternal');
     }
@@ -75,11 +66,9 @@ class SchoolboxCli extends \Codeception\Module
      * Returns a user model
      *
      * @param string $username
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      * @return \Schoolbox\User
      */
-    public function getUser(string $username): \Schoolbox\User
+    public function grabUser(string $username): \Schoolbox\User
     {
         return \Schoolbox\UserMapper::getInstance()->findOneByColumn('username', $username);
     }
@@ -88,11 +77,9 @@ class SchoolboxCli extends \Codeception\Module
      * Returns the the first found role matching on title.
      *
      * @param string $title
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      * @return \Schoolbox\Role
      */
-    public function getRoleByTitle(string $title): \Schoolbox\Role
+    public function grabRoleByTitle(string $title): \Schoolbox\Role
     {
         return \Schoolbox\RoleMapper::getInstance()->findOneByColumn('name', $title);
     }
@@ -102,10 +89,8 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $name
      * @return \Schoolbox\Campus
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getCampusByName(string $name): \Schoolbox\Campus
+    public function grabCampusByName(string $name): \Schoolbox\Campus
     {
         return \Schoolbox\CampusMapper::getInstance()->findOneByColumn('name', $name);
     }
@@ -115,10 +100,8 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $title
      * @return \Schoolbox\Calendar\Event
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getCalendarEventByTitle(string $title): \Schoolbox\Calendar\Event
+    public function grabCalendarEventByTitle(string $title): \Schoolbox\Calendar\Event
     {
         return \Schoolbox\Calendar\EventMapper::getInstance()->findOneByColumn('title', $title);
     }
@@ -128,14 +111,11 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param int $eventId
      * @return array
-     * @throws \RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Alaress\Database\Exception
      */
-    public function getCalendarEventAttendanceList(int $eventId): array
+    public function grabCalendarEventAttendanceList(int $eventId): array
     {
         $query = 'SELECT user_id, id FROM event_attendance WHERE event_id = :event_id';
-        return $this->getDatabaseInternal()->executeQuery($query, ['event_id' => $eventId])->fetchAll();
+        return $this->grabDatabaseInternal()->executeQuery($query, ['event_id' => $eventId])->fetchAll();
     }
 
     /**
@@ -143,48 +123,20 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $componentClass
      * @return \Component_Definition
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getComponentByClass(string $componentClass): \Component_Definition
+    public function grabComponentDefinitionByClass(string $componentClass): \Component_Definition
     {
         return \Component_DefinitionMapper::getInstance()->findOneByColumn('class', $componentClass);
     }
 
-    /**
-     * Returns the first component instance based on a few variables.
-     *
-     * @param int                   $folderId
-     * @param \Component_Definition $component
-     * @param string                $position
-     * @return \Component_Instance
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
-     */
-    public function getComponentOnHomepage(
-        int $folderId,
-        \Component_Definition $component,
-        string $position
-    ): \Component_Instance {
-        $columnList = [
-            'component_definition_id' => $component->getId(),
-            'module'                  => \Component_Instance::MODULE_HOMEPAGE,
-            'identifier'              => $folderId,
-            'position'                => $position,
-        ];
-
-        return \Component_InstanceMapper::getInstance()->findOneByColumnList($columnList);
-    }
 
     /**
      * Returns the the first TextBox by its title.
      *
      * @param string $title
      * @return \Schoolbox\Resource\Textbox\Model
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getTextBoxByHeading(string $title): \Schoolbox\Resource\Textbox\Model
+    public function grabTextBoxByHeading(string $title): \Schoolbox\Resource\Textbox\Model
     {
         return \Schoolbox\Resource\Textbox\Mapper::getInstance()->findOneByColumn('heading', $title);
     }
@@ -194,10 +146,8 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $title
      * @return \Schoolbox\Comms\News\Model
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getNewsArticleByTitle(string $title): \Schoolbox\Comms\News\Model
+    public function grabNewsArticleByTitle(string $title): \Schoolbox\Comms\News\Model
     {
         return \Schoolbox\Comms\News\Mapper::getInstance()->findOneByColumn('title', $title);
     }
@@ -209,10 +159,8 @@ class SchoolboxCli extends \Codeception\Module
      * @param int $assessmentOwnerId
      * @param int $submissionOwnerId
      * @return int
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getFirstSubmissionIdByOwnerAndAssessmentID(
+    public function grabFirstSubmissionIdByOwnerAndAssessmentID(
         int $assessmentId,
         int $assessmentOwnerId,
         int $submissionOwnerId
@@ -233,12 +181,10 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $title
      * @return int
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getFirstHomepageIdByTitle(string $title): int
+    public function grabFirstHomepageIdByTitle(string $title): int
     {
-        return $this->getFirstFolderByTitle($title)->getId();
+        return $this->grabFirstFolderByTitle($title)->getId();
     }
 
     /**
@@ -246,10 +192,8 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $title
      * @return \Schoolbox\Resource\Folder\Model
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getFirstFolderByTitle(string $title): \Schoolbox\Resource\Folder\Model
+    public function grabFirstFolderByTitle(string $title): \Schoolbox\Resource\Folder\Model
     {
         return \Schoolbox\Resource\Folder\Mapper::getInstance()->findOneByColumn('name', $title);
     }
@@ -259,52 +203,23 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $title
      * @return \Schoolbox\Learning\Course\DataModel\Specification\Model
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getFirstCourseByTitle(string $title): \Schoolbox\Learning\Course\DataModel\Specification\Model
+    public function grabFirstCourseSpecByTitle(string $title): \Schoolbox\Learning\Course\DataModel\Specification\Model
     {
-        $courseFolder = $this->getFirstFolderByTitle($title);
+        $courseFolder = $this->grabFirstFolderByTitle($title);
         return \Schoolbox\Learning\Course\DataModel\Specification\Mapper::getInstance()->findOneByColumn('folder_id', $courseFolder->getId());
     }
 
-    /**
-     * Returns all the units by the course spec ID
-     *
-     * @param int $courseSpecId
-     * @return \Schoolbox\GenericCollection|\Schoolbox\Learning\Course\DataModel\Specification\Unit\Model[]
-     */
-    public function getUnitsByCourseSpecId(int $courseSpecId): \Schoolbox\GenericCollection
-    {
-        return \Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::getInstance()->findAllByCourseId($courseSpecId);
-    }
-
-    /**
-     * Returns all assessment ID by the Course Unit Spec Id
-     *
-     * @param int $unitSpecId
-     * @return array
-     * @throws \Alaress\Database\Exception
-     * @throws \RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function getAssessmentIdByCourseUnitSpecId(int $unitSpecId): array
-    {
-        $sql = "SELECT * FROM assessment_course_unit_specification WHERE course_unit_specification_id = :unit_spec_id";
-        return $this->getDatabaseInternal()->executeQuery($sql, ['unit_spec_id' => $unitSpecId])->fetchAll();
-    }
 
     /**
      * Returns first Unit based on the title
      *
      * @param $title
      * @return \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getFirstUnitByTitle(string $title): \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model
+    public function grabFirstUnitSpecByTitle(string $title): \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model
     {
-        $unitFolder = $this->getFirstFolderByTitle($title);
+        $unitFolder = $this->grabFirstFolderByTitle($title);
         return \Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::getInstance()->findOneByColumn('folder_id', $unitFolder->getId());
     }
 
@@ -312,13 +227,13 @@ class SchoolboxCli extends \Codeception\Module
      * Returns first Assessment based on the title
      *
      * @param string $title
-     * @return \Schoolbox\Learning\Assessment\DataModel\Model
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
+     * @return \Schoolbox\Learning\Assessment\IAssessable
      */
-    public function getFirstAssessmentByTitle(string $title): \Schoolbox\Learning\Assessment\DataModel\Model
+    public function grabFirstAssessmentByTitle(string $title): \Schoolbox\Learning\Assessment\IAssessable
     {
-        return \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance()->findOneByColumn('title', $title);
+        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->cliKernel->get('assessmentDataSource');
+        return $assessmentMapperProxy->findOneByColumn('title', $title);
     }
 
     /**
@@ -326,12 +241,10 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $title
      * @return int
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
      */
-    public function getFirstAssessmentIdByTitle(string $title): int
+    public function grabFirstAssessmentIdByTitle(string $title): int
     {
-        return $this->getFirstAssessmentByTitle($title)->getId();
+        return $this->grabFirstAssessmentByTitle($title)->getId();
     }
 
     /**
@@ -339,11 +252,8 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param int $assessmentId
      * @return \Schoolbox\Assessment\Rubric\Grid\Grid
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getAssessmentRubricGrid(int $assessmentId): \Schoolbox\Assessment\Rubric\Grid\Grid
+    public function grabAssessmentRubricGrid(int $assessmentId): \Schoolbox\Assessment\Rubric\Grid\Grid
     {
         /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy */
         $assessableDataSource = $this->cliKernel->get('assessmentDataSource');
@@ -357,11 +267,8 @@ class SchoolboxCli extends \Codeception\Module
      *
      * @param string $heading
      * @return \Schoolbox\Pastoral\Model
-     * @throws \Schoolbox\Mapper\Exception         If no instance of model is found
-     * @throws \Schoolbox\Mapper\Exception\Deleted If the model was found but has been deleted
-     *
      */
-    public function getPastoralRecordByTitle(string $heading): \Schoolbox\Pastoral\Model
+    public function grabPastoralRecordByTitle(string $heading): \Schoolbox\Pastoral\Model
     {
         return \Schoolbox\Pastoral\Mapper::getInstance()->findOneByColumn('heading', $heading);
     }

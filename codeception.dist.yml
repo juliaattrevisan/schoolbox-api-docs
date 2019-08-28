@@ -32,19 +32,11 @@ suites:
         path: integration
         modules:
             enabled:
-                - \Helper\Integration
-                - \Helper\SchoolboxCli
-                - Asserts
-                - PhpBrowser:
-                    url: 'http://vagrant.dev.schoolbox.cloud'
-                    auth: ['alaress', 'alaress']
-                    curl:
-                      CURLOPT_RETURNTRANSFER: true
-                - Db:
-                      dsn: "mysql:host=localhost;dbname=schoolbox"
-                      user: "root"
-                      password: "tnp879"
-                      # dump goes here
+                - \Helper\Integration:
+                    depends: PhpBrowser
+                    url: 'https://vagrant.dev.schoolbox.cloud'
+                - \Helper\SchoolboxCli:
+                - Asserts:
 
 extensions:
     enabled:
