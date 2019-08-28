@@ -439,8 +439,6 @@ class Provisioner
     }
 
 
-
-
     /**
      * Format access levels in a user-readable manner
      *
@@ -452,7 +450,9 @@ class Provisioner
         // Take existing group access levels
         $result = [];
         foreach ($user->getAccessList() as $access) {
-            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
+            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE
+                && $access->getAccessLevel() < UserAccess::ACCESS_FULL
+            ) {
                 $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
             }
         }
