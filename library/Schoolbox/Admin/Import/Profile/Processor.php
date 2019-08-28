@@ -184,32 +184,6 @@ class Processor
 
 
     /**
-     * Process each of the supplied files in a specific order
-     * Relationship csvs must come last
-     *
-     * Override this class for different data sources when needed
-     *
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \InvalidArgumentException
-     */
-    public function process(): Processor
-    {
-        foreach ($this->files as $file) {
-            try {
-                $this->log[] = "Starting processing from {$file->getBasename()}";
-                $n = $this->processOne($file->readStream());
-                $this->log[] = "Processed {$n} rows from {$file->getBasename()}";
-            } catch (\InvalidArgumentException $e) {
-                $this->log[] = $e->getMessage();
-            }
-        }
-
-        return $this;
-    }
-
-
-    /**
      * Sort the files so that the relation one comes last
      *
      * @param array $files
@@ -243,6 +217,32 @@ class Processor
         /* Process all of these files in the required order
          */
         return array_merge($profileFiles, $relationFiles);
+    }
+
+
+    /**
+     * Process each of the supplied files in a specific order
+     * Relationship csvs must come last
+     *
+     * Override this class for different data sources when needed
+     *
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
+     */
+    public function process(): Processor
+    {
+        foreach ($this->files as $file) {
+            try {
+                $this->log[] = "Starting processing from {$file->getBasename()}";
+                $n = $this->processOne($file->readStream());
+                $this->log[] = "Processed {$n} rows from {$file->getBasename()}";
+            } catch (\InvalidArgumentException $e) {
+                $this->log[] = $e->getMessage();
+            }
+        }
+
+        return $this;
     }
 
 
