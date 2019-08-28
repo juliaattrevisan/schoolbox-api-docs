@@ -3,14 +3,18 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+/** @noinspection PhpDocMissingThrowsInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpUnused */
 declare(strict_types=1);
 
 namespace SmokeTests;
 
 use IntegrationTester;
-use GuzzleHttp\Psr7\Response;
 use Payload;
-use Payload\Base;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Resource\HomepageTemplate;
 
 class CourseCest
 {
@@ -18,208 +22,198 @@ class CourseCest
     public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin(); #we logged in as alaress
+        $i->stopFollowingRedirects();
     }
+
 
     /** Creates course using curl payloads
      *
      * Fires off creating a course folder.
      *
      * @param IntegrationTester $i
-     * @param Payload\Course    $coursePayload
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createCourse(IntegrationTester $i, Payload\Course $coursePayload): void
+    public function createCourse(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp      = time();
         $folder_title   = 'Test Folder For Create Course at ' . $timestamp;
-        $faculty_folder = $i->getFirstFolderByTitle('Faculties');
+        $faculty_folder = $i->grabFirstFolderByTitle('Faculties');
 
-        $folderPayload = new Payload\Folder();
-        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_NONE);
+        $folderPayload = new Payload\Resource\Folder\Create($faculty_folder->getId());
+        $folderPayload->setTemplate(HomepageTemplate::HOMEPAGE_NONE);
         $folderPayload->setName($folder_title);
-        $folderPayload->setParentFolder($faculty_folder->getId());
-        $i->sendCurlRequest($folderPayload, false, 'Send request create a Folder in faculty folder');
-        $course_folder = $i->getFirstFolderByTitle($folder_title);
+        $i->amGoingTo('Send request create a Folder in faculty folder');
+        $i->sendRequest($folderPayload);
+        $course_folder = $i->grabFirstFolderByTitle($folder_title);
 
         #WHEN
         $title = 'Course with empty Unit at ' . $timestamp;
 
+        $coursePayload = new Payload\Course\Specification\Create();
         $coursePayload->setName($title);
         $coursePayload->setParent($course_folder->getId());
-
-        $response             = $i->sendCurlRequest($coursePayload, true, 'Send request create a course spec');
-        $expectedUrlsReturned = [
-            ['https://vagrant.dev.schoolbox.cloud/course/list' => '303'],
-            [IntegrationTester::NO_REDIRECT => '200'],
-        ];
+        $i->amGoingTo('Send request create a course spec');
+        $i->sendRequest($coursePayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', '/course/list');
 
         #WHEN
-        $course_spec = $i->getFirstCourseByTitle($title);
+        $course_spec = $i->grabFirstCourseSpecByTitle($title);
         $unit_name   = $title . ' EmptyUnit';
 
-        $unitSpecPayload = new Base();
-        $unitSpecPayload->setPage('/course/' . $course_spec->getId() . '/unitspecs/new');
-        $unitSpecPayload->setReferer('/course/modify/' . $course_spec->getId());
+        $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
         $unitSpecPayload->setFormParam('name', $unit_name);
-
-        $response             = $i->sendCurlRequest($unitSpecPayload, true, 'Send request create a unit spec');
-        $expectedUrlsReturned = [[IntegrationTester::NO_REDIRECT => '200']];
+        $i->amGoingTo('Send request create a unit spec');
+        $i->sendRequest($unitSpecPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(200);
 
         #WHEN
-        $unit = $i->getFirstUnitByTitle($unit_name);
+        $unit         = $i->grabFirstUnitSpecByTitle($unit_name);
+        $modifyCourse = new Payload\Course\Specification\Update($course_spec);
+        $modifyCourse->addUnitSpec($unit->getId(), $unit_name);
 
-        $coursePayload->setModifyCourseSpec($course_spec->getId());
-        $coursePayload->addUnitSpec($unit->getId(), $unit_name);
-
-        $response             = $i->sendCurlRequest($coursePayload, true, 'Send save request for the newly created course');
-        $expectedUrlsReturned = [
-            ['https://vagrant.dev.schoolbox.cloud/course/list' => '303'],
-            [IntegrationTester::NO_REDIRECT => '200'],
-        ];
+        $i->amGoingTo('Send save request for the newly created course');
+        $i->sendRequest($coursePayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', '/course/list');
     }
 
-    /** Imports course into a class using curl payloads
+
+    /**
+     * Imports course into a group using curl payloads
      *
-     * Fires off creating a course folder, class folder, adding users to group, creating a course, creating assessments for the course.
+     * * creates a folder
+     * * creates a course spec in that folder
+     * * creates a unit spec in course spec
+     * * creates a project in unit spec
+     * * creates a due-work in project
+     * * creates a group folder
+     * * add group members to group
+     * * imports course spec to group folder
      *
      * @param IntegrationTester $i
-     * @param Payload\Course    $coursePayload
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function importCourseToClass(IntegrationTester $i, Payload\Course $coursePayload): void
+    public function importCourseToClass(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp      = time();
         $folder_title   = 'Test Folder For Create Course with assessments at ' . $timestamp;
-        $faculty_folder = $i->getFirstFolderByTitle('Faculties');
+        $faculty_folder = $i->grabFirstFolderByTitle('Faculties');
 
-        $folderPayload = new Payload\Folder();
-        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_NONE);
+        $folderPayload = new Payload\Resource\Folder\Create($faculty_folder->getId());
+        $folderPayload->setTemplate(HomepageTemplate::HOMEPAGE_NONE);
         $folderPayload->setName($folder_title);
-        $folderPayload->setParentFolder($faculty_folder->getId());
-        $i->sendCurlRequest($folderPayload, false, 'Send request create a Folder in faculty folder');
-        $course_folder = $i->getFirstFolderByTitle($folder_title);
+        $i->amGoingTo('Send request create a Folder in faculty folder');
+        $i->sendRequest($folderPayload);
+        $course_folder = $i->grabFirstFolderByTitle($folder_title);
 
         $title = 'Course with Unit with assessment at ' . $timestamp;
 
+        $coursePayload = new  Payload\Course\Specification\Create();
         $coursePayload->setName($title);
         $coursePayload->setParent($course_folder->getId());
+        $i->amGoingTo('Send request create a course spec');
+        $i->sendRequest($coursePayload);
 
-        $i->sendCurlRequest($coursePayload, false, 'Send request create a course spec');
-
-        $course_spec = $i->getFirstCourseByTitle($title);
+        $course_spec = $i->grabFirstCourseSpecByTitle($title);
         $unit_name   = $title . ' EmptyUnit';
 
-        $unitSpecPayload = new Base();
-        $unitSpecPayload->setPage('/course/' . $course_spec->getId() . '/unitspecs/new');
-        $unitSpecPayload->setReferer('/course/modify/' . $course_spec->getId());
+        $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
         $unitSpecPayload->setFormParam('name', $unit_name);
+        $i->amGoingTo('Send request create a unit spec');
+        $i->sendRequest($unitSpecPayload);
+        $unitSpec        = $i->grabFirstUnitSpecByTitle($unit_name);
+        $unit_folder = $i->grabFirstFolderByTitle($unit_name);
 
-        $i->sendCurlRequest($unitSpecPayload, false, 'Send request create a unit spec');
-        $unit        = $i->getFirstUnitByTitle($unit_name);
-        $unit_folder = $i->getFirstFolderByTitle($unit_name);
+        $assessment_title = 'Assessment for Course tests On Unit spec ID ' . $unitSpec->getId() . ' at ' . $timestamp;
 
-        $assessment_title = 'Assessment for Course tests On Unit spec ID ' . $unit->getId() . ' at ' . $timestamp;
-
-        $newAssessmentRequest = new Payload\Assessment();
+        $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_UNIT_SPECIFICATION, $unitSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFolderId($unit_folder->getId());
-        $newAssessmentRequest->setContextType('unitspecs');
-        $newAssessmentRequest->setContextId($unit->getId());
 
-        /** @var Response $response */
-        $i->sendCurlRequest($newAssessmentRequest, false, 'Send request create asessment on Unit spec #' . $unit->getId());
+        $i->amGoingTo('Send request create assessment on Unit spec #' . $unitSpec->getId());
+        $i->sendRequest($newAssessmentRequest);
 
         $project_name         = 'Assessment for course class project at ' . $timestamp;
         $project_duework_name = 'Assessment for project in class at ' . $timestamp;
 
-        $newAssessmentRequest = new Payload\Assessment();
+        $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_UNIT_SPECIFICATION, $unitSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_PROJECT);
         $newAssessmentRequest->setTitle($project_name);
-        $newAssessmentRequest->setFolderId($unit_folder->getId());
-        $newAssessmentRequest->setContextType('unitspecs');
-        $newAssessmentRequest->setContextId($unit->getId());
-        $newAssessmentRequest->setAssessmentType('project');
 
-        /** @var Response $response */
-        $i->sendCurlRequest($newAssessmentRequest, false, 'Send request create project on Unit spec #' . $unit->getId());
-        $project_assessment_id = $i->getFirstAssessmentIdByTitle($project_name);
+        $i->amGoingTo('Send request create project on Unit spec #' . $unitSpec->getId());
+        $i->sendRequest($newAssessmentRequest);
+        $projectSpec = $i->grabFirstAssessmentByTitle($project_name);
 
-        $newAssessmentRequest = new Payload\Assessment();
+        $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_PROJECT, $projectSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($project_duework_name);
-        $newAssessmentRequest->setFolderId($unit_folder->getId());
-        $newAssessmentRequest->setContextType('projects');
-        $newAssessmentRequest->setContextId($project_assessment_id);
 
-        /** @var Response $response */
-        $i->sendCurlRequest($newAssessmentRequest, false, 'Send request create due work on Project #' . $unit->getId());
+        $i->amGoingTo('Send request create due work on Project #' . $unitSpec->getId());
+        $i->sendRequest($newAssessmentRequest);
+        $dueWorkSpec = $i->grabFirstAssessmentByTitle($project_duework_name);
 
-        $coursePayload->setModifyCourseSpec($course_spec->getId());
-        $coursePayload->addUnitSpec($unit->getId(), $unit_name);
-
-        $i->sendCurlRequest($coursePayload, false, 'Send save request for the newly created course');
+        $modifyCourse = new Payload\Course\Specification\Update($course_spec);
+        $modifyCourse->addUnitSpec($unitSpec->getId(), $unit_name);
+        $i->amGoingTo('Send save request for the newly created course');
+        $i->sendRequest($coursePayload);
 
         $classpage_title = 'Testing Class Page for Course Sync and Assessment at ' . $timestamp;
         $class_code      = 'test' . $timestamp;
-        $student         = $i->getUser('drhodes');
-        $teacher         = $i->getUser('zsmith');
-        $admin           = $i->getUser('alaress');
+        $student         = $i->grabUser('drhodes');
+        $teacher         = $i->grabUser('zsmith');
+        $admin           = $i->grabUser('alaress');
 
-        $folderPayload = new Payload\Folder();
-        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Resource\Folder\Create();
+        $folderPayload->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
         $folderPayload->setName($classpage_title);
         $folderPayload->setFormParam('code', $class_code);
-        $i->sendCurlRequest($folderPayload, false, 'Create new class for import test');
-        $classpage = $i->getFirstFolderByTitle($classpage_title);
+        $i->amGoingTo('Create new class for import test');
+        $i->sendRequest($folderPayload);
+        $groupFolder = $i->grabFirstFolderByTitle($classpage_title);
 
-        $memberPayload = new Payload\GroupMember();
-        $memberPayload->setFolderGroup($classpage->getId());
-        $memberPayload->setNewMember($student->getId());
-        $memberPayload->setNewMember($admin->getId());
-        $memberPayload->setNewMember($teacher->getId());
-        $i->sendCurlRequest($memberPayload, false, 'Add group members to class page #' . $classpage->getId());
-
-        #WHEN
-        $importCourseSpecPayload = new Payload\CourseImport();
-
-        $importCourseSpecPayload->setCourseSpecId($course_spec->getId());
-        $importCourseSpecPayload->setClassPageId($classpage->getId());
-
-        $response             = $i->sendCurlRequest($importCourseSpecPayload, true, 'Send import Step 1. course spec to class page #' . $classpage->getId());
-        $expectedUrlsReturned = [[IntegrationTester::NO_REDIRECT => '200']];
-        #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $memberPayload = new Payload\Group\AddMembers($groupFolder->getId());
+        $memberPayload->setNewMembers([$student->getId(), $admin->getId(), $teacher->getId()]);
+        $i->amGoingTo('Add group members to class page #' . $groupFolder->getId());
+        $i->sendRequest($memberPayload);
 
         #WHEN
-        $importCourseSpecPayload->setImportUnits();
-        $unitsForCourseSpec      = $i->getUnitsByCourseSpecId($course_spec->getId());
-        $importCourseSpecPayload = $i->courseImportAddUnits($importCourseSpecPayload, $unitsForCourseSpec);
-
-        $response             = $i->sendCurlRequest($importCourseSpecPayload, true, 'Send import Step 2. unit specs to class page course, class page #' . $classpage->getId());
-        $expectedUrlsReturned = [[IntegrationTester::NO_REDIRECT => '200']];
+        $importCourseSpecPayload = new Payload\Course\Import\Part1($course_spec->getId(), $groupFolder->getId(), 0, '');
+        $i->amGoingTo('Send import Step 1. course spec to class page #' . $groupFolder->getId());
+        $i->sendRequest($importCourseSpecPayload);
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(200);
 
         #WHEN
-        $importCourseSpecPayload->setImportAssessments();
-        $unitsForCourseSpec      = $i->getUnitsByCourseSpecId($course_spec->getId());
-        $importCourseSpecPayload = $i->courseImportAddAssessments($importCourseSpecPayload, $unitsForCourseSpec);
-
-        $response             = $i->sendCurlRequest($importCourseSpecPayload, true, 'Send import Step 3. assessments to class page course unit spec, class page #' . $classpage->getId());
-        $expectedUrlsReturned = [[IntegrationTester::NO_REDIRECT => '200']];
+        $part2 = new Payload\Course\Import\Part2($course_spec->getId(), $groupFolder->getId(), 0, '', $course_spec->getId(), (string)$groupFolder->getId(), null);
+        $unitOpen = strtotime('- 5 day');
+        $unitClose = strtotime('+ 35 day');
+        $part2->setUnitImport(1, $unitSpec->getId(), null, true, $unitOpen, $unitClose);
+        $i->amGoingTo('Send import Step 2. unit specs to group page course, group page #' . $groupFolder->getId());
+        $i->sendRequest($importCourseSpecPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(200);
+
+        #WHEN
+        $selectedUnits = [
+            [
+                'spec_id' => $unitSpec->getId(),
+                'impl_id' => '',
+                'open'    => strtotime('- 5 day'),
+                'close'   => strtotime('+ 35 day'),
+            ],
+        ];
+        $part3 = new Payload\Course\Import\Part3($course_spec->getId(), $groupFolder->getId(), 0, '', $course_spec->getId(), (string)$groupFolder->getId(), null, $selectedUnits);
+        $part3->setAssessmentImport($unitSpec->getId(), $projectSpec->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+        $part3->setSubAssessmentImport($unitSpec->getId(), $projectSpec->getId(), $dueWorkSpec->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+        $i->amGoingTo('Send import Step 3. assessments to class page course unit spec, class page #' . $groupFolder->getId());
+        $i->sendRequest($importCourseSpecPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
     }
 }

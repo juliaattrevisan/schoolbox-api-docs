@@ -3,17 +3,20 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+/** @noinspection PhpDocMissingThrowsInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpUnused */
 declare(strict_types=1);
 
 namespace SmokeTests;
 
 use IntegrationTester;
-use Payload\PastoralRecord;
-use Payload\PastoralComment;
+use Payload;
+use Schoolbox\Pastoral;
+use Schoolbox\User;
 
 class PastoralCest
 {
-
     /**
      * Push a login payload to Schoolbox each test to ensure session is active and logged in.
      *
@@ -22,181 +25,144 @@ class PastoralCest
     public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin();
+        $i->stopFollowingRedirects();
     }
 
 
     /** Creates a pastoral record for a student using a curl request.
      *
      * @param IntegrationTester $i
-     * @param PastoralRecord    $pastoralRecPayload
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createPastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload): void
+    public function createPastoralRecord(IntegrationTester $i): void
     {
-        #GIVEN
-        $timestamp       = time();
-        $teacher         = $i->getUser('zsmith');
-        $student_drhodes = $i->getUser('drhodes');
-        $blocked_teacher = $i->getUser('jbenson');
-        $teacher_role    = $i->getRoleByTitle('Teachers');
-        $heading         = 'Automated Test Pastrol record create at ' . $timestamp;
-
-        #WHEN
-        $pastoralRecPayload->setStudentId($student_drhodes->getId());
-        $pastoralRecPayload->setViewer('user', $blocked_teacher->getId(), 'blocked');
-        $pastoralRecPayload->setViewer('role', $teacher_role->getId(), 'public');
-        $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
-        $pastoralRecPayload->setHeading($heading);
-        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Send request create pastoral record for student #' . $student_drhodes->getId());
-
-        $expectedUrlsReturned = [
-            ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200'],
-        ];
+        # GIVEN
+        $student_drhodes = $i->grabUser('drhodes');
+        $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral record create at ' . time());
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->sendGET("/pastoral/student/{$student_drhodes->getId()}");
+        $i->seeResponseCodeIs(200);
     }
+
 
     /** Modifies a pastoral record for a student using a curl request.
      *
      *  Fires off create a pastoral record step.
      *
      * @param IntegrationTester $i
-     * @param PastoralRecord    $pastoralRecPayload
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function modifyPastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload): void
+    public function modifyPastoralRecord(IntegrationTester $i): void
     {
         #GIVEN
-        $timestamp       = time();
-        $teacher         = $i->getUser('zsmith');
-        $student_drhodes = $i->getUser('drhodes');
-        $blocked_teacher = $i->getUser('jbenson');
-        $teacher_role    = $i->getRoleByTitle('Teachers');
-        $heading         = 'Automated Test Pastrol record modify at ' . $timestamp;
-
-        $pastoralRecPayload->setStudentId($student_drhodes->getId());
-        $pastoralRecPayload->setViewer('user', $blocked_teacher->getId(), 'blocked');
-        $pastoralRecPayload->setViewer('role', $teacher_role->getId(), 'public');
-        $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
-        $pastoralRecPayload->setHeading($heading);
-        $i->sendCurlRequest($pastoralRecPayload, false, 'Send request create pastoral record for student #' . $student_drhodes->getId());
-        $pastoral_record = $i->getPastoralRecordByTitle($heading);
+        $student_drhodes = $i->grabUser('drhodes');
+        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral record modify at ' . time());
 
         #WHEN
-        $pastoralRecPayload->setUpdateRecord($pastoral_record->getId());
-        $pastoralRecPayload->setFormParam('body_public', '<p>automated public statement - Edited</p>');
-        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Send request modify pastoral record for student #' . $student_drhodes->getId());
-
-        $expectedUrlsReturned = [
-            ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200'],
-        ];
+        $updatePastoral = new Payload\Pastoral\Update($pastoral_record);
+        $updatePastoral->setFormParam('body_public', '<p>automated public statement - Edited</p>');
+        $i->amGoingTo('Send request update pastoral record for student #' . $student_drhodes->getId());
+        $i->sendRequest($updatePastoral);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}");
+
+        $i->sendGET($i->grabHttpHeader('location'));
+        $i->seeResponseCodeIs(200);
     }
+
 
     /** Duplicates a pastoral record for a student using a curl request.
      *
      *  Fires off create a pastoral record step.
      *
      * @param IntegrationTester $i
-     * @param PastoralRecord    $pastoralRecPayload
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function duplicatePastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload): void
+    public function duplicatePastoralRecord(IntegrationTester $i): void
     {
         #GIVEN
-        $timestamp                = time();
-        $teacher                  = $i->getUser('zsmith');
-        $student_drhodes          = $i->getUser('drhodes');
-        $blocked_teacher          = $i->getUser('jbenson');
-        $teacher_role             = $i->getRoleByTitle('Teachers');
-        $student_duplicate_target = $i->getUser('rrhodes');
-        $heading                  = 'Automated Test Pastrol record duplicate at ' . $timestamp;
-
-        $pastoralRecPayload->setStudentId($student_drhodes->getId());
-        $pastoralRecPayload->setViewer('user', $blocked_teacher->getId(), 'blocked');
-        $pastoralRecPayload->setViewer('role', $teacher_role->getId(), 'public');
-        $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
-        $pastoralRecPayload->setHeading($heading);
-        $i->sendCurlRequest($pastoralRecPayload, false, 'Send request create pastoral record for student #' . $student_drhodes->getId());
-        $pastoral_record = $i->getPastoralRecordByTitle($heading);
+        $student_drhodes = $i->grabUser('drhodes');
+        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral record duplicate at ' . time());
 
         #WHEN
-        $pastoralRecPayload->setUpdateRecord($pastoral_record->getId());
-        $pastoralRecPayload->setDupicateToUser($student_duplicate_target->getId());
-        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Send request duplicate pastoral record for student #' . $student_drhodes->getId() . ' to student #' . $student_duplicate_target->getId());
-
-        $expectedUrlsReturned = [
-            ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200'],
-        ];
+        $student_duplicate_target = $i->grabUser('rrhodes');
+        $updatePastoral           = new Payload\Pastoral\Update($pastoral_record);
+        $updatePastoral->setDuplicateToUser($student_duplicate_target->getId());
+        $i->amGoingTo("Send request duplicate pastoral record for student #{$student_drhodes->getId()} to student #{$student_duplicate_target->getId()}");
+        $i->sendRequest($updatePastoral);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}");
+
+        $i->sendGET($i->grabHttpHeader('location'));
+        $i->seeResponseCodeIs(200);
     }
+
 
     /** Comments on a pastoral record for a student using a curl request.
      *
      *  Fires off create a pastoral record step.
      *
      * @param IntegrationTester $i
-     * @param PastoralRecord    $pastoralRecPayload
-     * @param PastoralComment   $pastoralCommentPayload
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function commentOnPastoralRecord(
-        IntegrationTester $i,
-        PastoralRecord $pastoralRecPayload,
-        PastoralComment $pastoralCommentPayload
-    ): void {
+    public function commentOnPastoralRecord(IntegrationTester $i): void
+    {
         #GIVEN
-        $timestamp       = time();
-        $teacher         = $i->getUser('zsmith');
-        $student_drhodes = $i->getUser('drhodes');
-        $blocked_teacher = $i->getUser('jbenson');
-        $teacher_role    = $i->getRoleByTitle('Teachers');
-        $heading         = 'Automated Test Pastrol create comments at ' . $timestamp;
-
-        $pastoralRecPayload->setStudentId($student_drhodes->getId());
-        $pastoralRecPayload->setViewer('user', $blocked_teacher->getId(), 'blocked');
-        $pastoralRecPayload->setViewer('role', $teacher_role->getId(), 'public');
-        $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
-
-        $pastoralRecPayload->setHeading($heading);
-        $i->sendCurlRequest($pastoralRecPayload, false, 'Send request create pastoral record for student #' . $student_drhodes->getId());
-        $pastoral_record = $i->getPastoralRecordByTitle($heading);
+        $student_drhodes = $i->grabUser('drhodes');
+        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral create comments at ' . time());
 
         #WHEN
-        $pastoralCommentPayload->setStudentAndRecordIds($student_drhodes->getId(), $pastoral_record->getId());
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
         $pastoralCommentPayload->setPublicComment('A very public comment');
-        $response = $i->sendCurlRequest($pastoralCommentPayload, true, 'Send request add comment to student #' . $student_drhodes->getId() . ' record # ' . $pastoral_record->getId());
-
-        $expectedUrlsReturned = [
-            ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200'],
-        ];
+        $i->amGoingTo("Send request add comment to student #{$student_drhodes->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}/record/{$pastoral_record->getId()}");
 
         #WHEN
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
         $pastoralCommentPayload->setPrivateComment('A very private comment');
-        $response = $i->sendCurlRequest($pastoralCommentPayload, true, 'Send request add private comment to student #' . $student_drhodes->getId() . ' record # ' . $pastoral_record->getId());
-
-        $expectedUrlsReturned = [
-            ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200'],
-        ];
+        $i->amGoingTo("Send request add private comment to student #{$student_drhodes->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}/record/{$pastoral_record->getId()}");
+
+        #WHEN
+        $i->sendGET($i->grabHttpHeader('location'));
+        $i->seeResponseCodeIs(200);
+    }
+
+
+    /**
+     * Convenience method to create a default pastoral record via the API
+     *
+     * @param IntegrationTester $i
+     * @param User              $student
+     * @param string            $heading
+     * @return Pastoral\Model
+     */
+    private function createDefaultPastoralRecord(IntegrationTester $i, User $student, string $heading): Pastoral\Model
+    {
+        $teacher         = $i->grabUser('zsmith');
+        $blocked_teacher = $i->grabUser('jbenson');
+        $teacher_role    = $i->grabRoleByTitle('Teachers');
+
+        $createPastoral = new Payload\Pastoral\Create($student->getId());
+        $createPastoral->setHeading($heading);
+        $createPastoral->setUserAccess($blocked_teacher->getId(), Pastoral\Access\Mapper::ACCESS_DENY);
+        $createPastoral->setRoleAccess($teacher_role->getId(), Pastoral\Access\Mapper::ACCESS_PUBLIC);
+        $createPastoral->setUserAccess($teacher->getId(), Pastoral\Access\Mapper::ACCESS_PRIVATE);
+        $i->amGoingTo('Send request create pastoral record for student #' . $student->getId());
+        $i->sendRequest($createPastoral);
+
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student->getId()}");
+
+        return $i->grabPastoralRecordByTitle($heading);
     }
 }
