@@ -57,6 +57,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     const URL_FORMAT = 'd-m-Y';
     const AM = 'AM';
     const PM = 'PM';
+    public const FORMAT_DATE_PICKER = 'd/m/Y h:ia'; // Used by JS DatePicker, eg '29/07/2014 11:59pm'
 
     const SUNDAY = 0;
     const MONDAY = 1;
