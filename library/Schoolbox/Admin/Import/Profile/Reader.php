@@ -196,17 +196,6 @@ class Reader implements \Iterator
 
 
     /**
-     * Get a list of column headings that were derived from the first row in the csv
-     *
-     * @return array|null
-     */
-    public function getColumnList(): ?array
-    {
-        return $this->columnList;
-    }
-
-
-    /**
      * Read the header row from the csv and remember it
      */
     public function readHeaderRow()
@@ -439,4 +428,3 @@ class Reader implements \Iterator
         $this->cleanup();
     }
 }
-
