@@ -45,10 +45,24 @@
         </section>
 
         {% if not perform %}
-        <form method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}?perform=1">
+        <script>
+            $(function() {
+                $('#perform').on('click', function (event) {
+                    event.preventDefault();
+
+                    $(this).confirmDialog({
+                        text: 'Are you sure you want to proceed with importing this data?',
+                        confirmEvent: function () {
+                            $('#form').submit();
+                        }
+                    });
+                });
+            });
+        </script>
+        <form id="form" method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}?perform=1">
             <input type="hidden" name="attachment[]" value="{{ attachment[0] }}" />
             <input type="hidden" name="file" value="{{ file }}" />
-            <input type="submit" value="Perform" />
+            <input type="submit" id="perform" value="Perform" />
         </form>
         {% endif %}
     </div>
