@@ -316,14 +316,33 @@ class Processor
 
 
     /**
-     * $row is the same as the expected columns of a Student Profile csv
+     * Identify columns that appear in the student csv, but in none of the others
+     * Presence of at least one of these columns concludes this is a student csv
      *
-     * @param array $row
+     * @param array $header
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    private function isStudentProfile(array $row): bool
+    private function isStudentProfile(array $header): bool
     {
-        return $this->matches($row, self::IMPORT_COLUMNS_STUDENT);
+        $columns = array_udiff(
+            self::IMPORT_COLUMNS_STUDENT,
+            self::IMPORT_COLUMNS_PARENT,
+            self::IMPORT_COLUMNS_STAFF,
+            self::IMPORT_COLUMNS_RELATION,
+            'strcasecmp'
+        );
+
+        /* The csv doesn't contain any conclusive fields which means we can't identify
+         * what kind of file this is; it could be any of the others
+         */
+        if (!\count($columns)) {
+            throw new \InvalidArgumentException('Student CSV structure is inconclusive');
+        }
+
+        /* Case-insensitve comparison
+         */
+        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
     }
 
 
@@ -401,14 +420,33 @@ class Processor
 
 
     /**
-     * $row is the same as the expected columns of a Staff Profile csv
+     * Identify columns that appear in the staff csv, but in none of the others
+     * Presence of at least one of these columns concludes this is a staff csv
      *
-     * @param array $row
+     * @param array $header
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    private function isStaffProfile(array $row): bool
+    private function isStaffProfile(array $header): bool
     {
-        return $this->matches($row, self::IMPORT_COLUMNS_STAFF);
+        $columns = array_udiff(
+            self::IMPORT_COLUMNS_STAFF,
+            self::IMPORT_COLUMNS_STUDENT,
+            self::IMPORT_COLUMNS_PARENT,
+            self::IMPORT_COLUMNS_RELATION,
+            'strcasecmp'
+        );
+
+        /* The csv doesn't contain any conclusive fields which means we can't identify
+         * what kind of file this is; it could be any of the others
+         */
+        if (!\count($columns)) {
+            throw new \InvalidArgumentException('Staff CSV structure is inconclusive');
+        }
+
+        /* Case-insensitve comparison
+         */
+        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
     }
 
 
@@ -466,14 +504,33 @@ class Processor
 
 
     /**
-     * $row is the same as the expected columns of a Parent Profile csv
+     * Identify columns that appear in the parent csv, but in none of the others
+     * Presence of at least one of these columns concludes this is a parent csv
      *
-     * @param array $row
+     * @param array $header
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    private function isParentProfile(array $row): bool
+    private function isParentProfile(array $header): bool
     {
-        return $this->matches($row, self::IMPORT_COLUMNS_PARENT);
+        $columns = array_udiff(
+            self::IMPORT_COLUMNS_PARENT,
+            self::IMPORT_COLUMNS_STAFF,
+            self::IMPORT_COLUMNS_STUDENT,
+            self::IMPORT_COLUMNS_RELATION,
+            'strcasecmp'
+        );
+
+        /* The csv doesn't contain any conclusive fields which means we can't identify
+         * what kind of file this is; it could be any of the others
+         */
+        if (!\count($columns)) {
+            throw new \InvalidArgumentException('Parent CSV structure is inconclusive');
+        }
+
+        /* Case-insensitve comparison
+         */
+        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
     }
 
 
@@ -583,16 +640,34 @@ class Processor
 
 
     /**
-     * $row is the same as the expected columns of a Relations csv
+     * Identify columns that appear in the relation csv, but in none of the others
+     * Presence of at least one of these columns concludes this is a relation csv
      *
-     * @param array $row
+     * @param array $header
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    private function isRelation(array $row): bool
+    private function isRelation(array $header): bool
     {
-        return $this->matches($row, self::IMPORT_COLUMNS_RELATION);
-    }
+        $columns = array_udiff(
+            self::IMPORT_COLUMNS_RELATION,
+            self::IMPORT_COLUMNS_PARENT,
+            self::IMPORT_COLUMNS_STAFF,
+            self::IMPORT_COLUMNS_STUDENT,
+            'strcasecmp'
+        );
 
+        /* The csv doesn't contain any conclusive fields which means we can't identify
+         * what kind of file this is; it could be any of the others
+         */
+        if (!\count($columns)) {
+            throw new \InvalidArgumentException('Relation CSV structure is inconclusive');
+        }
+
+        /* Case-insensitve comparison
+         */
+        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
+    }
 
     /**
      * Process the Relations csv
@@ -694,19 +769,6 @@ class Processor
         }
 
         return $n;
-    }
-
-
-    /**
-     * The elements of $row match $expected exactly
-     *
-     * @param array $row
-     * @param array $expected
-     * @return bool
-     */
-    private function matches(array $row, array $expected): bool
-    {
-        return !\count(array_diff($row, $expected));
     }
 
 
