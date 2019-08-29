@@ -1269,17 +1269,20 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return Model
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception
+     * @throws DefinitionException
      */
     public function findById($id)
     {
         // special case: 0 === root, but not in db
         // TODO localise setName()
-        if (null !== $id && 0 == $id) {
-            // TODO this should only need to check (0 === $id) but we need to support strings, see SA-4539
+        if ($id === 0 || $id === '0') {
             return $this->createModel()
                         ->setId(0)
                         ->setName('Top Level')
-                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
+                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID))
+                        ->setCodes($this->getJoinMapper('codes')->createCollection())
+                        ->setYearLevels($this->getJoinMapper('folder_year_level')->createCollection())
+                        ->setCurriculumNodes($this->getJoinMapper('curriculum_node_for_category')->createCollection());
         }
 
         /** @var Model $folder */

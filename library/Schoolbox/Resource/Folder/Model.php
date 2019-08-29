@@ -314,7 +314,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
             $externalIds = [];
 
-            /** @var \Schoolbox\Resource\Folder\Code\Model $code */
             foreach ($codeCollection as $code) {
                 $teacherIds = $DEPRECATED_EXTERNAL_CLASS->getTeachers($code->getCode());
                 if(is_array($teacherIds)) {
