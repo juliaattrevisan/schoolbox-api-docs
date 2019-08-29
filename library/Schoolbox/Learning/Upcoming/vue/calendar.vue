@@ -51,7 +51,6 @@
 
     // Various URLs that FullCalendar may make use of.
     const URL_EVENT_SOURCE = '/learning/due/events';
-    const EVENT_SOURCE_ID  = 1;
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
