@@ -97,10 +97,12 @@ class Controller extends Base
                 case 'staff':
                 case 'parent':
                 case 'relation':
-                    $logs[] = (new Processor($this->getRequest()->post['file'], $attachment, $db))->process()->getLog();
+                    $logs[] = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
                     break;
 
-                default: break;
+                default:
+                    // TODO: Error message for unknown type
+                    break;
             }
         }
 

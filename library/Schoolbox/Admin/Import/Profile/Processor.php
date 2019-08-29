@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Profile;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 
 /**
@@ -135,9 +136,9 @@ class Processor
 
 
     /**
-     * @var array
+     * @var IStorage
      */
-    private $files;
+    private $file;
 
 
     /**
@@ -188,12 +189,10 @@ class Processor
      * Processor constructor.
      *
      * @param string     $type
-     * @param array      $files
+     * @param IStorage   $file
      * @param IConnector $database
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
-    public function __construct(string $type, array $files, IConnector $database)
+    public function __construct(string $type, IStorage $file, IConnector $database)
     {
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
@@ -203,58 +202,12 @@ class Processor
         $this->database = $database;
 
         $this->type = $type;
-        $this->files = $this->presortFiles($files);
+        $this->file = $file;
     }
 
 
     /**
-     * Sort the files so that the relation one comes last
-     *
-     * @param array $files
-     * @return array
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     */
-    private function presortFiles(array $files): array
-    {
-        $profileFiles = [];
-        $relationFiles = [];
-
-        foreach($files as $file) {
-            $reader = new Reader($file->readStream(), true);
-
-            /* Load the first row
-             */
-            $reader->next();
-
-            /* Get the columns out and from here, work out what kind of file it is
-             */
-            $header = $reader->current();
-
-            if ($this->isRelation($header)) {
-                $relationFiles[] = [
-                    'file' => $file,
-                    'reader' => $reader,
-                    'header' => $header
-                ];
-            } else {
-                $profileFiles[] = [
-                    'file' => $file,
-                    'reader' => $reader,
-                    'header' => $header
-                ];
-            }
-        }
-
-        /* Process all of these files in the required order
-         */
-        return array_merge($profileFiles, $relationFiles);
-    }
-
-
-    /**
-     * Process each of the supplied files in a specific order
-     * Relationship csvs must come last
+     * Process the supplied file
      *
      * Override this class for different data sources when needed
      *
@@ -264,16 +217,14 @@ class Processor
      */
     public function process(): Processor
     {
-        foreach ($this->files as $file) {
-            try {
-                $this->log("Starting processing {$file['file']->getBasename()}", '', self::LOG_OK);
+        try {
+            $this->log("Starting processing {$this->file->getBasename()}", '', self::LOG_OK);
 
-                $n = $this->processOne($file['reader'], $file['header']);
+            $n = $this->processOne(new Reader($this->file->readStream(), true));
 
-                $this->log("Processing {$file['file']->getBasename()} complete", '', "{$n} rows");
-            } catch (\InvalidArgumentException $e) {
-                $this->log($e->getMessage(), '', self::LOG_ERROR);
-            }
+            $this->log("Processing {$this->file->getBasename()} complete", '', "{$n} rows");
+        } catch (\InvalidArgumentException $e) {
+            $this->log($e->getMessage(), '', self::LOG_ERROR);
         }
 
         return $this;
@@ -284,7 +235,6 @@ class Processor
      * Process the contents of a supplied file
      *
      * @param Reader $reader
-     * @param array  $header
      * @return int
      * @throws \Alaress\Database\Exception
      * @throws \InvalidArgumentException
@@ -292,9 +242,11 @@ class Processor
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processOne(Reader $reader, array $header): int
+    private function processOne(Reader $reader): int
     {
-       if ($this->isStudentProfile($header)) {
+        $header = $reader->readHeaderRow();
+
+        if ($this->isStudentProfile($header)) {
 
             /* Process the Student Profile csv
              */
