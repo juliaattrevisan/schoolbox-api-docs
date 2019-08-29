@@ -99,7 +99,15 @@ class Controller extends Base
                 $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
 
                 try {
-                    $logs = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
+                    $processor = new Processor($this->getRequest()->post['file'], $attachment[0], $db);
+
+                    /* Actually persist changes
+                     */
+                    if ((bool)$this->getRequest()->query['perform']) {
+                        $processor->setPerform(true);
+                    }
+
+                    $logs = $processor->process()->getLog();
                 } catch (\InvalidArgumentException $e) {
                     $errors[] = $e->getMessage();
                 }
@@ -111,8 +119,11 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
             'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
+            'attachment' => $this->getRequest()->post['attachment'],
             'errors' => $errors,
             'logs' => $logs,
+            'file' => $this->getRequest()->post['file'],
+            'perform' => (bool)$this->getRequest()->query['perform']
         ])->setTitle('Import User Profile'));
     }
 }
