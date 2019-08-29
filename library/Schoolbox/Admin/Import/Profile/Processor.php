@@ -647,13 +647,13 @@ class Processor
              * (probably from human error but who knows)
              */
             if (!$cache[$row['Role Type 1']][$row['External ID 1']]) {
-                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", "Skipped: {$row['Role Type 1']} {$row['External ID 1']} doesn't exist");
+                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}: {$row['Role Type 1']} {$row['External ID 1']} doesn't exist", self::LOG_SKIP);
 
                 continue;
             }
 
             if (!$cache[$row['Role Type 2']][$row['External ID 2']]) {
-                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", "Skipped: {$row['Role Type 2']} {$row['External ID 2']} doesn't exist");
+                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}: {$row['Role Type 2']} {$row['External ID 2']} doesn't exist", self::LOG_SKIP);
 
                 continue;
             }
