@@ -261,8 +261,6 @@ class Processor
      */
     private function processOne(Reader $reader): int
     {
-        $header = $reader->readHeaderRow();
-
         if ($this->isStudentProfile()) {
 
             /* Process the Student Profile csv
@@ -291,9 +289,9 @@ class Processor
            $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
 
            return $this->processRelation($reader);
-       }
+        }
 
-        throw new \InvalidArgumentException('Unknown header contents' . implode(', ', $header));
+        throw new \InvalidArgumentException('Unrecognised csv containing header row ' . implode(', ', $reader->readHeaderRow()));
     }
 
 
