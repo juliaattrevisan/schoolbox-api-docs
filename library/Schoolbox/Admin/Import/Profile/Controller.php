@@ -89,18 +89,23 @@ class Controller extends Base
         $logs = [];
         $errors = [];
 
-        /* Process attachment specifically
-         */
-        if ($this->getRequest()->post['attachment']) {
-            $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
-
-            try {
-                $logs = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
-            } catch (\InvalidArgumentException $e) {
-                $errors[] = $e->getMessage();
-            }
+        if (!$this->getRequest()->post['file']) {
+            $errors[] = 'Please choose a csv type.';
         } else {
-            $errors[] = 'No files were supplied.';
+
+            /* Process attachment specifically
+             */
+            if ($this->getRequest()->post['attachment']) {
+                $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
+
+                try {
+                    $logs = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
+                } catch (\InvalidArgumentException $e) {
+                    $errors[] = $e->getMessage();
+                }
+            } else {
+                $errors[] = 'No files were supplied.';
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
