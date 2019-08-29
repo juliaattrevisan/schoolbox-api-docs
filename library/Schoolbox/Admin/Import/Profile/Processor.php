@@ -203,6 +203,14 @@ class Processor
 
 
     /**
+     * Perform changes
+     *
+     * @var bool
+     */
+    private $perform = false;
+
+
+    /**
      * Processor constructor.
      *
      * @param string     $type
@@ -225,6 +233,19 @@ class Processor
 
         $this->type = $type;
         $this->file = $file;
+    }
+
+
+    /**
+     * Execute changes
+     *
+     * @param bool $perform
+     * @return $this
+     */
+    public function setPerform(bool $perform): self
+    {
+        $this->perform = $perform;
+        return $this;
     }
 
 
@@ -390,8 +411,10 @@ class Processor
                 ->setBoardingStatus((bool)$row['Boarding Status'])
                 ->setBaseProfile($baseProfile);
 
-            $this->baseProfileMapper->save($baseProfile);
-            $this->studentProfileMapper->save($studentProfile);
+            if ($this->perform) {
+                $this->baseProfileMapper->save($baseProfile);
+                $this->studentProfileMapper->save($studentProfile);
+            }
 
             if ($create) {
                 $this->log("Creating new student profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
@@ -475,8 +498,10 @@ class Processor
                 ->setCampusName($row['Campus'])
                 ->setBaseProfile($baseProfile);
 
-            $this->baseProfileMapper->save($baseProfile);
-            $this->staffProfileMapper->save($staffProfile);
+            if ($this->perform) {
+                $this->baseProfileMapper->save($baseProfile);
+                $this->staffProfileMapper->save($staffProfile);
+            }
 
             if ($create) {
                 $this->log("Creating new staff profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
@@ -556,8 +581,10 @@ class Processor
                 ->setEmail($row['Email'])
                 ->setBaseProfile($baseProfile);
 
-            $this->baseProfileMapper->save($baseProfile);
-            $this->parentProfileMapper->save($parentProfile);
+            if ($this->perform) {
+                $this->baseProfileMapper->save($baseProfile);
+                $this->parentProfileMapper->save($parentProfile);
+            }
 
             if ($create) {
                 $this->log("Creating new parent profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
@@ -666,7 +693,9 @@ class Processor
                 ->setChildProfileId($cache[$row['Role Type 2']][$row['External ID 2']])
                 ->setEmergencyContact((bool)$row['Emergency Contact']);
 
-            $this->relationMapper->save($relation);
+            if ($this->perform) {
+                $this->relationMapper->save($relation);
+            }
 
             $this->log("Created relation called \"{$row['Type']}\" between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", self::LOG_OK);
 
