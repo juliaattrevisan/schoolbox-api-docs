@@ -201,9 +201,14 @@ class Processor
      * @param string     $type
      * @param IStorage   $file
      * @param IConnector $database
+     * @throws \InvalidArgumentException
      */
     public function __construct(string $type, IStorage $file, IConnector $database)
     {
+        if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATION], true)) {
+            throw new \InvalidArgumentException('Unknown csv type.');
+        }
+
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
         $this->studentProfileMapper = new Profile\Student\Mapper();
@@ -224,6 +229,7 @@ class Processor
      * @throws \RuntimeException
      * @throws Exception
      * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function process(): Processor
     {
@@ -251,6 +257,7 @@ class Processor
      * @throws \PDOException
      * @throws Exception
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function processOne(Reader $reader): int
     {

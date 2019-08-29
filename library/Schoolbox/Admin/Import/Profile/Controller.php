@@ -77,6 +77,7 @@ class Controller extends Base
      * @throws \ReflectionException
      * @throws \RuntimeException
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function postUpload()
     {
@@ -86,30 +87,27 @@ class Controller extends Base
         $collectorFactory = new CollectorFactory();
 
         $logs = [];
+        $errors = [];
 
         /* Process attachment specifically
          */
         if ($this->getRequest()->post['attachment']) {
             $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
 
-            switch ($this->getRequest()->post['file']) {
-                case Processor::CSV_STUDENT:
-                case Processor::CSV_STAFF:
-                case Processor::CSV_PARENT:
-                case Processor::CSV_RELATION:
-                    $logs[] = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
-                    break;
-
-                default:
-                    // TODO: Error message for unknown type
-                    break;
+            try {
+                $logs = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
+            } catch (\InvalidArgumentException $e) {
+                $errors[] = 'Invalid file type selected.';
             }
+        } else {
+            $errors[] = 'No files were supplied.';
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
             'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
-            'logs' => $logs
+            'errors' => $errors,
+            'logs' => $logs,
         ])->setTitle('Import User Profile'));
     }
 }

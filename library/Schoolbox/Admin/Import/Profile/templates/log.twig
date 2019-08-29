@@ -8,6 +8,20 @@
     </div>
 </div>
 
+{% if errors|length %}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="alert-box alert">
+            The following errors were detected:
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% else %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Import Results</h2>
@@ -35,4 +49,4 @@
         {% endfor %}
     </div>
 </div>
-
+{% endif %}
