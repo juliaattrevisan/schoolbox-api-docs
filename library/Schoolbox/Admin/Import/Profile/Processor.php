@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Profile;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 
@@ -221,7 +222,7 @@ class Processor
      * Override this class for different data sources when needed
      *
      * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \InvalidArgumentException
      */
     public function process(): Processor
@@ -248,7 +249,7 @@ class Processor
      * @throws \Alaress\Database\Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
     private function processOne(Reader $reader): int
@@ -308,28 +309,39 @@ class Processor
      * @param Reader $reader
      * @return int number of rows processed
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      * @throws \Alaress\Database\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function processStudentProfile(Reader $reader): int
     {
-        /* Find the previously inserted ids; these need to be removed from both
-         * this table, the relationship table, and the sis_user_profile table
-         *
-         * Each file can be uploaded independently of the others which means we can't
-         * make very many assumptions/presumptions about the db's contents
+        /* This many rows were affected
          */
-        $newIds = [];
+        $n = 0;
 
         foreach ($reader as $row) {
-            $baseProfile = $this->baseProfileMapper->createModel()
+            $create = true;
+
+            /* Try to find a baseProfile that matches the externalId
+             */
+            try {
+                $studentProfile = $this->studentProfileMapper->findByExternalId($row['External ID']);
+                $baseProfile = $studentProfile->getBaseProfile();
+
+                $create = false;
+            } catch (Exception $e) {
+                $studentProfile = $this->studentProfileMapper->createModel();
+                $baseProfile = $this->baseProfileMapper->createModel();
+            }
+
+            $baseProfile
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
                 ->setLastname($row['Surname']);
 
-            $studentProfile = $this->studentProfileMapper->createModel()
+            $studentProfile
                 ->setDateOfBirth(\Alaress_Date_Format::now())
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
@@ -364,14 +376,16 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->studentProfileMapper->save($studentProfile);
 
-            $this->log('Created student profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            if ($create) {
+                $this->log('Creating new student profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            } else {
+                $this->log('Updating existing student profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            }
 
-            $newIds[] = $baseProfile->getId();
+            $n++;
         }
 
-        $this->removePreviousProfileIds($this->studentProfileMapper->getTable(), $newIds);
-
-        return \count($newIds);
+        return $n;
     }
 
 
@@ -394,7 +408,7 @@ class Processor
      * @param Reader $reader
      * @return int number of rows processed
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      * @throws \Alaress\Database\Exception
      */
@@ -460,7 +474,7 @@ class Processor
      * @param Reader $reader
      * @return int number of rows processed
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      * @throws \Alaress\Database\Exception
      */
@@ -578,7 +592,7 @@ class Processor
      * @return int number of rows processed
      * @throws \Alaress\Database\Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
     private function processRelation(Reader $reader): int
