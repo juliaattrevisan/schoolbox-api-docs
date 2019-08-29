@@ -225,16 +225,15 @@ class External_Schoolbox_User implements External_UserInterface
     {
         return $this->internalDatabase->executeQuery(
             "
-                SELECT      c.synergy_id AS RelatedID
-                FROM        user_relation ur
-                INNER JOIN  user p ON p.id = ur.user_id AND p.deleted_at IS NULL
-                INNER JOIN  user c ON c.id = ur.relation_id AND c.deleted_at IS NULL
-                WHERE       p.synergy_id = :externalUserId AND
-                            ur.relation_type = :relationType
+                SELECT sup_child.external_id AS RelatedID
+                FROM sis_user_profile sup
+                    JOIN sis_user_profile_parent supp on sup.id = supp.sis_user_profile_id
+                    JOIN sis_user_profile_relation supr ON supp.sis_user_profile_id =supr.user_profile_id
+                    JOIN sis_user_profile sup_child ON supr.child_profile_id = sup_child.id 
+                WHERE sup.external_id = :externalUserId
             ",
             [
                 'externalUserId' => $externalUserId,
-                'relationType'   => UserRelation::RELATION_TYPE_PARENT,
             ]
         )->fetchAll();
     }
