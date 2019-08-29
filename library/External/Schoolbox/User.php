@@ -116,12 +116,8 @@ class External_Schoolbox_User implements External_UserInterface
             ",
             ['externalUserId' => $externalUserId]
         )->fetch();
-        if($student) {
-            return $student;
-        }
-        else {
-            return [];
-        }
+
+        return $student ?: [];
     }
 
 
@@ -341,7 +337,36 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getParent(string $externalUserId): array
     {
-        return [];
+        $parent = $this->internalDatabase->executeQuery(
+            "
+                SELECT   title AS Title,
+                         firstname AS Preferred,
+                         lastname AS Surname,
+                         email AS Email,
+                         '' AS OccupEmail,
+                         '' AS DefaultEmailCode,
+                         phone_home AS HomePhone,
+                         '' AS SilentPhoneFlag,
+                         mobile AS MobilePhone,
+                         '' AS DirectoryIncludeFlag,
+                         '' AS SpouseID,
+                         '' AS SpouseTitle,
+                         '' AS SpousePreferred,
+                         '' AS SpouseSurname,
+                         '' AS SpouseEmail,
+                         '' AS SpouseOccupEmail,
+                         '' AS SpouseDefaultEmailCode,
+                         '' AS SpouseMobilePhone,
+                         '' AS SpouseDirectoryIncludeFlag
+                FROM      `sis_user_profile` sup
+                JOIN      `sis_user_profile_parent` supp ON sup.id = supp.sis_user_profile_id
+                WHERE      sup.external_id = :externalUserId
+                AND        sup.deleted_at IS NULL AND supp.deleted_at IS NULL
+            ",
+            ['externalUserId' => $externalUserId]
+        )->fetch();
+
+        return $parent ?: [];
     }
 
     /**
@@ -383,6 +408,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaff(string $externalUserId): array
     {
+
         return [];
     }
 
