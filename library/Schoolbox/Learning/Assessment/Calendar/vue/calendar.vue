@@ -93,9 +93,8 @@
                             'X-Requested-With' : 'XMLHttpRequest'
                         },
                         params: {
-                            start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                            end:   Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            // How do I get filters into here?
+                            start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                            end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                             filters: this.selectedFilters,
                         },
                         paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),

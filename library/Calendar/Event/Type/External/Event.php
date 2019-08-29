@@ -57,10 +57,10 @@ class Event extends EventBase
     protected function getRenderClasses(): array
     {
         return [
-            'javascript' => Renderer\Javascript::class,
-            'html'       => Renderer\Html::class,
-            'vcal'       => Renderer\VObject::class,
-            'csv'        => Renderer\Csv::class,
+            self::RENDER_FORMAT_JSON => Renderer\Javascript::class,
+            self::RENDER_FORMAT_HTML => Renderer\Html::class,
+            self::RENDER_FORMAT_VCAL => Renderer\VObject::class,
+            self::RENDER_FORMAT_CSV  => Renderer\Csv::class,
         ];
     }
 }

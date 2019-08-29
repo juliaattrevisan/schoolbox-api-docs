@@ -7,6 +7,7 @@
 
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Calendar\Event\Collection\Lister;
+use Calendar\Event\Type\EventBase;
 use Schoolbox\User;
 
 class Component_Dashboard_CalendarController extends Component_Dashboard_ControllerAbstract
@@ -144,7 +145,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     $hasSeries = true;
                 }
 
-                $htmlEvent = $this->eventRenderer->renderEvent($currentEvent, 'html');
+                $htmlEvent = $this->eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML);
                 if ($htmlEvent) {
                     $this->setVar('EVENT_CONTENT', $htmlEvent);
                     $this->parse("event_block", "event", true);

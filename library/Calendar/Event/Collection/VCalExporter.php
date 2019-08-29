@@ -7,6 +7,7 @@
 
 namespace Calendar\Event\Collection;
 
+use Calendar\Event\Type\EventBase;
 use Sabre\VObject\Component\VCalendar;
 use Config;
 
@@ -37,7 +38,7 @@ class VCalExporter implements IExporter
         echo trim(str_replace('END:VCALENDAR', '', $vCalendar->serialize())) . "\r\n";
 
         foreach ($renderer->getAllEvents() as $currentEvent) {
-            echo $renderer->renderEvent($currentEvent, 'vcal');
+            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_VCAL);
         }
 
         echo "END:VCALENDAR";

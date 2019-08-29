@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 class Renderer
 {
-
     /** @var Calendar_Api_EventType_Interface $api An instance of a Calendar API class */
     private $api;
 

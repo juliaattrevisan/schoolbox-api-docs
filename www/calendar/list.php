@@ -10,6 +10,7 @@
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Calendar\Api\ModuleChecker;
 use Calendar\Event\Collection\Lister;
+use Calendar\Event\Type\EventBase;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Config\ConfigMapper;
 
@@ -116,7 +117,7 @@ if ($calendar->getAllEvents()->count()) {
 
         $this->setVar('EVENT_DATE', $currentEvent->getStartTime()->getLongDateOnly());
 
-        $htmlEvent = $calendar->renderEvent($currentEvent, 'html');
+        $htmlEvent = $calendar->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML);
         if ($htmlEvent) {
             $this->setVar('TWIG_EVENT', $htmlEvent);
             $this->parse('event_block', 'event', true);

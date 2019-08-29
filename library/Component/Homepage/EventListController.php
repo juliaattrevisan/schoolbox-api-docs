@@ -7,6 +7,7 @@
  */
 
 use Calendar\Event\Collection\Lister;
+use Calendar\Event\Type\EventBase;
 use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
@@ -135,7 +136,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                 $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
-                $htmlEvent = $eventRenderer->renderEvent($currentEvent, 'html');
+                $htmlEvent = $eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML);
                 if  ($htmlEvent) {
                     $this->setVar('group_events', $htmlEvent);
                     $this->parse('group_events_block', 'group_events', true);

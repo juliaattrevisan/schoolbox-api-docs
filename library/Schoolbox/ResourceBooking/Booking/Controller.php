@@ -13,6 +13,7 @@ use Alaress\Date\Interval;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress\Date\Recurrence;
+use Calendar\Event\Type\EventBase;
 use Calendar_Api_Config_Mapper;
 use DateTime;
 use External_Timetable;
@@ -626,7 +627,7 @@ class Controller extends Base
             $this->getUser()
         );
 
-        $output = $calendar->renderAll('javascript');
+        $output = $calendar->renderAll(EventBase::RENDER_FORMAT_JSON);
 
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();

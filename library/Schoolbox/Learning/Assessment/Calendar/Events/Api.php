@@ -140,7 +140,7 @@ class Api implements Calendar_Api_EventType_Interface
         }
 
         // Not published yet?
-        // TODO shouldn't this be handled in the request?
+        // TODO remove this once the TemporalState filter is added
         $publishDate = $assessment->getPublishAt();
         if (!$publishDate
             || $publishDate instanceof Alaress_Date_NullDate

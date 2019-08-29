@@ -9,6 +9,8 @@
 
 namespace Calendar\Event\Collection;
 
+use Calendar\Event\Type\EventBase;
+
 class CSVExporter implements IExporter
 {
 
@@ -42,7 +44,7 @@ class CSVExporter implements IExporter
 		echo implode(',', $csvFormat)."\n";
 
 		foreach ($renderer->getAllEvents() as $currentEvent) {
-            echo $renderer->renderEvent($currentEvent, 'csv');
+            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_CSV);
 		}
 	}
 }

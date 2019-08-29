@@ -12,6 +12,7 @@
  */
 
 namespace Calendar\Event\Type\Submission;
+
 use Calendar\Event\Type\EventBase;
 use Custom\Mggs\Calendar\Event\Type\Submission as Mggs;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -19,10 +20,15 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 class Event extends EventBase
 {
+    /**
+     * Format for rendering events for the MGGS PBL calendar.
+     */
+    public const RENDER_FORMAT_JSON_PBL = 'pbl-javascript';
+
 
     /* Contextual: The owner of the submission box
       */
-    protected $authorId = -1;
+    protected $authorId   = -1;
     protected $authorName = '';
 
     /**
@@ -53,22 +59,23 @@ class Event extends EventBase
 
     /**
      * Get submission note
-	 *
-	 * @return string
-	 */
+     *
+     * @return string
+     */
     public function getTitle()
     {
         return $this->getAssessment()->getBaseContext()->getFolder()->getTitle() . "\n" . $this->title;
     }
 
-	/**
-	 * Event visibility; generates a CSS string
-	 *
-	 * @return string
-	 */
-	public function getFilterClasses() {
-		return 'personal';
-	}
+    /**
+     * Event visibility; generates a CSS string
+     *
+     * @return string
+     */
+    public function getFilterClasses()
+    {
+        return 'personal';
+    }
 
     /* Getters/Setters
      */
@@ -78,7 +85,8 @@ class Event extends EventBase
      *
      * @return array
      */
-    public function getCategoryCodes() {
+    public function getCategoryCodes()
+    {
         return $this->getCategory()->getCodes();
     }
 
@@ -86,17 +94,19 @@ class Event extends EventBase
      * Get category string
      * @return string
      */
-    public function getCategoryCodeString() {
+    public function getCategoryCodeString()
+    {
         return $this->getCategory()->getCodeString();
     }
 
     /**
      * @deprecated
-     * @param  bool $is_assessment
+     * @param bool $is_assessment
      *
      * @return $this
      */
-    public function setIsAssessment($is_assessment) {
+    public function setIsAssessment($is_assessment)
+    {
 //        $this->is_assessment = $is_assessment;
         return $this;
     }
@@ -105,7 +115,8 @@ class Event extends EventBase
      * @deprecated
      * @return bool
      */
-    public function getIsAssessment() {
+    public function getIsAssessment()
+    {
         return true;
 //        return $this->is_assessment;
     }
@@ -149,11 +160,11 @@ class Event extends EventBase
     protected function getRenderClasses(): array
     {
         return [
-            'javascript'     => Renderer\Javascript::class,
-            'html'           => Renderer\Html::class,
-            'vcal'           => Renderer\VObject::class,
-            'csv'            => Renderer\Csv::class,
-            'pbl-javascript' => Mggs\Renderer\Javascript::class
+            self::RENDER_FORMAT_JSON     => Renderer\Javascript::class,
+            self::RENDER_FORMAT_HTML     => Renderer\Html::class,
+            self::RENDER_FORMAT_VCAL     => Renderer\VObject::class,
+            self::RENDER_FORMAT_CSV      => Renderer\Csv::class,
+            self::RENDER_FORMAT_JSON_PBL => Mggs\Renderer\Javascript::class,
         ];
     }
 }
