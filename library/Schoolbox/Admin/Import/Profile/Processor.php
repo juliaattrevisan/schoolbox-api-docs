@@ -411,25 +411,36 @@ class Processor
      * @throws Exception
      * @throws \UnexpectedValueException
      * @throws \Alaress\Database\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function processStaffProfile(Reader $reader): int
     {
-        /* Find the previously inserted ids; these need to be removed from both
-         * this table, the relationship table, and the sis_user_profile table
-         *
-         * Each file can be uploaded independently of the others which means we can't
-         * make very many assumptions/presumptions about the db's contents
+        /* This many rows were affected
          */
-        $newIds = [];
+        $n = 0;
 
         foreach ($reader as $row) {
-            $baseProfile = $this->baseProfileMapper->createModel()
+            $create = true;
+
+            /* Try to find a baseProfile that matches the externalId
+             */
+            try {
+                $staffProfile = $this->staffProfileMapper->findByExternalId($row['External ID']);
+                $baseProfile = $staffProfile->getBaseProfile();
+
+                $create = false;
+            } catch (Exception $e) {
+                $staffProfile = $this->staffProfileMapper->createModel();
+                $baseProfile = $this->baseProfileMapper->createModel();
+            }
+
+            $baseProfile
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
                 ->setLastname($row['Surname']);
 
-            $staffProfile = $this->staffProfileMapper->createModel()
+            $staffProfile
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
                 ->setCategory($row['Staff Category'])
@@ -444,14 +455,16 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->staffProfileMapper->save($staffProfile);
 
-            $this->log('Created staff profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            if ($create) {
+                $this->log('Creating new staff profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            } else {
+                $this->log('Updating existing staff profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            }
 
-            $newIds[] = $baseProfile->getId();
+            $n++;
         }
 
-        $this->removePreviousProfileIds($this->staffProfileMapper->getTable(), $newIds);
-
-        return \count($newIds);
+        return $n;
     }
 
 
