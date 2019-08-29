@@ -33,7 +33,7 @@
                 </div>
                 <div class="content">
                     <div class="row">
-                        <div class="small-12 medium-3 columns">
+                        <div class="small-12 medium-6 columns">
                             <h2>Students</h2>
                             <p>
                                 This file is required to contain: External ID, Type, Username, Firstname and Surname.
@@ -43,7 +43,7 @@
                                 <a href="/adminv2/import/profile/student.csv" class="button icon-download">Download Student Template</a>
                             </p>
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div class="small-12 medium-6 columns">
                             <h2>Staff</h2>
                             <p>
                                 This file is required to contain: External ID, Type, Username, Firstname and Surname.
@@ -53,7 +53,7 @@
                                 <a href="/adminv2/import/profile/staff.csv" class="button icon-download">Download Staff Template</a>
                             </p>
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div class="small-12 medium-6 columns">
                             <h2>Parents</h2>
                             <p>
                                 This file is required to contain: External ID, Type, Username, Firstname and Surname.
@@ -63,7 +63,7 @@
                                 <a href="/adminv2/import/profile/parent.csv" class="button icon-download">Download Parent Template</a>
                             </p>
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div class="small-12 medium-6 columns">
                             <h2>Relationships</h2>
                             <p>
                                 This file must contain a Relation ID and a Student ID. The Relation ID must match a parent
@@ -76,9 +76,20 @@
                         </div>
                     </div>
                 </div>
-            </section>
 
-            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                <div class="content">
+                    <label for="file">Choose CSV type</label>
+                    <select id="file" name="file">
+                        <option disabled selected>Please select</option>
+                        <option value="student">Student</option>
+                        <option value="staff">Staff</option>
+                        <option value="parent">Parent</option>
+                        <option value="relation">Relationship</option>
+                    </select>
+
+                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                </div>
+            </section>
 
             <input type="submit" class="button" value="Upload CSV">
         </form>

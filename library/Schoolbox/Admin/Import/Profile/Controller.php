@@ -62,7 +62,7 @@ class Controller extends Base
             ->setAttachPrompt('Upload CSV Files')
             ->setMimeFilter('text/csv')
             ->setReadOnly(false)
-            ->setMulti(true)
+            ->setMulti(false)
             ->getTwigContext();
     }
 
@@ -83,14 +83,31 @@ class Controller extends Base
         /** @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');
 
-        $attachments = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
+        $collectorFactory = new CollectorFactory();
 
-        $processor = (new Processor($attachments, $db))->process();
+        $logs = [];
+
+        /* Process attachment specifically
+         */
+        if ($this->getRequest()->post['attachment']) {
+            $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
+
+            switch ($this->getRequest()->post['file']) {
+                case 'student':
+                case 'staff':
+                case 'parent':
+                case 'relation':
+                    $logs[] = (new Processor($this->getRequest()->post['file'], $attachment, $db))->process()->getLog();
+                    break;
+
+                default: break;
+            }
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
             'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
-            'log' => $processor->getLog()
+            'logs' => $logs
         ])->setTitle('Import User Profile'));
     }
 }

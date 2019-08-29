@@ -126,6 +126,15 @@ class Processor
 
 
     /**
+     * Upload type
+     * One of [student, staff, parent, relation]
+     *
+     * @var string
+     */
+    private $type;
+
+
+    /**
      * @var array
      */
     private $files;
@@ -178,12 +187,13 @@ class Processor
     /**
      * Processor constructor.
      *
+     * @param string     $type
      * @param array      $files
      * @param IConnector $database
-     * @throws \RuntimeException
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function __construct(array $files, IConnector $database)
+    public function __construct(string $type, array $files, IConnector $database)
     {
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
@@ -192,6 +202,7 @@ class Processor
         $this->relationMapper = new Profile\Relation\Mapper();
         $this->database = $database;
 
+        $this->type = $type;
         $this->files = $this->presortFiles($files);
     }
 
