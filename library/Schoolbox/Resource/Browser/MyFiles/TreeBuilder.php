@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource\Browser\MyFiles;
 
 
+use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource;
@@ -99,9 +100,9 @@ class TreeBuilder extends AbstractTreeBuilder
      * Return the given folder's colour
      *
      * @param IFolder $folder
-     * @return string
+     * @return null|Color
      */
-    protected function getFolderColour(IFolder $folder)
+    protected function getFolderColour(IFolder $folder): ?Color
     {
         return $folder->getColour();
     }

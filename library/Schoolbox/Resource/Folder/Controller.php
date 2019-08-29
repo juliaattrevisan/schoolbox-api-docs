@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Folder;
 
+use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use ArrayAccess;
@@ -920,13 +921,19 @@ class Controller extends BaseController
         $colourIndex = 0;
         $folderList = new Collection();
         $userAccess  = [];
+        $colourFactory = new ColorFactory();
+        $colourCache = new GenericCollection(Color::class);
 
         /** @var \Schoolbox\Resource\Folder\Model $folder */
         foreach ($this->folderMapper->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true)
                      ->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
+                $hexColour = $colourList[$colourIndex]->getHexColour();
+                if(!$colourCache->offsetExists($hexColour)){
+                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
+                }
                 /* Apply colour from list if no colour exists */
-                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                $folder->setColour($colourCache->getOffset($hexColour));
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
             $accessType = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());

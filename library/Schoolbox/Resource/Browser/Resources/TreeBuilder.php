@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -84,14 +85,14 @@ class TreeBuilder extends AbstractTreeBuilder
         return '/send.php?id=' . $file->getId();
     }
 
-    
+
     /**
      * Return the given folder's colour
      *
      * @param IFolder $folder
-     * @return string
+     * @return null|Color
      */
-    protected function getFolderColour(IFolder $folder)
+    protected function getFolderColour(IFolder $folder): ?Color
     {
         return $folder->getColour();
     }

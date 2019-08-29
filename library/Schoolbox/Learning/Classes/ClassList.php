@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Learning\Classes;
 
+use Alaress\Color\Color;
+use Alaress\Color\ColorFactory;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
@@ -149,12 +151,18 @@ class ClassList
         $colourList  = $this->timetableColourMapper->findAll();
         $colourIndex = 0;
 
-        /** @var Folder\Model $folder */
+        $colourFactory = new ColorFactory();
+        $colourCache   = new GenericCollection(Color::class);
         foreach ($folderList as $folder) {
             if (!$folder->getColour()) {
+                $hexColour = $colourList[$colourIndex]->getHexColour();
 
-                // Apply colour from list if no colour exists
-                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                // Build colour object from hex string and cache the colour object
+                if (!$colourCache->offsetExists($hexColour)) {
+                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
+                }
+
+                $folder->setColour($colourCache->getOffset($hexColour));
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
         }
