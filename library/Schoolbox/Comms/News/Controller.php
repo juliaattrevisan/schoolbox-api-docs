@@ -864,21 +864,7 @@ class Controller extends Base
         ];
 
         // Link auth requires hydrated audiences
-        $articles->indexByCallback(static function (Model $article) {
-            return $article->getId();
-        });
-        $audiencesPerArticle = $this->audienceMapper
-            ->findForArticles($articles->keys())
-            ->groupByCallback(static function (Audience\Model $segment) {
-                return $segment->getCommsNewsArticle()->getId();
-            });
-        foreach ($articles as $articlesId => $article) {
-            $article->setAudience(
-                $audiencesPerArticle->keyExists($articlesId)
-                    ? $audiencesPerArticle->getOffset($articlesId)
-                    : new GenericCollection(Audience\Model::class)
-            );
-        }
+        $this->hydrateArticleAudiences($articles);
 
         $articles->reindex();
 
@@ -1065,6 +1051,8 @@ class Controller extends Base
             'pageNum' => $params->getPageNum(),
             'referrer' => $params->getReferrer()
         ]);
+
+        $this->hydrateArticleAudiences($partialData['articles']);
 
         return $partialData;
     }
@@ -1581,5 +1569,31 @@ class Controller extends Base
     private function generateValidSubmittedArticleSpec() :\Alaress\Specification\ISpecification
     {
         return (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
+    }
+
+
+    /**
+     * Convenience helper to hydrate the articles' audiences
+     *
+     * @param GenericCollection|Model[] $articles
+     * @throws UnexpectedValueException
+     */
+    private function hydrateArticleAudiences(GenericCollection $articles): void
+    {
+        $articles->indexByCallback(static function (Model $article) {
+            return $article->getId();
+        });
+        $audiencesPerArticle = $this->audienceMapper
+            ->findForArticles($articles->keys())
+            ->groupByCallback(static function (Audience\Model $segment) {
+                return $segment->getCommsNewsArticle()->getId();
+            });
+        foreach ($articles as $articlesId => $article) {
+            $article->setAudience(
+                $audiencesPerArticle->keyExists($articlesId)
+                    ? $audiencesPerArticle->getOffset($articlesId)
+                    : new GenericCollection(Audience\Model::class)
+            );
+        }
     }
 }
