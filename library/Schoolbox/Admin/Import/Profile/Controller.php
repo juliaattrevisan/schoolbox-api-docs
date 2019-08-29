@@ -93,10 +93,10 @@ class Controller extends Base
             $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
 
             switch ($this->getRequest()->post['file']) {
-                case 'student':
-                case 'staff':
-                case 'parent':
-                case 'relation':
+                case Processor::CSV_STUDENT:
+                case Processor::CSV_STAFF:
+                case Processor::CSV_PARENT:
+                case Processor::CSV_RELATION:
                     $logs[] = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
                     break;
 

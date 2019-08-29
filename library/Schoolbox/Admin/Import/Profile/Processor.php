@@ -24,6 +24,15 @@ class Processor
 {
 
     /**
+     * Strings that denote a csv file
+     */
+    public const CSV_STUDENT = Role::STUDENT;
+    public const CSV_STAFF = Role::STAFF;
+    public const CSV_PARENT = Role::PARENT;
+    public const CSV_RELATION = 'relation';
+
+
+    /**
      * Status string for successful row processing
      */
     private const LOG_OK = 'OK';
@@ -246,28 +255,28 @@ class Processor
     {
         $header = $reader->readHeaderRow();
 
-        if ($this->isStudentProfile($header)) {
+        if ($this->isStudentProfile()) {
 
             /* Process the Student Profile csv
              */
             $reader->setExpectedColumns(self::IMPORT_COLUMNS_STUDENT);
 
             return $this->processStudentProfile($reader);
-        } elseif ($this->isStaffProfile($header)) {
+        } elseif ($this->isStaffProfile()) {
 
             /* Process the Staff Profile csv
              */
             $reader->setExpectedColumns(self::IMPORT_COLUMNS_STAFF);
 
             return $this->processStaffProfile($reader);
-        } elseif ($this->isParentProfile($header)) {
+        } elseif ($this->isParentProfile()) {
 
             /* Process the Parent Profile csv
              */
             $reader->setExpectedColumns(self::IMPORT_COLUMNS_PARENT);
 
             return $this->processParentProfile($reader);
-        } elseif ($this->isRelation($header)) {
+        } elseif ($this->isRelation()) {
 
            /* Process the Relations csv
             */
@@ -284,30 +293,12 @@ class Processor
      * Identify columns that appear in the student csv, but in none of the others
      * Presence of at least one of these columns concludes this is a student csv
      *
-     * @param array $header
      * @return bool
      * @throws \InvalidArgumentException
      */
-    private function isStudentProfile(array $header): bool
+    private function isStudentProfile(): bool
     {
-        $columns = array_udiff(
-            self::IMPORT_COLUMNS_STUDENT,
-            self::IMPORT_COLUMNS_PARENT,
-            self::IMPORT_COLUMNS_STAFF,
-            self::IMPORT_COLUMNS_RELATION,
-            'strcasecmp'
-        );
-
-        /* The csv doesn't contain any conclusive fields which means we can't identify
-         * what kind of file this is; it could be any of the others
-         */
-        if (!\count($columns)) {
-            throw new \InvalidArgumentException('Student CSV structure is inconclusive');
-        }
-
-        /* Case-insensitve comparison
-         */
-        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
+        return $this->type === self::CSV_STUDENT;
     }
 
 
@@ -388,30 +379,12 @@ class Processor
      * Identify columns that appear in the staff csv, but in none of the others
      * Presence of at least one of these columns concludes this is a staff csv
      *
-     * @param array $header
      * @return bool
      * @throws \InvalidArgumentException
      */
-    private function isStaffProfile(array $header): bool
+    private function isStaffProfile(): bool
     {
-        $columns = array_udiff(
-            self::IMPORT_COLUMNS_STAFF,
-            self::IMPORT_COLUMNS_STUDENT,
-            self::IMPORT_COLUMNS_PARENT,
-            self::IMPORT_COLUMNS_RELATION,
-            'strcasecmp'
-        );
-
-        /* The csv doesn't contain any conclusive fields which means we can't identify
-         * what kind of file this is; it could be any of the others
-         */
-        if (!\count($columns)) {
-            throw new \InvalidArgumentException('Staff CSV structure is inconclusive');
-        }
-
-        /* Case-insensitve comparison
-         */
-        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
+        return $this->type === self::CSV_STAFF;
     }
 
 
@@ -472,30 +445,12 @@ class Processor
      * Identify columns that appear in the parent csv, but in none of the others
      * Presence of at least one of these columns concludes this is a parent csv
      *
-     * @param array $header
      * @return bool
      * @throws \InvalidArgumentException
      */
-    private function isParentProfile(array $header): bool
+    private function isParentProfile(): bool
     {
-        $columns = array_udiff(
-            self::IMPORT_COLUMNS_PARENT,
-            self::IMPORT_COLUMNS_STAFF,
-            self::IMPORT_COLUMNS_STUDENT,
-            self::IMPORT_COLUMNS_RELATION,
-            'strcasecmp'
-        );
-
-        /* The csv doesn't contain any conclusive fields which means we can't identify
-         * what kind of file this is; it could be any of the others
-         */
-        if (!\count($columns)) {
-            throw new \InvalidArgumentException('Parent CSV structure is inconclusive');
-        }
-
-        /* Case-insensitve comparison
-         */
-        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
+        return $this->type === self::CSV_PARENT;
     }
 
 
@@ -608,30 +563,12 @@ class Processor
      * Identify columns that appear in the relation csv, but in none of the others
      * Presence of at least one of these columns concludes this is a relation csv
      *
-     * @param array $header
      * @return bool
      * @throws \InvalidArgumentException
      */
-    private function isRelation(array $header): bool
+    private function isRelation(): bool
     {
-        $columns = array_udiff(
-            self::IMPORT_COLUMNS_RELATION,
-            self::IMPORT_COLUMNS_PARENT,
-            self::IMPORT_COLUMNS_STAFF,
-            self::IMPORT_COLUMNS_STUDENT,
-            'strcasecmp'
-        );
-
-        /* The csv doesn't contain any conclusive fields which means we can't identify
-         * what kind of file this is; it could be any of the others
-         */
-        if (!\count($columns)) {
-            throw new \InvalidArgumentException('Relation CSV structure is inconclusive');
-        }
-
-        /* Case-insensitve comparison
-         */
-        return (bool)\count(array_uintersect($header, $columns, 'strcasecmp'));
+        return $this->type === self::CSV_RELATION;
     }
 
     /**
