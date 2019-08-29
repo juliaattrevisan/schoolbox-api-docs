@@ -44,9 +44,9 @@ trait FillFormTrait
         $this->setFormParam('audience', implode(',', $fragments));
 
         $publishDate = $article->getPublishAt();
-        $this->setFormParam('publishAt', $publishDate ? $publishDate->getUsingFormat(\Alaress_Date_Format::FORMAT_DATE_PICKER) : '');
+        $this->setFormParam('publishAt', $publishDate ? $publishDate->getDatePicker() : '');
         $expiresAt = $article->getExpiresAt();
-        $this->setFormParam('expiresAt', $expiresAt ? $expiresAt->getUsingFormat(\Alaress_Date_Format::FORMAT_DATE_PICKER) : '');
+        $this->setFormParam('expiresAt', $expiresAt ? $expiresAt->getDatePicker() : '');
         $this->setFormParam('draft', 'true');
     }
 }

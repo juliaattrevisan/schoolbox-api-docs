@@ -38,10 +38,10 @@ trait UpdateFormTrait
         if ($assessable instanceof DueWork\Model) {
             $this->setFormParam('acceptOnline', $assessable->getAcceptOnline());
         }
-        $this->setFormParam('publishDate', $assessable->getPublishAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATE_PICKER));
-        $this->setFormParam('dueDate', $assessable->getDueAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATE_PICKER));
-        $this->setFormParam('openDate', $assessable->getOpenAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATE_PICKER));
-        $this->setFormParam('closeDate', $assessable->getCloseAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATE_PICKER));
+        $this->setFormParam('publishDate', $assessable->getPublishAt()->getDatePicker());
+        $this->setFormParam('dueDate', $assessable->getDueAt()->getDatePicker());
+        $this->setFormParam('openDate', $assessable->getOpenAt()->getDatePicker());
+        $this->setFormParam('closeDate', $assessable->getCloseAt()->getDatePicker());
         if ($assessable instanceof Project) {
             $this->setFormParam('summator', $assessable->getSummator()::getTitle());
         }

@@ -1053,6 +1053,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return $this;
     }
 
+    // ************************* Formatting *************************
+
     /**
      * Transform the datetime into a localised version
      *
@@ -1420,6 +1422,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function getCalendarDateTime()
     {
         return $this->getUsingFormat($this->getLocale()->calendarDateTime());
+    }
+
+    /**
+     * @return string
+     */
+    public function getDatePicker(): string
+    {
+        return $this->getUsingFormat(self::FORMAT_DATE_PICKER);
     }
 
     /**
