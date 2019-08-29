@@ -585,6 +585,10 @@ class MapperProxy
         $options['due_before'] = $to;
         $builder               = $this->convertOptionsToPredicateBuilder($options, false);
 
+        if (count($ids) < 1) {
+            return new GenericCollection(IAssessable::class);
+        }
+
         if (isset($ids)) {
             $builder->in('id', $ids);
         }
