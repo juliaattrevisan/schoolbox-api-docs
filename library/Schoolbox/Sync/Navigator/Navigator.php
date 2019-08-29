@@ -28,7 +28,8 @@ class Navigator {
      *
      * @param array $nodes
      */
-    public function __construct(array $nodes) {
+    public function __construct(array $nodes)
+    {
         $this->allNodes = new Collection();
 
         /* Only add instances of \Schoolbox\Sync\Navigator\Node

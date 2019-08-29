@@ -311,11 +311,11 @@ class Processor
             return $this->processParentProfile($reader);
         } elseif ($this->isRelation()) {
 
-           /* Process the Relations csv
-            */
-           $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
+            /* Process the Relations csv
+             */
+            $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
 
-           return $this->processRelation($reader);
+            return $this->processRelation($reader);
         }
 
         throw new \InvalidArgumentException('Unrecognised csv containing header row ' . implode(', ', $reader->readHeaderRow()));

@@ -411,7 +411,8 @@ class Reader implements \Iterator
     /**
      * Close files and reset properties
      */
-    private function cleanup() {
+    private function cleanup()
+    {
         if (\is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
             $this->fp = null;
@@ -424,7 +425,8 @@ class Reader implements \Iterator
     /**
      * Cleans up after itself when destroyed
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->cleanup();
     }
 }
