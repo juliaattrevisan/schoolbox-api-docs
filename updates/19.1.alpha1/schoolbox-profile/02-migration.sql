@@ -33,7 +33,7 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
-             JOIN `house`  ON `user`.`house` = `house`.`id`
+             LEFT JOIN `house`  ON `user`.`house` = `house`.`id`
     WHERE `groups`.`group_type` = 'student';
 
 /*

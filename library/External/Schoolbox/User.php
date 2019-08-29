@@ -73,49 +73,55 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudent(string $externalUserId): array
     {
-        return $this->internalDatabase->executeQuery(
+        $student = $this->internalDatabase->executeQuery(
             "
-                SELECT    user.id AS StudentID,
-                          user.firstname AS StudentGiven1,
-                          user.lastname AS StudentSurname,
-                          UNIX_TIMESTAMP(dob) AS StudentBirthDate,
-                          '' AS StudentTutorName,
-                          '' AS StudentHeadOfHouse,
-                          '' AS HeadOfHouseID,
-                          '' AS StudentFormStaffName,
-                          '' AS StudentTutorDescription,
-                          '' AS TeacherFormID,
-                          '' AS StudentForm,
-                          '' AS TeacherTutorID,
-                          '' AS StudentTutor,
-                          '' AS FormDescription,
-                          '' AS StudentHouseDescription,
-                          user_profile.house AS StudentHouse,
-                          level AS StudentYearLevel,
+                SELECT    external_id AS StudentID,
+                          firstname AS StudentGiven1,
+                          lastname AS StudentSurname,
+                          UNIX_TIMESTAMP(date_of_birth) AS StudentBirthDate,
+                          tutor_teacher_name AS StudentTutorName,
+                          tutor_teacher_name AS StudentTutor,
+                          tutor_group AS StudentTutorDescription,
+                          tutor_teacher_id AS TeacherTutorID,
+                          house_name AS StudentHouseDescription,
+                          house_name AS StudentHouse,
+                          head_of_house_name AS StudentHeadOfHouse,
+                          head_of_house_id AS HeadOfHouseID,
+                          form_teacher_name AS StudentFormStaffName,
+                          form_teacher_id AS TeacherFormID,
+                          form_name AS StudentForm,
+                          form_name AS FormDescription,
+                          year_level AS StudentYearLevel,
                           '' AS StudentLockerBook,
                           '' AS StudentEmergencyName,
                           '' AS StudentEmergencyPhone,
                           '' AS StudentEmergencyPhoneAlt,
-                          '' AS StudentMedicalAlert,
-                          '' AS StudentMobilePhone,
-                          '' AS StudentSpecialNeedsFlag,
-                          user_profile.esl_flag AS EnglishSecondFlag,
+                          alert_medical AS StudentMedicalAlert,
+                          mobile AS StudentMobilePhone,
+                          individual_learning_plans AS StudentSpecialNeedsFlag,
+                          esl AS EnglishSecondFlag,
                           '' AS StudentStudiesCode,
-                          '' AS AlertMessage,
-                          '' AS CourtOrderType,
-                          '' AS StudentBoarder,
-                          '' AS Comment,
+                          alert_message AS AlertMessage,
+                          alert_legal AS CourtOrderType,
+                          boarding_status AS StudentBoarder,
+                          alert_comment AS Comment,
                           '' AS StudentEnrolmentDate,
                           '' AS StudentLeavingDate,
-                          user_profile.ib_flag AS StudentIBFlag,
+                          ib AS StudentIBFlag,
                           0 AS countIndividualEducationPlans
-                FROM      `user`
-                LEFT JOIN user_profile ON user.id = user_profile.user_id
-                WHERE     user.synergy_id = :externalUserId
-                AND       `user`.deleted_at IS NULL
+                FROM      `sis_user_profile` sup
+                JOIN      `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
+                WHERE      sup.external_id = :externalUserId
+                AND        sup.deleted_at IS NULL AND sups.deleted_at IS NULL
             ",
             ['externalUserId' => $externalUserId]
         )->fetch();
+        if($student) {
+            return $student;
+        }
+        else {
+            return [];
+        }
     }
 
 
