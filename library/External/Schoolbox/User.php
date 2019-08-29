@@ -408,8 +408,28 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaff(string $externalUserId): array
     {
+        $staff = $this->internalDatabase->executeQuery(
+            "
+            SELECT    external_id AS SchoolStaffCode,
+                      building AS StaffBuilding,
+                      room AS StaffRoom,
+                      phone AS StaffExtension,
+                      '' AS StaffMobilePhone,
+                      '' AS StaffDefaultMobilePhone,
+                      campus_name AS StaffCampusDescription,
+                      category AS StaffCategoryDescription,
+                      department AS StaffDepartment,
+                      '' AS StaffVoiceMail,
+                      '' AS StaffHouseDescription
+            FROM      `sis_user_profile` sup
+            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+            WHERE      sup.external_id = :externalUserId
+            AND        sup.deleted_at IS NULL AND sups.deleted_at IS NULL
+        ",
+            ['externalUserId' => $externalUserId]
+        )->fetch();
 
-        return [];
+        return $staff ?: [];
     }
 
     /**
