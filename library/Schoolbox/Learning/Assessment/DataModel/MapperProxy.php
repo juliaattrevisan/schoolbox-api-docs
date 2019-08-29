@@ -585,7 +585,7 @@ class MapperProxy
         $options['due_before'] = $to;
         $builder               = $this->convertOptionsToPredicateBuilder($options, false);
 
-        if ($ids) {
+        if (isset($ids)) {
             $builder->in('id', $ids);
         }
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
