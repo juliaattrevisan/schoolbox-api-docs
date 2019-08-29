@@ -97,7 +97,7 @@ class Controller extends Base
             try {
                 $logs = (new Processor($this->getRequest()->post['file'], $attachment[0], $db))->process()->getLog();
             } catch (\InvalidArgumentException $e) {
-                $errors[] = 'Invalid file type selected.';
+                $errors[] = $e->getMessage();
             }
         } else {
             $errors[] = 'No files were supplied.';

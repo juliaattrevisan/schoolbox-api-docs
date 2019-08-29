@@ -25,7 +25,6 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Import Results</h2>
-        {% for log in logs %}
         <section>
             <table>
                 <thead>
@@ -35,18 +34,17 @@
                     <th width="20%" class="text-right">Import Result</th>
                 </thead>
                 <tbody>
-                {% for row in log %}
+                {% for log in logs %}
                     <tr>
-                        <td>{{ row.timestamp }}</td>
-                        <td>{{ row.message }}</td>
-                        <td>{{ row.person }}</td>
-                        <td class="text-right">{{ row.status }}</td>
+                        <td>{{ log.timestamp }}</td>
+                        <td>{{ log.message }}</td>
+                        <td>{{ log.person }}</td>
+                        <td class="text-right">{{ log.status }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </section>
-        {% endfor %}
     </div>
 </div>
 {% endif %}
