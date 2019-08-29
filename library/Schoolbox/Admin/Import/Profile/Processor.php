@@ -181,6 +181,7 @@ class Processor
      * @param array      $files
      * @param IConnector $database
      * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $files, IConnector $database)
     {
@@ -201,6 +202,7 @@ class Processor
      * @param array $files
      * @return array
      * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     private function presortFiles(array $files): array
     {
