@@ -34,7 +34,9 @@ class Module extends AbstractModule
             // determine user's permissions
             /** @var \Alaress\Session\Session $session */
             $session = $ci->get('session');
-            $session->start();
+            if (!$session->isStarted()) {
+                $session->start();
+            }
             try {
                 return PortfolioWebDAV::factory();
             } catch (\UnexpectedValueException $e) {
