@@ -113,14 +113,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             if ($studentSubmission->getFiles() !== null) {
                 $response->setAllFiles(new GenericCollection(SingleFile\Model::class));
+                foreach ($studentSubmission->getFiles() as $file) {
+                    // Translate the file subobject
+                    $responseFile = clone $file;
+                    $responseFile->setSubmission($response);
+                    $response->getAllFiles()->add($responseFile);
+                }
             }
 
-            foreach ($studentSubmission->getFiles() as $file) {
-                // Translate the file subobject
-                $responseFile = clone $file;
-                $responseFile->setSubmission($response);
-                $response->getAllFiles()->add($responseFile);
-            }
             $dueWorkResponses->add($response);
         }
 
@@ -170,18 +170,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setSubmittedAt($domainObject->getSubmittedAt());
 
+            // Files
             if ($domainObject->getAllFiles() !== null) {
                 $dataModel->setFiles(new GenericCollection(SingleFile\Model::class));
-            }
-
-            // Files
-            foreach ($domainObject->getAllFiles() as $file) {
-
-                // The post-save of a file will have to handle saving of plagscan
-                // (due to the new Plagscan object not holding a file ID)
-                $dataModelFile = clone $file;
-                $dataModelFile->setSubmission($dataModel);
-                $dataModel->getFiles()->add($dataModelFile);
+                foreach ($domainObject->getAllFiles() as $file) {
+                    // The post-save of a file will have to handle saving of plagscan
+                    // (due to the new Plagscan object not holding a file ID)
+                    $dataModelFile = clone $file;
+                    $dataModelFile->setSubmission($dataModel);
+                    $dataModel->getFiles()->add($dataModelFile);
+                }
             }
 
             $dataModels->add($dataModel);
