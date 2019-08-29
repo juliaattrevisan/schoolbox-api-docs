@@ -626,22 +626,22 @@ class Processor
          * so we might as well cache these to save on performance penalty
          */
         $statement = $this->database->prepareQuery('
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::PARENT . '" AS roleType 
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::PARENT . '" AS roleType
             FROM schoolbox.sis_user_profile profile
             INNER JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
-            
+
             UNION
-            
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STUDENT . '" AS roleType 
+
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STUDENT . '" AS roleType
             FROM schoolbox.sis_user_profile profile
             INNER JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
-            
+
             UNION
-            
+
             SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STAFF . '" AS roleType
             FROM schoolbox.sis_user_profile profile
             INNER JOIN sis_user_profile_staff staff ON profile.id = staff.sis_user_profile_id
-            
+
             ORDER BY id
         ');
 
@@ -660,12 +660,15 @@ class Processor
             $cache[$roleType][$externalId] = $profileId;
         }
 
-        /* Delete previous relations
-         * Without a primary key you just can't tell where one set ends and where another begins
-         */
-        $this->database->executeQuery('
-            DELETE FROM sis_user_profile_relation
-        ');
+//        Relationships are now additive which means we don't really need this
+//        ...or do we...?
+//
+//        /* Delete previous relations
+//         * Without a primary key you just can't tell where one set ends and where another begins
+//         */
+//        $this->database->executeQuery('
+//            DELETE FROM sis_user_profile_relation
+//        ');
 
         /* Process each relation
          */
