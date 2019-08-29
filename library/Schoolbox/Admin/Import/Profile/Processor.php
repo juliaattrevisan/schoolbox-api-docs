@@ -589,7 +589,7 @@ class Processor
             if ($create) {
                 $this->log("Creating new parent profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             } else {
-                $this->log("Updating existing parent profile for{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+                $this->log("Updating existing parent profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             }
 
             $n++;
