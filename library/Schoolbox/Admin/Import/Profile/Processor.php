@@ -314,7 +314,6 @@ class Processor
      * @throws \PDOException
      * @throws Exception
      * @throws \UnexpectedValueException
-     * @throws \Alaress\Database\Exception
      * @throws DefinitionException
      */
     private function processStudentProfile(Reader $reader): int
