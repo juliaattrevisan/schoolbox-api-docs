@@ -129,11 +129,11 @@ class Processor
      * Columns in a Relation csv
      */
     private const IMPORT_COLUMNS_RELATION = [
-        'Role Type',
-        'Relation ID',
-        'Student ID',
+        'Role Type 1',
+        'External ID 1',
         'Type',
-        'Emergency Contact',
+        'Role Type 2',
+        'External ID 2',
     ];
 
 
@@ -613,14 +613,14 @@ class Processor
              * relation csv may contain data that wasn't in the other three files
              * (probably from human error but who knows)
              */
-            if (!$cache[$row['Role Type']][$row['Relation ID']]) {
-                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', "Skipped: {$row['Role Type']} {$row['Relation ID']} doesn't exist");
+            if (!$cache[$row['Role Type 1']][$row['External ID 1']]) {
+                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", '', "Skipped: {$row['Role Type 1']} {$row['External ID 1']} doesn't exist");
 
                 continue;
             }
 
-            if (!$cache[Role::STUDENT][$row['Student ID']]) {
-                $this->log("Relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', 'Skipped: ' . Role::STUDENT . " {$row['Student ID']} doesn't exist");
+            if (!$cache[$row['Role Type 2']][$row['External ID 2']]) {
+                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", '', "Skipped: {$row['Role Type 2']} {$row['External ID 2']} doesn't exist");
 
                 continue;
             }
@@ -628,14 +628,14 @@ class Processor
             /* Otherwise both exist; build relation
              */
             $relation = $this->relationMapper->createModel()
-                 ->setChildProfileId($cache[Role::STUDENT][$row['Student ID']])
-                 ->setUserProfileId($cache[$row['Role Type']][$row['Relation ID']])
-                 ->setType($row['Type'])
-                 ->setEmergencyContact((bool)$row['Emergency Contact']);
+                ->setUserProfileId($cache[$row['Role Type 1']][$row['External ID 1']])
+                ->setType($row['Type'])
+                ->setChildProfileId($cache[$row['Role Type 2']][$row['External ID 2']])
+                ->setEmergencyContact((bool)$row['Emergency Contact']);
 
             $this->relationMapper->save($relation);
 
-            $this->log("Created relation between {$row['Role Type']} {$row['Relation ID']} and " . Role::STUDENT . " {$row['Student ID']}", '', self::LOG_OK);
+            $this->log("Created relation called \"{$row['Type']}\" between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", '', self::LOG_OK);
 
             /* These two humans have relations
              */
