@@ -91,8 +91,11 @@ class Api implements Calendar_Api_EventType_Interface
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->viewer);
+
         $stack = new Collection();
         foreach ($assessments as $assessment) {
+
             $event = $this->transformAssessmentToEvent($assessment);
             if ($event) {
                 $stack->add($event);
