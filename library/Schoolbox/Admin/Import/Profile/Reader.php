@@ -225,6 +225,34 @@ class Reader implements \Iterator
 
 
     /**
+     * Read a row from the csv
+     *
+     * If column headings don't matter, just return the current row without any transformations
+     * Otherwise try to return an associative array of (expected column, value)
+     *
+     * @link  https://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     * @since 5.0.0
+     */
+    public function current()
+    {
+        /* If column headings don't matter, just return the current row without any transformations
+         */
+        if (null === $this->columnList) {
+            $this->preprocessUnspecifiedColumns();
+
+            return $this->currentRow;
+        }
+
+        /* Otherwise try to return an associative array of (expected column, value)
+         */
+        $this->preprocessSpecifiedColumns();
+
+        return $this->currentRow;
+    }
+
+
+    /**
      * If the filldown option is true, recycle previous row's data where
      * the current row has empty/null gaps
      *
@@ -306,34 +334,6 @@ class Reader implements \Iterator
         /* Remember this as the new previousRow
          */
         $this->previousRow = $this->currentRow;
-    }
-
-
-    /**
-     * Read a row from the csv
-     *
-     * If column headings don't matter, just return the current row without any transformations
-     * Otherwise try to return an associative array of (expected column, value)
-     *
-     * @link  https://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
-     * @since 5.0.0
-     */
-    public function current()
-    {
-        /* If column headings don't matter, just return the current row without any transformations
-         */
-        if (null === $this->columnList) {
-            $this->preprocessUnspecifiedColumns();
-
-            return $this->currentRow;
-        }
-
-        /* Otherwise try to return an associative array of (expected column, value)
-         */
-        $this->preprocessSpecifiedColumns();
-
-        return $this->currentRow;
     }
 
 
