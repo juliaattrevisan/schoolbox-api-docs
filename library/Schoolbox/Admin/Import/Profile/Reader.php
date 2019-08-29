@@ -83,7 +83,7 @@ class Reader implements \Iterator
      *
      * @var bool
      */
-    private $hasHeaderRow = false;
+    private $hasHeaderRow;
 
 
     /**
