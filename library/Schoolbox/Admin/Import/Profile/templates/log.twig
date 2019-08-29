@@ -30,15 +30,13 @@
                 <thead>
                     <th width="10%">Time</th>
                     <th width="50%">Heading</th>
-                    <th width="20%">Person</th>
-                    <th width="20%" class="text-right">Import Result</th>
+                    <th width="40%" class="text-right">Import Result</th>
                 </thead>
                 <tbody>
                 {% for log in logs %}
                     <tr>
                         <td>{{ log.timestamp }}</td>
                         <td>{{ log.message }}</td>
-                        <td>{{ log.person }}</td>
                         <td class="text-right">{{ log.status }}</td>
                     </tr>
                 {% endfor %}

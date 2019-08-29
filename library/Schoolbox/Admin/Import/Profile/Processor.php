@@ -234,13 +234,13 @@ class Processor
     public function process(): Processor
     {
         try {
-            $this->log("Starting processing {$this->file->getBasename()}", '', self::LOG_OK);
+            $this->log("Starting processing {$this->file->getBasename()}", self::LOG_OK);
 
             $n = $this->processOne(new Reader($this->file->readStream(), true));
 
-            $this->log("Processing {$this->file->getBasename()} complete", '', "{$n} rows");
+            $this->log("Processing {$this->file->getBasename()} complete", "{$n} rows");
         } catch (\InvalidArgumentException $e) {
-            $this->log($e->getMessage(), '', self::LOG_ERROR);
+            $this->log($e->getMessage(), self::LOG_ERROR);
         }
 
         return $this;
@@ -379,9 +379,9 @@ class Processor
             $this->studentProfileMapper->save($studentProfile);
 
             if ($create) {
-                $this->log('Creating new student profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+                $this->log("Creating new student profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             } else {
-                $this->log('Updating existing student profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+                $this->log("Updating existing student profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             }
 
             $n++;
@@ -455,9 +455,9 @@ class Processor
             $this->staffProfileMapper->save($staffProfile);
 
             if ($create) {
-                $this->log('Creating new staff profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+                $this->log("Creating new staff profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             } else {
-                $this->log('Updating existing staff profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+                $this->log("Updating existing staff profile {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             }
 
             $n++;
@@ -527,9 +527,9 @@ class Processor
             $this->parentProfileMapper->save($parentProfile);
 
             if ($create) {
-                $this->log('Creating new parent profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+                $this->log("Creating new parent profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             } else {
-                $this->log('Updating existing parent profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+                $this->log("Updating existing parent profile for{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             }
 
             $n++;
@@ -614,13 +614,13 @@ class Processor
              * (probably from human error but who knows)
              */
             if (!$cache[$row['Role Type 1']][$row['External ID 1']]) {
-                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", '', "Skipped: {$row['Role Type 1']} {$row['External ID 1']} doesn't exist");
+                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", "Skipped: {$row['Role Type 1']} {$row['External ID 1']} doesn't exist");
 
                 continue;
             }
 
             if (!$cache[$row['Role Type 2']][$row['External ID 2']]) {
-                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", '', "Skipped: {$row['Role Type 2']} {$row['External ID 2']} doesn't exist");
+                $this->log("Relation between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", "Skipped: {$row['Role Type 2']} {$row['External ID 2']} doesn't exist");
 
                 continue;
             }
@@ -635,7 +635,7 @@ class Processor
 
             $this->relationMapper->save($relation);
 
-            $this->log("Created relation called \"{$row['Type']}\" between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", '', self::LOG_OK);
+            $this->log("Created relation called \"{$row['Type']}\" between {$row['Role Type 1']} {$row['External ID 1']} and {$row['Role Type 2']} {$row['External ID 2']}", self::LOG_OK);
 
             /* These two humans have relations
              */
@@ -650,15 +650,13 @@ class Processor
      * Log four pieces of data
      *
      * @param string $message
-     * @param string $person
      * @param string $status
      */
-    private function log(string $message, string $person, string $status): void
+    private function log(string $message, string $status): void
     {
         $this->log[] = [
             'timestamp' => \Alaress_Date_Format::now()->getTimeOnly(),
             'message' => $message,
-            'person' => $person,
             'status' => $status
         ];
     }
