@@ -93,4 +93,46 @@ class Mapper extends \Schoolbox\Mapper
 
         return $collection;
     }
+
+    /**
+     * Find pieces of a parent's profile by their externalId
+     * Returns base and extension profile
+     *
+     * @param string $externalId
+     * @return Model
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws \PDOException
+     */
+    public function findByExternalId(string $externalId): Model
+    {
+        $query = "
+            SELECT * 
+            FROM {$this->getTable()} parent
+            INNER JOIN sis_user_profile profile ON parent.sis_user_profile_id = profile.id
+            WHERE profile.external_id = :externalId
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute([
+            'externalId' => $externalId
+        ]);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        if ($row) {
+            /** @var Profile\Model $baseProfile */
+            $baseProfile    = $this->getJoinMapper('baseProfile')->hydrate($row);
+            $parentProfile = $this->hydrate($row);
+
+            if ($baseProfile && $parentProfile) {
+                $parentProfile->setBaseProfile($baseProfile);
+
+                return $parentProfile;
+            }
+        }
+
+        throw new Exception('Unknown profile.');
+    }
 }

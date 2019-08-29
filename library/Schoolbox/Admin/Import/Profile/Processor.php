@@ -490,25 +490,36 @@ class Processor
      * @throws Exception
      * @throws \UnexpectedValueException
      * @throws \Alaress\Database\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function processParentProfile(Reader $reader): int
     {
-        /* Find the previously inserted ids; these need to be removed from both
-         * this table, the relationship table, and the sis_user_profile table
-         *
-         * Each file can be uploaded independently of the others which means we can't
-         * make very many assumptions/presumptions about the db's contents
+        /* This many rows were affected
          */
-        $newIds = [];
+        $n = 0;
 
         foreach ($reader as $row) {
-            $baseProfile = $this->baseProfileMapper->createModel()
+            $create = true;
+
+            /* Try to find a baseProfile that matches the externalId
+             */
+            try {
+                $parentProfile = $this->parentProfileMapper->findByExternalId($row['External ID']);
+                $baseProfile = $parentProfile->getBaseProfile();
+
+                $create = false;
+            } catch (Exception $e) {
+                $parentProfile = $this->parentProfileMapper->createModel();
+                $baseProfile = $this->baseProfileMapper->createModel();
+            }
+
+            $baseProfile
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
                 ->setLastname($row['Surname']);
 
-            $parentProfile = $this->parentProfileMapper->createModel()
+            $parentProfile
                 ->setMobile($row['Mobile'])
                 ->setPhoneHome($row['Home Phone'])
                 ->setPhoneWork($row['Work Phone'])
@@ -519,14 +530,16 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->parentProfileMapper->save($parentProfile);
 
-            $this->log('Created parent profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            if ($create) {
+                $this->log('Creating new parent profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            } else {
+                $this->log('Updating existing parent profile', "{$row['Firstname']} {$row['Surname']}", self::LOG_OK);
+            }
 
-            $newIds[] = $baseProfile->getId();
+            $n++;
         }
 
-        $this->removePreviousProfileIds($this->parentProfileMapper->getTable(), $newIds);
-
-        return \count($newIds);
+        return $n;
     }
 
 
