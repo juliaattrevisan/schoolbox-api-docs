@@ -77,7 +77,7 @@ class CourseCest
         $modifyCourse->addUnitSpec($unit->getId(), $unit_name);
 
         $i->amGoingTo('Send save request for the newly created course');
-        $i->sendRequest($coursePayload);
+        $i->sendRequest($modifyCourse);
 
         #THEN
         $i->seeResponseCodeIs(303);

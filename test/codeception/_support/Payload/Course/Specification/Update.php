@@ -23,7 +23,7 @@ class Update extends Request
 
         $this->setReferer("course/modify/{$courseSpec->getId()}");
 
-        $this->setFormParam('name', '');
+        $this->setFormParam('name', $courseSpec->getTitle());
         $this->setFormParam('parent', $courseSpec->getFolder()->getParent()->getId());
         $this->setFormParam('curriculumCodes[0]', '');
         $this->setFormParam('newUnitName', '');
