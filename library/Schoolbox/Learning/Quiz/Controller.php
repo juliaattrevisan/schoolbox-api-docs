@@ -8,18 +8,13 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 

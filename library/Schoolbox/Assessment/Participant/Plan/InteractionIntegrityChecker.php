@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\User;
 use PDOException;
 use Schoolbox\Mapper as SchoolboxMapper;

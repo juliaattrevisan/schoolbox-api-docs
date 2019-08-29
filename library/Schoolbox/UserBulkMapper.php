@@ -110,7 +110,7 @@ class UserBulkMapper extends UserMapper
         $userCollection = new Collection();
 
         foreach ($statement as $row) {
-            if($userCollection->offsetExists($row['u.id'])){
+            if ($userCollection->offsetExists($row['u.id'])) {
                 $user = $userCollection->offsetGet($row['u.id']);
             } else {
                 $user = $this->hydrate($row, 'u');

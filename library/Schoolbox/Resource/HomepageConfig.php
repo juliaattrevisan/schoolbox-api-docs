@@ -24,7 +24,7 @@ class HomepageConfig {
 	/**
 	 * The template originally used to create the page
 	 *
-	 * @var HomepageTemplate
+     * @var HomepageTemplate
 	 */
 	protected $template;
 

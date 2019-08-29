@@ -559,7 +559,7 @@ class Page implements ISoftDeletable{
      * @param GenericCollection<Permission> $permissions
      * @return $this
 	 */
-	public function setPermissions(GenericCollection $permissions): self
+    public function setPermissions(GenericCollection $permissions): self
     {
         $permissions->assertCollectionOf(Permission::class);
         $this->permissions = $permissions;

@@ -300,22 +300,16 @@ class Controller extends BaseController
      */
     public function postDeleteFolder()
     {
-        $folderMapper = $this->folderMapper;
-        $errorMapper  = $this->errorMapper;
-        $access       = $this->access;
-
         // Find the folder to be deleted
-
         try {
-            $folder = $folderMapper->findById($this->getRequest()->post["id"]);
+            $folder = $this->folderMapper->findById($this->getRequest()->post["id"]);
         } catch (\Exception $e) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         // Make sure they have access to delete the folder
-
-        if ($access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+        if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
         }
 
         $this->recursiveDelete($this->getRequest()->post["id"], $this->getUser());
@@ -333,34 +327,28 @@ class Controller extends BaseController
      */
     public function postMoveFolder()
     {
-        $access       = $this->access;
-        $errorMapper  = $this->errorMapper;
-        $folderMapper = $this->folderMapper;
-
         if ($this->getRequest()->post["source"] != $this->getRequest()->post["destination"])
         {
             // Check the folders exist
-
             try
             {
-                $source = $folderMapper->findById($this->getRequest()->post["source"]);
-                $destination = $folderMapper->findById($this->getRequest()->post["destination"]);
+                $source = $this->folderMapper->findById($this->getRequest()->post["source"]);
+                $destination = $this->folderMapper->findById($this->getRequest()->post["destination"]);
             }
             catch (\Exception $e)
             {
                 // One of the folders didn't exist
-                throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
             }
 
-            if ($access->getFolderAccess($this->getUser(), $source->getId()) < UserAccess::ACCESS_WRITE)
-                throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+            if ($this->access->getFolderAccess($this->getUser(), $source->getId()) < UserAccess::ACCESS_WRITE)
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
-            if ($access->getFolderAccess($this->getUser(), $destination->getId()) < UserAccess::ACCESS_WRITE)
-                throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+            if ($this->access->getFolderAccess($this->getUser(), $destination->getId()) < UserAccess::ACCESS_WRITE)
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
             // Move the folder
-
-            $folderMapper->moveFolder($source->getId(), $destination->getId(), $this->getUser());
+            $this->folderMapper->moveFolder($source->getId(), $destination->getId(), $this->getUser());
 
             // Yippee, all done.
 
@@ -372,8 +360,7 @@ class Controller extends BaseController
         else
         {
             // Doesn't make sense, source and destination folders the same
-
-            throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
 
@@ -597,10 +584,13 @@ class Controller extends BaseController
         if (!$folder->getInherit()) {
             /** @var GenericCollection|RoleAccess[] $existingRolePerms */
             $existingRolePerms = $folder->getId()
-                ? $this->roleAccessMapper->findAllForFolder($folder)->indexByCallback(
-                    static function (RoleAccess $roleAccess) {
-                        return $roleAccess->getRole()->getId();
-                    })
+                ? $this->roleAccessMapper
+                    ->findAllForFolder($folder)
+                    ->indexByCallback(
+                        static function (RoleAccess $roleAccess) {
+                            return $roleAccess->getRole()->getId();
+                        }
+                    )
                 : $this->roleAccessMapper->createCollection();
 
             foreach ($rolePermissions as $roleId => $permissionLevel) {
@@ -683,11 +673,13 @@ class Controller extends BaseController
     private function setCurriculumNodesOnFolder(Model $folder, array $nodeIds): array
     {
         // Ensure nodes are indexed by node.id
-        $folder->getCurriculumNodes()->indexByCallback(
-            static function (Curriculum\Node\Model $node) {
-                return $node->getId();
-            }
-        );
+        $folder
+            ->getCurriculumNodes()
+            ->indexByCallback(
+                static function (Curriculum\Node\Model $node) {
+                    return $node->getId();
+                }
+            );
 
         // Remove existing node if not in new set
         $nodesToRemove = $this->curriculumNodeMapper->createCollection();
@@ -789,40 +781,37 @@ class Controller extends BaseController
     protected function createGroup($postData, Model $model, User $user)
     {
         // No changes in "KEEP_EXISTING" case
-        $roleAccessMapper = $this->roleAccessMapper;
-        $userAccessMapper = $this->userAccessMapper;
-        $groupMapper      = $this->groupMapper;
 
         // is 'Create Group' set true?
         if ($postData['groupcheck']) {
 
             // Prevent students with write access from being able to create folders
-            if ($roleAccessMapper->roleMayOwnFolders($user->getRole())) {
+            if ($this->roleAccessMapper->roleMayOwnFolders($user->getRole())) {
                 // Setup group and forward to group management page
 
                 try {
                     // confirm the group exists
-                    $groupMapper->findOneByColumn('cid', $model->getId());
+                    $this->groupMapper->findOneByColumn('cid', $model->getId());
 
                 } catch (MapperException $e) {
                     // doesn't exist
-                    $group = $groupMapper->createModel()
+                    $group = $this->groupMapper->createModel()
                         ->setFolder($model)
                         ->setType(Group::PRIVATE_GROUP)
                         ->setForceFollow(false);
 
                     // create the group
-                    $groupMapper->save($group);
+                    $this->groupMapper->save($group);
                 }
 
                 // assign group ownership to the effecting user
-                $uA = $userAccessMapper->createModel()
+                $uA = $this->userAccessMapper->createModel()
                     ->setService(UserAccess::SERVICE_HOMEPAGE)
                     ->setAccessLevel(UserAccess::ACCESS_FULL)
                     ->setServiceIdentifier($model->getId())
                     ->setUser($user);
 
-                $userAccessMapper->save($uA);
+                $this->userAccessMapper->save($uA);
 
                 // TODO replace with routeLookup once it exists
                 return '/group/modify/'.$model->getId();
@@ -875,22 +864,17 @@ class Controller extends BaseController
      */
     public function postFolderReset()
     {
-        $access       = $this->access;
-        $errorMapper  = $this->errorMapper;
-        $folderMapper = $this->folderMapper;
-        $fileMapper   = $this->fileMapper;
-
         try
         {
-            $folder = $folderMapper->findById($this->getRequest()->post["id"]);
+            $folder = $this->folderMapper->findById($this->getRequest()->post["id"]);
 
-            if ($access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
-                throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, null);
+            if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, null);
             }
         }
         catch (\Exception $e)
         {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         // Remove component content
@@ -899,14 +883,14 @@ class Controller extends BaseController
         $homepage->emptyHomepage();
 
         // Soft Delete Assessments
-        $folderMapper->softDeleteAssessments($folder);
+        $this->folderMapper->softDeleteAssessments($folder);
 
         // Delete all files
 
-        $fileList = $fileMapper->findForFolders([ $folder->getId() ]);
+        $fileList = $this->fileMapper->findForFolders([ $folder->getId() ]);
 
         foreach ($fileList as $file) {
-            $fileMapper->delete($file);
+            $this->fileMapper->delete($file);
         }
 
         // Delete all links

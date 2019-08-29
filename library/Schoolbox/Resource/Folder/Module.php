@@ -84,8 +84,8 @@ class Module extends BaseModule
                 return (int)$params['parentId'];
             }, Access::getInstance())
         );
-        $preloadCreate = function (array $params){
-            if(($params['parent'] ?? null) instanceof Model){
+        $preloadCreate = function (array $params) {
+            if (($params['parent'] ?? null) instanceof Model) {
                 return ['parent' => $params['parent']];
             }
             return ['parent' => $this->getMapper()->findById($params['parentId'])];
@@ -93,14 +93,14 @@ class Module extends BaseModule
         $this->register('POST', '/folder/{parentId:\d+}/create', 'postCreateFolder', $permCreate, $preloadCreate);
 
         // POST Update
-        $permUpdate = new Rule\All(
+        $permUpdate    = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
                 return (int)$params['folderId'];
             }, Access::getInstance())
         );
-        $preloadUpdate = function (array $params){
-            if(($params['folder'] ?? null) instanceof Model){
+        $preloadUpdate = function (array $params) {
+            if (($params['folder'] ?? null) instanceof Model) {
                 return ['folder' => $params['folder']];
             }
             return ['folder' => $this->getMapper()->findById($params['folderId'])];

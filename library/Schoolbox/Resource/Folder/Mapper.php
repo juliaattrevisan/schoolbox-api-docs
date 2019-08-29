@@ -613,7 +613,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach ($oldCodes as $oldCode) {
             $found = false;
             foreach ($newCodes as $newCode) {
-                if (strnatcasecmp($oldCode->getCode(), $newCode) === 0) {
+                if (strnatcasecmp($oldCode->getCode(), $newCode->getCode()) === 0) {
                     $found = true;
                     break;
                 }
@@ -631,7 +631,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach ($newCodes as $newCode) {
             $found = false;
             foreach ($oldCodes as $oldCode) {
-                if (strnatcasecmp($oldCode->getCode(), $newCode) === 0) {
+                if (strnatcasecmp($oldCode->getCode(), $newCode->getCode()) === 0) {
                     $found = true;
                     break;
                 }
