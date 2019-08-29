@@ -163,6 +163,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
             $viewer = $this->getUser();
 
+            $isParent = $_SESSION['user']->getRole()->isParent();
+            $restrictParentEmails = $this->getConfigMapper()->get('restrict_parent_emails');
+
             if ($userListCount > 0) {
                 $i = 0;
                 foreach ($userList as $user) {
@@ -170,6 +173,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     /* Member bulk email
                      */
                     if ($user->getEmail()) {
+                        if ($restrictParentEmails && $isParent && $user->getRole()->isParent()){
+                            continue;
+                        }
                         $emailall[] = Scrub::text($user->getFormattedEmailDisplay());
                     }
 
