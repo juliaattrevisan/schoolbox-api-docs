@@ -126,7 +126,7 @@ class Session
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();
-            $_SESSION['password']           = $_POST['password'];
+            $_SESSION['password']           = $_POST['password'] ?? null;
             $_SESSION['eportfolio_enabled'] = $user->getEportfolioEnable();
             $_SESSION['ip']                 = $ip;
             $_SESSION['campus']             = $userHandler->getUserCampus($user->getId());
