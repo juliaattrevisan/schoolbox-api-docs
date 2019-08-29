@@ -9,6 +9,8 @@
  * This component is deprecated, it was previously used to display a school's campus calendar on a homepage
  *
  */
+
+use Calendar\Event\Type\EventBase;
 use \Schoolbox\Permission\Access\UserAccess;
 use Calendar\Event\Collection\Lister;
 
@@ -113,7 +115,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
             $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
-            $htmlEvent = $eventRenderer->renderEvent($currentEvent, 'html');
+            $htmlEvent = $eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML);
             if($htmlEvent) {
                 $this->setVar('campus_events', $htmlEvent);
                 $this->parse('campus_events_block', 'campus_events', true);

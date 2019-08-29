@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Calendar\Event\Collection;
 
+use Calendar\Event\Type\EventBase;
+
 class JsonExporter implements IExporter
 {
 
@@ -24,7 +26,7 @@ class JsonExporter implements IExporter
         $events = $renderer->getAllEvents();
         echo '[';
         foreach ($events as $i => $event) {
-            echo ($i > 0 ? ',' : '') . $renderer->renderEvent($event, 'javascript');
+            echo ($i > 0 ? ',' : '') . $renderer->renderEvent($event, EventBase::RENDER_FORMAT_JSON);
         }
         echo ']';
     }
