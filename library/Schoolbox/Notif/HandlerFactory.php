@@ -76,7 +76,11 @@ class HandlerFactory
         };
         $this->handlerGenerators[self::SYS_FATAL_LOG] = function ()
         {
-            return new StreamHandler(STDERR, Logger::EMERGENCY, false);
+            // If we are in web context, this const will not exist, just insert a placeholder handler
+            // that will never consume the record, thus bubbling to the next handler in the stack
+            return defined('STDERR')
+                ? new StreamHandler(STDERR, Logger::EMERGENCY, false)
+                : new SkipHandler();
         };
         $this->handlerGenerators[self::SYS_MAIL] = function ()
         {
@@ -84,7 +88,11 @@ class HandlerFactory
         };
         $this->handlerGenerators[self::SYS_LOG] = function ()
         {
-            return new StreamHandler(STDERR, Logger::ALERT, false);
+            // If we are in web context, this const will not exist, just insert a placeholder handler
+            // that will never consume the record, thus bubbling to the next handler in the stack
+            return defined('STDERR')
+                ? new StreamHandler(STDERR, Logger::ALERT, false)
+                : new SkipHandler();
         };
         $this->handlerGenerators[self::SYS_EXCEPTION_MAIL] = function ()
         {
@@ -110,7 +118,7 @@ class HandlerFactory
 
 
     /**
-     * Set the logger for this particular 
+     * Set the logger for this particular
      * @param LoggerInterface $log
      * @return static
      */
