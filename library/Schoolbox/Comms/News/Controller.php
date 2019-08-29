@@ -863,6 +863,23 @@ class Controller extends Base
             ]
         ];
 
+        // Link auth requires hydrated audiences
+        $articles->indexByCallback(static function (Model $article) {
+            return $article->getId();
+        });
+        $audiencesPerArticle = $this->audienceMapper
+            ->findForArticles($articles->keys())
+            ->groupByCallback(static function (Audience\Model $segment) {
+                return $segment->getCommsNewsArticle()->getId();
+            });
+        foreach ($articles as $articlesId => $article) {
+            $article->setAudience(
+                $audiencesPerArticle->keyExists($articlesId)
+                    ? $audiencesPerArticle->getOffset($articlesId)
+                    : new GenericCollection(Audience\Model::class)
+            );
+        }
+
         $articles->reindex();
 
         /**

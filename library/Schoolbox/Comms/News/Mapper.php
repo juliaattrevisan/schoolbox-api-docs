@@ -32,6 +32,7 @@ use Alaress_Date_Format;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model[]|GenericCollection createCollection($contents = [])
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
