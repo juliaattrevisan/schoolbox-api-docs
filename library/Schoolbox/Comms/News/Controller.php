@@ -1155,6 +1155,7 @@ class Controller extends Base
      * Get a list of articles that the logged in user authored
      *
      * @api GET /news/me/articles
+     * @throws UnexpectedValueException
      */
     public function getAuthoredArticles()
     {
@@ -1187,6 +1188,8 @@ class Controller extends Base
                 'json',
             ]
         ];
+
+        $this->hydrateArticleAudiences($articles);
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
