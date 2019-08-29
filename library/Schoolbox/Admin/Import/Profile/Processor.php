@@ -41,6 +41,12 @@ class Processor
 
 
     /**
+     * Status string for a skipped row
+     */
+    private const LOG_SKIP = 'Skipped';
+
+
+    /**
      * Status string for some kind of error during processing
      */
     private const LOG_ERROR = 'Error';
@@ -323,6 +329,15 @@ class Processor
         $n = 0;
 
         foreach ($reader as $row) {
+
+            /* Every row comes with a type; use this as extra surety
+             * If it doesn't match, log it and continue
+             */
+            if (strcasecmp($row['Type'], self::CSV_STUDENT)) {
+                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row is for {$row['Type']}", self::LOG_SKIP);
+                continue;
+            }
+
             $create = true;
 
             /* Try to find a baseProfile that matches the externalId
@@ -419,6 +434,15 @@ class Processor
         $n = 0;
 
         foreach ($reader as $row) {
+
+            /* Every row comes with a type; use this as extra surety
+             * If it doesn't match, log it and continue
+             */
+            if (strcasecmp($row['Type'], self::CSV_STAFF)) {
+                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row is for {$row['Type']}", self::LOG_SKIP);
+                continue;
+            }
+
             $create = true;
 
             /* Try to find a baseProfile that matches the externalId
@@ -495,6 +519,15 @@ class Processor
         $n = 0;
 
         foreach ($reader as $row) {
+
+            /* Every row comes with a type; use this as extra surety
+             * If it doesn't match, log it and continue
+             */
+            if (strcasecmp($row['Type'], self::CSV_PARENT)) {
+                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row is for {$row['Type']}", self::LOG_SKIP);
+                continue;
+            }
+
             $create = true;
 
             /* Try to find a baseProfile that matches the externalId
