@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Profile;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
@@ -228,8 +229,7 @@ class Processor
      *
      * @throws \RuntimeException
      * @throws Exception
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     public function process(): Processor
     {
@@ -257,7 +257,7 @@ class Processor
      * @throws \PDOException
      * @throws Exception
      * @throws \UnexpectedValueException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     private function processOne(Reader $reader): int
     {
@@ -296,11 +296,9 @@ class Processor
 
 
     /**
-     * Identify columns that appear in the student csv, but in none of the others
-     * Presence of at least one of these columns concludes this is a student csv
+     * The type that was chosen in the dropdown declares this to be a Student csv
      *
      * @return bool
-     * @throws \InvalidArgumentException
      */
     private function isStudentProfile(): bool
     {
@@ -317,7 +315,7 @@ class Processor
      * @throws Exception
      * @throws \UnexpectedValueException
      * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     private function processStudentProfile(Reader $reader): int
     {
@@ -395,11 +393,9 @@ class Processor
 
 
     /**
-     * Identify columns that appear in the staff csv, but in none of the others
-     * Presence of at least one of these columns concludes this is a staff csv
+     * The type that was chosen in the dropdown declares this to be a Staff csv
      *
      * @return bool
-     * @throws \InvalidArgumentException
      */
     private function isStaffProfile(): bool
     {
@@ -415,8 +411,7 @@ class Processor
      * @throws \PDOException
      * @throws Exception
      * @throws \UnexpectedValueException
-     * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     private function processStaffProfile(Reader $reader): int
     {
@@ -474,11 +469,9 @@ class Processor
 
 
     /**
-     * Identify columns that appear in the parent csv, but in none of the others
-     * Presence of at least one of these columns concludes this is a parent csv
+     * The type that was chosen in the dropdown declares this to be a Parent csv
      *
      * @return bool
-     * @throws \InvalidArgumentException
      */
     private function isParentProfile(): bool
     {
@@ -494,8 +487,7 @@ class Processor
      * @throws \PDOException
      * @throws Exception
      * @throws \UnexpectedValueException
-     * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     private function processParentProfile(Reader $reader): int
     {
@@ -605,16 +597,15 @@ class Processor
 
 
     /**
-     * Identify columns that appear in the relation csv, but in none of the others
-     * Presence of at least one of these columns concludes this is a relation csv
+     * The type that was chosen in the dropdown declares this to be a Relation csv
      *
      * @return bool
-     * @throws \InvalidArgumentException
      */
     private function isRelation(): bool
     {
         return $this->type === self::CSV_RELATION;
     }
+
 
     /**
      * Process the Relations csv
