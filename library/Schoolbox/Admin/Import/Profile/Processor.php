@@ -541,62 +541,6 @@ class Processor
 
 
     /**
-     * Delete everything in $previousIds
-     *
-     * @param string $table
-     * @param array $newIds
-     * @throws \Alaress\Database\Exception
-     */
-    private function removePreviousProfileIds(string $table, array $newIds): void
-    {
-        $ids = implode(', ', $newIds);
-
-        if (null !== $ids) {
-
-            /* Find the ids outside of $newIds
-             *
-             * These specific ids need to be removed from the collective set in sis_user_profile
-             * which may contain a whole bunch of other ids that should remain valid
-             *
-             * Remove these specific ids from $table
-             */
-            $previousIds = $this->database->executeQuery("
-                SELECT GROUP_CONCAT(sis_user_profile_id) AS previousIds 
-                FROM {$table}
-                WHERE sis_user_profile_id NOT IN ({$ids})
-            ")->fetch()['previousIds'];
-
-            /* If there were previous ids, remove 'em
-             */
-            if (null !== $previousIds) {
-
-                /* Remove from extension tables
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM {$table}
-                    WHERE sis_user_profile_id IN ({$previousIds});
-                ");
-
-                /* Remove from relation table
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM sis_user_profile_relation
-                    WHERE child_profile_id IN ({$previousIds})
-                    OR user_profile_id IN ({$previousIds});
-                ");
-
-                /* Remove from base profile table
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM sis_user_profile
-                    WHERE id IN ({$previousIds});
-                ");
-            }
-        }
-    }
-
-
-    /**
      * The type that was chosen in the dropdown declares this to be a Relation csv
      *
      * @return bool
@@ -659,16 +603,6 @@ class Processor
 
             $cache[$roleType][$externalId] = $profileId;
         }
-
-//        Relationships are now additive which means we don't really need this
-//        ...or do we...?
-//
-//        /* Delete previous relations
-//         * Without a primary key you just can't tell where one set ends and where another begins
-//         */
-//        $this->database->executeQuery('
-//            DELETE FROM sis_user_profile_relation
-//        ');
 
         /* Process each relation
          */
