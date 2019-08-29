@@ -236,7 +236,7 @@ class Reader implements \Iterator
             $n = \count($this->currentRow);
 
             for ($i = 0; $i < $n; $i++) {
-                if ('' === trim($this->currentRow[$i]) || null === $this->currentRow[$i]) {
+                if (null === $this->currentRow[$i] || '' === trim($this->currentRow[$i])) {
                     $this->currentRow[$i] = $this->previousRow[$i];
                 }
             }
@@ -291,7 +291,7 @@ class Reader implements \Iterator
          */
         if ($this->filldown && $this->previousRow) {
             foreach ($this->currentRow as $key => $value) {
-                if ('' === trim($this->currentRow[$key]) || null === $this->currentRow[$key]) {
+                if (null === $this->currentRow[$key] || '' === trim($this->currentRow[$key])) {
                     $this->currentRow[$key] = $this->previousRow[$key];
                 }
             }
