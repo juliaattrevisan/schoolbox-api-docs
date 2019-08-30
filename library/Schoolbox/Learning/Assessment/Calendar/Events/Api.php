@@ -31,24 +31,15 @@ class Api implements Calendar_Api_EventType_Interface
      */
     private $assessmentDataSource;
 
-
-    /**
-     * @var User
-     */
-    private $viewer;
-
-
     /**
      * @var Visibility
      */
     private $visibility;
 
-
     /**
      * @var IdFinder
      */
     private $assessmentIdFinder;
-
 
     /**
      * @var array
@@ -63,22 +54,19 @@ class Api implements Calendar_Api_EventType_Interface
     /**
      * Constructor
      *
-     * @param User                 $viewer
+     * @param User                 $user
      * @param AssessmentDataSource $assessmentDataSource
      * @param Visibility           $visibility
      * @param IdFinder             $assessmentIdFinder
-     * @param User                 $user
      * @param array                $filters
      */
     public function __construct(
-        User $viewer,
+        User $user,
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         IdFinder $assessmentIdFinder,
-        User $user,
         array $filters
     ) {
-        $this->viewer               = $viewer;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
         $this->assessmentIdFinder   = $assessmentIdFinder;

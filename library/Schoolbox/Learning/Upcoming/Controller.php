@@ -396,11 +396,10 @@ class Controller extends Base
         // Query the API for the events in this time span
         $calendar = new Renderer(
             new Api(
-                $this->getUser(),
+                $student,
                 $this->assessmentDataSource,
                 $visibility,
                 $this->assessmentIdFinder,
-                $student,
                 $filters
             ),
             $start,
