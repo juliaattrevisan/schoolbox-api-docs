@@ -48,7 +48,7 @@ class Username implements IdentifierInterface
     public function retrieve($row)
     {
         try {
-            return $this->userMapper->findOneByColumn('username', $row['Username'], ['cache' => false]);
+            return $this->userMapper->findOneByColumn('username', $row['Username']);
         } catch (MapperException $e) {
             return $this->userMapper->createModel();
         }
