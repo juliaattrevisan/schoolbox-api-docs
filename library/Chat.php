@@ -148,6 +148,9 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         $memberships = $groupHandler->getAllUserAccess($_SESSION['id']);
 
         if(!$groupHandler->isSuperuser()) {
+            if (!$memberships) {
+                return null;
+            }
             $permit = false;
             foreach ($memberships as $group) {
                 if($categoryID == $group['sid']) {
