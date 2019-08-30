@@ -329,7 +329,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudentForms(): array
     {
-        return [];
+        return $this->internalDatabase->executeQuery("SELECT DISTINCT form_name AS Code, form_name as Description FROM sis_user_profile_student")->fetchAll();
     }
 
     /**
@@ -339,7 +339,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getAllYearLevels(): array
     {
-        return [];
+        return $this->internalDatabase->executeQuery("SELECT DISTINCT year_level AS Code, year_level as Description FROM sis_user_profile_student")->fetchAll();
     }
 
     /**
@@ -447,6 +447,44 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
-        return [];
+        return $this->internalDatabase->executeQuery(
+            "
+            SELECT    
+                        child.external_id AS StudentID,
+                        child.firstname AS StudentPreferred,
+                        child.lastname AS StudentSurname,
+                        sups.year_level AS StudentYearLevel,
+                        sups.house_name AS StudentHouse,
+                        sups.boarding_status AS StudentBoarder,
+                        sups.form_name AS StudentForm,
+                        parent.external_id AS StudentContactID,
+                        parent.title AS StudentContactTitle,
+                        parent.firstname AS StudentContactPreferred,
+                        parent.lastname AS StudentContactSurname,
+                        '' AS StudentContactLegalFullName,
+                        supp.email AS StudentContactDefaultEmail,
+                        supp.phone_home AS StudentContactPhoneActual,
+                        supp.phone_work AS StudentContactOccupPhone,
+                        supp.mobile  AS StudentContactMobilePhone,
+                        '' AS StudentContactSpouseID,
+                        '' AS StudentContactSpouseTitle,
+                        '' AS StudentContactSpousePreferred,
+                        '' AS StudentContactSpouseLegalFullName,
+                        '' AS StudentContactSpouseSurname,
+                        '' AS StudentContactSpouseMobilePhone,
+                        '' AS StudentContactSpouseOccupPhone,
+                        '' AS StudentContactSpouseDefaultEmail,
+                        supr.type AS StudentContactType,
+                        '' AS StudentContactSilentPhoneFlag,
+                        1 AS PrimaryDirectoryIncludeFlag,
+                        '' AS SpouseDirectoryIncludeFlag,
+                        '' AS StudentParentsSeparatedFlag
+            FROM      `sis_user_profile` child
+            JOIN      `sis_user_profile_student` sups ON child.id = sups.sis_user_profile_id
+            JOIN      sis_user_profile_relation supr ON child.id = child_profile_id 
+            JOIN      sis_user_profile parent ON supr.user_profile_id = parent.id
+            JOIN      sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+            WHERE      child.deleted_at IS NULL AND sups.deleted_at IS NULL
+        ")->fetchAll();
     }
 }
