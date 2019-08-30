@@ -276,7 +276,28 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaffContactListExtended(): array
     {
-        return [];
+        return $this->internalDatabase->executeQuery(
+                    "
+            SELECT    external_id AS StaffID,
+                      username AS NetworkLogin,
+                      '' AS ActiveFlag,
+                      title AS StaffTitle,
+                      firstname AS StaffPreferredName,
+                      lastname AS StaffSurname,
+                      email AS StaffOccupEmail,
+                      '' AS DefaultEmailCode,
+                      '' AS OccupEmail,
+                      building AS StaffBuilding,
+                      room AS StaffRoom,
+                      position_title AS JobPositionDescription,
+                      phone AS StaffOccupPhone,
+                      campus_name AS StaffCampus,
+                      category AS StaffCategory,
+                      department AS StaffDepartment
+            FROM      `sis_user_profile` sup
+            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+            WHERE      sup.deleted_at IS NULL AND sups.deleted_at IS NULL
+        ")->fetchAll();
     }
 
     /**
