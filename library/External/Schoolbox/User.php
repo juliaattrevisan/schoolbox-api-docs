@@ -8,7 +8,6 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
-use Schoolbox\External\UserRelation;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -447,6 +446,33 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
+        $bindings = [];
+        $yearLevelQuery = '';
+        $nameQuery = '';
+        $boardingQuery = '';
+        $formQuery= '';
+
+        if($yearLevel) {
+            $yearLevelQuery = ' AND sups.year_level = :year_level';
+            $bindings[':year_level'] = $yearLevel;
+        }
+
+        if($name) {
+            $nameQuery = " AND CONCAT(firstname,' ',lastname) LIKE :name";
+            $bindings[':name'] = '%'.$name.'%';
+        }
+
+        if($boardingStatus) {
+            $boardingQuery = " AND sups.boarding_status = :boarding_status";
+            $bindings[':boarding_status'] = $boardingStatus;
+        }
+
+        if($form) {
+            $formQuery = " AND sups.form_name = :form";
+            $bindings[':form'] = $form;
+        }
+
+
         return $this->internalDatabase->executeQuery(
             "
             SELECT    
@@ -484,7 +510,7 @@ class External_Schoolbox_User implements External_UserInterface
             JOIN      sis_user_profile_relation supr ON child.id = child_profile_id 
             JOIN      sis_user_profile parent ON supr.user_profile_id = parent.id
             JOIN      sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-            WHERE      child.deleted_at IS NULL AND sups.deleted_at IS NULL
-        ")->fetchAll();
+            WHERE      child.deleted_at IS NULL AND sups.deleted_at IS NULL $yearLevelQuery $formQuery $nameQuery $boardingQuery
+        ", $bindings)->fetchAll();
     }
 }
