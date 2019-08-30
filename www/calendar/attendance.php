@@ -1,5 +1,12 @@
 <?php
 /** @var SitePage $this */
+
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Event\Access;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access as FolderAccess;
+
 $attendanceController = new Event_Attendance_Controller($this);
 
 $method = $this->arg[0];
@@ -14,14 +21,22 @@ if ($method == 'list' && is_numeric($this->arg[1])) {
 elseif ( $method == 'processModifyAttendanceList' && !empty($_POST) ) {
     $data = $_POST;
 
-    $attendanceController->processModifyAttendanceList($data);
+    if (isPermittedToModify($data['event']['id'])) {
+        $attendanceController->processModifyAttendanceList($data);
+    } else {
+        error(34);
+    }
 }
 
 elseif ( $method == 'processRemoveAttendance' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
     $eventId = $this->arg[1];
     $userId = $this->arg[2];
 
-    \Schoolbox\Calendar\EventMapper::getInstance()->removeAttendance($eventId, $userId);
+    if (isPermittedToModify($eventId)) {
+        \Schoolbox\Calendar\EventMapper::getInstance()->removeAttendance($eventId, $userId);
+    } else {
+        error(34);
+    }
 
     header('Location: '."/calendar/attendance/list/".$eventId);
     exit;
@@ -56,4 +71,25 @@ else if ($method == 'exportRejected') {
 	$attendanceController->renderExportCSV($data);
 } else {
     $this->pageNotFound();
+}
+
+/**
+ * @param $eventId
+ * @return bool
+ * @throws Exception
+ */
+function isPermittedToModify($eventId)
+{
+    $access = new Access(new FolderAccess());
+    $eventMapper = new EventMapper;
+    try {
+        $event = $eventMapper->findById($eventId);
+    } catch (MapperException $e) {
+        error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
+        exit;
+    }
+    if ($access->checkExisting($_SESSION['user'], $event)){
+        return true;
+    }
+    return false;
 }
