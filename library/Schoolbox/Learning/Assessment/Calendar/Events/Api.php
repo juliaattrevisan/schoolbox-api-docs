@@ -55,6 +55,10 @@ class Api implements Calendar_Api_EventType_Interface
      */
     private $filters;
 
+    /**
+     * @var User
+     */
+    private $user;
 
     /**
      * Constructor
@@ -63,6 +67,7 @@ class Api implements Calendar_Api_EventType_Interface
      * @param AssessmentDataSource $assessmentDataSource
      * @param Visibility           $visibility
      * @param IdFinder             $assessmentIdFinder
+     * @param User                 $user
      * @param array                $filters
      */
     public function __construct(
@@ -70,12 +75,14 @@ class Api implements Calendar_Api_EventType_Interface
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         IdFinder $assessmentIdFinder,
+        User $user,
         array $filters
     ) {
         $this->viewer               = $viewer;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
         $this->assessmentIdFinder   = $assessmentIdFinder;
+        $this->user                 = $user;
         $this->filters              = $filters;
     }
 
@@ -91,7 +98,7 @@ class Api implements Calendar_Api_EventType_Interface
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
-        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->viewer);
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->user);
 
         $stack = new Collection();
         foreach ($assessments as $assessment) {
@@ -153,7 +160,7 @@ class Api implements Calendar_Api_EventType_Interface
         }
 
         // Current user doesn't have permission?
-        if (!$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
+        if (!$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
             return null;
         }
 

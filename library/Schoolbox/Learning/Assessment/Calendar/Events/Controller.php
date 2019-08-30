@@ -116,6 +116,7 @@ class Controller extends Base
                 $this->assessmentDataSource,
                 $this->visibility,
                 $this->assessmentIdFinder,
+                $this->getUser(),
                 $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page)
             ),
             $start,

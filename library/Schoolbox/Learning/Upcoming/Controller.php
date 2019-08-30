@@ -388,6 +388,7 @@ class Controller extends Base
                 $this->assessmentDataSource,
                 $visibility,
                 $this->assessmentIdFinder,
+                $student,
                 $filters
             ),
             (int) $this->getRequest()->query['start'],
