@@ -129,30 +129,30 @@ class External_Schoolbox_User implements External_UserInterface
     {
         return $this->internalDatabase->executeQuery(
             "
-                SELECT      parent.synergy_id AS StudentContactID,
+                SELECT      parent.external_id AS StudentContactID,
                             parent.title AS StudentContactTitle,
                             parent.firstname AS StudentContactPreferred,
                             parent.lastname AS StudentContactSurname,
-                            pp.guardian1Email AS StudentContactDefaultEmail,
-                            pp.guardian1HomePhone AS StudentContactPhoneActual,
+                            supp.email AS StudentContactDefaultEmail,
+                            supp.phone_home AS StudentContactPhoneActual,
                             0 AS StudentContactSilentPhoneFlag,
-                            pp.guardian1MobilePhone AS StudentContactMobilePhone,
-                            pp.guardian1WorkPhone AS StudentContactOccupPhone,
+                            supp.mobile AS StudentContactMobilePhone,
+                            supp.phone_work AS StudentContactOccupPhone,
                             '' AS StudentContactSpouseID,
                             '' AS StudentContactSpouseTitle,
                             '' AS StudentContactSpousePreferred,
                             '' AS StudentContactSpouseSurname,
-                            pp.guardian2Name AS StudentContactSpousePreferred,
+                            '' AS StudentContactSpousePreferred,
                             '' AS StudentContactSpouseSurname,
-                            pp.guardian2Email AS StudentContactSpouseDefaultEmail,
-                            pp.guardian2HomePhone AS StudentContactSpousePhoneActual,
-                            pp.guardian2MobilePhone AS StudentContactSpouseMobilePhone,
-                            pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
-                FROM        `user` child
-                INNER JOIN  user_relation ur ON child.id = ur.relation_id
-                INNER JOIN  `user` parent ON ur.user_id = parent.id AND parent.deleted_at IS NULL
-                LEFT JOIN   user_profile pp ON `parent`.id = pp.user_id
-                WHERE       child.synergy_id = :externalUserId AND 
+                            '' AS StudentContactSpouseDefaultEmail,
+                            '' AS StudentContactSpousePhoneActual,
+                            '' AS StudentContactSpouseMobilePhone,
+                            '' AS StudentContactSpouseOccupPhone
+                FROM        sis_user_profile child
+                    JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
+                    JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
+                    JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+                WHERE       child.external_id = :externalUserId AND 
                             child.deleted_at IS NULL
             ",
             ['externalUserId' => $externalUserId]
@@ -243,13 +243,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function determineBoarderType(?string $boarderValue): string
     {
-        $boarders = ['B', 'W'];
-
-        if (in_array($boarderValue, $boarders, true)) {
-            return 'Boarder';
-        }
-
-        return 'Day';
+        return $boarderValue ?: '';
     }
 
     /**
