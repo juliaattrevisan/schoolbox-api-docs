@@ -290,7 +290,7 @@ class Controller extends Base\Base
         $targetFolderIds  = $this->parseFolderIds($this->getRequest()->post['import_folders']);
         $courseImplId     = trim($post['course_impl_id']);
         $componentId      = trim($post['component_id']);
-        $units            = $post['unit'];
+        $units            = $post['unit'] ?? [];
 
         if (empty($courseSpecId)) {
             // The course homepage ID has gone missing
