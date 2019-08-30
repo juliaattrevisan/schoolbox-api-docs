@@ -10,7 +10,9 @@ namespace Schoolbox\Learning\Upcoming;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Type\EventBase;
 use External_ClassInterface;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use function func_get_args;
 use Schoolbox\GenericCollection;
@@ -382,6 +384,16 @@ class Controller extends Base
         $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
         $visibility          = new Visibility($this->access);
 
+        // User must have provided a start and end date: error out otherwise
+        $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $end   = filter_var($this->request->query->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        if (!isset($start, $end)) {
+            // No you don't throw any exception: only ApplicationException
+            /** @noinspection PhpUnhandledExceptionInspection */
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INVALID_DATE);
+        }
+
+        // Query the API for the events in this time span
         $calendar = new Renderer(
             new Api(
                 $this->getUser(),
@@ -391,16 +403,15 @@ class Controller extends Base
                 $student,
                 $filters
             ),
-            (int) $this->getRequest()->query['start'],
-            (int) $this->getRequest()->query['end'],
+            $start,
+            $end,
             $student,
             $this->di,
             $this->getUser()
         );
 
-        // TODO: Apply constants that's implemented on SA-9154 once mergerd
         $this->response->content->set($this->buildJsonOutput(
-            array_map('json_decode', $calendar->renderAll('javascript'))
+            array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
         ));
     }
 }
