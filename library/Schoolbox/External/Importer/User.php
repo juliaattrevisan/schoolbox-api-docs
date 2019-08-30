@@ -353,6 +353,9 @@ class User extends AbstractImporter
                 // Fully populate the user fields
                 $childIds[] = $userRelation->getRelation()->getId();
             }
+            if (empty($childIds)) {
+                return new Collection();
+            }
             return $this->userMapper->findByColumn('id', $childIds);
         }
         return new Collection();

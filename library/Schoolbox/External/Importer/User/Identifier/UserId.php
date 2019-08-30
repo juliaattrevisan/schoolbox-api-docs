@@ -48,7 +48,7 @@ class UserId implements IdentifierInterface
     {
         $userId = $row['Schoolbox User ID'];
         try {
-            return $this->userMapper->findById($userId);
+            return $this->userMapper->findOneByColumn($this->userMapper->getIdentifierColumn(), $userId, ['cache' => false]);
         } catch (MapperException $e) {
             throw new \RuntimeException(sprintf('User with ID "%s" not found', $userId));
         }
