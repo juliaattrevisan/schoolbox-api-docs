@@ -11,11 +11,18 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\Model as File;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Link;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\File\Model as MyFile;
+use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 use Schoolbox\Resource\My\Folder\Model as MyFolder;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Resource\Textbox\Model as Textbox;
 
 class Mapper extends BaseMapper
 {
@@ -36,7 +43,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'file',
             array(
-                'mapper' => '\\Schoolbox\\Resource\\File\\Mapper',
+                'mapper' => FileMapper::class,
                 'other_key' => 'id',
                 'this_key' => 'objectId',
                 'multiple' => false,
@@ -45,7 +52,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'folder',
             array(
-                'mapper' => '\\Schoolbox\\Resource\\Folder\\Mapper',
+                'mapper' => FolderMapper::class,
                 'other_key' => 'id',
                 'this_key' => 'objectId',
                 'multiple' => false,
@@ -55,7 +62,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'link',
             array(
-                'mapper' => '\\Schoolbox\\Resource\\LinkMapper',
+                'mapper' => LinkMapper::class,
                 'other_key' => 'id',
                 'this_key' => 'objectId',
                 'multiple' => false,
@@ -64,7 +71,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'myFile',
             array(
-                'mapper' => '\\Schoolbox\\Resource\\My\\File\\Mapper',
+                'mapper' => MyFileMapper::class,
                 'other_key' => 'id',
                 'this_key' => 'objectId',
                 'multiple' => false,
@@ -73,7 +80,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'myFolder',
             array(
-                'mapper' => '\\Schoolbox\\Resource\\My\\Folder\\Mapper',
+                'mapper' => MyFolderMapper::class,
                 'other_key' => 'id',
                 'this_key' => 'objectId',
                 'multiple' => false,
@@ -82,7 +89,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'textBox',
             array(
-                'mapper' => '\\Schoolbox\\Resource\\Textbox\\Mapper',
+                'mapper' => TextboxMapper::class,
                 'other_key' => 'textBoxId',
                 'this_key' => 'objectId',
                 'multiple' => false,
@@ -154,7 +161,7 @@ class Mapper extends BaseMapper
                 $record->setLink($link);
             }
             if (!empty($row['t.textboxID'])) {
-                /** @var TextBox $textbox */
+                /** @var Textbox $textbox */
                 $textbox = $this->hydrateJoin($row, 'textBox', 't');
                 $record->setTextbox($textbox);
             }
