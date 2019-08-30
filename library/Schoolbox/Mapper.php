@@ -1081,13 +1081,13 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * The concise, type-safe version of hasMap() + hasJoin()
      *
-     * @param string                $column
-     * @param string                $foreignMapper
-     * @param string                $foreignKey
+     * @param string                $column         Name of field column in database
+     * @param string                $foreignMapper  Foreign mapper used for hydrating foreign model
+     * @param string                $foreignKey     Name of foriegn column we will join to in foreign table
      * @param IColumnType|null      $hydrator
      * @param int|null              $options
-     * @param string|null           $property
-     * @param string|null           $name
+     * @param string|null           $property       Property of the model that this object will be attached to
+     * @param string|null           $name           Name of the join used for referencing when retrieving join parameters
      * @return bool
      */
     protected function joins($column, $foreignMapper, $foreignKey = 'id', $hydrator = null, $options = null, $property = null, $name = null)
