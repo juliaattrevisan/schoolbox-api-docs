@@ -51,7 +51,8 @@ class External_Schoolbox_User implements External_UserInterface
                     JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
                 WHERE       child.external_id IN ({$predicate["placeholders"]}) AND 
                             child.deleted_at IS NULL
-            ", $predicate['bindings']
+            ",
+            $predicate['bindings']
         );
 
         foreach ($parentIterator as $parent) {
