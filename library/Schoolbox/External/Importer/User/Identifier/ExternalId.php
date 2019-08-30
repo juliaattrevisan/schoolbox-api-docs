@@ -9,7 +9,6 @@ namespace Schoolbox\External\Importer\User\Identifier;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role as RoleModel;
-use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 use function trim;
 
@@ -60,8 +59,14 @@ class ExternalId implements IdentifierInterface
         } else {
             throw new \RuntimeException(sprintf('Role "%s" not found', $row['Role']));
         }
+
         try {
-            return $this->userMapper->findByExternalId($row['External ID'], $role->getType());
+            return $this->userMapper->findOneByColumnList([
+                'group_id'   => $role->getId(),
+                'synergy_id' => $row['External ID'],
+            ],
+                ['cache' => false]
+            );
         } catch (MapperException $e) {
             return $this->userMapper->createModel();
         }
