@@ -392,9 +392,9 @@ class Controller extends Base
             ),
             (int) $this->getRequest()->query['start'],
             (int) $this->getRequest()->query['end'],
-            $this->getUser(),
+            $student,
             $this->di,
-            $student
+            $this->getUser()
         );
 
         // TODO: Apply constants that's implemented on SA-9154 once mergerd
