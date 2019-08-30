@@ -44,19 +44,15 @@ class External_Schoolbox_User implements External_UserInterface
 
         $parentIterator = $this->internalDatabase->getQueryIterator(
             "
-                SELECT      parent.synergy_id AS StudentContactID,
-                            parent.alt_email AS StudentContactEmail
-                FROM        `user`
-                INNER JOIN  user_relation ON user.id = user_relation.relation_id
-                INNER JOIN  `user` parent ON parent.id = user_relation.user_id AND parent.deleted_at IS NULL
-                WHERE       user.synergy_id IN ({$predicate["placeholders"]}) AND
-                            user_relation.relation_type = :relation_type AND
-                            `user`.deleted_at IS NULL
-            ",
-            array_merge(
-                $predicate['bindings'],
-                ['relation_type' => UserRelation::RELATION_TYPE_PARENT]
-            )
+                SELECT      parent.external_id AS StudentContactID,
+                            supp.email AS StudentContactEmail
+                FROM        sis_user_profile child
+                    JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
+                    JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
+                    JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+                WHERE       child.external_id IN ({$predicate["placeholders"]}) AND 
+                            child.deleted_at IS NULL
+            ", $predicate['bindings']
         );
 
         foreach ($parentIterator as $parent) {
