@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -143,11 +142,12 @@ class Definition extends Filter\AbstractDefinition
             $abstractKey = (string)$workType->getId();
 
             if (!$options->offsetExists($abstractKey)) {
-                $option = $this->getFilterOptionMapper()->createModel();
+                $option = new Filter\Page\Option\Model();
                 $option
                     ->setFilterPage($pageFilter)
                     ->setKey($abstractKey)
-                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter));
+                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                    ->setDefaults(new GenericCollection(Filter\Page\Option\Defaults\Model::class));
                 $options->setOffset($option->getKey(), $option);
             }
         }

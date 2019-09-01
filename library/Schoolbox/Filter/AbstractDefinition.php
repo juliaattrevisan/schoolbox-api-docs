@@ -132,7 +132,7 @@ abstract class AbstractDefinition implements IDefinition
         // Ensure it contains all abstract custom options
         foreach ($this->getCustomKeys() as $customAbstractKey) {
             if (!$options->offsetExists($customAbstractKey)) {
-                $option = $this->filterOptionMapper->createModel();
+                $option = new Page\Option\Model();
 
                 // If not yet configured by admin, should this option be available?
                 $isAvailable = $this->getInitialAvailability($customAbstractKey, $pageFilter);
@@ -140,7 +140,8 @@ abstract class AbstractDefinition implements IDefinition
                 $option
                     ->setFilterPage($pageFilter)
                     ->setKey($customAbstractKey)
-                    ->setAvailable($isAvailable);
+                    ->setAvailable($isAvailable)
+                    ->setDefaults(new GenericCollection(Page\Option\Defaults\Model::class));
                 $options->setOffset($option->getKey(), $option);
             }
         }

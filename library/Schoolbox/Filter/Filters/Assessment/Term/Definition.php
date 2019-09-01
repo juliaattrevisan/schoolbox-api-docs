@@ -132,12 +132,13 @@ abstract class Definition extends Filter\AbstractDefinition
         // Ensure it contains all Term instances
         foreach ($this->terms as $term) {
             if (!$options->offsetExists($term->getId())) {
-                $option = $this->getFilterOptionMapper()->createModel();
+                $option = new Filter\Page\Option\Model();
                 $key    = (string)$term->getId();
                 $option
                     ->setFilterPage($pageFilter)
                     ->setKey($key)
-                    ->setAvailable($this->getInitialAvailability($key, $pageFilter));
+                    ->setAvailable($this->getInitialAvailability($key, $pageFilter))
+                    ->setDefaults(new GenericCollection(Filter\Page\Option\Defaults\Model::class));
                 $options->setOffset($option->getKey(), $option);
             }
         }
