@@ -248,7 +248,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     {
         $this->campusCollection = new GenericCollection(Campus::class);
         $this->subject_collection = new GenericCollection(Subject::class);
-        $this->accessList = new GenericCollection(UserAccess::class);
+//        $this->accessList = new GenericCollection(UserAccess::class);
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
@@ -263,10 +263,10 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     public function __clone()
     {
         $this->campusCollection = clone $this->campusCollection;
-        $this->accessList = clone $this->accessList;
-//        if ($this->accessList instanceof Collection) {
-//            $this->accessList = clone $this->accessList;
-//        }
+//        $this->accessList = clone $this->accessList;
+        if ($this->accessList instanceof GenericCollection) {
+            $this->accessList = clone $this->accessList;
+        }
     }
 
     /**
