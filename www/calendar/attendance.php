@@ -92,24 +92,3 @@ else if ($method == 'exportRejected') {
 } else {
     $this->pageNotFound();
 }
-
-/**
- * @param $eventId
- * @return bool
- * @throws Exception
- */
-function isPermittedToModify($eventId)
-{
-    $access = new Access(new FolderAccess());
-    $eventMapper = new EventMapper;
-    try {
-        $event = $eventMapper->findById($eventId);
-    } catch (MapperException $e) {
-        error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
-        exit;
-    }
-    if ($access->checkExisting($_SESSION['user'], $event)){
-        return true;
-    }
-    return false;
-}
