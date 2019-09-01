@@ -1022,6 +1022,12 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     public function getAccessList(): GenericCollection
     {
+        /** @var UserAccessMapper $uaMapper */
+        if(!isset($this->accessList)) {
+            $uaMapper = UserAccessMapper::getInstance();
+            $this->setAccessList($uaMapper->findAllForUser($this));
+        }
+
         return $this->accessList;
     }
 
