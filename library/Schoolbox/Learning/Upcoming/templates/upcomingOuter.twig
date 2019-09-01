@@ -6,342 +6,6 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% set reportContentId = 'report_content' %}
 
-<!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
-<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
-<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
-<script type="text/javascript">
-
-    // provide page-wide access to the calendar object so the callbacks can actually use it
-    var c;
-
-    /**
-     * Update event method:
-     *
-     * * Gives event a "loading" style
-     * * Removes that style when update finishes
-     *
-     * @param event      The event to update
-     * @param data       The data to send to the update script
-     * @param revertFunc called if update failed for whatever reason.
-     *                   Sets event back to original state.
-     */
-    var updateWrapper = function(event, data, revertFunc) {
-        event.className.push('loading');
-        c.cupdate(data, function (returnData) {
-            event.className = event.className.filter(function (value) {
-                return value != 'loading';
-            });
-            if (!returnData) {
-                revertFunc();
-            }
-            c.dom.fullCalendar('rerenderEvents');
-        });
-    };
-
-    // once the DOM has loaded, punch a fancy calendar into it
-    $(function() {
-
-        /**
-         * Apply the most-recently applied filter panel selections to the events being displayed on the Calendar
-         */
-        var applyFiltersToCalendarEvents = function () {
-
-            // Update JS representation of current filter option selections
-            updateFilterOptionValues();
-
-            // Apply filter settings to each event
-            $('[data-meta-filter-sync]').each(function (idx, elem) {
-                var $event = $(elem);
-                if (hideEvent($event)) {
-                    $event.hide();
-                } else {
-                    $event.show();
-                }
-            });
-
-            $(window).trigger('resize');
-        };
-
-
-        // Filtered content has been [re]loaded
-        $('#{{ reportContentId }}').on('filterContentLoaded', function () {
-            applyFiltersToCalendarEvents();
-        });
-
-        // Maps filterId to currently-applied selections
-        var appliedFilters;
-
-        // Maps a filterId to a semantic slug
-        var filterIdSlugMap = {{ filterIdSlugMap|json_encode|raw }};
-
-        /**
-         * Examines the filter panel's most-recently submitted settings and
-         * converts to a suitable JS representation we can use to filter events.
-         *
-         * We need to include all filter selections because the options displayed may be a sub-set of all possible options.
-         * eg consider when Tasks are configured by the SU to never be available, we need to ensure they are always filtered out.
-         */
-        var updateFilterOptionValues = function () {
-            appliedFilters = {};
-            $('#filter_panel').find('[data-component]').each(function (idx, elem) {
-                var $panelComponent  = $(elem),
-                    filterSelections = {},
-                    filterId         = $panelComponent.attr('data-component'),
-                    $options         = $panelComponent.find('[data-value-original]');
-
-                var countSelected = 0;
-                $options.each(function (idx, elem) {
-                    var $option = $(elem),
-                        key     = $option.attr('data-key'),
-                        val     = $option.attr('data-value-original');
-
-                    if ('1' === val) {
-                        countSelected++;
-                    }
-                    filterSelections[key] = val;
-                });
-
-                // If no options were selected, then flip the value so that all options are selected in this representation
-                if (!countSelected) {
-                    for (var i in filterSelections) {
-                        if (filterSelections.hasOwnProperty(i)) {
-                            filterSelections[i] = '1';
-                        }
-                    }
-                }
-
-                appliedFilters[filterId] = filterSelections;
-            });
-        };
-
-
-        /**
-         * Returns whether we should hide this event due to the current filter panel selections
-         *
-         * @param {jQuery} $event
-         * @return {boolean}
-         */
-        var hideEvent = function ($event) {
-
-            // For each filter present in the panel
-            for (var filterId in filterIdSlugMap) {
-
-                // Ignore inherited properties
-                if (!filterIdSlugMap.hasOwnProperty(filterId)) {
-                    continue;
-                }
-
-                // Is this filter not being applied?
-                if (!appliedFilters.hasOwnProperty(filterId)) {
-                    continue;
-                }
-
-                // Which filter are we currently applying?
-                // Hide the event if its attribute is not present or not selected in the filter options.
-                var key = getFilterOptionKey(filterIdSlugMap[filterId], $event);
-                if (!(key in appliedFilters[filterId]) || '1' !== appliedFilters[filterId][key]) {
-                    return true;
-                }
-            }
-
-            // Filter is not being applied, so don't hide event.
-            return false;
-        };
-
-        /**
-         * Converts an event attribute into a filter key
-         *
-         * @param {string} slug
-         * @param {jQuery} $event
-         * @return {string}
-         */
-        var getFilterOptionKey = function (slug, $event) {
-            switch (slug) {
-                case 'activityType':
-                    return $event.attr('data-meta-assessmenttype');
-                case 'studentFolders':
-                    return $event.attr('data-meta-folderid');
-                case 'weighting':
-                    return "1" === $event.attr('data-meta-weighted') ? 'weighted' : 'unweighted';
-                case 'workType':
-                    var key = $event.attr('data-meta-worktypeid');
-                    if (!key) {
-                        key = 'none';
-                    }
-                    return key;
-                default:
-                    console.log('Unrecognised filter slug: ' + slug);
-            }
-        };
-
-        // Allow checking of anchor for view to display
-        var anchor = '';
-        var parts  = location.href.split('#');
-
-        if (parts.length > 1) {
-            anchor = parts[1];
-            switch (anchor) {
-                case 'month':
-                    anchor = 'month';
-                    break;
-                case 'week':
-                case 'agendaWeek':
-                    anchor = 'agendaWeek';
-                    break;
-                case 'day':
-                case 'agendaDay':
-                    anchor = 'agendaDay';
-                    break;
-                case 'basicWeek':
-                    anchor = 'basicWeek';
-                    break;
-                case 'basicDay':
-                    anchor = 'basicDay';
-                    break;
-                default:
-                    anchor = '';
-                    break;
-            }
-        }
-
-        c = new Calendar('calendar', 'calendar-bubble', {
-            userId: '{{ student.id|escape('js') }}',
-            filter: {
-                ajax: '/calendar/ajax/filter',
-                btnSelector: false,
-                exportButtonSelector: false,
-                checkboxSelector: false,
-                applyFiltersSelector: false,
-                listViewButton: false
-            },
-            fullCalendar: {
-                defaultDate: moment('{{ date|escape('js') }}'),
-                defaultView: anchor || 'month',
-                // Event limit: could be configured from session but leave global for now
-                eventLimit: false,
-                scrollTime: dateDisplayFormats.calendarStartTime,
-                firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
-
-                /**
-                 * Called when an event is about to be rendered on the calendar
-                 *
-                 * @param {object} calEvent
-                 * @param {jQuery} $elem
-                 * @see https://fullcalendar.io/docs/eventRender
-                 */
-                eventRender: function(calEvent, $elem) {
-                    // Convert all meta to HTML attributes
-                    var prefix = 'data-meta-';
-                    $elem.attr(prefix + 'filter-sync', '');
-                    $.each(calEvent.data.meta, function (k, v) {
-                        $elem.attr(prefix + k, v);
-                    });
-
-                    // Always render placeholders in the most basic manner
-                    if (calEvent.id === 'placeholder') {
-                        return true;
-                    }
-
-                    // Ignore the phantom event that the API puts there
-                    if (!calEvent.data) {
-                        return false;
-                    }
-
-                    // Don't render me if I'm marked as do not render
-                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
-                        return false;
-                    }
-                    return true;
-                },
-
-                /**
-                 * Nothing's resizable here
-                 *
-                 * @param event
-                 * @param delta
-                 * @param revertFunc
-                 */
-                eventResize: function(event, delta, revertFunc) {
-                    revertFunc();
-                },
-
-                /**
-                 * Nothing's movable here
-                 *
-                 * @param event
-                 * @param delta
-                 * @param revertFunc
-                 */
-                eventDrop: function(event, delta, revertFunc) {
-                    revertFunc();
-                },
-
-                /**
-                 * When external data is being fetched
-                 * @param isLoading
-                 * @param view
-                 */
-                loading: function(isLoading, view) {
-
-                    /* Show loading div right in the middle
-                     */
-                    if (isLoading === true) {
-                        $.magnificPopup.open({
-                            showCloseBtn: false,
-                            items: {
-                                src: "<div class='preview loader'></div>",
-                                type: 'inline'
-                            }
-                        });
-                    }
-                    /* Has finished loading
-                     */
-                    else {
-                        /* Hide loading div
-                         */
-                        $.magnificPopup.close();
-                        var d = c.dom.fullCalendar('getDate');
-                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
-                    }
-                },
-
-                // Stream location
-                events: function(start, end, timezone, callback) {
-                    $.ajax({
-                        dataType: 'json',
-                        url:      '/submission/ajax/events',
-                        data: {
-                            start: Calendar.reOffsetTimestamp(start.unix()),
-                            end:   Calendar.reOffsetTimestamp(end.unix()),
-                            userId: Number('{{ student.id|escape('js') }}')
-                        },
-                        success: function(data) {
-                            callback(data.filter(function(v) {
-                                return 'start' in v;
-                            }));
-                        },
-                        cache: false
-                    });
-                },
-
-                /**
-                 * Triggered after all events have finished rendering.
-                 *
-                 * @see https://fullcalendar.io/docs/viewRender
-                 */
-                eventAfterAllRender: function () {
-                    applyFiltersToCalendarEvents();
-                }
-            },
-            x: false
-        }).init();
-    })
-</script>
-<!-- END custom_head -->
-
 {# Header #}
 <div class="row">
     <div class="small-12 columns">
@@ -381,6 +45,28 @@
     quickload: true
 } only %}
 
+{% set reportContentId = 'report_content' %}
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            // (Shouldn't this trigger contain the filters that are selected?)
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                // Somehow pass the list of filters into the Vue calendar
+                window.upcomingDueworkCalendar.$children[0].onFilterChange(selectedFilters);
+            });
+        });
+
+        window.fullCalendarConfig = {
+            eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
+            firstDay:           Number('{{ config.calendar_start_day }}'),
+            dateDisplayFormats: dateDisplayFormats,
+            userId:             Number('{{ student.getId() }}')
+        };
+    </script>
+{% endautoescape %}
+
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -388,6 +74,8 @@
         </section>
     </div>
 </div>
+
+<script type="text/javascript" src="/javascript/components/upcomingDueworkCalendar.bundle.js"></script>
 
 {% if subjects|length %}
     <div class="row">
@@ -479,34 +167,3 @@
         </div>
     </div>
 {% endif %}
-
-<div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble">
-    <form id="editEvent">
-        <input type="hidden" name="eventId" />
-
-        <div class="row">
-            <div class="small-12">
-                <h3 class="note"></h3>
-                <ul class="meta">
-                    <li class="icon-calendar date"></li>
-                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
-                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
-                </ul>
-
-                <article class="detail" data-is-html="1"></article>
-                <div>
-                    <dl>
-                        <dd>
-                            <span class="homepageLink" data-is-html="1"></span>
-                            <span class="moreDetailsLink" data-is-html="1"></span>
-                            <span class="modifyLink" data-is-html="1"></span>
-                            <span class="deleteLink" data-is-html="1"></span>
-                        </dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
-    </form>
-
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>

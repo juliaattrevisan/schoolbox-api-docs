@@ -9,7 +9,11 @@ namespace Schoolbox\Learning\Upcoming;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Type\EventBase;
 use External_ClassInterface;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use function func_get_args;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -365,5 +369,48 @@ class Controller extends Base
             $filterIdMap[$definition->getFilter()->getId()] = $definition::getSlug();
         }
         return $filterIdMap;
+    }
+
+    /**
+     * @param User $student
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getEvents(User $student): void
+    {
+        $request             = $this->request->query->get('filters', []);
+        $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
+        $codec               = $this->filterFactoryFactory->buildCodec();
+        $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
+        $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+        $visibility          = new Visibility($this->access);
+
+        // User must have provided a start and end date: error out otherwise
+        $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $end   = filter_var($this->request->query->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        if (!isset($start, $end)) {
+            // No you don't throw any exception: only ApplicationException
+            /** @noinspection PhpUnhandledExceptionInspection */
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INVALID_DATE);
+        }
+
+        // Query the API for the events in this time span
+        $calendar = new Renderer(
+            new Api(
+                $student,
+                $this->assessmentDataSource,
+                $visibility,
+                $this->assessmentIdFinder,
+                $filters
+            ),
+            $start,
+            $end,
+            $student,
+            $this->di,
+            $this->getUser()
+        );
+
+        $this->response->content->set($this->buildJsonOutput(
+            array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
+        ));
     }
 }

@@ -584,7 +584,14 @@ class MapperProxy
         $options['due_after']  = $from;
         $options['due_before'] = $to;
         $builder               = $this->convertOptionsToPredicateBuilder($options, false);
+
         if (isset($ids)) {
+            if (empty($ids)) {
+                // A list of IDs was passed but it's empty. No matches are possible
+                return $this->createCollection();
+            }
+
+            // otherwise, build predicates for the non-empty list of IDs
             $builder->in('id', $ids);
         }
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));

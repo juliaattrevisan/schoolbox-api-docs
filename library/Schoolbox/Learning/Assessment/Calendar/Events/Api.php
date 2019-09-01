@@ -31,51 +31,46 @@ class Api implements Calendar_Api_EventType_Interface
      */
     private $assessmentDataSource;
 
-
-    /**
-     * @var User
-     */
-    private $viewer;
-
-
     /**
      * @var Visibility
      */
     private $visibility;
-
 
     /**
      * @var IdFinder
      */
     private $assessmentIdFinder;
 
-
     /**
      * @var array
      */
     private $filters;
 
+    /**
+     * @var User
+     */
+    private $user;
 
     /**
      * Constructor
      *
-     * @param User                 $viewer
+     * @param User                 $user
      * @param AssessmentDataSource $assessmentDataSource
      * @param Visibility           $visibility
      * @param IdFinder             $assessmentIdFinder
      * @param array                $filters
      */
     public function __construct(
-        User $viewer,
+        User $user,
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         IdFinder $assessmentIdFinder,
         array $filters
     ) {
-        $this->viewer               = $viewer;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
         $this->assessmentIdFinder   = $assessmentIdFinder;
+        $this->user                 = $user;
         $this->filters              = $filters;
     }
 
@@ -91,8 +86,11 @@ class Api implements Calendar_Api_EventType_Interface
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->user);
+
         $stack = new Collection();
         foreach ($assessments as $assessment) {
+
             $event = $this->transformAssessmentToEvent($assessment);
             if ($event) {
                 $stack->add($event);
@@ -150,7 +148,7 @@ class Api implements Calendar_Api_EventType_Interface
         }
 
         // Current user doesn't have permission?
-        if (!$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
+        if (!$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
             return null;
         }
 
