@@ -39,7 +39,7 @@ class Gateway
     private const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
 
     private const ABSENCE_TYPE_LATE = 'LFS';
-    private const ABSENCE_TYPE_DETENTION = 'DET';
+    private const ABSENCE_TYPE_DETENTION = 'INF';
     private const ABSENCE_TYPE_ENDORSED_LEAVE = 'AFS';
     private const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM', 'EDP'];
 
