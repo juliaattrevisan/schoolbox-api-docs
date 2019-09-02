@@ -37,6 +37,7 @@ Data:
             if ($articleList.find('.information-list').length > 0) {
                 $actionBar.removeClass('hide');
             }
+            window.iframely && iframely.load();
         }).error(function (response) {
             console.log(response);
         });
