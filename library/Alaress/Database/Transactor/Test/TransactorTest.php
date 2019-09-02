@@ -46,16 +46,16 @@ class TransactorTest extends TestCase
         // implicit commit.
         // (This should never be done in live code, hence it's in a mock.)
         $this->transactor = new class(new DummyStrategy()) extends Transactor {
-            private $brokenOut = false;
+            private $implicitlyCommitted = false;
 
-            public function breakOut(): void
+            public function implicitCommit(): void
             {
-                $this->brokenOut = true;
+                $this->implicitlyCommitted = true;
             }
 
             public function inTransaction(): bool
             {
-                if ($this->brokenOut) {
+                if ($this->implicitlyCommitted) {
                     return false;
                 }
                 return parent::inTransaction();
@@ -274,26 +274,85 @@ class TransactorTest extends TestCase
     public function testExceptionOnUnexpectedImplicitCommit(): void
     {
         $this->transactor->transact(function () {
-            $this->transactor->commit();
+            $this->transactor->implicitCommit();
         });
     }
 
 
     /**
-     * Test that an exception occurs when attempting to commit after an
-     * unexpected commit occurs elsewhere.
+     * Test that `onPersist` callbacks added:
+     * * before an implicit commit on the same nesting level
+     *
+     * are not called when an implicit commit occurs.
      */
-    public function testCatchOfExceptionOnUnexpectedImplicitCommit(): void
+    public function testOnPersistBeforeUnexpectedImplicitCommitOnSameLevel(): void
     {
-        // If I'm suddenly not within a transaction:
-        // I have no idea whether the transaction was committed or rolled back.
-        // All that I can do is throw an exception and let the developer handle
-        // that unexpected situation.
-        // (I don't believe that onPersist methods should be called either.)
+        try {
+            $this->transactor->transact(function () {
+                $this->buildOnPersist();
+                $this->transactor->implicitCommit();
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
+
+
+    /**
+     * Test that `onPersist` callbacks added:
+     * * after an implicit commit on the same nesting level
+     *
+     * are not called when an implicit commit occurs.
+     */
+    public function testOnPersistAfterUnexpectedImplicitCommitOnSameLevel(): void
+    {
+        try {
+            $this->transactor->transact(function () {
+                $this->transactor->implicitCommit();
+                $this->buildOnPersist();
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
+
+
+    /**
+     * Test that `onPersist` callbacks added:
+     * * before an implicit commit on an inner nesting level
+     *
+     * are not called when an implicit commit occurs.
+     */
+    public function testOnPersistBeforeUnexpectedImplicitCommitOnInnerLevel(): void
+    {
+        try {
+            $this->transactor->transact(function () {
+                $this->buildOnPersist();
+                $this->transactor->transact(function () {
+                    $this->transactor->implicitCommit();
+                });
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
+
+
+    /**
+     * Test that `onPersist` callbacks added:
+     * * after an implicit commit on an inner nesting level
+     *
+     * are not called when an implicit commit occurs.
+     */
+    public function testOnPersistAfterUnexpectedImplicitCommitOnInnerLevel(): void
+    {
         try {
             $this->transactor->transact(function () {
                 $this->transactor->transact(function () {
-                    $this->transactor->breakOut();
+                    $this->transactor->implicitCommit();
                 });
                 $this->buildOnPersist();
             });
@@ -304,6 +363,95 @@ class TransactorTest extends TestCase
     }
 
 
+    /**
+     * Test that `onPersist` callbacks added:
+     * * before an implicit commit on an outer nesting level
+     *
+     * are not called when an implicit commit occurs.
+     */
+    public function testOnPersistBeforeUnexpectedImplicitCommitOnOuterLevel(): void
+    {
+        try {
+            $this->transactor->transact(function () {
+                $this->transactor->transact(function () {
+                    $this->buildOnPersist();
+                });
+                $this->transactor->implicitCommit();
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
+
+
+    /**
+     * Test that `onPersist` callbacks added:
+     * * after an implicit commit on an outer nesting level
+     *
+     * are not called when an implicit commit occurs.
+     */
+    public function testOnPersistAfterUnexpectedImplicitCommitOnOuterLevel(): void
+    {
+        try {
+            $this->transactor->transact(function () {
+                $this->transactor->implicitCommit();
+                $this->transactor->transact(function () {
+                    $this->buildOnPersist();
+                });
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
+
+    /**
+     * Test that `onPersist` callbacks added:
+     * * before an implicit commit on a sibling nesting level
+     *
+     * are not called when an implicit commit occurs.
+     */
+    public function testOnPersistBeforeUnexpectedImplicitCommitOnSiblingLevel(): void
+    {
+        try {
+            $this->transactor->transact(function () {
+                $this->transactor->transact(function () {
+                    $this->buildOnPersist();
+                });
+                $this->transactor->transact(function () {
+                    $this->transactor->implicitCommit();
+                });
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
+
+
+    /**
+     * Test that `onPersist` callbacks added:
+     * * after an implicit commit on a sibling nesting level
+     *
+     * are not called when an implicit commit occurs.
+     */
+    public function testOnPersistAfterUnexpectedImplicitCommitOnSiblingLevel(): void
+    {
+        try {
+            $this->transactor->transact(function () {
+                $this->transactor->transact(function () {
+                    $this->transactor->implicitCommit();
+                });
+                $this->transactor->transact(function () {
+                    $this->buildOnPersist();
+                });
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
 
     /**
      * Increment count; used as onPersist callback.

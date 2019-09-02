@@ -139,7 +139,17 @@ class Base implements ITransactor
     }
 
     /**
-     * @inheritdoc
+     * Add a callback that is called once (and only if) the outermost nesting
+     * level is committed.
+     *
+     * Note that if the transactor is unexpectedly no longer in a transaction
+     * (e.g. if there was an implicit commit) there is no way to tell whether
+     * the transaction was committed or rolled back.
+     * If this happens, none of these callback methods will be called
+     * (and `commit` will raise an exception).
+     *
+     * @param callable $callback
+     * @return ITransactor
      */
     public function onPersist(callable $callback): ITransactor
     {
