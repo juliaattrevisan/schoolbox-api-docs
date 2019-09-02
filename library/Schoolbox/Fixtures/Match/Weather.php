@@ -10,6 +10,7 @@
 namespace Schoolbox\Fixtures\Match;
 
 use \Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Weather\ApixuClient;
 
 class Weather
 {
@@ -50,19 +51,28 @@ class Weather
 
     /**
      * Did we find any data?
-     * 
+     *
      * @var bool
      */
     private $hasResults = false;
 
     /**
+     * The weather API
+     *
+     * @var ApixuClient
+     */
+    private $api;
+
+    /**
      * Weather constructor.
      *
-     * @param Match $match
+     * @param Match       $match
+     * @param ApixuClient $api
      */
-    public function __construct(Match $match)
+    public function __construct(Match $match, ApixuClient $api)
     {
         $this->setMatch($match);
+        $this->api = $api;
 
         $this->findForecast();
     }
@@ -74,47 +84,11 @@ class Weather
     private function findForecast()
     {
         $forecast = $this->findWeather($this->getMatch());
-
-        $this->setIcon($this->parseIcon($forecast));
-        $this->setCondition($forecast['conditions']);
-        $this->setTemp($forecast['temp']['high']);
-    }
-
-    /**
-     * Spawn our own icon
-     *
-     * @param $forecast
-     * @return string
-     */
-    private function parseIcon($forecast)
-    {
-        /* Map of conditions => icon
-         */
-        $map = [
-            'chanceflurries' => 'icon-rain',
-            'chancerain' => 'icon-rain',
-            'chancesleet' => 'icon-rain',
-            'chancesnow' => 'icon-rain',
-            'chancetstorms' => 'icon-storm',
-            'clear' => 'icon-clear',
-            'cloudy' => 'icon-cloudy',
-            'flurries' => 'icon-rain',
-            'fog' => 'icon-cloudy',
-            'hazy' => 'icon-cloudy',
-            'mostlycloudy' => 'icon-mostly-cloudy',
-            'mostlysunny' => 'icon-clear',
-            'partlycloudy' => 'icon-mostly-cloudy',
-            'partlysunny' => 'icon-clear',
-            'rain' => 'icon-rain',
-            'sleet' => 'icon-rain',
-            'snow' => 'icon-rain',
-            'sunny' => 'icon-clear',
-            'tstorms' => 'icon-storm',
-        ];
-
-        $key = $forecast['styles']['foreground'];
-
-        return $map[$key];
+        if (!empty($forecast)) {
+            $this->setIcon($forecast['condition']['icon']);
+            $this->setCondition($forecast['condition']['text']);
+            $this->setTemp($forecast['avgtemp_c']);
+        }
     }
 
     /**
@@ -126,7 +100,7 @@ class Weather
     private function findWeather(Match $match)
     {
         $matchDayDiff = \Alaress_Date_Format::now()->diffInDays($match->getStartAt(), false);
-        $matchDay = $match->getStartAt()->getDatabaseDate();
+        $matchDay     = $match->getStartAt()->getDatabaseDate();
 
         /* Only return data if the match hasn't already occurred
          */
@@ -136,25 +110,11 @@ class Weather
              * Don't bother if the match day is too far into the future (10 days)
              */
             if ($matchDayDiff < $this->getForecastLength()) {
-                $weatherController = new \Weather_Wunderground();
-                $locationString = "{$match->getVenue()->getLatitude()},{$match->getVenue()->getLongitude()}";
-                $weatherController->guessLocation($locationString);
-                $forecast = $weatherController->getForecast();
-
-                /* Can probably find the data a little faster than spawning
-                 * adf instances but there are not many to tests to conduct
-                 */
-                if (count($forecast['forecast'])) {
-                    foreach ($forecast['forecast'] as $currentForecast) {
-                        $adf = new \Alaress_Date_Format($currentForecast['datetime'], 'U');
-
-                        if ($adf->getDatabaseDate() == $matchDay) {
-                            $this->setHasResults(true);
-
-                            return $currentForecast;
-                        }
-                    }
+                $forecast = $this->api->getForecastByDate($matchDay, $match->getVenue()->getLatitude(), $match->getVenue()->getLongitude());
+                if (!empty($forecast)) {
+                    $this->setHasResults(true);
                 }
+                return $forecast;
             }
         }
 

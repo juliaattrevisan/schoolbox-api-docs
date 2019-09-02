@@ -4,6 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Fixtures\Venue;
 
@@ -38,6 +39,7 @@ class Controller extends AbstractController
      * @since 165
      *
      * @param object $context
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getList($context = null)
     {
@@ -49,13 +51,15 @@ class Controller extends AbstractController
 
             /** @var VenueMapper $mapper */
             $mapper    = $this->getMapper();
-            $allVenues = $mapper->findByName($query);
-
             $venues = [];
-
-            /** @var Venue $currentVenue */
-            foreach ($allVenues as $currentVenue) {
-                $venues[] = array_combine(['id', 'name'], $currentVenue->findValueLabelPair());
+            try {
+                $allVenues = $mapper->findByName($query);
+                /** @var Venue $currentVenue */
+                foreach ($allVenues as $currentVenue) {
+                    $venues[] = array_combine(['id', 'name'], $currentVenue->findValueLabelPair());
+                }
+            } catch (MapperException $e) {
+                // noop
             }
 
             $this->getResponse()->content->set($this->buildJsonOutput($venues));
@@ -91,6 +95,7 @@ class Controller extends AbstractController
      * @since 165
      *
      * @param Model $entity
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getEntity($entity)
     {
@@ -108,6 +113,7 @@ class Controller extends AbstractController
      *
      * @param Model $entity
      * @param object $context
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getForm($entity, $context = null)
     {
@@ -117,18 +123,18 @@ class Controller extends AbstractController
             'googleApiKey' => $this->getConfigLoader()->get('googleapps_api_key'),
         ];
 
-        // if there's a better way than using the weather config....
-        $location = (new \Weather_Wunderground())->getLocation();
-
         // compensate for failed API call
-        if ($location['lat'] && $location['lon']) {
-            $data['location'] = $location;
+        if ($entity->getLatitude() && $entity->getLongitude()) {
+            $data['location'] = [
+                'lat' => $entity->getLatitude(),
+                'lon' => $entity->getLongitude(),
+            ];
         } else {
             $data['location'] = [
                 'lat' => '-27.299860',
-                'lon' => '133.622357'
+                'lon' => '133.622357',
             ];
-            $data['zoom'] = 5;
+            $data['zoom']     = 5;
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/create.twig', $data));
@@ -142,6 +148,7 @@ class Controller extends AbstractController
      * @since 165
      *
      * @param Model $entity
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     protected function persistEntity($entity)
     {
@@ -168,6 +175,7 @@ class Controller extends AbstractController
      * @param string $latitude
      * @param string $longitude
      * @param string $address
+     * @throws MapperException
      */
     private function saveVenue(Venue $venue, $name, $latitude, $longitude, $address)
     {

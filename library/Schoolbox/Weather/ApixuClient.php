@@ -54,8 +54,9 @@ class ApixuClient
     public function getForecast(int $forecastLimit, string $location) : array
     {
         try {
-            $response = $this->makeRequest($forecastLimit, $location);
-            $twigData = $this->parseWeatherData($response);
+            $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key={$this->apiKey}";
+            $response   = $this->makeRequest($requestUrl);
+            $twigData   = $this->parseWeatherData($response);
         } catch (\Exception $e) {
             return ['weatherAvailable' => false];
         }
@@ -64,18 +65,37 @@ class ApixuClient
     }
 
     /**
+     * Get weather for particular date and location
+     *
+     * @param string $date
+     * @param        $latitude
+     * @param        $longitude
+     *
+     * @return array|mixed
+     */
+    public function getForecastByDate(string $date, $latitude, $longitude)
+    {
+        try {
+            $requestUrl = "forecast.json?date={$date}&q={$latitude},{$longitude}&key={$this->apiKey}";
+            $response   = $this->makeRequest($requestUrl);
+            if (isset($response['forecast']['forecastday'][0]['day'])) {
+                return $response['forecast']['forecastday'][0]['day'];
+            }
+            return [];
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
      * Find $forecastLimit days worth of information about $location
      *
-     * @param int $forecastLimit   How many days to forecast - configurable in component settings
-     * @param string $location     City to get weather for - configurable in component settings
-     *
+     * @param string $requestUrl
      * @return array
      * @throws \DomainException
      */
-    private function makeRequest(int $forecastLimit, string $location) : array
+    private function makeRequest(string $requestUrl) : array
     {
-        $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key={$this->apiKey}";
-
         // Cache the request
         try {
             $cache = new \Alaress_Weather_Cache();

@@ -4,9 +4,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Fixtures\Result;
 
-use Alaress\Web\Controller\Exception;
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
@@ -28,6 +29,7 @@ use \Schoolbox\Fixtures\Team\Model as Team;
 use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\Fixtures\Team\Metadata\Factory as TeamMetadataFactory;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use Schoolbox\Weather\ApixuClient;
 
 
 class Controller extends AbstractController
@@ -89,7 +91,7 @@ class Controller extends AbstractController
      * @param object $entity
      * @param object $team
      * @param object $context
-     * @throws Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
      * @return void
      */
     public function getCreateFormForTeam($entity, $team, $context = null)
@@ -146,6 +148,7 @@ class Controller extends AbstractController
      * @inheritdoc
      *
      * @param $entity
+     * @throws \Exception
      */
     public function createResultForTeam($entity)
     {
@@ -156,6 +159,8 @@ class Controller extends AbstractController
      * List of Results and the Match they are in
      *
      * @param Match $context
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getList($context = null)
     {
@@ -224,6 +229,8 @@ class Controller extends AbstractController
      * @api /fixtures/matches/:matchId/results/:teamId
      * @param Match $context
      * @param Team $team
+     * @throws MapperException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getResultForTeam($context, $team)
     {
@@ -292,7 +299,10 @@ class Controller extends AbstractController
         /* Tell me the weather
          */
         /** @var Match $match */
-        $forecast = new MatchWeather($match);
+        $apiKey = $this->getConfigLoader()->get('weather_api_key');
+        $apiUrl = $this->getConfigLoader()->get('weather_api_url');
+        $apixuClient = new ApixuClient($apiKey, $apiUrl);
+        $forecast = new MatchWeather($match, $apixuClient);
 
         /* Determine whether you've got write access or not
          * when viewing this page
@@ -324,8 +334,9 @@ class Controller extends AbstractController
      *
      * @param Collection $allCoaches
      * @return bool
+     * @throws MapperException
      */
-    private function hasMatchModify(Collection $allCoaches)
+    private function hasMatchModify(Collection $allCoaches): bool
     {
         /** @var User $sessionUser */
         $sessionUser = $_SESSION['user'];
@@ -369,6 +380,9 @@ class Controller extends AbstractController
      *
      * @param Result $entity
      * @param Match $context
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getForm($entity, $context = null)
     {
@@ -405,6 +419,8 @@ class Controller extends AbstractController
      * Persist method for entity
      *
      * @param Result $entity
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     protected function persistEntity($entity)
     {
@@ -458,6 +474,7 @@ class Controller extends AbstractController
      * @param Status $status
      * @param string $description
      * @param Result $result
+     * @throws MapperException
      */
     private function saveResult(Match $match, Team $team, Status $status, $description, Result $result)
     {
