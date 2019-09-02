@@ -125,11 +125,15 @@ class Gateway
                 se.act_code,
                 ea.act_desc,
                 ea.act_type,
+                el.lev_desc,
                 eu.ud_desc
             FROM ecactivity ea
             INNER JOIN studecact se
                 ON se.act_code = ea.act_code
                 AND se.cmpy_code = ea.cmpy_code
+            LEFT JOIN ecalevel el
+                ON el.cmpy_code = se.cmpy_code
+                AND el.lev_code = se.act_level
             LEFT JOIN ecudtable eu
                 ON eu.ud_code = se.ecud2_code
                 AND eu.cmpy_code = se.cmpy_code
