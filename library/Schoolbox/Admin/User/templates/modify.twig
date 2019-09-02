@@ -765,13 +765,13 @@
             });
 
             {# Delete linked user #}
-    
+
             $('[data-delete-linked]').click(function (event) {
                 event.preventDefault();
-    
+
                 var linkedId = $(this).data('delete-linked');
                 var linkedUserRow = $(this).closest('[data-linked-user]');
-    
+
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this linked user?',
                     confirmEvent: function () {
