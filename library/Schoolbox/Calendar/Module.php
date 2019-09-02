@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule\All;
 use Alaress\Authorizer\Rule\Any;
 use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsLoggedIn;
@@ -82,20 +83,45 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, '.*', new IsLoggedIn())
-        ->addRoutePermission(
-            $authorizer,
-            '.*',
-            new Any(
-                new IsSuperuser(),
-                new HasRole(Role::STAFF),
-                new IsUserOrParentOfUser(
-                    $this->getExternalUser(),
-                    UserMapper::getInstance(),
-                    'userId'
+        $this->addRoutePermission($authorizer, '.*', new IsLoggedIn());
+
+        $sessionUserRole = $this->getUserMapper()->getSessionUser()->getRole();
+        $sessionIsStudent = $sessionUserRole->isStudent();
+        $sessionIsParent = $sessionUserRole->isParent();
+
+        if ($this->getRouter()->getMatchedRoute()->params['userId'] && ($sessionIsStudent || $sessionIsParent))
+        {
+            if ($sessionIsStudent) {
+                $this->addRoutePermission(
+                    $authorizer,
+                    '.*',
+                    new All (
+                        new HasRole(Role::STUDENT),
+                        new IsUserOrParentOfUser($this->getExternalUser(), UserMapper::getInstance(), 'userId')
+                    )
+                );
+            } else {
+                $this->addRoutePermission(
+                    $authorizer,
+                    '.*',
+                    new All (
+                        new HasRole(Role::PARENT),
+                        new IsUserOrParentOfUser($this->getExternalUser(), UserMapper::getInstance(), 'userId')
+                    )
+                );
+            }
+        } else {
+            $this->addRoutePermission(
+                $authorizer,
+                '.*',
+                new Any(
+                    new IsSuperuser(),
+                    new HasRole(Role::STAFF),
+                    new HasRole(Role::STUDENT),
+                    new HasRole(Role::PARENT)
                 )
-            )
-        );
+            );
+        }
     }
 
     /**
