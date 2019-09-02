@@ -9,6 +9,7 @@
 namespace Schoolbox\Sync\Log;
 
 use Schoolbox\Resource\Storage;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model
 {
@@ -29,6 +30,8 @@ class Model
 
     /** @var int */
     protected $usersSkipped;
+
+    use ModelTrait\CreatedAtDate;
 
     /** @var Storage\Model */
     protected $storage;

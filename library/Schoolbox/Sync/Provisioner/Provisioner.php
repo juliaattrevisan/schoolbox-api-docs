@@ -16,13 +16,12 @@ use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
-use Schoolbox\Sync\Provisioner\User;
-use Schoolbox\Sync\Provisioner\UserMapper;
 use UnexpectedValueException;
 use Schoolbox\Collection;
 
@@ -64,6 +63,14 @@ class Provisioner
     protected $userMapper;
 
     /**
+     * A user access mapper - this retrieves the permissions that an existing
+     * user has on groups.
+     *
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
      * A logger
      *
      * @var LoggerInterface
@@ -101,12 +108,12 @@ class Provisioner
     /**
      * Constructor
      *
-     * @param Ruleset\Factory $rulesetFactory
-     * @param Grammar\Factory $grammarFactory
-     * @param ISync $externalUserSource
-     * @param UserMapper $userMapper
+     * @param Ruleset\Factory          $rulesetFactory
+     * @param Grammar\Factory          $grammarFactory
+     * @param ISync                    $externalUserSource
+     * @param UserMapper               $userMapper
      * @param CacheableLoggerInterface $logger
-     * @param Log\Mapper $logMapper
+     * @param Log\Mapper               $logMapper
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
@@ -114,9 +121,9 @@ class Provisioner
         ISync $externalUserSource,
         UserMapper $userMapper,
         CacheableLoggerInterface $logger,
-        Log\Mapper $logMapper
-    )
-    {
+        Log\Mapper $logMapper,
+        UserAccessMapper $userAccessMapper
+    ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
         $this->externalUserSource = $externalUserSource;
@@ -124,12 +131,14 @@ class Provisioner
         $this->userMapper = $userMapper;
         $this->logger = $logger;
         $this->logMapper = $logMapper;
+        $userAccessMapper->setEventPropagator(new MockPropagator());
+        $this->userAccessMapper = $userAccessMapper;
     }
 
     /**
      * Set the logger from outside this class.
      *
-     * @param  LoggerInterface $logger
+     * @param LoggerInterface $logger
      * @return $this
      */
     public function setLogger(LoggerInterface $logger)
@@ -141,7 +150,7 @@ class Provisioner
     /**
      * Runs the UPS.
      *
-     * @param bool $update If true, updates - otherwise, performs a dry run.
+     * @param bool   $update      If true, updates - otherwise, performs a dry run.
      * @param string $forRoleType If set, provisions this role type
      *                            (and only this role type) regardless of if
      *                            it's enabled or not.
@@ -161,14 +170,14 @@ class Provisioner
             try {
                 $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
             } catch (\Exception $e) {
-                $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", [ 'exception'=>$e ]);
+                $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", ['exception' => $e]);
                 $this->logMapper->flush($this->logger);
                 continue;
             }
 
             if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
 
-                $this->logger->warning("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
+                $this->logger->info("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
 
                 $created = $updated = $skipped = $errors = 0;
 
@@ -185,7 +194,7 @@ class Provisioner
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {
-                        $this->logger->error("Cannot process user: no externalUserId in record");
+                        $this->logger->error("Cannot process user: User must have an External ID");
                         ++$skipped;
                         ++$errors;
                         continue;
@@ -193,13 +202,24 @@ class Provisioner
 
                     // this is the context that needs to be applied to every log message while working with a user, for filtering
                     $commonContext = [
-                        'externalUserId' => $externalUserId
+                        'externalUserId' => $externalUserId,
                     ];
 
                     // Get the currently stored user
                     /** @var User $internalUser */
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
+                        // Don't need to know about external DB access.
+                        // UPS can't change or do anything with class membership
+                        // as that comes from the SIS anyway.
+                        // Don't want to know about any permissions other than
+                        // group permissions, either: only group permissions can
+                        // be changed by UPS.
+                        $internalUser->setAccessList(
+                            $this->userAccessMapper
+                                ->findAllForUser($internalUser, false)
+                                ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+                        );
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
@@ -211,16 +231,24 @@ class Provisioner
                         $action = 'create';
                     }
 
+
+                    // Keep a copy of the original user, for comparison
+                    $originalUser  = clone $internalUser;
+                    $oldAccessList = $this->formatAccessLevels($originalUser);
+
+
                     /* Deliberately empty $accessList so that Role-based
                      * permissions don't get saved in addition to the Group
                      * permissions that we can set
                      */
-                    $preserved = new Collection();
+                    $preserved = $this->userAccessMapper->createCollection();
+
 
                     /* Don't blow away any UserAccess::ACCESS_FULL settings
                      */
                     foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-                        if ($current->getAccessLevel() == UserAccess::ACCESS_FULL) {
+                        /** @var UserAccess $current */
+                        if ($current->getAccessLevel() === UserAccess::ACCESS_FULL) {
                             $preserved->add($current);
 
                             $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
@@ -231,54 +259,50 @@ class Provisioner
 
                     $commonContext['action'] = $action;
 
-                    $originalUser = clone $internalUser;
 
                     // Run this user through the hydrators
                     try {
                         $ruleset->hydrate($externalUser, $internalUser);
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
-                        $this->logger->notice("Skipping user: " . $e->getMessage(), $commonContext);
+                        $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
                         ++$skipped;
                         continue;
 
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
-                        $this->logger->error("Error provisioning user: " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
+                        $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
                         ++$skipped;
-                        ++$errors;
                         continue;
                     }
 
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
-                    $originalName = ($action == 'create') ? "New user ({$internalUser->formatName()})" : $originalUser->formatName();
-
-                    if (count($diff)
-                        || count($internalUser->getUserAccessRead())
-                        || count($internalUser->getUserAccessWrite())
-                        || count($internalUser->getUserAccessRemove())
-                    ) {
-                        $level = Logger::NOTICE;
-                        $message = $update ? "Preparing to $action $originalName" : "$originalName would have been {$action}d";
-                        $context = array_merge($commonContext, ['diff' => $diff]);
-
-                        if ($action == 'update') {
-                            ++$updated;
-                        } else {
-                            ++$created;
-                        }
-
-                    } else {
-                        $level = Logger::DEBUG;
-                        $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': data is unchanged';
-                        $context = $commonContext;
-
-                        ++$skipped;
+                    // get a diff of the access list as well
+                    $newAccessList = $this->formatAccessLevels($internalUser, $originalUser);
+                    if ($newAccessList !== $oldAccessList) {
+                        $diff['accessList'] = [
+                            'old' => $oldAccessList,
+                            'new' => $newAccessList,
+                        ];
                     }
 
-                    $this->logger->log($level, $message, $context);
+                    $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
+                        : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
+
+                    if (count($diff)) {
+                        $level = Logger::NOTICE;
+                        $message = $update ? "$originalName $action" : "$originalName would have been {$action}d";
+                        $context = array_merge($commonContext, ['diff' => $diff]);
+                    } else {
+                        $level = Logger::INFO;
+                        $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': record is unchanged';
+                        $context = $commonContext;
+                        $this->logger->log($level, $message, $context);
+                        ++$skipped;
+                        continue;
+                    }
 
                     try {
                         if (!$update) {
@@ -291,16 +315,28 @@ class Provisioner
                             $this->logger->debug("User record passes sanity check", $commonContext);
                             $this->logger->debug("User record saved", $commonContext);
                         }
+
+                        $this->logger->log($level, $message, $context);
+
+                        if ($action == 'update') {
+                            ++$updated;
+                        } else {
+                            ++$created;
+                        }
+
                     } catch (UnexpectedValueException $e) {
-                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, ['error' => $e]));
+                        $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
+                        ++$skipped;
                         continue;
                     } catch (\Exception $e) {
-                        $this->logger->error("User record save failed!", array_merge($commonContext, ['error' => $e->getMessage()]));
+                        $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
+                        ++$skipped;
+
                     }
                 }
 
                 // end of a strat - save the result
-                $this->logger->warning("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
+                $this->logger->info("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
                 $this->logMapper->flush($this->logger);
             }
         }
@@ -384,8 +420,8 @@ class Provisioner
      * mapper to throw error during live-run.
      *
      * @param \Schoolbox\Sync\Provisioner\User $internalUser
-     * @throws UnexpectedValueException if multiple new users were created with same username
      * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if multiple new users were created with same username
      */
     protected function verifyUniqueNewUserUsername(User $internalUser)
     {
@@ -405,5 +441,73 @@ class Provisioner
             $this->newUsernameCache[$internalUser->getUsername()] = $internalUser->getExternalId();
         }
         return true;
+    }
+
+
+    /**
+     * Format access levels in a user-readable manner
+     *
+     * @param User      $user
+     * @param User|null $previous
+     * @return array
+     */
+    private function formatAccessLevels(User $user, ?User $previous = null): array
+    {
+        // Final access levels:
+        // Original - removed + added
+        $result = [];
+        if ($previous) {
+            foreach ($previous->getAccessList() as $access) {
+                if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
+                    $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
+                }
+            }
+        }
+
+
+        // Remove any groups in the remove list
+        foreach ($user->getUserAccessRemove() as $accessRemove) {
+            $existingAccess = $result[$accessRemove] ?? UserAccess::ACCESS_DENY;
+            if ($existingAccess < UserAccess::ACCESS_FULL) {
+                unset($result[$accessRemove]);
+            }
+        }
+
+
+        // Then add any groups in the add list
+        foreach ($user->getAccessList() as $access) {
+            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE
+                && $access->getAccessLevel() < UserAccess::ACCESS_FULL
+            ) {
+                $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
+            }
+        }
+
+
+        // Format it in a readable format
+        ksort($result);
+        $formattedResult = [];
+        foreach ($result as $groupId => $accessLevel) {
+            $accessLevelString = null;
+            switch ($accessLevel) {
+                case UserAccess::ACCESS_WRITE:
+                    $accessLevelString = 'write';
+                    break;
+
+                case UserAccess::ACCESS_READ:
+                    $accessLevelString = 'read';
+                    break;
+
+                case UserAccess::ACCESS_FULL:
+                case UserAccess::ACCESS_DENY:
+                default:
+                    // Don't render
+                    break;
+            }
+            if (isset($accessLevelString)) {
+                $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
+            }
+        }
+        return $formattedResult;
     }
 }

@@ -18,6 +18,9 @@ MAILTO="support@schoolbox.com.au"
 # Cleanup cache  files (minify,zip,stream) (once a week on a Sunday)
 0 1 * * 0	root	/usr/share/schoolbox/tools/clean-cache-dir.sh >> /var/log/schoolbox/cache-cleanup.log 2>&1
 
+# Cleanup UPS log files (once a week on a Sunday)
+20 3 * * 0	root	/usr/share/schoolbox/tools/ups/cleanup.php -p -vv >> /var/log/schoolbox/cache-cleanup.log 2>&1
+
 # Plagscan callback - every hour
 0 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/lib/schoolbox/cache/logs/plagscan.log 2>&1
 

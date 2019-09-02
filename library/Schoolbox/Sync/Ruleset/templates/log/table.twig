@@ -19,22 +19,20 @@
                             {% endfor %}
                         </ul>
                     {% elseif td is same as(false) %}
-                        No
+                    <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
+                       target="_blank"
+                       title="View log">No</a>
                     {% elseif td is same as(true) %}
-                        Yes
+                        <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
+                           target="_blank"
+                           title="View log">Yes</a>
                     {% else %}
-                        {{ td }}
+                    <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
+                       target="_blank"
+                       title="View log">{{ td }}</a>
                     {% endif %}
                 </td>
             {% endfor %}
-            <td class="actions-small-1">
-                <nav>
-                    <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
-                       target="_blank"
-                       class="icon-next"
-                       title="View log"></a>
-                </nav>
-            </td>
         </tr>
     {% endfor %}
     </tbody>

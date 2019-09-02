@@ -43,6 +43,8 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('users_created', self::TYPE_INTEGER);
         $this->uses('users_updated', self::TYPE_INTEGER);
         $this->uses('users_skipped', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+
 
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage');
     }

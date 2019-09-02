@@ -985,9 +985,10 @@ abstract class Kernel
                             ->addSubSync($customSync)
                             ->addSubSync($defaultSync);
                     }),
-                    'userMapper'     => $di->lazyNew(SyncUserMapper::class),
-                    'logger'         => $di->lazyGet('ups.logger'),
-                    'logMapper'      => $di->lazyNew(SyncLogMapper::class),
+                    'userMapper'       => $di->lazyNew(SyncUserMapper::class),
+                    'logger'           => $di->lazyGet('ups.logger'),
+                    'logMapper'        => $di->lazyNew(SyncLogMapper::class),
+                    'userAccessMapper' => $di->lazyNew(UserAccessMapper::class),
                 ]
             )
         );

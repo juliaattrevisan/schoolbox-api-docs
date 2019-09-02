@@ -10,6 +10,7 @@ namespace Schoolbox\Calendar\Test\Event;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
+use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -63,7 +64,7 @@ class AccessTest extends TestCase
 
                 $mockUser = $this->getMockBuilder(User::class)->setMethods($overload)->getMock();
                 $mockUser->setId($id);
-                $mockUser->setAccessList(new Collection());
+                $mockUser->setAccessList(new GenericCollection(UserAccess::class));
 
                 return $mockUser;
             };
@@ -202,7 +203,7 @@ class AccessTest extends TestCase
             $user = $this->getUser($key);
             $access = $this->getUserAccess($key);
 
-            $user->setAccessList(new Collection([$access]));
+            $user->setAccessList(new GenericCollection(UserAccess::class, [$access]));
             $access->setUser($user);
         }
     }

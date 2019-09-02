@@ -57,7 +57,7 @@ class SkipParentIfNoChildren implements HydratorInterface
      */
     public function getName()
     {
-        return 'Skip Parents with no enrolled Children';
+        return 'Skip Parents with no enrolled children';
     }
 
     /**

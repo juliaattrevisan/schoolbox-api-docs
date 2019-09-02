@@ -150,11 +150,11 @@ class UserAccessMapper extends Mapper
      *
      * @param User $user
      * @param bool $includeSynergy
-     * @return Collection|UserAccess[]
+     * @return GenericCollection|UserAccess[]
      */
-    public function findAllForUser(User $user, $includeSynergy = true)
+    public function findAllForUser(User $user, $includeSynergy = true): GenericCollection
     {
-        $access = new Collection();
+        $access = $this->createCollection();
 
         // start with the userAccess table (filtering away access level 0)
         $internal = $this->findByColumnList([
@@ -178,7 +178,7 @@ class UserAccessMapper extends Mapper
 
         $extSubjs = $_DEPRECATED_EXTERNAL_USER_HANDLER->getSubjectList($user);
 
-        $external = new Collection();
+        $external = $this->createCollection();
 
         // in case this is false, stop here
         if (!$extSubjs) {
