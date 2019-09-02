@@ -348,16 +348,27 @@ class Processor
     {
         /* This many rows were affected
          */
-        $n = 0;
         $affectedProfileIds = [];
 
+        /* Row counter
+         */
+        $i = 1;
+
         foreach ($reader as $row) {
+            $i++;
+
+            /* External ID is required
+             */
+            if ('' === trim($row['External ID'])) {
+                $this->log("External ID not specified in row {$i}", self::LOG_SKIP);
+                continue;
+            }
 
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
             if (strcasecmp($row['Type'], self::CSV_STUDENT)) {
-                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row is for {$row['Type']}", self::LOG_SKIP);
+                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i}  is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
 
@@ -428,8 +439,6 @@ class Processor
              * Do this outside $this->perform for Dry Run logging purposes
              */
             $affectedProfileIds[] = $baseProfile->getId();
-
-            $n++;
         }
 
         /* Delete everyone we didn't created/update
@@ -440,7 +449,7 @@ class Processor
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->studentProfileMapper);
         }
 
-        return $n;
+        return \count($affectedProfileIds);
     }
 
 
@@ -548,16 +557,27 @@ class Processor
     {
         /* This many rows were affected
          */
-        $n = 0;
         $affectedProfileIds = [];
 
+        /* Row counter
+         */
+        $i = 1;
+
         foreach ($reader as $row) {
+            $i++;
+
+            /* External ID is required
+             */
+            if ('' === trim($row['External ID'])) {
+                $this->log("External ID not specified in row {$i}", self::LOG_SKIP);
+                continue;
+            }
 
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
             if (strcasecmp($row['Type'], self::CSV_STAFF)) {
-                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row is for {$row['Type']}", self::LOG_SKIP);
+                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i}  is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
 
@@ -608,8 +628,6 @@ class Processor
              * Do this outside $this->perform for Dry Run logging purposes
              */
             $affectedProfileIds[] = $baseProfile->getId();
-
-            $n++;
         }
 
         /* Delete everyone we didn't created/update
@@ -620,7 +638,7 @@ class Processor
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->staffProfileMapper);
         }
 
-        return $n;
+        return \count($affectedProfileIds);
     }
 
 
@@ -650,16 +668,27 @@ class Processor
     {
         /* This many rows were affected
          */
-        $n = 0;
         $affectedProfileIds = [];
 
+        /* Row counter
+         */
+        $i = 1;
+
         foreach ($reader as $row) {
+            $i++;
+
+            /* External ID is required
+             */
+            if ('' === trim($row['External ID'])) {
+                $this->log("External ID not specified in row {$i}", self::LOG_SKIP);
+                continue;
+            }
 
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
             if (strcasecmp($row['Type'], self::CSV_PARENT)) {
-                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row is for {$row['Type']}", self::LOG_SKIP);
+                $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i} is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
 
@@ -706,8 +735,6 @@ class Processor
              * Do this outside $this->perform for Dry Run logging purposes
              */
             $affectedProfileIds[] = $baseProfile->getId();
-
-            $n++;
         }
 
         /* Delete everyone we didn't created/update
@@ -718,7 +745,7 @@ class Processor
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->parentProfileMapper);
         }
 
-        return $n;
+        return \count($affectedProfileIds);
     }
 
 
