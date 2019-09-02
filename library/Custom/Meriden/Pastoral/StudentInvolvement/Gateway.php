@@ -137,10 +137,10 @@ class Gateway
         ";
 
         $pb = new PredicateBuilder($this->database, 'ecactivity');
-        $pb = $pb->equals('studecact.stud_code', $externalId)
-                 ->equals('studecact.act_year', $year)
-                 ->equals('ecactivity.act_type', $activityType)
-                 ->equals('ecactivity.cmpy_code', self::COMPANY_CODE);
+        $pb = $pb->equals('se.stud_code', $externalId)
+                 ->equals('se.act_year', $year)
+                 ->equals('ea.act_type', $activityType)
+                 ->equals('ea.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
