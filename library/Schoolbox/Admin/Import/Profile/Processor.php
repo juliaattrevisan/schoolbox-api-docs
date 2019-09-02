@@ -628,25 +628,25 @@ class Processor
          * Our schema creates relations between profile_ids, not external_ids
          * so we might as well cache these to save on performance penalty
          */
-        $statement = $this->database->prepareQuery('
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::PARENT . '" AS roleType
-            FROM schoolbox.sis_user_profile profile
+        $statement = $this->database->prepareQuery("
+            SELECT id, external_id AS externalId, firstname, lastname, \"" . Role::PARENT . "\" AS roleType
+            FROM {$this->baseProfileMapper->getTable()} profile
             INNER JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
 
             UNION
 
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STUDENT . '" AS roleType
-            FROM schoolbox.sis_user_profile profile
+            SELECT id, external_id AS externalId, firstname, lastname, \"" . Role::STUDENT . "\" AS roleType
+            FROM {$this->baseProfileMapper->getTable()} profile
             INNER JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
 
             UNION
 
-            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STAFF . '" AS roleType
-            FROM schoolbox.sis_user_profile profile
+            SELECT id, external_id AS externalId, firstname, lastname, \"" . Role::STAFF . "\" AS roleType
+            FROM {$this->baseProfileMapper->getTable()} profile
             INNER JOIN sis_user_profile_staff staff ON profile.id = staff.sis_user_profile_id
 
             ORDER BY id
-        ');
+        ");
 
         $statement->execute();
 
@@ -662,6 +662,16 @@ class Processor
 
             $cache[$roleType][$externalId] = $profileId;
         }
+
+        /* Purge old relations before re-inserting them
+         */
+        if ($this->perform) {
+            $this->database->executeQuery("
+                DELETE FROM {$this->relationMapper->getTable()}
+            ");
+        }
+
+        $this->log('Removing old relations', self::LOG_OK);
 
         /* Process each relation
          */
