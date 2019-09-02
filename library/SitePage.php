@@ -367,6 +367,7 @@ class SitePage extends Page
             if ($this->config->get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
                 $redis = \Alaress\Redis::getClientInstance();
                 $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
+                $sessionHandler->disableLoginLog();
 
                 if (strlen($username) === 0 || !$sessionHandler->create($username)) {
                     $sessionHandler->destroy();
