@@ -1,3 +1,13 @@
+<script type="text/javascript">
+    $(function() {
+        $('#uploadForm').alaressValidate({
+            messages: {
+                file: 'Please select a CSV type.'
+            }
+        });
+    });
+</script>
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -10,7 +20,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form method="post" action="/adminv2/import/profile/upload">
+        <form id="uploadForm" method="post" action="/adminv2/import/profile/upload">
             <section class="content">
                 <p>
                     These uploads will help you populate information about the people in your school.
@@ -103,8 +113,8 @@
             </div>
 
             <section class="content">
-                <label for="file">Choose CSV type</label>
-                <select id="file" name="file">
+                <label for="file" class="required">Choose CSV type</label>
+                <select id="file" name="file" required>
                     <option disabled selected>Please select</option>
                     <option value="student">Student</option>
                     <option value="staff">Staff</option>
