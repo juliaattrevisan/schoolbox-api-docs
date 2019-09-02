@@ -500,16 +500,16 @@ class Processor
      */
     private function removeOrphanedProfiles(): void
     {
-        $statement = $this->database->executeQuery('
+        $statement = $this->database->executeQuery("
             SELECT GROUP_CONCAT(profile.id) AS orphans
             FROM sis_user_profile profile
-            LEFT JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
-            LEFT JOIN sis_user_profile_staff staff ON profile.id = staff.sis_user_profile_id
-            LEFT JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
+            LEFT JOIN {$this->studentProfileMapper->getTable()} student ON profile.id = student.sis_user_profile_id
+            LEFT JOIN {$this->staffProfileMapper->getTable()} staff ON profile.id = staff.sis_user_profile_id
+            LEFT JOIN {$this->parentProfileMapper->getTable()} parent ON profile.id = parent.sis_user_profile_id
             WHERE student.sis_user_profile_id IS NULL
             AND staff.sis_user_profile_id IS NULL
             AND parent.sis_user_profile_id IS NULL
-        ');
+        ");
 
         $orphans = $statement->fetch(\PDO::FETCH_ASSOC)['orphans'];
 
