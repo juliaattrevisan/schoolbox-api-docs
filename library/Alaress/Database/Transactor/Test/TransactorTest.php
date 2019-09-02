@@ -11,6 +11,7 @@ namespace Alaress\Database\Transactor\Test;
 use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy\Dummy as DummyStrategy;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Class TransactorTest
@@ -41,7 +42,25 @@ class TransactorTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->transactor     = new Transactor(new DummyStrategy());
+        // Augment the transactor with a breakOut method, which simulates an
+        // implicit commit.
+        // (This should never be done in live code, hence it's in a mock.)
+        $this->transactor = new class(new DummyStrategy()) extends Transactor {
+            private $brokenOut = false;
+
+            public function breakOut(): void
+            {
+                $this->brokenOut = true;
+            }
+
+            public function inTransaction(): bool
+            {
+                if ($this->brokenOut) {
+                    return false;
+                }
+                return parent::inTransaction();
+            }
+        };
         $this->count          = 0;
         $this->orderedResults = [];
     }
@@ -224,16 +243,66 @@ class TransactorTest extends TestCase
     }
 
 
-
-
-    public function testOnUnexpectedImplicitCommit(): void
+    /**
+     * Test that `commit` outside a transaction throws an error.
+     *
+     * @expectedException RuntimeException
+     */
+    public function testExceptionOnCommitOutsideTransaction(): void
     {
-        $this->transactor->transact(function() {
-            // Do something that will cause the transactor to commit
-            // On attempting to complete the transaction:
-            // raise an error as it's a totally unexpected state.
+        $this->transactor->commit();
+    }
+
+
+    /**
+     * Test that `rollback` outside a transaction throws an error.
+     *
+     * @expectedException RuntimeException
+     */
+    public function testExceptionOnRollbackOutsideTransaction(): void
+    {
+        $this->transactor->rollback();
+    }
+
+
+    /**
+     * Test that an exception occurs when attempting to commit after an
+     * unexpected commit occurs elsewhere.
+     *
+     * @expectedException RuntimeException
+     */
+    public function testExceptionOnUnexpectedImplicitCommit(): void
+    {
+        $this->transactor->transact(function () {
+            $this->transactor->commit();
         });
     }
+
+
+    /**
+     * Test that an exception occurs when attempting to commit after an
+     * unexpected commit occurs elsewhere.
+     */
+    public function testCatchOfExceptionOnUnexpectedImplicitCommit(): void
+    {
+        // If I'm suddenly not within a transaction:
+        // I have no idea whether the transaction was committed or rolled back.
+        // All that I can do is throw an exception and let the developer handle
+        // that unexpected situation.
+        // (I don't believe that onPersist methods should be called either.)
+        try {
+            $this->transactor->transact(function () {
+                $this->transactor->transact(function () {
+                    $this->transactor->breakOut();
+                });
+                $this->buildOnPersist();
+            });
+        } catch (RuntimeException $e) {
+            // noop
+        }
+        $this->assertEquals(0, $this->count);
+    }
+
 
 
     /**
