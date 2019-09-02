@@ -45,7 +45,8 @@ class TransactorTest extends TestCase
         // Augment the transactor with a breakOut method, which simulates an
         // implicit commit.
         // (This should never be done in live code, hence it's in a mock.)
-        $this->transactor = new class(new DummyStrategy()) extends Transactor {
+        $this->transactor     = new class(new DummyStrategy()) extends Transactor
+        {
             private $implicitlyCommitted = false;
 
             public function implicitCommit(): void
@@ -79,7 +80,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistInsideCommittedTransaction(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersist();
         });
         $this->assertEquals(1, $this->count);
@@ -90,7 +91,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistInsideRolledBackTransaction(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersist();
             return false;
         });
@@ -103,7 +104,7 @@ class TransactorTest extends TestCase
     public function testOnPersistInsideExceptionTransaction(): void
     {
         try {
-            $this->transactor->transact(function() {
+            $this->transactor->transact(function () {
                 $this->buildOnPersist();
                 throw new \Exception('blah');
             });
@@ -119,10 +120,10 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistNestCommitInsideRollback(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersist();
 
-            $this->transactor->transact(function() {
+            $this->transactor->transact(function () {
                 $this->buildOnPersist();
             });
 
@@ -137,10 +138,10 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistNestRollbackInsideCommit(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersist();
 
-            $this->transactor->transact(function() {
+            $this->transactor->transact(function () {
                 $this->buildOnPersist();
                 return false;
             });
@@ -153,10 +154,10 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistNestCommitInsideCommit(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersist();
 
-            $this->transactor->transact(function() {
+            $this->transactor->transact(function () {
                 $this->buildOnPersist();
             });
         });
@@ -168,22 +169,22 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistCommitSiblingLevels(): void
     {
-        $this->transactor->transact(function() {
-            $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
+            $this->transactor->transact(function () {
                 $this->buildOnPersist();
             });
 
-            $this->transactor->transact(function() {
-                $this->buildOnPersist();
-                return false;
-            });
-
-            $this->transactor->transact(function() {
+            $this->transactor->transact(function () {
                 $this->buildOnPersist();
                 return false;
             });
 
-            $this->transactor->transact(function() {
+            $this->transactor->transact(function () {
+                $this->buildOnPersist();
+                return false;
+            });
+
+            $this->transactor->transact(function () {
                 $this->buildOnPersist();
             });
         });
@@ -195,7 +196,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistMultipleCallbacks(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersist();
             $this->buildOnPersist();
             $this->buildOnPersist();
@@ -208,7 +209,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistOrdering(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersistForOrderedResults(1);
             $this->buildOnPersistForOrderedResults(2);
             $this->buildOnPersistForOrderedResults(3);
@@ -223,13 +224,13 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistOrderingBetweenNestingLevels(): void
     {
-        $this->transactor->transact(function() {
+        $this->transactor->transact(function () {
             $this->buildOnPersistForOrderedResults(1);
 
-            $this->transactor->transact(function() {
+            $this->transactor->transact(function () {
                 $this->buildOnPersistForOrderedResults(2);
 
-                $this->transactor->transact(function() {
+                $this->transactor->transact(function () {
                     $this->buildOnPersistForOrderedResults(3);
                     return false;
                 });
