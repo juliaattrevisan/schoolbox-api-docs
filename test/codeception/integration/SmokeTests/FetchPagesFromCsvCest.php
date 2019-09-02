@@ -37,7 +37,7 @@ class FetchPagesFromCsvCest
      */
     protected function urlProvider()
     {
-        $csvData = array_map('str_getcsv', file('test/codeception/integration/SmokeTests/data/FetchPagesFromCsvCest.csv'));
+        $csvData = array_map('str_getcsv', file('test/codeception/_data/SmokeTests/FetchPagesFromCsvCest.csv'));
         return $csvData;
     }
 }
