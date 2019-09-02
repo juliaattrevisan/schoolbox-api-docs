@@ -9,6 +9,9 @@ declare(strict_types=1);
 namespace Alaress\Database\Transactor;
 
 use Alaress\Database\Transactor\Strategy\IStrategy;
+use RuntimeException;
+use Throwable;
+use function count;
 
 /**
  * Base transactor class, implements the most basic transaction functionality
@@ -48,7 +51,7 @@ class Base implements ITransactor
         $this->beginTransaction();
         try {
             $result = $callback();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Rollback if an exception happened, and rethrow
             $this->rollback();
             throw $e;
@@ -85,6 +88,9 @@ class Base implements ITransactor
      */
     public function commit(): bool
     {
+        if (!$this->inTransaction()) {
+            throw $this->buildNotInTransactionException();
+        }
         if ($this->strategy->commit()) {
             if (!$this->inTransaction()) {
                 // Are all transactions complete?
@@ -98,8 +104,8 @@ class Base implements ITransactor
             } else {
                 // Not yet complete?
                 // Shift this nesting level's hooks onto the next most recent level
-                $committedHooks = array_pop($this->onPersistHooks);
-                $currentHooks   = array_pop($this->onPersistHooks);
+                $committedHooks         = array_pop($this->onPersistHooks);
+                $currentHooks           = array_pop($this->onPersistHooks);
                 $this->onPersistHooks[] = array_merge($currentHooks, $committedHooks);
             }
             return true;
@@ -113,6 +119,9 @@ class Base implements ITransactor
      */
     public function rollback(): bool
     {
+        if (!$this->inTransaction()) {
+            throw $this->buildNotInTransactionException();
+        }
         if ($this->strategy->rollback()) {
             if (!$this->inTransaction()) {
                 // Are all transactions complete?
@@ -134,7 +143,7 @@ class Base implements ITransactor
      */
     public function onPersist(callable $callback): ITransactor
     {
-        $persistStackSize = \count($this->onPersistHooks);
+        $persistStackSize = count($this->onPersistHooks);
         if ($persistStackSize > 0) {
             // put in the transaction Q, in the last possible point
             // Hope that onPersistHooks is in sync with transaction state
@@ -152,5 +161,17 @@ class Base implements ITransactor
     public function getStrategy(): IStrategy
     {
         return $this->strategy;
+    }
+
+    /**
+     * @return RuntimeException
+     */
+    private function buildNotInTransactionException(): RuntimeException
+    {
+        return new RuntimeException(
+            '`commit` or `rollback` may not be called when not in a transaction. ' .
+            'Either this was called without first calling `beginTransaction`, or the database ' .
+            'implicitly committed the transaction (possibly due to a schema change).'
+        );
     }
 }

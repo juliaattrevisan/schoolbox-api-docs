@@ -224,6 +224,18 @@ class TransactorTest extends TestCase
     }
 
 
+
+
+    public function testOnUnexpectedImplicitCommit(): void
+    {
+        $this->transactor->transact(function() {
+            // Do something that will cause the transactor to commit
+            // On attempting to complete the transaction:
+            // raise an error as it's a totally unexpected state.
+        });
+    }
+
+
     /**
      * Increment count; used as onPersist callback.
      */
