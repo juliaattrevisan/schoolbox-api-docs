@@ -348,6 +348,7 @@ class Processor
         /* This many rows were affected
          */
         $n = 0;
+        $affectedProfileIds = [];
 
         foreach ($reader as $row) {
 
@@ -411,18 +412,68 @@ class Processor
                 ->setBoardingStatus((bool)$row['Boarding Status'])
                 ->setBaseProfile($baseProfile);
 
-            if ($this->perform) {
-                $this->baseProfileMapper->save($baseProfile);
-                $this->studentProfileMapper->save($studentProfile);
-            }
-
             if ($create) {
                 $this->log("Creating new student profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             } else {
                 $this->log("Updating existing student profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             }
 
+            if ($this->perform) {
+                $this->baseProfileMapper->save($baseProfile);
+                $this->studentProfileMapper->save($studentProfile);
+            }
+
+            /* Remember the ids that were affected; we remove everyone that wasn't added/updated
+             * Do this outside $this->perform for Dry Run logging purposes
+             */
+            $affectedProfileIds[] = $baseProfile->getId();
+
             $n++;
+        }
+
+        /* Delete everyone we didn't created/update
+         */
+        $this->log("Removing profiles that weren't created/updated", self::LOG_OK);
+
+        if ($this->perform && \count($affectedProfileIds)) {
+            $ids = implode(',', $affectedProfileIds);
+
+            /* Find student profiles that weren't created/updated
+             */
+            $statement = $this->database->executeQuery("
+                SELECT GROUP_CONCAT(sis_user_profile_id) AS deletions
+                FROM {$this->studentProfileMapper->getTable()} 
+                WHERE sis_user_profile_id NOT IN ({$ids}) 
+            ");
+
+            /* Remove those from both tables
+             */
+            $deletions = $statement->fetch(\PDO::FETCH_ASSOC)['deletions'];
+
+            if ($deletions) {
+
+                /* Remove relations that they once held
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM {$this->relationMapper->getTable()}
+                    WHERE child_profile_id IN {$deletions}
+                    OR user_profile_id IN {$deletions}
+                ");
+
+                /* Remove their student profile
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM {$this->studentProfileMapper->getTable()}
+                    WHERE sis_user_profile_id IN ({$deletions})
+                ");
+
+                /* Remove their base profile
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM {$this->baseProfileMapper->getTable()}
+                    WHERE id IN ({$deletions}) 
+                ");
+            }
         }
 
         return $n;
