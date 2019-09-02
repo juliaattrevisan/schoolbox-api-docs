@@ -121,14 +121,19 @@ class Gateway
 
         $query = "
             SELECT DISTINCT
-                studecact.stud_code,
-                studecact.act_code,
-                ecactivity.act_desc,
-                ecactivity.act_type
-            FROM ecactivity
-            INNER JOIN studecact
-                ON studecact.act_code = ecactivity.act_code
-                AND studecact.cmpy_code = ecactivity.cmpy_code
+                se.stud_code,
+                se.act_code,
+                ea.act_desc,
+                ea.act_type,
+                eu.ud_desc
+            FROM ecactivity ea
+            INNER JOIN studecact se
+                ON se.act_code = ea.act_code
+                AND se.cmpy_code = ea.cmpy_code
+            LEFT JOIN ecudtable eu
+                ON eu.ud_code = se.ecud2_code
+                AND eu.cmpy_code = se.cmpy_code
+                AND eu.ref_code = '2'
         ";
 
         $pb = new PredicateBuilder($this->database, 'ecactivity');
