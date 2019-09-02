@@ -52,6 +52,7 @@ class CreditSummary extends Base
                 Level,
                 InternalorExternalAssessment,
                 EnteredCredits,
+                Result,
                 StrippedResult,
                 ResultCredits,
                 StandardType,
