@@ -487,11 +487,36 @@ class Processor
             ");
 
             /* Remove their base profile
-             * TODO: ...but only if it isn't connected to any other profiles
+             * ...but only if it isn't connected to any other profiles
              */
+            $this->removeOrphanedProfiles();
+        }
+    }
+
+
+    /**
+     * Remove any base profiles that are no longer connected to an extension profile
+     * student, staff or parent
+     */
+    private function removeOrphanedProfiles(): void
+    {
+        $statement = $this->database->executeQuery('
+            SELECT GROUP_CONCAT(profile.id) AS orphans
+            FROM sis_user_profile profile
+            LEFT JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
+            LEFT JOIN sis_user_profile_staff staff ON profile.id = staff.sis_user_profile_id
+            LEFT JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
+            WHERE student.sis_user_profile_id IS NULL
+            AND staff.sis_user_profile_id IS NULL
+            AND parent.sis_user_profile_id IS NULL
+        ');
+
+        $orphans = $statement->fetch(\PDO::FETCH_ASSOC)['orphans'];
+
+        if ($orphans) {
             $this->database->executeQuery("
                 DELETE FROM {$this->baseProfileMapper->getTable()}
-                WHERE id IN ({$deletions}) 
+                WHERE {$this->baseProfileMapper->getIdentifierColumn()} IN ({$orphans})
             ");
         }
     }
@@ -517,6 +542,7 @@ class Processor
      * @throws Exception
      * @throws \UnexpectedValueException
      * @throws DefinitionException
+     * @throws \Alaress\Database\Exception
      */
     private function processStaffProfile(Reader $reader): int
     {
