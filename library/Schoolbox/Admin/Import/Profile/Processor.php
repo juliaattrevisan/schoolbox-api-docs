@@ -342,6 +342,7 @@ class Processor
      * @throws Exception
      * @throws \UnexpectedValueException
      * @throws DefinitionException
+     * @throws \Alaress\Database\Exception
      */
     private function processStudentProfile(Reader $reader): int
     {
@@ -433,50 +434,65 @@ class Processor
 
         /* Delete everyone we didn't created/update
          */
-        $this->log("Removing profiles that weren't created/updated", self::LOG_OK);
+        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
 
         if ($this->perform && \count($affectedProfileIds)) {
-            $ids = implode(',', $affectedProfileIds);
-
-            /* Find student profiles that weren't created/updated
-             */
-            $statement = $this->database->executeQuery("
-                SELECT GROUP_CONCAT(sis_user_profile_id) AS deletions
-                FROM {$this->studentProfileMapper->getTable()} 
-                WHERE sis_user_profile_id NOT IN ({$ids}) 
-            ");
-
-            /* Remove those from both tables
-             */
-            $deletions = $statement->fetch(\PDO::FETCH_ASSOC)['deletions'];
-
-            if ($deletions) {
-
-                /* Remove relations that they once held
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM {$this->relationMapper->getTable()}
-                    WHERE child_profile_id IN {$deletions}
-                    OR user_profile_id IN {$deletions}
-                ");
-
-                /* Remove their student profile
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM {$this->studentProfileMapper->getTable()}
-                    WHERE sis_user_profile_id IN ({$deletions})
-                ");
-
-                /* Remove their base profile
-                 */
-                $this->database->executeQuery("
-                    DELETE FROM {$this->baseProfileMapper->getTable()}
-                    WHERE id IN ({$deletions}) 
-                ");
-            }
+            $this->removeUnaffectedProfiles($affectedProfileIds, $this->studentProfileMapper);
         }
 
         return $n;
+    }
+
+
+    /**
+     * Removes unaffected profiles in $mapper's table
+     *
+     * Unaffected profiles are records that weren't created/updated
+     *
+     * @param array             $affectedProfileIds
+     * @param \Schoolbox\Mapper $mapper
+     * @throws \Alaress\Database\Exception
+     */
+    private function removeUnaffectedProfiles(array $affectedProfileIds, \Schoolbox\Mapper $mapper): void
+    {
+        $ids = implode(',', $affectedProfileIds);
+
+        /* Find student profiles that weren't created/updated
+         */
+        $statement = $this->database->executeQuery("
+                SELECT GROUP_CONCAT(sis_user_profile_id) AS deletions
+                FROM {$mapper->getTable()} 
+                WHERE sis_user_profile_id NOT IN ({$ids}) 
+            ");
+
+        /* Remove those from both tables
+         */
+        $deletions = $statement->fetch(\PDO::FETCH_ASSOC)['deletions'];
+
+        if ($deletions) {
+
+            /* Remove relations that they once held
+             */
+            $this->database->executeQuery("
+                DELETE FROM {$this->relationMapper->getTable()}
+                WHERE child_profile_id IN {$deletions}
+                OR user_profile_id IN {$deletions}
+            ");
+
+            /* Remove their student profile
+             */
+            $this->database->executeQuery("
+                DELETE FROM {$mapper->getTable()}
+                WHERE sis_user_profile_id IN ({$deletions})
+            ");
+
+            /* Remove their base profile
+             */
+            $this->database->executeQuery("
+                DELETE FROM {$this->baseProfileMapper->getTable()}
+                WHERE id IN ({$deletions}) 
+            ");
+        }
     }
 
 
