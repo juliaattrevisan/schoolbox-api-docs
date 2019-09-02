@@ -86,30 +86,24 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '.*', new IsLoggedIn());
 
         $sessionUserRole = $this->getUserMapper()->getSessionUser()->getRole();
-        $sessionIsStudent = $sessionUserRole->isStudent();
-        $sessionIsParent = $sessionUserRole->isParent();
 
-        if ($this->getRouter()->getMatchedRoute()->params['userId'] && ($sessionIsStudent || $sessionIsParent))
+        if (($sessionUserRole->isStudent() || $sessionUserRole->isParent()) && $this->getRouter()->getMatchedRoute()->params['userId'])
         {
-            if ($sessionIsStudent) {
-                $this->addRoutePermission(
-                    $authorizer,
-                    '.*',
-                    new All (
+            $this->addRoutePermission(
+                $authorizer,
+                '.*',
+                new All (
+                    new Any(
                         new HasRole(Role::STUDENT),
-                        new IsUserOrParentOfUser($this->getExternalUser(), UserMapper::getInstance(), 'userId')
+                        new HasRole(Role::PARENT)
+                    ),
+                    new IsUserOrParentOfUser(
+                        $this->getExternalUser(),
+                        UserMapper::getInstance(),
+                        'userId'
                     )
-                );
-            } else {
-                $this->addRoutePermission(
-                    $authorizer,
-                    '.*',
-                    new All (
-                        new HasRole(Role::PARENT),
-                        new IsUserOrParentOfUser($this->getExternalUser(), UserMapper::getInstance(), 'userId')
-                    )
-                );
-            }
+                )
+            );
         } else {
             $this->addRoutePermission(
                 $authorizer,
