@@ -644,12 +644,14 @@ class Processor
      * @throws Exception
      * @throws \UnexpectedValueException
      * @throws DefinitionException
+     * @throws \Alaress\Database\Exception
      */
     private function processParentProfile(Reader $reader): int
     {
         /* This many rows were affected
          */
         $n = 0;
+        $affectedProfileIds = [];
 
         foreach ($reader as $row) {
 
@@ -689,18 +691,31 @@ class Processor
                 ->setEmail($row['Email'])
                 ->setBaseProfile($baseProfile);
 
-            if ($this->perform) {
-                $this->baseProfileMapper->save($baseProfile);
-                $this->parentProfileMapper->save($parentProfile);
-            }
-
             if ($create) {
                 $this->log("Creating new parent profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             } else {
                 $this->log("Updating existing parent profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
             }
 
+            if ($this->perform) {
+                $this->baseProfileMapper->save($baseProfile);
+                $this->parentProfileMapper->save($parentProfile);
+            }
+
+            /* Remember the ids that were affected; we remove everyone that wasn't added/updated
+             * Do this outside $this->perform for Dry Run logging purposes
+             */
+            $affectedProfileIds[] = $baseProfile->getId();
+
             $n++;
+        }
+
+        /* Delete everyone we didn't created/update
+         */
+        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
+
+        if ($this->perform && \count($affectedProfileIds)) {
+            $this->removeUnaffectedProfiles($affectedProfileIds, $this->parentProfileMapper);
         }
 
         return $n;
