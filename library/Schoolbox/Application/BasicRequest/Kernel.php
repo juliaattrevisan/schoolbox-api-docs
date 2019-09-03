@@ -198,9 +198,7 @@ class Kernel extends WebKernelAbstract
         $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
             /** @var \Alaress\Session\Session $session */
             $session = $di->get('session');
-            if (!$session->isStarted()) {
-                $session->start();
-            }
+            $session->start();
             return isset($_SESSION) ? $_SESSION : array();
         });
 
