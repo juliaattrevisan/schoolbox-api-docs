@@ -353,7 +353,7 @@ class External_Schoolbox_User implements External_UserInterface
                          phone_home AS HomePhone,
                          '' AS SilentPhoneFlag,
                          mobile AS MobilePhone,
-                         '' AS DirectoryIncludeFlag,
+                         1 AS DirectoryIncludeFlag,
                          '' AS SpouseID,
                          '' AS SpouseTitle,
                          '' AS SpousePreferred,
@@ -452,7 +452,7 @@ class External_Schoolbox_User implements External_UserInterface
         }
 
         if($name) {
-            $nameQuery = " AND CONCAT(firstname,' ',lastname) LIKE :name";
+            $nameQuery = " AND CONCAT(child.firstname,' ',child.lastname) LIKE :name";
             $bindings[':name'] = '%'.$name.'%';
         }
 
