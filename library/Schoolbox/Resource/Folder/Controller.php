@@ -529,8 +529,8 @@ class Controller extends BaseController
             $this->updateFolderYearLevels($folder, $yearLevelIds);
         }
 
-        // apply Curriculum codes
-        [$nodesToRemove, $nodesToAdd] = $this->setCurriculumNodesOnFolder($folder, $curriculumCodeIds);
+        // update Curriculum codes
+        $this->updateFolderCurriculumNodes($folder, $curriculumCodeIds);
 
         // update role permission
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
@@ -539,14 +539,6 @@ class Controller extends BaseController
         $this->folderMapper->save($folder);
 
         $this->updateHomepageTemplate($folder, $homepageTemplate);
-
-        // Persist curriculum code joins
-        if ($nodesToRemove->count()) {
-            $this->curriculumNodeMapper->delete($nodesToRemove);
-        }
-        if ($nodesToAdd->count()) {
-            $this->curriculumNodeMapper->save($nodesToRemove);
-        }
 
         // Update role perms
         if ($rolePermsToSave->count()) {
@@ -664,14 +656,11 @@ class Controller extends BaseController
     /**
      * Put the given Curriculum code lists onto the given folder
      *
-     * Returns the nodes that need to be added and remove in the database
-     *
      * @param Model    $folder
      * @param string[] $nodeIds
-     * @return GenericCollection[]|Curriculum\Node\Model[][]
      * @throws MapperException
      */
-    private function setCurriculumNodesOnFolder(Model $folder, array $nodeIds): array
+    private function updateFolderCurriculumNodes(Model $folder, array $nodeIds): void
     {
         // Ensure nodes are indexed by node.id
         $folder
@@ -683,24 +672,18 @@ class Controller extends BaseController
             );
 
         // Remove existing node if not in new set
-        $nodesToRemove = $this->curriculumNodeMapper->createCollection();
         foreach ($folder->getCurriculumNodes() as $idx => $node) {
             if (!in_array($node->getId(), $nodeIds, false)) {
-                $nodesToRemove[$node->getId()] = $node;
                 $folder->getCurriculumNodes()->offsetUnset($idx);
             }
         }
 
         // Add new node if not already on folder
-        $nodesToAdd = $this->curriculumNodeMapper->createCollection();
         foreach ($nodeIds as $nodeId) {
             if (!in_array($nodeId, $folder->getCurriculumNodes()->keys(), false)) {
-                $node                                  = $this->curriculumNodeMapper->findById($nodeId);
-                $nodesToAdd[$nodeId]                   = $node;
-                $folder->getCurriculumNodes()[$nodeId] = $node;
+                $folder->getCurriculumNodes()[$nodeId] = $this->curriculumNodeMapper->findById($nodeId);
             }
         }
-        return [$nodesToRemove, $nodesToAdd];
     }
 
     /**
