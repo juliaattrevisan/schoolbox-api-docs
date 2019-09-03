@@ -94,18 +94,21 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             'getCalendar',
-            new Any (
-                new IsSuperuser(),
-                new HasRole(Role::STAFF),
-                new All (
-                    new IsUserOrParentOfUser(
-                        $this->getExternalUser(),
-                        UserMapper::getInstance(),
-                        'userId'
-                    ),
-                    new Any (
-                        new HasRole(Role::PARENT),
-                        new HasRole(Role::STUDENT)
+            new All(
+                new IsLoggedIn(),
+                new Any(
+                    new IsSuperuser(),
+                    new HasRole(Role::STAFF),
+                    new All(
+                        new IsUserOrParentOfUser(
+                            $this->getExternalUser(),
+                            UserMapper::getInstance(),
+                            'userId'
+                        ),
+                        new Any(
+                            new HasRole(Role::PARENT),
+                            new HasRole(Role::STUDENT)
+                        )
                     )
                 )
             )
