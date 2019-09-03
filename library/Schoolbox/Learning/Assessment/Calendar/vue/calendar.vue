@@ -207,6 +207,12 @@
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             }"
+            :buttonText="{
+                today:    'Today',
+                month:    'Month',
+                week:     'Week',
+                day:      'Day'
+            }"
             default-view="dayGridMonth"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-limit="config.eventLimit"
