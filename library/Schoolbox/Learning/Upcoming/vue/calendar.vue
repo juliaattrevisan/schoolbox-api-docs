@@ -23,7 +23,7 @@
                 :event-time-format="helper.eventTimeFormat"
                 content-height="auto"
                 :header="{
-                    left: 'prev,today,next',
+                    left: 'today,prev,next',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 }"
