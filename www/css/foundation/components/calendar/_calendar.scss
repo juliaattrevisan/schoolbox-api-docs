@@ -55,9 +55,10 @@
     }
 
     .fc-center {
-      padding: 1rem 0 0;
       flex-basis: 80%;
       margin: 0 1rem;
+      padding: 1rem 0 0;
+
       h2 {
         font-size: 1.125rem;
       }
@@ -80,8 +81,8 @@
           @extend .disabled;
         }
         &:hover, &.fc-button-active {
-            color: $content-ui-foreground !important;
-            background-color: $content-ui-hover !important;
+          background-color: $content-ui-hover !important;
+          color: $content-ui-foreground !important;
         }
     }
 }
@@ -101,8 +102,8 @@
 
 .fc-widget-header span {
     display: block;
+    font-size: .875rem;
     margin: .25rem;
-    font-size: 0.875rem;
 }
 
 .fc-day-header {
