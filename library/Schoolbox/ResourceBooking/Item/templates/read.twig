@@ -82,27 +82,14 @@
         }
 
         window.fullCalendarConfig = {
-            userId:             Number('{{ user.id }}'),
-            token:              '{{ user.key }}',
-            taskTypeId:         Number('{{ taskTypeId }}'),
-            sources:            {{ sources | json_encode | raw }},
-            eventTypes:         {{ eventTypes | json_encode | raw }},
-            groups:             {{ groups | json_encode | raw }},
-            campuses:           {{ campuses | json_encode | raw }},
-            selectedFilters:    {{ filters | json_encode | raw }},
-            defaultDate:        '{{ selectedDate|date('Y-m-d') }}',
-            eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
-            firstDay:           Number('{{ config.calendar_start_day }}'),
-            defaultView:        anchorView || '{{ calendarView }}',
-            dateDisplayFormats: dateDisplayFormats,
-            translations:       {
-                eotc: {
-                    proper: '{{ locale.eotc.proper }}'
-                },
-                dueWork: {
-                    proper: '{{ locale.dueWork.proper }}'
-                }
-            }
+            token:                  '{{ token }}',
+            selectedFilters:        [],
+            defaultDate:            '{{ selectedDate|date('Y-m-d') }}',
+            eventLimit:             Boolean('{{ config.calendar_collapse_events }}'),
+            firstDay:               Number('{{ config.calendar_start_day }}'),
+            defaultView:            anchorView || '{{ calendarView }}',
+            dateDisplayFormats:     dateDisplayFormats,
+            resourceBookingEndpoint:{{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
         };
     </script>
 {% endautoescape %}

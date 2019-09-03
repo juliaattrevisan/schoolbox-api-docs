@@ -13,7 +13,7 @@
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
     // import CreateEventModal           from './createEventModal';
     // import ExportModal                from "./exportModal";
-    // import FilterModal                from "./filterModal";
+    import FilterModal                from "./filterModal";
     import axios                      from 'axios'
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
@@ -21,7 +21,6 @@
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
 
-    const URL_EVENT_SOURCE = '/calendar/ajax/full';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_FILTER = '/calendar/ajax/filter';
     const URL_EVENT_CREATE = '/calendar/ajax/create';
@@ -44,7 +43,7 @@
     export default {
         components: {
             Toast,
-            // FilterModal,
+            FilterModal,
             // ExportModal,
             // CreateEventModal,
             ViewEventModal,
@@ -71,7 +70,7 @@
                     create: URL_EVENT_CREATE,
                     modifyForm: URL_EVENT_MODIFY_FORM,
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-                    update: URL_EVENT_UPDATE,
+                    // update: URL_EVENT_UPDATE,
                     export: URL_EVENT_EXPORT,
                     attendanceList: URL_ATTENDANCE_LIST,
                     attendanceToggle: URL_ATTENDANCE_TOGGLE,
@@ -131,7 +130,7 @@
             events(fetchInfo, callback) {
                 var self = this;
                 axios.get(
-                    URL_EVENT_SOURCE,
+                    self.config.resourceBookingEndpoint,
                     {
                         headers: {
                             'X-Requested-With' : 'XMLHttpRequest'
@@ -341,18 +340,6 @@
             },
 
             /**
-             * Is the given event a task or not? This affects how it's rendered.
-             *
-             * @param event
-             * @return {boolean}
-             */
-            isTask(event) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading`)
-                return this.helper.isTask(event);
-            },
-
-            /**
              * Callback for reloading the calendar's events. May be used when
              * a series of events is deleted, as the calendar no longer knows
              * whether an event should be rendered even if it wasn't deleted.
@@ -403,13 +390,9 @@
 <!--                      :token="config.token"-->
 <!--                      :event-export-url="urls.export" />-->
 
-<!--        <filter-modal ref="filter"-->
-<!--                      :selected-filters="config.selectedFilters"-->
-<!--                      :sources="config.sources"-->
-<!--                      :event-types="config.eventTypes"-->
-<!--                      :groups="config.groups"-->
-<!--                      :campuses="config.campuses"-->
-<!--                      @filterChanged="updateSelectedFilters" />-->
+        <filter-modal ref="filter"
+                      :selected-filters="config.selectedFilters"
+                @filterChanged="updateSelectedFilters" />
 
 <!--        <create-event-modal ref="createEvent"-->
 <!--                            :event="newEvent"-->
