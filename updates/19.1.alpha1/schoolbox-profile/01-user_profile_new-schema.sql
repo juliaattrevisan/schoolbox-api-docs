@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `username`                    VARCHAR(255)  NULL,
     `email`                       VARCHAR(255)  NULL,
     `gender`                      VARCHAR(25)   NULL,
+    `campus_name`                 VARCHAR(255)  NULL,
     `head_of_house_id`            VARCHAR(64)   NULL,
     `head_of_house_name`          VARCHAR(255)  NULL,
     `house_name`                  VARCHAR(255)  NULL,
