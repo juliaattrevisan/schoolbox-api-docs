@@ -12,6 +12,7 @@ use Alaress_Date_Format;
 use function array_intersect;
 use function array_merge;
 use function array_unique;
+use function count;
 use function implode;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -79,8 +80,10 @@ class IdFinder extends Filter\AbstractIdFinder
         $unitImplIds           = $completeFilters[NullableContext\UnitImpl\Definition::class];
         $unitSpecIds           = $completeFilters[NullableContext\UnitSpec\Definition::class];
         $unitImpSpcIds         = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
+        $folderYearLevels      = $completeFilters[FolderYearLevel\Definition::class];
 
         [$folderWhere, $folderParams]     = $this->getClauseFolder($teacherFolderIds, $studentFolderIds, $courseImportFolderIds);
+        [$yearLevelJoin, $yearLevelWhere, $yearLevelParams] = $this->getClauseFolderYearLevels($folderYearLevels);
         [$projectWhere, $projectParams]   = $this->getClauseProject($projectIds);
         [$unitImplWhere, $unitImplParams] = $this->getClauseUnitImpl($unitImplIds);
         [$unitSpecWhere, $unitSpecParams] = $this->getClauseUnitSpec($unitSpecIds);
@@ -133,6 +136,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $workTypeWhere,
             $yearDueWhere,
             $deletedWhere,
+            $yearLevelWhere,
         ];
         $nonContextWhereClause = implode(' AND ', $nonContextWhereClauses);
 
@@ -149,11 +153,12 @@ class IdFinder extends Filter\AbstractIdFinder
             $termCParams,
             $weightingParams,
             $workTypeParams,
-            $yearDueParams
+            $yearDueParams,
+            $yearLevelParams
         );
 
         $subQueries = [];
-        if ($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $studentFolderIds, $projectIds, $unitImplIds, $unitSpecIds)) {
+        if ($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $studentFolderIds, $projectIds, $unitImplIds, $unitSpecIds, $folderYearLevels)) {
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$nonContextJoin}
@@ -161,47 +166,52 @@ class IdFinder extends Filter\AbstractIdFinder
                 ";
         } else {
             if ($this->subQueryFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
+                // Need to join to folder table if filtering on folder attributes
                 $folderJoin   = count($folderParams) ? 'JOIN folder f ON af.folder_id = f.id' : '';
+                $folderYearLevelJoin = $yearLevelJoin ? $yearLevelJoin . ' JOIN folder_year_level fyl ON af.folder_id = fyl.folder_id' : '';
                 $subQueries[] = "
                     SELECT a.id, 1 AS 'case' FROM `assessment` a
                     JOIN assessment_folder af ON af.assessment_id = a.id
                     {$folderJoin}
+                    {$folderYearLevelJoin}
                     {$nonContextJoin}
                     WHERE {$folderWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryProjectFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
                 $folderJoin   = count($folderParams) ? 'JOIN folder f ON paf.folder_id = f.id' : '';
+                $folderYearLevelJoin = $yearLevelJoin ? $yearLevelJoin . ' JOIN folder_year_level fyl ON paf.folder_id = fyl.folder_id' : '';
                 $subQueries[] = "
                     SELECT a.id, 2 AS 'case' FROM `assessment` a
                     JOIN project_assessment ap ON ap.assessment_id  = a.id
                     JOIN project p             ON ap.project_id     = p.id
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
                     {$folderJoin}
+                    {$folderYearLevelJoin}
                     {$nonContextJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
-                $folderJoin   = count($folderParams)
-                    ? 'JOIN course_implementation ci ON ui.course_implementation_id = ci.id
-                       JOIN folder f                 ON ci.folder_id                = f.id'
-                    : '';
+                $courseImplJoin      = $yearLevelJoin || count($folderParams) ? 'JOIN course_implementation ci ON ui.course_implementation_id = ci.id' : '';
+                $folderJoin          = count($folderParams) ? 'JOIN folder f  ON ci.folder_id = f.id' : '';
+                $folderYearLevelJoin = $yearLevelJoin ? $yearLevelJoin . ' JOIN folder_year_level fyl ON ci.folder_id = fyl.folder_id' : '';
                 $subQueries[] = "
                     SELECT a.id, 3 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$uImpSpcJoin}
+                    {$courseImplJoin}
                     {$folderJoin}
+                    {$folderYearLevelJoin}
                     {$nonContextJoin}
                     WHERE {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryProjectUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
-                $folderJoin   = count($folderParams)
-                    ? 'JOIN course_implementation ci ON ui.course_implementation_id = ci.id
-                       JOIN folder f                 ON ci.folder_id                = f.id'
-                    : '';
+                $courseImplJoin      = $yearLevelJoin || count($folderParams) ? 'JOIN course_implementation ci ON ui.course_implementation_id = ci.id' : '';
+                $folderJoin          = count($folderParams) ? 'JOIN folder f  ON ci.folder_id = f.id' : '';
+                $folderYearLevelJoin = $yearLevelJoin ? $yearLevelJoin . ' JOIN folder_year_level fyl ON ci.folder_id = fyl.folder_id' : '';
                 $subQueries[] = "
                     SELECT a.id, 4 AS 'case' FROM `assessment` a
                     JOIN project_assessment ap                     ON ap.assessment_id                  = a.id
@@ -209,24 +219,29 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$uImpSpcJoin}
+                    {$courseImplJoin}
                     {$folderJoin}
+                    {$folderYearLevelJoin}
                     {$nonContextJoin}
                     WHERE {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
                 $folderJoin   = count($folderParams) ? 'JOIN folder f ON us.folder_id = f.id' : '';
+                $folderYearLevelJoin = $yearLevelJoin ? $yearLevelJoin . ' JOIN folder_year_level fyl ON us.folder_id = fyl.folder_id' : '';
                 $subQueries[] = "
                     SELECT a.id, 5 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_specification aus ON aus.assessment_id = a.id
                     JOIN course_unit_specification us ON aus.course_unit_specification_id = us.id
                     {$folderJoin}
+                    {$folderYearLevelJoin}
                     {$nonContextJoin}
                     WHERE {$folderWhere} AND {$unitSpecWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryProjectUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
                 $folderJoin   = count($folderParams) ? 'JOIN folder f ON us.folder_id = f.id' : '';
+                $folderYearLevelJoin = $yearLevelJoin ? $yearLevelJoin . ' JOIN folder_year_level fyl ON us.folder_id = fyl.folder_id' : '';
                 $subQueries[] = "
                     SELECT a.id, 6 AS 'case' FROM `assessment` a
                     JOIN project_assessment ap                     ON ap.assessment_id  = a.id
@@ -234,6 +249,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN assessment_course_unit_specification aus  ON aus.assessment_id = p.assessment_id
                     JOIN course_unit_specification us              ON aus.course_unit_specification_id = us.id
                     {$folderJoin}
+                    {$folderYearLevelJoin}
                     {$nonContextJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere} AND {$nonContextWhereClause}
                     ";
@@ -247,7 +263,7 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Include (#0) 'base' sub-query? (and just the base query)
      *
-     * This will only be true if no context filters are specified
+     * This will only be true if no context or folderYearLevel filters are specified
      *
      * @param null|Collection|int[] $uImpSpcIds
      * @param null|Collection|int[] $teacherFolderIds
@@ -255,23 +271,26 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param null|Collection|int[] $projectIds
      * @param null|Collection|int[] $unitImplIds
      * @param null|Collection|int[] $unitSpecIds
+     * @param Collection|null       $folderYearLevels
      * @return bool
      */
     private function subQueryBase(
-        Collection $uImpSpcIds = null,
-        Collection $teacherFolderIds = null,
-        Collection $studentFolderIds = null,
-        Collection $projectIds = null,
-        Collection $unitImplIds = null,
-        Collection $unitSpecIds = null
-    ) {
+        ?Collection $uImpSpcIds,
+        ?Collection $teacherFolderIds,
+        ?Collection $studentFolderIds,
+        ?Collection $projectIds,
+        ?Collection $unitImplIds,
+        ?Collection $unitSpecIds,
+        ?Collection $folderYearLevels
+    ): bool {
         return
             null === $uImpSpcIds &&
             null === $teacherFolderIds &&
             null === $studentFolderIds &&
             null === $projectIds &&
             null === $unitImplIds &&
-            null === $unitSpecIds;
+            null === $unitSpecIds &&
+            $folderYearLevels === null;
     }
 
 
@@ -285,11 +304,12 @@ class IdFinder extends Filter\AbstractIdFinder
      * @return bool
      */
     private function subQueryFolder(
-        Collection $uImpSpcIds = null,
-        Collection $projectIds = null,
-        Collection $unitImplIds = null,
-        Collection $unitSpecIds = null
+        ?Collection $uImpSpcIds,
+        ?Collection $projectIds,
+        ?Collection $unitImplIds,
+        ?Collection $unitSpecIds
     ) {
+        // Semantically, each of these tests equate to: "Do filters indicate assessment must reside in instances of this non-folder context?"
         if ($projectIds instanceOf Collection && $projectIds->count() && !$projectIds->keyExists(NullableContext\Definition::KEY_NONE)) {
             return false;
         }
@@ -316,10 +336,10 @@ class IdFinder extends Filter\AbstractIdFinder
      * @return bool
      */
     private function subQueryProjectFolder(
-        Collection $uImpSpcIds = null,
-        Collection $projectIds = null,
-        Collection $unitImplIds = null,
-        Collection $unitSpecIds = null
+        ?Collection $uImpSpcIds,
+        ?Collection $projectIds,
+        ?Collection $unitImplIds,
+        ?Collection $unitSpecIds
     ) {
         if ($projectIds instanceOf Collection && !$projectIds->count()) {
             return false;
@@ -347,11 +367,11 @@ class IdFinder extends Filter\AbstractIdFinder
      * @return bool
      */
     private function subQueryUnitImpl(
-        Collection $uImpSpcIds = null,
-        Collection $projectIds = null,
-        Collection $unitImplIds = null,
-        Collection $unitSpecIds = null
-    ) {
+        ?Collection $uImpSpcIds,
+        ?Collection $projectIds,
+        ?Collection $unitImplIds,
+        ?Collection $unitSpecIds
+    ): bool {
         if ($unitImplIds instanceOf Collection && !$unitImplIds->count()) {
             return false;
         }
@@ -379,11 +399,11 @@ class IdFinder extends Filter\AbstractIdFinder
      * @return bool
      */
     private function subQueryProjectUnitImpl(
-        Collection $uImpSpcIds = null,
-        Collection $projectIds = null,
-        Collection $unitImplIds = null,
-        Collection $unitSpecIds = null
-    ) {
+        ?Collection $uImpSpcIds,
+        ?Collection $projectIds,
+        ?Collection $unitImplIds,
+        ?Collection $unitSpecIds
+    ): bool {
         if ($projectIds instanceOf Collection && !$projectIds->count()) {
             return false;
         }
@@ -410,11 +430,11 @@ class IdFinder extends Filter\AbstractIdFinder
      * @return bool
      */
     private function subQueryUnitSpec(
-        Collection $uImpSpcIds = null,
-        Collection $projectIds = null,
-        Collection $unitImplIds = null,
-        Collection $unitSpecIds = null
-    ) {
+        ?Collection $uImpSpcIds,
+        ?Collection $projectIds,
+        ?Collection $unitImplIds,
+        ?Collection $unitSpecIds
+    ): bool {
         if ($unitSpecIds instanceOf Collection && !$unitSpecIds->count()) {
             return false;
         }
@@ -441,11 +461,11 @@ class IdFinder extends Filter\AbstractIdFinder
      * @return bool
      */
     private function subQueryProjectUnitSpec(
-        Collection $uImpSpcIds = null,
-        Collection $projectIds = null,
-        Collection $unitImplIds = null,
-        Collection $unitSpecIds = null
-    ) {
+        ?Collection $uImpSpcIds,
+        ?Collection $projectIds,
+        ?Collection $unitImplIds,
+        ?Collection $unitSpecIds
+    ): bool {
         if ($projectIds instanceOf Collection && !$projectIds->count()) {
             return false;
         }
@@ -666,10 +686,10 @@ class IdFinder extends Filter\AbstractIdFinder
      * @throws UnderflowException
      */
     private function getClauseFolder(
-        Collection $teacherFolderIds = null,
-        Collection $studentFolderIds = null,
-        Collection $courseImportFolderIds = null
-    ) {
+        ?Collection $teacherFolderIds,
+        ?Collection $studentFolderIds,
+        ?Collection $courseImportFolderIds
+    ): array {
         // Different filters are always combined using INTERSECT
 
         // All NULL ?
@@ -691,11 +711,66 @@ class IdFinder extends Filter\AbstractIdFinder
                 ? $courseImportFolderIds :
                 array_intersect($folderIds, $courseImportFolderIds->getAll());
         }
-
         $builder = $this->getMapper()->getPredicateBuilder();
         $builder->in('f.id', $folderIds);
 
         return [$builder->getWhere()[0], $builder->getParams()];
+    }
+
+
+    /**
+     * Return structure indicates:
+     * * Whether we need to join to the `folder_year_level` table, and the type of join (INNER | LEFT)
+     * * The WHERE clause with placeholders
+     * * Any params to use in the WHERE clause
+     *
+     * @param Collection|null $folderYearLevels
+     * @return array
+     * @internal null|string return[0] join type to folder_year_level table
+     * @internal string      return[1] Where clause with placeholders
+     * @internal array       return[2] Where clause params
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    private function getClauseFolderYearLevels(?Collection $folderYearLevels): array
+    {
+        // Case #1 - null, don't apply the filter at all
+        if ($folderYearLevels === null) {
+            return [null, 'TRUE', []];
+        }
+
+        // Case #2 - empty collection, should already be handled by pre-query-build optimiser
+        if (!$folderYearLevels->count()) {
+            throw new UnexpectedValueException('Folder YearLevels filter is empty');
+        }
+
+        # Case #3 - options present.
+
+        // What does the filter options semantically contain?
+        $concreteYearLevelIds = [];
+        $matchNone            = false;
+        foreach ($folderYearLevels as $yearLevelId) {
+            if ($yearLevelId === null) {
+                $matchNone = true;
+                continue;
+            }
+            $concreteYearLevelIds[] = $yearLevelId;
+        }
+
+        $pb = $this->getMapper()->getPredicateBuilder();
+        if ($matchNone) {
+            $pb->isNull('fyl.year_level_id');
+        }
+        if (count($concreteYearLevelIds)) {
+            $pb->in('fyl.year_level_id', $concreteYearLevelIds);
+        }
+
+        if ($matchNone && count($concreteYearLevelIds)) {
+            $pb = $this->getMapper()->getPredicateBuilder()->any($pb);
+        }
+
+        return [$matchNone ? 'LEFT' : 'INNER', $pb->getWhere()[0], $pb->getParams()];
     }
 
 
@@ -1285,6 +1360,13 @@ class IdFinder extends Filter\AbstractIdFinder
             ) {
                 return true;
             }
+        }
+
+        // Did call explicitly request assessments belongs to folder with some year-level relation, but no relations found?
+        // Note that 'none' is an explicit option, and must be present to match folders without any year-level associations
+        $yearLevels = $completeFilters[FolderYearLevel\Definition::class];
+        if ($yearLevels instanceof Collection && !$yearLevels->count()) {
+            return true;
         }
 
         // Unable to conclude that result set is guaranteed to be empty
