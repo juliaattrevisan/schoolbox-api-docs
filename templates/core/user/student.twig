@@ -371,6 +371,16 @@
 {% block pd %}
 {% endblock pd %}
 
+{# TODO: Where to pus this?
+ # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
+ # https://foundation.zurb.com/forum/posts/22995-empty-column
+ #}
+<style type="text/css">
+    .columns, .column {
+        min-height: 1px;
+    }
+</style>
+
 <div class="row">
     <div class="small-12 {% if showClasses %}medium-6 medium-push-6{% else %}large-reset-order{% endif %} columns">
         {% if showContacts and contacts|length > 0 %}
