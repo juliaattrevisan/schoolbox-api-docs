@@ -94,9 +94,9 @@ class External_Schoolbox_User implements External_UserInterface
                           '' AS StudentEmergencyPhoneAlt,
                           alert_medical AS StudentMedicalAlert,
                           mobile AS StudentMobilePhone,
-                          individual_learning_plans AS StudentSpecialNeedsFlag,
+                          special_needs AS StudentSpecialNeedsFlag,
                           esl AS EnglishSecondFlag,
-                          '' AS StudentStudiesCode,
+                          studies_code AS StudentStudiesCode,
                           alert_message AS AlertMessage,
                           alert_legal AS CourtOrderType,
                           boarding_status AS StudentBoarder,
@@ -104,7 +104,7 @@ class External_Schoolbox_User implements External_UserInterface
                           '' AS StudentEnrolmentDate,
                           '' AS StudentLeavingDate,
                           ib AS StudentIBFlag,
-                          0 AS countIndividualEducationPlans
+                          individual_learning_plans AS countIndividualEducationPlans
                 FROM      `sis_user_profile` sup
                 JOIN      `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
                 WHERE      sup.external_id = :externalUserId
