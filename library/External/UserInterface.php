@@ -357,7 +357,7 @@ interface External_UserInterface extends External\IConnector
      *         StaffPreferredName,
      *         StaffSurname,
      *         DefaultEmailCode,
-     *         OccupEmail,
+     *         StaffOccupEmail,
      *         Email,
      *         StaffCampus,
      *         StaffCategoryType,

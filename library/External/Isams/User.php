@@ -473,7 +473,6 @@ class External_Isams_User implements External_UserInterface
                         Username          AS NetworkLogin,
                         1                 AS ActiveFlag,
                         'o'               AS DefaultEmailCode,
-                        Email             AS OccupEmail,
                         ''                AS Email,
                         Campus            AS StaffCampus,
                         ''                AS StaffCategoryType,

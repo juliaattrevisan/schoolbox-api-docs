@@ -283,7 +283,6 @@ class External_Schoolbox_User implements External_UserInterface
                       lastname AS StaffSurname,
                       email AS StaffOccupEmail,
                       '' AS DefaultEmailCode,
-                      '' AS OccupEmail,
                       building AS StaffBuilding,
                       room AS StaffRoom,
                       position_title AS JobPositionDescription,
