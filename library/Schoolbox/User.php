@@ -1162,6 +1162,19 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         return $this;
     }
 
+
+    /**
+     * @param GenericCollection<User> $parents
+     * @return User
+     */
+    public function setParents(GenericCollection $parents): self
+    {
+        $parents->assertCollectionOf(self::class);
+        $this->parents = $parents;
+        return $this;
+    }
+
+
     /**
      * Get the parents associated with this user
      *

@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -148,6 +149,8 @@ class Session
                 $_SESSION['su'] = 1;
             }
 
+            // If external is off, or user is not a parent, user explicitly has no children (as opposed to unknown)
+            $user->setChildren(new GenericCollection(User::class));
             if (Cfg::get('external_enable')) {
                 $this->setSynergyInfo($userMapper, $user);
             }
@@ -500,6 +503,7 @@ class Session
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             continue;
                         }
+                        $childObject->setParents(new GenericCollection(User::class));
                         $user->getChildren()[$childObject->getId()] = $childObject;
                         $childObject->getParents()[$user->getId()]  = $user;
                         if (!$childObject->getHideTimetable()) {
