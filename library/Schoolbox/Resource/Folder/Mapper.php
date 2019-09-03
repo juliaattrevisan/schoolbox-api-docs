@@ -1254,9 +1254,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         // special case: 0 === root, but not in db
         // TODO localise setName()
-        if ($id === 0 || $id === '0') {
+        if ($id === IFolder::ROOT_ID || $id === (string)IFolder::ROOT_ID) {
             return $this->createModel()
-                        ->setId(0)
+                        ->setId(IFolder::ROOT_ID)
                         ->setName('Top Level')
                         ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID))
                         ->setCodes($this->getJoinMapper('codes')->createCollection())
