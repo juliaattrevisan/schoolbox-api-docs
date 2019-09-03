@@ -44,7 +44,6 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS StudentForm,
 				'' AS StudentFormStaffName, -- This field is hydrated below
 				'' AS TeacherFormID,
-				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,

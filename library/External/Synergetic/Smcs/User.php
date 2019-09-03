@@ -48,7 +48,6 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         uvStudents.StudentForm,
                         luTutor.ID AS TeacherTutorID,
                         uvStudents.StudentTutor,
-                        luForm.Description AS FormDescription,
                         uvStudents.StudentHouseDescription,
                         uvStudents.StudentHouse,
                         uvStudents.StudentYearLevel,

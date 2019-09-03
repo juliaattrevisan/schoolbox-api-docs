@@ -304,7 +304,6 @@ class External_Maze_User implements External_UserInterface
 				'' AS StudentForm,
 				'' AS StudentFormStaffName,
 				'' AS TeacherFormID,
-				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
 				%s AS StudentYearLevel,

@@ -227,7 +227,6 @@ class External_Denbigh_User implements External_UserInterface
             'StudentForm'              => '',
             'TeacherTutorID'           => '',
             'StudentTutor'             => '',
-            'FormDescription'          => '',
             'StudentHouseDescription'  => '',
             'StudentHouse'             => '',
             'StudentYearLevel'         => '',

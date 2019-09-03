@@ -182,7 +182,6 @@ class Freedom implements IQueryHelper
                 ''                              AS StudentLeavingDate,
                 ''                              AS StudentIBFlag,
                 S.HOME_CLASS                    AS StudentForm,
-                S_CLASS.DESCRIPTION             AS FormDescription,
                 S_HOME_TEACHER.NAME_FOR_REPORT  AS StudentFormStaffName,
                 S.DEAN                          AS StudentTutor,
                 S_HOME_TEACHER.NAME_FOR_REPORT  AS StudentTutorName,

@@ -85,7 +85,6 @@ class External_Schoolbox_User implements External_UserInterface
                           form_teacher_name AS StudentFormStaffName,
                           form_teacher_id AS TeacherFormID,
                           form_name AS StudentForm,
-                          form_name AS FormDescription,
                           year_level AS StudentYearLevel,
                           '' AS StudentLockerBook,
                           '' AS StudentEmergencyName,

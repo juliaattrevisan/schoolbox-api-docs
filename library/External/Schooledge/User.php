@@ -167,7 +167,6 @@ class External_Schooledge_User implements External_UserInterface
                 '' AS StudentLeavingDate,
                 '' AS StudentIBFlag,
                 s.Form AS StudentForm,
-                s.Form AS FormDescription,
                 '' AS StudentFormStaffName,
                 '' AS StudentTutorName,
                 s.HomeGroup AS StudentTutorDescription,

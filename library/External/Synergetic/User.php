@@ -341,7 +341,6 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentForm,
                         luTutor.ID AS TeacherTutorID,
                         vStudentsAll.StudentTutor,
-                        luForm.Description AS FormDescription,
                         vStudentsAll.StudentHouseDescription,
                         vStudentsAll.StudentHouse,
                         vStudentsAll.StudentYearLevel,

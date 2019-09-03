@@ -465,7 +465,6 @@ class Adapter {
         $student
             ->getForm()
                 ->setLevel($currentResult['StudentForm'])
-                ->setDescription($currentResult['FormDescription'])
         ;
 
         $student

@@ -47,7 +47,6 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 vStudents.StudentForm,
                 luTutor.ID as TeacherTutorID,
                 vStudents.StudentTutor,
-                luForm.Description as FormDescription,
                 vStudents.StudentHouseDescription,
                 vStudents.StudentHouse,
                 vStudents.StudentYearLevel,

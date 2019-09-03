@@ -139,7 +139,6 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentForm,
                         ''                      AS TeacherTutorID,
                         ''                      AS StudentTutor,
-                        ''                      AS FormDescription,
                         ''                      AS StudentHouseDescription,
                         ''                      AS StudentHouse,
                         Grade                   AS StudentYearLevel,
