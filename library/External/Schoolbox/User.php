@@ -8,7 +8,6 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
-use Schoolbox\External\UserRelation;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -44,19 +43,15 @@ class External_Schoolbox_User implements External_UserInterface
 
         $parentIterator = $this->internalDatabase->getQueryIterator(
             "
-                SELECT      parent.synergy_id AS StudentContactID,
-                            parent.alt_email AS StudentContactEmail
-                FROM        `user`
-                INNER JOIN  user_relation ON user.id = user_relation.relation_id
-                INNER JOIN  `user` parent ON parent.id = user_relation.user_id AND parent.deleted_at IS NULL
-                WHERE       user.synergy_id IN ({$predicate["placeholders"]}) AND
-                            user_relation.relation_type = :relation_type AND
-                            `user`.deleted_at IS NULL
+                SELECT      parent.external_id AS StudentContactID,
+                            supp.email AS StudentContactEmail
+                FROM        sis_user_profile child
+                    JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
+                    JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
+                    JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+                WHERE       child.external_id IN ({$predicate["placeholders"]})
             ",
-            array_merge(
-                $predicate['bindings'],
-                ['relation_type' => UserRelation::RELATION_TYPE_PARENT]
-            )
+            $predicate['bindings']
         );
 
         foreach ($parentIterator as $parent) {
@@ -73,49 +68,50 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudent(string $externalUserId): array
     {
-        return $this->internalDatabase->executeQuery(
+        $student = $this->internalDatabase->executeQuery(
             "
-                SELECT    user.id AS StudentID,
-                          user.firstname AS StudentGiven1,
-                          user.lastname AS StudentSurname,
-                          UNIX_TIMESTAMP(dob) AS StudentBirthDate,
-                          '' AS StudentTutorName,
-                          '' AS StudentHeadOfHouse,
-                          '' AS HeadOfHouseID,
-                          '' AS StudentFormStaffName,
-                          '' AS StudentTutorDescription,
-                          '' AS TeacherFormID,
-                          '' AS StudentForm,
-                          '' AS TeacherTutorID,
-                          '' AS StudentTutor,
-                          '' AS FormDescription,
-                          '' AS StudentHouseDescription,
-                          user_profile.house AS StudentHouse,
-                          level AS StudentYearLevel,
+                SELECT    external_id AS StudentID,
+                          firstname AS StudentGiven1,
+                          lastname AS StudentSurname,
+                          UNIX_TIMESTAMP(date_of_birth) AS StudentBirthDate,
+                          tutor_teacher_name AS StudentTutorName,
+                          tutor_teacher_name AS StudentTutor,
+                          tutor_group AS StudentTutorDescription,
+                          tutor_teacher_id AS TeacherTutorID,
+                          house_name AS StudentHouseDescription,
+                          house_name AS StudentHouse,
+                          head_of_house_name AS StudentHeadOfHouse,
+                          head_of_house_id AS HeadOfHouseID,
+                          form_teacher_name AS StudentFormStaffName,
+                          form_teacher_id AS TeacherFormID,
+                          form_name AS StudentForm,
+                          form_name AS FormDescription,
+                          year_level AS StudentYearLevel,
                           '' AS StudentLockerBook,
                           '' AS StudentEmergencyName,
                           '' AS StudentEmergencyPhone,
                           '' AS StudentEmergencyPhoneAlt,
-                          '' AS StudentMedicalAlert,
-                          '' AS StudentMobilePhone,
-                          '' AS StudentSpecialNeedsFlag,
-                          user_profile.esl_flag AS EnglishSecondFlag,
-                          '' AS StudentStudiesCode,
-                          '' AS AlertMessage,
-                          '' AS CourtOrderType,
-                          '' AS StudentBoarder,
-                          '' AS Comment,
+                          alert_medical AS StudentMedicalAlert,
+                          mobile AS StudentMobilePhone,
+                          special_needs AS StudentSpecialNeedsFlag,
+                          esl AS EnglishSecondFlag,
+                          studies_code AS StudentStudiesCode,
+                          alert_message AS AlertMessage,
+                          alert_legal AS CourtOrderType,
+                          boarding_status AS StudentBoarder,
+                          alert_comment AS Comment,
                           '' AS StudentEnrolmentDate,
                           '' AS StudentLeavingDate,
-                          user_profile.ib_flag AS StudentIBFlag,
-                          0 AS countIndividualEducationPlans
-                FROM      `user`
-                LEFT JOIN user_profile ON user.id = user_profile.user_id
-                WHERE     user.synergy_id = :externalUserId
-                AND       `user`.deleted_at IS NULL
+                          ib AS StudentIBFlag,
+                          individual_learning_plans AS countIndividualEducationPlans
+                FROM      `sis_user_profile` sup
+                JOIN      `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
+                WHERE      sup.external_id = :externalUserId
             ",
             ['externalUserId' => $externalUserId]
         )->fetch();
+
+        return $student ?: [];
     }
 
 
@@ -127,31 +123,30 @@ class External_Schoolbox_User implements External_UserInterface
     {
         return $this->internalDatabase->executeQuery(
             "
-                SELECT      parent.synergy_id AS StudentContactID,
+                SELECT      parent.external_id AS StudentContactID,
                             parent.title AS StudentContactTitle,
                             parent.firstname AS StudentContactPreferred,
                             parent.lastname AS StudentContactSurname,
-                            pp.guardian1Email AS StudentContactDefaultEmail,
-                            pp.guardian1HomePhone AS StudentContactPhoneActual,
+                            supp.email AS StudentContactDefaultEmail,
+                            supp.phone_home AS StudentContactPhoneActual,
                             0 AS StudentContactSilentPhoneFlag,
-                            pp.guardian1MobilePhone AS StudentContactMobilePhone,
-                            pp.guardian1WorkPhone AS StudentContactOccupPhone,
+                            supp.mobile AS StudentContactMobilePhone,
+                            supp.phone_work AS StudentContactOccupPhone,
                             '' AS StudentContactSpouseID,
                             '' AS StudentContactSpouseTitle,
                             '' AS StudentContactSpousePreferred,
                             '' AS StudentContactSpouseSurname,
-                            pp.guardian2Name AS StudentContactSpousePreferred,
+                            '' AS StudentContactSpousePreferred,
                             '' AS StudentContactSpouseSurname,
-                            pp.guardian2Email AS StudentContactSpouseDefaultEmail,
-                            pp.guardian2HomePhone AS StudentContactSpousePhoneActual,
-                            pp.guardian2MobilePhone AS StudentContactSpouseMobilePhone,
-                            pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
-                FROM        `user` child
-                INNER JOIN  user_relation ur ON child.id = ur.relation_id
-                INNER JOIN  `user` parent ON ur.user_id = parent.id AND parent.deleted_at IS NULL
-                LEFT JOIN   user_profile pp ON `parent`.id = pp.user_id
-                WHERE       child.synergy_id = :externalUserId AND 
-                            child.deleted_at IS NULL
+                            '' AS StudentContactSpouseDefaultEmail,
+                            '' AS StudentContactSpousePhoneActual,
+                            '' AS StudentContactSpouseMobilePhone,
+                            '' AS StudentContactSpouseOccupPhone
+                FROM        sis_user_profile child
+                    JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
+                    JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
+                    JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+                WHERE       child.external_id = :externalUserId
             ",
             ['externalUserId' => $externalUserId]
         )->fetchAll();
@@ -223,16 +218,15 @@ class External_Schoolbox_User implements External_UserInterface
     {
         return $this->internalDatabase->executeQuery(
             "
-                SELECT      c.synergy_id AS RelatedID
-                FROM        user_relation ur
-                INNER JOIN  user p ON p.id = ur.user_id AND p.deleted_at IS NULL
-                INNER JOIN  user c ON c.id = ur.relation_id AND c.deleted_at IS NULL
-                WHERE       p.synergy_id = :externalUserId AND
-                            ur.relation_type = :relationType
+                SELECT sup_child.external_id AS RelatedID
+                FROM sis_user_profile sup
+                    JOIN sis_user_profile_parent supp on sup.id = supp.sis_user_profile_id
+                    JOIN sis_user_profile_relation supr ON supp.sis_user_profile_id =supr.user_profile_id
+                    JOIN sis_user_profile sup_child ON supr.child_profile_id = sup_child.id 
+                WHERE sup.external_id = :externalUserId
             ",
             [
                 'externalUserId' => $externalUserId,
-                'relationType'   => UserRelation::RELATION_TYPE_PARENT,
             ]
         )->fetchAll();
     }
@@ -242,13 +236,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function determineBoarderType(?string $boarderValue): string
     {
-        $boarders = ['B', 'W'];
-
-        if (in_array($boarderValue, $boarders, true)) {
-            return 'Boarder';
-        }
-
-        return 'Day';
+        return $boarderValue ? 'Boarder' : '';
     }
 
     /**
@@ -285,7 +273,26 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaffContactListExtended(): array
     {
-        return [];
+        return $this->internalDatabase->executeQuery(
+                    "
+            SELECT    external_id AS StaffID,
+                      username AS NetworkLogin,
+                      '' AS ActiveFlag,
+                      title AS StaffTitle,
+                      firstname AS StaffPreferredName,
+                      lastname AS StaffSurname,
+                      email AS StaffOccupEmail,
+                      '' AS DefaultEmailCode,
+                      building AS StaffBuilding,
+                      room AS StaffRoom,
+                      position_title AS JobPositionDescription,
+                      phone AS StaffOccupPhone,
+                      campus_name AS StaffCampus,
+                      category AS StaffCategory,
+                      department AS StaffDepartment
+            FROM      `sis_user_profile` sup
+            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+        ")->fetchAll();
     }
 
     /**
@@ -317,7 +324,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudentForms(): array
     {
-        return [];
+        return $this->internalDatabase->executeQuery("SELECT DISTINCT form_name AS Code, form_name as Description FROM sis_user_profile_student")->fetchAll();
     }
 
     /**
@@ -327,7 +334,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getAllYearLevels(): array
     {
-        return [];
+        return $this->internalDatabase->executeQuery("SELECT DISTINCT year_level AS Code, year_level as Description FROM sis_user_profile_student")->fetchAll();
     }
 
     /**
@@ -335,7 +342,35 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getParent(string $externalUserId): array
     {
-        return [];
+        $parent = $this->internalDatabase->executeQuery(
+            "
+                SELECT   title AS Title,
+                         firstname AS Preferred,
+                         lastname AS Surname,
+                         email AS Email,
+                         '' AS OccupEmail,
+                         '' AS DefaultEmailCode,
+                         phone_home AS HomePhone,
+                         '' AS SilentPhoneFlag,
+                         mobile AS MobilePhone,
+                         1 AS DirectoryIncludeFlag,
+                         '' AS SpouseID,
+                         '' AS SpouseTitle,
+                         '' AS SpousePreferred,
+                         '' AS SpouseSurname,
+                         '' AS SpouseEmail,
+                         '' AS SpouseOccupEmail,
+                         '' AS SpouseDefaultEmailCode,
+                         '' AS SpouseMobilePhone,
+                         '' AS SpouseDirectoryIncludeFlag
+                FROM      `sis_user_profile` sup
+                JOIN      `sis_user_profile_parent` supp ON sup.id = supp.sis_user_profile_id
+                WHERE      sup.external_id = :externalUserId
+            ",
+            ['externalUserId' => $externalUserId]
+        )->fetch();
+
+        return $parent ?: [];
     }
 
     /**
@@ -377,7 +412,27 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaff(string $externalUserId): array
     {
-        return [];
+        $staff = $this->internalDatabase->executeQuery(
+            "
+            SELECT    external_id AS SchoolStaffCode,
+                      building AS StaffBuilding,
+                      room AS StaffRoom,
+                      phone AS StaffExtension,
+                      '' AS StaffMobilePhone,
+                      '' AS StaffDefaultMobilePhone,
+                      campus_name AS StaffCampusDescription,
+                      category AS StaffCategoryDescription,
+                      department AS StaffDepartment,
+                      '' AS StaffVoiceMail,
+                      '' AS StaffHouseDescription
+            FROM      `sis_user_profile` sup
+            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+            WHERE      sup.external_id = :externalUserId
+        ",
+            ['externalUserId' => $externalUserId]
+        )->fetch();
+
+        return $staff ?: [];
     }
 
     /**
@@ -385,6 +440,71 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
-        return [];
+        $bindings = [];
+        $yearLevelQuery = '';
+        $nameQuery = '';
+        $boardingQuery = '';
+        $formQuery= '';
+
+        if($yearLevel) {
+            $yearLevelQuery = ' AND sups.year_level = :year_level';
+            $bindings[':year_level'] = $yearLevel;
+        }
+
+        if($name) {
+            $nameQuery = " AND CONCAT(child.firstname,' ',child.lastname) LIKE :name";
+            $bindings[':name'] = '%'.$name.'%';
+        }
+
+        if($boardingStatus) {
+            $boardingQuery = " AND sups.boarding_status = :boarding_status";
+            $bindings[':boarding_status'] = $boardingStatus == 'yes' ? 1 : 0;
+        }
+
+        if($form) {
+            $formQuery = " AND sups.form_name = :form";
+            $bindings[':form'] = $form;
+        }
+
+
+        return $this->internalDatabase->executeQuery(
+            "
+            SELECT    
+                        child.external_id AS StudentID,
+                        child.firstname AS StudentPreferred,
+                        child.lastname AS StudentSurname,
+                        sups.year_level AS StudentYearLevel,
+                        sups.house_name AS StudentHouse,
+                        sups.boarding_status AS StudentBoarder,
+                        sups.form_name AS StudentForm,
+                        parent.external_id AS StudentContactID,
+                        parent.title AS StudentContactTitle,
+                        parent.firstname AS StudentContactPreferred,
+                        parent.lastname AS StudentContactSurname,
+                        '' AS StudentContactLegalFullName,
+                        supp.email AS StudentContactDefaultEmail,
+                        supp.phone_home AS StudentContactPhoneActual,
+                        supp.phone_work AS StudentContactOccupPhone,
+                        supp.mobile  AS StudentContactMobilePhone,
+                        '' AS StudentContactSpouseID,
+                        '' AS StudentContactSpouseTitle,
+                        '' AS StudentContactSpousePreferred,
+                        '' AS StudentContactSpouseLegalFullName,
+                        '' AS StudentContactSpouseSurname,
+                        '' AS StudentContactSpouseMobilePhone,
+                        '' AS StudentContactSpouseOccupPhone,
+                        '' AS StudentContactSpouseDefaultEmail,
+                        supr.type AS StudentContactType,
+                        '' AS StudentContactSilentPhoneFlag,
+                        1 AS PrimaryDirectoryIncludeFlag,
+                        '' AS SpouseDirectoryIncludeFlag,
+                        '' AS StudentParentsSeparatedFlag
+            FROM      `sis_user_profile` child
+            JOIN      `sis_user_profile_student` sups ON child.id = sups.sis_user_profile_id
+            JOIN      sis_user_profile_relation supr ON child.id = child_profile_id 
+            JOIN      sis_user_profile parent ON supr.user_profile_id = parent.id
+            JOIN      sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+            WHERE     1=1 $yearLevelQuery $formQuery $nameQuery $boardingQuery
+        ", $bindings)->fetchAll();
     }
 }

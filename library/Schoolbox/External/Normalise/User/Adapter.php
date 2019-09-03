@@ -1259,21 +1259,14 @@ class Adapter {
 
                 /* Email
                  */
-                $email1 = new Common\Email();
-                $email1
+                $email = new Common\Email();
+                $email
                     ->setAddress($currentResult['Email'])
                 ;
 
-                $email2 = new Common\Email();
-                $email2
-                    ->setAddress($currentResult['OccupEmail'])
-                ;
-
-                foreach (array($email1, $email2) as $currentEmail) {
-                    if (strlen($currentEmail->getAddress())) {
-                        $staff->addEmail($currentEmail);
-                    }
-                }
+                 if (strlen($email->getAddress())) {
+                     $staff->addEmail($email);
+                 }
 
                 /* Campus
                  */
