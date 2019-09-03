@@ -230,7 +230,6 @@ class External_Denbigh_User implements External_UserInterface
             'StudentHouseDescription'  => '',
             'StudentHouse'             => '',
             'StudentYearLevel'         => '',
-            'StudentLockerBook'        => '',
             'StudentEmergencyName'     => '',
             'StudentEmergencyPhone'    => '',
             'StudentEmergencyPhoneAlt' => '',

@@ -309,7 +309,6 @@ class External_Maze_User implements External_UserInterface
 				%s AS StudentYearLevel,
 				'' AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
-				'' AS StudentLockerBook,
 				'' AS StudentEmergencyName,
 				'' AS StudentEmergencyPhone,
 				'' AS StudentEmergencyPhoneAlt,

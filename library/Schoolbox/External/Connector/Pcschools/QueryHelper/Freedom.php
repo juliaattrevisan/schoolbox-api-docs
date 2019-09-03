@@ -191,7 +191,6 @@ class Freedom implements IQueryHelper
                 S.CURRENT_YEAR                  AS StudentYearLevel,
                 S.DEAN                          AS YearLevelCoordID,
                 ''                              AS StudentYearLevelCoordinator,
-                S.LOCKER                        AS StudentLockerBook,
                 S.EMERG_CONTACT                 AS StudentEmergencyName,
                 S.EMERG_PHONE                   AS StudentEmergencyPhone,
                 ''                              AS StudentEmergencyPhoneAlt,

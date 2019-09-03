@@ -31,7 +31,6 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 					vStudents.StudentYearLevel,
 					vStudents.StudentYearLevelCoordinator,
 					luYearLevel.YearLevelCoordID,
-					vStudents.StudentLockerBook,
 					vStudents.StudentEmergencyName,
 					vStudents.StudentEmergencyPhone,
 					vStudents.StudentEmergencyPhoneAlt,

@@ -368,7 +368,6 @@ class External_Doublefirst_User implements External_UserInterface
                 House                                               AS StudentHouseDescription,
                 HouseID                                             AS StudentHouse,
                 YearGroup                                           AS StudentYearLevel,
-                ''                                                  AS StudentLockerBook,
                 ecm.ContactName                                     AS StudentEmergencyName,
                 LTRIM(
                   RTRIM(

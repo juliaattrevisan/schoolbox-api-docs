@@ -51,7 +51,6 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				COORDINATOR.SFKEY AS YearLevelCoordID,
 				(COACH.FIRST_NAME + ' ' + COACH.SURNAME) AS StudentCoach,
 				COACH.SFKEY AS CoachID,
-				'' AS StudentLockerBook,
 				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
 				ST.EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
 				ST.EMERGENCY_ONE_MOBILE AS StudentEmergencyPhoneAlt,

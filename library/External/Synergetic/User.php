@@ -346,7 +346,6 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentYearLevel,
                         vStudentsAll.StudentYearLevelCoordinator,
                         luYearLevel.YearLevelCoordID,
-                        vStudentsAll.StudentLockerBook,
                         vStudentsAll.StudentEmergencyName,
                         vStudentsAll.StudentEmergencyPhone,
                         vStudentsAll.StudentEmergencyPhoneAlt,

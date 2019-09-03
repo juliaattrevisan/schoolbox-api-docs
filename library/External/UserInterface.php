@@ -40,7 +40,6 @@ interface External_UserInterface extends External\IConnector
      * @internal string return['StudentYearLevel']
      * @internal string return['StudentYearLevelCoordinator']
      * @internal string return['YearLevelCoordID']
-     * @internal string return['StudentLockerBook']
      * @internal string return['StudentEmergencyName']
      * @internal string return['StudentEmergencyPhone']
      * @internal string return['StudentEmergencyPhoneAlt']

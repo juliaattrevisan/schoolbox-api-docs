@@ -175,7 +175,6 @@ class External_Schooledge_User implements External_UserInterface
                 s.Year AS StudentYearLevel,
                 '' AS YearLevelCoordID,
                 '' AS StudentYearLevelCoordinator,
-                '' AS StudentLockerBook,
                 (c.FirstName + ' ' + c.LastName) AS StudentEmergencyName,
                 c.PhoneHome AS StudentEmergencyPhone,
                 c.PhoneWork AS StudentEmergencyPhoneAlt,

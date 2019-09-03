@@ -53,7 +53,6 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         uvStudents.StudentYearLevel,
                         uvStudents.StudentYearLevelCoordinator,
                         luYearLevel.YearLevelCoordID,
-                        uvStudents.StudentLockerBook,
                         uvStudents.StudentEmergencyName,
                         uvStudents.StudentEmergencyPhone,
                         uvStudents.StudentEmergencyPhoneAlt,

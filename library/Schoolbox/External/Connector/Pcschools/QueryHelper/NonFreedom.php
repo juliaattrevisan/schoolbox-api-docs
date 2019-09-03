@@ -324,7 +324,6 @@ class NonFreedom implements IQueryHelper
                 S.CURRENT_YEAR                                                AS StudentYearLevel,
                 S.DEAN                                                        AS YearLevelCoordID,
                 ''                                                            AS StudentYearLevelCoordinator,
-                S.LOCKER                                                      AS StudentLockerBook,
 
                 -- emerghergency contact details
                 S.EMERG_CONTACT                                               AS StudentEmergencyName,

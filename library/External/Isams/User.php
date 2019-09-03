@@ -142,7 +142,6 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentHouseDescription,
                         ''                      AS StudentHouse,
                         Grade                   AS StudentYearLevel,
-                        ''                      AS StudentLockerBook,
                         ''                      AS StudentEmergencyName,
                         ''                      AS StudentEmergencyPhone, 
                         ''                      AS StudentEmergencyPhoneAlt,

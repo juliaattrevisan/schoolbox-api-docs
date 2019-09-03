@@ -154,7 +154,6 @@ class External_Tass_User implements External_UserInterface
             s.year_grp AS StudentYearLevel,
             '' AS StudentYearLevelCoordinator,
             '' AS YearLevelCoordID,
-            '' AS StudentLockerBook,
             '' AS StudentEmergencyName,
             '' AS StudentEmergencyPhone,
             '' AS StudentEmergencyPhoneAlt,

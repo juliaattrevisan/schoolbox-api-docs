@@ -52,7 +52,6 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 vStudents.StudentYearLevel,
                 vStudents.StudentYearLevelCoordinator,
                 luYearLevel.YearLevelCoordID,
-                vStudents.StudentLockerBook,
                 vStudents.StudentEmergencyName,
                 vStudents.StudentEmergencyPhone,
                 vStudents.StudentEmergencyPhoneAlt,
