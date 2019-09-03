@@ -25,7 +25,6 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Role;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
