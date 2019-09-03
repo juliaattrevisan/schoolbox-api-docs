@@ -80,20 +80,63 @@ class Controller extends Base
 
     /**
      * @param string|null $selectedDate
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getOwnCalendar(?string $selectedDate): void
+    {
+        $this->buildResponse($this->getUser(), $this->generateSelectedDate($selectedDate));
+    }
+
+    /**
+     * @param string|null $selectedDate
      * @param User        $user
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getCalendar(?string $selectedDate, User $user): void
     {
-        $series = $this->getRequest()->query->get('s');
+        $this->buildResponse($user, $this->generateSelectedDate($selectedDate));
+    }
 
-        if ($series !== null) {
-            $event = $this->eventMapper->findNextInSeries($series);
-
-            $selectedDate = $event->getStartDateTime()->getURLDate();
+    /**
+     * Redirect old paths to new
+     * E.g calendar/week -> calendar or calendar/week/2013-08-2019/230 -> calendar/2013-08-2019/230
+     *
+     * @param string|null $selectedDate
+     * @param User        $user
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function redirect(?string $selectedDate, User $user): void
+    {
+        if ($this->getRouter()->getMatchedRoute()->params['userId']) {
+            $route = $this->getRouter()->generate(
+                'calendar.getCalendar',
+                [
+                    'selectedDate'  => $selectedDate,
+                    'userId'        => $user->getId()
+                ]
+            );
+        } else {
+            $route = $this->getRouter()->generate(
+                'calendar.getOwnCalendar'
+            );
         }
 
+        if ($this->getRequest()->query->get('s')) {
+            $route .= '?s=1';
+        }
+
+        $this->response->redirect->to($route);
+    }
+
+    /**
+     * @param User        $user
+     * @param string|null $selectedDate
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function buildResponse(User $user, ?string $selectedDate): void
+    {
         $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
         $eventType        = (new EventType($this->eventTypeMapper))->generate();
@@ -123,23 +166,19 @@ class Controller extends Base
 
     /**
      * @param string|null $selectedDate
-     * @param User        $user
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @return string|null
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function redirect(?string $selectedDate, User $user)
+    private function generateSelectedDate(?string $selectedDate): ?string
     {
-        $route = $this->getRouteIfAuthorized(
-            'calendar.getCalendar',
-            [
-                'selectedDate'  => $selectedDate,
-                'userId'        => $user->getId()
-            ]
-        );
+        $series = $this->getRequest()->query->get('s');
 
-        if ($this->getRequest()->query->get('s')) {
-            $route .= '?s=1';
+        if ($series !== null) {
+            $event = $this->eventMapper->findNextInSeries($series);
+
+            return $event->getStartDateTime()->getURLDate();
         }
 
-        $this->response->redirect->to($route);
+        return $selectedDate;
     }
 }
