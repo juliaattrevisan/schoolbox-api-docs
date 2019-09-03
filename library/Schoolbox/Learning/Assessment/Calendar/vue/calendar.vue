@@ -203,7 +203,7 @@
             :event-time-format="helper.eventTimeFormat"
             content-height="auto"
             :header="{
-                left: 'oday,prev,next',
+                left: 'today,prev,next',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             }"
