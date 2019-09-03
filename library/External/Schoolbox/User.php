@@ -236,7 +236,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function determineBoarderType(?string $boarderValue): string
     {
-        return $boarderValue ?: '';
+        return $boarderValue ? 'Boarder' : '';
     }
 
     /**
@@ -458,7 +458,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         if($boardingStatus) {
             $boardingQuery = " AND sups.boarding_status = :boarding_status";
-            $bindings[':boarding_status'] = $boardingStatus;
+            $bindings[':boarding_status'] = $boardingStatus == 'yes' ? 1 : 0;
         }
 
         if($form) {

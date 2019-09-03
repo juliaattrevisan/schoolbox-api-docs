@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `individual_learning_plans`   TINYINT(1)    NULL,
     `esl`                         TINYINT(1)    NULL,
     `special_needs`               TINYINT(1)    NULL,
-    `boarding_status`             VARCHAR(45)   NULL,
+    `boarding_status`             TINYINT(1)    NULL,
     `created_at`                  DATETIME      NOT NULL,
     `updated_at`                  DATETIME      NOT NULL,
     PRIMARY KEY (`sis_user_profile_id`),
