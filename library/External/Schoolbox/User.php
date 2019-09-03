@@ -49,8 +49,7 @@ class External_Schoolbox_User implements External_UserInterface
                     JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
                     JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
                     JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-                WHERE       child.external_id IN ({$predicate["placeholders"]}) AND 
-                            child.deleted_at IS NULL
+                WHERE       child.external_id IN ({$predicate["placeholders"]})
             ",
             $predicate['bindings']
         );
@@ -108,7 +107,6 @@ class External_Schoolbox_User implements External_UserInterface
                 FROM      `sis_user_profile` sup
                 JOIN      `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
                 WHERE      sup.external_id = :externalUserId
-                AND        sup.deleted_at IS NULL AND sups.deleted_at IS NULL
             ",
             ['externalUserId' => $externalUserId]
         )->fetch();
@@ -148,8 +146,7 @@ class External_Schoolbox_User implements External_UserInterface
                     JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
                     JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
                     JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-                WHERE       child.external_id = :externalUserId AND 
-                            child.deleted_at IS NULL
+                WHERE       child.external_id = :externalUserId
             ",
             ['externalUserId' => $externalUserId]
         )->fetchAll();
@@ -296,7 +293,6 @@ class External_Schoolbox_User implements External_UserInterface
                       department AS StaffDepartment
             FROM      `sis_user_profile` sup
             JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
-            WHERE      sup.deleted_at IS NULL AND sups.deleted_at IS NULL
         ")->fetchAll();
     }
 
@@ -371,7 +367,6 @@ class External_Schoolbox_User implements External_UserInterface
                 FROM      `sis_user_profile` sup
                 JOIN      `sis_user_profile_parent` supp ON sup.id = supp.sis_user_profile_id
                 WHERE      sup.external_id = :externalUserId
-                AND        sup.deleted_at IS NULL AND supp.deleted_at IS NULL
             ",
             ['externalUserId' => $externalUserId]
         )->fetch();
@@ -434,7 +429,6 @@ class External_Schoolbox_User implements External_UserInterface
             FROM      `sis_user_profile` sup
             JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
             WHERE      sup.external_id = :externalUserId
-            AND        sup.deleted_at IS NULL AND sups.deleted_at IS NULL
         ",
             ['externalUserId' => $externalUserId]
         )->fetch();
@@ -511,7 +505,7 @@ class External_Schoolbox_User implements External_UserInterface
             JOIN      sis_user_profile_relation supr ON child.id = child_profile_id 
             JOIN      sis_user_profile parent ON supr.user_profile_id = parent.id
             JOIN      sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-            WHERE      child.deleted_at IS NULL AND sups.deleted_at IS NULL $yearLevelQuery $formQuery $nameQuery $boardingQuery
+            WHERE     1=1 $yearLevelQuery $formQuery $nameQuery $boardingQuery
         ", $bindings)->fetchAll();
     }
 }

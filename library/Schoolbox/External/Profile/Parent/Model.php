@@ -12,12 +12,10 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\External\Profile\Model as ProfileModel;
 
 
-class Model implements ISoftDeletable
+class Model
 {
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
-    use ModelTrait\DeletedAtDate;
-
 
     /**
      * @var string|null

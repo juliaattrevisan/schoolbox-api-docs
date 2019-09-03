@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
     `lastname`    VARCHAR(255) NULL,
     `created_at`  DATETIME     NOT NULL,
     `updated_at`  DATETIME     NOT NULL,
-    `deleted_at`  DATETIME     NULL,
     PRIMARY KEY (`id`)
 )
     ENGINE = InnoDB
@@ -33,7 +32,6 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
     `email`               VARCHAR(255) NULL,
     `created_at`          DATETIME     NOT NULL,
     `updated_at`          DATETIME     NOT NULL,
-    `deleted_at`          DATETIME     NULL,
     PRIMARY KEY (`sis_user_profile_id`),
     CONSTRAINT `fk1_sis_user_profile_parent`
         FOREIGN KEY (`sis_user_profile_id`)
@@ -79,10 +77,9 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `individual_learning_plans`   TINYINT(1)    NULL,
     `esl`                         TINYINT(1)    NULL,
     `special_needs`               TINYINT(1)    NULL,
-    `boarding_status`             TINYINT(1)    NULL,
+    `boarding_status`             VARCHAR(45)   NULL,
     `created_at`                  DATETIME      NOT NULL,
     `updated_at`                  DATETIME      NOT NULL,
-    `deleted_at`                  DATETIME      NULL,
     PRIMARY KEY (`sis_user_profile_id`),
     CONSTRAINT `fk1_sis_user_profile_student`
         FOREIGN KEY (`sis_user_profile_id`)
@@ -111,7 +108,6 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
     `campus_name`          VARCHAR(255) NULL,
     `created_at`           DATETIME     NOT NULL,
     `updated_at`           DATETIME     NOT NULL,
-    `deleted_at`           DATETIME     NULL,
     PRIMARY KEY (`sis_user_profile_id`),
     CONSTRAINT `fk1_sis_user_profile_staff`
         FOREIGN KEY (`sis_user_profile_id`)
