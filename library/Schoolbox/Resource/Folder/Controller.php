@@ -35,6 +35,7 @@ use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -76,9 +77,6 @@ class Controller extends BaseController
     /** @var Access */
     protected $access;
 
-    /** @var Folder\Code\Mapper */
-    protected $classCodeMapper;
-
     /** @var Curriculum\Node\Mapper */
     protected $curriculumNodeMapper;
 
@@ -101,7 +99,6 @@ class Controller extends BaseController
      * @param RoleMapper             $roleMapper
      * @param ErrorMapper            $errorMapper
      * @param Access                 $access
-     * @param Code\Mapper            $classCodeMapper
      * @param Curriculum\Node\Mapper $curriculumNodeMapper
      * @param GroupMapper            $groupMapper
      * @param FileMapper             $fileMapper
@@ -116,7 +113,6 @@ class Controller extends BaseController
         RoleMapper $roleMapper,
         ErrorMapper $errorMapper,
         Access $access,
-        Folder\Code\Mapper $classCodeMapper,
         Curriculum\Node\Mapper $curriculumNodeMapper,
         GroupMapper $groupMapper,
         FileMapper $fileMapper,
@@ -130,7 +126,6 @@ class Controller extends BaseController
         $this->roleMapper             = $roleMapper;
         $this->errorMapper            = $errorMapper;
         $this->access                 = $access;
-        $this->classCodeMapper        = $classCodeMapper;
         $this->curriculumNodeMapper   = $curriculumNodeMapper;
         $this->groupMapper            = $groupMapper;
         $this->fileMapper             = $fileMapper;
@@ -592,8 +587,7 @@ class Controller extends BaseController
                     $existingPerm->setType($permissionLevel);
                     $rolePermsToSave[$roleId] = $existingPerm;
                 } else {
-                    $rolePermsToSave[$roleId] = $this->roleAccessMapper
-                        ->createModel()
+                    $rolePermsToSave[$roleId] = (new RoleAccess())
                         ->setCategory($folder)
                         ->setRole(RoleMapper::getInstance()->createModel($roleId))
                         ->setType($permissionLevel);
@@ -622,8 +616,7 @@ class Controller extends BaseController
         }
 
         foreach ($newClassCodes as $newCode) {
-            $folder->getCodes()[$newCode] = $this->classCodeMapper
-                ->createModel()
+            $folder->getCodes()[$newCode] = (new Folder\Code\Model())
                 ->setFolder($folder)
                 ->setCode($newCode);
         }
@@ -741,8 +734,7 @@ class Controller extends BaseController
             return;
         }
 
-        $homepageConfig = $this->homepageConfigMapper
-            ->createModel()
+        $homepageConfig = (new HomepageConfig())
             ->setCategory($folder)
             ->setTemplate($homepageTemplate);
         $folder->setHomepage($homepageConfig);
@@ -779,7 +771,7 @@ class Controller extends BaseController
 
                 } catch (MapperException $e) {
                     // doesn't exist
-                    $group = $this->groupMapper->createModel()
+                    $group = (new Group())
                         ->setFolder($model)
                         ->setType(Group::PRIVATE_GROUP)
                         ->setForceFollow(false);
@@ -789,7 +781,7 @@ class Controller extends BaseController
                 }
 
                 // assign group ownership to the effecting user
-                $uA = $this->userAccessMapper->createModel()
+                $uA = (new UserAccess())
                     ->setService(UserAccess::SERVICE_HOMEPAGE)
                     ->setAccessLevel(UserAccess::ACCESS_FULL)
                     ->setServiceIdentifier($model->getId())

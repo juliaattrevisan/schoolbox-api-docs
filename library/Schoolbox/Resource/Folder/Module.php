@@ -208,7 +208,6 @@ class Module extends BaseModule
                 'roleMapper'             => $mapperFactory->getLazy(RoleMapper::class),
                 'errorMapper'            => $mapperFactory->getLazy(Error\Mapper::class),
                 'access'                 => $mapperFactory->getLazy(Access::class),
-                'classCodeMapper'        => $mapperFactory->getLazy(Code\Mapper::class),
                 'curriculumNodeMapper'   => $mapperFactory->getLazy(Curriculum\Node\Mapper::class),
                 'groupMapper'            => $mapperFactory->getLazy(GroupMapper::class),
                 'fileMapper'             => $mapperFactory->getLazy(File\Mapper::class),
