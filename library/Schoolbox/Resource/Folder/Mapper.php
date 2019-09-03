@@ -608,38 +608,17 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ? $folderCodeMapper->createCollection()
             : $model->getCodes();
 
-        // Efficiently delete any class codes that have been removed from folder
-        $codesToRemove = $folderCodeMapper->createCollection();
-        foreach ($oldCodes as $oldCode) {
-            $found = false;
-            foreach ($newCodes as $newCode) {
-                if (strnatcasecmp($oldCode->getCode(), $newCode->getCode()) === 0) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $codesToRemove[] = $oldCode;
-            }
-        }
+        $comparator = static function(Code\Model $left, Code\Model $right){
+            return strnatcasecmp($left->getCode(), $right->getCode()) === 0;
+        };
+
+        $codesToRemove = $oldCodes->diff($newCodes, $comparator);
         if ($codesToRemove->count()) {
             $folderCodeMapper->delete($codesToRemove);
         }
 
         // Save any class codes that have been added to folder
-        $codesToAdd = $folderCodeMapper->createCollection();
-        foreach ($newCodes as $newCode) {
-            $found = false;
-            foreach ($oldCodes as $oldCode) {
-                if (strnatcasecmp($oldCode->getCode(), $newCode->getCode()) === 0) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $codesToAdd[] = $newCode;
-            }
-        }
+        $codesToAdd = $newCodes->diff($oldCodes, $comparator);
         if ($codesToAdd->count()) {
             $folderCodeMapper->save($codesToAdd);
         }
