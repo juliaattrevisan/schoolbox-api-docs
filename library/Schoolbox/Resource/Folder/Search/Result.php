@@ -80,11 +80,11 @@ class Result extends Base
                 break;
             }
 
-            $folder = $mapper->hydrate($row, 'c');
-
-            /* Accumulate folder codes here
-             */
-            if (!($results->getOffset($folder->getId()) instanceof Folder\Model)) {
+            if ($results->offsetExists($row['c.id'])) {
+                $folder = $results->getOffset($row['c.id']);
+            } else {
+                $folder = $mapper->hydrate($row, 'c');
+                $folder->setCodes($code_mapper->createCollection());
                 $results->setOffset($folder->getId(), $folder);
             }
 
