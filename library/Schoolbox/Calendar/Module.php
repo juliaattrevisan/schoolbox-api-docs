@@ -25,6 +25,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -39,19 +40,25 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+        $selectedDateRegex = '([0][1-9]|[12][0-9]|3[01])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}';
+
+        $this->addGetRoute($router, 'getOwnCalendar', $basePath, "{/selectedDate}")->addTokens([
+            'selectedDate' => $selectedDateRegex,
+        ]);
+
         // Supported selectedDate format DD-MM-YYYY
         // userId is optional and must be integer
         // Sample path: 23-08-2019 or 23-08-2019/230
         // Selected date regex explanation here: https://regex101.com/r/X8zFce/3
-        $this->addGetRoute($router, 'getCalendar', $basePath, "{/selectedDate,userId}")->addTokens([
-            'selectedDate' => '([0][1-9]|[12][0-9]|3[01])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}',
+        $this->addGetRoute($router, 'getCalendar', $basePath, "/{selectedDate}/{userId}")->addTokens([
+            'selectedDate' => $selectedDateRegex,
             'userId' => '\d+'
         ]);
 
         // Redirect old paths
         $this->addGetRoute($router, 'redirect', $basePath, "/{format}{/selectedDate,userId}")->addTokens([
             'format' => 'week|month|full|week-list|month-list',
-            'selectedDate' => '([0][1-9]|[12][0-9]|3[01])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}',
+            'selectedDate' => $selectedDateRegex,
             'userId' => '\d+'
         ]);
     }
@@ -83,39 +90,27 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, '.*', new IsLoggedIn());
+        $this->addRoutePermission($authorizer, 'getOwnCalendar', new IsLoggedIn());
 
-        $sessionUserRole = $this->getUserMapper()->getSessionUser()->getRole();
-
-        if (($sessionUserRole->isStudent() || $sessionUserRole->isParent()) && $this->getRouter()->getMatchedRoute()->params['userId'])
-        {
-            $this->addRoutePermission(
-                $authorizer,
-                '.*',
+        $this->addRoutePermission(
+            $authorizer,
+            'getCalendar',
+            new Any (
+                new IsSuperuser(),
+                new HasRole(Role::STAFF),
                 new All (
-                    new Any(
-                        new HasRole(Role::STUDENT),
-                        new HasRole(Role::PARENT)
-                    ),
                     new IsUserOrParentOfUser(
                         $this->getExternalUser(),
                         UserMapper::getInstance(),
                         'userId'
+                    ),
+                    new Any (
+                        new HasRole(Role::PARENT),
+                        new HasRole(Role::STUDENT)
                     )
                 )
-            );
-        } else {
-            $this->addRoutePermission(
-                $authorizer,
-                '.*',
-                new Any(
-                    new IsSuperuser(),
-                    new HasRole(Role::STAFF),
-                    new HasRole(Role::STUDENT),
-                    new HasRole(Role::PARENT)
-                )
-            );
-        }
+            )
+        );
     }
 
     /**
