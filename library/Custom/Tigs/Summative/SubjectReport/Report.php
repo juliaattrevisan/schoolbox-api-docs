@@ -235,12 +235,10 @@ class Report
             );
         }
 
-        $data   = [
-            'user'                      => $user,
+        return [
             'folder'                    => $folder,
             'teachers'                  => $folder->loadTeachers()->getTeachers(),
             'courseSpec'                => $courseSpec,
-            'isEnabled'                 => $this->config->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             'showNoLongerEnrolledAlert' => !$attributes->isHistorical() && !$this->isCurrentEnrollment($user, $folder),
             'attributes'                => $attributes,
             'errors'                    => $errors,
@@ -253,10 +251,7 @@ class Report
             'nesaGraphData'             => $nesaGraphData,
             'hscTaskMarks'              => $hscTaskMarks,
             'hscRankData'               => $hscRankData,
-            'showErrors'                => ($roleTypeOverride ?? $this->viewer->getRole()->getType()) === Role::STAFF,
-            'dataAttributeError'        => Config::ERROR_DATA_ATTRIBUTE,
         ];
-        return $data;
     }
 
     /**

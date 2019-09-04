@@ -150,31 +150,35 @@ class Controller extends Web\Controller\Base
     {
         $externalStudent = $this->externalUser->getStudent($user->getExternalId());
         $attributes      = new StudentAttributes($this->getConfigLoader(), $user, $externalStudent['StudentIBFlag'], $reportDate);
+        $roleTypeOverride = $this->request->query->get('role-type');
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
         $subjectList   = $this->getSubjectList($user, $attributes, $reportDate);
-        $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $this->request->query->get('role-type'));
+        $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes, (bool)$this->getRequest()->query->get('inline'));
 
-        $data   = [
-            'user'          => $user,
-            'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
-            'attributes'    => $attributes,
-            'dean'          => $deanAndMentor['dean'],
-            'mentor'        => $deanAndMentor['mentor'],
-            'awards'        => $awards,
-            'houseEvents'   => $houseEvents,
-            'absences'      => $absences,
+        $data = [
+            'user'               => $user,
+            'isEnabled'          => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
+            'attributes'         => $attributes,
+            'dean'               => $deanAndMentor['dean'],
+            'mentor'             => $deanAndMentor['mentor'],
+            'awards'             => $awards,
+            'houseEvents'        => $houseEvents,
+            'absences'           => $absences,
             'academicTranscript' => $academicTranscript,
-            'subjects'      => $subjectList,
-            'deansComments' => $deansComments,
-            'explanation'   => $explanation,
-            'reportDate'    => $reportDate,
+            'subjects'           => $subjectList,
+            'deansComments'      => $deansComments,
+            'explanation'        => $explanation,
+            'reportDate'         => $reportDate,
+            'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
+            'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
         ];
+
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
         $this->getResponse()->content->set($output);

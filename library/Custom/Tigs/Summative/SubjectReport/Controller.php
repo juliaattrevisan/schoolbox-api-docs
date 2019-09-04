@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\SubjectReport;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
+use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -18,9 +19,11 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Role;
 use Schoolbox\Resource\Textbox;
 use Schoolbox\User;
 use External_UserInterface;
+use function array_merge;
 
 class Controller extends Web\Controller\Base
 {
@@ -119,7 +122,16 @@ class Controller extends Web\Controller\Base
             $this->getUser()
         );
 
-        $data = $report->getReport($user, $folder, $attributes, $roleTypeOverride);
+        $subjectData = $report->getReport($user, $folder, $attributes, $roleTypeOverride);
+
+        $data = array_merge($subjectData, [
+                'user'               => $user,
+                'attributes'         => $attributes,
+                'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
+                'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
+                'isEnabled'          => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
+            ]
+        );
 
         $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
 

@@ -128,6 +128,7 @@ class AcademicTranscript
      * @throws UnexpectedValueException
      * @throws InvalidColumnException
      * @throws UnderflowException
+     * @throws \Alaress\Database\Exception
      */
     public function toContext(User $viewer, User $student, StudentAttributes $attributes, array $subjectList, ?string $roleTypeOverride): array
     {
@@ -156,7 +157,6 @@ class AcademicTranscript
                 $attributes,
                 $roleTypeOverride
             );
-            unset($data[$folderId]['user']);
         }
         return $data;
     }
