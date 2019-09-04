@@ -17,7 +17,7 @@ use DomainException;
 use External_UserInterface;
 use InvalidArgumentException;
 use LogicException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -53,7 +53,7 @@ class AcademicTranscript
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var RubricMapper */
+    /** @var RubricDataModel\DataSource */
     private $rubricMapper;
 
     /** @var Textbox\Mapper */
@@ -78,7 +78,7 @@ class AcademicTranscript
      * @param External_UserInterface $externalUser
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
-     * @param RubricMapper           $rubricMapper
+     * @param RubricDataModel\DataSource $rubricMapper
      * @param Textbox\Mapper         $textBoxMapper
      * @param Access                 $access
      * @param IConnector             $database
@@ -91,7 +91,7 @@ class AcademicTranscript
         External_UserInterface $externalUser,
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
-        RubricMapper $rubricMapper,
+        RubricDataModel\DataSource $rubricMapper,
         Textbox\Mapper $textBoxMapper,
         Access $access,
         IConnector $database,

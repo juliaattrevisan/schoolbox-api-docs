@@ -14,7 +14,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -95,7 +95,7 @@ class Module extends Alaress\Module\Module
             'externalDatabase'      => $injector->lazyGet('databaseExternal'),
             'assessmentMapper'      => $this->getMapperFactory()->getLazy(Assessment\Mapper::class),
             'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataModel\DataSource::class),
         ];
     }
 

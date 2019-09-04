@@ -25,7 +25,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
@@ -64,7 +64,7 @@ class Report
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var RubricMapper */
+    /** @var RubricDataModel\DataSource */
     private $rubricMapper;
 
     /** @var Textbox\Mapper */
@@ -89,7 +89,7 @@ class Report
      * @param External_UserInterface $externalUser
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
-     * @param RubricMapper           $rubricMapper
+     * @param RubricDataModel\DataSource $rubricMapper
      * @param Textbox\Mapper         $textboxMapper
      * @param Visibility             $visibility
      * @param IConnector             $database
@@ -102,7 +102,7 @@ class Report
         External_UserInterface $externalUser,
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
-        RubricMapper $rubricMapper,
+        RubricDataModel\DataSource $rubricMapper,
         Textbox\Mapper $textboxMapper,
         Visibility $visibility,
         IConnector $database,

@@ -19,7 +19,7 @@ use function implode;
 use LogicException;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -80,7 +80,7 @@ class Controller extends Web\Controller\Base
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var RubricMapper */
+    /** @var RubricDataModel\DataSource */
     private $rubricMapper;
 
 
@@ -96,7 +96,7 @@ class Controller extends Web\Controller\Base
      * @param IConnector             $externalDatabase
      * @param Assessment\Mapper      $assessmentMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
-     * @param RubricMapper           $rubricMapper
+     * @param RubricDataModel\DataSource $rubricMapper
      */
     public function __construct(
         IConnector $database,
@@ -110,7 +110,7 @@ class Controller extends Web\Controller\Base
         IConnector $externalDatabase,
         Assessment\Mapper $assessmentMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
-        RubricMapper $rubricMapper
+        RubricDataModel\DataSource $rubricMapper
     ) {
         $this->database              = $database;
         $this->externalUser          = $externalUser;
