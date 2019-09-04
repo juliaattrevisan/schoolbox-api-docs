@@ -91,7 +91,8 @@
             dateDisplayFormats:     dateDisplayFormats,
             resourceBookingEndpoint:{{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
             bookingIsAuthorized:    Boolean('{{ isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) }}'),
-            createBookingPath:      {{ routeLookup('resourceBooking.book', {id: item.id})|json_encode|raw }}
+            createBookingPath:      {{ routeLookup('resourceBooking.book', {id: item.id})|json_encode|raw }},
+            resourceId:             Number('{{ item.id }}')
         };
     </script>
 {% endautoescape %}
@@ -190,14 +191,6 @@
             </div>
         </div>
     </div>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-{# Dialog for calendar export #}
-<div class="reveal-modal" data-reveal aria-labelledby="calendar-export-dialog-text" aria-hidden="true" role="dialog" id="calendar-export-dialog">
-    <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
-    <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
-    <div id="calendar-export-dialog-url" class="alert-box"></div>
-    <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" class="button icon-copy">Copy to Clipboard</button>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 

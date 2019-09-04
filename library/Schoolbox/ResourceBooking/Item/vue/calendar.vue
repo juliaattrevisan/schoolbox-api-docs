@@ -12,7 +12,7 @@
     import Toast                      from "@schoolbox/toast";
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
     import CreateBookingModal         from './createBookingModal';
-    // import ExportModal                from "./exportModal";
+    import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
     import axios                      from 'axios'
     import qs                         from "qs";
@@ -45,7 +45,7 @@
             Toast,
             FilterModal,
             CreateBookingModal,
-            // ExportModal,
+            ExportModal,
             ViewEventModal,
             MetaItem,
             MetaList,
@@ -383,17 +383,15 @@
 
 <template>
     <div>
-<!--        <export-modal ref="export"-->
-<!--                      :event-types="config.eventTypes"-->
-<!--                      :groups="config.groups"-->
-<!--                      :campuses="config.campuses"-->
-<!--                      :translations="config.translations"-->
-<!--                      :token="config.token"-->
-<!--                      :event-export-url="urls.export" />-->
+        <export-modal ref="export"
+                      :token="config.token"
+                      :booking-export-url="urls.export"
+                      :resource-id="config.resourceId"
+        />
 
         <filter-modal ref="filter"
                       :selected-filters="config.selectedFilters"
-                @filterChanged="updateSelectedFilters" />
+                      @filterChanged="updateSelectedFilters" />
 
         <create-booking-modal ref="createBooking"
                               :event="newEvent"
