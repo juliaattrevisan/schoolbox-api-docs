@@ -138,9 +138,9 @@ Data:
             {% if nesaGraphData.error|default(null) %}
                 <div data-alert {{ dataAttributeError }} class="alert-box alert">{{ nesaGraphData.error|raw }}</div>
             {% else %}
-                {% for nesaGraphDatum in nesaGraphData.data %}
-                    <div class="semester-{{ nesaGraphDatum.semester }}">
-                    <h2 class="subheader">NESA Grade (Semester {{ nesaGraphDatum.semester }})</h2>
+                {% for semester, nesaGraphDatum in nesaGraphData.data %}
+                    <div class="semester-{{ semester }}">
+                    <h2 class="subheader">NESA Grade (Semester {{ semester }})</h2>
                         {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphDatum|merge(extraComponentData) only %}
                     </div>
                 {% endfor %}
