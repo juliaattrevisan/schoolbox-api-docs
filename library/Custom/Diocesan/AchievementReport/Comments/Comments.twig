@@ -20,10 +20,10 @@
                         <th>Teacher</th>
                     </thead>
                     <tbody>
-                    {% for year, courseData in comments %}
-                        {% for course, termData in courseData.classCodes %}
+                    {% for year, data in comments %}
+                        {% for classCode, termData in data.classCodes %}
                             <tr>
-                                <td class="subheading" colspan="4">{{ course }}</td>
+                                <td class="subheading" colspan="4">{{ termData.course }}</td>
                             </tr>
 
                             {# Inspect every term for content

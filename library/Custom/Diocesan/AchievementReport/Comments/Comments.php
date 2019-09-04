@@ -225,7 +225,12 @@ class Comments extends Base
              */
             if (!isset($comments[$year]['courses'][$courseName])) {
                 $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
+                $comments[$year]['courses'][$courseName]['classCode'] = $classCode;
+            }
+
+            if (!isset($comments[$year]['classCodes'][$classCode])) {
                 $comments[$year]['classCodes'][$classCode]['terms'] = self::INITIAL_TERMS;
+                $comments[$year]['classCodes'][$classCode]['course'] = $courseName;
             }
 
             /* Compile data grouped by Course Description and also by Class Code
