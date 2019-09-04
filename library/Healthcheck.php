@@ -687,7 +687,6 @@ class Healthcheck
             'sbGetStudentMedicalConditions',
             'sbGetTeacherName',
             'sbGetTimetableDefinition',
-            'sbGetTimetableDefinition',
         ];
         $this->executeTest($procedures);
     }
