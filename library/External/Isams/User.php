@@ -463,7 +463,7 @@ class External_Isams_User implements External_UserInterface
                         ''                AS StaffCategoryType,
                         ''                AS StaffDefaultMobilePhone,
                         ''                AS StaffVoiceMail,
-                        ''                AS StaffDepartmentDescription,
+                        ''                AS StaffDepartment,
                         ''                AS JobPositionDescription,
                         EnrolmentDate     AS StaffJobPositionStartDate,
                         ''                AS StaffJobPositionEndDate,

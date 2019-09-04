@@ -437,7 +437,7 @@ class External_Schooledge_User implements External_UserInterface
                 '' AS StaffCategoryType,
                 t.Mobile AS StaffDefaultMobilePhone,
                 '' AS StaffVoiceMail,
-                t.TeachingDepartment AS StaffDepartmentDescription,
+                t.TeachingDepartment AS StaffDepartment,
                 '' AS StaffJobPositionStartDate,
                 '' AS StaffJobPositionEndDate,
                 t.Position AS JobPositionDescription,

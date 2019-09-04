@@ -287,7 +287,7 @@ class External_Schoolbox_User implements External_UserInterface
                       '' AS StaffExtension,
                       campus_name AS StaffCampusDescription,
                       category AS StaffCategory,
-                      department AS StaffDepartmentDescription
+                      department AS StaffDepartment
             FROM      `sis_user_profile` sup
             JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
         ")->fetchAll();

@@ -115,7 +115,7 @@ class Report_Staff extends Report_Abstract
                         'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname']),
                         'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])),
                         'STAFF_ROLE_ALTERNATE' => Scrub::text(implode(', ', $currentStaff['JobPositionDescriptionAlternate'])),
-                        'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartmentDescription']),
+                        'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartment']),
                         'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription']),
                         'STAFF_CATEGORY'   => Scrub::text($currentStaff['StaffCategoryType']),
                         'STAFF_EXTENSION'  => Scrub::text($currentStaff['StaffExtension']),
