@@ -90,7 +90,7 @@ class NesaScoreGraph extends BaseComponent
      * @param int $semester
      * @return array
      */
-    public function toContext(int $semester): array
+    public function toContext(int $semester): ?array
     {
         try {
             [$markData, $studentMark, $showComponent] = $this->collateMarks($this->collateAssessables($semester));

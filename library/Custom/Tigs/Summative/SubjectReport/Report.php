@@ -666,7 +666,10 @@ class Report
                 $folder,
                 $roleTypeOverride
             );
-            $reports['data'][$semester] = $ib->toContext($semester);
+            $context = $ib->toContext($semester);
+            if ($context) {
+                $reports['data'][$semester] = $context;
+            }
         }
 
         return $reports;
