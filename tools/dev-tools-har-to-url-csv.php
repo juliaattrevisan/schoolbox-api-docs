@@ -122,7 +122,7 @@ foreach($url_entries as $log_entry){
     if(!key_exists($log_entry['request']['url'], $have_seen) && !key_exists($extention, $filtered_extensions) && $VAGRANT_DOMAIN==$host && !isset($port))
     {
         //Write the row to the CSV file.
-        fputcsv($csv_file, ['url' => $log_entry['request']['url']]);
+        fputcsv($csv_file, ['', 'Superuser', 'Har Exported Action', 'url' => $log_entry['request']['url']]);
         $have_seen[$log_entry['request']['url']] = 'url';
         if ($debug) {
             printf("Inserted url: %s\n", $log_entry['request']['url']);
