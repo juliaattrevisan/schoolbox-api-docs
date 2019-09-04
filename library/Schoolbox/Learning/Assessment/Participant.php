@@ -620,6 +620,17 @@ class Participant
         return $this->allResponses;
     }
 
+    /**
+     * @return GenericCollection|IResponse[]
+     */
+    public function getSubmittedResponses()
+    {
+        return $this->allResponses->filter(
+            function (IResponse $response) {
+                return $response->getSubmittedAt() && !$response->getSubmittedAt()->isNull();
+            }
+        );
+    }
 
     /**
      * @param GenericCollection|IResponse[] $allResponses
