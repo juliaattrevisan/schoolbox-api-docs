@@ -506,21 +506,28 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $count = 0;
 
+        $sequenceIds = [];
         foreach ($iterator as $spRow) {
             if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
-                $periodList[] = array(
-                    'Room' => $spRow['Room'],
-                    'Description' => $spRow['ClassDescription'],
-                    'PeriodNumber' => $spRow['Period'],
-                    'ClassCampus' => $spRow['ClassCampus'],
-                    'ClassCode' => $spRow['ClassCode'],
-                    'SubstituteFlag' => $spRow['SubstituteFlag'],
-                    'SubstitutedFlag' => $spRow['SubstitutedFlag'],
-                    'AttendanceMarked' => $spRow['IsMarkedFlag'],
-                    'AttendanceEnabled' => $spRow['AttendanceEntryEnabledFlag'],
-                    'ClassCancelled' => $spRow['ClassCancelledFlag'],
-
-                );
+                // There is a SeqLinkedTo field, which is only set for linked classes.
+                $attendanceEnabled = $spRow['AttendanceEntryEnabledFlag'];
+                $sequenceId        = $spRow['SeqLinkedTo'] ?? null;
+                if (isset($sequenceId, $sequenceIds[$sequenceId])) {
+                    $attendanceEnabled        = false;
+                    $sequenceIds[$sequenceId] = true;
+                }
+                $periodList[] = [
+                    'Room'              => $spRow['Room'],
+                    'Description'       => $spRow['ClassDescription'],
+                    'PeriodNumber'      => $spRow['Period'],
+                    'ClassCampus'       => $spRow['ClassCampus'],
+                    'ClassCode'         => $spRow['ClassCode'],
+                    'SubstituteFlag'    => $spRow['SubstituteFlag'],
+                    'SubstitutedFlag'   => $spRow['SubstitutedFlag'],
+                    'AttendanceMarked'  => $spRow['IsMarkedFlag'],
+                    'AttendanceEnabled' => $attendanceEnabled,
+                    'ClassCancelled'    => $spRow['ClassCancelledFlag'],
+                ];
             }
             $count++;
         }
