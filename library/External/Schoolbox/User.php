@@ -132,6 +132,7 @@ class External_Schoolbox_User implements External_UserInterface
                             0 AS StudentContactSilentPhoneFlag,
                             supp.mobile AS StudentContactMobilePhone,
                             supp.phone_work AS StudentContactOccupPhone,
+                            supr.type AS StudentContactRelation,
                             '' AS StudentContactSpouseID,
                             '' AS StudentContactSpouseTitle,
                             '' AS StudentContactSpousePreferred,
