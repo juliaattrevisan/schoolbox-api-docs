@@ -98,11 +98,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // StudentTutorDescription
         // TeacherFormID
         // TeacherTutorID
-        // FormDescription
         // StudentHouseDescription
         // StudentYearLevelCoordinator
         // YearLevelCoordID
-        // StudentLockerBook
         // StudentEmergencyPhoneAlt
         // StudentMedicalAlert
         // StudentSpecialNeedsFlag

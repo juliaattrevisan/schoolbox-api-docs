@@ -255,28 +255,6 @@ class Student extends Base {
     }
 
     /**
-     * Set locker
-     *
-     * @param string $locker
-     * @return $this
-     */
-    public function setLocker($locker)
-    {
-        $this->locker = $locker;
-        return $this;
-    }
-
-    /**
-     * Get locker
-     *
-     * @return string
-     */
-    public function getLocker()
-    {
-        return $this->locker;
-    }
-
-    /**
      * Set medical
      *
      * @param string $medical

@@ -104,7 +104,7 @@ class Report_StaffDepartment extends Report_Abstract
             $previousDepartment = "";
 
             foreach ($allStaff as $key => $currentStaff) {
-                $department = trim(Scrub::text($currentStaff['StaffDepartmentDescription']));
+                $department = trim(Scrub::text($currentStaff['StaffDepartment']));
                 $role = trim(Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])));
 
                 // Remove staff with unknown departments
@@ -113,20 +113,20 @@ class Report_StaffDepartment extends Report_Abstract
                 if ($department == '' || strtolower($department) == 'not selected' || $role == '') {
                     unset($allStaff[$key]);
                 } else {
-                    $allStaff[$key]['StaffDepartmentDescription'] = $department;
+                    $allStaff[$key]['StaffDepartment'] = $department;
                 }
             }
 
             $sort = array();
 
             foreach ($allStaff as $k=>$v) {
-                $sort['StaffDepartmentDescription'][$k] = $v['StaffDepartmentDescription'];
+                $sort['StaffDepartment'][$k] = $v['StaffDepartment'];
                 $sort['StaffSurname'][$k] = $v['StaffSurname'];
                 $sort['StaffPreferredName'][$k] = $v['StaffPreferredName'];
             }
 
             array_multisort(
-                $sort['StaffDepartmentDescription'], SORT_ASC,
+                $sort['StaffDepartment'], SORT_ASC,
                 $sort['StaffSurname'], SORT_ASC,
                 $sort['StaffPreferredName'], SORT_ASC,
                 $allStaff
@@ -134,12 +134,12 @@ class Report_StaffDepartment extends Report_Abstract
 
             foreach ($allStaff as $currentStaff) {
 
-                if ($previousDepartment != $currentStaff['StaffDepartmentDescription']) {
+                if ($previousDepartment != $currentStaff['StaffDepartment']) {
                     if ($previousDepartment != '') {
                         $this->getPage()->parse('department_block', 'department', true);
                         $this->getPage()->setVar('staff_block', '');
                     }
-                    $previousDepartment = $currentStaff['StaffDepartmentDescription'];
+                    $previousDepartment = $currentStaff['StaffDepartment'];
                 }
 
                 $extensionText = Scrub::text($currentStaff['StaffExtension']) == '' ? '' : '(x' . Scrub::text($currentStaff['StaffExtension']) . ')';
@@ -161,7 +161,7 @@ class Report_StaffDepartment extends Report_Abstract
                         'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName']),
                         'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname']),
                         'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])),
-                        'STAFF_DEPARTMENT' => $currentStaff['StaffDepartmentDescription'],
+                        'STAFF_DEPARTMENT' => $currentStaff['StaffDepartment'],
                         'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription']),
                         'STAFF_EXTENSION'  => $extensionText,
                         'STAFF_MOBILE'     => Scrub::text($currentStaff['StaffDefaultMobilePhone']),

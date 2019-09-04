@@ -364,12 +364,9 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS TeacherFormID,
                 Form                                                AS StudentForm,
                 ''                                                  AS TeacherTutorID,
-                ''                                                  AS StudentTutor,
-                Form                                                AS FormDescription,
                 House                                               AS StudentHouseDescription,
                 HouseID                                             AS StudentHouse,
                 YearGroup                                           AS StudentYearLevel,
-                ''                                                  AS StudentLockerBook,
                 ecm.ContactName                                     AS StudentEmergencyName,
                 LTRIM(
                   RTRIM(
@@ -1065,7 +1062,7 @@ class External_Doublefirst_User implements External_UserInterface
                         CASE WHEN IsStaffPartTime = 1 THEN 'Part Time' ELSE 'Full Time' END AS StaffCategoryType,
                         ''                    AS StaffDefaultMobilePhone,
                         ''                    AS StaffVoiceMail,
-                        ''                    AS StaffDepartmentDescription,
+                        ''                    AS StaffDepartment,
                         cat.Description       AS JobPositionDescription,
                         ''                    AS StaffJobPositionStartDate,
                         ''                    AS StaffJobPositionEndDate

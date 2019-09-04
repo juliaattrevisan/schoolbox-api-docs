@@ -35,7 +35,6 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				ST.FIRST_NAME AS StudentGiven1,
 				ST.SURNAME AS StudentSurname,
 				SUBSTRING(CONVERT(VARCHAR, ST.BIRTHDATE, 120), 0, 11) AS StudentBirthDate,
-				'' AS StudentTutor,
 				(ADVISOR.FIRST_NAME + ' ' + ADVISOR.SURNAME) AS StudentTutorName,
 				KGC.DESCRIPTION AS StudentTutorDescription,
 				'' AS TeacherTutorID,
@@ -44,7 +43,6 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS StudentForm,
 				'' AS StudentFormStaffName, -- This field is hydrated below
 				'' AS TeacherFormID,
-				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
@@ -52,7 +50,6 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				COORDINATOR.SFKEY AS YearLevelCoordID,
 				(COACH.FIRST_NAME + ' ' + COACH.SURNAME) AS StudentCoach,
 				COACH.SFKEY AS CoachID,
-				'' AS StudentLockerBook,
 				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
 				ST.EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
 				ST.EMERGENCY_ONE_MOBILE AS StudentEmergencyPhoneAlt,

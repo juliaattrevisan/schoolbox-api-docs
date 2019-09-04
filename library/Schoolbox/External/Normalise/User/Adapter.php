@@ -448,7 +448,6 @@ class Adapter {
             ->setGivenName($currentResult['StudentGiven1'])
             ->setLastname($currentResult['StudentSurname'])
             ->setDob($currentResult['StudentBirthDate'])
-            ->setLocker($currentResult['StudentLockerBook'])
             ->setMedical($currentResult['StudentMedicalAlert'])
             ->setSpecialNeeds($currentResult['StudentSpecialNeedsFlag'])
             ->setAlert($currentResult['AlertMessage'])
@@ -465,7 +464,6 @@ class Adapter {
         $student
             ->getForm()
                 ->setLevel($currentResult['StudentForm'])
-                ->setDescription($currentResult['FormDescription'])
         ;
 
         $student

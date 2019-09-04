@@ -211,7 +211,8 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentBirthDate'        => $currentStudent['Birthdate'],
                 'StudentHouse'            => $currentStudent['HeadOfHouse'],
                 'StudentYearLevel'        => $currentStudent['YearLevel'],
-                'StudentTutor'            => $currentStudent['TutorName'],
+                'StudentTutorDescription' => $currentStudent['TutorName'],
+                'StudentTutorName'        => $currentStudent['TutorStaffName'],
                 'StudentForm'             => $currentStudent['FormName'],
                 'StudentFormStaffName'    => $currentStudent['FormStaffName'],
                 'StudentEmergencyName'    => $currentStudent['EmergencyContactName'],
@@ -317,7 +318,7 @@ class External_Schoolpro_User implements External_UserInterface
     {
         return date('m') < 6 ? '1' : '2';
     }
-    
+
     /**
      * @inheritDoc
      */

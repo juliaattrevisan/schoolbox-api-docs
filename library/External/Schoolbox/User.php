@@ -75,7 +75,6 @@ class External_Schoolbox_User implements External_UserInterface
                           lastname AS StudentSurname,
                           UNIX_TIMESTAMP(date_of_birth) AS StudentBirthDate,
                           tutor_teacher_name AS StudentTutorName,
-                          tutor_teacher_name AS StudentTutor,
                           tutor_group AS StudentTutorDescription,
                           tutor_teacher_id AS TeacherTutorID,
                           house_name AS StudentHouseDescription,
@@ -85,9 +84,7 @@ class External_Schoolbox_User implements External_UserInterface
                           form_teacher_name AS StudentFormStaffName,
                           form_teacher_id AS TeacherFormID,
                           form_name AS StudentForm,
-                          form_name AS FormDescription,
                           year_level AS StudentYearLevel,
-                          '' AS StudentLockerBook,
                           '' AS StudentEmergencyName,
                           '' AS StudentEmergencyPhone,
                           '' AS StudentEmergencyPhoneAlt,
@@ -291,7 +288,7 @@ class External_Schoolbox_User implements External_UserInterface
                       '' AS StaffExtension,
                       campus_name AS StaffCampusDescription,
                       category AS StaffCategory,
-                      department AS StaffDepartmentDescription
+                      department AS StaffDepartment
             FROM      `sis_user_profile` sup
             JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
         ")->fetchAll();

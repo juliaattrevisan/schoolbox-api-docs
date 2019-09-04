@@ -26,13 +26,11 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 					vStudents.StudentForm,
 					luTutor.ID as TeacherTutorID,
 					vStudents.StudentTutor,
-					luForm.Description as FormDescription,
 					vStudents.StudentHouseDescription,
 					vStudents.StudentHouse,
 					vStudents.StudentYearLevel,
 					vStudents.StudentYearLevelCoordinator,
 					luYearLevel.YearLevelCoordID,
-					vStudents.StudentLockerBook,
 					vStudents.StudentEmergencyName,
 					vStudents.StudentEmergencyPhone,
 					vStudents.StudentEmergencyPhoneAlt,
@@ -118,21 +116,21 @@ and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester
 				WHERE vStudents.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . "'
 				AND vStudents.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "'
 			";
-		
+
 			return $this->getDatabase()->getAll($query);
 		}
 
-	
+
 	protected function setDatabase($database) {
                 $this->database = $database;
         }
-	
+
         /**
          * Get database
          *
          * @return MSSQL
          */
-	       
+
 	 protected function getDatabase() {
                 return $this->database;
         }
