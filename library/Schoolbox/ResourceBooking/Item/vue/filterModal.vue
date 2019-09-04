@@ -55,21 +55,8 @@
              * Apply the selected filters, and close the modal.
              */
             applyFilters() {
-                // I guess this posts a msg back to the fullcalendar component,
-                // with the selected filters.
-                // The events are already loaded regardless of whether the
-                // filters exclude them: the event's visibility just needs to be
-                // updated.
-
-                // Hopefully selectedFilters isn't passed by reference:
-                // I don't want to apply filters till I click this button.
-                // (Turns out they are: I'll have to think of something else)
                 this.$emit(FILTER_CHANGED, this.selected);
                 this.$refs.modal.close();
-            },
-
-            toLower(value) {
-                return value.toLower().trim();
             },
 
             select(event) {

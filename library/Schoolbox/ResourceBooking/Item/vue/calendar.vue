@@ -21,15 +21,7 @@
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
 
-    const URL_EVENT_UPDATE = '/calendar/ajax/update';
-    const URL_EVENT_FILTER = '/calendar/ajax/filter';
-    const URL_EVENT_CREATE = '/calendar/ajax/create';
-    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
-    const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_EXPORT = '/calendar/export.php';
-
-    const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
-    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -67,13 +59,7 @@
             config: () => window.fullCalendarConfig,
             urls() {
                 return {
-                    create: URL_EVENT_CREATE,
-                    modifyForm: URL_EVENT_MODIFY_FORM,
-                    modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-                    // update: URL_EVENT_UPDATE,
                     export: URL_EVENT_EXPORT,
-                    attendanceList: URL_ATTENDANCE_LIST,
-                    attendanceToggle: URL_ATTENDANCE_TOGGLE,
                 };
             },
             formats() {
@@ -200,48 +186,6 @@
                     }
                 });
 
-
-                // All of the event's attributes must match at least one
-                // selected filter.
-                // If it doesn't, don't render it.
-                Object.keys(eventAttributes).forEach(function (attributeGroup) {
-                    let ids                = eventAttributes[attributeGroup],
-                        eventMatchesFilter = false;
-                    ids.forEach(function (id) {
-                        // Check id against the list of selected filters.
-                        let keyspace = [];
-                        switch (attributeGroup) {
-                            case 'source':
-                                // Sources have multiple IDs per selection:
-                                // this event needs to only match one of them.
-                                keyspace = (self.config.selectedFilters?.source || []).flat();
-                                break;
-
-                            case 'type':
-                                keyspace = self.config.selectedFilters?.eventType || [];
-                                break;
-
-                            case 'group':
-                                keyspace = self.config.selectedFilters?.group || [];
-                                break;
-
-                            case 'campus':
-                                keyspace = self.config.selectedFilters?.campus || [];
-                                break;
-
-                            default:
-                                // Ignore this one
-                                return;
-                        }
-                        if (keyspace.includes(id)) {
-                            eventMatchesFilter = true;
-                        }
-                    });
-                    if (!eventMatchesFilter) {
-                        isEventRendered = false;
-                    }
-                });
-
                 return isEventRendered;
             },
 
@@ -280,45 +224,6 @@
             },
 
             /**
-             * Resize event callback: persist the change to the event's start
-             * and end dates.
-             * @see https://fullcalendar.io/docs/eventResize
-             *
-             * @param eventResizeInfo
-             */
-            onEventResize(eventResizeInfo) {
-                // TODO this needs to consider events in series
-                let event = eventResizeInfo.event,
-                    data  = {
-                        eventId: event?.extendedProps?.data?.meta?.eventId,
-                        resize:  true,
-                        start:   this.toMoment(event.start).format(),
-                        end:     this.toMoment(event.end).format(),
-                    };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            },
-
-            /**
-             * Drop event callback: persist the change to the event's start
-             * and end dates.
-             * @see https://fullcalendar.io/docs/eventDrop
-             *
-             * @param eventDropInfo
-             */
-            onEventDrop(eventDropInfo) {
-                let event = eventDropInfo.event,
-                    delta = toDuration(eventDropInfo.delta),
-                    data  = {
-                        eventId:     event?.extendedProps?.data?.meta?.eventId,
-                        minuteDelta: delta.asMinutes(),
-                        allDay:      event.allDay,
-                    };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            },
-
-            /**
              * Helper function for converting a Date object to a Moment object.
              * @see https://fullcalendar.io/docs/moment-plugins
              *
@@ -351,20 +256,6 @@
             },
 
             /**
-             * Callback for when the filters have been updated: rerender events
-             * (thus hiding events which don't match the new filters) and
-             * persist the filters selected.
-             *
-             * @param selectedFilters
-             */
-            updateSelectedFilters(selectedFilters) {
-                // The selected filters in config are read-only and passed by reference.
-                // TODO pass it by value into the filter modal, and update in this method
-                this.$refs.fullCalendar.getApi().refetchEvents();
-                // axios.post(self.config.resourceBookingEndpoint, qs.stringify({ filters: this.config.selectedFilters, }))
-            },
-
-            /**
              * Helper for rendering the title of the day view.
              * Without this the calendar renders the date twice for some reason.
              *
@@ -391,7 +282,7 @@
 
         <filter-modal ref="filter"
                       :selected-filters="config.selectedFilters"
-                      @filterChanged="updateSelectedFilters" />
+                      @filterChanged="reloadEvents" />
 
         <create-booking-modal ref="createBooking"
                               :event="newEvent"
@@ -406,8 +297,6 @@
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"
                           :event-update-url="urls.update"
-                          :attendance-list-url="urls.attendanceList"
-                          :attendance-toggle-url="urls.attendanceToggle"
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
                           :format-display-datetime="formats.displayDatetime"
@@ -454,8 +343,6 @@
                 @loading="onLoading"
                 @dateClick="onDateClick"
                 @eventClick="onEventClick"
-                @eventResize="onEventResize"
-                @eventDrop="onEventDrop"
         />
 
         <toast ref="toast"></toast>

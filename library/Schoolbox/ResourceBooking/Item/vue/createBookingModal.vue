@@ -1,7 +1,7 @@
 <template>
     <reveal-modal ref="modal">
         <form id="createEvent" :action="bookingPath" v-on:submit.prevent>
-            <p>Create booking for: <span>{{ this.displayDate() }}</span></p>
+            <p>Create booking for: <span>{{ this.displayDate }}</span></p>
             <input type="submit" class='expand' value="Create Booking" v-on:click="submitForm" />
         </form>
     </reveal-modal>
@@ -32,21 +32,6 @@
                 this.$refs.modal.open();
             },
 
-            /**
-             * The event's date, as displayed on the modal.
-             *
-             * @return {string}
-             */
-            displayDate() {
-                return this.event.date
-                    ? this.toMoment(this.event.date).format(
-                        this.event.allDay
-                            ? 'LL'
-                            : 'LLLL'
-                    )
-                    : '';
-            },
-
             submitForm() {
 
                 var createBookingParamsRoute = [
@@ -64,9 +49,23 @@
                 return this.event.date ? this.toMoment(this.event.date).format('YYYY-MM-DD') : '';
             }
         },
+        computed: {
+            window: () => window,
+
+            /**
+             * The booking's date, as displayed on the modal.
+             *
+             * @return {string}
+             */
+            displayDate() {
+                return this.event.date
+                    ? this.toMoment(this.event.date).format(
+                        this.event.allDay
+                            ? 'LL'
+                            : 'LLLL'
+                    )
+                    : '';
+            }
+        }
     }
 </script>
-
-<style scoped>
-
-</style>
