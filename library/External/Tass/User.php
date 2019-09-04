@@ -148,7 +148,6 @@ class External_Tass_User implements External_UserInterface
             '' AS TeacherFormID,
             s.form_cls AS StudentForm,
             t.tch_code AS TeacherTutorID,
-            '' AS StudentTutor,
             h.hse_name AS StudentHouseDescription,
             s.house AS StudentHouse,
             s.year_grp AS StudentYearLevel,

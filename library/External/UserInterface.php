@@ -34,7 +34,6 @@ interface External_UserInterface extends External\IConnector
      * @internal string return['TeacherFormID']
      * @internal string return['StudentForm']
      * @internal string return['TeacherTutorID']
-     * @internal string return['StudentTutor']
      * @internal string return['StudentHouseDescription']
      * @internal string return['StudentHouse']
      * @internal string return['StudentYearLevel']

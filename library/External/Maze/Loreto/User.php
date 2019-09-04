@@ -35,7 +35,6 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				ST.FIRST_NAME AS StudentGiven1,
 				ST.SURNAME AS StudentSurname,
 				SUBSTRING(CONVERT(VARCHAR, ST.BIRTHDATE, 120), 0, 11) AS StudentBirthDate,
-				'' AS StudentTutor,
 				(ADVISOR.FIRST_NAME + ' ' + ADVISOR.SURNAME) AS StudentTutorName,
 				KGC.DESCRIPTION AS StudentTutorDescription,
 				'' AS TeacherTutorID,

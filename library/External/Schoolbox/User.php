@@ -75,7 +75,6 @@ class External_Schoolbox_User implements External_UserInterface
                           lastname AS StudentSurname,
                           UNIX_TIMESTAMP(date_of_birth) AS StudentBirthDate,
                           tutor_teacher_name AS StudentTutorName,
-                          tutor_teacher_name AS StudentTutor,
                           tutor_group AS StudentTutorDescription,
                           tutor_teacher_id AS TeacherTutorID,
                           house_name AS StudentHouseDescription,

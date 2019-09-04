@@ -364,7 +364,6 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS TeacherFormID,
                 Form                                                AS StudentForm,
                 ''                                                  AS TeacherTutorID,
-                ''                                                  AS StudentTutor,
                 House                                               AS StudentHouseDescription,
                 HouseID                                             AS StudentHouse,
                 YearGroup                                           AS StudentYearLevel,
