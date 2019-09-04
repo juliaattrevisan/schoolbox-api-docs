@@ -845,7 +845,6 @@ class Report
             $folder,
             $roleTypeOverride
         );
-        $hscTaskMarks->setSemesters(1, $attributes->getCurriculumSemester());
         return ['data' => $hscTaskMarks->toContext()];
     }
 
