@@ -83,7 +83,7 @@
 
         window.fullCalendarConfig = {
             token:                  '{{ token }}',
-            selectedFilters:        [],
+            selectedFilters:        [1,2],
             defaultDate:            '{{ selectedDate|date('Y-m-d') }}',
             eventLimit:             Boolean('{{ config.calendar_collapse_events }}'),
             firstDay:               Number('{{ config.calendar_start_day }}'),
