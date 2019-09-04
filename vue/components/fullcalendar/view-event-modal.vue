@@ -360,7 +360,7 @@
                     efficacy: efficacy,
                 };
                 return axios
-                    .post(this.eventExtendedProps.booking.actions.cancel.href, qs.stringify(data))
+                    .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href, qs.stringify(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_DELETED, this.event));
             },
@@ -379,7 +379,7 @@
                     efficacy: efficacy,
                 };
                 return axios
-                    .post(this.eventExtendedProps.booking.actions.approve.href, qs.stringify(data))
+                    .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href, qs.stringify(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
@@ -398,7 +398,7 @@
                     efficacy: efficacy,
                 };
                 return axios
-                    .post(this.eventExtendedProps.booking.actions.reject.href, qs.stringify(data))
+                    .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href, qs.stringify(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
