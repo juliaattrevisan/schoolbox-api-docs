@@ -97,6 +97,7 @@ class Controller extends Web\Controller\Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \UnderflowException
+     * @throws \Alaress\Database\Exception
      */
     public function getReport(User $user, Folder\Model $folder, ?string $reportDate): void
     {
