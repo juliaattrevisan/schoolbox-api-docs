@@ -40,8 +40,6 @@ var jsSrc = {
         'www/javascript/components/jquery-ui/ui/widgets/draggable.js',
         'www/javascript/components/jquery-ui/ui/widgets/resizable.js',
         'www/javascript/components/jquery-ui/ui/widgets/sortable.js',
-        // widgets
-        'www/javascript/components/jquery-ui/ui/widgets/datepicker.js',
 
         // jQueryUI Touch Punch
         'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
