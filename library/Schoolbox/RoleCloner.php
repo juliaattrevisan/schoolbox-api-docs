@@ -48,6 +48,7 @@ class RoleCloner
         $this->cloneTopNav($source, $destination);
         $this->cloneDashboard($source, $destination);
         $this->cloneCategoryPermissions($source, $destination);
+        $this->cloneCommsArticleAudiences($source, $destination);
         $this->cloneSchoolCalendarPermissions($source, $destination);
         $this->cloneTours($source, $destination);
     }
@@ -177,10 +178,32 @@ class RoleCloner
     }
 
     /**
+     * Clone role audiences for comms articles.
+     *
      * @param Role $source
      * @param Role $destination
      */
-    protected function cloneSchoolCalendarPermissions(Role $source, Role $destination): void
+    protected function cloneCommsArticleAudiences(Role $source, Role $destination): void
+    {
+        $this->clonePerms(
+            "DELETE FROM comms_news_audience WHERE entity_type = 'role' AND entity_value = ?",
+            "
+                INSERT INTO comms_news_audience
+                    (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
+                SELECT comms_news_article_id, parent_id, entity_type, :dest, relationship
+                FROM comms_news_audience
+                WHERE entity_type = 'role'
+                AND entity_value = :src
+            ",
+            ['src'  => $source->getId(), 'dest' => $destination->getId(),]
+        );
+    }
+
+    /**
+     * @param Role $source
+     * @param Role $destination
+     */
+    protected function cloneSchoolCalendarPermissions(Role $source, Role $destination)
     {
         $this->permClone($source, $destination, 'event_group', ['event_id', ':dest'], 'group_id');
     }
@@ -242,4 +265,4 @@ class RoleCloner
         // insert new perms
         $this->db->query($insertQuery, $args);
     }
-} 
+}
