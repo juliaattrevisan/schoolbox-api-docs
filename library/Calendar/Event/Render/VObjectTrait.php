@@ -75,6 +75,10 @@ trait VObjectTrait
             $vEvent->add('DTSTART', $start_time);
             $vEvent->add('DTEND', $end_time);
         } else {
+            // the end date for multi-day event should be non-inclusive date. (rfc5545#page-54)
+            if ($start_time->format('Ymd') !== $end_time->format('Ymd')) {
+                $end_time->add(new DateInterval('P1D'));
+            }
             $vEvent->add('DTSTART', $start_time->format('Ymd'), ['VALUE' => 'DATE']);
             $vEvent->add('DTEND', $end_time->format('Ymd'), ['VALUE' => 'DATE']);
         }
