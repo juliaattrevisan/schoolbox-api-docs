@@ -11,7 +11,7 @@
     import MetaItem                   from '@schoolbox/meta/item'
     import Toast                      from "@schoolbox/toast";
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-    // import CreateEventModal           from './createEventModal';
+    import CreateBookingModal         from './createBookingModal';
     // import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
     import axios                      from 'axios'
@@ -44,8 +44,8 @@
         components: {
             Toast,
             FilterModal,
+            CreateBookingModal,
             // ExportModal,
-            // CreateEventModal,
             ViewEventModal,
             MetaItem,
             MetaList,
@@ -253,15 +253,16 @@
              * @param dateClickInfo
              */
             onDateClick(dateClickInfo) {
-                let [firstEventType] = this.config.eventTypes;
-                this.newEvent = {
-                    date:        dateClickInfo.date,
-                    allDay:      dateClickInfo.allDay,
-                    title:       '',
-                    detail:      '',
-                    type:        firstEventType ? firstEventType.id : null,
-                };
-                this.$refs.createEvent.open();
+                // Just a proposal.
+                // If the user doesn't have the rights to create a booking, just don't show the modal.
+                if (this.config.bookingIsAuthorized) {
+                    this.newEvent = {
+                        date: dateClickInfo.date,
+                        allDay: dateClickInfo.allDay,
+                    };
+
+                    this.$refs.createBooking.open();
+                }
             },
 
             /**
@@ -394,19 +395,11 @@
                       :selected-filters="config.selectedFilters"
                 @filterChanged="updateSelectedFilters" />
 
-<!--        <create-event-modal ref="createEvent"-->
-<!--                            :event="newEvent"-->
-<!--                            :user-id="config.userId"-->
-<!--                            :task-type-id="config.taskTypeId"-->
-<!--                            :event-types="config.eventTypes"-->
-<!--                            :to-moment="toMoment"-->
-<!--                            :event-create-url="urls.create"-->
-<!--                            :event-modify-form-url="urls.modifyForm"-->
-<!--                            :format-form-date="formats.formDate"-->
-<!--                            :format-form-datetime="formats.formDatetime"-->
-<!--                            :format-display-date="formats.displayDate"-->
-<!--                            :format-display-datetime="formats.displayDatetime"-->
-<!--                            @eventCreated="addEvent" />-->
+        <create-booking-modal ref="createBooking"
+                              :event="newEvent"
+                              :to-moment="toMoment"
+                              :booking-path="config.createBookingPath"
+        />
 
         <view-event-modal ref="event"
                           :event="currentEvent"
