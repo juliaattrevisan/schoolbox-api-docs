@@ -321,6 +321,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     'RECENT_BLOG_BLOG_ID' => $currentBlog->getId(),
                     'RECENT_BLOG_TITLE' => $currentBlog->getHeading(),
                     'RECENT_BLOG_CREATED_AT' => $currentBlog->getCreatedAt()->getRelativeTime(),
+                    'RECENT_BLOG_TIMESTAMP' => $currentBlog->getCreatedAt()->getLong(),
                     'RECENT_BLOG_PAGE_ID' => $currentBlog->getPage()->getPageId(),
                 ));
 
