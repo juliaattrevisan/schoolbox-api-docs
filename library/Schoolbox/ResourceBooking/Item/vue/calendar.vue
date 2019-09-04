@@ -138,7 +138,7 @@
                         params: {
                             start:  Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                             end:    Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            userId: self.config.userId,
+                            status: this.config.selectedFilters,
                         }
                     }
                 ).then(
@@ -360,8 +360,8 @@
             updateSelectedFilters(selectedFilters) {
                 // The selected filters in config are read-only and passed by reference.
                 // TODO pass it by value into the filter modal, and update in this method
-                this.$refs.fullCalendar.getApi().rerenderEvents();
-                axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, }))
+                this.$refs.fullCalendar.getApi().refetchEvents();
+                // axios.post(self.config.resourceBookingEndpoint, qs.stringify({ filters: this.config.selectedFilters, }))
             },
 
             /**
