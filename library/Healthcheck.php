@@ -684,6 +684,9 @@ class Healthcheck
             'sbGetStudentContact',
             'sbGetPortraitLastUpdated',
             'sbGetPortraitFile',
+            'sbGetStudentAccounts',
+            'sbGetGuardianAccounts',
+            'sbGetStaffAccounts',
         ];
         $this->executeTest($procedures);
     }
