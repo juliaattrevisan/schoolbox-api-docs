@@ -120,14 +120,18 @@ Data:
                                 </div>
                             {% endif %}
 
-                            {% set nesaGraphDatum = folderData.nesaGraphData | first %}
-                            {% if nesaGraphDatum.showComponent %}
-                                <div class="result-group{% if nesaGraphDatum.error|default(false) %} error{% endif %}">
-                                    <div class="result-item nesa-grade">
-                                        <span class="result-heading">NESA Grade</span><br>
-                                        <span class="result-value">{{ nesaGraphDatum.studentMark|default('-') }}</span>
+                            {% set nesaGraphData = folderData.nesaGraphData.data | default(null) %}
+
+                            {% if nesaGraphData  %}
+                                {% set nesaGraphDatum = folderData.nesaGraphData.data | first %}
+                                {% if nesaGraphDatum  %}
+                                    <div class="result-group{% if nesaGraphDatum.error|default(false) %} error{% endif %}">
+                                        <div class="result-item nesa-grade">
+                                            <span class="result-heading">NESA Grade</span><br>
+                                            <span class="result-value">{{ nesaGraphDatum.studentMark|default('-') }}</span>
+                                        </div>
                                     </div>
-                                </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                         <div class="column small-12 teacher-comment">

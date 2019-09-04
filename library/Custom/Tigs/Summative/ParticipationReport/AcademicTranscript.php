@@ -156,6 +156,7 @@ class AcademicTranscript
                 $attributes,
                 $roleTypeOverride
             );
+            unset($data[$folderId]['user']);
         }
         return $data;
     }
