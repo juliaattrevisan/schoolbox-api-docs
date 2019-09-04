@@ -7,13 +7,24 @@ namespace SmokeTests;
 use Codeception\Exception\ConditionalAssertionFailed;
 use IntegrationTester;
 use Payload\GetPage;
+use Payload\Login as LoginPayload;
 
 class FetchPagesFromCsvCest
 {
+    #Need some constants to represent users or logic in the before that sets the users.
+    protected $personas=[
+        'Superuser' => ['username'=>'alaress', 'password'=>'alaress'],
+        'Admin' => ['username'=>'alaress', 'password'=>'alaress'],
+        'Teacher'=> ['username'=>'jcoles', 'password'=>'password'],
+        'Student'=> ['username'=>'jreed', 'password'=>'password'],
+        'Pastoral Moderator'=> ['username'=>'jcoles', 'password'=>'password'],
+        'News Moderator'=> ['username'=>'rwhite', 'password'=>'password']
+    ];
+
     public function _before(IntegrationTester $i)
     {
-
-        $i->loginAdmin(); #we logged in as alaress
+        #Might not need this login any more as I think this runs each test, so the login differs each test now.
+        #$i->loginAdmin(); #we logged in as alaress
     }
 
     /** Get all the pages, uses the url provider, data that is read from a csv to fetch all the pages stated and
@@ -23,8 +34,16 @@ class FetchPagesFromCsvCest
      */
     public function getAllThePages(IntegrationTester $i, \Codeception\Example $example)
     {
-        $url=$example[0];
+        $persona=$example[1];
+        $url=$example[3];
 
+        $user_details=$this->personas[$persona];
+
+        #Need to login to the right user
+        $this->loginUser($i, $user_details['username'], $user_details['password']);
+        #State the intention of the test.
+
+        #proceed to test the url which is below.
         $getPayload = new GetPage();
         $getPayload->setURL($url);
         $response = $i->sendCurlRequest($getPayload, true, 'fetch - '.$url);
@@ -33,11 +52,29 @@ class FetchPagesFromCsvCest
 
     /** Url Provider - reads a csv file to provide an array of data for the fetch all pages test.
      *
-     * @return array
+     * GetSmokeTestList csv is formatted a specific way for the test.
+     * Module, Persona, Action, URL
+     *
+     * Module is not used, just for file readability.
+     * Persona selects the user to login with
+     * Action not used in the test, gives context as to the action on the csv.
+     * URL is what we fetch.
+     *
+     * @return array - [string Module, string Persona, string Action, string URL]
      */
     protected function urlProvider()
     {
-        $csvData = array_map('str_getcsv', file('test/codeception/_data/SmokeTests/FetchPagesFromCsvCest.csv'));
+        $csvData = array_map('str_getcsv', file('test/codeception/_data/SmokeTests/GetSmokeTestList.csv'));
+
         return $csvData;
+    }
+
+    protected function loginUser(IntegrationTester $i, string $username, string $password)
+    {
+        $loginPayload = new LoginPayload();
+        $loginPayload->setUsername($username);
+        $loginPayload->setPassword($password);
+
+        $i->sendCurlRequest($loginPayload, false);
     }
 }
