@@ -668,22 +668,25 @@ class Healthcheck
     private function schoolproTest(): void
     {
         $procedures = [
-            'sbGetParent',
-            'sbGetStudent',
-            'sbGetStudentSubjectList',
-            'sbGetStaffSubjectList',
-            'sbGetEnrolledStudents',
-            'sbGetTimetableDefinition',
             'sbGetDayNumber',
+            'sbGetEnrolledStudents',
+            'sbGetGuardianAccounts',
+            'sbGetParent',
             'sbGetPeriodNumber',
+            'sbGetPortraitFile',
+            'sbGetPortraitLastUpdated',
+            'sbGetStaffAccounts',
             'sbGetStaffDayTimetable',
-            'sbGetStudentDayTimetable',
+            'sbGetStaffSubjectList',
+            'sbGetStudent',
             'sbGetStudents',
+            'sbGetStudentAccounts',
+            'sbGetStudentContact',
+            'sbGetStudentSubjectList',
+            'sbGetStudentDayTimetable',
+            'sbGetStudentMedicalConditions',
             'sbGetTeacherName',
             'sbGetTimetableDefinition',
-            'sbGetStudentContact',
-            'sbGetPortraitLastUpdated',
-            'sbGetPortraitFile',
         ];
         $this->executeTest($procedures);
     }
