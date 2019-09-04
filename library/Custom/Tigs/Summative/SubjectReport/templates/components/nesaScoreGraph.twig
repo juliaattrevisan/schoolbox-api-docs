@@ -16,11 +16,11 @@ Data:
 {% set normalisedMark = studentMarks[studentMark] / (studentMarks | length) * 100 %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(normalisedMark) ~ '-bg' %}
 {% set graphId = 'nesa-graph' ~ semester %}
+
+<div class="nesa-wrap">
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
-
-<div class="nesa-wrap">
     <div{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>
         <h3 class="grade-heading {% if gradientClass %}has-gradient{% endif %}">{{ studentMark|default('-') }}</h3>
     </div>
