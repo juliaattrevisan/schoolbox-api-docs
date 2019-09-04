@@ -890,7 +890,7 @@ class Report
             return ['error' => $e->getMessage()];
         }
 
-        $assessables = $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 1, $attributes->getCurriculumSemester());
+        $assessables = $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 2, 2);
 
         $hscRank = new HscAssessmentRank(
             $assessables,
@@ -901,7 +901,6 @@ class Report
             $folder,
             $roleTypeOverride
         );
-        $hscRank->setSemesters(1, $attributes->getCurriculumSemester());
 
         try {
             return $hscRank->toContext();

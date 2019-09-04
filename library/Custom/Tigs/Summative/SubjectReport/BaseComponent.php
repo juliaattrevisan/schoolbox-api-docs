@@ -26,20 +26,6 @@ class BaseComponent
     /** @var StudentAttributes */
     private $attributes;
 
-    /**
-     * @deprecated Move this logic internal to component
-     * @todo Move this logic internal to component
-     * @var int $semesterFrom
-     */
-    protected $semesterFrom = 0;
-
-    /**
-     * @deprecated Move this logic internal to component
-     * @todo Move this logic internal to component
-     * @var int $semesterTo
-     */
-    protected $semesterTo = 0;
-
     /** @var User */
     private $viewer;
 
@@ -215,24 +201,4 @@ class BaseComponent
     {
         return $this->attributes;
     }
-
-
-    /**
-     * @deprecated Move this logic internal to component
-     * @todo Move this logic internal to component
-     * Implicitly specify the semester of the report
-     * @param int $semesterFrom
-     * @param int|null $semesterTo
-     */
-    public function setSemesters(int $semesterFrom, ?int $semesterTo = null): void
-    {
-        $this->semesterFrom = $semesterFrom;
-        if ($semesterTo) {
-            $this->semesterTo = $semesterTo;
-        } else {
-            $this->semesterTo = $semesterFrom;
-        }
-    }
-
-
 }
