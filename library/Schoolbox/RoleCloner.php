@@ -185,15 +185,22 @@ class RoleCloner
      */
     protected function cloneCommsArticleAudiences(Role $source, Role $destination): void
     {
+        // Non-composite permissions: fairly simple, just clone the audience
         $this->clonePerms(
-            "DELETE FROM comms_news_audience WHERE entity_type = 'role' AND entity_value = ?",
+            "
+                DELETE FROM comms_news_audience
+                WHERE entity_type = 'role'
+                AND   entity_value = ?
+                AND   parent_id IS NULL
+            ",
             "
                 INSERT INTO comms_news_audience
                     (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
                 SELECT comms_news_article_id, parent_id, entity_type, :dest, relationship
-                FROM comms_news_audience
-                WHERE entity_type = 'role'
-                AND entity_value = :src
+                FROM   comms_news_audience
+                WHERE  entity_type = 'role'
+                AND    entity_value = :src
+                AND    parent_id IS NULL
             ",
             ['src'  => $source->getId(), 'dest' => $destination->getId(),]
         );
