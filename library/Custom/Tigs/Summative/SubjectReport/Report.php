@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
 use Alaress\Web;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
@@ -21,12 +22,16 @@ use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
+use DomainException;
 use InvalidArgumentException;
+use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -36,6 +41,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use UnderflowException;
 use function strnatcasecmp;
 use UnexpectedValueException;
 use Schoolbox\Filter\Filters;
@@ -133,12 +139,12 @@ class Report
      * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \LogicException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnderflowException
+     * @throws UnderflowException
      * @throws Database\Exception
      */
     public function getReport(User $user, Folder\Model $folder, StudentAttributes $attributes, ?string $roleTypeOverride): array
@@ -262,7 +268,7 @@ class Report
      * @param  User   $user   The user to authorize the route for. Defaults to
      *                        currently authenticated user.
      * @return string|bool    The URL for the route if authorized, false if not.
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     private function getRouteIfAuthorized($name, array $params, User $user) {
         if ($this->authorizer->isPathAuthorizedForUser($name, $params, $user)) {
@@ -297,8 +303,8 @@ class Report
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \LogicException
+     * @throws DomainException
+     * @throws LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
@@ -390,7 +396,7 @@ class Report
      * @param string|null                        $roleTypeOverride
      * @return array
      * @throws InvalidArgumentException
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
     private function buildAcademicAchievementMatrixData(
@@ -441,7 +447,7 @@ class Report
      * @param string|null                        $roleTypeOverride
      * @return array
      * @throws InvalidArgumentException
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
     private function buildAcademicAchievementSummaryData(
@@ -496,7 +502,7 @@ class Report
      * @return array|null
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
     private function buildFinalAchievementLevelsData(
@@ -593,12 +599,12 @@ class Report
      * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnderflowException
-     * @throws \Alaress\Database\Exception
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws Database\Exception
      */
     private function buildInternationalBaccalaureateGraphData(
         Folder\Model $folder,
@@ -643,15 +649,8 @@ class Report
             return $this->showErrorsToViewer($roleTypeOverride) ? ['error' => $e->getMessage()] : null;
         }
 
-        // Find relevant assessments and participation and insert into units
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, $semesterFrom, $semesterTo));
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
-        foreach ($assessables as $assessable) {
-            $unitImpl                                                                        = $assessable->getBaseContext();
-            $baseAssessable                                                                  = $assessable->getBaseAssessable();
-            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
-        }
+        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, $semesterFrom, $semesterTo);
 
         $semesters = [];
         foreach([2,1] as $candidate){
@@ -699,6 +698,15 @@ class Report
     /**
      * Builds NESA Grade Graph report data.
      *
+     * Return structure:
+     * @internal string      return['error']                       Optional. Info about why these components could not be built
+     * @internal array       return['data']
+     * @internal null|array  return['data'][idx]                   Where idx is [1,2] and represents data for a semester. Null if don't show component
+     * @internal null|string return['data'][idx]['error']          Optional. Info why this component cannot be built for specific semester
+     * @internal array       return['data'][idx]['cohortMarks']
+     * @internal string      return['data'][idx]['studentMark']
+     * @internal int         return['data'][idx]['semester']
+     *
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
      * @param CourseSpec\Model  $courseSpec
@@ -708,11 +716,12 @@ class Report
      * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnderflowException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws Database\Exception
      */
     private function buildNesaScoreGraphData(
         Folder\Model $folder,
@@ -720,46 +729,56 @@ class Report
         CourseSpec\Model $courseSpec,
         User $student,
         ?string $roleTypeOverride
-    ): ?array {
+    ): ?array
+    {
         // Only relevant for:
-        // * MYP S1
-        // * MYP S2
-        // * HSC-Y11-S2
+        // * MYP S1       (work-type = NESA)
+        // * MYP S2       (work-type = FAL)
+        // * HSC-Y11-S2   (work-type = NESA)
         $yearLevel = $attributes->getCurriculumYearLevel();
-        $semesters = $attributes->getCurriculumSemester() === 2 ? [2, 1] : [1];
+        $semester  = $attributes->getCurriculumSemester();
+        if (!($attributes->isMyp() || (11 === $yearLevel && $semester === 2 && $attributes->isHsc()))) {
+            return null;
+        }
+
+        // Which work types should we fetch?
+        $configNames = [Config::_TIGS_WORK_TYPE_NESA_SCORE => 'Set MYP FAL Work Type'];
+        if ($semester === 2 && $attributes->isMyp()) {
+            $configNames[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS] = 'Set NESA Grade Work Type';
+        }
+        $workTypeIds = [];
+        foreach ($configNames as $configName => $errorMsgLink) {
+            try {
+                $workTypeIds[$configName] = $this->checkWorkType($configName, 'Cannot render NESA Grade graph. Work type not set.', $errorMsgLink);
+            } catch (UnexpectedValueException $e) {
+                return $this->showErrorsToViewer($roleTypeOverride) ? ['error' => $e->getMessage()] : null;
+            }
+        }
+
+        // Which semesters' data should we fetch?
+        $semesterFrom = $attributes->isHsc() ? 2 : 1;
+        $semesterTo   = $semester;
+
+        // Load assessments and participations
+        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+        $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semesterFrom, $semesterTo);
+
+        $semesters = [];
+        foreach ([2, 1] as $candidate) {
+            if ($candidate === $semesterFrom || $candidate === $semesterTo) {
+                $semesters[] = $candidate;
+            }
+        }
 
         // Find relevant assessments and participation and insert into units
         $reports = [];
         foreach ($semesters as $reportSemester) {
-            if (($reportSemester === 1 && $attributes->isMyp()) || (11 === $yearLevel && $reportSemester === 2 && $attributes->isHsc())) {
-                $configName = Config::_TIGS_WORK_TYPE_NESA_SCORE;
-                $errorMsgLink = 'Set NESA Grade Work Type';
-            } elseif ($reportSemester === 2 && $attributes->isMyp()) {
-                $configName = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-                $errorMsgLink = 'Set MYP FAL Work Type';
-            } else {
-                // Component is not relevant for this report & semester.
-                continue;
-            }
 
-            try {
-                $workTypeId = $this->checkWorkType($configName, 'Cannot render NESA Grade graph. Work type not set.', $errorMsgLink);
-            } catch (UnexpectedValueException $e) {
-                $reports[] = ['error' => $e->getMessage()];
-                continue;
-            }
+            $workTypeId = $reportSemester === 2 && $attributes->isMyp()
+                ? $workTypeIds[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS]
+                : $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
 
-            $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-            $ids = $this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, 1, $attributes->getCurriculumSemester());
-            $assessables = $this->assessmentMapperProxy->findAllByIds($ids);
-            $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
-            foreach ($assessables as $assessable) {
-                $unitImpl = $assessable->getBaseContext();
-                $baseAssessable = $assessable->getBaseAssessable();
-                $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
-            }
-
-            $nesa = new NesaScoreGraph(
+            $nesa    = new NesaScoreGraph(
                 $cohortUnitImpls,
                 $student,
                 $attributes,
@@ -769,10 +788,9 @@ class Report
                 $folder,
                 $roleTypeOverride
             );
-            $nesa->setSemesters($reportSemester);
-            $context = $nesa->toContext();
-            if ($context['showComponent']) {
-                $reports[] = $context;
+            $context = $nesa->toContext($reportSemester);
+            if ($context !== null) {
+                $reports['data'][$reportSemester] = $context;
             }
         }
         return $reports;
@@ -789,11 +807,12 @@ class Report
      * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnderflowException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws Database\Exception
      */
     private function buildHscTaskMarksData(
         Folder\Model $folder,
@@ -817,15 +836,7 @@ class Report
             return ['error' => $e->getMessage()];
         }
 
-        // Find relevant assessments and participation and insert into units
-        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, 1, $attributes->getCurriculumSemester()));
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
-        foreach ($assessables as $assessable) {
-            $unitImpl                                                                        = $assessable->getBaseContext();
-            $baseAssessable                                                                  = $assessable->getBaseAssessable();
-            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
-        }
+        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 1, $attributes->getCurriculumSemester());
 
         $hscTaskMarks = new HscAssessmentTasks(
             $courseSpec,
@@ -854,11 +865,12 @@ class Report
      * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnderflowException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws Database\Exception
      */
     private function buildHscAssessmentRankData(
         Folder\Model $folder,
@@ -882,15 +894,7 @@ class Report
             return ['error' => $e->getMessage()];
         }
 
-        // Find relevant assessments and participation and insert into units
-        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, 1, $attributes->getCurriculumSemester()));
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
-        foreach ($assessables as $assessable) {
-            $unitImpl                                                                        = $assessable->getBaseContext();
-            $baseAssessable                                                                  = $assessable->getBaseAssessable();
-            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
-        }
+        $assessables = $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 1, $attributes->getCurriculumSemester());
 
         $hscRank = new HscAssessmentRank(
             $assessables,
@@ -912,14 +916,52 @@ class Report
 
 
     /**
+     * Loads assessables and participations from database into model graph
+     *
+     * @param CourseSpec\Model  $courseSpec
+     * @param array             $workTypeIds
+     * @param StudentAttributes $attributes
+     * @param int               $semesterFrom
+     * @param int               $semesterTo
+     * @return GenericCollection<IAssessable>|IAssessable[]
+     * @throws Database\Exception
+     * @throws InvalidArgumentException
+     * @throws Predicate\InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     */
+    private function loadAssessmentsAndParticipation(
+        CourseSpec\Model $courseSpec,
+        array $workTypeIds,
+        StudentAttributes $attributes,
+        int $semesterFrom,
+        int $semesterTo
+    ): GenericCollection {
+        // Find relevant assessments and participation and insert into units
+        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeIds, $attributes, $semesterFrom, $semesterTo));
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+        foreach ($assessables as $assessable) {
+            $unitImpl                                                                        = $assessable->getBaseContext();
+            $baseAssessable                                                                  = $assessable->getBaseAssessable();
+            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+        }
+        return $assessables;
+    }
+
+
+    /**
      * Load the assessments into each unit implementation.
      *
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
      * @return GenericCollection|UnitImpl\Model[]
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \LogicException
+     * @throws DomainException
+     * @throws LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function loadAssessmentsIntoUnitImpls(GenericCollection $unitImpls): GenericCollection
@@ -934,20 +976,20 @@ class Report
     /**
      * Efficiently fetch a set of assessment IDs where the assessments:
      * * Reside inside the specified Unit Implementations,
-     * * Have the specified work type, and
+     * * Have the specified work types, and
      * * Are due within the specified range
      *
      * @param GenericCollection $unitImpls
-     * @param int               $workTypeId
+     * @param int[]             $workTypeIds
      * @param StudentAttributes $attributes
      * @param int|null          $semesterFrom
      * @param int|null          $semesterTo
      * @return array
      * @throws Predicate\InvalidColumnException
      * @throws \Alaress\Database\Exception
-     * @throws \UnderflowException
+     * @throws UnderflowException
      */
-    private function findAssessmentIds(GenericCollection $unitImpls, int $workTypeId, StudentAttributes $attributes, int $semesterFrom, int $semesterTo): array
+    private function findAssessmentIds(GenericCollection $unitImpls, array $workTypeIds, StudentAttributes $attributes, int $semesterFrom, int $semesterTo): array
     {
         if (!\count($unitImpls)) {
             return [];
@@ -959,7 +1001,7 @@ class Report
         $pb = (new Predicate\Builder(new \Alaress\Database\Quoter\Mysql\Quoter(), ''))
             ->isNull('a.deleted_at')
             ->in('ui.id', $unitImpls->getPropertyValues('id'))
-            ->equals('a.work_type_id', $workTypeId)
+            ->in('a.work_type_id', $workTypeIds)
             ->betweenDates('a.due_date', $searchStart, $searchFinish);
 
         $whereClause = \implode(' AND ', $pb->getWhere());
@@ -994,7 +1036,7 @@ class Report
      * @param string $errorMsg
      * @param string $errorMsgLink
      * @return int
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      * @throws UnexpectedValueException
      */
     private function checkWorkType(string $configName, string $errorMsg, string $errorMsgLink): int

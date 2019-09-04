@@ -87,43 +87,38 @@ class NesaScoreGraph extends BaseComponent
     /**
      * Generates and returns a data structure, suitable for passing to twig.
      *
+     * @param int $semester
      * @return array
      */
-    public function toContext(): array
+    public function toContext(int $semester): array
     {
-        $markData      = self::BASE_MARKS;
-        $studentMark   = null;
-        $error         = null;
         try {
-            [$markData, $studentMark, $showComponent] = $this->collateMarks($this->collateAssessables());
+            [$markData, $studentMark, $showComponent] = $this->collateMarks($this->collateAssessables($semester));
+            return $showComponent
+                ? [
+                    'cohortMarks'   => $markData,
+                    'studentMark'   => $studentMark,
+                    'semester'      => $semester,
+                ]
+                : null;
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
-            $showComponent = $this->showErrors();
         }
 
-        $context = [
-            'data'          => $markData,
-            'studentMark'   => $studentMark,
-            'showComponent' => $showComponent,
-            'semester'      => $this->semesterFrom,
-        ];
-        if (isset($error)) {
-            $context['error'] = $error;
-        }
-
-        return $context;
+        return $this->showErrors() ? ['error' => $error] : null;
     }
 
 
     /**
      * Collate the unit implementations into a set of assessables.
      *
+     * @param int $semester
      * @return array
-     * @var Folder\Model    $assessables [$folderId]['folder']      The folder the assessables are in
-     * @var DueWork\Model[] $assessables [$folderId]['assessments'] The NESA assessables for this folder
+     * @internal Folder\Model    $assessables [$folderId]['folder']      The folder the assessables are in
+     * @internal DueWork\Model[] $assessables [$folderId]['assessments'] The NESA assessables for this folder
      * @throws UnexpectedValueException If NESA assessable isn't valid
      */
-    private function collateAssessables(): array
+    private function collateAssessables(int $semester): array
     {
         $assessables = [];
         foreach ($this->unitImpls as $unitImpl) {
@@ -139,7 +134,7 @@ class NesaScoreGraph extends BaseComponent
             }
             foreach ($this->retrieveAssessments($unitImpl) as $assessment) {
 
-                if (!$this->isDueWithinReportWindow($assessment)) {
+                if (!$this->isDueWithinReportWindow($assessment, $semester)) {
                     continue;
                 }
 

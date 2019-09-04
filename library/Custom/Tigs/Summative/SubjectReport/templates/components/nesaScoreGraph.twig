@@ -4,7 +4,8 @@ Renders a NESA Grade graph.
 Data:
     error:               string   - Optional. If present, the reason why we can't render the component
     studentMark:         int|null - Optional. The student's mark for the NESA graph assessment
-    data:                array    - The results to render. key: column, value: height
+    cohortMarks:         array    - The results to render. key: column, value: height
+    semester:            int      - Which semester this is for
     showErrors           bool     - Should we render errors?
     dataAttributeError   string   - A string to apply as a data attribute to error alerts
 #}
@@ -30,7 +31,7 @@ Data:
 
             $(function () {
 
-                var rawData = {{ data|json_encode|raw }},
+                var rawData = {{ cohortMarks|json_encode|raw }},
                     studentMark = "{{ studentMark }}",
                     studentMarks = {{ studentMarks|json_encode|raw }},
                     studentMarksInverted = {};
