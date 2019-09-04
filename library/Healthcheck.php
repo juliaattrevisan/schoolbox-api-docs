@@ -687,6 +687,7 @@ class Healthcheck
             'sbGetStudentAccounts',
             'sbGetGuardianAccounts',
             'sbGetStaffAccounts',
+            'sbGetStudentMedicalConditions',
         ];
         $this->executeTest($procedures);
     }
