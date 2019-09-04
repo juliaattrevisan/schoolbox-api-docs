@@ -484,8 +484,6 @@ class Report
             $this->router,
             $roleTypeOverride
         );
-        $aas->setSemesters(1, $attributes->getCurriculumSemester());
-
         return $aas->toContext();
     }
 
