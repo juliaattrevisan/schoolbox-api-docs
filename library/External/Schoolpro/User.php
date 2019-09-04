@@ -212,6 +212,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentHouse'            => $currentStudent['HeadOfHouse'],
                 'StudentYearLevel'        => $currentStudent['YearLevel'],
                 'StudentTutorDescription' => $currentStudent['TutorName'],
+                'StudentTutorName'        => $currentStudent['TutorStaffName'],
                 'StudentForm'             => $currentStudent['FormName'],
                 'StudentFormStaffName'    => $currentStudent['FormStaffName'],
                 'StudentEmergencyName'    => $currentStudent['EmergencyContactName'],

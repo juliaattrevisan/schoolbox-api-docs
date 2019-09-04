@@ -181,18 +181,15 @@ class Freedom implements IQueryHelper
                 ''                              AS StudentEnrolmentDate,
                 ''                              AS StudentLeavingDate,
                 ''                              AS StudentIBFlag,
-                S.HOME_CLASS                    AS StudentForm,
+                S_CLASS.DESCRIPTION             AS StudentForm,
                 S_HOME_TEACHER.NAME_FOR_REPORT  AS StudentFormStaffName,
-                S_DEAN.NAME_FOR_REPORT          AS StudentTutorName,
-                S_DEAN                          AS StudentTutorDescription,
                 S.HOME_TEACHER                  AS TeacherFormID,
+                S_DEAN.NAME_FOR_REPORT          AS StudentTutorName,
+                ''                              AS StudentTutorDescription,
                 S.DEAN                          AS TeacherTutorID,
                 S.CURRENT_YEAR                  AS StudentYearLevel,
                 S.DEAN                          AS YearLevelCoordID,
                 ''                              AS StudentYearLevelCoordinator,
-                S.EMERG_CONTACT                 AS StudentEmergencyName,
-                S.EMERG_PHONE                   AS StudentEmergencyPhone,
-                ''                              AS StudentEmergencyPhoneAlt,
 
                 -- emerghergency contact details
                 EC.GIVENNAME + ' ' + EC.SURNAME AS StudentEmergencyName,
@@ -202,9 +199,9 @@ class Freedom implements IQueryHelper
                 -- alerts
                 S.ALERT                         AS StudentMedicalAlert,
                 ''                              AS CourtOrderType,
-                ''                              AS StudentMobilePhone,
+                S.MOBILEPHONE                   AS StudentMobilePhone,
                 ''                              AS StudentSpecialNeedsFlag,
-                ''                              AS EnglishSecondFlag,
+                S.NON_ENG_SPEAK                 AS EnglishSecondFlag,
                 ''                              AS StudentStudiesCode,
                 S.ALERT                         AS AlertMessage,
                 0                               AS countIndividualEducationPlans
