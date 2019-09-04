@@ -21,7 +21,7 @@
                     </thead>
                     <tbody>
                     {% for year, courseData in comments %}
-                        {% for course, termData in courseData.courses %}
+                        {% for course, termData in courseData.classCodes %}
                             <tr>
                                 <td class="subheading" colspan="4">{{ course }}</td>
                             </tr>
