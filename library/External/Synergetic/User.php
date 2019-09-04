@@ -1102,7 +1102,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStaff.StaffCategoryType,
                         vStaff.StaffDefaultMobilePhone,
                         vStaff.StaffVoiceMail,
-                        StaffDepartmentDescription as staffDepartment,
+                        StaffDepartmentDescription as StaffDepartment,
                         JobPositions.StaffJobPositionStartDate,
                         JobPositions.StaffJobPositionEndDate,
                         Community.OccupDesc AS JobPositionDescriptionAlternate,                
