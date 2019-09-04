@@ -156,7 +156,7 @@ class Controller extends Web\Controller\Base
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
         $subjectList   = $this->getSubjectList($user, $attributes, $reportDate);
-        $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, null);
+        $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $this->request->query->get('role-type'));
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes, (bool)$this->getRequest()->query->get('inline'));
 
