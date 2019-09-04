@@ -140,17 +140,17 @@ class BaseComponent
     {
         $semesters = $this->attributes->getCurriculumSemesters();
 
-        $reportStart = $semester === null
+        $startDate = $semester === null
             ? $this->attributes->getCurriculumYearStart()
             : $semesters[$semester]->getStart();
 
-        $reportFinish = $semester === null
+        $finishDate = $semester === null
             ? $this->attributes->getCurriculumYearFinish()
             : $semesters[$semester]->getFinish();
 
         $dueDate = $assessable->getDueAt();
 
-        return $dueDate->gte($reportStart) && $dueDate->lte($reportFinish);
+        return $dueDate->gte($startDate) && $dueDate->lte($finishDate);
     }
 
 
