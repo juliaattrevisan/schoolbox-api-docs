@@ -14,6 +14,7 @@ use \DateTime;
 use \DateInterval;
 use \DateTimeZone;
 use Alaress\Html;
+use Calendar\Event\Type\Timetable\Event as TimetableEvent;
 
 /**
  * Default VObject rendering for all types of Calendar events.
@@ -54,7 +55,10 @@ trait VObjectTrait
         /** @var VEvent $vEvent */
         $vEvent = $this->getVCalendar()->create('VEVENT');
         // Generate a UID based on $this->getEvent()->getEventId()
-        $vEvent->add('UID', $event->getEventId() . '/' . $event->getConnectorId());
+        // Only if getEventId is not negative (Google Calendar doesn't like it)
+        if ((!empty($event->getEventId()) && is_string($event->getEventId())) || (is_int($event->getEventId()) && $event->getEventId() > 0)) {
+            $vEvent->add('UID', $event->getEventId() . '/' . $event->getConnectorId());
+        }
         $vEvent->add('CATEGORIES', $this->getCategories());
         $vEvent->add('LOCATION', $event->getLocation());
 
