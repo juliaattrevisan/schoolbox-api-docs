@@ -87,7 +87,9 @@
                 <input name='classCode' type='hidden' value='{CLASS_CODE}' />
                 <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
                 <input name='attendanceDay' type='hidden' value='{ATTENDANCE_DAY}' />
-                <input name='attendancePeriods' type='hidden' value='{ATTENDANCE_PERIODS}' />
+                <!-- BEGIN attendance_period -->
+                <input name='attendancePeriod[]' type='hidden' value='{ATTENDANCE_PERIOD}' />
+                <!-- END attendance_period -->
                 <input name='timetableGroup' type='hidden' value='{TIMETABLE_GROUP}' />
                 <table>
                     <thead>

@@ -54,9 +54,11 @@ if (count($this->arg) < 3) {
 $classCode         = urldecode(urldecode(urldecode($classCode)));
 $attendancePeriods = explode(',', $attendancePeriods);
 
+// Finagle PHPLib
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
+$this->setBlock(TEMPLATE_content, 'attendance_period', 'attendance_period_block');
 
 // Dropdowns and such for each student
 
@@ -120,11 +122,10 @@ if (!$_SESSION['user']->getRole()->isStaff()) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
-// Attendance Period
-
-[$attendancePeriod] = $attendancePeriods;
-$firstPeriod = array_shift($attendancePeriods);
-$lastPeriod  = empty($attendancePeriods) ? $firstPeriod : array_pop($attendancePeriods);
+// Attendance Periods
+$tempPeriods = $attendancePeriods;
+$firstPeriod = array_shift($tempPeriods);
+$lastPeriod  = empty($tempPeriods) ? $firstPeriod : array_pop($tempPeriods);
 
 // Check selected campus is one of users campus
 
@@ -163,11 +164,16 @@ if ($class) {
             'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
             'ATTENDANCE_DAY' => $timetableDay,
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
-            'ATTENDANCE_PERIODS' => implode(',', $attendancePeriods),
             'ATTENDANCE_PERIOD_LONG' => Scrub::text(implode(' to ', $periodNames)),
             'TIMETABLE_GROUP' => $timetableGroup,
+            'attendance_period_block' => '',
         )
     );
+
+    foreach ($attendancePeriods as $attendancePeriod) {
+        $this->setVar('ATTENDANCE_PERIOD', $attendancePeriod);
+        $this->parse('attendance_period_block', 'attendance_period', true);
+    }
 
     // Get the attendance record for this class
     // For attendance records spanning multiple classes: show only the first
@@ -182,7 +188,7 @@ if ($class) {
             $class,
             $attendanceDate,
             $timetableDay,
-            $attendancePeriod,
+            $firstPeriod,
             $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
             $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
             $_SESSION['user']->getExternalId(),
