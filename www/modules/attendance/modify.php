@@ -145,10 +145,11 @@ $definition = $externalTimetable->getTimetableDefinition(
     $timetableDay
 );
 
-$periods = array_keys($definition['number'], $attendancePeriod);
-$startTime = $definition['start'][$periods[0]];
-$endTime = $definition['end'][$periods[0]];
-$periodName = $definition['desc'][$periods[0]];
+[$firstPeriodNumber] = array_keys($definition['number'], $firstPeriod);
+[$lastPeriodNumber]  = array_keys($definition['number'], $lastPeriod);
+$startTime   = $definition['start'][$firstPeriodNumber];
+$endTime     = $definition['end'][$lastPeriodNumber];
+$periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);
 
 if ($class) {
 
@@ -163,8 +164,8 @@ if ($class) {
             'ATTENDANCE_DAY' => $timetableDay,
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
             'ATTENDANCE_PERIODS' => implode(',', $attendancePeriods),
-            'ATTENDANCE_PERIOD_LONG' => Scrub::text($periodName),
-            'TIMETABLE_GROUP' => $timetableGroup
+            'ATTENDANCE_PERIOD_LONG' => Scrub::text(implode(' to ', $periodNames)),
+            'TIMETABLE_GROUP' => $timetableGroup,
         )
     );
 
