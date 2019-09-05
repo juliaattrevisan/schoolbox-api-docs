@@ -127,53 +127,48 @@ class InternationalBaccalaureateGraph extends BaseComponent
     /**
      * Generates and returns a data structure, suitable for passing to twig.
      *
-     * @return array
-     * @throws Router\Exception\RouteNotFound
+     * @param int $semester
+     * @return null|array
      * @throws LogicException
+     * @throws Router\Exception\RouteNotFound
      */
-    public function toContext(): array
+    public function toContext(int $semester): ?array
     {
-        $markData    = self::BASE_MARKS;
-        $studentMark = null;
-        $studentComment = null;
-        $error       = null;
-        $header      = $this->generateHeader();
+        $header         = $this->generateHeader($semester);
         try {
-            [$markData, $studentMark, $studentComment, $showComponent] = $this->collateMarks($this->collateAssessments());
+            [$markData, $studentMark, $studentComment, $showComponent] = $this->collateMarks($this->collateAssessments($semester));
+            return $showComponent
+                ? [
+                    'header'         => $header,
+                    'data'           => $markData,
+                    'studentMark'    => $studentMark,
+                    'studentComment' => $studentComment,
+                    'useComment'     => $this->getAttributes()->isDp(),
+                    'semester'       => $semester,
+                ]
+                : null;
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
-            $showComponent = $this->showErrors();
         } catch (MapperException $e) {
             $error = $e->getMessage();
-            $showComponent = $this->showErrors();
         }
 
-        $context = [
-            'header'         => $header,
-            'data'           => $markData,
-            'studentMark'    => $studentMark,
-            'studentComment' => $studentComment,
-            'useComment'     => $this->getAttributes()->isDp(),
-            'showComponent'  => $showComponent,
-        ];
-        if (isset($error)) {
-            $context['error'] = $error;
-        }
-        return $context;
+        return $this->showErrors() ? ['error' => $error] : null;
     }
 
 
     /**
      * Collate the unit implementations into a set of assessments.
      *
+     * @param int $semester
      * @return array
-     * @var Folder\Model    $dpAssessments [$folderId]['folder']      The folder the assessments are in
-     * @var DueWork\Model[] $dpAssessments [$folderId]['assessments'] The MYP/DP assessments for this folder
+     * @internal Folder\Model    $dpAssessments [$folderId]['folder']      The folder the assessments are in
+     * @internal DueWork\Model[] $dpAssessments [$folderId]['assessments'] The MYP/DP assessments for this folder
      * @throws UnexpectedValueException if a IB Report Grade assessment isn't a due work,
      *                                  and has neither a rubric or a max mark
      *                                  of 7.
      */
-    private function collateAssessments(): array
+    private function collateAssessments(int $semester): array
     {
         $ibAssessments = [];
         foreach ($this->unitImpls as $unitImpl) {
@@ -190,7 +185,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
             }
             foreach ($this->retrieveAssessments($unitImpl) as $assessment) {
 
-                if (!$this->isDueWithinReportWindow($assessment)) {
+                if (!$this->isDueWithinReportWindow($assessment, $semester)) {
                     continue;
                 }
 
@@ -500,22 +495,23 @@ class InternationalBaccalaureateGraph extends BaseComponent
      * * Year 11, Sem 2: Early Indicator
      * * Year 11, Sem 1: MYP Grade
      *
+     * @param int $semester
      * @return string
      * @throws LogicException
      */
-    private function generateHeader(): string
+    private function generateHeader(int $semester): string
     {
         $year     = $this->getAttributes()->getCurriculumYearLevel();
 
-        if ($year <= 10 && $this->semesterFrom === 2) {
+        if ($year <= 10 && $semester === 2) {
             return 'MYP Grade';
         }
-        if (($year === 11 && $this->semesterFrom === 2) || ($year === 12 && $this->semesterFrom === 1)) {
+        if (($year === 11 && $semester=== 2) || ($year === 12 && $semester=== 1)) {
             return 'Early Indicator';
         }
-        if ($year === 12 && $this->semesterFrom === 2) {
+        if ($year === 12 && $semester === 2) {
             return 'Predicted Grade';
         }
-        throw new LogicException("Unable to determine header. Curriculum Year: {$year}, Curriculum Semester: {$this->semesterFrom}");
+        throw new LogicException("Unable to determine header. Curriculum Year: {$year}, Curriculum Semester: {$semester}");
     }
 }

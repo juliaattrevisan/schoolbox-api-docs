@@ -30,11 +30,14 @@ use function strtotime;
  * * Technically nothing should be due in Yr 12 Term 4, but we include it in Sem2 so the report will continue to show at this time.
  *
  * In the client data, Year12 students are soft-deleted at the end of year 12, and stay as year 12 in the DB.
- * In our test data, we don't delete students, and keep incrementing their year levels so we don't need to keep updating the test data
+ * In our test data, we don't delete students, and keep incrementing their year levels so we don't need to keep updating the test data.
+ * A request for the report of either scenario should 404.
  */
 class StudentAttributes
 {
-    private const YEAR_LEVEL_MIN = 7;  // Reports are not relevant for students with year level less than this
+    // Reports are not relevant if student's year level is outside this range
+    public const YEAR_LEVEL_MIN = 7;
+    public const YEAR_LEVEL_MAX = 12;
 
     /**
      * The student's year level at the time of the report
@@ -80,6 +83,9 @@ class StudentAttributes
     /** @var Alaress_Date_Format */
     private $curriculumYearFinish;
 
+    /** @var bool */
+    private $isHistorical;
+
 
     /**
      * @param IConfigLoader $config
@@ -115,6 +121,7 @@ class StudentAttributes
         // If unknown (NULL), assume $ibFlag is FALSE
         $this->isIb           = (bool)$ibFlag;
         $this->reportDateYear = (int)$reportDate->getYear();
+        $this->isHistorical   = $reportDate->lt($now);
 
         $this->calculateDerivedAttributes($config, (int)$user->getYear(), $reportDate, $now);
     }
@@ -288,6 +295,24 @@ class StudentAttributes
         ];
     }
 
+
+    /**
+     * @return bool
+     */
+    public function isCurrent(): bool
+    {
+        return !$this->isHistorical;
+    }
+
+    /**
+     * Returns whether this is for a historical report, as opposed to a current report
+     *
+     * @return bool
+     */
+    public function isHistorical(): bool
+    {
+        return $this->isHistorical;
+    }
 
 
     /**

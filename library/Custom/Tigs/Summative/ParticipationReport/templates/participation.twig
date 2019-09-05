@@ -146,42 +146,13 @@ Data:
     </div>
     <div class="row subject-list-group">
         <div class="small-12 island">
-            <h2 class="subheader">Subject List</h2>
-            <section>
-                {% for subject in subjects %}
-                    <ul class="subject-list group">
-                        <li class="subject-group">
-                            {% set href = routeLookup('tigsSubjectReport.getReport', {userId: user.id, folderId: subject.folderId, reportDate: reportDate}) %}
-                            <a href="{{ href }}"
-                               class="link-row" title="Subject Report">
-                                <div class="small-12 content sibling">
-                                    <h3 class="no-margin">
-                                        {{ subject.name }}
-                                        <span class="meta">
-                                        {% for code in subject.codes %}
-                                            ({{ code }}){% if not loop.last %},{% endif %}
-                                        {% endfor %}
-                                    </span>
-                                    </h3>
-                                </div>
-                            </a>
-                        </li>
-                        {% for teacher in subject.teachers %}
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="compact card small-12">
-                                        <a href="/search/user/{{ teacher.id }}" title="">
-                                            <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
-                                                 alt="{{ teacher.fullName }}"/>
-                                            <p>{{ teacher.fullName }} <span class="pipe meta">Teacher</span></p>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endfor %}
-            </section>
+            {% include '@tigsParticipationReport/fragments/academicTranscript.twig' with {
+                attributes: attributes,
+                student:    user,
+                subjects:   subjects,
+                data:       academicTranscript,
+                reportDate: reportDate
+            } only %}
         </div>
     </div>
 

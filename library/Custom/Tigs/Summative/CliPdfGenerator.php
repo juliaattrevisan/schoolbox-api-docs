@@ -648,6 +648,9 @@ class CliPdfGenerator extends CliTool\App
     {
         $data                   = ['userId' => $student->getId(), 'reportDate' => $this->reportDateOverride,];
         $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data) . '?inline=1';
+        if ($this->roleTypeOverride) {
+            $participationReportUrl .= "&role-type={$this->roleTypeOverride}";
+        }
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [new Uri($participationReportUrl)];
 

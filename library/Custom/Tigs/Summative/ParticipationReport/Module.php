@@ -14,6 +14,9 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
+use Custom\Tigs\Summative\StudentAttributes;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -23,8 +26,8 @@ use Schoolbox\User;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 
 class Module extends Alaress\Module\Module
 {
@@ -82,13 +85,18 @@ class Module extends Alaress\Module\Module
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
-            'externalUser'     => $injector->lazyGet('externalUser'),
-            'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'pastoralMapper'   => $this->getMapperFactory()->getLazy(PastoralMapper::class),
-            'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'textBoxMapper'    => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
-            'assessmentMapper' => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
-            'externalDatabase' => $injector->lazyGet('databaseExternal'),
+            'database'              => $injector->lazyGet('databaseInternal'),
+            'externalUser'          => $injector->lazyGet('externalUser'),
+            'courseImplMapper'      => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
+            'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'pastoralMapper'        => $this->getMapperFactory()->getLazy(PastoralMapper::class),
+            'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'textBoxMapper'         => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
+            'access'                => $this->getMapperFactory()->getLazy(Access::class),
+            'externalDatabase'      => $injector->lazyGet('databaseExternal'),
+            'assessmentMapper'      => $this->getMapperFactory()->getLazy(Assessment\Mapper::class),
+            'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataModel\DataSource::class),
         ];
     }
 
@@ -148,6 +156,11 @@ class Module extends Alaress\Module\Module
                     $userYear = $student->getYear();
                     if (!\is_numeric($userYear) || $userYear < 7) {
                         throw new InvalidPath("User is not in years 7 or above, found '$userYear'");
+                    }
+                    $attributes      = new StudentAttributes($this->getConfig(), $student, null, $params['reportDate'] ?? null);
+                    $reportYearLevel = $attributes->getYearLevel();
+                    if ($reportYearLevel < StudentAttributes::YEAR_LEVEL_MIN || $reportYearLevel > StudentAttributes::YEAR_LEVEL_MAX) {
+                        throw new InvalidPath("User year level not valid for report date, found '$userYear'");
                     }
                 }),
                 new Rule\Any(

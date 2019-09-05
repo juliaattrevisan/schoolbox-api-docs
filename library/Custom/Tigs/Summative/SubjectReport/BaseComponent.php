@@ -26,12 +26,6 @@ class BaseComponent
     /** @var StudentAttributes */
     private $attributes;
 
-    /** @var int $semesterFrom */
-    protected $semesterFrom = 0;
-
-    /** @var int $semesterTo */
-    protected $semesterTo = 0;
-
     /** @var User */
     private $viewer;
 
@@ -122,24 +116,27 @@ class BaseComponent
 
 
     /**
-     * Returns whether an assessable is due within this component's report's window
+     * Returns whether an assessable is due within this component's report's (semester or year) window
      *
      * @param IAssessable $assessable
+     * @param int|null    $semester   If present, filter to this semester, otherwise filter to year
      * @return bool
      */
-    protected function isDueWithinReportWindow(IAssessable $assessable): bool
+    protected function isDueWithinReportWindow(IAssessable $assessable, int $semester = null): bool
     {
-        // If a valid semester is not provided, use semester from attribute.
         $semesters = $this->attributes->getCurriculumSemesters();
-        if (!\key_exists($this->semesterFrom, $semesters) || !\key_exists($this->semesterTo, $semesters)) {
-            $this->setSemesters($this->attributes->getCurriculumSemester());
-        }
 
-        $dueDate      = $assessable->getDueAt();
-        $reportStart  = $semesters[$this->semesterFrom]->getStart();
-        $reportFinish = $semesters[$this->semesterTo]->getFinish();
+        $startDate = $semester === null
+            ? $this->attributes->getCurriculumYearStart()
+            : $semesters[$semester]->getStart();
 
-        return $dueDate->gte($reportStart) && $dueDate->lte($reportFinish);
+        $finishDate = $semester === null
+            ? $this->attributes->getCurriculumYearFinish()
+            : $semesters[$semester]->getFinish();
+
+        $dueDate = $assessable->getDueAt();
+
+        return $dueDate->gte($startDate) && $dueDate->lte($finishDate);
     }
 
 
@@ -204,22 +201,4 @@ class BaseComponent
     {
         return $this->attributes;
     }
-
-
-    /**
-     * Implicitly specify the semester of the report
-     * @param int $semesterFrom
-     * @param int|null $semesterTo
-     */
-    public function setSemesters(int $semesterFrom, ?int $semesterTo = null): void
-    {
-        $this->semesterFrom = $semesterFrom;
-        if ($semesterTo) {
-            $this->semesterTo = $semesterTo;
-        } else {
-            $this->semesterTo = $semesterFrom;
-        }
-    }
-
-
 }

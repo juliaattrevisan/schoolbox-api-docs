@@ -46,6 +46,7 @@ class StudentAttributesTest extends TestCase
      * @dataProvider providerInvalidTermDates
      * @param array $invalidTermDates
      * @expectedException InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testInvalidTermDates(array $invalidTermDates): void
     {
@@ -63,6 +64,26 @@ class StudentAttributesTest extends TestCase
     {
         $user = (new User())->setYear(7);
         new StudentAttributes($this->getConfigLoader(), $user, null, '2010-02-15', '2011-02-15');
+    }
+
+
+    /**
+     * Tests that we can detect whether the report is current or historical
+     *
+     * @dataProvider providerCurrentOrHistoricalReport
+     * @param null|string $reportDate
+     * @param null|string $now
+     * @param bool   $isHistorical
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     */
+    public function testCurrentOrHistoricalReport(?string $reportDate, ?string $now, bool $isHistorical): void
+    {
+        $user = (new User())->setYear(7);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $reportDate, $now);
+
+        $this->assertSame($isHistorical, $attributes->isHistorical());
+        $this->assertSame(!$isHistorical, $attributes->isCurrent());
     }
 
 
@@ -473,6 +494,21 @@ class StudentAttributesTest extends TestCase
              ]],
         ];
     }
+
+
+    /**
+     * @return array
+     */
+    public function providerCurrentOrHistoricalReport(): array
+    {
+        // $reportDate, $now, bool $isHistorical
+        return [
+            [null, null, false],
+            ['2010-10-10', '2010-10-11', true],     // one day ago
+            ['2010-10-10', '2010-10-10', false],    // now
+        ];
+    }
+
 
     /**
      * @return array

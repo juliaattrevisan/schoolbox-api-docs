@@ -8,17 +8,24 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\ParticipationReport;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use DomainException;
 use function implode;
+use LogicException;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -27,18 +34,27 @@ use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Resource\Textbox;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use External_User;
+use UnderflowException;
 use UnexpectedValueException;
 use Alaress\Database;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Mapper;
 
 class Controller extends Web\Controller\Base
 {
+    /** @var IConnector */
+    private $database;
+
     /** @var External_UserInterface|External_User */
     private $externalUser;
+
+    /** @var CourseImpl\Mapper */
+    private $courseImplMapper;
 
     /** @var UserMapper */
     private $userMapper;
@@ -55,34 +71,59 @@ class Controller extends Web\Controller\Base
     /** @var Textbox\Mapper */
     private $textBoxMapper;
 
-    /** @var AssessmentMapper $assessmentMapper */
+    /** @var Access */
+    private $access;
+
+    /** @var Assessment\Mapper */
     private $assessmentMapper;
 
+    /** @var Assessment\MapperProxy */
+    private $assessmentMapperProxy;
+
+    /** @var RubricDataModel\DataSource */
+    private $rubricMapper;
+
+
     /**
+     * @param IConnector             $database
      * @param External_UserInterface $externalUser
+     * @param CourseImpl\Mapper      $courseImplMapper
      * @param UserMapper             $userMapper
-     * @param IConnector             $externalDatabase
      * @param PastoralMapper         $pastoralMapper
      * @param FolderMapper           $folderMapper
      * @param Textbox\Mapper         $textBoxMapper
-     * @param AssessmentMapper       $assessmentMapper
+     * @param Access                 $access
+     * @param IConnector             $externalDatabase
+     * @param Assessment\Mapper      $assessmentMapper
+     * @param Assessment\MapperProxy $assessmentMapperProxy
+     * @param RubricDataModel\DataSource $rubricMapper
      */
     public function __construct(
+        IConnector $database,
         External_UserInterface $externalUser,
+        CourseImpl\Mapper $courseImplMapper,
         UserMapper $userMapper,
-        IConnector $externalDatabase,
         PastoralMapper $pastoralMapper,
         FolderMapper $folderMapper,
         Textbox\Mapper $textBoxMapper,
-        AssessmentMapper $assessmentMapper
+        Access $access,
+        IConnector $externalDatabase,
+        Assessment\Mapper $assessmentMapper,
+        Assessment\MapperProxy $assessmentMapperProxy,
+        RubricDataModel\DataSource $rubricMapper
     ) {
-        $this->externalUser     = $externalUser;
-        $this->userMapper       = $userMapper;
-        $this->externalDatabase = $externalDatabase;
-        $this->pastoralMapper   = $pastoralMapper;
-        $this->folderMapper     = $folderMapper;
-        $this->textBoxMapper    = $textBoxMapper;
-        $this->assessmentMapper = $assessmentMapper;
+        $this->database              = $database;
+        $this->externalUser          = $externalUser;
+        $this->courseImplMapper      = $courseImplMapper;
+        $this->userMapper            = $userMapper;
+        $this->externalDatabase      = $externalDatabase;
+        $this->pastoralMapper        = $pastoralMapper;
+        $this->folderMapper          = $folderMapper;
+        $this->textBoxMapper         = $textBoxMapper;
+        $this->access                = $access;
+        $this->assessmentMapper      = $assessmentMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->rubricMapper          = $rubricMapper;
     }
 
 
@@ -93,42 +134,51 @@ class Controller extends Web\Controller\Base
      * @since 18.1.0
      * @param User        $user
      * @param string|null $reportDate
+     * @throws InvalidColumnException
+     * @throws DefinitionException
+     * @throws DomainException
      * @throws Exception
      * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws RouteNotFound
      * @throws ServiceNotFound
+     * @throws UnderflowException
      * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnderflowException
+     * @throws Database\Exception
      */
     public function getReport(User $user, ?string $reportDate): void
     {
         $externalStudent = $this->externalUser->getStudent($user->getExternalId());
         $attributes      = new StudentAttributes($this->getConfigLoader(), $user, $externalStudent['StudentIBFlag'], $reportDate);
+        $roleTypeOverride = $this->request->query->get('role-type');
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
         $subjectList   = $this->getSubjectList($user, $attributes, $reportDate);
+        $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes, (bool)$this->getRequest()->query->get('inline'));
 
-        $data   = [
-            'user'          => $user,
-            'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
-            'attributes'    => $attributes,
-            'dean'          => $deanAndMentor['dean'],
-            'mentor'        => $deanAndMentor['mentor'],
-            'awards'        => $awards,
-            'houseEvents'   => $houseEvents,
-            'absences'      => $absences,
-            'subjects'      => $subjectList,
-            'deansComments' => $deansComments,
-            'explanation'   => $explanation,
-            'reportDate'    => $reportDate,
+        $data = [
+            'user'               => $user,
+            'isEnabled'          => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
+            'attributes'         => $attributes,
+            'dean'               => $deanAndMentor['dean'],
+            'mentor'             => $deanAndMentor['mentor'],
+            'awards'             => $awards,
+            'houseEvents'        => $houseEvents,
+            'absences'           => $absences,
+            'academicTranscript' => $academicTranscript,
+            'subjects'           => $subjectList,
+            'deansComments'      => $deansComments,
+            'explanation'        => $explanation,
+            'reportDate'         => $reportDate,
+            'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
+            'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
         ];
+
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
         $this->getResponse()->content->set($output);
@@ -141,7 +191,8 @@ class Controller extends Web\Controller\Base
      * @param User  $user
      * @param array $externalStudent
      * @return User[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
      */
     private function getDeanAndMentor(User $user, array $externalStudent): array
     {
@@ -227,6 +278,7 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes $attributes
      * @return GenericCollection|Award[]
      * @throws UnexpectedValueException
+     * @throws Database\Exception
      */
     private function getAwardsData(User $user, StudentAttributes $attributes): GenericCollection
     {
@@ -264,6 +316,7 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes $attributes
      * @return GenericCollection|Award[]
      * @throws UnexpectedValueException
+     * @throws Database\Exception
      */
     private function getHouseEventsData(User $user, StudentAttributes $attributes): GenericCollection
     {
@@ -300,6 +353,7 @@ class Controller extends Web\Controller\Base
      * @param User              $user
      * @param StudentAttributes $attributes
      * @return array
+     * @throws Database\Exception
      */
     private function getAbsenceData(User $user, StudentAttributes $attributes): array
     {
@@ -343,6 +397,44 @@ class Controller extends Web\Controller\Base
 
 
     /**
+     * Returns data suitable for rendering the 'Academic Transcript' component
+     *
+     * @param User              $student
+     * @param StudentAttributes $attributes
+     * @param array             $subjectList
+     * @param string|null       $roleTypeOverride
+     * @return array
+     * @throws InvalidColumnException
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     */
+    private function getAcademicTranscript(User $student, StudentAttributes $attributes, array $subjectList, ?string $roleTypeOverride): array
+    {
+        $at = new AcademicTranscript(
+            $this->getConfigLoader(),
+            $this->folderMapper,
+            $this->externalUser,
+            $this->courseImplMapper,
+            $this->assessmentMapperProxy,
+            $this->rubricMapper,
+            $this->textBoxMapper,
+            $this->access,
+            $this->database,
+            $this->getAuthorizer(),
+            $this->getRouter()
+        );
+
+        return $at->toContext($this->getUser(), $student, $attributes, $subjectList, $roleTypeOverride);
+    }
+
+
+    /**
      * Returns subject list for report
      *
      * @param User              $user
@@ -350,21 +442,20 @@ class Controller extends Web\Controller\Base
      * @param null|string       $reportDate
      * @return array
      * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnderflowException
-     * @throws \DomainException
+     * @throws InvalidColumnException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws DomainException
      * @throws Exception
      */
     private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate): array
     {
-        $getCurrent = null === $reportDate;
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
         $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
 
         $subjects = [];
         foreach ($folders as $folder) {
-            $this->loadTeachers($folder, $attributes, $getCurrent);
+            $this->loadTeachers($folder, $attributes);
             $subjects[] = [
                 'name'     => $folder->getName(),
                 'codes'    => $folder->getCodes()->getPropertyValues('code'),
@@ -382,16 +473,15 @@ class Controller extends Web\Controller\Base
      *
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
-     * @param bool              $getCurrent
      * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \UnderflowException
+     * @throws InvalidColumnException
+     * @throws DomainException
+     * @throws UnderflowException
      * @throws Exception
      */
-    private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes, bool $getCurrent): void
+    private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes): void
     {
-        if ($getCurrent) {
+        if ($attributes->isCurrent()) {
             // If viewing current, just use SIS values
             $folder->loadTeachers();
             return;
@@ -423,7 +513,7 @@ class Controller extends Web\Controller\Base
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
      * @return Collection
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      */
     private function findAssessmentsForFolderAndReport(Folder\Model $folder, StudentAttributes $attributes): Collection
     {
@@ -441,8 +531,8 @@ class Controller extends Web\Controller\Base
      *
      * @param Collection $assessments
      * @return int[]
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     private function findUsersWhoGaveFeedback(Collection $assessments): array
     {
@@ -544,7 +634,7 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes $attributes
      * @param bool              $renderExplanationOfGradesInline
      * @return null|string
-     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      */
     private function getExplanation(StudentAttributes $attributes, bool $renderExplanationOfGradesInline): ?string
     {

@@ -4,7 +4,8 @@ Renders a NESA Grade graph.
 Data:
     error:               string   - Optional. If present, the reason why we can't render the component
     studentMark:         int|null - Optional. The student's mark for the NESA graph assessment
-    data:                array    - The results to render. key: column, value: height
+    cohortMarks:         array    - The results to render. key: column, value: height
+    semester:            int      - Which semester this is for
     showErrors           bool     - Should we render errors?
     dataAttributeError   string   - A string to apply as a data attribute to error alerts
 #}
@@ -15,11 +16,11 @@ Data:
 {% set normalisedMark = studentMarks[studentMark] / (studentMarks | length) * 100 %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(normalisedMark) ~ '-bg' %}
 {% set graphId = 'nesa-graph' ~ semester %}
+
+<div class="nesa-wrap">
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
-
-<div class="nesa-wrap">
     <div{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>
         <h3 class="grade-heading {% if gradientClass %}has-gradient{% endif %}">{{ studentMark|default('-') }}</h3>
     </div>
@@ -30,7 +31,7 @@ Data:
 
             $(function () {
 
-                var rawData = {{ data|json_encode|raw }},
+                var rawData = {{ cohortMarks|json_encode|raw }},
                     studentMark = "{{ studentMark }}",
                     studentMarks = {{ studentMarks|json_encode|raw }},
                     studentMarksInverted = {};

@@ -122,8 +122,10 @@ class HscAssessmentTasks extends BaseComponent
         }
 
         // Filter anything not due within this report's window
+        // If report is for Sem1, only get data from Sem1, otherwise no limit
+        $semester = $this->getAttributes()->getCurriculumSemester() === 1 ? 1 : null;
         foreach ($cohortAssessments as $assessable) {
-            if (!$this->isDueWithinReportWindow($assessable)) {
+            if (!$this->isDueWithinReportWindow($assessable, $semester)) {
                 $cohortAssessments->offsetUnset($assessable->getId());
             }
         }

@@ -187,9 +187,14 @@ class Module extends Alaress\Module\Module
                     if (!$student->getRole()->isStudent()) {
                         throw new InvalidPath("User must be a student. Found '{$student->getRole()->getType()}'");
                     }
-                    $userYear = $student->getYear();
-                    if (!\is_numeric($userYear) || $userYear < 7) {
-                        throw new InvalidPath("User is not in years 7 or above, found '$userYear'");
+                    try {
+                        $attributes = new StudentAttributes($this->getConfig(), $student, null, $params['reportDate'] ?? null);
+                    } catch (InvalidArgumentException $e) {
+                        throw new InvalidPath("Student attributes appear invalid", 0, $e);
+                    }
+                    $userYear = $attributes->getYearLevel();
+                    if ($userYear < 7 || $userYear > 12) {
+                        throw new InvalidPath("User is not in years 7 to 12, found '$userYear'");
                     }
 
                     /** @var Folder\Model $folder */

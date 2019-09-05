@@ -132,9 +132,11 @@ class AcademicAchievementMatrix extends BaseComponent
      */
     private function buildUnitData(UnitSpec\Model $unitSpec): ?array
     {
+        // If report is for Sem1, only get data from Sem1, otherwise no limit
+        $semester = $this->getAttributes()->getCurriculumSemester() === 1 ? 1 : null;
         $aamAssessables = $this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->aamWorkTypeId)
-                               ->filter(function (IAssessable $assessable) {
-                                   return $this->isDueWithinReportWindow($assessable) && $assessable->isParticipant($this->student);
+                               ->filter(function (IAssessable $assessable) use ($semester) {
+                                   return $this->isDueWithinReportWindow($assessable, $semester) && $assessable->isParticipant($this->student);
                                });
 
         // Did we find 2+ AAM assessments in this unit?

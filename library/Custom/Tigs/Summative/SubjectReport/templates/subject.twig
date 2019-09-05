@@ -124,7 +124,7 @@ Data:
     <div class="row">
         <div class="column small-12 medium-6">
             {% if ibGraphData %}
-                {% for ibData in ibGraphData %}
+                {% for ibData in ibGraphData.data %}
                     {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibData|merge(extraComponentData) only %}
                 {% endfor %}
             {% elseif hscRankData %}
@@ -134,25 +134,16 @@ Data:
             {% endif %}
         </div>
 
-        <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.0.semester }}">
-            {% if nesaGraphData.0 %}
-                <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.0.semester }})</h2>
-                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.0|merge(extraComponentData) only %}
+        <div class="column small-12 medium-6 nesa">
+            {% if nesaGraphData.error|default(null) %}
+                <div data-alert {{ dataAttributeError }} class="alert-box alert">{{ nesaGraphData.error|raw }}</div>
             {% else %}
-                <p></p>
-            {% endif %}
-        </div>
-
-        <div class="column small-12 medium-6 empty">
-                <p><!-- New Curriculum Year Report--></p>
-        </div>
-
-        <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.1.semester }}">
-            {% if nesaGraphData.1 %}
-                <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.1.semester }})</h2>
-                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.1|merge(extraComponentData) only %}
-            {% else %}
-                <p></p>
+                {% for semester, nesaGraphDatum in nesaGraphData.data %}
+                    <div class="semester-{{ semester }}">
+                    <h2 class="subheader">NESA Grade (Semester {{ semester }})</h2>
+                        {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphDatum|merge(extraComponentData) only %}
+                    </div>
+                {% endfor %}
             {% endif %}
         </div>
 
