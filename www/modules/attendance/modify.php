@@ -43,10 +43,15 @@ $configLoader = new Config();
 if (!$configLoader->get('external_attendance')) {
     $this->pageNotFound();
 }
+
 // Ensure correct parameter count
 if (count($this->arg) < 3) {
     $this->error(ErrorMapper::ERROR_CLASS_CODE_DATE_PERIOD);
 }
+
+// Finagle path parameters
+[$classCampus, $classCode, $date, $periods, $timetableGroup] = $this->arg;
+$classCode = urldecode(urldecode(urldecode($classCode)));
 
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
@@ -65,17 +70,17 @@ $externalClass = new External_Synergetic_Class();
 $externalTimetable = new External_Timetable();
 $externalUserHandler = new External_User();
 
-if ($this->arg[0]) {
-    $class = $externalClass->getClass($this->arg[0] . '/' . urldecode(urldecode(urldecode($this->arg[1]))), $_SESSION['user']);
+if ($classCampus) {
+    $class = $externalClass->getClass($classCampus . '/' . $classCode, $_SESSION['user']);
 } else {
-    $class = $externalClass->getClass(urldecode(urldecode(urldecode($this->arg[1]))), $_SESSION['user']);
+    $class = $externalClass->getClass($classCode, $_SESSION['user']);
 }
 
 if (!$class) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
-if (!strlen($this->arg[2])) {
+if (!strlen($date)) {
     $this->error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
@@ -86,7 +91,7 @@ if (!preg_match('/^\d+$/', $this->arg[3]) || $this->arg[3] < 0 || $this->arg[3] 
 // Selected date for which to deal with attendances check that you are allowed to edit something in a particular date range (You cannot edit anything
 // older than the previous week)
 
-$attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
+$attendanceDate = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 if (!$attendanceDate->isValid()) {
     $this->error(ErrorMapper::ERROR_DATE_FORMAT);
 }
@@ -120,7 +125,7 @@ $attendancePeriod = $this->arg[3];
 
 try {
     /** @var Campus $selectedCampus */
-    $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $this->arg[4]);
+    $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $timetableGroup);
 } catch (MapperException $e) {
     error(ErrorMapper::ERROR_CAMPUS_CODE);
 }
@@ -139,7 +144,6 @@ $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
 $endTime = $definition['end'][$periods[0]];
 $periodName = $definition['desc'][$periods[0]];
-$timetableGroup = $this->arg[4];
 
 if ($class) {
 
