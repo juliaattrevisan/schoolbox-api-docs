@@ -25,10 +25,6 @@ if (!strlen($_POST['attendanceDate'])) {
     error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
 }
 
-if (!is_numeric(preg_replace('/[^0-9]+/', '', $_POST['attendancePeriod']))) {
-    error(ErrorMapper::ERROR_ATTENDANCE_PAST);
-}
-
 // Selected date for which to deal with attendances
 // Check that you are allowed to edit something in a particular date range
 // (You cannot edit anything older than the previous week)
@@ -63,6 +59,12 @@ $timetableGroup = $_POST['timetableGroup'];
 // Deal with it all
 
 foreach ($attendancePeriods as $attendancePeriod) {
+    // Attendance period must be numeric, otherwise... say it's in the past?
+    // Just copying what was here before.
+    if (!is_numeric(preg_replace('/[^0-9]+/', '', $attendancePeriod))) {
+        error(ErrorMapper::ERROR_ATTENDANCE_PAST);
+    }
+
     try {
 
         $externalUserHandler = new External_User();
@@ -82,7 +84,7 @@ foreach ($attendancePeriods as $attendancePeriod) {
         error(ErrorMapper::ERROR_ATTENDANCE_LIST);
     }
 
-// Create everyone's attendance initially
+    // Create everyone's attendance initially
 
     if (is_array($_POST['studentID'])) {
 
