@@ -182,12 +182,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     {
         switch ($this->getConfigMapper()->get('external_type')) {
             case 'synergetic':
-                if (!$class['AttendanceEnabled']) {
+                if (!$class['AttendanceEnabled'] || empty($class['AttendancePeriods'])) {
                     return '';
                 }
                 $encodedClass = urlencode(urlencode(urlencode($class['code'])));
+                $periodLink   = implode(',', $class['AttendancePeriods']);
                 $classLink    = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
-                return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$period['periodNumber']}/{$campusList[$campusId]->getExtTimetableCode()}";
+                return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$periodLink}/{$campusList[$campusId]->getExtTimetableCode()}";
             case 'tass':
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 [$year, $subject, $class] = explode('-', $class['code']);
