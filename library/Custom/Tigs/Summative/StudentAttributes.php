@@ -35,7 +35,9 @@ use function strtotime;
  */
 class StudentAttributes
 {
-    private const YEAR_LEVEL_MIN = 7;  // Reports are not relevant for students with year level less than this
+    // Reports are not relevant if student's year level is outside this range
+    public const YEAR_LEVEL_MIN = 7;
+    public const YEAR_LEVEL_MAX = 12;
 
     /**
      * The student's year level at the time of the report

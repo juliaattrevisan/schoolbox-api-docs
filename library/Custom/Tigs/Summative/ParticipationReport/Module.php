@@ -14,6 +14,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
+use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -155,6 +156,11 @@ class Module extends Alaress\Module\Module
                     $userYear = $student->getYear();
                     if (!\is_numeric($userYear) || $userYear < 7) {
                         throw new InvalidPath("User is not in years 7 or above, found '$userYear'");
+                    }
+                    $attributes      = new StudentAttributes($this->getConfig(), $student, null, $params['reportDate'] ?? null);
+                    $reportYearLevel = $attributes->getYearLevel();
+                    if ($reportYearLevel < StudentAttributes::YEAR_LEVEL_MIN || $reportYearLevel > StudentAttributes::YEAR_LEVEL_MAX) {
+                        throw new InvalidPath("User year level not valid for report date, found '$userYear'");
                     }
                 }),
                 new Rule\Any(
