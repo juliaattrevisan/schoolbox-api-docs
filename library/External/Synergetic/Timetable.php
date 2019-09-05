@@ -534,6 +534,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $count++;
         }
 
+        // Sort the periods and period sequences for niceness
+        usort(
+            $periodList,
+            static function ($a, $b) {
+                return $a['PeriodNumber'] <=> $b['PeriodNumber'];
+            }
+        );
+        foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
+            sort($periodsForSequenceId);
+            $periodsForSequenceId = array_unique($periodsForSequenceId);
+        }
+        unset($periodsForSequenceId);
+
         // Merge period numbers for attendance all together
         foreach ($periodList as &$period) {
             $periodSequence = $period['PeriodSequence'];
@@ -587,6 +600,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'SubstitutedFlag'   => $desc['SubstitutedFlag'],
                         'AttendanceMarked'  => $desc['AttendanceMarked'],
                         'AttendanceEnabled' => ($desc['AttendanceEnabled'] && !$desc['ClassCancelled']) ? true : false,
+                        'AttendancePeriods' => $desc['AttendancePeriods'],
                         'ClassCancelled'    => $desc['ClassCancelled'],
                     );
                     break;
