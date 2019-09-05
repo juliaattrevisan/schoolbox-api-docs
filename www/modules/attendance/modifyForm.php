@@ -13,7 +13,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 // Ensure parameters are correct
 
 $externalClass = new External_Synergetic_Class();
-$groupHandler = new Group();
 
 $class = $externalClass->getClass($_POST['classCode'], $_SESSION['user']);
 
