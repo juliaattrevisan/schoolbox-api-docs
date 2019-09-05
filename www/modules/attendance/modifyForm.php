@@ -85,6 +85,8 @@ foreach ($attendancePeriods as $attendancePeriod) {
 
     // Find period, so I can ensure I don't save something outside the class' time
     $periodDefinition = $attendanceHandler->getAttendanceMaster()->findTimetablePeriod();
+    $periodStart      = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeFrom']))->getTimeOnly();
+    $periodEnd        = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeTo']))->getTimeOnly();
 
     // Create everyone's attendance initially
 
@@ -118,15 +120,21 @@ foreach ($attendancePeriods as $attendancePeriod) {
             if ($_POST['LateArrivalTime'][$i]) {
                 // if this period starts after the late arrival,
                 // don't mark them as late
-                $data['LateArrivalFlag'] = 1;
-                $data['LateArrivalTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['LateArrivalTime'][$i])));
+                $lateArrivalTime = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['LateArrivalTime'][$i])));
+                if ($lateArrivalTime->getTimeOnly() > $periodStart) {
+                    $data['LateArrivalFlag'] = 1;
+                    $data['LateArrivalTime'] = $lateArrivalTime->getDatabase();
+                }
             }
 
             if ($_POST['EarlyDepartureTime'][$i]) {
                 // if this period starts before the early departure,
                 // don't mark them as leaving early
-                $data['EarlyDepartureFlag'] = 1;
-                $data['EarlyDepartureTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['EarlyDepartureTime'][$i])));
+                $earlyDepartureTime = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['EarlyDepartureTime'][$i])));
+                if ($earlyDepartureTime->getTimeOnly() < $periodEnd) {
+                    $data['EarlyDepartureFlag'] = 1;
+                    $data['EarlyDepartureTime'] = $earlyDepartureTime->getDatabase();
+                }
             }
 
             $attendanceRecord->update($data);
