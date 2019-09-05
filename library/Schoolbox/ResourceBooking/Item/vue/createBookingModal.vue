@@ -1,7 +1,7 @@
 <template>
     <reveal-modal ref="modal">
         <form id="createEvent" :action="bookingPath" v-on:submit.prevent>
-            <p>Create booking for: <span>{{ this.displayDate }}</span></p>
+            <p>Create booking for: <span>{{ displayDate }}</span></p>
             <input type="submit" class='expand' value="Create Booking" v-on:click="submitForm" />
         </form>
     </reveal-modal>
