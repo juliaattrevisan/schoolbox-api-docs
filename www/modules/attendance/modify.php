@@ -122,7 +122,9 @@ if (!$_SESSION['user']->getRole()->isStaff()) {
 
 // Attendance Period
 
-$attendancePeriod = $this->arg[3];
+[$attendancePeriod] = $attendancePeriods;
+$firstPeriod = array_shift($attendancePeriods);
+$lastPeriod  = empty($attendancePeriods) ? $firstPeriod : array_pop($attendancePeriods);
 
 // Check selected campus is one of users campus
 
@@ -160,13 +162,16 @@ if ($class) {
             'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
             'ATTENDANCE_DAY' => $timetableDay,
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
-            'ATTENDANCE_PERIOD' => $attendancePeriod,
+            'ATTENDANCE_PERIODS' => implode(',', $attendancePeriods),
             'ATTENDANCE_PERIOD_LONG' => Scrub::text($periodName),
             'TIMETABLE_GROUP' => $timetableGroup
         )
     );
 
     // Get the attendance record for this class
+    // For attendance records spanning multiple classes: show only the first
+    // period's
+    // (but use lateness records from last period)
 
     $allStudents = [];
 
