@@ -47,17 +47,16 @@
 .fc-toolbar {
     border: 1px solid #ededed;
     margin: 0 !important;
-    padding-bottom: 1rem;
+    padding: 1rem;
 
     .fc-left .fc-button-group {
-        margin-left: 1rem !important;
-        margin-top: 1rem;
+        margin: 0 !important;
     }
 
     .fc-center {
       flex-basis: 80%;
       margin: 0 1rem;
-      padding: 1rem 0 0;
+      padding: 0 !important;
 
       h2 {
         font-size: 1.125rem;
@@ -65,8 +64,7 @@
     }
 
     .fc-right .fc-button-group {
-        margin-right: 1rem;
-        margin-top: 1rem;
+        margin: 0;
     }
 
     button {
@@ -128,14 +126,28 @@
 
 .fc-event {
     border-radius: 0 !important;
+
+    .fc-title,
+    .fc-title:hover {
+        color: $black;
+    }
 }
 
-@media #{$small-only} {
+@media #{$medium-down} {
+    .fc-toolbar {
+        flex-direction: column;
+        .fc-center {
+            margin: 1rem;
+        }
+    }
+    .fc-right {
+        width: 100%;
+    }
     .fc-center h2 {
         font-size: 1rem;
     }
     .fc-right .fc-button-group {
-        flex-wrap: wrap;
+        width: 100%;
         button {
             padding: .5rem !important;
         }
