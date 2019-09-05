@@ -14,7 +14,6 @@ use \DateTime;
 use \DateInterval;
 use \DateTimeZone;
 use Alaress\Html;
-use Calendar\Event\Type\Timetable\Event as TimetableEvent;
 
 /**
  * Default VObject rendering for all types of Calendar events.
