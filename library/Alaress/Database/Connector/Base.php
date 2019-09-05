@@ -15,12 +15,16 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use Alaress\Database\Transactor\ITransactor;
 use Serializable;
 
 class Base implements Serializable, IConnector
 {
     /** @var IBroker */
     protected $broker;
+
+    /** @var ITransactor */
+    protected $transactor;
 
     /** @param array */
     protected $options;
@@ -49,11 +53,13 @@ class Base implements Serializable, IConnector
     /**
      * Connector constructor
      *
-     * @param IBroker $broker Type specific broker
+     * @param IBroker     $broker     Type specific broker
+     * @param ITransactor $transactor Transactor appropriate for this broker
      */
-    public function __construct($broker)
+    public function __construct(IBroker $broker, ITransactor $transactor)
     {
-        $this->broker = $broker;
+        $this->broker     = $broker;
+        $this->transactor = $transactor;
     }
 
     /**
@@ -75,7 +81,11 @@ class Base implements Serializable, IConnector
         $this->database = $database;
 
         $this->broker->setConnector($this);
-        return $this->broker->connect($options);
+        if ($this->broker->connect($options)) {
+            $this->transactor->getStrategy()->setConnection($this->broker->getPdo());
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -388,9 +398,27 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
+    public function transact(callable $callback)
+    {
+        $this->transactor->transact($callback);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function onPersist(callable $callback)
+    {
+        $this->transactor->onPersist($callback);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function beginTransaction()
     {
-        return $this->broker->beginTransaction();
+        return $this->transactor->beginTransaction();
     }
 
     /**
@@ -398,7 +426,7 @@ class Base implements Serializable, IConnector
      */
     public function inTransaction()
     {
-        return $this->broker->inTransaction();
+        return $this->transactor->inTransaction();
     }
 
     /**
@@ -406,7 +434,7 @@ class Base implements Serializable, IConnector
      */
     public function commit()
     {
-        return $this->broker->commit();
+        return $this->transactor->commit();
     }
 
     /**
@@ -414,7 +442,7 @@ class Base implements Serializable, IConnector
      */
     public function rollBack()
     {
-        return $this->broker->rollBack();
+        return $this->transactor->rollBack();
     }
 
     // ----------------------------------------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
-use DebugBar\DataCollector\PDO as DebugPDO;
+use PDO;
 use PDOException;
 use PDOStatement;
 
@@ -59,6 +59,13 @@ interface IBroker extends IQuoter
      * @return string
      */
     public function getDatabase();
+
+    /**
+     * Retrieves the base PDO connection object.
+     *
+     * @return PDO
+     */
+    public function getPdo(): PDO;
 
     /**
      * Connects to the actual database

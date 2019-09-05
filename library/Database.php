@@ -11,6 +11,8 @@
 use Alaress\Cache;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Quoter\Mysql\Quoter as MysqlQuoter;
+use Alaress\Database\Transactor\Base as Transactor;
+use Alaress\Database\Transactor\Strategy\Savepoint as TransactionStrategy;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
@@ -63,6 +65,13 @@ class Database implements IDatabase, Serializable, IQuoter
      * @var PDO
      */
     private $connection;
+
+    /**
+     * The transaction handler
+     *
+     * @var Transactor
+     */
+    private $transactor;
 
     /** @var Cache|PDOStatement[] */
     private $qCache = [];
@@ -145,6 +154,10 @@ class Database implements IDatabase, Serializable, IQuoter
             }
             $this->error($exception);
         }
+
+        // Create transactor, which depends on connection
+        $this->transactor = new Transactor(new TransactionStrategy());
+        $this->transactor->getStrategy()->setConnection($this->connection);
 
         return true;
     }
@@ -343,6 +356,23 @@ class Database implements IDatabase, Serializable, IQuoter
     }
 
     /**
+     * @inheritdoc
+     */
+    public function transact(callable $callback)
+    {
+        return $this->transactor->transact($callback);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function onPersist(callable $callback)
+    {
+        $this->transactor->onPersist($callback);
+        return $this;
+    }
+
+    /**
      * Wrapper for PDO::beginTransaction
      * Initiates a transaction
      *
@@ -350,7 +380,7 @@ class Database implements IDatabase, Serializable, IQuoter
      */
     public function beginTransaction()
     {
-        return $this->connection->beginTransaction();
+        return $this->transactor->beginTransaction();
     }
 
     /**
@@ -362,7 +392,7 @@ class Database implements IDatabase, Serializable, IQuoter
      */
     public function commit()
     {
-        return $this->connection->commit();
+        return $this->transactor->commit();
 
     }
 
@@ -375,7 +405,7 @@ class Database implements IDatabase, Serializable, IQuoter
      */
     public function rollBack()
     {
-        return $this->connection->rollBack();
+        return $this->transactor->rollback();
     }
 
     /**
@@ -387,7 +417,7 @@ class Database implements IDatabase, Serializable, IQuoter
      */
     public function inTransaction()
     {
-        return $this->connection->inTransaction();
+        return $this->transactor->inTransaction();
     }
 
     /**

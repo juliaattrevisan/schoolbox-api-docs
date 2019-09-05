@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace External\Canvas\Sync;
 
 use Alaress\Database\Exception;
+use Alaress\Database\Transactor\Base as Transactor;
+use Alaress\Database\Transactor\Strategy;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Alaress\Database\Connector\Base;
@@ -82,7 +84,7 @@ class CliDatabaseCreator extends CliTool\App
         }
 
         // Check whether the credential is correct by connecting to schoolbox database.
-        $rootDb = new Base(new Broker());
+        $rootDb = new Base(new Broker(), new Transactor(new Strategy\Savepoint()));
         try {
             $result = $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
         } catch (Exception $e) {

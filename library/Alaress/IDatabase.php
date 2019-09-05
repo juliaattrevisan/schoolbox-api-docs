@@ -46,6 +46,26 @@ interface IDatabase
     public function quote($string, $parameter_type = PDO::PARAM_STR);
 
     /**
+     * Wraps `$callback` in a transaction.
+     *
+     * @param callable $callback
+     * @return bool
+     * @throws \Throwable
+     */
+    public function transact(callable $callback);
+
+    /**
+     * If not in a transaction, call `$callback` immediately.
+     *
+     * Otherwise, queue `$callback` to be called only if the outermost nesting
+     * level is committed.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function onPersist(callable $callback);
+
+    /**
      * Begin transaction
      *
      * @return bool

@@ -227,7 +227,7 @@ class CampusReassignment extends AbstractNotificationTest
      */
     private function moveCampus($destinationId)
     {
-        Database::getInstance()->query("TRUNCATE `userCampus`");
+        Database::getInstance()->query("DELETE FROM `userCampus`");
         Database::getInstance()->query("INSERT INTO `userCampus` SELECT id, :c, :c FROM `user`", [ 'c' => (int)$destinationId ]);
         $this->currentCampus = $destinationId;
         $this->log->notice("Everyone is now in campus $destinationId");

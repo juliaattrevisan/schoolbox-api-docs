@@ -9,12 +9,12 @@
 namespace Schoolbox\Database\Test\Resource\Folder;
 
 use Alaress;
-use Alaress\Database\Connector\IConnector;
+use Alaress\IDatabase;
 use OverflowException;
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper;
-use PHPUnit\Framework\TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
 
 /**
@@ -24,6 +24,11 @@ use PHPUnit\Framework\TestCase as TestCase;
 class MapperTest extends TestCase
 {
     use Alaress\Database\Test\TestConnectorTrait;
+
+    /**
+     * @var Alaress\IDatabase
+     */
+    private $database;
 
     /** @var array */
     private static $tree = [
@@ -91,11 +96,12 @@ class MapperTest extends TestCase
     public function setUp()
     {
         $this->connectSchoolbox();
-        $this->schoolbox->beginTransaction();
-        $this->schoolbox->executeQuery("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
-        $this->schoolbox->executeQuery('TRUNCATE `folder_code`');
+        $this->database = \Database::getInstance();
+        $this->database->beginTransaction();
+        $this->database->query("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
+        $this->database->query('DELETE FROM `folder_code`');
 
-        self::iterate($this->schoolbox, 0, self::$tree);
+        self::iterate($this->database, 0, self::$tree);
     }
 
     /**
@@ -103,15 +109,15 @@ class MapperTest extends TestCase
      */
     public function tearDown()
     {
-        $this->schoolbox->rollBack();
+        $this->database->rollback();
     }
 
     /**
-     * @param IConnector $db
-     * @param int        $parent
-     * @param array      $folders
+     * @param IDatabase $db
+     * @param int       $parent
+     * @param array     $folders
      */
-    private static function iterate(IConnector $db, $parent, array $folders)
+    private static function iterate(IDatabase $db, $parent, array $folders)
     {
         foreach ($folders as $id => $sub) {
 
@@ -122,15 +128,15 @@ class MapperTest extends TestCase
             ];
 
             try {
-                $db->executeQuery('INSERT INTO `folder` (`id`, `name`, `parent`) VALUES (:id, :nm, :pa)', $params);
-            } catch (Alaress\Database\Exception $e) {
-                $db->executeQuery('UPDATE `folder` SET `name` = :nm, `parent` = :pa, deleted_at = NULL WHERE id = :id', $params);
+                $db->query('INSERT INTO `folder` (`id`, `name`, `parent`) VALUES (:id, :nm, :pa)', $params);
+            } catch (\PDOException $e) {
+                $db->query('UPDATE `folder` SET `name` = :nm, `parent` = :pa, deleted_at = NULL WHERE id = :id', $params);
             }
 
             if (is_array($sub)) {
                 self::iterate($db, $id, $sub);
             } else {
-                $db->executeQuery('INSERT INTO `folder_code` VALUES (:id, :code, NULL)', [
+                $db->query('INSERT INTO `folder_code` VALUES (:id, :code, NULL)', [
                     'id'   => $id,
                     'code' => $sub
                 ]);
