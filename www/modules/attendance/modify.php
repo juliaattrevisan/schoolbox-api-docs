@@ -50,8 +50,9 @@ if (count($this->arg) < 3) {
 }
 
 // Finagle path parameters
-[$classCampus, $classCode, $date, $periods, $timetableGroup] = $this->arg;
-$classCode = urldecode(urldecode(urldecode($classCode)));
+[$classCampus, $classCode, $date, $attendancePeriods, $timetableGroup] = $this->arg;
+$classCode         = urldecode(urldecode(urldecode($classCode)));
+$attendancePeriods = explode(',', $attendancePeriods);
 
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
@@ -84,8 +85,10 @@ if (!strlen($date)) {
     $this->error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
-if (!preg_match('/^\d+$/', $this->arg[3]) || $this->arg[3] < 0 || $this->arg[3] > 100) {
-    $this->error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
+foreach ($attendancePeriods as $attendancePeriod) {
+    if ($attendancePeriod < 0 || $attendancePeriod > 100 || !preg_match('/^\d+$/', $attendancePeriod)) {
+        $this->error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
+    }
 }
 
 // Selected date for which to deal with attendances check that you are allowed to edit something in a particular date range (You cannot edit anything
