@@ -506,31 +506,46 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $count = 0;
 
-        $sequenceIds = [];
+        $periodsForSequenceIds = [];
         foreach ($iterator as $spRow) {
             if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
                 // There is a SeqLinkedTo field, which is only set for linked classes.
-                $attendanceEnabled = $spRow['AttendanceEntryEnabledFlag'];
-                $sequenceId        = $spRow['SeqLinkedTo'] ?? null;
-                if (isset($sequenceId, $sequenceIds[$sequenceId])) {
-                    $attendanceEnabled        = false;
-                    $sequenceIds[$sequenceId] = true;
+                $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
+                $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
+                if (isset($sequenceId) && $multiPeriodAttendance) {
+                    $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
                 }
                 $periodList[] = [
-                    'Room'              => $spRow['Room'],
-                    'Description'       => $spRow['ClassDescription'],
-                    'PeriodNumber'      => $spRow['Period'],
-                    'ClassCampus'       => $spRow['ClassCampus'],
-                    'ClassCode'         => $spRow['ClassCode'],
-                    'SubstituteFlag'    => $spRow['SubstituteFlag'],
-                    'SubstitutedFlag'   => $spRow['SubstitutedFlag'],
-                    'AttendanceMarked'  => $spRow['IsMarkedFlag'],
-                    'AttendanceEnabled' => $attendanceEnabled,
-                    'ClassCancelled'    => $spRow['ClassCancelledFlag'],
+                    'Room'                      => $spRow['Room'],
+                    'Description'               => $spRow['ClassDescription'],
+                    'PeriodNumber'              => $spRow['Period'],
+                    'ClassCampus'               => $spRow['ClassCampus'],
+                    'ClassCode'                 => $spRow['ClassCode'],
+                    'SubstituteFlag'            => $spRow['SubstituteFlag'],
+                    'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
+                    'PeriodSequence'            => $sequenceId,
+                    'AttendancePeriods'         => [$spRow['Period']],
+                    'AttendanceMarked'          => $spRow['IsMarkedFlag'],
+                    'AttendanceEnabled'         => $spRow['AttendanceEntryEnabledFlag'],
+                    'ClassCancelled'            => $spRow['ClassCancelledFlag'],
+                    'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
                 ];
             }
             $count++;
         }
+
+        // Merge period numbers for attendance all together
+        foreach ($periodList as &$period) {
+            $periodSequence = $period['PeriodSequence'];
+            if (isset($periodsForSequenceIds[$periodSequence]) && $period['MultiPeriodAttendanceMode']) {
+                $period['AttendancePeriods'] = $periodsForSequenceIds[$periodSequence];
+
+                // Clear the list of periods for sequence IDs, so that later
+                // classes in the sequence don't get an attendance link.
+                $periodsForSequenceIds[$periodSequence] = [];
+            }
+        }
+        unset($period);
 
         if ($count == 0) {
             // Fall back to getDayTimetable()
