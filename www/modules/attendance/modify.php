@@ -176,14 +176,12 @@ if ($class) {
     }
 
     // Get the attendance record for this class
-    // For attendance records spanning multiple classes: show only the first
-    // period's
-    // (but use lateness records from last period)
 
     $allStudents = [];
 
     try {
 
+        // Show the first period's records (last period's should be the same)
         $attendanceHandler = new External_Synergetic_Attendance(
             $class,
             $attendanceDate,
