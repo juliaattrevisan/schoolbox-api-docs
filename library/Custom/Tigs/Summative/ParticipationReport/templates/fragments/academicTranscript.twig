@@ -150,7 +150,7 @@ Data:
 
                                 {% if commentData.comment %}
                                     {% set commentFound = true %}
-                                    {{ commentData.comment }}
+                                    {{ commentData.comment | nl2br }}
                                 {% endif %}
                             {% endfor %}
                         </div>
