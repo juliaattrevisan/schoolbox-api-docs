@@ -84,6 +84,9 @@ foreach ($attendancePeriods as $attendancePeriod) {
         error(ErrorMapper::ERROR_ATTENDANCE_LIST);
     }
 
+    // Find period, so I can ensure I don't save something outside the class' time
+    $periodDefinition = $attendanceHandler->getAttendanceMaster()->findTimetablePeriod();
+
     // Create everyone's attendance initially
 
     if (is_array($_POST['studentID'])) {
@@ -114,11 +117,15 @@ foreach ($attendancePeriods as $attendancePeriod) {
             ];
 
             if ($_POST['LateArrivalTime'][$i]) {
+                // if this period starts after the late arrival,
+                // don't mark them as late
                 $data['LateArrivalFlag'] = 1;
                 $data['LateArrivalTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['LateArrivalTime'][$i])));
             }
 
             if ($_POST['EarlyDepartureTime'][$i]) {
+                // if this period starts before the early departure,
+                // don't mark them as leaving early
                 $data['EarlyDepartureFlag'] = 1;
                 $data['EarlyDepartureTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['EarlyDepartureTime'][$i])));
             }

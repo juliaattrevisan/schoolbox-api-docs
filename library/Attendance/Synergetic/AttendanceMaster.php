@@ -130,14 +130,14 @@ class Attendance_Synergetic_AttendanceMaster
 
 
     /**
-     * Find all timetable periods for this master record's day.
+     * Find the timetable period for this master record's day and period.
      *
      * Used for finding the time at which a period starts and ends, so that a
      * record exceeding the start/end time of a double period is not saved.
      *
      * @return array
      */
-    public function findTimetablePeriods(): array
+    public function findTimetablePeriod(): ?array
     {
         $timetableDefinition = $this->connector->prepareStoredProcedure('spsTimetableDefinition');
         $timetableDefinition->bindInputs([
@@ -148,7 +148,12 @@ class Attendance_Synergetic_AttendanceMaster
             'FileType'       => $this->classFileType,
         ]);
         $timetableDefinition->execute();
-        return $timetableDefinition->fetchAll();
+        foreach ($timetableDefinition->fetchAll() as $record) {
+            if ((int)$this->attendancePeriod === $record['PeriodNumber']) {
+                return $record;
+            }
+        }
+        return null;
     }
 
 
