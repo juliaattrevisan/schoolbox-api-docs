@@ -12,12 +12,8 @@
     import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
     import axios                      from 'axios'
-    import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
     import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
-
-    // Various URLs that FullCalendar may make use of.
-    const URL_STATE_CHANGE = '/calendar/changeState';
 
     const URL_EVENT_EXPORT = '/calendar/export.php';
 
@@ -136,20 +132,6 @@
             },
 
             /**
-             * Callback for when the calendar view changes: preserve the
-             * newly selected view for this user.
-             * @see https://fullcalendar.io/docs/viewSkeletonRender
-             *
-             * @param info
-             */
-            viewSkeletonRender(info) {
-                axios.post(
-                    URL_STATE_CHANGE,
-                    qs.stringify({calendarView: info.view.type})
-                );
-            },
-
-            /**
              * Event render callback: manually tweaks the event's rendering, and
              * can also conditionally show/hide the event.
              * @see https://fullcalendar.io/docs/eventRender
@@ -189,7 +171,7 @@
                 if (this.config.bookingIsAuthorized) {
                     this.selectedResource = {
                         date: dateClickInfo.date,
-                        allDay: dateClickInfo.allDay,
+                        viewType: dateClickInfo.view.viewSpec.type,
                         name: dateClickInfo.resource.extendedProps.name,
                         id: dateClickInfo.resource.id,
                     };
@@ -277,6 +259,7 @@
                               :resource="selectedResource"
                               :to-moment="toMoment"
                               :booking-path="config.createBookingPath"
+                              :date-formats="formats"
         />
 
         <view-event-modal ref="event"
@@ -335,7 +318,6 @@
                 :first-day="config.firstDay"
                 :events="events"
                 :event-render="eventRender"
-                :view-skeleton-render="viewSkeletonRender"
                 :all-day-slot="'false'"
                 :default-timed-event-duration="'00:05:00'"
                 @loading="onLoading"

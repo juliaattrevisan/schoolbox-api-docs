@@ -17,6 +17,7 @@
             'resource',
             'toMoment',
             'bookingPath',
+            'dateFormats',
         ],
         data() {
             return {
@@ -41,7 +42,7 @@
                     'startDate=' + encodeURIComponent(this.toMoment(this.resource.date).format('YYYY-MM-DD'))
                 ];
 
-                if (!this.resource.allDay) {
+                if (this.resource.viewType !== 'dayGridMonth') {
                     createBookingParamsRoute.push(
                         'startTime=' + encodeURIComponent(this.toMoment(this.resource.date).format('HH:mm'))
                     );
@@ -67,9 +68,9 @@
             displayDate() {
                 return this.resource.date
                     ? this.toMoment(this.resource.date).format(
-                        this.resource.allDay
-                            ? 'LL'
-                            : 'LLLL'
+                        this.resource.viewType !== 'dayGridMonth'
+                            ? this.dateFormats.displayDatetime
+                            : this.dateFormats.displayDate
                     )
                     : '';
             }
