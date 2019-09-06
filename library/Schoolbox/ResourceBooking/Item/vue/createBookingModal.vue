@@ -16,6 +16,7 @@
             'event',
             'toMoment',
             'bookingPath',
+            'dateFormats',
         ],
         data() {
             return {
@@ -62,8 +63,8 @@
                 return this.event.date
                     ? this.toMoment(this.event.date).format(
                         this.event.viewType !== 'dayGridMonth'
-                            ? 'LLLL'
-                            : 'LL'
+                            ? this.dateFormats.displayDatetime
+                            : this.dateFormats.displayDate
                     )
                     : '';
             }
