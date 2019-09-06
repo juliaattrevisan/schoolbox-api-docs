@@ -15,7 +15,6 @@
     import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
     import axios                      from 'axios'
-    import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
