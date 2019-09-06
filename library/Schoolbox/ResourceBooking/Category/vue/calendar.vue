@@ -162,27 +162,16 @@
                     return false;
                 }
 
-
-                // Extra condition for rendering events on this calendar:
-                // All of the event's attributes must match at least one
-                // selected filter: if it doesn't, don't render it.
-                let self            = this,
-                    calEvent        = eventRenderInfo.event,
-                    eventAttributes = {},
+                let bookingStatus = eventRenderInfo.event.extendedProps.data.booking.status,
                     isEventRendered = true;
 
-                // Build a list of filters from the event
-                calEvent.classNames.forEach(function (className) {
-                    let match = className.match(/^([a-z]+)(\d+)/i);
-                    if (match) {
-                        let attributeGroup = match[1],
-                            id             = Number(match[2]);
-                        if (!eventAttributes[attributeGroup]) {
-                            eventAttributes[attributeGroup] = [];
-                        }
-                        eventAttributes[attributeGroup].push(id);
-                    }
-                });
+                if (bookingStatus.isRejected) {
+                    eventRenderInfo.el.classList.add('rejected');
+                } else if (bookingStatus.isApproved) {
+                    eventRenderInfo.el.classList.add('approved');
+                } else if (bookingStatus.isPending) {
+                    eventRenderInfo.el.classList.add('pending');
+                }
 
                 return isEventRendered;
             },
@@ -348,7 +337,7 @@
                 :event-render="eventRender"
                 :view-skeleton-render="viewSkeletonRender"
                 :all-day-slot="'false'"
-                :default-all-day-event-duration="'00:05:00'"
+                :default-timed-event-duration="'00:05:00'"
                 @loading="onLoading"
                 @dateClick="onDateClick"
                 @eventClick="onEventClick"
