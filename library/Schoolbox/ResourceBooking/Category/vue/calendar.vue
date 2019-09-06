@@ -347,6 +347,8 @@
                 :events="events"
                 :event-render="eventRender"
                 :view-skeleton-render="viewSkeletonRender"
+                :all-day-slot="'false'"
+                :default-all-day-event-duration="'00:05:00'"
                 @loading="onLoading"
                 @dateClick="onDateClick"
                 @eventClick="onEventClick"

@@ -20,7 +20,6 @@
         calendarDate = new Date();
     }
 
-    console.log(calendarDate);
     switch (calendarView) {
         case 'day':
             calendarView = 'resourceTimelineDay';
@@ -74,14 +73,6 @@
 
             }
         }],
-        // firstHour: 9,
-        // allDaySlot: false,
-
-        // scrollTime: dateDisplayFormats.calendarStartTime,
-        // height: 'auto',
-
-
-        {#resourceLabelText: 'Rooms',#}
         resources: {{ resources|json_encode|raw }},
     };
 </script>
