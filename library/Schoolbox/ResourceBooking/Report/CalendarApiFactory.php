@@ -79,11 +79,12 @@ class CalendarApiFactory
     /**
      * Creates a calendar API for a list of resource items.
      *
-     * @param  Item\Model[] $resourceCollection
-     * @param  bool         $getTimetabledRooms
+     * @param Item\Model[] $resourceCollection
+     * @param bool         $getTimetabledRooms
+     * @param array        $status
      * @return Calendar_Api_EventType_Interface
      */
-    public function buildFromResourceCollection($resourceCollection, $getTimetabledRooms = true)
+    public function buildFromResourceCollection($resourceCollection, $getTimetabledRooms = true, $status = [])
     {
         // Get the list of resource IDs and room codes
         $resourceIds = [];
@@ -110,6 +111,11 @@ class CalendarApiFactory
                 $this->user,
                 $resourceIds
             );
+
+            if (!empty($status)) {
+                $resourceApi->setStatus($status);
+            }
+
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
