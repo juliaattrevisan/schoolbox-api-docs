@@ -138,20 +138,6 @@
             },
 
             /**
-             * Callback for when the calendar view changes: preserve the
-             * newly selected view for this user.
-             * @see https://fullcalendar.io/docs/viewSkeletonRender
-             *
-             * @param info
-             */
-            viewSkeletonRender(info) {
-                axios.post(
-                    URL_STATE_CHANGE,
-                    qs.stringify({calendarView: info.view.type})
-                );
-            },
-
-            /**
              * Event render callback: manually tweaks the event's rendering, and
              * can also conditionally show/hide the event.
              * @see https://fullcalendar.io/docs/eventRender
@@ -339,7 +325,6 @@
                 :first-day="config.firstDay"
                 :events="events"
                 :event-render="eventRender"
-                :view-skeleton-render="viewSkeletonRender"
                 @loading="onLoading"
                 @dateClick="onDateClick"
                 @eventClick="onEventClick"
