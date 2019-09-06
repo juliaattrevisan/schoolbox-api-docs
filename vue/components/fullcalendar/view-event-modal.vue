@@ -536,7 +536,7 @@
                         <ul>
                             <li v-for="relatedBooking in eventExtendedProps.booking.related">
                                 ({{ relatedBooking.status.name }})
-                                <a :href="relatedBooking.status.href">{{ relatedBooking.title }}</a>
+                                <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
                             </li>
                         </ul>
                     </div>
