@@ -35,6 +35,7 @@ class ValidQualification
     public const MANDATORY_QUIZZES = [
         16058, // Unit 1, Project 2 Prove yourself as a Schoolbox Teacher Newbie
         15912, // Unit 2, Project 1 Review your knowledge of the calendar
+        55313, // Unit 2, Project 2 Verify your understanding of news
         15509, // Unit 3, Project 2 Verify your knowledge of page types and components
         15768, // Unit 6, Project 1 Prove your knowledge about submitting and marking
         16911, // Unit 7, Project 1 Test your knowledge of advanced component usage
@@ -55,8 +56,6 @@ class ValidQualification
      * @var array
      */
     public const CONDITIONAL_QUIZZES = [
-        15578, // Unit 2, Project 2 Verify your understanding of news
-        15579, // Unit 2, Project 2 Verify your understanding of viewing and posting news
         15767, // Unit 3, Project 1 Assess your knowledge of the timetable
         15766, // Unit 3, Project 1 Assess your knowledge of the timetable and marking attendance
     ];
@@ -70,7 +69,6 @@ class ValidQualification
      * @var array
      */
     private const CONDITIONAL_QUIZ_PAIRS = [
-        15578 => 15579,
         15767 => 15766
     ];
 
