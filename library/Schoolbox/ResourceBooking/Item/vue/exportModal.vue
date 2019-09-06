@@ -11,7 +11,7 @@
     import qs          from 'qs';
 
     export default {
-        name: "export-modal",
+        name: "export-booking-item-modal",
         props: [
             'token',
             'bookingExportUrl',
