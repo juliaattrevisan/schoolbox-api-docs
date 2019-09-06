@@ -34,16 +34,22 @@
             },
 
             submitForm() {
+                var currentLocation = window.location;
+                var callBackUrl = currentLocation.pathname + currentLocation.search;
 
                 var createBookingParamsRoute = [
-                    'startDate=' + this.toMoment(this.resource.date).format('YYYY-MM-DD')
+                    'startDate=' + encodeURIComponent(this.toMoment(this.resource.date).format('YYYY-MM-DD'))
                 ];
 
                 if (!this.resource.allDay) {
-                    createBookingParamsRoute.push('startTime=' + this.toMoment(this.resource.date).format('HH:mm'));
+                    createBookingParamsRoute.push(
+                        'startTime=' + encodeURIComponent(this.toMoment(this.resource.date).format('HH:mm'))
+                    );
                 }
 
-                window.location = this.bookingPath + this.resource.id + '?' + createBookingParamsRoute.join('&');
+                createBookingParamsRoute.push('callbackUrl=' + encodeURIComponent(callBackUrl));
+
+                window.location = this.bookingPath + this.resource.id + '?' + createBookingParamsRoute.join('&') + '#resourceBookingByCategory';
             },
 
             getStartDate() {
