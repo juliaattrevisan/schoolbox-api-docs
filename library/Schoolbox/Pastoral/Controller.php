@@ -6,12 +6,14 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
+use Exception;
 use External_Pastoral;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
@@ -197,9 +199,7 @@ class Controller extends Base
     /**
      * Display pastoral dashboard page
      *
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws MapperException
-     * @throws \DomainException
      */
     public function getIndex(): void
     {
@@ -226,8 +226,10 @@ class Controller extends Base
 
     /**
      * Display pastoral care search results
+     *
+     * @throws MapperException
      */
-    public function getSearch()
+    public function getSearch(): void
     {
         $get = $this->getRequest()->query;
 
@@ -250,22 +252,26 @@ class Controller extends Base
      *
      * @throws MapperException
      */
-    public function getStudent($student)
+    public function getStudent($student): void
     {
         $get = $this->getRequest()->query;
 
         // Create an audit record of anyone viewing a student record
+        // Hydrate user with group membership
+        $user              = $this->getUser();
+        $groupsMemberships = $this->pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
+        $user->setPastoralGroupsMemberships($groupsMemberships);
 
         $auditRecord = $this->pastoralAuditMapper->createModel();
         $auditRecord->setStudent($student);
-        $auditRecord->setUser($this->getUser());
+        $auditRecord->setUser($user);
         $this->pastoralAuditMapper->save($auditRecord);
 
         if (!is_numeric($get['type'])) {
             // Retrieve all of the students pastoral records
 
             $records = $this->pastoralDataSource->findByColumn(
-                $this->getUser(),
+                $user,
                 'student_id',
                 $student->getId()
             );
@@ -273,7 +279,7 @@ class Controller extends Base
             // Retrieve results filtered by pastoral type
 
             $records = $this->pastoralDataSource->findByColumnList(
-                $this->getUser(),
+                $user,
                 [
                     'student_id' => $student->getId(),
                     'type_id'    => $get['type'],
@@ -302,7 +308,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
             'data'     => [
-                'user'           => $this->getUser(),
+                'user'           => $user,
                 'recordCount'    => $records->count(),
                 'records'        => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
                 'student'        => $student,
@@ -320,10 +326,9 @@ class Controller extends Base
      *
      * @param User $student
      * @param User $linkedStudent
-     *
-     * @throws SchoolboxException
+     * @throws MapperException
      */
-    public function getLinked($student, $linkedStudent)
+    public function getLinked($student, $linkedStudent): void
     {
         $get = $this->getRequest()->query;
 
@@ -384,8 +389,9 @@ class Controller extends Base
      * @param User  $student
      *
      * @throws MapperException
+     * @throws Exception
      */
-    public function getStudentRecord($record, $student)
+    public function getStudentRecord($record, $student): void
     {
         // They've manually put an ID number they don't have access to- so the record doesn't get hydrated in preload
 
@@ -459,10 +465,9 @@ class Controller extends Base
      * Insert pastoral care record
      *
      * @param User $student
-     *
-     * @throws SchoolboxException
+     * @throws MapperException
      */
-    public function getStudentRecordInsertForm($student)
+    public function getStudentRecordInsertForm($student): void
     {
         // Throw in a blank pastoral record with the student populated
 
@@ -480,7 +485,7 @@ class Controller extends Base
      *
      * @throws SchoolboxException
      */
-    public function getStudentRecordUpdateForm($record)
+    public function getStudentRecordUpdateForm($record): void
     {
         if (!$this->getConfigLoader()->get('pastoral_severity')) {
             $severities = [];
@@ -550,10 +555,9 @@ class Controller extends Base
      * Delete a comment from pastoral record
      *
      * @param PastoralComment $comment
-     *
-     * @throws SchoolboxException
+     * @throws MapperException
      */
-    public function postCommentDelete($comment)
+    public function postCommentDelete($comment): void
     {
         // Delete from internal database
 
@@ -570,8 +574,9 @@ class Controller extends Base
      *
      * @throws SchoolboxException
      * @throws RouteNotFound
+     * @throws Exception
      */
-    public function postCommentInsert()
+    public function postCommentInsert(): void
     {
         $post = $this->getRequest()->post;
 
@@ -616,8 +621,9 @@ class Controller extends Base
      *
      * @param Model  $record
      * @param string $tagCsv
+     * @throws MapperException
      */
-    private function assignTagsToRecord(Model $record, $tagCsv)
+    private function assignTagsToRecord(Model $record, $tagCsv): void
     {
         $tags = explode(",", $tagCsv);
 
@@ -652,11 +658,10 @@ class Controller extends Base
     /**
      * Insert a pastoral care record
      *
-     * @throws SchoolboxException
-     * @throws MapperException
      * @throws RouteNotFound
+     * @throws Exception
      */
-    public function postRecordInsert()
+    public function postRecordInsert(): void
     {
         $post = $this->getRequest()->post;
 
@@ -697,8 +702,9 @@ class Controller extends Base
      *
      * @throws MapperException
      * @throws RouteNotFound
+     * @throws Exception
      */
-    public function postRecordUpdate()
+    public function postRecordUpdate(): void
     {
         $post = $this->getRequest()->post;
 
@@ -746,6 +752,8 @@ class Controller extends Base
      * @param PastoralModel $parent              Parent record (if we are updating an existing record)
      *
      * @return Collection|PastoralModel[]
+     * @throws MapperException
+     * @throws Exception
      */
     private function processPastoralRecords($primaryStudentId, $post, array $duplicateStudentIds = [], PastoralModel $parent = null)
     {
@@ -935,8 +943,9 @@ class Controller extends Base
      * @param PastoralModel $record
      *
      * @throws RouteNotFound
+     * @throws MapperException
      */
-    public function postRecordDelete($record)
+    public function postRecordDelete($record): void
     {
         $studentId = $record->getStudent()->getId();
 
@@ -968,7 +977,7 @@ class Controller extends Base
      *
      * @return array
      */
-    private function getAttachZone($name, $record = null)
+    private function getAttachZone($name, $record = null): array
     {
         $zone = new Zone($name);
         $zone
@@ -1004,7 +1013,7 @@ class Controller extends Base
      *
      * @param PastoralAttachmentModel $attachment
      */
-    public function getStudentRecordAttachment(PastoralAttachmentModel $attachment)
+    public function getStudentRecordAttachment(PastoralAttachmentModel $attachment): void
     {
         if (!$attachment->getStorage()->getMimetype()->getInline()) {
             $attach = "attachment;";
@@ -1038,6 +1047,7 @@ class Controller extends Base
      * @param RequestValues $post      POST request vars
      * @param PastoralModel $record    The record to persist
      * @param bool          $isPrivate Is this a private or public attachment?
+     * @throws MapperException
      */
     private function persistAttachments(PastoralModel $record, RequestValues $post, bool $isPrivate): void
     {

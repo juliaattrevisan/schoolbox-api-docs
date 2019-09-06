@@ -18,6 +18,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -1012,7 +1013,7 @@ class User extends BaseModel implements \Alaress\Json\Serializable, Linkable, IS
     public function getAccessList(): GenericCollection
     {
         /** @var UserAccessMapper $uaMapper */
-        if(!isset($this->accessList)) {
+        if (!isset($this->accessList)) {
             $uaMapper = UserAccessMapper::getInstance();
             $this->setAccessList($uaMapper->findAllForUser($this));
         }
@@ -1409,6 +1410,9 @@ class User extends BaseModel implements \Alaress\Json\Serializable, Linkable, IS
      */
     public function getPastoralGroupsMemberships(): GenericCollection
     {
+        if (!$this->pastoralGroupsMemberships) {
+            throw new InsufficientHydrationException('group membership not set');
+        }
         return $this->pastoralGroupsMemberships;
     }
 
@@ -1420,6 +1424,10 @@ class User extends BaseModel implements \Alaress\Json\Serializable, Linkable, IS
      */
     public function setPastoralGroupsMemberships(Collection $pastoralGroupsMemberships): self
     {
+        if (!$this->pastoralGroupsMemberships) {
+            $this->pastoralGroupsMemberships = Pastoral\Group\Member\Model::createCollection();
+        }
+
         $this->pastoralGroupsMemberships->replaceWith($pastoralGroupsMemberships);
         return $this;
     }

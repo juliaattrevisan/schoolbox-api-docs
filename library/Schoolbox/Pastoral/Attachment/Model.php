@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral\Attachment;
 
+use Schoolbox\BaseModel;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -21,7 +22,7 @@ use Schoolbox\Resource\Storage\IStorage;
  *
  * @package Schoolbox\Pastoral\Attachment
  */
-class Model implements IStorage, ISoftDeletable
+class Model extends BaseModel implements IStorage, ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;

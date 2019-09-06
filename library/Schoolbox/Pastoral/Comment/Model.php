@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral\Comment;
 
+use Schoolbox\BaseModel;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -16,7 +17,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable
+class Model extends BaseModel implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;

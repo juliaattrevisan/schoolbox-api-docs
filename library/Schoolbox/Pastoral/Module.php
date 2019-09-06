@@ -290,6 +290,12 @@ class Module extends BaseModule
                     /** @var User $user */
                     $user = $this->getInjector()->get('user');
 
+                    // Hydrate user with group membership
+                    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
+                    $pastoralGroupMemberMapper = $this->getMapperFactory()->get(PastoralGroupMemberMapper::class);
+                    $groupsMemberships = $pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
+                    $user->setPastoralGroupsMemberships($groupsMemberships);
+
                     $injectedValues['record'] = $pastoralDataSource->findById($user, $params['recordId']);
 
                     /** @var PastoralAccessMapper $pastoralAccessMapper */

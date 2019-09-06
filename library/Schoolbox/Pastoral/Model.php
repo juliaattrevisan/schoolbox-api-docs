@@ -547,6 +547,8 @@ class Model extends BaseModel implements ISoftDeletable
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
 
+        // TODO: Does this taking group into account?????????????
+
         // Otherwise start with deny access, and work our way up the permission levels
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
