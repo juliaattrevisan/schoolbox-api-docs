@@ -19,6 +19,8 @@
     } else {
         calendarDate = new Date();
     }
+
+    console.log(calendarDate);
     switch (calendarView) {
         case 'day':
             calendarView = 'resourceTimelineDay';
@@ -35,7 +37,7 @@
     window.fullCalendarConfig = {
         token:                  '{{ token }}',
         selectedFilters:        [1,2],
-        defaultDate:            '{{ calendarDate|date('Y-m-d') }}',
+        defaultDate:            calendarDate,
         eventLimit:             Boolean('{{ config.calendar_collapse_events }}'),
         firstDay:               Number('{{ config.calendar_start_day }}'),
         defaultView:            calendarView,
