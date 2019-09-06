@@ -51,7 +51,6 @@ class CalendarApiFactory
     public function build(Item\Model $resource)
     {
         $api = new Calendar_Api_Composite();
-        $calendarConfigMapper = Calendar_Api_Config_Mapper::getInstance();
 
         // Add the resource API
         $resourceApi = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
@@ -99,8 +98,6 @@ class CalendarApiFactory
                 $roomCodes[$roomCode] = $resource->getId();
             }
         }
-
-        $calendarConfigMapper = Calendar_Api_Config_Mapper::getInstance();
 
         // Get the list of resource IDs and room codes
         $api = new Calendar_Api_Composite();
