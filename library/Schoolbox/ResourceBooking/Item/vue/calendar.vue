@@ -142,37 +142,27 @@
              * can also conditionally show/hide the event.
              * @see https://fullcalendar.io/docs/eventRender
              *
-             * @param eventRenderInfo
+             * @param event
              * @return {boolean}
              */
-            eventRender(eventRenderInfo) {
-                if (!this.helper.eventRender(eventRenderInfo)) {
+            eventRender(event) {
+                if (!this.helper.eventRender(event)) {
                     return false;
                 }
 
+                let bookingStatus = event.event.extendedProps.data.booking.status,
+                    element = event.el;
 
-                // Extra condition for rendering events on this calendar:
-                // All of the event's attributes must match at least one
-                // selected filter: if it doesn't, don't render it.
-                let self            = this,
-                    calEvent        = eventRenderInfo.event,
-                    eventAttributes = {},
-                    isEventRendered = true;
+                // Add booking styles
+                if (bookingStatus.isRejected) {
+                    element.classList.add('rejected');
+                } else if (bookingStatus.isApproved) {
+                    element.classList.add('approved');
+                } else if (bookingStatus.isPending) {
+                    element.classList.add('pending');
+                }
 
-                // Build a list of filters from the event
-                calEvent.classNames.forEach(function (className) {
-                    let match = className.match(/^([a-z]+)(\d+)/i);
-                    if (match) {
-                        let attributeGroup = match[1],
-                            id             = Number(match[2]);
-                        if (!eventAttributes[attributeGroup]) {
-                            eventAttributes[attributeGroup] = [];
-                        }
-                        eventAttributes[attributeGroup].push(id);
-                    }
-                });
-
-                return isEventRendered;
+                return true;
             },
 
             /**
