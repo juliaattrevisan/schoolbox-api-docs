@@ -4,8 +4,8 @@ $shortopts = 'f:i:o:';
 
 $options = getopt($shortopts,$longopts);
 
-$debug=key_exists('debug', $options);
-$help=key_exists('help', $options);
+$debug=array_key_exists('debug', $options);
+$help=array_key_exists('help', $options);
 
 if ($help)
 {
@@ -47,7 +47,7 @@ function jsonHarFileToUrlRequestedArray($file_location)
     return $url_entries;
 }
 
-if(!key_exists('i', $options) || !key_exists('o', $options))
+if(!array_key_exists('i', $options) || !key_exists('o', $options))
 {
     printf("Please set the browser the har file came from, the location of where the HAR file we are converting and the location we are outputting the csv. eg.\n");
     printf("php dev_tools_har_to_url_csv.php -f chrome -i thisFIle.har -o toThisCsv.csv\n");
@@ -59,7 +59,7 @@ if(!strcasecmp($argv[1], 'firefox') && !strcasecmp($argv[1], 'chrome'))
     printf("Right now only support firefox and chrome HAR exported formats\n");
 }
 
-if (!key_exists('f', $options))
+if (!array_key_exists('f', $options))
 {
     $options['f']='chrome';
 }
@@ -119,7 +119,7 @@ foreach($url_entries as $log_entry){
     {
         printf("Attempt to import: %s, %s, %s\n", $host, $url, $extention);
     }
-    if(!key_exists($log_entry['request']['url'], $have_seen) && !key_exists($extention, $filtered_extensions) && $VAGRANT_DOMAIN==$host && !isset($port))
+    if(!array_key_exists($log_entry['request']['url'], $have_seen) && !array_key_exists($extention, $filtered_extensions) && $VAGRANT_DOMAIN==$host && !isset($port))
     {
         //Write the row to the CSV file.
         fputcsv($csv_file, ['', 'Superuser', 'Har Exported Action', 'url' => $log_entry['request']['url']]);
