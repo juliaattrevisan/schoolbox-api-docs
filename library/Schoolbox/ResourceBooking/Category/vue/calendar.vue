@@ -171,7 +171,7 @@
                 if (this.config.bookingIsAuthorized) {
                     this.selectedResource = {
                         date: dateClickInfo.date,
-                        viewType: dateClickInfo.view.viewSpec.type,
+                        allDay: dateClickInfo.allDay,
                         name: dateClickInfo.resource.extendedProps.name,
                         id: dateClickInfo.resource.id,
                     };
