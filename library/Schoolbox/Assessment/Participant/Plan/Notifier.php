@@ -1136,6 +1136,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                                 ->setParam('boxType', new Param($parentBoxType));
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
+                $bob->unsetParam('boxType');
             }
         }
 
