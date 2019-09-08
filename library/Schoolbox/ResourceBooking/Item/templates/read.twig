@@ -1,254 +1,5 @@
-<!-- BEGIN custom_header -->
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
-<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
-<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
-<script type="text/javascript">
-
-    // once the DOM has loaded, punch a fancy calendar into it
-    $(function() {
-
-        // Calendar setup
-        var calendarView = {{ calendar.view|json_encode|raw }};
-        var calendarDate = moment({{ calendar.date|json_encode|raw }});
-
-        if (calendarDate.isValid()) {
-            calendarDate = calendarDate.toDate();
-        }
-        else {
-            calendarDate = new Date();
-        }
-
-        switch (calendarView) {
-            case 'day':
-                calendarView = 'agendaDay';
-                break;
-            case 'month':
-                calendarView = 'month';
-                break;
-            case 'week':
-            default:
-                calendarView = 'agendaWeek';
-                break;
-        }
-
-        // Dialog for use when clicking an item that is in a series
-        var updateSeriesDialog = $('#dialog-bulk-update');
-        updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
-            e.preventDefault();
-            updateSeriesDialog.foundation('reveal', 'close');
-        });
-
-        c = new Calendar('calendar', 'calendar-bubble', {
-            filter: {
-                enabled: true,
-                ajax: false,
-                // This AJAX lookup should always be a GET request
-                parentSelector: '#calendar-controls',
-                exportButtonSelector: true,
-                checkboxSelector: false,
-                applyFiltersSelector: false,
-                listViewButton: false
-            },
-            fullCalendar: {
-                allDaySlot: false,
-                slotDuration: '00:15:00',
-                slotLabelInterval: '01:00:00',
-                scrollTime: dateDisplayFormats.calendarStartTime,
-                defaultDate: calendarDate,
-                defaultView: calendarView,
-                defaultTimedEventDuration: '00:05:00',
-                eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
-                firstDay: Number({{ config.calendar_start_day }}),
-                events: function(start, end, timezone, callback) {
-                    var data = [
-                        {name: 'start', value: Calendar.reOffsetTimestamp(start.unix())},
-                        {name: 'end',   value: Calendar.reOffsetTimestamp(end.unix())}
-                    ];
-                    $.ajax({
-                        data:     data.concat($('#calendar-controls').find('form').serializeArray()),
-                        dataType: 'json',
-                        url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
-                        success: function(data) {
-                            callback(data.filter(function(v) {
-                                return 'start' in v;
-                            }));
-                        },
-                        cache: false
-                    });
-                },
-                loading: function(isLoading) {
-                    /* Show loading div right in the middle
-                     */
-                    if (isLoading === true) {
-                        $.magnificPopup.open({
-                            showCloseBtn: false,
-                            items: {
-                                src: "<div class='preview loader'></div>",
-                                type: 'inline'
-                            }
-                        });
-                    }
-                    /* Has finished loading
-                     */
-                    else {
-                        /* Hide loading div
-                         */
-                        $.magnificPopup.close();
-                    }
-                },
-                /**
-                 * Event rendering: put the event's start and end time into data
-                 */
-                eventRender: function(event, element) {
-                    if (!event.data) {
-                        return false;
-                    }
-                    element.attr({
-                        'data-start':  event.start.format(),
-                        'data-end':    (event.end || event.start).format(),
-                        'data-allday': event.allDay ? 1 : 0
-                    })
-
-                    // Add booking styles
-                    element.addClass('booking');
-                    if ('booking' in event.data) {
-                        if (event.data.booking.status.isRejected) {
-                            element.addClass('rejected');
-                        }
-                        if (event.data.booking.status.isApproved) {
-                            element.addClass('approved');
-                        }
-                        if (event.data.booking.status.isPending) {
-                            element.addClass('pending');
-                        }
-                    }
-                    return element
-                },
-
-                /**
-                 * Event that is triggered when clicking on a calendar day or time.
-                 *
-                 * @param date
-                 * @param jsEvent
-                 * @param view
-                 */
-                dayClick: function(date, jsEvent, view) {
-                    // Bookings may not be made in the past.
-                    var allDay = !date.hasTime();
-                    var eventData = {
-                        allDay:    allDay ? 1 : 0,
-                        startDate: date.format('YYYY-MM-DD')
-                    };
-                    if (allDay) {
-                        eventData.displayDate = date.format('ddd, Do MMMM')
-                    } else {
-                        eventData.startTime   = date.format('HH:mm');
-                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
-                    }
-
-                    $('#calendar-create').foundation('reveal','open');
-
-                    c.bubble.display('create', eventData, jsEvent, this)
-                },
-                eventStartEditable: false
-            },
-            x: false
-        }).init()
-
-        // Event filter - reload events when the filter button is pressed.
-        $('#calendar-controls').on('click', '#applyFilters', function(event) {
-            event.preventDefault()
-            c.dom.fullCalendar('refetchEvents')
-            $('#calendar-controls').foundation('reveal','close');
-        })
-
-        // Approve, Reject, Cancel: all AJAX events
-        // Modify: not AJAX
-        // For any AJAX event - open a dialog if this is a series event
-        $('#calendar-bubble').find('#editEvent').on(
-            'click',
-            '[data-booking-button=booking-approve], [data-booking-button=booking-reject], [data-booking-button=booking-cancel]',
-            function(event) {
-                event.preventDefault()
-                var href     = this.href
-                var callback = function(data) {
-                    return $.ajax(href, {data: data})
-                        .done(function() {
-                            c.dom.fullCalendar('refetchEvents')
-                        })
-                        .fail(function() {
-                            // fail in some way, not yet sure how
-                        });
-                }
-                var seriesId = $(this).data('seriesId')
-                if (seriesId) {
-                    // Remove all previous change status events, and reapply to this
-                    // dialog box.
-                    updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
-                    updateSeriesDialog.foundation('reveal', 'open');
-                    updateSeriesDialog.off('click', '[data-efficacy="self"]');
-                    updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
-                        e.preventDefault();
-                        updateSeriesDialog.foundation('reveal', 'close');
-                        callback({efficacy: 'self'});
-                    });
-                    updateSeriesDialog.off('click', '[data-efficacy="series"]');
-                    updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
-                        e.preventDefault();
-                        updateSeriesDialog.foundation('reveal', 'close');
-                        callback({efficacy: 'series', seriesId: seriesId});
-                    });
-                } else if ($(this).hasClass('booking-cancel')) {
-                    $(this).confirmDialog({
-                        text: 'Are you sure you want to delete this booking?',
-                        confirmEvent: function() {
-                            callback({});
-                        }
-                    });
-                } else {
-                    c.bubble.hide()
-                    callback()
-                }
-            }
-        )
-
-        $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
-
-        /* Export calendar
-         */
-        $.fn.clipboardSelector({
-            exportActivator: '#fc-button-export',
-            onReady: function() {
-                var form = $('#calendar-export-form');
-                var url = $.fn.getExportCalendarLink('{{token}}', form.serializeArray())+'&resource_id={{item.id}}';
-
-                var dialog = $('#calendar-export-dialog');
-                var dialogUrl = $('#calendar-export-dialog-url');
-
-                /* Bypass foundation bug
-                 * https://github.com/zurb/foundation/issues/4746
-                 */
-                dialogUrl.text(url);
-                dialog.foundation('reveal', 'open');
-
-                dialog.on('opened.fndtn.reveal', function() {
-                    dialogUrl.select();
-                });
-            },
-            onZeroClipboardReady: function() {
-                $('#copy-button').show();
-            }
-        });
-
-    });
-</script>
-<!-- END custom_header -->
-
 <ul class="breadcrumb">
-   <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
+    <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
     <li><a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.category.id|e('url') }}" >{{ item.category.name }}</a></li>
     <li class="active"><a href="#">{% include '@resourceItem/sub/itemName.twig' with {item: item} %}</a></li>
 </ul>
@@ -260,10 +11,10 @@
 
             <ul class="meta">
                 {% if item.moderatorList is not empty %}
-                <li class="icon-staff-students">
-                    {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
-                    {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
-                </li>
+                    <li class="icon-staff-students">
+                        {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
+                        {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
+                    </li>
                 {% endif %}
             </ul>
         </div>
@@ -272,7 +23,7 @@
         <a class="icon-eye" data-reveal-id="dialog-description" title="View Description"></a>
         <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
         {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
-        <a class="resource-name resource-edit-link icon-modify" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
+            <a class="resource-name resource-edit-link icon-modify" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
         {% endif %}
     </nav>
 </div>
@@ -301,6 +52,51 @@
         </h2>
     </div>
 </div>
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        // Which view gets shown?
+        var anchorView = '',
+            parts      = location.href.split('#');
+
+        if (parts.length > 1) {
+            anchorView = parts[1];
+            switch (anchorView) {
+                case 'month':
+                    anchorView = 'dayGridMonth';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                case 'basicWeek':
+                    anchorView = 'timeGridWeek';
+                    break;
+                case 'day':
+                case 'agendaDay':
+                case 'basicDay':
+                    anchorView = 'timeGridDay';
+                    break;
+                default:
+                    anchorView = '';
+                    break;
+            }
+        }
+
+        window.fullCalendarConfig = {
+            token:                  '{{ token }}',
+            selectedFilters:        [1,2],
+            defaultDate:            '{{ selectedDate|date('Y-m-d') }}',
+            eventLimit:             Boolean('{{ config.calendar_collapse_events }}'),
+            firstDay:               Number('{{ config.calendar_start_day }}'),
+            defaultView:            anchorView || '{{ calendarView }}',
+            dateDisplayFormats:     dateDisplayFormats,
+            resourceBookingEndpoint:{{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
+            bookingIsAuthorized:    Boolean('{{ isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) }}'),
+            createBookingPath:      {{ routeLookup('resourceBooking.book', {id: item.id})|json_encode|raw }},
+            resourceId:             Number('{{ item.id }}')
+        };
+    </script>
+{% endautoescape %}
+
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -309,105 +105,7 @@
     </div>
 </div>
 
-<div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-create">
-    <form id="createEvent" data-no-calendar-listener="" method="get" action="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">
-        <input type="hidden" name="startDate" />
-        <input type="hidden" name="startTime" />
-
-        {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-        <p>Create booking for: <span data-event-modal-field="displayDate"></span></p>
-
-        <input type="submit" class='expand' value="Create Booking" />
-        {% else %}
-        <p>You do not have permission to book this item.</p>
-        {% endif %}
-    </form>
-</div>
-
-<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
-    <!-- Edit Event Form -->
-    <form id="editEvent">
-        <input type="hidden" name="eventId" />
-
-        <div class="row">
-            <div class="small-12">
-                <h3 class="note"></h3>
-                <ul class="meta">
-                    <li class="icon-resource-booking" data-event-modal-field="bookingStatus"></li>
-                    <li class="icon-calendar date"></li>
-                    <li class="icon-location" data-event-modal-field="location"></li>
-                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
-                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
-                </ul>
-
-                <article class="detail" data-is-html="1"></article>
-
-                <ul class="relatedBookings"></ul>
-
-                <div class="attendance">
-                    <dl>
-                        <dd><p class="attendanceIcon"></p></dd>
-                        <dd class="rm"><p class="attendanceStatus"></p></dd>
-                    </dl>
-                </div>
-                <div>
-                    <dl>
-                        <dd>
-                            <span class="modifyLink" data-is-html="1"></span>
-                            <span class="attendanceListButton" data-is-html="1"></span>
-                            <span class="attendanceRequestButton" data-is-html="1"></span>
-                        </dd>
-                    </dl>
-                </div>
-                <div class="bookingActions" data-is-html="1"></div>
-            </div>
-        </div>
-    </form>
-
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-{##
- # Calendar controls
- # Add the popup event
- #}
-<div id="calendar-controls" class="reveal-modal tiny" data-reveal aria-hidden="true" role="dialog">
-    <form>
-        <section>
-            <fieldset class="content">
-                <legend>Status</legend>
-                <div class="small-12 columns">
-                    <label title="Pending">
-                        <input type="checkbox" id='status-1' name="status[]" value="1" class="checkbox" checked />
-                        <label for="status-1" class="checkbox-label">Pending</label>
-                    </label>
-                    <label title="Approved">
-                        <input type="checkbox" id='status-2' name="status[]" value="2" class="checkbox" checked />
-                        <label for="status-2" class="checkbox-label">Approved</label>
-                    </label>
-                    <label title="Rejected">
-                        <input type="checkbox" id='status-3' name="status[]" value="3" class="checkbox"/>
-                        <label for="status-3" class="checkbox-label">Rejected</label>
-                    </label>
-                </div>
-            </fieldset>
-        </section>
-    </form>
-    <a href="#" id="applyFilters" class="submit button">Apply Filters</a>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-{# Dialog for changing bookings in series #}
-<div class="reveal-modal" data-reveal aria-labelledby="dialog-booking-bulk-update-title" aria-hidden="true" role="dialog" id="dialog-bulk-update">
-    <h2 id="dialog-booking-bulk-update-title">This booking is part of a series</h2>
-    <p>Would you like to <span data-booking-action-text></span> only this booking, or all in the series?</p>
-    <ul class="flex-list buttons">
-        <li><a href="#" class="button" data-efficacy="self">Only this booking</a></li>
-        <li><a href="#" class="button" data-efficacy="series">All bookings in the series</a></li>
-        <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
-    </ul>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
+<script type="text/javascript" src="/javascript/components/resourceBookingItemCalendar.bundle.js"></script>
 
 {# Dialog for showing description and rules #}
 <div class="reveal-modal" data-reveal aria-labelledby="dialog-description-title" aria-hidden="true" role="dialog" id="dialog-description">
@@ -440,12 +138,3 @@
     </div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-{# Dialog for calendar export #}
-<div class="reveal-modal" data-reveal aria-labelledby="calendar-export-dialog-text" aria-hidden="true" role="dialog" id="calendar-export-dialog">
-    <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
-    <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
-    <div id="calendar-export-dialog-url" class="alert-box"></div>
-    <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" class="button icon-copy">Copy to Clipboard</button>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
