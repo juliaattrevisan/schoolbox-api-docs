@@ -177,7 +177,7 @@
                 if (this.config.bookingIsAuthorized) {
                     this.newEvent = {
                         date: dateClickInfo.date,
-                        viewType: dateClickInfo.view.viewSpec.type,
+                        allDay: dateClickInfo.allDay,
                     };
 
                     this.$refs.createBooking.open();
