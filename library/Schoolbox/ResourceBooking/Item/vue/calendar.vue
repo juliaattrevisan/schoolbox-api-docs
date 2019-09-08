@@ -285,10 +285,12 @@
                 :views="{
                 day: {
                     titleFormat: dayTitleFormat,
-                    columnHeader: false
+                    columnHeader: false,
+                    allDaySlot: false,
                 },
                 week: {
-                    columnHeaderFormat: formats.displayWeekDay
+                    columnHeaderFormat: formats.displayWeekDay,
+                    allDaySlot: false,
                 }
             }"
                 :event-time-format="helper.eventTimeFormat"
