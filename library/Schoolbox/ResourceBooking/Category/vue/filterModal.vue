@@ -28,7 +28,7 @@
     const FILTER_CHANGED = 'filterChanged';
 
     export default {
-        name: "filter-modal",
+        name: "booking-category-filter-modal",
         props: [
             'selectedFilters',
         ],
