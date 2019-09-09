@@ -253,7 +253,7 @@
                       :token="config.token"
                       :booking-export-url="urls.export"
                       :resource-id="config.resourceId"
-                      :is-category="false"
+                      :booking-type="'item'"
         />
 
         <filter-modal ref="filter"

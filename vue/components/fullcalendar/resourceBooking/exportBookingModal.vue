@@ -16,7 +16,7 @@
             'token',
             'bookingExportUrl',
             'resourceId',
-            'isCategory'
+            'bookingType',
         ],
         components: {RevealModal},
         methods: {
@@ -36,7 +36,7 @@
                 // Add token to object
                 values.token = this.token;
 
-                if (this.isCategory) {
+                if (this.bookingType === 'category') {
                     values.resource_category_id = this.resourceId;
                 } else {
                     values.resource_id = this.resourceId;
