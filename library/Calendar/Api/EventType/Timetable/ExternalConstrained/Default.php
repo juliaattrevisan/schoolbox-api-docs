@@ -172,11 +172,17 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         }
                         $event->setType($eventType);
 
-                        /* Setup attendance button */
-                        $event->setHasAttendance($period['AttendanceEnabled'] != null);
+                        // Setup attendance button
+                        // The attendance link will only be shown if this period
+                        // has periods to mark.
+                        $hasAttendancePeriods = !empty($period['AttendancePeriods']);
+                        $event->setHasAttendance(!empty($period['AttendanceEnabled']) && $hasAttendancePeriods);
                         $event->setCode($period['code']);
                         $event->setCampus($period['campus']);
-                        $event->setPeriod($period['periodNumber']);
+                        $event->setPeriod(
+                            $hasAttendancePeriods
+                                ? implode(',', $period['AttendancePeriods'])
+                                : $period['periodNumber']);
                         $event->setPeriodName($period['periodName']);
 
                         // Load the color for this timetabled class
