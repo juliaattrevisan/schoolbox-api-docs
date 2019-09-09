@@ -117,23 +117,31 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
             ];
 
+
+            // Arrival/Departure for multi-period classes
             if ($_POST['LateArrivalTime'][$i]) {
                 // if this period starts after the late arrival,
                 // don't mark them as late
-                $lateArrivalTime = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['LateArrivalTime'][$i])));
-                if ($lateArrivalTime->getDatabaseTime() > $periodStart) {
+                $arrival     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['LateArrivalTime'][$i])));
+                $arrivalTime = $arrival->getDatabaseTime();
+                if ($arrivalTime > $periodEnd) {
+                    $data['AttendedFlag'] = 0;
+                } elseif ($arrivalTime > $periodStart) {
                     $data['LateArrivalFlag'] = 1;
-                    $data['LateArrivalTime'] = $lateArrivalTime->getDatabase();
+                    $data['LateArrivalTime'] = $arrival->getDatabase();
                 }
             }
 
             if ($_POST['EarlyDepartureTime'][$i]) {
                 // if this period starts before the early departure,
                 // don't mark them as leaving early
-                $earlyDepartureTime = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['EarlyDepartureTime'][$i])));
-                if ($earlyDepartureTime->getDatabaseTime() < $periodEnd) {
+                $departure     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['EarlyDepartureTime'][$i])));
+                $departureTime = $departure->getDatabaseTime();
+                if ($departureTime < $periodStart) {
+                    $data['AttendedFlag'] = 0;
+                } elseif ($departureTime < $periodEnd) {
                     $data['EarlyDepartureFlag'] = 1;
-                    $data['EarlyDepartureTime'] = $earlyDepartureTime->getDatabase();
+                    $data['EarlyDepartureTime'] = $departure->getDatabase();
                 }
             }
 
