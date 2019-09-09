@@ -11,10 +11,8 @@
 {% if (recordType == 'public' and access.public) or (recordType == 'private' and access.private) %}
 
     {% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
-    {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
 
     {# Only users that are able to make comments should see comments #}
-
     {% if commentInsertRoute %}
 
         <div class="content" id="comments">
@@ -46,6 +44,7 @@
                                             </div>
                                         </div>
                                         <nav>
+                                            {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
                                             {% if commentDeleteRoute %}
                                                 <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
                                             {% endif %}
