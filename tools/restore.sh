@@ -569,8 +569,8 @@ then
 	sourcedb=`echo "$sourcedb" | sed 's/\.gz//g'`;
 fi
 echo "Restoring database '$sourcedb'";
-## Restore specified database
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
+## Restore specified database (commenting out VIEW DEFINER clause on the fly)
+cat $sourcedb | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
