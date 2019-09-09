@@ -8,7 +8,7 @@
     import MetaItem                   from '@schoolbox/meta/item'
     import Toast                      from "@schoolbox/toast";
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-    import CreateBookingModal         from './createBookingModal';
+    import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/createBookingModal';
     import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
     import axios                      from 'axios'
@@ -45,7 +45,7 @@
             return {
                 calendarPlugins: [ interactionPlugin, momentPlugin, resourceTimelinePlugin ],
                 currentEvent: {},
-                selectedResource: {},
+                selectedEvent: {},
             }
         },
         computed: {
@@ -169,7 +169,7 @@
                 // Just a proposal.
                 // If the user doesn't have the rights to create a booking, just don't show the modal.
                 if (this.config.bookingIsAuthorized) {
-                    this.selectedResource = {
+                    this.selectedEvent = {
                         date: dateClickInfo.date,
                         allDay: dateClickInfo.allDay,
                         name: dateClickInfo.resource.extendedProps.name,
@@ -256,7 +256,7 @@
                       @filterChanged="reloadEvents" />
 
         <create-booking-modal ref="createBooking"
-                              :resource="selectedResource"
+                              :event="selectedEvent"
                               :to-moment="toMoment"
                               :booking-path="config.createBookingPath"
                               :date-formats="formats"

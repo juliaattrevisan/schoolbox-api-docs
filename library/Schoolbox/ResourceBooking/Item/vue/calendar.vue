@@ -11,7 +11,7 @@
     import MetaItem                   from '@schoolbox/meta/item'
     import Toast                      from "@schoolbox/toast";
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-    import CreateBookingModal         from './createBookingModal';
+    import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/createBookingModal';
     import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
     import axios                      from 'axios'
