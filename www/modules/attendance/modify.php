@@ -181,19 +181,44 @@ if ($class) {
 
     try {
 
-        // Show the first period's records (last period's should be the same)
-        $attendanceHandler = new External_Synergetic_Attendance(
-            $class,
-            $attendanceDate,
-            $timetableDay,
-            $firstPeriod,
-            $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
-            $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
-            $_SESSION['user']->getExternalId(),
-            $timetableGroup
-        );
+        // Glue the records for all periods together.
+        // TODO make External_Synergetic_Attendance accept multiple periods
+        $allStudents = [];
+        foreach ($attendancePeriods as $attendancePeriod) {
+            $attendanceHandler = new External_Synergetic_Attendance(
+                $class,
+                $attendanceDate,
+                $timetableDay,
+                $attendancePeriod,
+                $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
+                $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
+                $_SESSION['user']->getExternalId(),
+                $timetableGroup
+            );
+            $allStudentsTemp = $attendanceHandler->findAttendanceRecords();
+            $allStudentsTemp = array_combine(
+                array_column($allStudentsTemp, 'ID'),
+                $allStudentsTemp
+            );
+            foreach ($allStudentsTemp as $id => $student) {
+                // Set base student record
+                if (!isset($allStudents[$id])) {
+                    $allStudents[$id] = $student;
+                }
 
-        $allStudents = $attendanceHandler->findAttendanceRecords();
+                // Override late arrival / early departure if set
+                if ($student['LateArrivalFlag']) {
+                    $allStudents[$id]['AttendedFlag']    = 1;
+                    $allStudents[$id]['LateArrivalFlag'] = 1;
+                    $allStudents[$id]['LateArrivalTime'] = $student['LateArrivalTime'];
+                }
+                if ($student['EarlyDepartureFlag']) {
+                    $allStudents[$id]['AttendedFlag']       = 1;
+                    $allStudents[$id]['EarlyDepartureFlag'] = 1;
+                    $allStudents[$id]['EarlyDepartureTime'] = $student['EarlyDepartureTime'];
+                }
+            }
+        }
 
     } catch (ExternalException $e) {
         error(ErrorMapper::ERROR_ATTENDANCE_LIST);
