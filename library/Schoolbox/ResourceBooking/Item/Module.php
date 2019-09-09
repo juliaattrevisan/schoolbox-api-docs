@@ -6,7 +6,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Item;
 
 use Alaress\Authorizer\Authorizer;
@@ -33,6 +33,7 @@ class Module extends BaseModule
     {
         $this->attachResourceRoutes($router, $basePath);
         $this->addRoute($router, 'search', $basePath, '/search');
+        $this->addRoute($router, 'read', $basePath, '/{id}');
     }
 
     /**
