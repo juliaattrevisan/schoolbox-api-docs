@@ -225,6 +225,13 @@ class Classes
          */
         $timetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
+        /* If there aren't any timetables, log it and exit
+         */
+        if (!\count($timetables)) {
+            $this->log->warning('No PublishedTimetables detected.');
+            return;
+        }
+
         foreach ($timetables as $timetable) {
             $ext = trim((string)$timetable->xpath('@Id')[0]->Id);
 
