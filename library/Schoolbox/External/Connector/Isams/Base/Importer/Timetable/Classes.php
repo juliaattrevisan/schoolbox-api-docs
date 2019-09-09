@@ -226,7 +226,7 @@ class Classes
         $timetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         foreach ($timetables as $timetable) {
-            $ext = (string)$timetable->xpath('@Id')[0]->Id;
+            $ext = trim((string)$timetable->xpath('@Id')[0]->Id);
 
             $currentTimetable = $this->batchxml->fetchXml("/iSAMS/TimetableManager/PublishedTimetables/Timetable[@Id='{$ext}']")[0];
 

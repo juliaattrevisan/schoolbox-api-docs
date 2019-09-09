@@ -68,8 +68,8 @@ class Identifier implements ImporterInterface
         foreach ($timetables as $timetable) {
             $this->log->info(sprintf(
                 'Found timetable %s: assign %s to ext_timetable_code',
-                (string)$timetable->Name,
-                (string)$timetable->xpath('@Id')[0]->Id
+                trim((string)$timetable->Name),
+                trim((string)$timetable->xpath('@Id')[0]->Id)
             ));
         }
     }

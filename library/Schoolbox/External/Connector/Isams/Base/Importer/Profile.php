@@ -205,7 +205,7 @@ class Profile implements ImporterInterface
         /* This isn't the primary identifier that we use in $student
          * This is some sort of internal relation id in the xml
          */
-        $studentId = (string)$node->xpath('@Id')[0];
+        $studentId = trim((string)$node->xpath('@Id')[0]);
 
         /* Use that to find the parents in similar fashion
          * https://stackoverflow.com/questions/3005370/xpath-to-find-nearest-ancestor-element-that-contains-an-element-that-has-an-attr/40333166
@@ -223,36 +223,36 @@ class Profile implements ImporterInterface
             /* Implode non-empty address fields into one big string for our schema
              */
             $address = implode(', ', array_filter([
-                (string)$parent->Address->AddressLines->Address1,
-                (string)$parent->Address->AddressLines->Address2,
-                (string)$parent->Address->AddressLines->Address3
+                trim((string)$parent->Address->AddressLines->Address1),
+                trim((string)$parent->Address->AddressLines->Address2),
+                trim((string)$parent->Address->AddressLines->Address3)
             ]));
 
             /* Full, formal address that you could paste on an envelope
              */
             $mailAddress = implode(', ', [
                 $address,
-                (string)$parent->Address->Town,
-                (string)$parent->Address->Postcode,
-                (string)$parent->Address->Country
+                trim((string)$parent->Address->Town),
+                trim((string)$parent->Address->Postcode),
+                trim((string)$parent->Address->Country)
             ]);
 
             /* Stack 'em up
              */
             $stack[] = [
-                'name' => (string)$parent->Forename . ' ' . (string)$parent->Surname,
+                'name' => trim((string)$parent->Forename) . ' ' . trim((string)$parent->Surname),
                 'phone' => [
-                    'home' =>  (string)$parent->Telephone,
-                    'work' => (string)$parent->Telephone,
-                    'mobile' => (string)$parent->Mobile,
+                    'home' =>  trim((string)$parent->Telephone),
+                    'work' => trim((string)$parent->Telephone),
+                    'mobile' => trim((string)$parent->Mobile),
                 ],
                 'address' => [
                     'home' => $address,
                     'mail' => $mailAddress,
-                    'suburb' => (string)$parent->Address->Town,
-                    'postcode' => (string)$parent->Address->Postcode,
+                    'suburb' => trim((string)$parent->Address->Town),
+                    'postcode' => trim((string)$parent->Address->Postcode),
                 ],
-                'email' => (string)$parent->EmailAddress,
+                'email' => trim((string)$parent->EmailAddress),
             ];
         }
 

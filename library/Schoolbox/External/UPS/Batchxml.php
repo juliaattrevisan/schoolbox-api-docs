@@ -97,9 +97,9 @@ class Batchxml implements ISync
 
         foreach ($campuses as $currentResult) {
             $campus = (new User\Common\Campus())
-                ->setId((string)$currentResult->xpath('@Id')[0])
-                ->setCode((string)$currentResult->Code)
-                ->setName((string)$currentResult->Name);
+                ->setId(trim((string)$currentResult->xpath('@Id')[0]))
+                ->setCode(trim((string)$currentResult->Code))
+                ->setName(trim((string)$currentResult->Name));
 
             /* Map campuses to their NCYear levels
              */
@@ -125,17 +125,17 @@ class Batchxml implements ISync
         $student = new User\Student();
 
         $student
-            ->setId((string)$currentResult->SchoolCode)
-            ->setTitle((string)$currentResult->Title)
-            ->setGivenName((string)$currentResult->Forename)
-            ->setPreferredName((string)$currentResult->Preferredname)
-            ->setLastname((string)$currentResult->Surname)
-            ->setGender((string)$currentResult->Gender)
-            ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime((string)$currentResult->DOB)));
+            ->setId(trim((string)$currentResult->SchoolCode))
+            ->setTitle(trim((string)$currentResult->Title))
+            ->setGivenName(trim((string)$currentResult->Forename))
+            ->setPreferredName(trim((string)$currentResult->Preferredname))
+            ->setLastname(trim((string)$currentResult->Surname))
+            ->setGender(trim((string)$currentResult->Gender))
+            ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$currentResult->DOB))));
 
         $student
             ->getYear()
-            ->setDescription((string)$currentResult->NCYear)
+            ->setDescription(trim((string)$currentResult->NCYear))
             ->setLevel((int)$currentResult->NCYear);
 
         /* "Form" seems to be some kind of string, not an int
@@ -143,19 +143,19 @@ class Batchxml implements ISync
          */
         $student
             ->getForm()
-            ->setDescription((string)$currentResult->Form);
+            ->setDescription(trim((string)$currentResult->Form));
         $student
             ->getHouse()
-            ->setName((string)$currentResult->AcademicHouse)
-            ->setCode((string)$currentResult->AcademicHouse);
+            ->setName(trim((string)$currentResult->AcademicHouse))
+            ->setCode(trim((string)$currentResult->AcademicHouse));
 
         $student
             ->getAccount()
-            ->setLogin((string)$currentResult->UserName)
+            ->setLogin(trim((string)$currentResult->UserName))
             ->setActive(true);
 
         $student
-            ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+            ->addEmail((new User\Common\Email())->setAddress(trim((string)$currentResult->EmailAddress)));
 
         /* Assign campuses if they exist in the mapping
          * Otherwise quietly disregard bad data
@@ -201,7 +201,7 @@ class Batchxml implements ISync
         /* Find the full details of each student
          */
         foreach ($studentNodes as $studentNode) {
-            $studentId = (string)$studentNode->xpath('@Id')[0]->Id;
+            $studentId = trim((string)$studentNode->xpath('@Id')[0]->Id);
 
             $node = $this->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
 
@@ -225,43 +225,43 @@ class Batchxml implements ISync
             $staff = new User\Staff();
 
             $staff
-                ->setId((string)$currentResult->xpath('@PersonId')[0]->PersonId)
-                ->setTitle((string)$currentResult->Title)
-                ->setPreferredName((string)$currentResult->PreferredName)
-                ->setGivenName((string)$currentResult->Forename)
-                ->setLastname((string)$currentResult->Surname)
-                ->setGender((string)$currentResult->Gender)
-                ->setPhoneWork((new User\Common\Phone())->setNumber((string)$currentResult->SchoolMobileNumber))
-                ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->SchoolMobileNumber))
-                ->setPhoneHome((new User\Common\Phone())->setNumber((string)$currentResult->PersonalMobileNumber))
+                ->setId(trim((string)$currentResult->xpath('@PersonId')[0]->PersonId))
+                ->setTitle(trim((string)$currentResult->Title))
+                ->setPreferredName(trim((string)$currentResult->PreferredName))
+                ->setGivenName(trim((string)$currentResult->Forename))
+                ->setLastname(trim((string)$currentResult->Surname))
+                ->setGender(trim((string)$currentResult->Gender))
+                ->setPhoneWork((new User\Common\Phone())->setNumber(trim((string)$currentResult->SchoolMobileNumber)))
+                ->setPhoneMobile((new User\Common\Phone())->setNumber(trim((string)$currentResult->SchoolMobileNumber)))
+                ->setPhoneHome((new User\Common\Phone())->setNumber(trim((string)$currentResult->PersonalMobileNumber)))
                 ->getMeta()
-                    ->getPosition()->add((new User\Staff\Position())->setDescription((string)$currentResult->Roles->Role->Name));
+                    ->getPosition()->add((new User\Staff\Position())->setDescription(trim((string)$currentResult->Roles->Role->Name)));
 
             /* Account
              */
             $staff
                 ->getAccount()
-                    ->setLogin((string)$currentResult->UserName)
+                    ->setLogin(trim((string)$currentResult->UserName))
                     ->setActive(true);
 
             /* Email - one for every item in stack
              */
             $staff
                 ->getEmail()
-                    ->add((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->SchoolEmailAddress)));
 
             $staff
                 ->getWorkEmail()
-                    ->add((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->SchoolEmailAddress)));
 
             $staff
                 ->getHomeEmail()
-                    ->add((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->SchoolEmailAddress)));
 
             /* Campus
              */
             foreach ($currentResult->Divisions->Division as $division) {
-                $staff->getCampus()->add((new User\Common\Campus())->setName((string)$division->Name));
+                $staff->getCampus()->add((new User\Common\Campus())->setName(trim((string)$division->Name)));
             }
 
             yield $staff;
@@ -280,42 +280,42 @@ class Batchxml implements ISync
             $guardian = new User\Guardian();
 
             $guardian
-                ->setId((string)$currentResult->xpath('@PersonId')[0]->PersonId)
-                ->setTitle((string)$currentResult->Title)
-                ->setPreferredName((string)$currentResult->Forename)
-                ->setGivenName((string)$currentResult->Forename)
-                ->setLastname((string)$currentResult->Surname)
-                ->setType((string)$currentResult->Relationship)
-                ->setPhoneWork((new User\Common\Phone())->setNumber((string)$currentResult->Telephone))
-                ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->Mobile));
+                ->setId(trim((string)$currentResult->xpath('@PersonId')[0]->PersonId))
+                ->setTitle(trim((string)$currentResult->Title))
+                ->setPreferredName(trim((string)$currentResult->Forename))
+                ->setGivenName(trim((string)$currentResult->Forename))
+                ->setLastname(trim((string)$currentResult->Surname))
+                ->setType(trim((string)$currentResult->Relationship))
+                ->setPhoneWork((new User\Common\Phone())->setNumber(trim((string)$currentResult->Telephone)))
+                ->setPhoneMobile((new User\Common\Phone())->setNumber(trim((string)$currentResult->Mobile)));
 
             /* Account
              */
             $guardian
                 ->getAccount()
-                    ->setLogin((string)$currentResult->EmailAddress)
+                    ->setLogin(trim((string)$currentResult->EmailAddress))
                     ->setActive(true);
 
             /* Email Address
              */
             $guardian
                 ->getEmail()
-                    ->add((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->EmailAddress)));
 
             $guardian
                 ->getWorkEmail()
-                    ->add((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->EmailAddress)));
 
             $guardian
                 ->getHomeEmail()
-                    ->add((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->EmailAddress)));
 
             /* Find all the pupils for this parent and stack them up
              */
             $allStudents = [];
 
             foreach ($currentResult->xpath('Pupils/Pupil/@Id') as $studentNode) {
-                $studentId = (string)$studentNode;
+                $studentId = trim((string)$studentNode);
 
                 /* Find the first instance of a Pupil with Id = $studentId
                  * For some reason they've duped the data for us

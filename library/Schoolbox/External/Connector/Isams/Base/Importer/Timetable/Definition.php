@@ -134,7 +134,7 @@ class Definition implements ImporterInterface
                 /** @var TimetableCycle $timetableCycle */
                 $timetableCycle = $this->timetableCycleMapper->createModel()
                     ->setId($campus->getId())
-                    ->setTitle((string)$cycle->Name)
+                    ->setTitle(trim((string)$cycle->Name))
                     ->setCycleLength(\count($cycle->xpath('Days/Day')))
                     ->setDayLength($dayData['maxPeriods'])
 
@@ -239,7 +239,7 @@ class Definition implements ImporterInterface
 
         foreach ($days as $day) {
             $periods = $day->xpath('Periods/Period');
-            $dayIndex = (string)$day->Day;
+            $dayIndex = trim((string)$day->Day);
 
             /* Figure out which day has the most periods
              * Consider this value and scheme canonical
@@ -255,11 +255,11 @@ class Definition implements ImporterInterface
             /** @var TimetablePeriod $period */
             foreach ($periods as $period) {
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
-                    ->setTitle((string)$period->Name)
+                    ->setTitle(trim((string)$period->Name))
                     ->setDay($dayIndex)
-                    ->setSequence((string)$period->Ordinal)
-                    ->setStart((string)$period->StartTime . ':00')
-                    ->setFinish((string)$period->EndTime . ':00');
+                    ->setSequence(trim((string)$period->Ordinal))
+                    ->setStart(trim((string)$period->StartTime . ':00'))
+                    ->setFinish(trim((string)$period->EndTime . ':00'));
 
                 $struct['days'][$dayIndex][] = $timetablePeriod;
             }
@@ -269,8 +269,8 @@ class Definition implements ImporterInterface
             if (!\count($struct['days'][$dayIndex])) {
                 $this->log->warning(sprintf(
                     'Cycle %s (%s), Day %s has no periods.',
-                    (string)$cycle->xpath('@Id')[0],
-                    (string)$cycle->Name,
+                    trim((string)$cycle->xpath('@Id')[0]),
+                    trim((string)$cycle->Name),
                     $dayIndex
                 ));
             }

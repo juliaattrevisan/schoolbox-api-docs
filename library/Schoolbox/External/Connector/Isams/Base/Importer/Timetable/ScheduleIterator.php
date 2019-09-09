@@ -69,16 +69,16 @@ class ScheduleIterator implements Iterator
 
         /* Class
          */
-        $subject = $this->findSubject((string)$schedule->Code);
+        $subject = $this->findSubject(trim((string)$schedule->Code));
 
         /* Teacher
          * (I've only seen one per class in the xml so far...but there could be many?)
          */
-        $teachers = $this->findTeacher((string)$schedule->Teacher);
+        $teachers = $this->findTeacher(trim((string)$schedule->Teacher));
 
         /* Students
          */
-        $students = $this->findStudents((string)$schedule->Code);
+        $students = $this->findStudents(trim((string)$schedule->Code));
 
         /* Find out when this happens in the grand design of the timetable
          */
@@ -121,7 +121,7 @@ class ScheduleIterator implements Iterator
 
         return [
             'code' => $setCode,
-            'name' => (string)$node[0]->Name,
+            'name' => trim((string)$node[0]->Name),
         ];
     }
 
@@ -137,7 +137,7 @@ class ScheduleIterator implements Iterator
      */
     private function findPeriod(SimpleXMLElement $schedule)
     {
-        $periodId = (string)$schedule->PeriodId;
+        $periodId = trim((string)$schedule->PeriodId);
 
         $periodPath = "/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period[@Id='{$periodId}']";
 
@@ -180,13 +180,13 @@ class ScheduleIterator implements Iterator
         /* Otherwise we knew when this happened and what was in it
          */
         return [
-            'day' => (string)$day[0]->Day,
-            'name' => (string)$period[0]->Name,
-            'abbrev' => (string)$period[0]->ShortName,
-            'start' => (string)$period[0]->StartTime,
-            'end' => (string)$period[0]->EndTime,
-            'sequence' => (string)$period[0]->Ordinal,
-            'room' => $this->findRoom((string)$schedule->RoomId)
+            'day' => trim((string)$day[0]->Day),
+            'name' => trim((string)$period[0]->Name),
+            'abbrev' => trim((string)$period[0]->ShortName),
+            'start' => trim((string)$period[0]->StartTime),
+            'end' => trim((string)$period[0]->EndTime),
+            'sequence' => trim((string)$period[0]->Ordinal),
+            'room' => $this->findRoom(trim((string)$schedule->RoomId))
         ];
     }
 
@@ -213,9 +213,9 @@ class ScheduleIterator implements Iterator
         }
 
         return [
-            'name' => (string)$node[0]->Name,
-            'initials' => (string)$node[0]->Initials,
-            'code' => (string)$node[0]->Code,
+            'name' => trim((string)$node[0]->Name),
+            'initials' => trim((string)$node[0]->Initials),
+            'code' => trim((string)$node[0]->Code),
         ];
     }
 
@@ -247,10 +247,10 @@ class ScheduleIterator implements Iterator
         $teacher = $node[0];
 
         return [
-            'title' => (string)$teacher->Title,
-            'firstname' => (string)$teacher->Forename,
-            'surname' => (string)$teacher->Surname,
-            'username' => (string)$teacher->xpath('@PersonId')[0]->PersonId,
+            'title' => trim((string)$teacher->Title),
+            'firstname' => trim((string)$teacher->Forename),
+            'surname' => trim((string)$teacher->Surname),
+            'username' => trim((string)$teacher->xpath('@PersonId')[0]->PersonId),
         ];
     }
 
@@ -278,12 +278,12 @@ class ScheduleIterator implements Iterator
          */
         $students = [];
 
-        $setId = (string)$node[0]->xpath('@Id')[0]->Id;
+        $setId = trim((string)$node[0]->xpath('@Id')[0]->Id);
 
         $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[contains(SetId, '{$setId}')]");
 
         foreach ($setListNodes as $current) {
-            $studentId = (string)$current->xpath('@PupilId')[0];
+            $studentId = trim((string)$current->xpath('@PupilId')[0]);
 
             $student = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
 
@@ -294,10 +294,10 @@ class ScheduleIterator implements Iterator
             }
 
             $students[] = [
-                'title' => (string)$student->Title,
-                'firstname' => (string)$student->Forename,
-                'surname' => (string)$student->Surname,
-                'username' => (string)$student->SchoolCode,
+                'title' => trim((string)$student->Title),
+                'firstname' => trim((string)$student->Forename),
+                'surname' => trim((string)$student->Surname),
+                'username' => trim((string)$student->SchoolCode),
             ];
         }
 
