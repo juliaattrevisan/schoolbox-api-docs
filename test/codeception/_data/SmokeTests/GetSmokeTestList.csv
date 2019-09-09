@@ -112,3 +112,24 @@ News,News Moderator,Get an RSS feed,https://vagrant.dev.schoolbox.cloud/news/fee
 ,Teacher,View an individual news item,https://vagrant.dev.schoolbox.cloud/news/34
 ,Teacher,View saved news,https://vagrant.dev.schoolbox.cloud/news/saved
 ,Teacher,View news archive,https://vagrant.dev.schoolbox.cloud/news/archive
+Fixtures,Fixtures Administrator,Go to fixtures,https://vagrant.dev.schoolbox.cloud/fixtures
+,Fixtures Administrator,See all seasons,https://vagrant.dev.schoolbox.cloud/fixtures/seasons
+,Fixtures Administrator,Change a seacon,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit
+,Fixtures Administrator,Add external schools if needed,https://vagrant.dev.schoolbox.cloud/fixtures/school
+,Fixtures Administrator,Update match status,https://vagrant.dev.schoolbox.cloud/fixtures/statuses
+,Fixtures Administrator,View all sports.,https://vagrant.dev.schoolbox.cloud/fixtures/sports
+,Fixtures Administrator,See all sport types sport teams.,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2
+,Fixtures Administrator,Check all venues.,https://vagrant.dev.schoolbox.cloud/fixtures/venues
+,Fixtures Administrator,Add remove positions to sports team template,https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit
+,Fixtures Administrator,Assign players to team,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby
+,Fixtures Administrator,Edit venue,https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit
+,Fixtures Administrator,Create a new season,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new
+,Fixtures Administrator,Create a new venue,https://vagrant.dev.schoolbox.cloud/fixtures/venues/new
+,Fixtures Administrator,Create new sport,https://vagrant.dev.schoolbox.cloud/fixtures/sports/new
+,Fixtures Administrator,Add new division,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new
+,Fixtures Administrator,Add new team,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new
+,Fixtures Administrator,View all matches in a division,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches
+,Fixtures Administrator,Add a new match to the division,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1
+,Teacher,Fixture match details,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1
+,Teacher,View team matches,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches
+,Student,Fixture match details,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1

@@ -18,6 +18,7 @@ class FetchPagesFromCsvCest
         'Teacher'=> ['username'=>'jcoles', 'password'=>'password'],
         'Student'=> ['username'=>'jreed', 'password'=>'password'],
         'Pastoral Moderator'=> ['username'=>'jcoles', 'password'=>'password'],
+        'Fixtures Administrator'=> ['username'=>'jcoles', 'password'=>'password'],
         'News Moderator'=> ['username'=>'rwhite', 'password'=>'password']
     ];
 
