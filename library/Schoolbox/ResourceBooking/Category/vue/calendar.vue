@@ -261,6 +261,7 @@
                               :to-moment="toMoment"
                               :booking-path="config.createBookingPath"
                               :date-formats="formats"
+                              :booking-type="'category'"
         />
 
         <view-event-modal ref="event"

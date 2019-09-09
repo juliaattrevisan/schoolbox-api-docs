@@ -265,6 +265,7 @@
                               :to-moment="toMoment"
                               :booking-path="config.createBookingPath"
                               :date-formats="formats"
+                              :booking-type="'item'"
         />
 
         <view-event-modal ref="event"

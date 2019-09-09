@@ -29,6 +29,7 @@
             'toMoment',
             'bookingPath',
             'dateFormats',
+            'bookingType',
         ],
         data() {
             return {
@@ -46,7 +47,6 @@
             },
 
             submitForm() {
-
                 var createBookingParamsRoute = [
                     'startDate=' + this.toMoment(this.event.date).format('YYYY-MM-DD')
                 ];
@@ -55,7 +55,17 @@
                     createBookingParamsRoute.push('startTime=' + this.toMoment(this.event.date).format('HH:mm'));
                 }
 
-                window.location = this.bookingPath + '?' + createBookingParamsRoute.join('&');
+                var createBookingPath = this.bookingPath + '?' + createBookingParamsRoute.join('&');
+
+                if (this.bookingType === 'category') {
+                    var currentLocation = window.location;
+                    var callBackUrl = currentLocation.pathname + currentLocation.search;
+                    createBookingParamsRoute.push('callbackUrl=' + encodeURIComponent(callBackUrl));
+
+                    createBookingPath = this.bookingPath + this.event.id + '?' + createBookingParamsRoute.join('&') + '#resourceBookingByCategory';
+                }
+
+                window.location = createBookingPath;
             },
 
             getStartDate() {
