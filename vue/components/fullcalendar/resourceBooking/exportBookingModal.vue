@@ -11,11 +11,12 @@
     import qs          from 'qs';
 
     export default {
-        name: "export-booking-item-modal",
+        name: "export-booking-modal",
         props: [
             'token',
             'bookingExportUrl',
             'resourceId',
+            'bookingType',
         ],
         components: {RevealModal},
         methods: {
@@ -34,7 +35,12 @@
 
                 // Add token to object
                 values.token = this.token;
-                values.resource_id = this.resourceId;
+
+                if (this.bookingType === 'category') {
+                    values.resource_category_id = this.resourceId;
+                } else {
+                    values.resource_id = this.resourceId;
+                }
 
                 return this.window.location.protocol
                     + '//'

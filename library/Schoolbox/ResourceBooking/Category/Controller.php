@@ -182,7 +182,9 @@ class Controller extends Base {
                 'resource_category_id',
                 $item->getId(),
                 ['order' => ['name' => 'asc',]]
-            )
+            ),
+            true,
+            $this->getRequest()->query['status']
         );
         // put the results into a renderer
         $calendar = new Renderer(

@@ -11,9 +11,9 @@
     import MetaItem                   from '@schoolbox/meta/item'
     import Toast                      from "@schoolbox/toast";
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-    import CreateBookingModal         from './createBookingModal';
-    import ExportModal                from "./exportModal";
-    import FilterModal                from "./filterModal";
+    import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/createBookingModal';
+    import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/exportBookingModal';
+    import FilterModal                from '@schoolbox/fullcalendar/resourceBooking/filterModal';
     import axios                      from 'axios'
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 
@@ -253,6 +253,7 @@
                       :token="config.token"
                       :booking-export-url="urls.export"
                       :resource-id="config.resourceId"
+                      :booking-type="'item'"
         />
 
         <filter-modal ref="filter"
@@ -264,6 +265,7 @@
                               :to-moment="toMoment"
                               :booking-path="config.createBookingPath"
                               :date-formats="formats"
+                              :booking-type="'item'"
         />
 
         <view-event-modal ref="event"
