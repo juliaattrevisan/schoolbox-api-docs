@@ -126,7 +126,7 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 $arrivalTime = $arrival->getDatabaseTime();
                 if ($arrivalTime > $periodEnd) {
                     $data['AttendedFlag'] = 0;
-                } elseif ($arrivalTime > $periodStart) {
+                } elseif ($arrivalTime >= $periodStart) {
                     $data['LateArrivalFlag'] = 1;
                     $data['LateArrivalTime'] = $arrival->getDatabase();
                 }
@@ -139,7 +139,7 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 $departureTime = $departure->getDatabaseTime();
                 if ($departureTime < $periodStart) {
                     $data['AttendedFlag'] = 0;
-                } elseif ($departureTime < $periodEnd) {
+                } elseif ($departureTime <= $periodEnd) {
                     $data['EarlyDepartureFlag'] = 1;
                     $data['EarlyDepartureTime'] = $departure->getDatabase();
                 }
