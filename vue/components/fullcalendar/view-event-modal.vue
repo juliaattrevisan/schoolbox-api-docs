@@ -531,7 +531,7 @@
                         <span v-html="eventExtendedProps.detail"></span>
                     </article>
 
-                    <div v-if="eventExtendedProps.booking.related.length">
+                    <template v-if="eventExtendedProps.booking.related.length">
                         <h3>Related Bookings</h3>
                         <ul>
                             <li v-for="relatedBooking in eventExtendedProps.booking.related">
@@ -539,7 +539,15 @@
                                 <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
                             </li>
                         </ul>
-                    </div>
+                    </template>
+
+                    <!--
+                        Temporary solution to prevent a mysterious error:
+                        schoolbox.min.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
+                        when there's a related booking. According to my research, it's not a sizzle error and  we'll
+                        need to update jQuery to 3.x. However, doing so may potentially open un new issues.
+                     -->
+                    <template v-else></template>
 
                     <!--
                     <div v-if="eventExtendedProps.attendance.isAttendable">
