@@ -1,5 +1,5 @@
 <template>
-    <div class="reveal-modal" data-reveal aria-hidden="true" role="dialog" :id="elementId">
+    <div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" :id="elementId">
         <slot></slot>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>

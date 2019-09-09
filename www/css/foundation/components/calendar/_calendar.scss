@@ -22,72 +22,134 @@
 
 /* Destroy FullCalendar icons...
  */
-.fc-icon-left-single-arrow:after,
-.fc-icon-right-single-arrow:after{
-    content: none !important;
+.fc-icon-chevron-right:before,
+.fc-icon-chevron-left:before{
+    font-family: $font-family-icon;
 }
 /* Add SB icons instead
  */
 .fc-button .fc-icon{
-    font-family: $font-family-icon;
+  font-family: $font-family-icon;
+  font-size: 1rem !important;
 }
 
-.fc-icon-left-single-arrow:before{
-    @extend .icon-previous;
+.fc-icon-chevron-left:before{
+    content: '\e655' !important;
 }
 
-.fc-icon-right-single-arrow:before{
-    @extend .icon-next;
+.fc-icon-chevron-right:before{
+    content: '\e64b' !important;
 }
 
 /* Force FullCalendar control buttons to absorb
  * Skin Builder choices
  */
-#calendar {
-    .calendar-controls {
-        .fc-left .fc-button-group {
-            margin-left: 1rem;
-            margin-top: 1rem;
-        }
+.fc-toolbar {
+    border: 1px solid #ededed;
+    margin: 0 !important;
+    padding: 1rem;
 
-        .fc-right .fc-button-group {
-            margin-right: 1rem;
-            margin-top: 1rem;
-        }
-
-        button {
-            color: $content-ui-foreground;
-            background-color: $content-ui-background;
-            &:hover, &.fc-state-active {
-                color: $content-ui-foreground;
-                background-color: $content-ui-hover;
-            }
-        }
+    .fc-left .fc-button-group {
+        margin: 0 !important;
     }
 
-    @media #{$small-only} {
-        .fc-left,
-        .fc-right,
-        .fc-button-group,
-        .fc-button-group button{
-            float: none;
-        }
-        .calendar-controls {
-            .fc-left .fc-button-group {
-                margin-left: 0;
-            }
+    .fc-center {
+      flex-basis: 80%;
+      margin: 0 1rem;
+      padding: 0 !important;
 
-            .fc-right .fc-button-group {
-                margin-right: 0;
-            }
+      h2 {
+        font-size: 1.125rem;
+      }
+    }
+
+    .fc-right .fc-button-group {
+        margin: 0;
+    }
+
+    button {
+        @include button-dimensions();
+        color: $content-ui-foreground;
+        background-color: $content-ui-background;
+        border-radius: 0;
+        padding: .5rem .875rem !important;
+        margin: 0 1px 0 0 !important;
+
+        &.fc-button-primary:disabled {
+          @extend .disabled;
         }
-        .fc-icon {
-            line-height: 0.6rem;
-            font-size: 0.8rem;
-            height: 1.1em;
-            &:after{
-                top: 0;
-            }
+        &:hover, &.fc-button-active {
+          background-color: $content-ui-hover !important;
+          color: $content-ui-foreground !important;
+        }
+    }
+}
+
+.fc-unthemed th,
+.fc-unthemed td,
+.fc-unthemed thead,
+.fc-unthemed tbody,
+.fc-unthemed .fc-divider,
+.fc-unthemed .fc-row,
+.fc-unthemed .fc-content,
+.fc-unthemed .fc-popover,
+.fc-unthemed .fc-list-view,
+.fc-unthemed .fc-list-heading td {
+    border-color: #ededed !important;
+}
+
+.fc-widget-header span {
+    display: block;
+    font-size: .875rem;
+    margin: .25rem;
+}
+
+.fc-day-header {
+    font-weight: 400 !important;
+    text-transform: uppercase !important;
+}
+
+.fc-day-top {
+    text-align: center;
+    span {
+        float: none !important;
+    }
+}
+
+.fc-day-grid-event {
+    padding: 3px 2px !important;
+}
+
+.fc .fc-row .fc-content-skeleton td {
+    border-color: inherit !important;
+}
+
+.fc-event {
+    border-radius: 0 !important;
+
+    .fc-title,
+    .fc-title:hover {
+        color: $black;
+    }
+}
+
+@media #{$medium-down} {
+    .fc-toolbar {
+        flex-direction: column;
+        .fc-center {
+            margin: 1rem;
+        }
+    }
+    .fc-right {
+        width: 100%;
+    }
+    .fc-center h2 {
+        font-size: 1rem;
+    }
+    .fc-right .fc-button-group {
+        width: 100%;
+        button {
+            padding: .5rem !important;
         }
     }
 }

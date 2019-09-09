@@ -456,18 +456,24 @@
             content-height="auto"
             :custom-buttons="{
                 customExport: {
-                    text: 'export',
+                    text: 'Export',
                     click: onExportClick
                 },
                 customFilters: {
-                    text: 'filters',
+                    text: 'Filters',
                     click: onFilterClick
                 },
             }"
             :header="{
-                left: 'prev,today,next',
+                left: 'today,prev,next',
                 center: 'title',
                 right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+            }"
+            :buttonText="{
+                today:    'Today',
+                month:    'Month',
+                week:     'Week',
+                day:      'Day'
             }"
             :default-date="config.defaultDate"
             :default-view="config.defaultView || 'dayGridMonth'"

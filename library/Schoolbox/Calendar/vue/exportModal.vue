@@ -131,7 +131,7 @@
             <input type="hidden" name="token" :value="token" />
 
             <ul class="flex-list buttons">
-                <li><button class="icon-rss" @click.prevent="$refs.feedUrlModal.open">Generate URL</button></li>
+                <li><button @click.prevent="$refs.feedUrlModal.open">Generate URL</button></li>
                 <li><input type="submit" class="icon-download" value="Download CSV" /></li>
             </ul>
         </form>

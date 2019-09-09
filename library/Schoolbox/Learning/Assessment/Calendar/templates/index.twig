@@ -29,19 +29,19 @@ Usage:
 {% endautoescape %}
 
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 island">
         <h1>{{ locale.assessment.proper }} Calendar</h1>
-        <section class="content">
+        <div>
             {% include '@filters/panel.twig' with {
                 contentId: reportContentId,
                 panel:     filterPanel,
                 quickload: true
             } only %}
-        </section>
+        </div>
 
-        <div id="{{ reportContentId }}">
+        <section id="{{ reportContentId }}">
             <div id="calendar"></div>
             <script type="text/javascript" src="/javascript/components/assessmentCalendar.bundle.js?v={{ config.site_version }}"></script>
-        </div>
+        </section>
     </div>
 </div>

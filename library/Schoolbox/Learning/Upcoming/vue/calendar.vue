@@ -23,9 +23,15 @@
                 :event-time-format="helper.eventTimeFormat"
                 content-height="auto"
                 :header="{
-                    left: 'prev,today,next',
+                    left: 'today,prev,next',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                }"
+                :buttonText="{
+                    today:    'Today',
+                    month:    'Month',
+                    week:     'Week',
+                    day:      'Day'
                 }"
                 default-view="dayGridMonth"
                 :event-render="eventRender"
