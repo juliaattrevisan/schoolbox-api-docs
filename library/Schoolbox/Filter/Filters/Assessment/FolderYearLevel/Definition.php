@@ -38,7 +38,9 @@ class Definition extends Filter\AbstractDefinition
         GenericCollection $yearLevels
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->yearLevels = $yearLevels->shallowClone();
+        $this->yearLevels = $yearLevels->shallowClone()->indexByCallback(static function (YearLevel\Model $yearLevel) {
+            return $yearLevel->getId();
+        });
     }
 
 
