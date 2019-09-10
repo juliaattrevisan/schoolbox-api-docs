@@ -269,7 +269,8 @@ Usage:
             });
 
             // Set all nested values to NULL if they're empty
-            // This is required so that qs submits an empty value (required so that
+            // This is required so that qs.stringify serializes an empty value
+            // into an actual key.
             Object.keys(nestedObj).forEach(function (filterId) {
                 if (Object.keys(nestedObj[filterId]).length === 0) {
                     nestedObj[filterId] = null;
