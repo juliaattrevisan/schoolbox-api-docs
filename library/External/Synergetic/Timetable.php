@@ -860,7 +860,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable(array $roomCodes): array
     {
-        if (empty($roomCodes)) {
+        $filteredRoomCodes = array_filter($roomCodes);
+        if (empty($filteredRoomCodes)) {
             return [];
         }
         $query = "
@@ -896,7 +897,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             array(
                 ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
                 ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
-                ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $roomCodes)),
+                ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $filteredRoomCodes)),
             )
         );
 
