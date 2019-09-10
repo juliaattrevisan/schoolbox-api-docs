@@ -20,7 +20,15 @@
                     data:     {},
                     dataType: 'json'
                 },
-                multiple: true
+                multiple: true,
+                selectize: {
+                    optgroups: [
+                        {value: 'class', label: 'Classes'},
+                        {value: 'group', label: 'Groups'},
+                        {value: 'other', label: 'Other Folders'}
+                    ],
+                    lockOptgroupOrder: true
+                }
             });
         });
     </script>
