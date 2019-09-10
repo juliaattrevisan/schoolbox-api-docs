@@ -21,6 +21,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	protected $timestamp;
 	protected $calendarDate;
 	protected $calendarDateTime;
+	protected $weekendDays;
 
 	/**
 	 * Get the preferred local format
@@ -111,4 +112,13 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	public function calendarDateTime() {
 		return $this->calendarDateTime;
 	}
+
+	/**
+     * Get the days which are the weekends for this locale
+     */
+	public function weekendDays()
+    {
+        return $this->weekendDays;
+    }
+
 }

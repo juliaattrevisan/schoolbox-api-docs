@@ -29,5 +29,5 @@ class Alaress_Date_Locale_Static extends Alaress_Date_Locale_Abstract {
 	protected $calendarDate = 'jS M';
 	protected $calendarDateTime = 'jS M g:ia';
 
-
+    protected $weekendDays = [Alaress_Date_Format::SATURDAY,Alaress_Date_Format::SUNDAY];
 }

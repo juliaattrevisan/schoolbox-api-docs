@@ -23,4 +23,5 @@ interface Alaress_Date_Locale_Interface {
 	public function calendarDate();
 	public function calendarDateTime();
 
+    public function weekendDays();
 }

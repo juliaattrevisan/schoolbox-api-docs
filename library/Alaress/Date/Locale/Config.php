@@ -47,7 +47,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
         $this->config = new class($loader) implements IConfigLoader {
 
             private const KEYS = [
-                'date_local', 'date_time', 'date_long', 'date_short', 'date_time', 'date_only'
+                'date_local', 'date_time', 'date_long', 'date_short', 'date_time', 'date_only', 'locale_weekend'
             ];
 
             /** @var string[] */
@@ -179,5 +179,14 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
      */
     public function calendarDateTime() {
         return $this->getConfig()->get('date_only').' '.$this->getConfig()->get('date_time');
+    }
+
+    /**
+     * Get the calendar datetime format
+     *
+     * @return string
+     */
+    public function weekendDays() {
+        return explode(',',$this->getConfig()->get('locale_weekend'));
     }
 }
