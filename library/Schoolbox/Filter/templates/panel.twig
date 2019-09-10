@@ -35,7 +35,7 @@ Usage:
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
-        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden]');
+        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden], select');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
@@ -232,31 +232,44 @@ Usage:
          * @return {object}
          */
         function deserialize(serialised){
-            var decodedData = decodeURIComponent(serialised),
-                flatArray   = decodedData.split('&'),
-                nestedObj   = {},
-                regEx       = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/, // eg 'filter_selection[1][task]=1'
-                emptyRegEx  = /^filter_selection\[(\d+)]=$/;               // eg 'filter_selection[17]='
+            var decodedData    = decodeURIComponent(serialised),
+                flatArray      = decodedData.split('&'),
+                nestedObj      = {},
+                regEx          = /^filter_selection\[(\d+)]\[(\w*)]=([01])$/, // eg 'filter_selection[1][task]=1'
+                emptyRegEx     = /^filter_selection\[(\d+)]=$/,               // eg 'filter_selection[17]='
+                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(\d+)$/;       // eg 'filter_selection[17][]=22'
 
             // Convert flat string array to nested object
             flatArray.forEach(function (keyValue) {
                 var filterId  = null,
                     optionKey = null,
                     optionVal = null,
-                    result = regEx.exec(keyValue);
+                    result    = regEx.exec(keyValue);
 
-                if (!result){
-                    // This happens if a filter has no options, eg course import not imported to any classes
-                    // Still attempt to output an empty nested object
-                    result = emptyRegEx.exec(keyValue);
-                    if (!result) {
-                        return;
-                    }
-                    filterId = result[1];
-                } else {
+                // First: try the main regex
+                if (result) {
                     filterId  = result[1];
                     optionKey = result[2];
                     optionVal = result[3];
+                } else {
+                    // Second: try the selectize regex
+                    result = selectizeRegEx.exec(keyValue);
+                    if (result) {
+                        filterId  = result[1];
+                        optionKey = result[2];
+                        optionVal = 1;
+                    } else {
+                        // Finally: try the empty regex
+                        result = emptyRegEx.exec(keyValue);
+                        if (result) {
+                            filterId = result[1];
+                        }
+                    }
+                }
+
+                // Did none of the regexes match? exit
+                if (filterId === null) {
+                    return;
                 }
 
                 if (!nestedObj.hasOwnProperty(filterId)) {
