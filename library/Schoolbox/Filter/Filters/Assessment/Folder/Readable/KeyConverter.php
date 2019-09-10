@@ -33,4 +33,33 @@ class KeyConverter extends BaseFolderKeyConverter
         }
         return parent::getSelectedItems($availableSelections, $user, $page);
     }
+
+
+    /**
+     * This key is valid for any user who may view this folder.
+     *
+     * @param string $key
+     * @param User   $user
+     * @param string $page
+     */
+    protected function assertValidKey(string $key, User $user, string $page): void
+    {
+        // TODO check for read permissions
+    }
+
+
+    /**
+     * This key converter doesn't store a list of folder IDs, because said list
+     * is dynamic based on whatever's in the selectize box.
+     *
+     * @param string $key
+     * @param User   $user
+     * @param string $page
+     * @return int
+     */
+    public function getItem(string $key, User $user, string $page): int
+    {
+        $this->assertValidKey($key, $user, $page);
+        return (int)$key;
+    }
 }
