@@ -95,7 +95,7 @@ class IdFinder extends Filter\AbstractIdFinder
         [$unitSpecWhere, $unitSpecParams] = $this->getClauseUnitSpec($unitSpecIds);
 
         // This filter affects which sub-queries are used, and also potentially modifies the unit-impl-context sub-queries
-        list($uImpSpcJoin, $uImpSpcWhere, $uImpSpcParams) = $this->getClauseUnitImplSpec($unitImpSpcIds);
+        [$uImpSpcJoin, $uImpSpcWhere, $uImpSpcParams] = $this->getClauseUnitImplSpec($unitImpSpcIds);
 
         // Sub-query modifiers
         $aTypes         = $completeFilters[AssessmentType\Definition::class];
@@ -113,12 +113,12 @@ class IdFinder extends Filter\AbstractIdFinder
         [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
         [$markPerCapWhere]                                        = $this->getClauseMarkPerCap($markPerCap, $dueWorkAlias);
         [$temporalWhere, $temporalParams, $participantPlanJoin]   = $this->getClauseTemporalState($temporalStates);
-        list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
-        list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
-        list($weightingWhere, $weightingParams)     = $this->getClauseWeighting($weightings);
-        list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypeIds);
-        list($yearDueWhere, $yearDueParams)         = $this->getClauseYear($yearsDue, self::DATE_COL_DUE);
-        list($deletedWhere)                         = $this->getClauseDeleted($deleted);
+        [$termDJoin, $termDWhere, $termDParams]                   = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
+        [$termCJoin, $termCWhere, $termCParams]                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
+        [$weightingWhere, $weightingParams]                       = $this->getClauseWeighting($weightings);
+        [$workTypeWhere,  $workTypeParams]                        = $this->getClauseWorkType($workTypeIds);
+        [$yearDueWhere, $yearDueParams]                           = $this->getClauseYear($yearsDue, self::DATE_COL_DUE);
+        [$deletedWhere]                                           = $this->getClauseDeleted($deleted);
 
         // Build the non-context JOINs
         $nonContextJoins = [
