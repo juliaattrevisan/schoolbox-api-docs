@@ -11,7 +11,6 @@ use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -85,10 +84,7 @@ class Factory extends FolderFilter\Factory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->indexByCallback(function ($folderId) {
-                return $folderId;
-            });
-        return new KeyConverter($filter, $folderIds, $this->getAccess());
+        // Don't care about contents yet
+        return new KeyConverter($filter, new Collection(), $this->getAccess());
     }
 }
