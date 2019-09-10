@@ -67,9 +67,6 @@
         });
 
         var form = $('#folderForm');
-        var postParams = {
-            id: '{{ folder.id }}'
-        };
 
         form.alaressValidate({
             rules: {
@@ -99,7 +96,7 @@
             }
         });
 
-        {% if folder.getId %}
+        {% if folder.id %}
 
             $('[data-interaction="delete"]').click(function(event) {
                 event.preventDefault();
@@ -111,7 +108,10 @@
                         $toast.toastActivate({text: 'Deleting folder...'});
 
                         // Redirect to dashboard after request completes
-                        $.post('/resource/folder/delete', postParams)
+                        $.ajax({
+                                url: '/resource/folder/{{ folder.id }}',
+                                type: 'DELETE',
+                            })
                             .done(function() {
                                 window.setTimeout(function() {
                                     $toast.toastTimeout({text: 'Folder deleted', duration: 3000, css: 'success'});
@@ -121,7 +121,6 @@
                             .fail(function() {
                                 $toast.toastTimeout({text: 'Folder cannot be deleted', css: 'alert'});
                             });
-
                     }
                 });
             });
@@ -150,7 +149,7 @@
                         "<li>Social Stream Posts</li>" +
                         "</ul>",
                     confirmEvent: function() {
-                        $.post('/resource/folder/reset', postParams).done(function() {
+                        $.post('{{routeLookup('folder.postFolderReset', {id: folder.id}) }}').done(function() {
                             window.location.href = '/homepage/{{ folder.getId }}';
                         });
                     }

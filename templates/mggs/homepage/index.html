@@ -105,11 +105,11 @@
         // This is done with JS, otherwise components that are added after page load will be locked,
         // and who can be bothered wrangling with phplib
         $('a[data-component-settings], [data-component-handle]').hide();
-        
+
         // Toggle for homepage lock
         $('#component-lock-toggle').click(function (event) {
             var locked = this.checked;
-            
+
             $('a[data-component-settings], [data-component-handle]').toggle(locked);
 
         });
@@ -273,10 +273,10 @@
         <li class="separator">Folder Actions</li>
         <!-- BEGIN stats_data -->
         <li>
-            <a href="/resource/folder/create/{ID}" class="icon-add">Add Sub Folder</a>
+            <a href="/resource/folder/{ID}/create" class="icon-add">Add Sub Folder</a>
         </li>
         <li>
-            <a href="/resource/folder/modify/{ID}" class="icon-modify">Modify Folder</a>
+            <a href="/resource/folder/{ID}/modify" class="icon-modify">Modify Folder</a>
         </li>
         <!-- END stats_data -->
         <!-- BEGIN manage_page -->

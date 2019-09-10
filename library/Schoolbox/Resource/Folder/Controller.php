@@ -133,13 +133,13 @@ class Controller extends BaseController
     }
 
 
+    /** @noinspection PhpUnused */
     /**
      * Display create folder page
      *
-     * @api   /resource/folder/create/{parentId}
+     * @api GET /resource/folder/{parentId}/create
      *
      * @param Model $parent
-     * @throws MapperException
      * @throws UnexpectedValueException
      * @throws Router\Exception\RouteNotFound
      */
@@ -170,16 +170,20 @@ class Controller extends BaseController
     }
 
 
+    /** @noinspection PhpUnused */
     /**
      * Display update folder screen
      *
-     * @api GET /resource/folder/modify/:folderId
+     * @api GET /resource/folder/{id}/modify
      * @param Model $folder
      * @throws UnexpectedValueException
      * @throws Router\Exception\RouteNotFound
+     * @throws MapperException
      */
     public function getFolderModify(Model $folder): void
     {
+        // Lightly hydrate parent for breadcrumb label
+        $folder->setParent($this->folderMapper->findCheaplyById($folder->getParent()->getId()));
         $breadcrumbs = [
             [
                 'text' => $folder->getParent()->getName(),
@@ -202,6 +206,7 @@ class Controller extends BaseController
 
         $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
     }
+
 
     /**
      * Displays the folder modify form.
@@ -289,26 +294,17 @@ class Controller extends BaseController
         );
     }
 
+    /** @noinspection PhpUnused */
     /**
-     * Delete folder AJAX
+     * Delete folder
      *
+     * @api DELETE /resource/folder/{id}
+     * @param Model $folder
      * @throws SchoolboxException
      */
-    public function postDeleteFolder()
+    public function deleteFolder(Folder\Model $folder): void
     {
-        // Find the folder to be deleted
-        try {
-            $folder = $this->folderMapper->findById($this->getRequest()->post["id"]);
-        } catch (\Exception $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
-        }
-
-        // Make sure they have access to delete the folder
-        if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
-        }
-
-        $this->recursiveDelete($this->getRequest()->post["id"], $this->getUser());
+        $this->recursiveDelete($folder->getId(), $this->getUser());
 
         $this->getResponse()->content->set([
             'format' => 'json',
@@ -316,54 +312,38 @@ class Controller extends BaseController
         ]);
     }
 
+
+    /** @noinspection PhpUnused */
     /**
      * Move folder with an AJAX response
      *
-     * @throws SchoolboxException
+     * @api PUT /resource/folder/{id}/move/{parentId}
+     * @param Model $folder
+     * @param Model $newParent
+     * @throws MapperException
+     * @throws SchoolboxException If move would cause folder ancestry cycle
      */
-    public function postMoveFolder()
+    public function putMoveFolder(Model $folder, Model $newParent): void
     {
-        if ($this->getRequest()->post["source"] != $this->getRequest()->post["destination"])
-        {
-            // Check the folders exist
-            try
-            {
-                $source = $this->folderMapper->findById($this->getRequest()->post["source"]);
-                $destination = $this->folderMapper->findById($this->getRequest()->post["destination"]);
-            }
-            catch (\Exception $e)
-            {
-                // One of the folders didn't exist
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
-            }
-
-            if ($this->access->getFolderAccess($this->getUser(), $source->getId()) < UserAccess::ACCESS_WRITE)
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
-
-            if ($this->access->getFolderAccess($this->getUser(), $destination->getId()) < UserAccess::ACCESS_WRITE)
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
-
-            // Move the folder
-            $this->folderMapper->moveFolder($source->getId(), $destination->getId(), $this->getUser());
-
-            // Yippee, all done.
-
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => json_encode(['result' => 'success'])
-            ]);
-        }
-        else
-        {
+        if($folder->getId() === $newParent->getId()){
             // Doesn't make sense, source and destination folders the same
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
+
+        $this->folderMapper->moveFolder($folder->getId(), $newParent->getId(), $this->getUser());
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => json_encode(['result' => 'success'])
+        ]);
     }
 
+
+    /** @noinspection PhpUnused */
     /**
      * Creates a new folder in the specified parent folder
      *
-     * @api   POST /resource/folder/{parentId:\d}/create
+     * @api   POST /resource/folder/{parentId}/create
      * @since 19.1
      * @param Model $parent
      * @throws InvalidArgumentException
@@ -384,9 +364,9 @@ class Controller extends BaseController
     }
 
     /**
-     * Update a folders details
+     * Update a folder's details
      *
-     * @api   POST /resource/folder/{folderId:\d}/update
+     * @api   POST /resource/folder/{folderId}/update
      * @since 156
      * @param Model $folder
      * @throws InvalidArgumentException
@@ -602,12 +582,12 @@ class Controller extends BaseController
      *
      * @param Model    $folder
      * @param string[] $newClassCodes
-     * @throws MapperException
+     * @throws UnexpectedValueException
      */
     private function updateFolderClassCodes(Model $folder, array $newClassCodes): void
     {
         // Clear codes
-        $folder->setCodes($folder->getCodes()->emptyClone());
+        $folder->setCodes(new GenericCollection(Folder\Code\Model::class));
 
         // Remove codes if folder inherits perms, or if code no longer in use
         if ($folder->getInherit()) {
@@ -833,28 +813,18 @@ class Controller extends BaseController
         ]);
     }
 
+
+    /** @noinspection PhpUnused */
     /**
      * Reset folder content
      *
-     * @throws SchoolboxException
+     * @api POST /resource/folder/{id}/reset
+     * @param Model $folder
+     * @throws MapperException
      */
-    public function postFolderReset()
+    public function postFolderReset(Model $folder): void
     {
-        try
-        {
-            $folder = $this->folderMapper->findById($this->getRequest()->post["id"]);
-
-            if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, null);
-            }
-        }
-        catch (\Exception $e)
-        {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
-        }
-
         // Remove component content
-
         $homepage = new Homepage($folder->getId());
         $homepage->emptyHomepage();
 
@@ -862,7 +832,6 @@ class Controller extends BaseController
         $this->folderMapper->softDeleteAssessments($folder);
 
         // Delete all files
-
         $fileList = $this->fileMapper->findForFolders([ $folder->getId() ]);
 
         foreach ($fileList as $file) {
@@ -870,7 +839,6 @@ class Controller extends BaseController
         }
 
         // Delete all links
-
         $linkMapper = new LinkMapper();
         $allLinks = $linkMapper->findAllInCategory($folder, array());
 
@@ -889,8 +857,8 @@ class Controller extends BaseController
      *
      * @api GET /resource/mygroups
      */
-    public function getGroups() {
-
+    public function getGroups(): void
+    {
         /* Get Timetable colours to use as random colours for null set folders */
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;

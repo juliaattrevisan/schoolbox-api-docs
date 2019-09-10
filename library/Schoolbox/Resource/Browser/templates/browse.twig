@@ -120,13 +120,12 @@
 
             if (draggedTypeGen == 'category') {
                 // /cms/categoryForm.php no longer exists, use controller instead.
-                $.post(
-                    '/resource/folder/move/',
-                    {
-                        source: draggedId,
-                        destination: dropTargetId
-                    }
-                );
+                $.ajax({
+                    url: '/resource/folder/{id}/move/{parentId}'
+                        .replace('{id}', draggedId)
+                        .replace('{parentId}', dropTargetId),
+                    type: 'PUT'
+                });
             } else {
                 $.post(
                     '/cms/' + draggedTypeGen + 'Form.php',
@@ -300,10 +299,15 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this?',
                 confirmEvent: function (anchor) {
-                    $.post(anchor.attr('href'), {id: $(event.target).attr('data-folder-id') }).done(function () {
-                        jstree.delete_node(deleteNode);
-                        jstree.select_node(selectParent);
-                    });
+                    $
+                        .ajax({
+                            url: anchor.attr('href'),
+                            type: 'DELETE',
+                        })
+                        .done(function () {
+                            jstree.delete_node(deleteNode);
+                            jstree.select_node(selectParent);
+                        });
                 }
             });
         });

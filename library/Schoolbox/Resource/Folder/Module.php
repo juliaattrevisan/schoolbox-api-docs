@@ -1,22 +1,18 @@
 <?php
 /**
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
 
-use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -36,40 +32,6 @@ class Module extends BaseModule
     /** @var string */
     protected $basename = 'folder';
 
-    /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param Router $router
-     * @param string $basePath The base route for this module
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $routes = [
-            'GET' => [
-                '/folder/modify/{id}'                   => 'getFolderModify',
-                '/folder/create/{parentId}'             => 'getFolderCreate',
-                '/mygroups'                             => 'getGroups',
-            ],
-            'POST' => [
-                '/folder/move'                          => 'postMoveFolder',
-                '/folder/delete'                        => 'postDeleteFolder',
-                '/folder/reset'                         => 'postFolderReset',
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
-    }
 
     /**
      * @inheritDoc
@@ -77,77 +39,67 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        // POST Create
-        $permCreate = new Rule\All(
+        $parentWriteAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
                 return (int)$params['parentId'];
             }, Access::getInstance())
         );
-        $preloadCreate = function (array $params) {
+
+        $preloadParent = function (array $params) {
             if (($params['parent'] ?? null) instanceof Model) {
                 return ['parent' => $params['parent']];
             }
-            return ['parent' => $this->getMapper()->findById($params['parentId'])];
+            try {
+                return ['parent' => $this->getMapper()->findById($params['parentId'])];
+            } catch (MapperException $e) {
+                throw new InvalidPath($e->getMessage(), 0, $e);
+            }
         };
-        $this->register('POST', '/folder/{parentId:\d+}/create', 'postCreateFolder', $permCreate, $preloadCreate);
 
-        // POST Update
-        $permUpdate    = new Rule\All(
+        $folderWriteAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
-                return (int)$params['folderId'];
+                return (int)$params['id'];
             }, Access::getInstance())
         );
-        $preloadUpdate = function (array $params) {
+        $preloadFolder     = function (array $params) {
             if (($params['folder'] ?? null) instanceof Model) {
                 return ['folder' => $params['folder']];
             }
-            return ['folder' => $this->getMapper()->findById($params['folderId'])];
+            try {
+                return ['folder' => $this->getMapper()->findById($params['id'])];
+            } catch (MapperException $e) {
+                throw new InvalidPath($e->getMessage(), 0, $e);
+            }
         };
-        $this->register('POST', '/folder/{folderId:\d+}/update', 'postUpdateFolder', $permUpdate, $preloadUpdate);
+
+        $permWriteBoth = new Rule\All($folderWriteAccess, $parentWriteAccess);
+        $preloadBoth   = function (array $params) {
+            try {
+                return [
+                    'folder'    => ($params['folder'] ?? null) instanceof Model
+                        ? $params['folder']
+                        : $this->getMapper()->findById($params['id']),
+                    'newParent' => ($params['newParent'] ?? null) instanceof Model
+                        ? $params['newParent']
+                        : $this->getMapper()->findById($params['parentId']),
+                ];
+            } catch (MapperException $e) {
+                throw new InvalidPath($e->getMessage(), 0, $e);
+            }
+        };
+
+        $this->register('GET',    '/mygroups',                            'getGroups',        new Rule\IsLoggedIn());
+        $this->register('GET',    '/folder/{parentId:\d+}/create',        'getFolderCreate',  $parentWriteAccess, $preloadParent);
+        $this->register('POST',   '/folder/{parentId:\d+}/create',        'postCreateFolder', $parentWriteAccess, $preloadParent);
+        $this->register('GET',    '/folder/{id:\d+}/modify',              'getFolderModify',  $folderWriteAccess, $preloadFolder);
+        $this->register('POST',   '/folder/{id:\d+}/update',              'postUpdateFolder', $folderWriteAccess, $preloadFolder);
+        $this->register('PUT',    '/folder/{id:\d+}/move/{parentId:\d+}', 'putMoveFolder',    $permWriteBoth,     $preloadBoth);
+        $this->register('DELETE', '/folder/{id:\d+}',                     'deleteFolder',     $folderWriteAccess, $preloadFolder);
+        $this->register('POST',   '/folder/{id:\d+}/reset',               'postFolderReset',  $folderWriteAccess, $preloadFolder);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function initRoutePreloads(PathMatcher $matcher): void
-    {
-        $this
-            ->addRoutePreload(
-                $matcher,
-                '(?:getFolderCreate)',
-                function (array $params) {
-                    if (($params['parent'] ?? null) instanceof Model) {
-                        $parent = $params['parent'];
-                    } else {
-                        try {
-                            $parent = $this->getMapper()->findById($params['parentId']);
-                        } catch (MapperException $e) {
-                            throw new NotFound("No folder found for {$params['parentId']}", 0, $e);
-                        }
-                    }
-                    return ['parent' => $parent,];
-                }
-            )
-            ->addRoutePreload(
-                $matcher,
-                '(?:getFolderModify)',
-                function (array $params) {
-                    if (($params['folder'] ?? null) instanceof Model) {
-                        $folder = $params['folder'];
-                    } else {
-                        try {
-                            $folder = $this->getMapper()->findById($params['id']);
-                            $folder->setParent($this->getMapper()->findById($folder->getParent()->getId()));
-                        } catch (MapperException $e) {
-                            throw new NotFound("No folder found for {$params['id']}", 0, $e);
-                        }
-                    }
-                    return ['folder' => $folder,];
-                }
-            );
-    }
 
     /**
      * @return Mapper
@@ -158,32 +110,11 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(Mapper::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer) {
-        $this
-            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, 'getFolderCreate', new Rule\HasHomepageAccess(
-                UserAccess::ACCESS_WRITE,
-                static function (array $params): int {
-                    return (int)$params['parentId'];
-                },
-                Access::getInstance()
-            ))
-            ->addRoutePermission($authorizer, 'getFolderModify', new Rule\HasHomepageAccess(
-                UserAccess::ACCESS_WRITE,
-                static function (array $params): int {
-                    return (int)$params['id'];
-                },
-                Access::getInstance()
-            ));
-    }
 
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/Templates');
     }

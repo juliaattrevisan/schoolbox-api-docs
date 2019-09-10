@@ -414,7 +414,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return Collection|FolderCode[]
+     * @return GenericCollection<FolderCode>|FolderCode[]|null
      */
     public function getCodes()
     {
