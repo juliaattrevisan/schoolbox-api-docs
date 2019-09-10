@@ -14,6 +14,7 @@
     <script type="text/javascript">
         $(function () {
             $('#filter-selector-readable').selectizeSelector({
+                // Somehow has to contain values already selected
                 ajax: {
                     url:      '/ajax/findCategory.php',
                     type:     'GET',
@@ -23,11 +24,26 @@
                 multiple: true,
                 selectize: {
                     optgroups: [
-                        {value: 'class', label: 'Classes'},
-                        {value: 'group', label: 'Groups'},
+                        {value: 'class', label: 'My Classes'},
+                        {value: 'group', label: 'My Groups'},
                         {value: 'other', label: 'Other Folders'}
                     ],
-                    lockOptgroupOrder: true
+                    lockOptgroupOrder: true,
+                    render: {
+                        option: function (option, escape) {
+                            // Add breadcrumb if there is one
+                            var breadcrumb = null;
+                            if (option.breadcrumb && option.breadcrumb.length) {
+                                breadcrumb = option.breadcrumb
+                                    .map(function (v) { return v.name; })
+                                    .join(' > ');
+                            }
+                            return '<div class="option">'
+                                + escape(option.name)
+                                + (breadcrumb ? ('<p><em>(' + escape(breadcrumb) + ')</em></p>') : '')
+                                + '</div>';
+                        }
+                    }
                 }
             });
         });
