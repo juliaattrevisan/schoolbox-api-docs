@@ -1,0 +1,9 @@
+{#
+    Usage:
+        definition:     IFilterDefinition
+        roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        folders:        Folder\Model[]
+
+#}
+{% extends '@filterDefinitions/Assessment/Folder/templates/component.twig' %}
