@@ -75,7 +75,6 @@ class Sync extends Base implements ISync
             JOIN    sis_user_profile_relation supr ON child.id = supr.child_profile_id
             JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
             JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-            WHERE child.deleted_at IS NULL
             ORDER BY parent.external_id ASC
         ';
 
@@ -111,7 +110,6 @@ class Sync extends Base implements ISync
                       ''                     AS staff_house
             FROM      `sis_user_profile` sup
             JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
-            WHERE     sup.deleted_at IS NULL AND sups.deleted_at IS NULL
             ORDER BY  sup.external_id ASC
         ";
 

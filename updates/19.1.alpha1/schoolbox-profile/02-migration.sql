@@ -27,7 +27,7 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
                                         `year_level_coordinator_id`, `year_level_coordinator_name`,`mobile`, `studies_code`,`alert_medical`,`alert_comment`,
                                         `alert_message`,`alert_legal`,`enrolment_date`,`leaving_date`, `ib`, `individual_learning_plans`,`esl`, `special_needs`,
                                         `boarding_status`, created_at, updated_at)
-    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user`.`username`, `user`.`alt_email`,`user_profile`.`gender`,NULL, NULL, NULL,`house`.`house`, NULL, NULL, NULL, NULL, NULL, NULL,
+    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user`.`username`, `user`.`alt_email`,`user_profile`.`gender`,`luCampus`.`name`, NULL, NULL,`house`.`house`, NULL, NULL, NULL, NULL, NULL, NULL,
            `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,`user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`,
     NULL, `user`.`boarding_status` , NOW(), NOW()
     FROM `user`
@@ -35,6 +35,8 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
              JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
              LEFT JOIN `house`  ON `user`.`house` = `house`.`id`
+             JOIN `userCampus`  ON `user`.`id` = `userCampus`.`uid`
+             JOIN `luCampus`    ON `userCampus`.`campus` = `luCampus`.`id`
     WHERE `groups`.`group_type` = 'student';
 
 /*
