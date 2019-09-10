@@ -187,6 +187,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getSelectionMapper(),
                     $this->getYearLevelMapper()
                 );
+            case Filters\Assessment\Folder\Readable\Definition::class:
+                return new Filters\Assessment\Folder\Readable\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getFolderMapper(),
+                    $this->getAccess()
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
