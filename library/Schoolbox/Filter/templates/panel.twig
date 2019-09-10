@@ -233,24 +233,37 @@ Usage:
             var decodedData = decodeURIComponent(serialised),
                 flatArray   = decodedData.split('&'),
                 nestedObj   = {},
-                regEx       = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/; // eg 'filter_selection[1][task]=1'
+                regEx       = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/, // eg 'filter_selection[1][task]=1'
+                emptyRegEx  = /^filter_selection\[(\d+)]=$/;               // eg 'filter_selection[17]='
 
             // Convert flat string array to nested object
             for (var i in flatArray) {
-                var result = regEx.exec(flatArray[i]);
-                if(!result){
+                var keyValue  = flatArray[i],
+                    filterId  = null,
+                    optionKey = null,
+                    optionVal = null,
+                    result = regEx.exec(keyValue);
+                if (!result){
+                    result = emptyRegEx.exec(keyValue);
+                    if (!result) {
+                        continue;
+                    }
+                    filterId = result[1];
+
                     // TODO make this more elegant. This happens if a filter has no options, eg course import not imported to any classes
-                    continue;
+                } else {
+                    filterId  = result[1];
+                    optionKey = result[2];
+                    optionVal = result[3];
                 }
-                var filterId = result[1];
-                var optionKey = result[2];
-                var optionVal = result[3];
 
                 if (!nestedObj.hasOwnProperty(filterId)) {
                     nestedObj[filterId] = {};
                 }
 
-                nestedObj[filterId][optionKey] = optionVal;
+                if (optionKey !== null) {
+                    nestedObj[filterId][optionKey] = optionVal;
+                }
             }
             return nestedObj;
         }
