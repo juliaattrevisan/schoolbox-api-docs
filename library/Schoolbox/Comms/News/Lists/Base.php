@@ -289,6 +289,10 @@ abstract class Base
     {
         $selectedTopicId = Mapper::TOPIC_ALL_ID;
 
+        if ($slug === null || trim($slug) === '') {
+            return $selectedTopicId;
+        }
+
         foreach ($topics as $topic) {
             if ($topic->getSlug() === $slug) {
                 return $topic->getId();

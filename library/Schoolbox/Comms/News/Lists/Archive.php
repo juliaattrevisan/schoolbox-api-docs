@@ -68,7 +68,7 @@ class Archive extends Base
          * We always fetched everything, then manually sorted by slug
          * Inherit this situation, improvise and adapt (or just use ids...)
          */
-        $topicId = $params->getSlug() !== null ? $this->determineSelectedTopicId($topics, $params->getSlug()) : Mapper::TOPIC_ALL_ID;
+        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user
