@@ -312,16 +312,18 @@ try {
 
                 $api->add($resourceApi);
 
-                $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $user,
-                    $user,
-                    $kernel->getDependencyInjector()->get('externalTimetable'),
-                    [$roomCode => $item->getId()]
-                );
+                // If room code is set, get timetable for the room
+                if (!empty($roomCode)) {
+                    $timetableApi = new Calendar_Api_EventType_Timetable_Room(
+                        Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                        $user,
+                        $user,
+                        $kernel->getDependencyInjector()->get('externalTimetable'),
+                        [$roomCode => $item->getId()]
+                    );
 
-                $api->add($timetableApi);
-
+                    $api->add($timetableApi);
+                }
             }
 
             $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
