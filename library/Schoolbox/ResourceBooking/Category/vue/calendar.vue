@@ -297,13 +297,19 @@
                 :height="'auto'"
                 :custom-buttons="{
                     customExport: {
-                        text: 'export',
+                        text: 'Export',
                         click: onExportClick
                     },
                     customFilters: {
-                        text: 'filters',
+                        text: 'Filters',
                         click: onFilterClick
                     },
+                }"
+                :buttonText="{
+                    today:    'Today',
+                    month:    'Month',
+                    week:     'Week',
+                    day:      'Day'
                 }"
                 :header="{
                     left: 'prev,today,next',
