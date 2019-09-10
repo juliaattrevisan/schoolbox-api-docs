@@ -21,7 +21,7 @@
                         required: true,
                         minlength: 2
                     },
-                    mime: {
+                    attachedFile: {
                         required: {
                             depends: function (element) {
                                 return !($(element).parents('form').find('input[name="attachment[]"]').length);
@@ -31,12 +31,12 @@
                 },
                 messages: {
                     description: "Please enter a title.",
-                    mime: "Please attach a file."
+                    attachedFile: "Please attach a file."
                 },
             });
 
         $(document).on('click', '#upload', function () {
-            $('#mime-error').remove();
+            $('#attachedFile-error').remove();
         })
 
     });
@@ -74,7 +74,7 @@
                         <label for="cms-zone" class="required">
                             Attach File
                         </label>
-                        <input type="hidden" name="mime">
+                        <input type="hidden" name="attachedFile">
                         {ATTACH_ZONE}
                         <label>
                             Description

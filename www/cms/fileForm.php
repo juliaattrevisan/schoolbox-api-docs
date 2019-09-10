@@ -55,7 +55,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
                 $file->setStorage($result->getStorage());
             }
         } else {
-            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+            throw new Exception('Attachment is required');
         }
 
     } catch (\Schoolbox\Mapper\Exception $e) {
