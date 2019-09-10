@@ -76,13 +76,19 @@ class IdFinder extends Filter\AbstractIdFinder
         $teacherFolderIds      = $completeFilters[Folder\TeacherInvolved\Definition::class];
         $studentFolderIds      = $completeFilters[Folder\StudentInteractions\Definition::class];
         $courseImportFolderIds = $completeFilters[Folder\CourseImports\Definition::class];
+        $readableFolderIds     = $completeFilters[Folder\Readable\Definition::class];
         $projectIds            = $completeFilters[NullableContext\Project\Definition::class];
         $unitImplIds           = $completeFilters[NullableContext\UnitImpl\Definition::class];
         $unitSpecIds           = $completeFilters[NullableContext\UnitSpec\Definition::class];
         $unitImpSpcIds         = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
         $folderYearLevels      = $completeFilters[FolderYearLevel\Definition::class];
 
-        [$folderWhere, $folderParams]     = $this->getClauseFolder($teacherFolderIds, $studentFolderIds, $courseImportFolderIds);
+        [$folderWhere, $folderParams]     = $this->getClauseFolder(
+            $teacherFolderIds,
+            $studentFolderIds,
+            $courseImportFolderIds,
+            $readableFolderIds
+        );
         [$yearLevelJoin, $yearLevelWhere, $yearLevelParams] = $this->getClauseFolderYearLevels($folderYearLevels);
         [$projectWhere, $projectParams]   = $this->getClauseProject($projectIds);
         [$unitImplWhere, $unitImplParams] = $this->getClauseUnitImpl($unitImplIds);
@@ -681,6 +687,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param null|Collection|int[] $teacherFolderIds
      * @param null|Collection|int[] $studentFolderIds
      * @param null|Collection|int[] $courseImportFolderIds
+     * @param null|Collection|int[] $readableFolderIds
      * @return mixed[]
      * @throws InvalidColumnException
      * @throws UnderflowException
@@ -688,12 +695,17 @@ class IdFinder extends Filter\AbstractIdFinder
     private function getClauseFolder(
         ?Collection $teacherFolderIds,
         ?Collection $studentFolderIds,
-        ?Collection $courseImportFolderIds
+        ?Collection $courseImportFolderIds,
+        ?Collection $readableFolderIds
     ): array {
         // Different filters are always combined using INTERSECT
 
         // All NULL ?
-        if (null === $teacherFolderIds && null === $studentFolderIds && null === $courseImportFolderIds) {
+        if (null === $teacherFolderIds
+            && null === $studentFolderIds
+            && null === $courseImportFolderIds
+            && null === $readableFolderIds
+        ) {
             return ['TRUE', []];
         }
 
@@ -711,6 +723,12 @@ class IdFinder extends Filter\AbstractIdFinder
                 ? $courseImportFolderIds :
                 array_intersect($folderIds, $courseImportFolderIds->getAll());
         }
+        if ($readableFolderIds) {
+            $folderIds = null === $folderIds
+                ? $readableFolderIds :
+                array_intersect($folderIds, $readableFolderIds->getAll());
+        }
+
         $builder = $this->getMapper()->getPredicateBuilder();
         $builder->in('f.id', $folderIds);
 
