@@ -9,9 +9,24 @@
 {% extends '@filterDefinitions/Assessment/Folder/templates/component.twig' %}
 
 {% block userOptions %}
-    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
-    <select name="filter_selection[{{ definition.filter.id }}][]" multiple>
+    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+    <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#filter-selector-readable').selectizeSelector({
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {roleTypeID: 'staff;student;parent', showCampus: true},
+                    dataType: 'json'
+                },
+                multiple: true
+            });
+        });
+    </script>
 
+    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+    <select id="filter-selector-readable" name="filter_selection[{{ definition.filter.id }}][]" multiple>
     </select>
 
     <div class="empty-state">
