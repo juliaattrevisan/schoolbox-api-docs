@@ -15,9 +15,9 @@
         $(function () {
             $('#filter-selector-readable').selectizeSelector({
                 ajax: {
-                    url:      '/ajax/user.php',
+                    url:      '/ajax/findCategory.php',
                     type:     'GET',
-                    data:     {roleTypeID: 'staff;student;parent', showCampus: true},
+                    data:     {},
                     dataType: 'json'
                 },
                 multiple: true
