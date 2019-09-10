@@ -7,3 +7,14 @@
 
 #}
 {% extends '@filterDefinitions/Assessment/Folder/templates/component.twig' %}
+
+{% block userOptions %}
+    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+    <select name="filter_selection[{{ definition.filter.id }}][]" multiple>
+
+    </select>
+
+    <div class="empty-state">
+        <p>Type a folder name above to view it</p>
+    </div>
+{% endblock %}
