@@ -39,11 +39,12 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $parentWriteAccess = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
+        $parentWriteAccess = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            static function (array $params): int {
                 return (int)$params['parentId'];
-            }, Access::getInstance())
+            },
+            Access::getInstance()
         );
 
         $preloadParent = function (array $params) {
@@ -57,11 +58,12 @@ class Module extends BaseModule
             }
         };
 
-        $folderWriteAccess = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
+        $folderWriteAccess = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            static function (array $params): int {
                 return (int)$params['id'];
-            }, Access::getInstance())
+            },
+            Access::getInstance()
         );
         $preloadFolder     = function (array $params) {
             if (($params['folder'] ?? null) instanceof Model) {
