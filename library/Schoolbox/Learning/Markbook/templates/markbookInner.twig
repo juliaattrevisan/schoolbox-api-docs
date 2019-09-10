@@ -114,7 +114,7 @@
 
                     {% for assessment in markbook.assessments %}
                         {% set participant = assessment.getParticipantIfExtant(student) %}
-                        <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
+                        <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }} indicator-pending">
                             {% if participant and not participant.isExcluded %}
                                 {% if assessment is task %}
                                    {# An icon that shows if the student has attempted the task or not #}
@@ -153,6 +153,10 @@
                                         <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
                                     {% endif %}
                                 {% endif %}
+                            {% endif %}
+                            {% set feedback = participant.authoritativeFeedback(false) %}
+                            {% if feedback and feedback.isDraft %}
+                                <span class="indicator indicator-pending"  title="Unpublished Draft"></span>
                             {% endif %}
                         </td>
                     {% endfor %}
