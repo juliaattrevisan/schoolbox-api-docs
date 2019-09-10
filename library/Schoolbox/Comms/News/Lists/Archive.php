@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Paginator\Paginator as BasePaginator;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
@@ -67,7 +68,7 @@ class Archive extends Base
          * We always fetched everything, then manually sorted by slug
          * Inherit this situation, improvise and adapt (or just use ids...)
          */
-        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
+        $topicId = $params->getSlug() !== null ? $this->determineSelectedTopicId($topics, $params->getSlug()) : Mapper::TOPIC_ALL_ID;
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user
