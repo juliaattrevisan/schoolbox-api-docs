@@ -242,14 +242,15 @@ Usage:
                     optionKey = null,
                     optionVal = null,
                     result = regEx.exec(keyValue);
+
                 if (!result){
+                    // This happens if a filter has no options, eg course import not imported to any classes
+                    // Still attempt to output an empty nested object
                     result = emptyRegEx.exec(keyValue);
                     if (!result) {
                         return;
                     }
                     filterId = result[1];
-
-                    // TODO make this more elegant. This happens if a filter has no options, eg course import not imported to any classes
                 } else {
                     filterId  = result[1];
                     optionKey = result[2];
@@ -264,6 +265,15 @@ Usage:
                     nestedObj[filterId][optionKey] = optionVal;
                 }
             });
+
+            // Set all nested values to NULL if they're empty
+            // This is required so that qs submits an empty value (required so that
+            Object.keys(nestedObj).forEach(function (filterId) {
+                if (Object.keys(nestedObj[filterId]).length === 0) {
+                    nestedObj[filterId] = null;
+                }
+            });
+
             return nestedObj;
         }
 
