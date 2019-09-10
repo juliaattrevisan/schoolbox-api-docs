@@ -164,7 +164,15 @@ class IdFinder extends Filter\AbstractIdFinder
         );
 
         $subQueries = [];
-        if ($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $studentFolderIds, $projectIds, $unitImplIds, $unitSpecIds, $folderYearLevels)) {
+        if ($this->subQueryBase(
+            $unitImpSpcIds,
+            $teacherFolderIds,
+            $studentFolderIds,
+            $readableFolderIds,
+            $projectIds,
+            $unitImplIds,
+            $unitSpecIds
+        , $folderYearLevels)) {
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$nonContextJoin}
@@ -274,6 +282,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param null|Collection|int[] $uImpSpcIds
      * @param null|Collection|int[] $teacherFolderIds
      * @param null|Collection|int[] $studentFolderIds
+     * @param null|Collection|int[] $readableFolderIds
      * @param null|Collection|int[] $projectIds
      * @param null|Collection|int[] $unitImplIds
      * @param null|Collection|int[] $unitSpecIds
@@ -284,6 +293,7 @@ class IdFinder extends Filter\AbstractIdFinder
         ?Collection $uImpSpcIds,
         ?Collection $teacherFolderIds,
         ?Collection $studentFolderIds,
+        ?Collection $readableFolderIds = null,
         ?Collection $projectIds,
         ?Collection $unitImplIds,
         ?Collection $unitSpecIds,
@@ -293,6 +303,7 @@ class IdFinder extends Filter\AbstractIdFinder
             null === $uImpSpcIds &&
             null === $teacherFolderIds &&
             null === $studentFolderIds &&
+            null === $readableFolderIds &&
             null === $projectIds &&
             null === $unitImplIds &&
             null === $unitSpecIds &&
