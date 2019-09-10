@@ -94,12 +94,12 @@
                         status: data?.attendance?.status,
                         actions: {
                             toggle: {
-                                isAvailable: Boolean(data?.attendance?.requestButton),
+                                isAvailable: Boolean(data?.attendance?.listButton),
                                 href: this.attendanceToggleUrl,
                                 text: data?.attendance?.nextAction === ATTENDANCE_ACTION_ADD ? 'RSVP' : 'Unattend',
                             },
                             list: {
-                                isAvailable: Boolean(data?.attendance?.listButton),
+                                isAvailable: Boolean(data?.attendance?.requestButton),
                                 href: this.attendanceListUrl + String(metadata?.eventId),
                             },
                         },
