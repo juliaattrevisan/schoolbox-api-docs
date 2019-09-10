@@ -62,7 +62,7 @@ class Factory extends FolderFilter\Factory
         if ($getClasses || $getGroups) {
             // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
             $groupAccessLevel = $getGroups ? UserAccess::ACCESS_READ : UserAccess::ACCESS_FULL + 1;
-            $folders          = $this->getFolderMapper()->findForUser($user, $getClasses, $groupAccessLevel, true)->indexBy('id');
+            $folders          = $this->getFolderMapper()->findForUser($user, $getClasses, $groupAccessLevel)->indexBy('id');
         } else {
             $folders = $this->getFolderMapper()->createCollection();
         }
