@@ -4,7 +4,11 @@
 <div class="small-12 medium-8 column">
     <dl>
         {% for activity in activityList %}
-            <dd>{{ activity.act_desc }}</dd>
+            <dd>
+                {{ activity.act_desc }}
+                {% if activity.lev_desc is not null %} - {{ activity.lev_desc }}{% endif %}
+                {% if activity.ud_desc is not null %} - {{ activity.ud_desc }}{% endif %}
+            </dd>
         {% endfor %}
     </dl>
 </div>
