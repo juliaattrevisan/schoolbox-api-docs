@@ -1,6 +1,5 @@
 <?php
 
-use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -9,9 +8,10 @@ use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Kernel();
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
@@ -54,16 +54,18 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
                 // target attachment is from SBFS, but a different file: override storage
                 $file->setStorage($result->getStorage());
             }
+        } else {
+            throw new Exception('Attachment is required');
         }
 
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(41);
+        error(ErrorMapper::ERROR_FILE_NOT_FOUND);
         exit; // shut UP, storm.
     } catch (\Schoolbox\Resource\Exception $e) {
-        error(43);
+        error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
         exit;
     } catch (\InvalidArgumentException $e) {
-        error(43);
+        error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
         exit;
     }
 
@@ -104,7 +106,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         if ($modifyExisting) {
 
             if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE || 0 == $_POST['category']) {
-                error(6);
+                error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
             }
 
             $file->setFolder(FolderMapper::getInstance()->createModel()->setId($_POST['category']));
@@ -120,7 +122,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
             foreach ($destinations as $cat) {
                 if ($groupHandler->getPermission($cat) < UserAccess::ACCESS_WRITE || 0 == $cat) {
-                    error(6);
+                    error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                 }
 
                 $clone = clone $file;
@@ -221,12 +223,12 @@ elseif (is_numeric($_GET['delete'])) {
         $file = FileMapper::getInstance()->findById($_GET['delete']);
 
         if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-            error(6);
+            error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         FileMapper::getInstance()->delete($file);
     } catch (Exception $e) {
-        error(2);
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     if (isset($_REQUEST['ajax'])) {
@@ -247,12 +249,12 @@ elseif (is_numeric($_GET['deleteList'])) {
                     $file = FileMapper::getInstance()->findById($fileID);
 
                     if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                        error(6);
+                        error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                     }
 
                     FileMapper::getInstance()->delete($file);
                 } catch (Exception $e) {
-                    error(2);
+                    error(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
             }
         }
@@ -265,11 +267,11 @@ elseif (is_numeric($_GET['deleteList'])) {
                 /** @var Link $link */
                 $link = LinkMapper::getInstance()->findById($linkID);
                 if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                    error(6);
+                    error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                 }
                 LinkMapper::getInstance()->delete($link);
             } catch (Exception $e) {
-                error(2);
+                error(ErrorMapper::ERROR_INFORMATION_MISSING);
             }
         }
     }
@@ -277,10 +279,10 @@ elseif (is_numeric($_GET['deleteList'])) {
     $page->backToTheFuture(1);
 } /* Exceeded PHP max file size */
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES)) {
-    error(10);
+    error(ErrorMapper::ERROR_FILE_SIZE);
 } /* Unknown action */
 else {
-    error(2);
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 
