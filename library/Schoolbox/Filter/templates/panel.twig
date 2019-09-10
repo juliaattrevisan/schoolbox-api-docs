@@ -237,16 +237,15 @@ Usage:
                 emptyRegEx  = /^filter_selection\[(\d+)]=$/;               // eg 'filter_selection[17]='
 
             // Convert flat string array to nested object
-            for (var i in flatArray) {
-                var keyValue  = flatArray[i],
-                    filterId  = null,
+            flatArray.forEach(function (keyValue) {
+                var filterId  = null,
                     optionKey = null,
                     optionVal = null,
                     result = regEx.exec(keyValue);
                 if (!result){
                     result = emptyRegEx.exec(keyValue);
                     if (!result) {
-                        continue;
+                        return;
                     }
                     filterId = result[1];
 
@@ -264,7 +263,7 @@ Usage:
                 if (optionKey !== null) {
                     nestedObj[filterId][optionKey] = optionVal;
                 }
-            }
+            });
             return nestedObj;
         }
 
