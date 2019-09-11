@@ -201,7 +201,7 @@ class Controller extends BaseController
 
         $formAction = $this->getRouter()->generate(
             'folder.postUpdateFolder',
-            ['folder' => $folder, 'folderId' => $folder->getId()]
+            ['folder' => $folder, 'id' => $folder->getId()]
         );
 
         $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
