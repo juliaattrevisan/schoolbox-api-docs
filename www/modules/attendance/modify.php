@@ -123,9 +123,8 @@ if (!$_SESSION['user']->getRole()->isStaff()) {
 }
 
 // Attendance Periods
-$tempPeriods = $attendancePeriods;
-$firstPeriod = array_shift($tempPeriods);
-$lastPeriod  = empty($tempPeriods) ? $firstPeriod : array_pop($tempPeriods);
+$firstPeriod = (int)reset($attendancePeriods);
+$lastPeriod  = (int)end($attendancePeriods);
 
 // Check selected campus is one of users campus
 
@@ -146,8 +145,8 @@ $definition = $externalTimetable->getTimetableDefinition(
     $timetableDay
 );
 
-[$firstPeriodNumber] = array_keys($definition['number'], $firstPeriod);
-[$lastPeriodNumber]  = array_keys($definition['number'], $lastPeriod);
+$firstPeriodNumber = array_search($firstPeriod, $definition['number'], true);
+$lastPeriodNumber  = array_search($lastPeriod, $definition['number'], true);
 $startTime   = $definition['start'][$firstPeriodNumber];
 $endTime     = $definition['end'][$lastPeriodNumber];
 $periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);
