@@ -65,7 +65,7 @@ Data:
                         <div class="card column small-12 medium-6">
 
                             <img src="/portrait.php?id={{ firstTeacher.id }}&amp;size=square64" width="48" alt="{{ firstTeacher.fullName }}">
-                            <h3>{{ subject.name }}
+                            <h3 class="subject-name">{{ subject.name }}
                                 <span class="meta">
                                 {% for code in subject.codes %}
                                     ({{ code }}){% if not loop.last %},{% endif %}
@@ -74,7 +74,7 @@ Data:
                             </h3>
 
                             <div class="meta">
-                                <p>{{ firstTeacher.fullName }} <span class="pipe meta">{{ firstTeacher.role.name }}</span></p>
+                                <p class="teacher-name">{{ firstTeacher.fullName }} <span class="pipe meta">{{ firstTeacher.role.name }}</span></p>
                             </div>
                         </div>
                         <div class="column small-12 medium-6 results">
