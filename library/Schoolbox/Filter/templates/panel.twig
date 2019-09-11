@@ -487,18 +487,36 @@ Usage:
                 var $component = $(component),
                     filterId   = $component.data('component'),
                     $available = $component.find('input[type=checkbox]'),
-                    $selected  = $component.find('input:checked[type=checkbox]');
+                    $selected  = $component.find('input:checked[type=checkbox]'),
+                    $selectize = $component.find('select[data-selectize]');
 
-                // Are a subset of available options selected ?
-                if($selected.length !== 0 && $selected.length !== $available.length){
+                // These will be deleted if the filter's not in use
+                componentsInUse[filterId]           = {};
+                componentsInUse[filterId]['name']   = $component.find('[data-filter-name]').html();
+                componentsInUse[filterId]['labels'] = [];
+
+                // Maybe this is a selectize?
+                if ($selectize.length !== 0) {
+                    var selectize = $selectize[0].selectize;
+                    if (selectize && selectize.items && selectize.items.length) {
+                        selectize.items.forEach(function (v) {
+                            componentsInUse[filterId]['labels'].push(selectize.options[v].name);
+                        });
+                    }
+                } else if ($selected.length !== 0) {
                     // Filter is being applied, add its name and selected option labels.
-                    componentsInUse[filterId]           = {};
-                    componentsInUse[filterId]['name']   = $component.find('[data-filter-name]').html();
-                    componentsInUse[filterId]['labels'] = [];
                     $selected.each(function(idx, elem){
                         var label = $component.find('label[for='+$(elem).attr('id')+']').html();
                         componentsInUse[filterId]['labels'].push(label);
                     });
+
+                    // Hide the filter in use if all its options are selected
+                    // (all options is functionally equivalent to none selected)
+                    if ($selected.length === $available.length) {
+                        delete componentsInUse[filterId];
+                    }
+                } else {
+                    delete componentsInUse[filterId];
                 }
             });
 
