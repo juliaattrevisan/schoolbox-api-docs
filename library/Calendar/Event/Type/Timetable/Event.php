@@ -48,6 +48,17 @@ class Event extends Day\Event
     protected $hasAttendance = false;
 
     /**
+     * A list of periods for which attendance may be marked for this timetabled
+     * class.
+     *
+     * If this class spans multiple periods, then the first period will contain
+     * the attendance periods for the entire span.
+     *
+     * @var array
+     */
+    protected $attendancePeriods = [];
+
+    /**
      * @return string
      */
     public function getCode()
@@ -141,6 +152,26 @@ class Event extends Day\Event
     public function setHasAttendance(bool $hasAttendance): void
     {
         $this->hasAttendance = $hasAttendance;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getAttendancePeriods(): array
+    {
+        return $this->attendancePeriods;
+    }
+
+
+    /**
+     * @param array $attendancePeriods
+     * @return static
+     */
+    public function setAttendancePeriods(array $attendancePeriods): self
+    {
+        $this->attendancePeriods = $attendancePeriods;
+        return $this;
     }
 
 

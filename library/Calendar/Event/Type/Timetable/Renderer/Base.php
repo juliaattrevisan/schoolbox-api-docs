@@ -52,6 +52,7 @@ abstract class Base extends RendererBase
             && $this->getEvent()->hasAttendance()
             && $this->getViewer()->getRole()->isStaff()
             && $this->getEvent()->getCode() != ''
+            && count($this->getEvent()->getAttendancePeriods())
         )
         {
             $now = new \Alaress_Date_Format();
