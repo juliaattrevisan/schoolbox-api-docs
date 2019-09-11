@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Participant\Plan;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\User;
@@ -135,7 +136,7 @@ class InteractionIntegrityChecker
         if (null === $assessment->getId()) {
             throw new InvalidArgumentException('Assessment id not set');
         }
-        $plans = $assessment->getPlans()->emptyClone();
+        $plans = new GenericCollection(Model::class);
         foreach ($this->planMapper->findPlansAndParticipantsForAssessments([$assessment->getId()]) as $plan) {
             $plan->setAssessment($assessment);
             $plans[$plan->getId()] = $plan;

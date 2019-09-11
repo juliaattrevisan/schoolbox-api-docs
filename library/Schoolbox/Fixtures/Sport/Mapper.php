@@ -91,6 +91,9 @@ class Mapper extends BaseMapper
     {
         /** @var Sport[] $cache */
         $cache = [];
+        /** @var PositionMapper $positionMapper */
+        $positionMapper = $this->getJoinMapper('positions');
+        $positionIdCol  = "p.{$positionMapper->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
@@ -98,16 +101,20 @@ class Mapper extends BaseMapper
 
             if (empty($cache[$sportId])) {
                 $cache[$sportId] = $this->hydrate($r);
+                $cache[$sportId]->setPositions($positionMapper->createCollection());
             }
-            
-            $cache[$sportId]->getPositions()->add($this->hydrateJoin($r, 'positions', 'p'));
+
+            // Only add position/s if sport has some
+            if (isset($r[$positionIdCol])) {
+                $cache[$sportId]->getPositions()->add($this->hydrateJoin($r, 'positions', 'p'));
+            }
         }
 
         return $this->createCollection($cache);
     }
 
     /**
-     * Perform an intersection of the itinerary given against what exists in the database:
+     * Perform an intersection of the positions given against what exists in the database:
      *  - any records that exist in memory are to be persisted to the DB;
      *  - any records that exist in DB but not memory are to be deleted.
      *
@@ -116,6 +123,10 @@ class Mapper extends BaseMapper
      */
     public function savePositions(Sport $model)
     {
+        if ($model->getPositions() === null) {
+            // Don't attempt to save if join is not hydrated
+            return true;
+        }
         // ensure the positions all point onto this sport
         foreach ($model->getPositions() as $position) {
             $position->setSport($model);

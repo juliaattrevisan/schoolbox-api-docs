@@ -25,6 +25,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Curriculum\Node;
+use TypeError;
 
 /**
  * Class Model
@@ -217,8 +218,6 @@ class Model implements ISoftDeletable
         $this->createdAt       = new Alaress_Date_NullDate();
         $this->updatedAt       = new Alaress_Date_NullDate();
         $this->deletedAt       = new Alaress_Date_NullDate();
-        $this->curriculumNodes = new GenericCollection(Node\Model::class);
-        $this->plans           = new GenericCollection(Plan\Model::class);
     }
 
     function __clone()
@@ -750,10 +749,12 @@ class Model implements ISoftDeletable
     /**
      * @param Node\Model[]|GenericCollection $curriculumNodes
      * @return $this
+     * @throws TypeError
      */
     public function setCurriculumNodes(GenericCollection $curriculumNodes)
     {
-        $this->curriculumNodes->replaceWith($curriculumNodes);
+        $curriculumNodes->assertCollectionOf(Node\Model::class);
+        $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
 
@@ -768,10 +769,12 @@ class Model implements ISoftDeletable
     /**
      * @param Plan\Model[]|GenericCollection $plans
      * @return $this
+     * @throws TypeError
      */
     public function setPlans(GenericCollection $plans)
     {
-        $this->plans->replaceWith($plans);
+        $plans->assertCollectionOf(Plan\Model::class);
+        $this->plans = $plans;
         return $this;
     }
 

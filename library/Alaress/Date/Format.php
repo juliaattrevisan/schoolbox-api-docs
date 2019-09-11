@@ -57,6 +57,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     const URL_FORMAT = 'd-m-Y';
     const AM = 'AM';
     const PM = 'PM';
+    public const FORMAT_DATE_PICKER = 'd/m/Y h:ia'; // Used by JS DatePicker, eg '29/07/2014 11:59pm'
 
     const SUNDAY = 0;
     const MONDAY = 1;
@@ -1052,6 +1053,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return $this;
     }
 
+    // ************************* Formatting *************************
+
     /**
      * Transform the datetime into a localised version
      *
@@ -1419,6 +1422,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function getCalendarDateTime()
     {
         return $this->getUsingFormat($this->getLocale()->calendarDateTime());
+    }
+
+    /**
+     * @return string
+     */
+    public function getDatePicker(): string
+    {
+        return $this->getUsingFormat(self::FORMAT_DATE_PICKER);
     }
 
     /**

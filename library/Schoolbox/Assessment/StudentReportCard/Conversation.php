@@ -27,9 +27,6 @@ class Conversation
     /** @var Collection[User] $participants */
     protected $participants;
 
-    /** @var Collection[User] $recipients */
-    protected $emailRecipients = null;
-
     /** @var Collection[Comment] $comments */
     protected $comments;
 
@@ -56,7 +53,7 @@ class Conversation
              * merely acting as observers of the dialog, so they are excluded from this
              * list of participants
              */
-            
+
             $this->participants = $this->participants->add($student)
                 ->merge($student->getParents())
                 ->merge($subject->getTeachers());

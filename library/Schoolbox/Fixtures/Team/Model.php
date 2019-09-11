@@ -54,15 +54,6 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     protected $coaches;
 
     /**
-     * Model constructor.
-     */
-    public function __construct()
-    {
-        $this->players = new Collection();
-        $this->coaches = new Collection();
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @return array

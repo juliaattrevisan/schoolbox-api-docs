@@ -9,6 +9,7 @@
 namespace Eportfolio;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 
@@ -165,16 +166,9 @@ class Page implements ISoftDeletable{
 	/**
 	 * A collection of permissions
 	 *
-     * @var Collection|Permission[]
+     * @var GenericCollection<Permission>|Permission[]
 	 */
 	private $permissions;
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setPermissions(new \Schoolbox\Collection());
-	}
 
 	/* Getters/Setters
 	 */
@@ -562,10 +556,14 @@ class Page implements ISoftDeletable{
 	/**
 	 * Set permissions
 	 *
-     * @param Collection|Permission[] $permissions
+     * @param GenericCollection<Permission> $permissions
+     * @return $this
 	 */
-	public function setPermissions($permissions) {
-		$this->permissions = $permissions;
+    public function setPermissions(GenericCollection $permissions): self
+    {
+        $permissions->assertCollectionOf(Permission::class);
+        $this->permissions = $permissions;
+        return $this;
 	}
 
 	/**

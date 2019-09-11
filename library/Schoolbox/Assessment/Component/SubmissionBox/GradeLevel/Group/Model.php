@@ -36,14 +36,6 @@ class Model
     protected $gradeLevels;
 
     /**
-     * Constructor - sets up grade level collection.
-     */
-    public function __construct()
-    {
-        $this->setGradeLevels(new Collection());
-    }
-
-    /**
      * @return int
      */
     public function getId()

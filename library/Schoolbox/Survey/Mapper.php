@@ -11,7 +11,6 @@
 
 namespace Schoolbox\Survey;
 
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
@@ -22,6 +21,9 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -77,15 +79,21 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var Model[] $results */
         $results = [];
 
+        $idCol = $this->getIdentifierColumn();
+        /** @var SurveyAttemptMapper $attemptMapper */
+        $attemptMapper = $this->getJoinMapper('assess_attempts');
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['availability'] == 'survey') {
-                $results[] = $row;
-
-                /** @var Model $model */
-                $model = $this->hydrate($row, '');
-
+            if ($row['availability'] !== 'survey') {
+                continue;
+            }
+            if (array_key_exists([$row[$idCol]], $results)) {
+                $model = $results[$row[$idCol]];
+            } else {
+                $model = $this->hydrate($row);
                 /** @var Folder $folder */
                 $folder = $this->hydrateJoin($row, 'folder', 'f');
                 $model->setFolder($folder);
@@ -93,14 +101,16 @@ class Mapper extends BaseMapper
                 /** @var Assessment $assessment */
                 $assessment = $this->hydrateJoin($row, 'assessment', 'ass');
                 $model->setAssessment($assessment);
+                $model->setAttempts($attemptMapper->createCollection());
+            }
 
-                /** @var Collection $attempts */
-                $attempts = $this->getJoinMapper('assess_attempts')->findByColumn('assess_id', $model->getId());
-                $model->setAttempts($attempts);
+            $attempt = $attemptMapper->hydrate($row, 'aa');
+            if ($attempt) {
+                $attempt->setSurvey($model);
+                $model->getAttempts()->offsetSet($attempt->getId(), $attempt);
             }
         }
 
-        /** @noinspection PhpDeprecationInspection */
         return $this->hydrateList($results);
     }
 

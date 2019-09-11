@@ -12,6 +12,10 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use UnexpectedValueException;
+use function array_key_exists;
 use function count;
 use function explode;
 use PDO;
@@ -54,15 +58,15 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
+use Schoolbox\YearLevel;
 use Alaress\Database\Predicate;
-use function strpos;
-use UnexpectedValueException;
 use Schoolbox\Error;
+use function strnatcasecmp;
 
 /**
  * Class Mapper
  *
- * SBFS Folder Mapper. Maps category table to SBFS folder objects.
+ * SBFS Folder Mapper. Maps folder table to SBFS folder objects.
  *
  * @package Schoolbox\Resource\Folder
  * @method Model createModel($idValue = null)
@@ -139,6 +143,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             )
         );
 
+        $this->joinsVia(
+            'folder_year_level',
+            YearLevel\Mapper::class,
+            YearLevel\Mapper::COL_ID,
+            'year_level_id',
+            'folder_id',
+            null,
+            null,
+            null,
+            'yearLevels'
+        );
+
         $this->hasJoin(
             'homepages', array(
                 'multiple'  => false,
@@ -159,7 +175,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $this->hasJoin(
             'groups', array(
-                'multiple'  => true,
+                'multiple'  => false,
                 'mapper'    => GroupMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'cid',
@@ -202,7 +218,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'unMuteClassNotifications']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCourseSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'refreshNotificationRedirects']);
 
@@ -468,8 +483,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @throws Predicate\InvalidColumnException
      * @throws SchoolboxException
      */
-    public function validateFolderCodes(Model $model): bool
+    protected function validateFolderCodes(Model $model): bool
     {
+        if ($model->getCodes() === null) {
+            return true;
+        }
         /** @var Code\Mapper $codeMapper */
         $codeMapper = $this->getJoinMapper('codes');
         if(!(new ValidCodesSpec($codeMapper))->isSatisfiedBy($model)){
@@ -532,49 +550,77 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * PostSave callback to clear permissions if they are now being inherited
+     * PostSave callback to clear User- + Role-based permissions if they are now being inherited
      *
      * @param Model $model
-     * @param Model $previous
+     * @param null|Model $previous
      * @return bool
      * @throws DefinitionException If specified join not defined
      */
-    public function updateInheritedPermissions($model, $previous = null)
+    protected function updateInheritedPermissions(Model $model, Model $previous = null): bool
     {
-        // If we are inheriting permissions delete any previously created group perms
-        if ($model->getInherit()) {
+        // If we are inheriting permissions delete any previously created group + user perms
+        if ($previous && $model->getInherit()) {
+
+            // Delete the group
             $this->getJoinMapper('groups')->deleteByColumn('cid', $model->getId());
+
+            // Delete group memberships
+            UserAccessMapper::getInstance()->deleteByColumnList([
+                "sid"     => $model->getId(),
+                "service" => UserAccess::SERVICE_HOMEPAGE,
+            ]);
+
+            // Delete role permissions
+            RoleAccessMapper::getInstance()->deleteByColumn('cid', $model->getId());
         }
         return true;
     }
 
 
     /**
-     * PostSave callback to save the folder's folderCodes
-     *
-     * @param Model $model
-     * @param Model $previous
+     * PostSave callback to efficiently save the folder's folderCodes
+     * @param Model      $model
+     * @param Model|null $previous
      * @return bool
-     * @throws DefinitionException If specified join not defined
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function updateFolderCodes($model, $previous = null)
+    protected function updateFolderCodes(Model $model, Model $previous = null): bool
     {
-        $folderCodeMapper = $this->getJoinMapper('codes');
-        // first drop the previous code(s) connected to this folder
-        $folderCodes = $folderCodeMapper->findByColumn('folder_id', $model->getId());
-        if($folderCodes->count()){
-            $folderCodeMapper->delete($folderCodes);
+        // Don't update if join not hydrated
+        if ($model->getCodes() === null) {
+            return true;
         }
 
-        // only execute if folder has codes and not inheriting permissions
-        if ($model->getCodes()->count() && !$model->getInherit()) {
-            // bind the given codes to this category
-            foreach ($model->getCodes() as $code) {
-                $code->setFolder($model);
-            }
+        /** @var Code\Mapper $folderCodeMapper */
+        $folderCodeMapper = $this->getJoinMapper('codes');
 
-            // persist the Code objects
-            $folderCodeMapper->save($model->getCodes());
+        // No prior codes if this is a CREATE.
+        $oldCodes = $previous
+            ? $folderCodeMapper->findByColumn('folder_id', $model->getId())
+            : $folderCodeMapper->createCollection();
+
+        // Don't save any codes if folder is inheriting permissions
+        $newCodes = $model->getInherit()
+            ? $folderCodeMapper->createCollection()
+            : $model->getCodes();
+
+        $comparator = static function(Code\Model $left, Code\Model $right){
+            return strnatcasecmp($left->getCode(), $right->getCode()) === 0;
+        };
+
+        $codesToRemove = $oldCodes->diff($newCodes, $comparator);
+        if ($codesToRemove->count()) {
+            $folderCodeMapper->delete($codesToRemove);
+        }
+
+        // Save any class codes that have been added to folder
+        $codesToAdd = $newCodes->diff($oldCodes, $comparator);
+        if ($codesToAdd->count()) {
+            $folderCodeMapper->save($codesToAdd);
         }
         return true;
     }
@@ -589,35 +635,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function unMuteClassNotifications($model, $previous = null)
     {
         // only execute if folder has codes and not inheriting permissions
-        if ($model->getCodes()->count() && !$model->getInherit()) {
+        if (!$model->getInherit() && $model->getCodes() && $model->getCodes()->count()) {
 
             // remove any mutes that might exist on this subject (classes are not allowed to be muted)
             RerouteOverrideMapper::getInstance()->deleteByColumnList([
                 'delivery'      => RoutePermission::MUTE,
                 'msg_route_key' => "service.1.{$model->getId()}"
             ]);
-        }
-
-        return true;
-    }
-
-    /**
-     * Post-save callback - saves a homepage config for newly created folders.
-     *
-     * @param Model $model
-     * @param Model $previous
-     * @return bool
-     * @throws DefinitionException If specified join not defined
-     */
-    public function saveHomepageConfig($model, $previous = null)
-    {
-        if (!isset($previous)) {
-            $homepage = $model->getHomepage();
-            if ($homepage instanceof HomepageConfig && $homepage->getTemplate()->getId()) {
-                $model->getHomepage()->setCategory($model);
-                $homepageConfigMapper = $this->getJoinMapper('homepages');
-                $homepageConfigMapper->save($model->getHomepage());
-            }
         }
 
         return true;
@@ -763,6 +787,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     protected function getSelectString()
     {
         $code_mapper           = $this->getJoinMapper('codes');
+        $yearLevelMapper       = $this->getJoinMapper('folder_year_level');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper          = $this->getJoinMapper('groups');
         $courseSpecMapper      = $this->getJoinMapper('course_specification');
@@ -775,6 +800,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getJoinColumnString('coverImage', 'ci')},
                 {$this->getJoinColumnString('coverImage.allowedFileExtension', 'cim')},
                 {$code_mapper->getColumnString('cc')},
+                {$yearLevelMapper->getColumnString('yl')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
                 {$courseSpecMapper->getColumnString('cs')},
@@ -798,6 +824,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
+            LEFT JOIN {$this->getJoinSql('folder_year_level', '', 'yl')}
             LEFT JOIN {$this->getJoinSql('coverImage', '', 'ci', true)}
             LEFT JOIN {$this->getJoinSql('coverImage.allowedFileExtension', 'ci', 'cim', true)}
             LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
@@ -871,10 +898,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Helper method for hydrating a result from a query created by getFindQuery().
      *
-     * @param  PDOStatement $statement
-     * @throws MapperException if statement returned no category
+     * @param PDOStatement $statement
      * @return Collection|Model[]
+     * @throws MapperException if statement returned no category
      * @throws DefinitionException If specified join does is not defined
+     * @throws UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -888,10 +916,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $unitSpecMapper       = $this->getJoinMapper('unit_specification');
         /** @var FolderCode\Mapper $codeMapper */
         $codeMapper           = $this->getJoinMapper('codes');
+        /** @var YearLevel\Mapper $yearLevelMapper */
+        $yearLevelMapper      = $this->getJoinMapper('folder_year_level');
         /** @var Node\Mapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_category');
 
         $folders = $this->createCollection();
+
+        /**
+         * Light-weight cache for efficiency, indexed by YearLevel.id
+         * @var YearLevel\Model[] $yearLevelCache
+         */
+        $yearLevelCache = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
@@ -901,10 +937,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if (!$folders->offsetExists($folderId)) {
                 $folders[$folderId] = $this->hydrate($row);
 
-                // Blow away any previously attached codes
+                // Instantiate collections we are about to populate
                 $folders[$folderId]->setCodes($codeMapper->createCollection());
-
-                // Blow away any previously attached curriculum node codes
+                $folders[$folderId]->setYearLevels($yearLevelMapper->createCollection());
                 $folders[$folderId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
 
                 $folders[$folderId]->setHomepage($homepageConfigMapper->hydrate($row, 'hp'));
@@ -935,6 +970,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if ($row['cc.code']) {
                 $folderCode = $codeMapper->hydrate($row, 'cc');
                 $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
+            }
+
+            // Year Level usages: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
+            $yearLevelId = $row['yl.' . YearLevel\Mapper::COL_ID];
+            if ($yearLevelId) {
+                if (!array_key_exists($yearLevelId, $yearLevelCache)) {
+                    $yearLevelCache[$yearLevelId] = $yearLevelMapper->hydrate($row, 'yl');
+                }
+                $folders[$folderId]->getYearLevels()->setOffset($yearLevelId, $yearLevelCache[$yearLevelId]);
             }
 
             // Hydrate curriculum node codes (avoiding duplicates)
@@ -1204,17 +1248,20 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return Model
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception
+     * @throws DefinitionException
      */
     public function findById($id)
     {
         // special case: 0 === root, but not in db
         // TODO localise setName()
-        if (null !== $id && 0 == $id) {
-            // TODO this should only need to check (0 === $id) but we need to support strings, see SA-4539
+        if ($id === IFolder::ROOT_ID || $id === (string)IFolder::ROOT_ID) {
             return $this->createModel()
-                        ->setId(0)
+                        ->setId(IFolder::ROOT_ID)
                         ->setName('Top Level')
-                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
+                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID))
+                        ->setCodes($this->getJoinMapper('codes')->createCollection())
+                        ->setYearLevels($this->getJoinMapper('folder_year_level')->createCollection())
+                        ->setCurriculumNodes($this->getJoinMapper('curriculum_node_for_category')->createCollection());
         }
 
         /** @var Model $folder */
@@ -1226,6 +1273,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Generates the prepared statement for usage in findFolderIdsForUser() and findForUser()
+     *
+     * Joins onto:
+     *  * Homepage
+     *  * Folder codes
+     *  * Group
      *
      * @param User $user
      * @param bool $get_subjects
@@ -1372,7 +1424,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     ) {
         $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess);
 
-        /** @var Collection|Model[] $collection */
+        /** @var Code\Mapper $folderCodeMapper */
+        $folderCodeMapper = $this->getJoinMapper('codes');
+
         $collection = $this->createCollection();
         while($row = $statement->fetch(PDO::FETCH_ASSOC)){
             $id = $row['c.id'];
@@ -1380,6 +1434,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // First time we've seen folder?
             if (!isset($collection[$id])) {
                 $collection[$id] = $this->hydrate($row, 'c');
+                $collection[$id]->setCodes($folderCodeMapper->createCollection());
             }
 
             $folder = $collection[$id];
@@ -1893,6 +1948,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Return a list of folders that the student has submitted work to in a given term
+     *
+     * Folder is hydrated with:
+     *  * folder codes
+     *
      * @param User $student
      * @param null|Term $term
      * @return Collection|Model[]
@@ -1900,6 +1959,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithResponses(User $student, Term $term = null)
     {
+        /** @var Code\Mapper $codeMapper */
         $codeMapper           = $this->getJoinMapper('codes');
 
         $whereParams = [
@@ -1954,6 +2014,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if ($folders[$folderId] == null) {
                 $folder = $this->hydrate($row, 'f');
                 $folders[$folderId] = $folder;
+                $folder->setCodes($codeMapper->createCollection());
             } else {
                 $folder = $folders[$folderId];
             }
@@ -1974,6 +2035,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Return a set of folders where the student has received feedback
+     *
+     * Hydrated joins:
+     * * folder code
      *
      * @param User $student
      * @param Term|null $term
@@ -1997,6 +2061,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Return a set of folders where the teacher has provided feedback in the specified term
+     *
+     * Hydrated joins:
+     *  * folder codes
      *
      * Includes:
      * 1. assessments directly in folders
@@ -2027,6 +2094,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Hydrates folders with feedbacks based on a where clause provided
+     *
+     * Hydrated joins:
+     *  * folder code
      *
      * @param $whereClause
      * @param $whereParams
@@ -2092,6 +2162,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             if (!$folderCache[$folderId] instanceof Model) {
                 $folderCache[$folderId] = $this->hydrate($row, 'f');
+                $folderCache[$folderId]->setCodes($codeMapper->createCollection());
                 $folders->add($folderCache[$folderId]);
             }
 
@@ -2149,6 +2220,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function getAncestry()
     {
         return $this->ancestry;
+    }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        // By default, order by folder.name, yearLevel.sequence
+        return ['name' => 'ASC', 'yl.' .  YearLevel\Mapper::COL_SEQUENCE => 'ASC'];
     }
 
     /**

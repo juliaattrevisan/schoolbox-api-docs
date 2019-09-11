@@ -13,6 +13,7 @@ use \PDO;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
+ * @method Campus hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Campus[] findAll($options = array())
  * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = array())
  */

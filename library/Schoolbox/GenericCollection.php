@@ -7,6 +7,7 @@
 
 namespace Schoolbox;
 
+use TypeError;
 use function class_exists;
 use DomainException;
 use function is_a;
@@ -178,6 +179,37 @@ class GenericCollection extends Collection
         return false;
     }
 
+    /**
+     * Asserts that this collection is a collection of the specified type.
+     *
+     * If $exact match, then element types must be exact matches, otherwise
+     * applies OO principles to respect interface and class hierarchies.
+     *
+     * @param string $elementType
+     * @param bool   $exact
+     * @throws TypeError
+     */
+    public function assertCollectionOf(string $elementType, bool $exact = true): void
+    {
+        if ($exact && $this->elementType !== $elementType) {
+            throw new TypeError(
+                "These elements '{$this->elementType}' are not exact match of '$elementType'"
+            );
+        }
+        try {
+            if (!$this->isCollectionOf($elementType)) {
+                throw new TypeError(
+                    "These elements '{$this->elementType}' are not instance of '$elementType'"
+                );
+            }
+        } catch (ReflectionException $e) {
+            throw new TypeError(
+                "These elements '{$this->elementType}' are not instance of '$elementType'",
+                0,
+                $e
+            );
+        }
+    }
 
     /**
      * Ensures the $item is of the specified type

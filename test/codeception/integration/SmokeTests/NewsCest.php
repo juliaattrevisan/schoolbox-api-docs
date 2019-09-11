@@ -1,275 +1,295 @@
 <?php
-
-namespace SmokeTests;
-
-use IntegrationTester;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\GuzzleException;
-use Page\Common;
-use Payload\CreateNews as NewsPayload;
-
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+/** @noinspection PhpDocMissingThrowsInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpUnused */
+declare(strict_types=1);
 
-class NewsCest {
+namespace SmokeTests;
 
+use IntegrationTester;
+use Payload;
+use Schoolbox\Comms\News\Querystring;
+use function time;
+
+class NewsCest
+{
     /**
      * Push a login payload to Schoolbox each test to ensure session is active and logged in.
      *
      * @param IntegrationTester $i
      */
-    public function _before(IntegrationTester $i)
+    public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin();
+        $i->stopFollowingRedirects();
     }
+
 
     /** Create draft news using curl request
      *
-     * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
-     * @throws \Schoolbox\External\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @param IntegrationTester    $i
      */
-    public function createDraftNews(IntegrationTester $i, NewsPayload $newsPayload){
+    public function createDraftNews(IntegrationTester $i): void
+    {
         #GIVEN
-        $timestamp=time();
-        $title = 'Smoke Test News Title Draft at '.$timestamp;
+        $timestamp = time();
+        $title     = 'Smoke Test News Title Draft at ' . $timestamp;
 
         #WHEN
+        $newsPayload = new Payload\News\Create(Querystring::encode('/'));
         $newsPayload->setNewsTitle($title);
-        $response = $i->sendCurlRequest($newsPayload, true, 'Send request to create draft news');
-        $draft_article=$i->getNewsArticleByTitle($title);
-
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news/'.$draft_article->getId().'?returnUrl=Lw%253D%253D'=>'303'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
+        $newsPayload->setFormParam('audience', 'role:IjMi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($newsPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+
+        $draftArticle = $i->grabNewsArticleByTitle($title);
+
+        $i->sendGET("https://vagrant.dev.schoolbox.cloud/news/{$draftArticle->getId()}");
+        $i->seeResponseCodeIs(200);
     }
+
+
+    /**
+     * Tests we can update a draft article
+     *
+     * @param IntegrationTester $i
+     */
+    public function updateDraft(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+        $title     = 'Smoke Test News Title Draft at ' . $timestamp;
+
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('audience', 'role:IjQi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($createDraft);
+        $article = $i->grabNewsArticleByTitle($title);
+
+        #WHEN
+        $updatedTitle = 'Smoke Test News Title Update at ' . $timestamp;
+        $updateDraft = new Payload\News\Update(Querystring::encode('/'), $article);
+        $updateDraft->setFormParam('title', $updatedTitle);
+        $i->amGoingTo('Send request to update draft news');
+        $i->sendRequest($updateDraft);
+
+        # THEN
+        $i->seeResponseCodeIs(303);
+        $i->grabNewsArticleByTitle($updatedTitle);
+    }
+
 
     /** Publish draft news into moderation using curl request
      *
      *  Fires off a create step.
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
-     * @throws \Schoolbox\External\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function publishDraftToModerate(IntegrationTester $i, NewsPayload $newsPayload){
+    public function submitNewsToModeration(IntegrationTester $i): void
+    {
         #GIVEN
-        $timestamp=time();
-        $title = 'Smoke Test News Title Moderate at '.$timestamp;
+        $timestamp = time();
+        $title     = 'Smoke Test News Title Draft at ' . $timestamp;
 
-        $newsPayload->setNewsTitle($title);
-        $i->sendCurlRequest($newsPayload, false, 'Send request to create draft news');
-        $article_id=$i->getNewsArticleByTitle($title)->getId();
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('audience', 'role:IjQi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($createDraft);
+        $article = $i->grabNewsArticleByTitle($title);
 
         #WHEN
-        $newsPayload->setPage('/news/moderation/'.$article_id.'/submit');
-        $newsPayload->setReferer('/news/'.$article_id.'/update');
-        $newsPayload->removeFormParam('draft');
-        $newsPayload->removeFormParam('returnUrl');
+        $submitRequest = new Payload\News\Submit(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to submit news to moderation queue');
+        $i->sendRequest($submitRequest);
 
-        $response = $i->sendCurlRequest($newsPayload, true, 'Send request to publish draft news to moderate');
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', "/news/{$article->getId()}");
     }
+
 
     /** Publish draft news using curl request
      *
      *  Fires off a create step.
      *
-     * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
-     * @throws \Schoolbox\External\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @param IntegrationTester    $i
      */
-    public function publishNewsFromDraft(IntegrationTester $i, NewsPayload $newsPayload){
+    public function publishNewsFromDraft(IntegrationTester $i): void
+    {
         #GIVEN
-        $timestamp=time();
-        $title = 'Smoke Test News Title Publish Form Draft at '.$timestamp;
+        $timestamp = time();
+        $title     = 'Smoke Test News Title Publish Form Draft at ' . $timestamp;
 
-        $newsPayload->setNewsTitle($title);
-        $i->sendCurlRequest($newsPayload, false, 'Send request to create draft news');
-        $article_id=$i->getNewsArticleByTitle($title)->getId();
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('audience', 'role:IjQi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($createDraft);
+        $article = $i->grabNewsArticleByTitle($title);
 
         #WHEN
-        $newsPayload->setPage('/news/moderation/'.$article_id.'/accept');
-        $newsPayload->setReferer('/news/'.$article_id.'/update');
-        $newsPayload->removeFormParam('draft');
-        $newsPayload->removeFormParam('returnUrl');
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept draft news');
+        $i->sendRequest($submitRequest);
 
-        $response = $i->sendCurlRequest($newsPayload, true, 'Send request to publish draft news');
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
     }
+
 
     /** Accept news in moderate using curl request
      *
      *  Fires off a create step and putting the news into moderation
      *
-     * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
-     * @throws \Schoolbox\External\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @param IntegrationTester    $i
      */
-    public function publishNewsFromModerate(IntegrationTester $i, NewsPayload $newsPayload){
+    public function acceptNewsAwaitingModeration(IntegrationTester $i): void
+    {
         #GIVEN
-        $timestamp=time();
-        $title = 'Smoke Test News Title Publish Form Moderate at '.$timestamp;
+        $timestamp = time();
+        $title     = 'Smoke Test News Title Draft at ' . $timestamp;
 
-        $newsPayload->setNewsTitle($title);
-        $i->sendCurlRequest($newsPayload, false, 'Send request to create draft news');
-        $article_id=$i->getNewsArticleByTitle($title)->getId();
-
-        $newsPayload->setPage('/news/moderation/'.$article_id.'/submit');
-        $newsPayload->setReferer('/news/'.$article_id.'/update');
-        $newsPayload->removeFormParam('draft');
-        $newsPayload->removeFormParam('returnUrl');
-        $i->sendCurlRequest($newsPayload, false, 'Send request to publish draft news to moderate');
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('audience', 'role:IjQi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($createDraft);
+        $article = $i->grabNewsArticleByTitle($title);
 
         #WHEN
-        $newsPayload->setPage('/news/moderation/'.$article_id.'/accept');
-        $newsPayload->setReferer('/news/'.$article_id.'/update');
-        $newsPayload->clearAllFormParams();
-        $newsPayload->setFormParam('articleID', $article_id);
-        $response = $i->sendCurlRequest($newsPayload, true, 'Send request to accept news from moderate');
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
+        $submitRequest = new Payload\News\Submit(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to submit news to moderation queue');
+        $i->sendRequest($submitRequest);
+
+        #WHEN
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept news awaiting moderation');
+        $i->sendRequest($submitRequest);
+
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
     }
+
 
     /** Reject news in moderate using curl request
      *
      *  Fires off a create step and putting the news into moderation
      *
-     * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
-     * @throws \Schoolbox\External\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @param IntegrationTester    $i
      */
-    public function rejectNewsFromModerate(IntegrationTester $i, NewsPayload $newsPayload){
+    public function rejectNewsFromModerate(IntegrationTester $i): void
+    {
         #GIVEN
-        $timestamp=time();
-        $title = 'Smoke Test News Title Reject from Moderate at '.$timestamp;
+        $timestamp = time();
+        $title     = 'Smoke Test News Title Reject from Moderate at ' . $timestamp;
 
-        $newsPayload->setNewsTitle($title);
-        $i->sendCurlRequest($newsPayload, false, 'Send request to create draft news');
-        $article_id=$i->getNewsArticleByTitle($title)->getId();
-
-        $newsPayload->setPage('/news/moderation/'.$article_id.'/submit');
-        $newsPayload->setReferer('/news/'.$article_id.'/update');
-        $newsPayload->removeFormParam('draft');
-        $newsPayload->removeFormParam('returnUrl');
-        $i->sendCurlRequest($newsPayload, false, 'Send request to publish draft news to moderate');
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('audience', 'role:IjQi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($createDraft);
+        $article = $i->grabNewsArticleByTitle($title);
 
         #WHEN
-        $newsPayload->setPage('/news/moderation/'.$article_id.'/reject');
-        $newsPayload->setReferer('/news/'.$article_id.'/update');
-        $newsPayload->clearAllFormParams();
-        $newsPayload->setFormParam('articleID', $article_id);
-        $newsPayload->setFormParam('rejectReason', 'The reason is valid');
-        $response = $i->sendCurlRequest($newsPayload, true, 'Send request to reject news from moderate');
-        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
+        $submitRequest = new Payload\News\Submit(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to submit news to moderation queue');
+        $i->sendRequest($submitRequest);
 
-        #THEN;
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        #WHEN
+        $rejectRequest = new Payload\News\Reject(Querystring::encode('/'), $article);
+        $rejectRequest->setFormParam('rejectReason', 'The reason is valid');
+        $i->amGoingTo('Send request to reject news awaiting moderation');
+        $i->sendRequest($rejectRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
     }
+
 
     /** Save news for later using curl request
      *
      *  Fires off a create step and publish step for news.
      *
-     * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
-     * @throws \Schoolbox\External\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @param IntegrationTester    $i
      */
-    public function saveNewsForLater(IntegrationTester $i, NewsPayload $newsPayload){
+    public function saveNewsForLater(IntegrationTester $i): void
+    {
         #GIVEN
-        $timestamp=time();
-        $title = 'Smoke Test News Title Save news for later at '.$timestamp;
+        $timestamp = time();
+        $title     = 'Smoke Test News Title Save news for later at ' . $timestamp;
 
-        $newsPayload->setNewsTitle($title);
-        $i->sendCurlRequest($newsPayload, false, 'Send request to create draft news');
-        $article_id=$i->getNewsArticleByTitle($title)->getId();
-
-        $newsPayload->setPage('/news/moderation/'.$article_id.'/accept');
-        $newsPayload->setReferer('/news/'.$article_id.'/update');
-        $newsPayload->removeFormParam('draft');
-        $newsPayload->removeFormParam('returnUrl');
-        $i->sendCurlRequest($newsPayload, false, 'Send request to publish draft news');
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('audience', 'role:IjQi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($createDraft);
+        $article = $i->grabNewsArticleByTitle($title);
 
         #WHEN
-        $newsPayload->setPage('/news/saved/'.$article_id.'/add');
-        $newsPayload->setReferer('/news');
-        $newsPayload->clearAllFormParams();
-        $response = $i->sendCurlRequest($newsPayload, true, 'Send request to save news for later');
-        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept draft news');
+        $i->sendRequest($submitRequest);
+
+        #WHEN
+        $addSavedForLater = new Payload\Base('POST', '/news', "/news/saved/{$article->getId()}/add");
+        $i->amGoingTo('Send request to add article to saved-for-later');
+        $i->sendRequest($addSavedForLater);
+
         #THEN;
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(200);
+
+        #WHEN
+        $removeSavedForLater = new Payload\Base('POST', '/news', "/news/saved/{$article->getId()}/remove");
+        $i->amGoingTo('Send request to remove news for from saved-for-later');
+        $i->sendRequest($removeSavedForLater);
+
+        #THEN;
+        $i->seeResponseCodeIs(200);
     }
+
 
     /** Delete news using curl request
      *
      *  Fires off a create step and publish step for news.
      *
-     * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
-     * @throws \Schoolbox\External\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @param IntegrationTester    $i
      */
-    public function deleteNews(IntegrationTester $i, NewsPayload $newsPayload)
+    public function deleteNews(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp = time();
-        $title = 'Smoke Test News Title Delete, I should not exist. at ' . $timestamp;
+        $title     = 'Smoke Test News Title Delete, I should not exist. at ' . $timestamp;
 
-        $newsPayload->setNewsTitle($title);
-        $i->sendCurlRequest($newsPayload, false, 'Send request to create draft news');
-        $article_id = $i->getNewsArticleByTitle($title)->getId();
-
-        $newsPayload->setPage('/news/moderation/' . $article_id . '/accept');
-        $newsPayload->setReferer('/news/' . $article_id . '/update');
-        $newsPayload->removeFormParam('draft');
-        $newsPayload->removeFormParam('returnUrl');
-        $i->sendCurlRequest($newsPayload, false, 'Send request to publish draft news');
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('audience', 'role:IjQi:self');
+        $i->amGoingTo('Send request to create draft news');
+        $i->sendRequest($createDraft);
+        $article = $i->grabNewsArticleByTitle($title);
 
         #WHEN
-        $newsPayload->setPage('/news/' . $article_id . '/delete');
-        $newsPayload->setReferer('/news/' . $article_id . '/update');
-        $newsPayload->clearAllFormParams();
-        $newsPayload->setFormParam('articleID', $article_id);
-        $response = $i->sendCurlRequest($newsPayload, true, 'Send request to delete news');
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news'=>'302'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept draft news');
+        $i->sendRequest($submitRequest);
+
+        #WHEN
+        $deleteRequest = new Payload\Base('POST', "/news/{$article->getId()}/update", "/news/{$article->getId()}/delete");
+        $i->amGoingTo('Send request to delete news');
+        $i->sendRequest($deleteRequest);
 
         #THEN;
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/news');
     }
 }

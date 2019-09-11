@@ -11,8 +11,8 @@ namespace Schoolbox\Fixtures\Team;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Fixtures\Coach;
 use Schoolbox\Fixtures\Division;
 use Schoolbox\Fixtures\Season;
@@ -22,7 +22,7 @@ use Schoolbox\Fixtures\Season;
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
- *
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @package Schoolbox\Fixtures\Division
  */
 class Mapper extends BaseMapper
@@ -100,6 +100,8 @@ class Mapper extends BaseMapper
     {
         /** @var Model[] $cache */
         $cache = [];
+        /** @var Coach\Mapper $coachMapper */
+        $coachMapper = $this->getJoinMapper('sportsfixtures_team_coach');
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -108,6 +110,7 @@ class Mapper extends BaseMapper
 
             if (empty($cache[$teamId])) {
                 $cache[$teamId] = $this->hydrate($r);
+                $cache[$teamId]->setCoaches($coachMapper->createCollection());
             }
 
             if ($r['coaches.id']) {

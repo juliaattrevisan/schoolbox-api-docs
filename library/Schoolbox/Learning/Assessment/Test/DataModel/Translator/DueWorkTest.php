@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
@@ -205,9 +206,7 @@ class DueWorkTest extends TestCase
                     ->setMarkScheme(new LetterGrade(
                         (new DueWorkModel\GradeLevel\Group\Model())
                             ->setId(7)
-                            ->addGradeLevel(
-                                new DueWorkModel\GradeLevel\Model()
-                            )
+                            ->setGradeLevels(new GenericCollection(GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()]))
                     ))
                     ->setWorkType(new WorkType())
                     ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
@@ -544,8 +543,8 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
-                    ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->addGradeLevel(
-                        new DueWorkModel\GradeLevel\Model()
+                    ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->setGradeLevels(
+                        new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     ))
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 LetterGrade::class,

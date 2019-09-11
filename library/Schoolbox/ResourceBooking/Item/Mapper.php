@@ -206,7 +206,6 @@ class Mapper extends BaseMapper
         $c = $this->createCollection();
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            /** @var Model $item */
             $item = $this->hydrate($r);
 
             /** @var Category\Model $category */
@@ -243,7 +242,7 @@ class Mapper extends BaseMapper
      * @param string $alias
      * @param null   $callback
      *
-     * @return object
+     * @return object|Model
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {

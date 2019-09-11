@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Component;
 
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -23,7 +22,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 
 class SubmissionBox implements IAssessableDataModel, ISoftDeletable
@@ -154,11 +152,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $deleted;
 
     /**
-     * @var Submission[]|GenericCollection
-     */
-    private $submissions;
-
-    /**
      * Can learners reflect on or grade their own submissions?
      *
      * @see SubmissionBox::SELF_REVIEWABILITY_NONE and adjacent constants
@@ -166,18 +159,14 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     private $selfReviewability;
 
-
     public function __construct()
     {
         $this->setCategory(new FolderModel());
-        $this->setCurriculumNodes(new Collection());
         $this->setPublishDate(new \Alaress_Date_NullDate());
         $this->setOpenDate(new \Alaress_Date_NullDate());
         $this->setDueDate(new \Alaress_Date_NullDate());
         $this->setLateDate(new \Alaress_Date_NullDate());
         $this->setAssessmentModel(new Model());
-        $this->submissions = new GenericCollection(Submission::class);
-        $this->attachments = new GenericCollection(SubmissionBox\SingleFile\Model::class);
     }
 
     /**
@@ -360,7 +349,8 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function setAttachments(GenericCollection $attachments)
     {
-        $this->attachments->replaceWith($attachments);
+        $attachments->assertCollectionOf(SubmissionBox\SingleFile\Model::class);
+        $this->attachments = $attachments;
         return $this;
     }
 
@@ -777,24 +767,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         }
 
         return false;
-    }
-
-    /**
-     * @return Submission[]|GenericCollection
-     */
-    public function getSubmissions()
-    {
-        return $this->submissions;
-    }
-
-    /**
-     * @param Submission[]|GenericCollection $submissions
-     * @return static
-     */
-    public function setSubmissions(GenericCollection $submissions)
-    {
-        $this->submissions->replaceWith($submissions);
-        return $this;
     }
 
     /**

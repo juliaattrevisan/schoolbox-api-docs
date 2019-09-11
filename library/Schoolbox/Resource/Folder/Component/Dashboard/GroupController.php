@@ -9,9 +9,12 @@
 
 namespace Schoolbox\Resource\Folder\Component\Dashboard;
 
+use Alaress\Color\Color;
+use Alaress\Color\ColorFactory;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -71,10 +74,16 @@ class GroupController extends Component_Dashboard_ControllerAbstract
             }
         }
 
+        $colourFactory = new ColorFactory();
+        $colourCache   = new GenericCollection(Color::class);
         foreach($filteredFolders->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
-                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                $hexColour = $colourList[$colourIndex]->getHexColour();
+                if (!$colourCache->offsetExists($hexColour)) {
+                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
+                }
+                $folder->setColour($colourCache->getOffset($hexColour));
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
             $accessType = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());

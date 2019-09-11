@@ -1036,6 +1036,22 @@ class MapperProxy
         return $model;
     }
 
+    /**
+     * @param string $column
+     * @param        $value
+     * @return IAssessable
+     * @throws DefinitionException
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException\Deleted
+     * @throws UnexpectedValueException
+     */
+    public function findOneByColumn(string $column, $value): IAssessable
+    {
+        return $this->findSingle($column, $value, false);
+    }
+
 
     /**
      * Helper function for finding a single assessment by a column and value.

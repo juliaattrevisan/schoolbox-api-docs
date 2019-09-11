@@ -10,6 +10,7 @@ namespace Schoolbox\Resource\Folder\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\ValidCodesSpec;
 use Schoolbox\Resource\Folder;
 use PHPUnit\Framework;
@@ -36,7 +37,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testNonUniqueOnFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderWithEmptyCodes();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -56,7 +57,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testUniqueOnFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderWithEmptyCodes();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -76,7 +77,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testExactCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderWithEmptyCodes();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -96,7 +97,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testPrefixCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderWithEmptyCodes();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -117,7 +118,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testNoCollisionWithOtherFolder(?int $folderId, array $codes, int $countDbMatches): void
     {
-        $folderModel = (new Folder\Model())->setId($folderId);
+        $folderModel = $this->createFolderWithEmptyCodes()->setId($folderId);
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -229,5 +230,13 @@ class ValidCodesSpecTest extends TestCase
             ->willReturn($results);
 
         return new ValidCodesSpec($folderCodeMapper);
+    }
+
+    /**
+     * @return Folder\Model
+     */
+    private function createFolderWithEmptyCodes(): Folder\Model
+    {
+        return (new Folder\Model())->setCodes(new GenericCollection(Folder\Code\Model::class));
     }
 }

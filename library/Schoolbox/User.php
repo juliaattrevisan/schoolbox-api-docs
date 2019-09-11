@@ -12,7 +12,6 @@ namespace Schoolbox;
 
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
-use DomainException;
 use House;
 use HouseResidential;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -205,15 +204,6 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     private $calendarView = 'month';
 
     /**
-     * A Collection of User objects who should be receiving email
-     * notifications about this User. These recipients are usually,
-     * but not necessarily, a parent of this User instance.
-     *
-     * @var Collection|self[]
-     */
-    private $emailRecipients;
-
-    /**
      * Student's boarding status (only used if boarder leave module is enabled)
      *
      * @var null|string
@@ -221,7 +211,10 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     private $boardingStatus;
 
     /**
+     *
      * @var IConfigLoader
+     * @deprecated Don't use this in new code, models should not have dependencies on services
+     * @todo Remove this from this model
      */
     protected $config_loader;
 
@@ -240,20 +233,10 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     private $children;
 
 
-    /**
-     * Build default empty objects so things don't explode
-     * @throws \UnexpectedValueException
-     */
     public function __construct()
     {
-        $this->campusCollection = new GenericCollection(Campus::class);
-        $this->subject_collection = new GenericCollection(Subject::class);
-//        $this->accessList = new GenericCollection(UserAccess::class);
-        $this->setConfigLoader(new ConfigLoader());
-        $this->setLinkedUser(new Collection(array()));
-        $this->setRole(new Role());
-        $this->children = new GenericCollection(self::class);
-        $this->parents  = new GenericCollection(self::class);
+        $this->role = new Role();
+        $this->config_loader = new ConfigLoader();  // TODO. Remove global dependency
     }
 
 
@@ -262,7 +245,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     public function __clone()
     {
-        $this->campusCollection = clone $this->campusCollection;
+        if ($this->campusCollection !== null) {
+            $this->campusCollection = clone $this->campusCollection;
+        }
 //        $this->accessList = clone $this->accessList;
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
@@ -937,7 +922,8 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     public function setCampusCollection(GenericCollection $campusCollection)
     {
-        $this->campusCollection->replaceWith($campusCollection);
+        $campusCollection->assertCollectionOf(Campus::class);
+        $this->campusCollection = $campusCollection;
         return $this;
     }
 
@@ -1140,6 +1126,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         if ($this->parentsLoaded) {
             return $this;
         }
+        $this->parents = new GenericCollection(self::class);
         if (null === $this->externalId) {
             return $this;
         }
@@ -1175,6 +1162,19 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         return $this;
     }
 
+
+    /**
+     * @param GenericCollection<User> $parents
+     * @return User
+     */
+    public function setParents(GenericCollection $parents): self
+    {
+        $parents->assertCollectionOf(self::class);
+        $this->parents = $parents;
+        return $this;
+    }
+
+
     /**
      * Get the parents associated with this user
      *
@@ -1184,78 +1184,6 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     {
         return $this->parents;
     }
-
-    /**
-     * TODO this logic needs to go in the mapper. Or somewhere. Just not here!
-     *
-     * Find the email recipients for this user who should be notified whenever
-     * a comment is made, or when some other email-worthy action takes place
-     *
-     * At the moment it's private because nobody else is using this yet, but I
-     * think there are other places which do a similar thing - when those are
-     * ready to utilise findEmailRecipients, make this public or use the
-     * loadEmailRecipients() approach
-     *
-     * Migrated from Conversation.php
-     *
-     * @param self $user
-     *
-     * @return Collection|self[]
-     */
-    private function findEmailRecipients($user)
-    {
-        $parentRoles = RoleMapper::getInstance()->findByColumn(
-            'group_type',
-            Role::PARENT
-        )->getColumnValues('id');
-        $allRecipients            = new Collection();
-        $DEPRECATED_EXTERNAL_USER = new \External_User();
-        $emailArray               = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($user->getExternalId()));
-        if (is_array($emailArray) && count($emailArray)) {
-            foreach ($emailArray as $synergyId => $emailAddress) {
-                $thisRecipient = new Collection();
-                // if a synergy ID is available, and a valid user can be obtained from it, use that
-                if ($synergyId) {
-                    $thisRecipient = UserMapper::getInstance()->findByColumnList(
-                        array(
-                            'synergy_id' => $synergyId,
-                            'group_id'   => $parentRoles
-                        )
-                    );
-                }
-                if ($thisRecipient->count()) {
-                    /* This person has a Schoolbox account, so just use that
-                     */
-                    $recipient = $thisRecipient->first();
-                } else {
-                    /* Generate a dummy user object (which will still have a correct email address)
-                     *
-                     * This is used when someone is specified to receive emails, but doesn't
-                     * actually have a Schoolbox account. This is actually possible.
-                     */
-                    $recipient = new User();
-                    $recipient->setId(-1);
-                }
-                // override any email retrieved from schoolbox with the one from synergy
-                $recipient->setAltEmail($emailAddress);
-                /* Add him to the stack
-                 */
-                $allRecipients->add($recipient);
-            }
-        }
-        return $allRecipients;
-    }
-
-    /**
-     * Public alias for the Report Card approach
-     *
-     * @return void
-     */
-    public function loadEmailRecipients()
-    {
-        $this->setEmailRecipients($this->findEmailRecipients($this));
-    }
-
 
     /**
      * Hide the sidenav
@@ -1311,35 +1239,13 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
 
     /**
-     * Set recipients
-     *
-     * @param Collection|self[] $emailRecipients
-     *
-     * @return self
-     */
-    private function setEmailRecipients($emailRecipients)
-    {
-        $this->emailRecipients = $emailRecipients;
-        return $this;
-    }
-
-    /**
-     * Get recipients
-     *
-     * @return Collection|self[]
-     */
-    public function getEmailRecipients()
-    {
-        return $this->emailRecipients;
-    }
-
-
-    /**
      * @param Collection|self[] $linkedUser
+     * @return $this
      */
-    public function setLinkedUser($linkedUser)
+    public function setLinkedUser($linkedUser): self
     {
         $this->linkedUser = $linkedUser;
+        return $this;
     }
 
     /**
@@ -1440,13 +1346,13 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
 
     /**
-     * @param Collection|User[] $children
+     * @param GenericCollection<User> $children
      * @return $this
-     * @throws DomainException If collection has wrong member-item type
      */
-    public function setChildren(Collection $children): self
+    public function setChildren(GenericCollection $children): self
     {
-        $this->children->replaceWith($children);
+        $children->assertCollectionOf(self::class);
+        $this->children = $children;
         return $this;
     }
 

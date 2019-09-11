@@ -66,7 +66,7 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $codec            = new Audience\Segment\Codec($this->audienceMapper);
+        $codec            = new Audience\Segment\Codec();
         $simpleStrategies = $this->strategyFactory->makeAllSimpleStrategies();
         $placeholder      = 'keyword';
         $pieces           = [];
@@ -126,7 +126,7 @@ class Controller extends Base
             return;
         }
 
-        $codec = new Audience\Segment\Codec($this->audienceMapper);
+        $codec = new Audience\Segment\Codec();
 
         // Special case for folder, only show involved folders in the list
         if (Audience\Segment\Strategy\Folder::getEntityType() === $entityType) {

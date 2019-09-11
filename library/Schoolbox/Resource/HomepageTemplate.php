@@ -8,7 +8,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 
 namespace Schoolbox\Resource;
 
@@ -17,8 +17,8 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class HomepageTemplate {
 
-	const HOMEPAGE_REMOVE = -1;
-	const HOMEPAGE_KEEP_EXISTING = 0;
+    public const HOMEPAGE_NONE          = -1;
+    public const HOMEPAGE_KEEP_EXISTING = 0;
 
     use Id;
 

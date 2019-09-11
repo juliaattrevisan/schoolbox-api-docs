@@ -1,77 +1,122 @@
 <?php
 /**
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
 
-use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
-use Schoolbox\Role;
+use InvalidArgumentException;
+use Schoolbox\Curriculum;
+use Schoolbox\Error;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\YearLevel;
 
 class Module extends BaseModule
 {
     /** @var string */
     protected $basename = 'folder';
 
+
     /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param Router $router
-     * @param string $basePath The base route for this module
+     * @inheritDoc
+     * @throws InvalidArgumentException
      */
-    public function initRoutes(Router $router, $basePath)
+    protected function registerRoutes(): void
     {
-        $routes = [
-            'GET' => [
-                '/folder/modify/{id}'                   => 'getFolderModify',
-                '/folder/create/{parentId}'             => 'getFolderCreate',
-                '/mygroups'                             => 'getGroups',
-            ],
-            'POST' => [
-                '/folder/move'                          => 'postMoveFolder',
-                '/folder/update'                        => 'postUpdateFolder',
-                '/folder/delete'                        => 'postDeleteFolder',
-                '/folder/reset'                         => 'postFolderReset',
-            ]
-        ];
+        $parentWriteAccess = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            static function (array $params): int {
+                return (int)$params['parentId'];
+            },
+            Access::getInstance()
+        );
 
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
+        $preloadParent = function (array $params) {
+            if (($params['parent'] ?? null) instanceof Model) {
+                return ['parent' => $params['parent']];
+            }
+            try {
+                return ['parent' => $this->getMapper()->findById($params['parentId'])];
+            } catch (MapperException $e) {
+                throw new InvalidPath($e->getMessage(), 0, $e);
+            }
+        };
 
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
+        $folderWriteAccess = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            static function (array $params): int {
+                return (int)$params['id'];
+            },
+            Access::getInstance()
+        );
+        $preloadFolder     = function (array $params) {
+            if (($params['folder'] ?? null) instanceof Model) {
+                return ['folder' => $params['folder']];
+            }
+            try {
+                return ['folder' => $this->getMapper()->findById($params['id'])];
+            } catch (MapperException $e) {
+                throw new InvalidPath($e->getMessage(), 0, $e);
+            }
+        };
+
+        $permWriteBoth = new Rule\All($folderWriteAccess, $parentWriteAccess);
+        $preloadBoth   = function (array $params) {
+            try {
+                return [
+                    'folder'    => ($params['folder'] ?? null) instanceof Model
+                        ? $params['folder']
+                        : $this->getMapper()->findById($params['id']),
+                    'newParent' => ($params['newParent'] ?? null) instanceof Model
+                        ? $params['newParent']
+                        : $this->getMapper()->findById($params['parentId']),
+                ];
+            } catch (MapperException $e) {
+                throw new InvalidPath($e->getMessage(), 0, $e);
+            }
+        };
+
+        $this->register('GET',    '/mygroups',                            'getGroups',        new Rule\IsLoggedIn());
+        $this->register('GET',    '/folder/{parentId:\d+}/create',        'getFolderCreate',  $parentWriteAccess, $preloadParent);
+        $this->register('POST',   '/folder/{parentId:\d+}/create',        'postCreateFolder', $parentWriteAccess, $preloadParent);
+        $this->register('GET',    '/folder/{id:\d+}/modify',              'getFolderModify',  $folderWriteAccess, $preloadFolder);
+        $this->register('POST',   '/folder/{id:\d+}/update',              'postUpdateFolder', $folderWriteAccess, $preloadFolder);
+        $this->register('PUT',    '/folder/{id:\d+}/move/{parentId:\d+}', 'putMoveFolder',    $permWriteBoth,     $preloadBoth);
+        $this->register('DELETE', '/folder/{id:\d+}',                     'deleteFolder',     $folderWriteAccess, $preloadFolder);
+        $this->register('POST',   '/folder/{id:\d+}/reset',               'postFolderReset',  $folderWriteAccess, $preloadFolder);
     }
+
+
+    /**
+     * @return Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getMapper(): Mapper
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
+    }
+
 
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
-        $this
-            ->addRoutePermission($authorizer, '.*', new Rule\All(
-                new Rule\IsLoggedIn()
-            ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/Templates');
     }
@@ -80,12 +125,27 @@ class Module extends BaseModule
      * Initializes controller classes into the dependency injector.
      *
      * @param ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
+        $mapperFactory = $this->getMapperFactory();
         $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            'controller:' . $this->basename,
+            $injector->lazyNew(Controller::class, [
+                'folderMapper'           => $mapperFactory->getLazy(Mapper::class),
+                'homepageConfigMapper'   => $mapperFactory->getLazy(HomepageConfigMapper::class),
+                'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class),
+                'roleAccessMapper'       => $mapperFactory->getLazy(RoleAccessMapper::class),
+                'userAccessMapper'       => $mapperFactory->getLazy(UserAccessMapper::class),
+                'roleMapper'             => $mapperFactory->getLazy(RoleMapper::class),
+                'errorMapper'            => $mapperFactory->getLazy(Error\Mapper::class),
+                'access'                 => $mapperFactory->getLazy(Access::class),
+                'curriculumNodeMapper'   => $mapperFactory->getLazy(Curriculum\Node\Mapper::class),
+                'groupMapper'            => $mapperFactory->getLazy(GroupMapper::class),
+                'fileMapper'             => $mapperFactory->getLazy(File\Mapper::class),
+                'yearLevelMapper'        => $mapperFactory->getLazy(YearLevel\Mapper::class),
+            ])
         );
     }
 }

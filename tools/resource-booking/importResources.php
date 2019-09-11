@@ -5,6 +5,7 @@
  */
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\UserMapper;
@@ -78,6 +79,7 @@ HELP
 
             // Create the resource to import booking for
             $resource = new Item\Model();
+
             $resource
                 ->setName($row['Name'])
                 ->setDescription($row['Description'])
@@ -100,6 +102,7 @@ HELP
 
             // Set its moderators
             if($row['ManagedBy_SynergeticID']) {
+                $resource->setModeratorList(new Collection());
                 try {
                     $moderator = $userMapper->findByExternalId($row['ManagedBy_SynergeticID']);
                     $resource->addModerator($moderator);

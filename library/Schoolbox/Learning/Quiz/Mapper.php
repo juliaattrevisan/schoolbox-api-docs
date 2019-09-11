@@ -523,6 +523,8 @@ class Mapper extends BaseMapper
         foreach ($quiz->getSections() as $section) {
             if (isset($sectionQuestions[$section->getId()])) {
                 $section->setQuestions($sectionQuestions[$section->getId()]);
+            } else {
+                $section->setQuestions($questionMapper->createCollection());
             }
         }
 
@@ -562,6 +564,8 @@ class Mapper extends BaseMapper
         foreach ($quiz->getAttempts() as $attempt) {
             if (isset($attemptAnswers[$attempt->getId()])) {
                 $attempt->setAnswers($attemptAnswers[$attempt->getId()]);
+            } else {
+                $attempt->setAnswers($answerMapper->createCollection());
             }
         }
 

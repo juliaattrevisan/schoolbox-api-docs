@@ -21,6 +21,7 @@ use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableArrayExporter;
+use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -583,7 +584,8 @@ class Controller extends Base
             ->setResource($resource)
             ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
             ->setName($this->getRequest()->post['name'])
-            ->setNotes($this->getRequest()->post['notes']);
+            ->setNotes($this->getRequest()->post['notes'])
+            ->setRelatedBookingList(new GenericCollection(Model::class));
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {

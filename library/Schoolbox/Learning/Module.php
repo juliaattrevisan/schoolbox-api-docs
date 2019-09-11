@@ -161,7 +161,7 @@ class Module extends BaseModule
                 }
 
                 try {
-                    if ($params['termCode']) {
+                    if ($params['termCode'] ?? null) {
                         $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
                     } else {
                         $args['term'] = $this->getTermMapper()->findForToday();

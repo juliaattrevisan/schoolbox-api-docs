@@ -1,6 +1,5 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,8 +7,6 @@
 
 namespace Schoolbox\Resource\Folder;
 
-
-use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
@@ -20,6 +17,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
@@ -30,6 +28,9 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
+use Schoolbox\YearLevel;
+use TypeError;
+use UnexpectedValueException;
 
 /**
  * Class Model
@@ -45,11 +46,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     use DeletedAtDate;
 
     /**
-     * A homepage instance
+     * A homepage instance (if this folder has one)
      *
-     * @var \Schoolbox\Resource\HomepageConfig
+     * @var null|Resource\HomepageConfig
      */
-    protected $homepage;
+    private $homepage;
 
     /**
      * A collection of FolderCode() instances
@@ -57,9 +58,18 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * You must index these by folder_code.code to enable efficient de-duplication
      * when building collection (array key lookup vs array value traversal)
      *
-     * @var Collection|FolderCode[]
+     * Null means 'unknown'. Empty collection means this folder has no codes.
+     *
+     * @var null|Collection|FolderCode[]
      */
     private $codes;
+
+    /**
+     * A collection of YearLevels
+     *
+     * @var null|GenericCollection|YearLevel\Model[]
+     */
+    private $yearLevels;
 
     /**
      * Place holder for one of folder codes of this folder, which matches a class code and a campus code from SIS.
@@ -71,15 +81,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * A group instance
      *
-     * @var \Schoolbox\Resource\Group
+     * @var null|\Schoolbox\Resource\Group
      */
     protected $group;
-
-    /** @var IStorage */
-    protected $coverImage;
-
-    /** @var Color */
-    protected $colour;
 
     /**
      * A collection of user instances
@@ -106,17 +110,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @var IAssessable[]|GenericCollection<IAssessable>
      */
     private $assessables;
-
-    /**
-     * Constructor
-     *
-     */
-    public function __construct()
-    {
-        $this->setCodes(new Collection(array()));
-        $this->setCurriculumNodes(new Collection());
-        $this->assessables = new GenericCollection(IAssessable::class);
-    }
 
     /**
      * Does this category have a homepage?
@@ -321,7 +314,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
             $externalIds = [];
 
-            /** @var \Schoolbox\Resource\Folder\Code\Model $code */
             foreach ($codeCollection as $code) {
                 $teacherIds = $DEPRECATED_EXTERNAL_CLASS->getTeachers($code->getCode());
                 if(is_array($teacherIds)) {
@@ -410,17 +402,19 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
 
     /**
-     * @param  Collection $codes
+     * @param GenericCollection $codes
      * @return $this
+     * @throws TypeError
      */
     public function setCodes($codes)
     {
+        $codes->assertCollectionOf(Code\Model::class);
         $this->codes = $codes;
         return $this;
     }
 
     /**
-     * @return Collection|FolderCode[]
+     * @return GenericCollection<FolderCode>|FolderCode[]|null
      */
     public function getCodes()
     {
@@ -430,10 +424,10 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Set homepage
      *
-     * @param \Schoolbox\Resource\HomepageConfig $homepage
+     * @param null|Resource\HomepageConfig $homepage
      * @return $this
      */
-    public function setHomepage($homepage)
+    public function setHomepage(?Resource\HomepageConfig $homepage): self
     {
         $this->homepage = $homepage;
         return $this;
@@ -442,9 +436,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Get homepage
      *
-     * @return \Schoolbox\Resource\HomepageConfig
+     * @return Resource\HomepageConfig
      */
-    public function getHomepage()
+    public function getHomepage(): ?Resource\HomepageConfig
     {
         return $this->homepage;
     }
@@ -501,7 +495,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @param Collection $teachers
      * @return Model
      * @throws \DomainException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function setTeachers(Collection $teachers): self
     {
@@ -533,26 +527,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
 
     /**
-     * @return Color
-     */
-    public function getColour()
-    {
-        return $this->colour;
-    }
-
-
-    /**
-     * @param Color $colour
-     * @return $this
-     */
-    public function setColour($colour)
-    {
-        $this->colour = $colour;
-        return $this;
-    }
-
-
-    /**
      * @return bool
      */
     public function hasCoverImage()
@@ -560,24 +534,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return $this->getCoverImage() instanceof IStorage && strlen($this->getCoverImage()->getHash());
     }
 
-    /**
-     * @return IStorage
-     */
-    public function getCoverImage()
-    {
-        return $this->coverImage;
-    }
-
-
-    /**
-     * @param IStorage $coverImage
-     * @return $this
-     */
-    public function setCoverImage($coverImage)
-    {
-        $this->coverImage = $coverImage;
-        return $this;
-    }
 
     /**
      * @return $this
@@ -614,12 +570,14 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @param Collection|IAssessable[] $assessables
+     * @param Collection|GenericCollection|IAssessable[] $assessables
      * @return static
+     * @throws TypeError
      */
     public function setAssessables(Collection $assessables)
     {
-        $this->assessables->replaceWith($assessables);
+        $assessables->assertCollectionOf(IAssessable::class);
+        $this->assessables = $assessables;
         return $this;
     }
 
@@ -659,5 +617,25 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function getMatchedCode(): string
     {
         return $this->matchedCode ?? '';
+    }
+
+    /**
+     * @return GenericCollection|YearLevel\Model[]|null
+     */
+    public function getYearLevels(): ?GenericCollection
+    {
+        return $this->yearLevels;
+    }
+
+    /**
+     * @param GenericCollection|YearLevel\Model[]|null $yearLevels
+     * @return $this
+     * @throws TypeError
+     */
+    public function setYearLevels(GenericCollection $yearLevels): self
+    {
+        $yearLevels->assertCollectionOf(YearLevel\Model::class);
+        $this->yearLevels = $yearLevels;
+        return $this;
     }
 }

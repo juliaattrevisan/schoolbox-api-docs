@@ -554,7 +554,6 @@ class Controller extends Base
         if (!isset($user)) {
 
             // Creating a new user
-
             $user = new User();
 
             // New users get enabled automatically

@@ -523,12 +523,16 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($mapper->map as $map) {
                 $propertyName = $map['property'];
 
+                // We don't hydrate the model for:
+                // * many-many join (Where this entity A and other B have a N:N cardinality)
+                // * reverse multi-join (Where this entity A and other B have a 1:N cardinality)
                 if (empty($map['column'])) {
                     // check for multijoin
                     if (!(isset($map['join']) && isset($mapper->joins[$map['join']]['multi']))) {
                         throw new Exception("Column must be declared if no multijoin set for it: " . json_encode($map));
                     }
-                } else {
+                    // Don't hydrate reverse multi joins on model instantiation
+                } elseif (!(isset($map['join']) && $map['type'] === self::TYPE_COLLECTION && ($map['join_def']['reverse'] ?? false))) {
                     $columnName = $map['column'];
 
                     if (!empty($alias)) {
@@ -2845,6 +2849,20 @@ abstract class Mapper implements IMapper, Serializable
                     continue;
                 }
 
+                // We use join tables for two use cases:
+                // 1. True N:N relationships (eg folder:yearLevel), and
+                // 2. N:0..1 relationships (eg assessment:unitSpec)
+                // The first case is a Collection, the latter a Model.
+                // For N:N, null means 'unknown', while empty means 'no associations'.
+                // For N:0..1, null could either mean 'unknown' or 'no association'.
+                // For the latter, for now assume the join is always hydrated (see SA-9156)
+                $dehydrated = $this->getModelProperty($model, $map['property']);
+                if (null === $dehydrated && $map['hydrator'] instanceof Column\Collection) {
+                    // Join is not hydrated on this model
+                    continue;
+                }
+                $propertyValue = (array)$dehydrated;
+
                 $joinSchema = $this->joins[$map['join']];
                 $joinMulti  = $joinSchema['multi'];
                 $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
@@ -2864,9 +2882,6 @@ abstract class Mapper implements IMapper, Serializable
 
                 // step 2: insert new relations in join table
                 $insertRelationStatement = $this->database->prepare(sprintf($insertPattern, $viaTable, $viaLocal, $viaForeign));
-
-                // should dehydrate to an array
-                $propertyValue = (array)$this->getModelProperty($model, $map['property']);
 
                 // iterate the values given and insert into join table
                 $otherMapper       = $this->getJoinMapper($map['join']);
@@ -3410,16 +3425,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // create a new, blank model
-        $model = new $this->model;
-
-        // Ensure any model Collections are instantiated
-        foreach ($this->map as $map){
-            if($map['hydrator'] instanceof Column\Collection){
-                $this->setModelProperty($model, $map['property'], null);
-            }
-        }
-
-        return $model;
+        return new $this->model;
     }
 
     /**

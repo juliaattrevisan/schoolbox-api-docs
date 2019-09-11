@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News;
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
-use DomainException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Exceptions\InvalidTransitionException;
 use Schoolbox\Discussion\Thread;
@@ -24,6 +23,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use TypeError;
 
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
@@ -178,8 +178,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
     public function __construct()
     {
-        /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
-        $this->audience = new GenericCollection(Audience\Model::class);
         $this->metadata = new Metadata();
     }
 
@@ -982,20 +980,21 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * @return Audience\Model[]|GenericCollection
      */
-    public function getAudience(): GenericCollection
+    public function getAudience(): ?GenericCollection
     {
         return $this->audience;
     }
 
 
     /**
-     * @param Collection|Audience\Model[] $audience
-     * @throws DomainException If the new collection contains items of an incompatible type
+     * @param GenericCollection|Audience\Model[] $audience
+     * @throws TypeError If the new collection contains items of an incompatible type
      * @return $this
      */
-    public function setAudience(Collection $audience): self
+    public function setAudience(GenericCollection $audience): self
     {
-        $this->audience->replaceWith($audience);
+        $audience->assertCollectionOf(Audience\Model::class);
+        $this->audience = $audience;
         return $this;
     }
 

@@ -95,14 +95,6 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     protected $assessments;
 
     /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->assessments = new GenericCollection(Assessment\Model::class);
-    }
-
-    /**
      * @return FolderModel
      */
     public function getFolder()
@@ -147,12 +139,13 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @param Collection|Assessment\Model[] $assessments
+     * @param Collection|GenericCollection|Assessment\Model[] $assessments
      * @return $this
      */
     public function setAssessments(Collection $assessments): self
     {
-        $this->assessments->replaceWith($assessments);
+        $assessments->assertCollectionOf(Assessment\Model::class);
+        $this->assessments = $assessments;
         return $this;
     }
 

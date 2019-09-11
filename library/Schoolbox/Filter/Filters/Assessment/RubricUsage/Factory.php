@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 use InvalidArgumentException;
 use ReflectionException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFactory;
@@ -95,6 +96,7 @@ class Factory extends AbstractFactory
      * @throws ReflectionException
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
+     * @throws \DomainException
      */
     public function buildComponent(
         IDefinition $definition,
@@ -133,8 +135,11 @@ class Factory extends AbstractFactory
         } elseif ($showIndicators) {
             $capabilities = RubricCapabilityMapper::getInstance()->createCollection();
             foreach (RubricIndicatorMapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
-                $capability                                       = $indicator->getCapability();
-                $capability->getIndicators()[$indicator->getId()] = $indicator;
+                $capability = $indicator->getCapability();
+                if (!$capability->getIndicators()) {
+                    $capability->setIndicators(new GenericCollection(Indicator\Model::class));
+                }
+                $capability->getIndicators()->setOffset($indicator->getId(), $indicator);
                 if (!$capabilities->offsetExists($capability->getId())) {
                     $capabilities[$capability->getId()] = $capability;
                 }

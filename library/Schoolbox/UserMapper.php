@@ -303,6 +303,9 @@ class UserMapper extends Mapper
         /** @var User[] $users */
         $users = [];
 
+        /** @var CampusMapper $campusMapper */
+        $campusMapper = $this->getJoinMapper('userCampus');
+
         foreach ($statement as $row) {
 
             $userId = $row['id'];
@@ -315,11 +318,12 @@ class UserMapper extends Mapper
                 $users[$userId] = $this->hydrate($row)
                                        ->setSuperuser($row['superuser'] == 1)
                                        ->setRole($role)
-                                       ->setSchoolHouse($schoolHouse);
+                                       ->setSchoolHouse($schoolHouse)
+                                       ->setLinkedUser($this->createCollection())
+                                       ->setCampusCollection($campusMapper->createCollection());
             }
 
-            /** @var Campus $campus */
-            $campus = $this->hydrateJoin($row, 'userCampus', 'c');
+            $campus = $campusMapper->hydrate($row, 'c');
 
             /* If the campus object has no id, then it spawned a campus
              * object from nonexistent data (e.g. a user with no campus)

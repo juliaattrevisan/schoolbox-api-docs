@@ -9,12 +9,16 @@
 namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
+/**
+ * @method GenericCollection|RoleAccess[] findByColumn($columnName, $columnValue, $options = [])
+ */
 class RoleAccessMapper extends Mapper
 {
 

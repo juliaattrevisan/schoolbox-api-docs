@@ -71,12 +71,17 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('levels', '', 'l')}
         ";
     }
+
     /**
      * @param PDOStatement $statement
      * @return GenericCollection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
      */
     public function hydrateSelect(PDOStatement $statement)
     {
+        /** @var GradeMapper $gradeLevelMapper */
+        $gradeLevelMapper = $this->getJoinMapper('levels');
         /** @var Model[] $groups */
         $groups = [];
         foreach ($statement as $row) {
@@ -84,10 +89,11 @@ class Mapper extends BaseMapper
             $id = $row['id'];
             if (!isset($groups[$id])) {
                 $groups[$id] = $this->hydrate($row);
+                $groups[$id]->setGradeLevels($gradeLevelMapper->createCollection());
             }
             // Build levels
-            $level = $this->hydrateJoin($row, 'levels', 'l');
-            if ($level instanceof GradeModel && $level->getId()) {
+            $level = $gradeLevelMapper->hydrate($row, 'l');
+            if ($level instanceof GradeModel) {
                 $groups[$id]->addGradeLevel($level);
             }
         }

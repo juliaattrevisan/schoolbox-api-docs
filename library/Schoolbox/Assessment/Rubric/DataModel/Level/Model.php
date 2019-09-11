@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Level;
 
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -40,11 +39,6 @@ class Model implements ISoftDeletable
      */
     private $descriptors;
 
-
-    public function __construct()
-    {
-        $this->descriptors = DescriptorMapper::getInstance()->createCollection();
-    }
 
     /**
      * @return SubmissionBox
@@ -119,7 +113,8 @@ class Model implements ISoftDeletable
      */
     public function setDescriptors(GenericCollection $descriptors)
     {
-        $this->descriptors->replaceWith($descriptors);
+        $descriptors->assertCollectionOf(DescriptorModel::class);
+        $this->descriptors = $descriptors;
         return $this;
     }
 }

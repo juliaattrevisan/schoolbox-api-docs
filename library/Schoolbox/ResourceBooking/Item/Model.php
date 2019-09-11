@@ -109,12 +109,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     protected $roleList;
 
     public function __construct() {
-        $this
-            ->setModeratorList(new Collection())
-            ->setRelatedResourceList(new Collection())
-            ->setRoleList(new Collection())
-            ->setImage(new Storage\Model())
-        ;
+        $this->setImage(new Storage\Model());
     }
 
     /**

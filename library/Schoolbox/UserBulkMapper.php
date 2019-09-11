@@ -110,26 +110,23 @@ class UserBulkMapper extends UserMapper
         $userCollection = new Collection();
 
         foreach ($statement as $row) {
-            $user = $this->hydrate($row, 'u');
+            if ($userCollection->offsetExists($row['u.id'])) {
+                $user = $userCollection->offsetGet($row['u.id']);
+            } else {
+                $user = $this->hydrate($row, 'u');
+                $user->setCampusCollection($campusMapper->createCollection());
+                $userCollection->offsetSet($user->getId(), $user);
+            }
             $user->setRole($roleMapper->hydrate($row, 'g'));
 
             $campus = $campusMapper->hydrate($row, 'c');
-
-            /* Put this user in his place
-             */
-            $userOffset = $userCollection->getOffset($user->getId());
-
-            if (!($userOffset instanceof User)) {
-                $userCollection->setOffset($user->getId(), $user);
-                $userOffset = $userCollection->getOffset($user->getId());
-            }
 
             /* If the campus object has no id, then it spawned a campus
              * object from nonexistent data (e.g. a user with no campus)
              * Don't add this non-existent campus to the user
              */
             if ($campus instanceof Campus) {
-                $userOffset->getCampusCollection()->add($campus);
+                $user->getCampusCollection()->add($campus);
             }
         }
 

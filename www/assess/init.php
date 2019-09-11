@@ -8,6 +8,7 @@
  */
 
 use Schoolbox\Error;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\Mapper;
@@ -108,7 +109,7 @@ if (!$attempt) {
                                        ->setUser(UserMapper::getInstance()->createModel($userId))
                                        ->setStart(Alaress_Date_Format::now());
         $attemptMapper->save($attemptModel);
-        $quizModel->getAttempts()->add($attemptModel);
+        $quizModel->setAttempts(new GenericCollection(Quiz\Attempt\Model::class, [$attemptModel]));
         $attemptId = $attemptModel->getId();
         // Assign all questions on quiz init, not starting a section.
         // This ensures that a response is created for all answers,

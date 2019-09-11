@@ -52,7 +52,7 @@ class Marksheet_Letter extends Marksheet_Abstract
             $grades[] = array(
                 'id'      => $grade->getId(),
                 'caption' => $grade->getCaption(),
-                'group'   => $grade->getGroup()->getId() ?: 0,
+                'group'   => $grade->getGroup() ? $grade->getGroup()->getId() : 0,
             );
         }
         $page->dropdown(

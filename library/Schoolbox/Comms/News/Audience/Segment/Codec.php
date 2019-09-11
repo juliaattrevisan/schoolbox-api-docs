@@ -13,6 +13,7 @@ use Schoolbox\GenericCollection;
 use LogicException;
 use Schoolbox\Mapper;
 use DomainException;
+use UnexpectedValueException;
 
 /**
  * Responsible for converting between audience segment models and their string representation.
@@ -25,19 +26,6 @@ class Codec
     private const DELIMITER_COMPOSITE = ';';
     private const DELIMITER_SIMPLE = ':';
     private const DELIMITER_CHILDREN = '.';
-
-    /** @var Audience\Mapper */
-    private $segmentMapper;
-
-
-    /**
-     * @param Audience\Mapper $segmentMapper
-     */
-    public function __construct(Audience\Mapper $segmentMapper)
-    {
-        $this->segmentMapper = $segmentMapper;
-    }
-
 
     /**
      * Returns a string-representation of this segment
@@ -74,8 +62,8 @@ class Codec
      * @param string $encodedSegment
      * @return Audience\Model
      * @throws DomainException
-     * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws UnexpectedValueException
      */
     public function decode(string $encodedSegment): Audience\Model
     {
@@ -105,12 +93,12 @@ class Codec
      * @param string $selectizeValues
      * @return GenericCollection
      * @throws DomainException
-     * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws UnexpectedValueException
      */
     public function decodeSelectizeValues(string $selectizeValues): GenericCollection
     {
-        $rootSegments = $this->segmentMapper->createCollection();
+        $rootSegments = new GenericCollection(Audience\Model::class);
 
         $trimmed = \trim($selectizeValues);
 
@@ -182,13 +170,12 @@ class Codec
      *
      * @param string $encodedSegment
      * @return Audience\Model
-     * @throws Mapper\Exception
      */
     private function decodeSimple(string $encodedSegment): Audience\Model
     {
         [$type, $encodedValue, $modifier] = \explode(self::DELIMITER_SIMPLE, $encodedSegment);
 
-        return $this->segmentMapper->createModel()
+        return (new Audience\Model())
                                    ->setEntityType($type)
                                    ->setEntityValue($this->decodeValue($encodedValue))
                                    ->setRelationship($modifier);
@@ -224,14 +211,14 @@ class Codec
      * @param string $encodedSegment
      * @return Audience\Model
      * @throws DomainException
-     * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws UnexpectedValueException
      */
     private function decodeComposite(string $encodedSegment): Audience\Model
     {
         [$type, $modifier, $encodedChildren] = \explode(self::DELIMITER_COMPOSITE, $encodedSegment);
 
-        $children = $this->segmentMapper->createCollection();
+        $children = new GenericCollection(Audience\Model::class);
         foreach (\explode(self::DELIMITER_CHILDREN, $encodedChildren) as $encodedChild) {
             $children->add($this->decodeSimple($encodedChild));
         }
@@ -250,13 +237,13 @@ class Codec
         }
         if (!$distinctChildFound) {
             $effectiveModifier = $modifier === Audience\Model::RELATIONSHIP_SELF ? $firstSegment->getRelationship() : $modifier;
-            return $this->segmentMapper->createModel()
+            return (new Audience\Model())
                                        ->setEntityType($firstSegment->getEntityType())
                                        ->setEntityValue($firstSegment->getEntityValue())
                                        ->setRelationship($effectiveModifier);
         }
 
-        return $this->segmentMapper->createModel()
+        return (new Audience\Model())
                                    ->setEntityType($type)
                                    ->setChildren($children)
                                    ->setRelationship($modifier);

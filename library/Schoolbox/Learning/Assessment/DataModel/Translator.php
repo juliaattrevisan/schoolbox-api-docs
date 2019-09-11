@@ -312,9 +312,10 @@ class Translator
 
         // This would ideally be in the Project translator. But that would require making this method public.
         // The danger of that is worth the instanceof check here.
-        if ($domainObject instanceof Project) {
+        if ($domainObject instanceof Project && $domainObject->getAssessables() !== null) {
+            /** @var ProjectModel $dataModel */
+            $dataModel->setAssessments(new GenericCollection(AssessmentModel::class));
             foreach ($domainObject->getAssessables() as $idx => $domainChild) {
-                /** @var ProjectModel $dataModel */
                 $subAssessmentModel = $this->translateToDataModelRecursive($domainChild, $depth + 1)->getAssessmentModel();
                 $subAssessmentModel->setContextProject($dataModel);
                 $dataModel->getAssessments()[$idx] = $subAssessmentModel;
@@ -409,8 +410,7 @@ class Translator
                      ->setTitle($assessmentModel->getTitle())
                      ->setDescription($assessmentModel->getDescription())
                      ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
-                     ->setDeletedAt($assessmentModel->getDeletedAt())
-                     ->setCurriculumNodes($assessmentModel->getCurriculumNodes());
+                     ->setDeletedAt($assessmentModel->getDeletedAt());
 
         // Non-nullable properties
         $markScheme = $this->markSchemeFactory->spawnMarkSchemeFor($domainObject);
@@ -422,6 +422,7 @@ class Translator
         null === $assessmentModel->getCloseDate() || $domainObject->setCloseAt($assessmentModel->getCloseDate());
         null === $assessmentModel->getCreatedAt() || $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
         null === $assessmentModel->getUpdatedAt() || $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
+        null === $assessmentModel->getCurriculumNodes() || $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
 
         // Translate specification assessment if there is one
         $specification = $dataModel->getAssessmentModel()->getSpecificationAssessment();
@@ -452,9 +453,10 @@ class Translator
 
         // Ideally this would exist in the Project translator, but that would require making this method public.
         // That is too dangerous, best to perform an instanceof here.
-        if ($dataModel instanceof ProjectModel) {
+        if ($dataModel instanceof ProjectModel && $dataModel->getAssessments() !== null) {
+            /** @var Project $domainObject */
+            $domainObject->setAssessables(new GenericCollection(IAssessable::class));
             foreach ($dataModel->getAssessments() as $idx => $dataChild) {
-                /** @var Project $domainObject */
                 $domainChild = $this->translateToDomainModelRecursive($dataChild->getSubObject(), $depth + 1);
                 $domainChild->setContext($domainObject);
                 $domainObject->getAssessables()[$idx] = $domainChild;

@@ -8,7 +8,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 
 namespace Schoolbox\Resource;
 
@@ -24,7 +24,7 @@ class HomepageConfig {
 	/**
 	 * The template originally used to create the page
 	 *
-	 * @var HomepageTemplate|null
+     * @var HomepageTemplate
 	 */
 	protected $template;
 
@@ -336,7 +336,7 @@ class HomepageConfig {
     }
 
     /**
-     * @return HomepageTemplate|null
+     * @return HomepageTemplate
      */
     public function getTemplate()
     {

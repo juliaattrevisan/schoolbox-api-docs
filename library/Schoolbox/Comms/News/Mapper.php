@@ -13,7 +13,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
-use function count;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
@@ -33,6 +32,7 @@ use Alaress_Date_Format;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model[]|GenericCollection createCollection($contents = [])
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
@@ -139,51 +139,40 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
         $collection = $this->createCollection();
+        $idColumn   = $this->getIdentifierColumn();
+        /** @var Topic\Mapper $topicMapper */
+        $topicMapper = $this->getJoinMapper('comms_news_article_topic');
+        /** @var UserMapper $authorMapper */
+        $authorMapper = $this->getJoinMapper('author');
+        /** @var UserMapper $moderatorMapper */
+        $moderatorMapper = $this->getJoinMapper('moderator');
+        /** @var UserMapper $rejectorMapper */
+        $rejectorMapper = $this->getJoinMapper('rejector');
+        /** @var Storage\Mapper $featureImageMapper */
+        $featureImageMapper = $this->getJoinMapper('featureImage');
+        /** @var \Schoolbox\File\MimetypeMapper $mimeTypeMapper */
+        $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $article = $this->hydrate($row);
+            if ($collection->offsetExists($row[$idColumn])) {
+                $article = $collection->offsetGet($row[$idColumn]);
+            } else {
+                $article = $this->hydrate($row);
+                $collection->setOffset($row[$idColumn], $article);
 
-            if ($article) {
-                $topic = $this->getJoinMapper('comms_news_article_topic')->hydrate($row, 'topics');
+                // Hydrate 1:1 and 1:0..1 joins
+                $article->setTopics($topicMapper->createCollection());
+                $article->setAuthor($authorMapper->hydrate($row, 'a'));
+                $article->setAcceptedBy($moderatorMapper->hydrate($row, 'm'));
+                $article->setRejectedBy($rejectorMapper->hydrate($row, 'r'));
 
-                if ($topic) {
-                    $article->getTopics()->setOffset($topic->getId(), $topic);
-                }
-
-                /** @var User $author */
-                $author = $this->getJoinMapper('author')->hydrate($row, 'a');
-
-                if ($author) {
-                    $article->setAuthor($author);
-                }
-
-                /** @var User $moderator */
-                $moderator = $this->getJoinMapper('moderator')->hydrate($row, 'm');
-
-                if ($moderator) {
-                    $article->setAcceptedBy($moderator);
-                }
-
-                /** @var User $rejector */
-                $rejector = $this->getJoinMapper('rejector')->hydrate($row, 'r');
-
-                if ($rejector) {
-                    $article->setRejectedBy($rejector);
-                }
-
-                /** @var Storage\Model $featureImage */
-                $featureImage = $this->hydrateJoin($row, 'featureImage', 'fi');
-
-                /** @var \Schoolbox\File\Mimetype $mime */
-                $mime = $this->hydrateJoin($row, 'featureImage.allowedFileExtension', 'afe');
-
+                $featureImage = $featureImageMapper->hydrate($row, 'fi');
                 if ($featureImage) {
-                    $article->setFeatureImage($featureImage->setMimetype($mime));
+                    $article->setFeatureImage($featureImage->setMimetype($mimeTypeMapper->hydrate($row, 'afe')));
                 }
 
                 /** @var Thread\Model|null $discussionThread */
@@ -193,7 +182,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 }
             }
 
-            $collection->setOffset($article->getId(), $article);
+            $topic = $topicMapper->hydrate($row, 'topics');
+            if ($topic) {
+                $article->getTopics()->setOffset($topic->getId(), $topic);
+            }
         }
 
         /* Reorder topics sequentially

@@ -321,7 +321,7 @@ class Factory extends NullableContext\Factory
                 $folderCodeCode = $row['fc.code'];
                 $groupId        = $row['g.cid'];
                 if (!$folderCache->offsetExists($folderId)) {
-                    $folderCache->setOffset($folderId, $this->folderMapper->hydrate($row, 'f'));
+                    $folderCache->setOffset($folderId, $this->folderMapper->hydrate($row, 'f')->setCodes($folderCodeMapper->createCollection()));
                 }
                 if (!$projects->offsetExists($projectId)) {
                     $projects->setOffset($projectId, $this->projectMapper->hydrate($row, 'p'));
@@ -374,7 +374,7 @@ class Factory extends NullableContext\Factory
                 $groupId        = $row['g.cid'];
 
                 if (!$folderCache->offsetExists($folderId)) {
-                    $folderCache->setOffset($folderId, $this->folderMapper->hydrate($row, 'f'));
+                    $folderCache->setOffset($folderId, $this->folderMapper->hydrate($row, 'f')->setCodes($folderCodeMapper->createCollection()));
                 }
                 if (!$unitImplCache->offsetExists($unitImplId)) {
                     $unitImplCache->setOffset($unitImplId, $this->unitImplMapper->hydrate($row, 'ui'));

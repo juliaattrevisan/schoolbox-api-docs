@@ -21,6 +21,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model[] findByColumnList($columnList, $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
  */
@@ -88,6 +89,8 @@ class Mapper extends BaseMapper
         foreach ($collection as $capability) {
             if (isset($capabilityNodes[$capability->getId()])) {
                 $capability->setCurriculumNodes($capabilityNodes[$capability->getId()]);
+            } else {
+                $capability->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
         }
 
@@ -233,6 +236,9 @@ class Mapper extends BaseMapper
      * Find a capability with the given name for the given parent.
      * If none is found, create one and return it.
      *
+     * Joins hydrated:
+     *  * Curriculum nodes
+     *
      * @param int    $parentId
      * @param string $parentType
      * @param string $name
@@ -257,10 +263,13 @@ class Mapper extends BaseMapper
 
         } catch (MapperException $e) {
             // Create one
+            /** @var NodeMapper $nodeMapper */
+            $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_capability');
             $item = $this->createModel()
                          ->setParentId($parentId)
                          ->setParentType($parentType)
-                         ->setName($name);
+                         ->setName($name)
+                         ->setCurriculumNodes($nodeMapper->createCollection());
             $this->save($item);
             return $item;
         }
@@ -270,6 +279,9 @@ class Mapper extends BaseMapper
     /**
      * Find a capability with the given name for the given folder.
      * If none is found, create one and return it.
+     *
+     * Joins hydrated:
+     *  * curriculum nodes
      *
      * @param int    $folderId
      * @param string $name

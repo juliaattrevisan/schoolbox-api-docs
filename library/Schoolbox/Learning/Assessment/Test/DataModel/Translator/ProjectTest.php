@@ -10,7 +10,9 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -80,7 +82,8 @@ class ProjectTest extends TestCase
             ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setTitle('Mr Test Project ништа')
             ->setDescription('A description сплат')
-            ->setWeight(13);
+            ->setWeight(13)
+            ->setAssessables(new GenericCollection(IAssessable::class));
 
         // Add sub-assessables
         $project->getAssessables()
@@ -251,8 +254,8 @@ class ProjectTest extends TestCase
                 (new Project(new WeightedAverage()))
                     ->setContext($context)
                     ->setCreator($user)
-                    ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7)->addGradeLevel(
-                        new DueWorkModel\GradeLevel\Model()
+                    ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7)->setGradeLevels(
+                        new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     ))),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 7,
@@ -310,7 +313,7 @@ class ProjectTest extends TestCase
             ->setMarkType($this->buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
-
+        $projectModel->setAssessments(new GenericCollection(AssessmentModel::class));
         $projectModel->getAssessments()
             ->add($subTask->getAssessmentModel()->setSubObject($subTask))
             ->add($subQuiz->getAssessmentModel()->setSubObject($subQuiz))
@@ -379,7 +382,8 @@ class ProjectTest extends TestCase
                 (new AssessmentModel())
                     ->setId(4)
                     ->setAssessmentContext((new Folder())->setId(1))
-            );
+            )
+            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $projectModel->getAssessments()
             ->add((new ProjectModel())
                 ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
@@ -481,8 +485,8 @@ class ProjectTest extends TestCase
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
-                    ->setGradeGroup((new GradeGroup())->setId(1)->addGradeLevel(
-                        new DueWorkModel\GradeLevel\Model()
+                    ->setGradeGroup((new GradeGroup())->setId(1)->setGradeLevels(
+                        new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     )),
                 LetterGrade::class,
                 1
@@ -590,6 +594,7 @@ class ProjectTest extends TestCase
             ->setMarkType($this->buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
+        $projectModel->setAssessments(new GenericCollection(AssessmentModel::class));
         $projectModel->getAssessments()
                      ->add($subTask->getAssessmentModel()->setSubObject($subTask))
                      ->add($subQuiz->getAssessmentModel()->setSubObject($subQuiz))
@@ -773,11 +778,11 @@ class ProjectTest extends TestCase
     public function testDataProjectTreeAssessmentInMultipleProjects()
     {
         // Create three projects: p1, p2, p3
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class));
         $p1->getAssessmentModel()->setSubObject($p1);
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))->setAssessments(new GenericCollection(AssessmentModel::class));
         $p2->getAssessmentModel()->setSubObject($p2);
-        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3))->setAssessments(new GenericCollection(AssessmentModel::class));
         $p3->getAssessmentModel()->setSubObject($p3);
 
         // Put p2 and p3 in p1
@@ -864,10 +869,10 @@ class ProjectTest extends TestCase
     {
         $this->translator->setMaxProjectLevels(2);
 
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class));
         $p1->getAssessmentModel()->setSubObject($p1);
 
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))->setAssessments(new GenericCollection(AssessmentModel::class));
         $p2->getAssessmentModel()->setSubObject($p2);
         $p2->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $p2->getAssessmentModel();
@@ -1141,25 +1146,30 @@ class ProjectTest extends TestCase
      */
     public function provider_linear_data_project_tree(): array
     {
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p1->getAssessmentModel()->setSubObject($p1);
 
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p2->getAssessmentModel()->setSubObject($p2);
         $p2->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $p2->getAssessmentModel();
 
-        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p3->getAssessmentModel()->setSubObject($p3);
         $p3->getAssessmentModel()->setContextProject($p2);
         $p2->getAssessments()[3] = $p3->getAssessmentModel();
 
-        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p4->getAssessmentModel()->setSubObject($p4);
         $p4->getAssessmentModel()->setContextProject($p3);
         $p3->getAssessments()[4] = $p4->getAssessmentModel();
 
-        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5));
+        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p5->getAssessmentModel()->setSubObject($p5);
         $p5->getAssessmentModel()->setContextProject($p4);
         $p4->getAssessments()[5] = $p5->getAssessmentModel();
@@ -1181,15 +1191,20 @@ class ProjectTest extends TestCase
      */
     public function provider_branched_data_project_tree(): array
     {
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p1->getAssessmentModel()->setSubObject($p1);
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p2->getAssessmentModel()->setSubObject($p2);
-        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p3->getAssessmentModel()->setSubObject($p3);
-        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p4->getAssessmentModel()->setSubObject($p4);
-        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5));
+        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5))
+                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
         $p5->getAssessmentModel()->setSubObject($p5);
 
         // #2 and #3 are children of #1

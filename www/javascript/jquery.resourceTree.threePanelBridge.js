@@ -33,12 +33,10 @@
             threePanel: null,
             moveFolder: function(self, folderNode, destinationNode) {
                 return {
-                    type: 'post',
-                    url:  '/resource/folder/move',
-                    data: {
-                        source:      folderNode.attr('id'),
-                        destination: destinationNode.attr('id')
-                    },
+                    type: 'put',
+                    url:  '/resource/folder/{id}/move/{parentId}'
+                        .replace('{id}', folderNode.attr('id'))
+                        .replace('{parentId}', destinationNode.attr('id')),
                     dataType: 'json'
                 }
             },

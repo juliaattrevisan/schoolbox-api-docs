@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFe
 use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -468,6 +469,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     ->setCloseDate($domainModelPlan->getDueDate());
 
                 // Finagle participants too
+                $dataModelPlan->setParticipants(new GenericCollection(\Schoolbox\Assessment\Participant\Model::class));
                 foreach ($domainModelPlan->getParticipants() as $participant) {
                     $dataModelParticipant = ParticipantMapper::getInstance()->createModel($participant->getId());
                     $dataModelParticipant

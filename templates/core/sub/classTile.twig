@@ -27,7 +27,7 @@
                 {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}" class="icon-curriculum">Class Markbook</a></li>{% endif %}
                 {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folderId: class.id}) %}
                 {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
-                <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
+                <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}" class="icon-modify">Modify</a></li>
                 {% if courses | length %}
                     <li class="separator">Analytics</li>
                     {% for courseSpecId, courseSpecTitle in courses %}

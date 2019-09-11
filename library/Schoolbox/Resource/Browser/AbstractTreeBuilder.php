@@ -409,7 +409,7 @@ abstract class AbstractTreeBuilder
             'text' => $name,
             'children' => 0,
             'type' => $type,
-            'colour' => $colour,
+            'colour' => $colour ? $colour->__toString() : null,
             'coverImage' => $coverImage,
         );
 
@@ -623,9 +623,9 @@ abstract class AbstractTreeBuilder
      * Return the given folder's colour
      *
      * @param IFolder $folder
-     * @return string
+     * @return null|Color
      */
-    protected abstract function getFolderColour(IFolder $folder);
+    abstract protected function getFolderColour(IFolder $folder): ?Color;
 
 
     /**

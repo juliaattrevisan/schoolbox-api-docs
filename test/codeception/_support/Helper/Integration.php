@@ -1,22 +1,43 @@
 <?php
+/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+declare(strict_types=1);
+
 namespace Helper;
 
-// here you can define custom actions
-// all public methods declared in helper class will be available in $I
+use Codeception\Module\REST;
+use Payload\Request;
 
-use Codeception\Exception\ModuleException;
-use Codeception\Module\Db;
-use Codeception\TestInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
-use Schoolbox\Resource\Storage\HashGenerator;
-
-class Integration extends \Codeception\Module
+/**
+ * This Helper provides custom extensions to the REST module
+ *
+ * Extends, rather than uses, as we need access to protected methods in the REST module
+ *
+ * Low-level 'how' actions are performed belongs here.
+ * Higher-level convenience 'what' actions belong in the Actor, which wll use this Helper.
+ *
+ * All public methods declared in helper class will be available in $I
+ *
+ * Note that annotations need to use FQDN as these are copied verbatim to generated actor trait
+ *
+ * @see https://codeception.com/docs/06-ModulesAndHelpers
+ */
+class Integration extends REST
 {
-
-    public function sendRequestCurl($method, $uri, $params)
+    /**
+     * @param \Payload\Request $request
+     */
+    public function sendRequest(Request $request): void
     {
-        #_request($method, $uri, $params);
-        return $this->getModule('PhpBrowser')->guzzle->request($method, $uri, $params);
+        foreach ($request->getHeaders() as $name => $value) {
+            $this->haveHttpHeader($name, $value);
+        }
+
+        $this->execute(
+            $request->getMethod(),
+            $request->getUrlWithQueryString(),
+            $request->getFormParams(),
+            $request->getFiles()
+        );
     }
 }

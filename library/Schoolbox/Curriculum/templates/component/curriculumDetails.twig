@@ -37,7 +37,7 @@
                 {% endif %}
 
             {% else %}
-                <p><a href="/resource/folder/modify/{{ context.id }}#curriculum-codes">Map a curriculum or an area of the curriculum</a> to your course or {{ locale.unit }} page to display the associated description of your curriculum.</p>
+                <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum or an area of the curriculum</a> to your course or {{ locale.unit }} page to display the associated description of your curriculum.</p>
             {% endif %}
 
         {% endif %}

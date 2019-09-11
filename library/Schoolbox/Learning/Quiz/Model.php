@@ -26,7 +26,6 @@ use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
-use \DomainException;
 
 class Model implements ISoftDeletable, IAssessableDataModel
 {
@@ -157,12 +156,6 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     private $attempts;
 
-    public function __construct()
-    {
-        $this->setCurriculumNodes(new Collection());
-        $this->sections = new GenericCollection(QuizSection::class);
-        $this->attempts = new GenericCollection(QuizAttempt::class);
-    }
 
     /**
      * Is this mark shown to students?
@@ -248,16 +241,18 @@ class Model implements ISoftDeletable, IAssessableDataModel
         $this->id = null;
 
         // Clear Attempts
-        $this->attempts = new GenericCollection(QuizAttempt::class);
+        $this->attempts = null;
 
         // Clone Sections to clear their IDs, so subsequent save is INSERT instead of UPDATE
-        $clonedSections = new GenericCollection(QuizSection::class);
-        foreach($this->sections as $section){
-            $cloneSection = clone $section;
-            $cloneSection->setQuiz($this);
-            $clonedSections->add($cloneSection);
+        if ($this->sections !== null) {
+            $clonedSections = new GenericCollection(QuizSection::class);
+            foreach ($this->sections as $section) {
+                $cloneSection = clone $section;
+                $cloneSection->setQuiz($this);
+                $clonedSections->add($cloneSection);
+            }
+            $this->sections = $clonedSections;
         }
-        $this->setSections($clonedSections);
     }
 
     /* Getters/Setters
@@ -651,18 +646,18 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param GenericCollection $sections
+     * @param GenericCollection<QuizSection> $sections
      * @return static
-     * @throws DomainException if new Generic Collection is of incorrect type
      */
     public function setSections(GenericCollection $sections)
     {
-        $this->sections->replaceWith($sections);
+        $sections->assertCollectionOf(QuizSection::class);
+        $this->sections = $sections;
         return $this;
     }
 
     /**
-     * @return QuizAttempt[]|GenericCollection<QuizAttempts>
+     * @return QuizAttempt[]|GenericCollection<QuizAttempt>
      */
     public function getAttempts()
     {
@@ -670,13 +665,13 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param GenericCollection $attempts
+     * @param GenericCollection<QuizAttempt> $attempts
      * @return static
-     * @throws DomainException if new Generic Collection is of incorrect type
      */
     public function setAttempts(GenericCollection $attempts)
     {
-        $this->attempts->replaceWith($attempts);
+        $attempts->assertCollectionOf(QuizAttempt::class);
+        $this->attempts = $attempts;
         return $this;
     }
 }

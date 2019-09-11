@@ -106,7 +106,9 @@ class LetterGrade extends AbstractMarkScheme
     protected function setGradeGroup(GradeGroup $gradeGroup)
     {
         // Ensure levels are sorted DESC so facilitate search traversal
-        $gradeGroup->getGradeLevels()->sortBy('lowerBound', 'desc');
+        if ($gradeGroup->getGradeLevels()) {
+            $gradeGroup->getGradeLevels()->sortBy('lowerBound', 'desc');
+        }
 
         $this->gradeGroup = $gradeGroup;
         return $this;

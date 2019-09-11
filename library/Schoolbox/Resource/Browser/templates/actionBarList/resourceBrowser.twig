@@ -2,19 +2,19 @@
     <li><a class="icon-home"   data-action="folder"   href="/homepage/{{ folder.id }}">Homepage</a></li>
 {% endif %}
 {% if folder.id == 0 %}
-    <li><a class="icon-folder"   data-action="folder"   href="/resource/folder/create/{{ folder.id }}">Add Folder</a></li>
+    <li><a class="icon-folder"   data-action="folder"   href="{{ routeLookup('folder.getFolderCreate', {parentId: folder.id}) }}">Add Folder</a></li>
 {% else %}
     {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-modify"   data-action="modify"   href="/resource/folder/modify/{{ folder.id }}">Modify</a></li>
+        <li><a class="icon-modify"   data-action="modify"   href="{{ routeLookup('folder.getFolderModify', {id: folder.id}) }}">Modify</a></li>
         <li><a class="icon-drop-box" data-action="file"     href="/cms/file/new/{{ folder.id }}">Post File</a></li>
-        <li><a class="icon-folder"   data-action="folder"   href="/resource/folder/create/{{ folder.id }}">Add Folder</a></li>
+        <li><a class="icon-folder"   data-action="folder"   href="{{ routeLookup('folder.getFolderCreate', {parentId: folder.id}) }}">Add Folder</a></li>
         <li><a class="icon-link"     data-action="link"     href="/cms/link/new/{{ folder.id }}">Add Link</a></li>
         <li><a class="icon-download" data-action="download" href="/cms/fetchFolder.php?folder={{ folder.id }}" title="{{ folder.name }}">Download</a></li>    {% endif %}
     {% if user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload) %}
         <li><a class="icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a></li>
     {% endif %}
     {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-delete"   data-action="delete"   href="/resource/folder/delete/" data-folder-id="{{ folder.id }}" >Delete</a></li>
+        <li><a class="icon-delete"   data-action="delete"   href="{{ routeLookup('folder.deleteFolder', {id: folder.id}) }}">Delete</a></li>
     {% endif %}
 {% endif %}
 {% if folder.group.category %}

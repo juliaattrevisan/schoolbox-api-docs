@@ -11,10 +11,12 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 use Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark;
 use PHPUnit\Framework\TestCase;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 
 
@@ -26,7 +28,7 @@ class ValidCapabilityMarkTest extends TestCase
         /* Mark types */
         $markSchemePercentage = new Percentage();
         $markSchemeTotalMark = new TotalMarkFractional();
-        $markSchemeLetterGrade = new LetterGrade(new GradeGroup());
+        $markSchemeLetterGrade = new LetterGrade((new GradeGroup())->setGradeLevels(new GenericCollection(GradeLevel\Model::class)));
 
         /* Cap maximums */
         $capabilityMax1 = 5;

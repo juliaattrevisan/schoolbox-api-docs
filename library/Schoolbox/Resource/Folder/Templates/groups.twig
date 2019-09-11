@@ -49,7 +49,7 @@
                             </nav>
                             <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
                                 {% if (userAccess[group.id].write or userAccess[group.id].admin) %}
-                                    <li><a href="/resource/folder/modify/{{ group.id }}" class="icon-modify">Modify Folder</a></li>
+                                    <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}" class="icon-modify">Modify Folder</a></li>
                                     <li><a href="/statistics/homepage/{{ group.id }}" class="icon-report">View Statistics</a></li>
                                 {% endif %}
                                 {% if userAccess[group.id].admin %}

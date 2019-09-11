@@ -8,18 +8,13 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -191,109 +186,6 @@ class Controller extends AbstractController
         }
         $quiz = $this->getQuizForAssessmentId($assessmentId);
         $this->getResponse()->redirect->to("/assess/export/$format/{$quiz->getId()}");
-    }
-
-    /**
-     * Builds the Quiz graph. Attaches and links Sections, Questions, Solutions, Attempts & Answers
-     *
-     * Edge cases:
-     * * An Attempt my be for a subset of Questions available in a Quiz
-     * * An Attempt may have Answers to Sections/Questions that are no longer in a Quiz
-     *
-     * @param Model $quiz
-     * @return Model
-     */
-    public function buildQuizGraph(Model $quiz)
-    {
-        // Add Attempts to Quiz (historical view)
-        /** @var QuizAttempt[] $attempts */
-        $attempts = $this->quizAttemptMapper->findByColumn('assess_id', $quiz->getId());
-        foreach($attempts as $attempt){
-            $attempt->setQuiz($quiz);
-            $quiz->getAttempts()->setOffset($attempt->getId(), $attempt);
-        }
-
-        // Add Answers to Attempts (historical view)
-        /** @var QuizAnswer[] $answers */
-        $answers = $this->quizAnswerMapper->findByColumn('attempt_id', $quiz->getAttempts()->keys());
-        $answeredQuestionIds = [];
-        foreach($answers as $answer){
-            $answeredQuestionIds[] = $answer->getQuestion()->getId();
-
-            /** @var QuizAnswer $answer */
-            $attempt = $quiz->getAttempts()->getOffset($answer->getAttempt()->getId());
-            $attempt->getAnswers()->setOffset($answer->getId(), $answer);
-            $answer->setAttempt($attempt);
-        }
-
-        // Get all answered Questions (historical view)
-        $columnName = $this->quizQuestionMapper->getIdentifierColumn();
-        /** @var QuizQuestion[]|Collection $answeredQuestions */
-        $answeredQuestions = $this->quizQuestionMapper->findByColumn($columnName, array_unique($answeredQuestionIds));
-
-        $answeredSectionIds = [];
-        foreach ($answeredQuestions as $answeredQuestion) {
-            $answeredSectionIds[] = $answeredQuestion->getSection()->getId();
-        }
-
-        // Get all answered Sections (historical view)
-        $columnName = $this->quizSectionMapper->getIdentifierColumn();
-        /** @var QuizSection[]|Collection $answeredSections */
-        $answeredSections = $this->quizSectionMapper->findByColumn($columnName, array_unique($answeredSectionIds));
-        foreach ($answeredSections as $answeredSection) {
-            $quiz->getSections()->setOffset($answeredSection->getId(), $answeredSection);
-            $answeredSection->setQuiz($quiz);
-        }
-
-        /**
-         * Maintain a cache so we can later link Questions and Answers.
-         *
-         * @var QuizQuestion[]|Collection $allQuestionsIndexedById
-         */
-        $allQuestionsIndexedById = $this->quizQuestionMapper->createCollection();
-
-        // Add answered Questions to Sections (historical view)
-
-        foreach ($answeredQuestions as $answeredQuestion) {
-            $allQuestionsIndexedById[$answeredQuestion->getId()] = $answeredQuestion;
-            /** @var QuizSection $answeredSection */
-            $answeredSection = $quiz->getSections()->getOffset($answeredQuestion->getSection()->getId());
-            $answeredSection->getQuestions()->setOffset($answeredQuestion->getId(), $answeredQuestion);
-            $answeredQuestion->setSection($answeredSection);
-        }
-
-        // Get all Sections in the Quiz (transient view)
-        /** @var QuizSection[] $sections */
-        $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
-        foreach($sections as $section){
-            if(!$quiz->getSections()->getOffset($section->getId()) instanceof QuizSection){
-                $quiz->getSections()->setOffset($section->getId(), $section);
-                $section->setQuiz($quiz);
-            }
-        }
-
-        // Get all Questions for the Sections (transient view)
-        /** @var QuizQuestion[] $questions */
-        $questions = $this->quizQuestionMapper->findByColumn('section_id', $quiz->getSections()->keys());
-
-        foreach($questions as $question){
-            /** @var QuizSection $section */
-            $section = $quiz->getSections()->getOffset($question->getSection()->getId());
-            if(!$section->getQuestions()->getOffset($question->getId()) instanceof QuizQuestion){
-                $allQuestionsIndexedById[$question->getId()] = $question;
-                $section->getQuestions()->setOffset($question->getId(), $question);
-                $question->setSection($section);
-            }
-        }
-
-        // Link Questions and Answers
-        foreach($answers as $answer){
-            $question = $allQuestionsIndexedById[$answer->getQuestion()->getId()];
-            $answer->setQuestion($question);
-            $question->getAnswers()->setOffset($answer->getId(), $answer);
-        }
-
-        return $quiz;
     }
 
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,10 +9,13 @@
 namespace Schoolbox\Resource\Folder\Code;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
+ * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {

@@ -22,9 +22,6 @@ use Schoolbox\Mapper;
  */
 class HomepageTemplateMapper extends Mapper
 {
-    const TEMPLATE_NONE = -1;
-    const TEMPLATE_KEEP_EXISTING = 0;
-
     protected function mapping()
     {
         $this->hasModel(HomepageTemplate::class);
@@ -75,7 +72,7 @@ class HomepageTemplateMapper extends Mapper
     public function getNoHomepageTemplate()
     {
         $templateNone = $this->createModel();
-        $templateNone->setId(self::TEMPLATE_NONE);
+        $templateNone->setId(HomepageTemplate::HOMEPAGE_NONE);
         $templateNone->setName("No Homepage");
         return $templateNone;
     }
@@ -87,7 +84,7 @@ class HomepageTemplateMapper extends Mapper
     public function getKeepExistingHomepageTemplate()
     {
         $templateNone = $this->createModel();
-        $templateNone->setId(self::TEMPLATE_KEEP_EXISTING);
+        $templateNone->setId(HomepageTemplate::HOMEPAGE_KEEP_EXISTING);
         $templateNone->setName("Keep Existing");
         return $templateNone;
     }

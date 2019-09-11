@@ -160,7 +160,6 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'validateOpenSpan'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCurriculumNodes']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
@@ -224,23 +223,6 @@ class Mapper extends BaseMapper
         return $this->executeSelect($this->getSelectStringForParticipant($student), $this->getFromString(), $pb, [], $options)->indexBy('id');
     }
 
-
-    /**
-     * Update any associated curriculum nodes when saving an assessment
-     *
-     * @param Model $assessment
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    protected function updateCurriculumNodes(Model $assessment)
-    {
-        /** @var CurriculumNodeMapper $curriculumNodeMapper */
-        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_assessment');
-        $curriculumNodeMapper
-            ->deleteRelations($assessment->getId())
-            ->insertRelations($assessment->getCurriculumNodes(), $assessment->getId());
-    }
-
-
     /**
      * @param Model      $assessment
      * @param Model|null $previous
@@ -249,7 +231,7 @@ class Mapper extends BaseMapper
      */
     protected function createDynamicPlanIfNew(Model $assessment, Model $previous = null)
     {
-        if ($previous || $assessment->hasProject() || $assessment->getPlans()->count()) {
+        if ($previous || $assessment->hasProject() || ($assessment->getPlans() && $assessment->getPlans()->count())) {
             // this is a modify, or a project, or already has plan[s]; do nothing
             return true;
         }
@@ -830,6 +812,7 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             $project = $model->getProject();
             if ($project) {
+                $project->setAssessments($this->createCollection());
                 $projects[$project->getId()] = $project;
             }
         }
@@ -899,6 +882,8 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             if (isset($curriculumNodes[$model->getId()])) {
                 $model->setCurriculumNodes($curriculumNodes[$model->getId()]);
+            } else {
+                $model->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
         }
         return $modelList;
@@ -931,8 +916,12 @@ class Mapper extends BaseMapper
                     // Broken assessment - not much I can do besides ignore
                     continue;
                 }
-                if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
-                    $submodel->setAttachments($files[$submodel->getId()]);
+                if ($submodel instanceof SubmissionBox) {
+                    if (!empty($files[$submodel->getId()])) {
+                        $submodel->setAttachments($files[$submodel->getId()]);
+                    } else {
+                        $submodel->setAttachments($this->getJoinMapper('duework.files')->createCollection());
+                    }
                 }
             }
         }

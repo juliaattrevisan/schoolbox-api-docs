@@ -1,87 +1,92 @@
 <?php
-
-namespace SmokeTests;
-
-use IntegrationTester;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\GuzzleException;
-use Payload\Login as LoginPayload;
-use Payload\ForgotPassword as ForgotPassPayload;
-use const GuzzleHelper\VAGRANT_DOMAIN;
-
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+/** @noinspection PhpDocMissingThrowsInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpUnused */
+declare(strict_types=1);
 
-class LoginCest {
+namespace SmokeTests;
+
+use IntegrationTester;
+use Payload;
+
+/**
+ * Tests:
+ * * Can login with username + password
+ * * Can request password reset for email or username
+ *
+ * @noinspection PhpUnused
+ */
+class LoginCest
+{
+    /**
+     * Hook method to execute prior to each test
+     * @param IntegrationTester $i
+     */
+    public function _before(IntegrationTester $i): void
+    {
+        $i->stopFollowingRedirects();
+    }
+
+
     /**
      * Hit /login/ url with POST request to login user.
      *
      * @param IntegrationTester $i
-     *
-     * @throws GuzzleException
      */
-    public function LoginLocalUser(IntegrationTester $i, LoginPayload $loginPayload){
-
+    public function LoginLocalUser(IntegrationTester $i): void
+    {
         #GIVEN
-        $user='alaress';
-        $password='alaress';
-
+        $user     = 'alaress';
+        $password = 'alaress';
 
         #WHEN
+        $loginPayload = new Payload\Authentication\Login();
         $loginPayload->setUsername($user);
         $loginPayload->setPassword($password);
 
-        /** @var Response $response */
-        $response = $i->sendCurlRequest($loginPayload, true);
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
+        $i->sendRequest($loginPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(303);
+        $i->sendGET($i->grabHttpHeader('location'));
+        $i->seeResponseCodeIs(200);
     }
+
 
     /**
      * Hit /passwordReset/createRequest url with POST to request password reset.
      *
-     * @param IntegrationTester $i
-     *
-     * @throws GuzzleException
+     * @param IntegrationTester      $i
      */
-    public function LoginForgotPassword(IntegrationTester $i, ForgotPassPayload $forgotPasswordPayload){
-
+    public function LoginForgotPassword(IntegrationTester $i): void
+    {
         #GIVEN
-        $user_email='alaress@schoolbox.com.au';
-        $user_username='alaress';
-
+        $user_email    = 'alaress@schoolbox.com.au';
+        $user_username = 'alaress';
 
         #WHEN
+        $forgotPasswordPayload = new Payload\Authentication\ForgotPassword();
         $forgotPasswordPayload->setEmailOrUsername($user_email);
 
-        /** @var Response $response */
-        $response = $i->sendCurlRequest($forgotPasswordPayload, true, 'Send request for forgotten password with email');
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
+        $i->amGoingTo('Send request for forgotten password with email');
+        $i->sendRequest($forgotPasswordPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/passwordReset');
 
         #WHEN
+        $forgotPasswordPayload = new Payload\Authentication\ForgotPassword();
         $forgotPasswordPayload->setEmailOrUsername($user_username);
-
-        /** @var Response $response */
-        $response = $i->sendCurlRequest($forgotPasswordPayload, true, 'Send request for forgotten password with username');
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
-            [IntegrationTester::NO_REDIRECT=>'200']
-        ];
+        $i->amGoingTo('Send request for forgotten password with username');
+        $i->sendRequest($forgotPasswordPayload);
 
         #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/passwordReset');
     }
 }

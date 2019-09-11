@@ -52,7 +52,7 @@
                 {% endif %}
 
             {% else %}
-                <p><a href="/resource/folder/modify/{{ context.id }}#curriculum-codes">Map a curriculum code</a> to your course or {{ locale.unit }} page to display a list of all of the curriculum codes and matching skill descriptors covered in this area of the curriculum.</p>
+                <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum code</a> to your course or {{ locale.unit }} page to display a list of all of the curriculum codes and matching skill descriptors covered in this area of the curriculum.</p>
             {% endif %}
 
         {% endif %}

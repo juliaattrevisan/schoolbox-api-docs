@@ -10,6 +10,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\GenericCollection;
+
+/**
+ * @method GenericCollection|Timetable_Colour[] findAll($options = [])
+ */
 class Timetable_ColourMapper extends Schoolbox\Mapper {
 
 	protected $table = 'lu_timetable_colour';

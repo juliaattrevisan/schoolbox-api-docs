@@ -209,6 +209,10 @@ class SubmissionMapper extends BaseMapper
      */
     public function persistFiles(Submission $object, Submission $previous = null)
     {
+        if ($object->getFiles() === null) {
+            // Join not hydrated, nothing to do.
+            return;
+        }
         $joinMapper = $this->getJoinMapper('files');
 
         // Delete files that were attached but aren't now
