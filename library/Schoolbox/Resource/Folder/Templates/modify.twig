@@ -204,6 +204,7 @@
             multiple: true,
             value: {{ yearLevelValues|json_encode|raw }},
             selectize: {
+                load: null,
                 options: {{ yearLevelOptions|json_encode|raw }},
                 hideSelected: true
             }
