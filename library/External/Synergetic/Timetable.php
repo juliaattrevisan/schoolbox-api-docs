@@ -599,7 +599,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'SubstituteFlag'    => $desc['SubstituteFlag'],
                         'SubstitutedFlag'   => $desc['SubstitutedFlag'],
                         'AttendanceMarked'  => $desc['AttendanceMarked'],
-                        'AttendanceEnabled' => ($desc['AttendanceEnabled'] && !$desc['ClassCancelled']) ? true : false,
+                        'AttendanceEnabled' => $desc['AttendanceEnabled'] && !$desc['ClassCancelled'],
                         'AttendancePeriods' => $desc['AttendancePeriods'],
                         'ClassCancelled'    => $desc['ClassCancelled'],
                     );

@@ -118,6 +118,7 @@ interface External_TimetableInterface extends External\IConnector
      * @internal null|int    array[]['class'][]['SubstitutedFlag']
      * @internal null|int    array[]['class'][]['AttendanceMarked']
      * @internal null|bool   array[]['class'][]['AttendanceEnabled']
+     * @internal null|bool   array[]['class'][]['AttendancePeriods']
      * @internal null|int    array[]['class'][]['ClassCancelled']
      *
      * @param string $externalUserId
