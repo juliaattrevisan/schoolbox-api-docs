@@ -73,7 +73,7 @@ class Module extends BaseModule
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
-        $hasInlineAccess = new Rule\All(
+        $hasSelfAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 $this->buildRuleHasWriteAccess(),
@@ -101,8 +101,8 @@ class Module extends BaseModule
 
         $this->register('DELETE', $responsePattern, 'deleteParticularResponse',  $hasWriteAccess, $preloadParticipant); // a || r
 
-        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasInlineAccess, $preloadParticipant); // a || r
-        $this->register('GET', $participantPattern . '/responses/self/{responseId:\d+}', 'getParticularResponseForSelfReflection', $hasInlineAccess, $preloadParticipant); // a || r
+        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
+        $this->register('GET', $participantPattern . '/responses/self/{responseId:\d+}', 'getParticularResponseForSelfReflection', $hasSelfAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
