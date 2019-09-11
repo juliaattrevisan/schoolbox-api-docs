@@ -54,7 +54,6 @@ class Definition extends FolderFilter\Definition
     {
         $options = parent::unsetInvalidOptions($pageFilter);
 
-
         // TODO unset options which the current user doesn't have read perms on
         return $options;
     }

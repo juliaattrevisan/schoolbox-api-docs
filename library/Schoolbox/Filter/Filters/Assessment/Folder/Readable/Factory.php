@@ -66,7 +66,7 @@ class Factory extends FolderFilter\Factory
             $folders = $this->getFolderMapper()->createCollection();
         }
 
-        return new FolderFilter\Component(
+        return new Component(
             $definition,
             $user,
             $pageFilter,
