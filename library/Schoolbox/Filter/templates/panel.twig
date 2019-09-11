@@ -126,7 +126,9 @@ Usage:
          * @param {int} filterId
          */
         function clearFilter(filterId) {
-            $panelComponents.filter('[data-component='+filterId+']').find('input[type=checkbox]').prop('checked', false);
+            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']');
+            $panelComponent.find('input[type=checkbox]').prop('checked', false);
+            $panelComponent.find('[data-selectize]')[0].selectize.clear(true);
             updateFiltersInUseLabel();
         }
 
@@ -515,7 +517,10 @@ Usage:
                     if ($selected.length === $available.length) {
                         delete componentsInUse[filterId];
                     }
-                } else {
+                }
+
+                // Remove components with no selected options
+                if (componentsInUse[filterId].labels.length === 0) {
                     delete componentsInUse[filterId];
                 }
             });
