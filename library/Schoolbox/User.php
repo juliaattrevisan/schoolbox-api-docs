@@ -12,6 +12,7 @@ namespace Schoolbox;
 
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
+use Alaress\Json\Serializable;
 use House;
 use HouseResidential;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -19,6 +20,7 @@ use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -27,12 +29,13 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
-class User extends BaseModel implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
+class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
     use SerializeTrait;
+    use CreateCollection;
 
     /** @var int */
     private $id;

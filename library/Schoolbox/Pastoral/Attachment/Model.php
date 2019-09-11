@@ -7,9 +7,10 @@
 
 namespace Schoolbox\Pastoral\Attachment;
 
-use Schoolbox\BaseModel;
+use Schoolbox\IModel;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -22,12 +23,13 @@ use Schoolbox\Resource\Storage\IStorage;
  *
  * @package Schoolbox\Pastoral\Attachment
  */
-class Model extends BaseModel implements IStorage, ISoftDeletable
+class Model implements IStorage, ISoftDeletable, IModel
 {
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
     use StorableTrait;
+    use CreateCollection;
 
     /** @var Pastoral $pastoral */
     private $pastoral;

@@ -79,7 +79,7 @@ class Model implements ISoftDeletable
     private function getUserAccessLevel(User $user): ?int
     {
         $thisUser = $this->getUser();
-        if ($thisUser && (int)$thisUser->getId() === (int)$user->getId()) {
+        if ($thisUser && $thisUser->getId() === $user->getId()) {
             return $this->access;
         }
         return null;
@@ -102,7 +102,7 @@ class Model implements ISoftDeletable
         $thisRole = $this->getRole();
 
         // Not a role-based rule, or for a different role?
-        if (!$thisRole || (int)$user->getRole()->getId() !== (int)$thisRole->getId()) {
+        if (!$thisRole || $user->getRole()->getId() !== $thisRole->getId()) {
             // Does not apply
             return null;
         }
@@ -134,9 +134,8 @@ class Model implements ISoftDeletable
             return null;
         }
 
-        $maxAccess = null;
         foreach ($user->getPastoralGroupsMemberships() as $groupsMembership) {
-            if ((int)$thisGroup->getId() === (int)$groupsMembership->getGroup()->getId()) {
+            if ($thisGroup->getId() === $groupsMembership->getGroup()->getId()) {
                 return $this->access;
             }
         }

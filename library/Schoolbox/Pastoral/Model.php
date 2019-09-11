@@ -8,10 +8,11 @@
 namespace Schoolbox\Pastoral;
 
 use Alaress_Date_Format;
-use Schoolbox\BaseModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\IModel;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -27,12 +28,13 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 /**
  * @method static GenericCollection|Model[] createCollection()
  */
-class Model extends BaseModel implements ISoftDeletable
+class Model implements ISoftDeletable, IModel
 {
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use CreateCollection;
 
     /** @var Alaress_Date_Format $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
     private $updatedAtDisplay;
@@ -546,8 +548,6 @@ class Model extends BaseModel implements ISoftDeletable
         if ($this->isUserInPastoralService($user) || (int)$user->getId() === (int)$this->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
-
-        // TODO: Does this taking group into account?????????????
 
         // Otherwise start with deny access, and work our way up the permission levels
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;

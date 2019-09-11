@@ -16,8 +16,7 @@ use function spl_object_hash;
 /**
  * Responsible for stripping the content/relationships from a pastoral record that a
  * specific user does not have sufficient permission to access.
- *
- * ** THIS WILL INTENTIONALLY MUTATE THE PASTORAL MODELS PASSED TO IT **
+ * The original pastoral model passed in will not be changed.
  */
 class AccessLevelCensor
 {
@@ -160,8 +159,8 @@ class AccessLevelCensor
         }
 
         // Record owner and Comment owner can see their comments
-        $userId = (int)$user->getId();
-        if ($userId === (int)$comment->getOwner()->getId() || $userId === (int)$comment->getPastoral()->getOwner()->getId()) {
+        $userId = $user->getId();
+        if ($userId === $comment->getOwner()->getId() || $userId === $comment->getPastoral()->getOwner()->getId()) {
             return $comment;
         }
 
