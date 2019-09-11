@@ -13,32 +13,7 @@
             });
         });
 
-        $('#fileForm').alaressValidate(
-            {
-
-                rules: {
-                    description: {
-                        required: true,
-                        minlength: 2
-                    },
-                    attachedFile: {
-                        required: {
-                            depends: function (element) {
-                                return !($(element).parents('form').find('input[name="attachment[]"]').length);
-                            }
-                        }
-                    }
-                },
-                messages: {
-                    description: "Please enter a title.",
-                    attachedFile: "Please attach a file."
-                },
-            });
-
-        $(document).on('click', '#upload', function () {
-            $('#attachedFile-error').remove();
-        })
-
+        $('#fileForm').alaressValidate();
     });
 </script>
 <!-- END custom_head -->
@@ -74,7 +49,6 @@
                         <label for="cms-zone" class="required">
                             Attach File
                         </label>
-                        <input type="hidden" name="attachedFile">
                         {ATTACH_ZONE}
                         <label>
                             Description
