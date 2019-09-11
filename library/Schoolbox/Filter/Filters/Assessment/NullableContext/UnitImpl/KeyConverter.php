@@ -60,7 +60,7 @@ class KeyConverter extends NullableContext\KeyConverter
      *
      * @return Collection|int[]
      */
-    public function getAllPossibleItems()
+    public function getAllPossibleItems(): Collection
     {
         return $this->unitImplIds->shallowClone();
     }

@@ -138,27 +138,6 @@ class Definition extends Filter\AbstractDefinition
         return $cleanedPageOptions;
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
-    {
-        // No options checked
-        return false;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
-    {
-        // by default, all TemporalStates are available
-        return true;
-    }
-
-
     /**
      * @inheritdoc
      */

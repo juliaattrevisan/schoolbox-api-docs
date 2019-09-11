@@ -57,7 +57,7 @@ class KeyConverter extends AbstractKeyConverter
      *
      * @return Collection|int[]
      */
-    public function getAllPossibleItems()
+    public function getAllPossibleItems(): Collection
     {
         return $this->workTypeIds->shallowClone()->offsetSet(Definition::KEY_NONE, null);
     }

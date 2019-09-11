@@ -72,9 +72,9 @@ class BaseComponent implements IComponent
     /**
      * @inheritdoc
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
-        return $this->definition->getPanelComponentTemplate();
+        return $this->definition::getPanelComponentTemplate();
     }
 
 

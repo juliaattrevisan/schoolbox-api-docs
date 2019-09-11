@@ -10,6 +10,8 @@ namespace Schoolbox\Filter\Filters\Assessment\Term;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
+use function array_map;
+use function array_merge;
 
 
 /**
@@ -130,12 +132,13 @@ abstract class Definition extends Filter\AbstractDefinition
         // Ensure it contains all Term instances
         foreach ($this->terms as $term) {
             if (!$options->offsetExists($term->getId())) {
-                $option = $this->getFilterOptionMapper()->createModel();
+                $option = new Filter\Page\Option\Model();
                 $key    = (string)$term->getId();
                 $option
                     ->setFilterPage($pageFilter)
                     ->setKey($key)
-                    ->setAvailable($this->getInitialAvailability($key, $pageFilter));
+                    ->setAvailable($this->getInitialAvailability($key, $pageFilter))
+                    ->setDefaults(new GenericCollection(Filter\Page\Option\Defaults\Model::class));
                 $options->setOffset($option->getKey(), $option);
             }
         }
@@ -189,9 +192,12 @@ abstract class Definition extends Filter\AbstractDefinition
      *
      * @return string[]
      */
-    public function getAbstractKeys()
+    public function getAbstractKeys(): array
     {
-        return array_merge($this->getCustomKeys(), $this->terms->keys());
+        // Ensure numeric ids are cast to string keys
+        return array_merge($this->getCustomKeys(), array_map(static function (int $termId) {
+            return (string)$termId;
+        }, $this->terms->keys()));
     }
 
 

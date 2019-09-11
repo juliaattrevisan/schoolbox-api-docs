@@ -106,7 +106,14 @@ abstract class AbstractDefinition implements IDefinition
      * @param Page\Model $pageFilter
      * @return bool
      */
-    abstract protected function getInitialAvailability(string $customAbstractKey, Page\Model $pageFilter): bool;
+    protected function getInitialAvailability(
+        /** @noinspection PhpUnusedParameterInspection */
+        string $customAbstractKey,
+        Page\Model $pageFilter
+    ): bool
+    {
+        return true;
+    }
 
 
     /**
@@ -125,7 +132,7 @@ abstract class AbstractDefinition implements IDefinition
         // Ensure it contains all abstract custom options
         foreach ($this->getCustomKeys() as $customAbstractKey) {
             if (!$options->offsetExists($customAbstractKey)) {
-                $option = $this->filterOptionMapper->createModel();
+                $option = new Page\Option\Model();
 
                 // If not yet configured by admin, should this option be available?
                 $isAvailable = $this->getInitialAvailability($customAbstractKey, $pageFilter);
@@ -133,7 +140,8 @@ abstract class AbstractDefinition implements IDefinition
                 $option
                     ->setFilterPage($pageFilter)
                     ->setKey($customAbstractKey)
-                    ->setAvailable($isAvailable);
+                    ->setAvailable($isAvailable)
+                    ->setDefaults(new GenericCollection(Page\Option\Defaults\Model::class));
                 $options->setOffset($option->getKey(), $option);
             }
         }
@@ -281,7 +289,14 @@ abstract class AbstractDefinition implements IDefinition
      * @param string $roleType
      * @return bool
      */
-    abstract protected function getInitialSelectedState(string $key, string $page, string $roleType): bool;
+    protected function getInitialSelectedState(
+        /** @noinspection PhpUnusedParameterInspection */
+        string $key,
+        string $page,
+        string $roleType
+    ): bool {
+        return false;
+    }
 
 
     /**
@@ -301,8 +316,9 @@ abstract class AbstractDefinition implements IDefinition
      * eg:
      *   list of configured terms,
      *   list of configured work-types
+     * @return string[]
      */
-    public function getAbstractKeys()
+    public function getAbstractKeys(): array
     {
         // Default. You MUST override if the set of options displayed in admin includes dynamic options (eg Terms, WorkTypes etc).
         // Dynamic options depend on database contents, but do not change per viewee.

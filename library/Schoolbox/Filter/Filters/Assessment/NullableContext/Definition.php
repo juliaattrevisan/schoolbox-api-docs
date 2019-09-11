@@ -42,24 +42,4 @@ abstract class Definition extends Filter\AbstractDefinition
             self::KEY_NONE,
         ];
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
-    {
-        // All available by default
-        return true;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
-    {
-        // Nothing is selected, meaning filter is not applied
-        return false;
-    }
 }

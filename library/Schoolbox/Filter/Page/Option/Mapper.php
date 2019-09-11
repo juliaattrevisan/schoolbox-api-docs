@@ -11,7 +11,6 @@ use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 
 /**
- * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])

@@ -7,11 +7,13 @@
 
 namespace Schoolbox\Filter\Page;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
@@ -63,12 +65,16 @@ class Mapper extends \Schoolbox\Mapper
      * * FilterPage options are indexed by option.key
      * * Option defaults are indexed by default.roleType
      *
-     * @param string      $page
+     * @param string $page
      * @return Model[]|GenericCollection
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
+     * @throws \UnexpectedValueException
+     * @throws \PDOException
+     * @throws InvalidColumnException
+     * @throws \DomainException
      */
     public function findForPage($page)
     {
@@ -95,22 +101,25 @@ class Mapper extends \Schoolbox\Mapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($builder->getParams());
 
-        /** @var GenericCollection|Model[] $pageFilters Indexed by ID */
         $pageFilters = $this->createCollection();
 
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $id = (int)$row["p.{$this->getIdentifierColumn()}"];
             if (!$pageFilters->offsetExists($id)) {
-                $pageFilters[$id] = $this->hydrate($row, 'p');
-                $filterPages      = $pageFilters[$id]->getFilter()->getPages();
-                $filterPages->setOffset($page, $pageFilters[$id]);
+                $pageFilter = $this->hydrate($row, 'p')->setOptions($optionMapper->createCollection());
+                $pageFilters->setOffset($id, $pageFilter);
+
+                // Also add it to filter's page collection
+                $pageFilter->getFilter()->getPages()->setOffset($page, $pageFilter);
+            } else {
+                $pageFilter = $pageFilters->getOffset($id);
             }
-            $pageFilter = $pageFilters[$id];
 
             $optionKey = $row['o.key'];
             $options   = $pageFilter->getOptions();
             if ($optionKey && !$options->offsetExists($optionKey)) {
-                $options[$optionKey] = $optionMapper->hydrate($row, 'o');
+                $options[$optionKey] = $optionMapper->hydrate($row, 'o')->setDefaults($defaultsMapper->createCollection());
                 $options[$optionKey]->setFilterPage($pageFilter);
             }
             $option = $options[$optionKey];

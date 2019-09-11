@@ -64,7 +64,7 @@ class Mapper extends AbstractCourseMapper
      *
      * @param int|int[] $folderId
      * @param array     $options
-     * @return Model[]|Collection
+     * @return Model[]|GenericCollection
      */
     public function findByFolderId($folderId, $options = [])
     {

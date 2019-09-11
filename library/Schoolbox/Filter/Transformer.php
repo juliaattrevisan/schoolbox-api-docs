@@ -104,33 +104,4 @@ class Transformer
 
         return $filters;
     }
-
-    /* Getters
-     */
-
-    /**
-     * @return Collection|GenericCollection[]|Selection\Model[][]
-     */
-    protected function getSelectionsPerFilter()
-    {
-        return $this->selectionsPerFilter;
-    }
-
-
-    /**
-     * @return Model[]|GenericCollection
-     */
-    protected function getFiltersByClass()
-    {
-        return $this->filtersByClass;
-    }
-
-
-    /**
-     * @return IKeyConverter[]|GenericCollection
-     */
-    protected function getKeyConverters()
-    {
-        return $this->keyConverters;
-    }
 }

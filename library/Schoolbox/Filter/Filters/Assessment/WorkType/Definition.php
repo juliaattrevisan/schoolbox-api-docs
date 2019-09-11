@@ -7,10 +7,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
+use function array_map;
+use function array_merge;
 
 
 /**
@@ -25,12 +26,10 @@ class Definition extends Filter\AbstractDefinition
     protected const NAME = 'Work Type';
 
     // If assessment does not have a WorkType at all
-    const KEY_NONE = 'none';
+    public const KEY_NONE = 'none';
 
     /**
-     * Intentionally not a GenericCollection so we can include null (ie assessment does not have a workType at all)
-     *
-     * @var Collection|WorkType\Model[]
+     * @var GenericCollection|WorkType\Model[]
      */
     private $workTypes;
 
@@ -39,13 +38,13 @@ class Definition extends Filter\AbstractDefinition
      * @param Filter\Model                       $filter
      * @param Filter\Page\Option\Mapper          $filterOptionMapper
      * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
-     * @param Collection                         $workTypes
+     * @param GenericCollection|WorkType\Model[] $workTypes
      */
     public function __construct(
         Filter\Model $filter,
         Filter\Page\Option\Mapper $filterOptionMapper,
         Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
-        Collection $workTypes
+        GenericCollection $workTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->workTypes = $workTypes;
@@ -109,9 +108,12 @@ class Definition extends Filter\AbstractDefinition
      *
      * @return string[]
      */
-    public function getAbstractKeys()
+    public function getAbstractKeys(): array
     {
-        return array_merge($this->getCustomKeys(), $this->workTypes->keys());
+        // Ensure numeric ids are cast to string keys
+        return array_merge($this->getCustomKeys(), array_map(static function (int $workTypeId) {
+            return (string)$workTypeId;
+        }, $this->workTypes->keys()));
     }
 
 
@@ -137,40 +139,20 @@ class Definition extends Filter\AbstractDefinition
         // Ensure it contains all WorkTypes
         foreach ($this->workTypes as $workType) {
 
-            $abstractKey = null === $workType ? self::KEY_NONE : (string)$workType->getId();
+            $abstractKey = (string)$workType->getId();
 
             if (!$options->offsetExists($abstractKey)) {
-                $option = $this->getFilterOptionMapper()->createModel();
+                $option = new Filter\Page\Option\Model();
                 $option
                     ->setFilterPage($pageFilter)
                     ->setKey($abstractKey)
-                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter));
+                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                    ->setDefaults(new GenericCollection(Filter\Page\Option\Defaults\Model::class));
                 $options->setOffset($option->getKey(), $option);
             }
         }
         return $options;
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
-    {
-        // No options checked
-        return false;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
-    {
-        // by default, all WorkTypes are available
-        return true;
-    }
-
 
     /**
      * @inheritdoc

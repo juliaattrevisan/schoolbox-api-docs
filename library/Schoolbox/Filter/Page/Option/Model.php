@@ -48,18 +48,9 @@ class Model
     /**
      * The roleType-specific defaults configured by the admin for this option
      *
-     * @var GenericCollection|\Schoolbox\Filter\Page\Option\Defaults\Model[]
+     * @var null|GenericCollection|Defaults\Model[]
      */
     private $defaults;
-
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->defaults = new GenericCollection(Defaults\Model::class);
-    }
 
 
     /**
@@ -125,7 +116,7 @@ class Model
     /**
      * @return GenericCollection|Defaults\Model[]
      */
-    public function getDefaults()
+    public function getDefaults(): ?GenericCollection
     {
         return $this->defaults;
     }
@@ -135,9 +126,10 @@ class Model
      * @param GenericCollection|Defaults\Model[] $defaults
      * @return $this
      */
-    public function setDefaults(GenericCollection $defaults)
+    public function setDefaults(GenericCollection $defaults): self
     {
-        $this->defaults->replaceWith($defaults);
+        $defaults->assertCollectionOf(Defaults\Model::class);
+        $this->defaults = $defaults;
         return $this;
     }
 

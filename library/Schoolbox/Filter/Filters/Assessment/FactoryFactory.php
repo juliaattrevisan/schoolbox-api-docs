@@ -26,6 +26,7 @@ use Schoolbox\Filter\Filters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\User;
 use Schoolbox\Mapper;
+use Schoolbox\YearLevel;
 use InvalidArgumentException;
 
 /**
@@ -179,6 +180,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getSelectionMapper(),
                     $this->rosettaStone
                 );
+            case FolderYearLevel\Definition::class:
+                return new FolderYearLevel\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getYearLevelMapper()
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -294,5 +302,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
     private function getProjectMapper(): Project\Mapper
     {
         return $this->getMapperFactory()->get(Project\Mapper::class);
+    }
+
+    /**
+     * @return YearLevel\Mapper|Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getYearLevelMapper(): YearLevel\Mapper
+    {
+        return $this->getMapperFactory()->get(YearLevel\Mapper::class);
     }
 }

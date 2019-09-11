@@ -50,5 +50,5 @@ interface IKeyConverter
      *
      * @return Collection|int[]|string[] (intentionally not a GenericCollection)
      */
-    public function getAllPossibleItems();
+    public function getAllPossibleItems(): Collection;
 }

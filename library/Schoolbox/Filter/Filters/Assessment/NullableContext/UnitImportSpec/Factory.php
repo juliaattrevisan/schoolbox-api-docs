@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
+use Schoolbox\Mapper\DefinitionException;
 use function count;
 use InvalidArgumentException;
 use Schoolbox\Collection;
@@ -146,6 +147,9 @@ class Factory extends NullableContext\Factory
             // Get all courses imported to these folders
             $courseImpls = $this->courseImplMapper->findByFolderId($folders->getPropertyValues('id'));
 
+            // We need folder codes hydrated to determine if course was imported to class or group
+            $this->loadFolderCodes($courseImpls);
+
             foreach ($courseImpls as $courseImpl) {
                 foreach ($courseImpl->getUnits() as $unitImpl) {
                     $unitSpec = $unitImpl->getSpecification();
@@ -195,6 +199,32 @@ class Factory extends NullableContext\Factory
             $unitSpecsImportedToClasses,
             $unitSpecsImportedToGroups
         );
+    }
+
+    /**
+     * Hydrates folder codes onto Course Implementation folders
+     *
+     * @param GenericCollection $courseImplementations
+     * @throws DefinitionException
+     */
+    private function loadFolderCodes(GenericCollection $courseImplementations): void
+    {
+        /** @var Folder\Code\Mapper $folderCodeMapper */
+        $folderCodeMapper = $this->folderMapper->getJoinMapper('codes');
+
+        /** @var Collection|Folder\Model[] $indexedFolders */
+        $indexedFolders = $courseImplementations->map(static function (CourseImpl\Model $courseImpl) {
+            return $courseImpl->getFolder();
+        })->indexByCallback(static function (Folder\Model $folder) {
+            return $folder->getId();
+        });
+        $codesPerFolderId = $folderCodeMapper->findForCategories($indexedFolders->keys())
+                                             ->groupByCallback(static function (Folder\Code\Model $code) {
+                                                 return $code->getFolder()->getId();
+                                             });
+        foreach($indexedFolders as $folderId => $folder){
+            $folder->setCodes($codesPerFolderId[$folderId] ?? $folderCodeMapper->createCollection());
+        }
     }
 
 

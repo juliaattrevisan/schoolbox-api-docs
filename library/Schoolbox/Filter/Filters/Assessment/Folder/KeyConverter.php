@@ -66,7 +66,7 @@ class KeyConverter extends AbstractKeyConverter
      *
      * @return Collection|int[]
      */
-    public function getAllPossibleItems()
+    public function getAllPossibleItems(): Collection
     {
         return $this->folderIds->shallowClone();
     }

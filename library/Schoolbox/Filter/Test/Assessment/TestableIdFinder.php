@@ -115,6 +115,7 @@ class TestableIdFinder extends IdFinder
             Assessment\YearDue\Definition::class,
             Assessment\RubricUsage\Definition::class,
             Assessment\MarkPerCap\Definition::class,
+            Assessment\FolderYearLevel\Definition::class,
         ];
         $this->setRegistry(array_combine($filterClasses, $filterClasses));
     }
