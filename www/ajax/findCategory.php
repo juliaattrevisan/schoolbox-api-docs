@@ -5,6 +5,8 @@
 
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -20,7 +22,8 @@ $data        = [];
 $return = [];
 
 /** @var User $user */
-$user = $_SESSION['user'];
+$user   = $_SESSION['user'];
+$access = Access::getInstance();
 
 // My classes
 // Just return them all: selectize will filter them
@@ -52,6 +55,11 @@ foreach ($categoryMapper->searchByName($_GET['query']) as $currentResult) {
     /** @var Folder\Model $currentResult */
     $folderId = $currentResult->getId();
     if (isset($return[$folderId])) {
+        continue;
+    }
+
+    // Verify user has permission to view this folder
+    if ($access->getFolderAccess($user, $folderId) < UserAccess::ACCESS_READ) {
         continue;
     }
 
