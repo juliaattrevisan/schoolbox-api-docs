@@ -322,7 +322,7 @@ Usage:
                     var optionVal = decodedSelections[filterId][optionKey];
 
                     // We only need to know about checked values
-                    if ("1" === optionVal) {
+                    if (1 === Number(optionVal)) {
                         nestedObj[filterId][optionKey] = optionVal;
                     }
                 }
