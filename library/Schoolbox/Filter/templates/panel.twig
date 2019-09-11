@@ -573,17 +573,25 @@ Usage:
         function updateCountMoreModal(filterId)
         {
             var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
-                decodedData = deserialize($optionCheckboxes.serialize())[filterId];
+                decodedData = deserialize($optionCheckboxes.serialize())[filterId],
+                $selectize  = $component.find('[data-selectize]'),
+                selectize   = $selectize.length ? $selectize[0].selectize : null;
 
             $countMoreModalName.html($component.find('[data-filter-name]').html());
-
             $countMoreModalList.html('');
-            for(var key in decodedData){
-                if(decodedData.hasOwnProperty(key) && decodedData[key] === "1"){
-                    var label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html();
+
+            Object.keys(decodedData).forEach(function (key) {
+                if (Number(decodedData[key]) === 1) {
+                    // This key is selected: use it
+                    var label = null;
+                    if (selectize) {
+                        label = selectize.options[key].name;
+                    } else {
+                        label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html()
+                    }
                     $countMoreModalList.append($modalListItem.clone().html(label));
                 }
-            }
+            });
         }
 
         /**
