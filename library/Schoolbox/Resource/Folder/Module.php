@@ -39,6 +39,8 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        $loggedInAccess = new Rule\IsLoggedIn();
+
         $parentWriteAccess = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
             static function (array $params): int {
@@ -92,7 +94,8 @@ class Module extends BaseModule
             }
         };
 
-        $this->register('GET',    '/mygroups',                            'getGroups',        new Rule\IsLoggedIn());
+        $this->register('GET',    '/mygroups',                            'getGroups',        $loggedInAccess);
+        $this->register('GET',    '/folder/search',                       'getFolderSearch',  $loggedInAccess);
         $this->register('GET',    '/folder/{parentId:\d+}/create',        'getFolderCreate',  $parentWriteAccess, $preloadParent);
         $this->register('POST',   '/folder/{parentId:\d+}/create',        'postCreateFolder', $parentWriteAccess, $preloadParent);
         $this->register('GET',    '/folder/{id:\d+}/modify',              'getFolderModify',  $folderWriteAccess, $preloadFolder);
