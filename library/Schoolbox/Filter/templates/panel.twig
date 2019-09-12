@@ -515,7 +515,7 @@ Usage:
                     // Hide the filter in use if all its options are selected
                     // (all options is functionally equivalent to none selected)
                     if ($selected.length === $available.length) {
-                        delete componentsInUse[filterId];
+                        componentsInUse[filterId]['labels'] = [];
                     }
                 }
 
