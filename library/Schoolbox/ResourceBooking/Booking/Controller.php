@@ -82,15 +82,12 @@ class Controller extends Base
      */
     public function book(Item\Model $item)
     {
-        /** @var Model $item */
-        /** @var Item\Model $resource */
-
         $resource = $item;
-        $item     = $this->getBookingMapper()->createModel();
-        $item
+        $booking  = (new Model())
             ->setResource($resource)
             ->setEvent(new Calendar\Event())
-            ->setName($this->getRequest()->query['name']);
+            ->setName($this->getRequest()->query['name'])
+            ->setRelatedBookingList(new GenericCollection(Model::class));
 
         // Create datetime is unique to this method, so it can be a function.
         $createDatetime = function ($date, $time) {
@@ -118,7 +115,7 @@ class Controller extends Base
             $this->request->query['endTime']
         );
         if ($startDate instanceof DateTime) {
-            $item->getEvent()->setStartDateTime(new Alaress_Date_Format($startDate));
+            $booking->getEvent()->setStartDateTime(new Alaress_Date_Format($startDate));
 
             // No end date? Create one based on the minimum reservation time.
             // Use the DateInterval object to adjust datetimes, to make days
@@ -135,18 +132,18 @@ class Controller extends Base
             }
         }
         if ($endDate instanceof DateTime) {
-            $item->getEvent()->setEndDateTime(new Alaress_Date_Format($endDate));
+            $booking->getEvent()->setEndDateTime(new Alaress_Date_Format($endDate));
         }
 
         $this->getResponse()->content->set(
             [
                 'template' => '@resourceBooking/book.twig',
                 'data'     => [
-                    'item'              => $item,
+                    'item'              => $booking,
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
                     'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
-                    'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
+                    'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
                     'validationData'    => [
                                             'start' => Validation::START_DATETIME,
