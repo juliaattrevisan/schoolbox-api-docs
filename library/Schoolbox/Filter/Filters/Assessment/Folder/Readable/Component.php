@@ -43,29 +43,4 @@ class Component extends BaseComponent
         }
         return $userSelections;
     }
-
-
-    /**
-     * Add a list of previously selected folders to the filter's context.
-     *
-     * @return array|Filter\Selection\Model[]
-     */
-    public function toContext()
-    {
-        $context                 = parent::toContext();
-        $userSelectionsSelectize = [];
-        $userSelections          = $context['userSelections'] ?? [];
-        if (is_iterable($userSelections)) {
-            foreach ($userSelections as $userSelection) {
-                if ($userSelection instanceof Filter\Selection\Model) {
-                    $userSelectionsSelectize[] = [
-                        'id'   => (int)$userSelection->getKey(),
-                        'name' => 'Folder #' . $userSelection->getKey(), // TODO this ought to be a folder name
-                    ];
-                }
-            }
-        }
-        $context['userSelectionsSelectize'] = $userSelectionsSelectize;
-        return $context;
-    }
 }
