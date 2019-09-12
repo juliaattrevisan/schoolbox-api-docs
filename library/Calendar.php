@@ -12,6 +12,9 @@ class Calendar extends DeprecatedModel
      */
     private $groupHandler;
 
+    /** @var string[] */
+    private $colourSet;
+
     function __construct()
     {
 
@@ -183,8 +186,7 @@ class Calendar extends DeprecatedModel
                 $this->colourSet[$row['eventTypeID']] = $row['eventColour'];
             }
         }
-        return $this->colourSet[$id];
-
+        return $this->colourSet[$id] ?? '';
     }
 
     function getPerm($eventID)
