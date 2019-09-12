@@ -2,6 +2,7 @@
 
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\File\IFile;
@@ -33,41 +34,44 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         // if we're editing an existing file, ensure the file exists
         if ($modifyExisting) {
             $file = FileMapper::getInstance()->findById($_POST['fileID']);
-
         } else {
             $file = FileMapper::getInstance()->createModel();
-
         }
-
-        // if file was ajax-uploaded
-        if (isset($_POST['attachment'])) {
-            $factory = new CollectorFactory(FileMapper::getInstance());
-            /** @var File $result */
-            $result = $factory->build($_POST['attachment'])->getFirst();
-
-            // if the attachment is an already-existing file
-            if ($result->getId() && $result->getId() == $file->getId()) {
-                // mirror, mirror (the file on disk was not changed)
-                $file = $result;
-
-            } else {
-                // target attachment is from SBFS, but a different file: override storage
-                $file->setStorage($result->getStorage());
-            }
-        }
-
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(41);
-        exit; // shut UP, storm.
-    } catch (\Schoolbox\Resource\Exception $e) {
-        error(43);
-        exit;
-    } catch (\InvalidArgumentException $e) {
-        error(43);
+        error(ErrorMapper::ERROR_FILE_NOT_FOUND);
         exit;
     }
 
-    // if file was synchronously uploaded
+    // if file was uploaded from Post File page
+    if (!$ajax) {
+        if (isset($_POST['attachment'])) {
+            try {
+                $factory = new CollectorFactory(FileMapper::getInstance());
+                /** @var File $result */
+                $result = $factory->build($_POST['attachment'])->getFirst();
+
+                // if the attachment is an already-existing file
+                if ($result->getId() && $result->getId() == $file->getId()) {
+                    // mirror, mirror (the file on disk was not changed)
+                    $file = $result;
+                } else {
+                    // target attachment is from SBFS, but a different file: override storage
+                    $file->setStorage($result->getStorage());
+                }
+            } catch (\Schoolbox\Resource\Exception $e) {
+                error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
+                exit;
+            } catch (\InvalidArgumentException $e) {
+                error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
+                exit;
+            }
+        } else {
+            error(ErrorMapper::ERROR_INFORMATION_MISSING);
+            exit;
+        }
+    }
+
+    // if file was uploaded from File Component / Resource Browser
     if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
         try {
             // fake this momentarily
@@ -104,7 +108,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         if ($modifyExisting) {
 
             if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE || 0 == $_POST['category']) {
-                error(6);
+                error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
             }
 
             $file->setFolder(FolderMapper::getInstance()->createModel()->setId($_POST['category']));
@@ -120,7 +124,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
             foreach ($destinations as $cat) {
                 if ($groupHandler->getPermission($cat) < UserAccess::ACCESS_WRITE || 0 == $cat) {
-                    error(6);
+                    error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                 }
 
                 $clone = clone $file;
@@ -221,12 +225,12 @@ elseif (is_numeric($_GET['delete'])) {
         $file = FileMapper::getInstance()->findById($_GET['delete']);
 
         if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-            error(6);
+            error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         FileMapper::getInstance()->delete($file);
-    } catch (Exception $e) {
-        error(2);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     if (isset($_REQUEST['ajax'])) {
@@ -247,12 +251,12 @@ elseif (is_numeric($_GET['deleteList'])) {
                     $file = FileMapper::getInstance()->findById($fileID);
 
                     if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                        error(6);
+                        error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                     }
 
                     FileMapper::getInstance()->delete($file);
                 } catch (Exception $e) {
-                    error(2);
+                    error(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
             }
         }
@@ -265,11 +269,11 @@ elseif (is_numeric($_GET['deleteList'])) {
                 /** @var Link $link */
                 $link = LinkMapper::getInstance()->findById($linkID);
                 if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                    error(6);
+                    error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                 }
                 LinkMapper::getInstance()->delete($link);
             } catch (Exception $e) {
-                error(2);
+                error(ErrorMapper::ERROR_INFORMATION_MISSING);
             }
         }
     }
@@ -277,10 +281,10 @@ elseif (is_numeric($_GET['deleteList'])) {
     $page->backToTheFuture(1);
 } /* Exceeded PHP max file size */
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES)) {
-    error(10);
+    error(ErrorMapper::ERROR_FILE_SIZE);
 } /* Unknown action */
 else {
-    error(2);
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 

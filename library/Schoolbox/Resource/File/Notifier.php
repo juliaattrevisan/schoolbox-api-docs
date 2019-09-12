@@ -36,6 +36,10 @@ class Notifier extends ResourceNotifier
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null): Envelope
     {
+        if (!$file->getFolder()) {
+            return new Envelope();
+        }
+
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());
         } catch (Exception $e) {
