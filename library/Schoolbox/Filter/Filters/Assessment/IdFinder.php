@@ -293,7 +293,7 @@ class IdFinder extends Filter\AbstractIdFinder
         ?Collection $uImpSpcIds,
         ?Collection $teacherFolderIds,
         ?Collection $studentFolderIds,
-        ?Collection $readableFolderIds = null,
+        ?Collection $readableFolderIds,
         ?Collection $projectIds,
         ?Collection $unitImplIds,
         ?Collection $unitSpecIds,
