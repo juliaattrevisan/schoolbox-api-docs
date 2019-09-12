@@ -22,30 +22,24 @@ class Sync extends Base implements ISync
     {
         $query = "
             SELECT
-                u.synergy_id         AS student_id,
-                u.username           AS network_login,
-                u.title              AS student_title,
-                u.firstname          AS student_given_name,
-                u.firstname          AS student_preferred,
-                u.lastname           AS student_surname,
-                ''                   AS student_gender,
-                ''                   AS student_home_email,
-                ''                   AS student_default_email,
-                ''                   AS student_work_email,
-                u.year               AS student_year_level,
-                h.house              AS student_house,
-                r.name               AS student_boarder,
-                r.name               AS student_boarding_house,
-                c.ext_timetable_code AS student_campus
-            FROM `user` `u`
-            LEFT  JOIN house h              ON u.house = h.id
-            LEFT  JOIN luResidentialHouse r ON u.residential_house_id = r.id
-            INNER JOIN userCampus uc        ON u.id = uc.uid
-            INNER JOIN luCampus c           ON uc.campus = c.id
-            INNER JOIN `groups` g           ON u.group_id = g.id
-            WHERE u.enabled IS TRUE
-            AND   g.group_type = 'student'
-            ORDER BY u.synergy_id ASC
+                sup.external_id                             AS student_id,
+                sups.username                               AS network_login,
+                sup.title                                   AS student_title,
+                sup.firstname                               AS student_given_name,
+                sup.firstname                               AS student_preferred,
+                sup.lastname                                AS student_surname,
+                sups.gender                                 AS student_gender,
+                sups.email                                  AS student_home_email,
+                sups.email                                  AS student_default_email,
+                sups.email                                  AS student_work_email,
+                sups.year_level                             AS student_year_level,
+                sups.house_name                             AS student_house,
+                sups.boarding_status                        AS student_boarder,
+                ''                                          AS student_boarding_house,
+                sups.campus_name                            AS student_campus
+            FROM        `sis_user_profile` `sup`
+            JOIN        `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
+            ORDER BY    sup.external_id ASC
         ";
 
         return new Iterator\Student(
@@ -58,36 +52,31 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
-        $query = "
+        $query = '
             SELECT
-                p.username           AS student_contact_network_login,
-                p.synergy_id         AS student_contact_id,
-                p.title              AS student_contact_title,
-                p.firstname          AS student_contact_given_name,
-                p.firstname          AS student_contact_preferred,
-                p.lastname           AS student_contact_surname,
-                ''                   AS student_contact_home_email,
-                ''                   AS student_contact_default_email,
-                ''                   AS student_contact_work_email,
-                s.synergy_id         AS student_id,
-                s.year               AS student_year_level,
-                c.ext_timetable_code AS student_campus,
-                h.house              AS student_house,
-                ''                   AS student_gender,
-                s.firstname          AS student_preferred,
-                s.lastname           AS student_surname
-            FROM `user` `p`
-            INNER JOIN `groups` pg        ON p.group_id = pg.id
-            LEFT  JOIN user_relation `ur` ON p.id = ur.user_id
-            LEFT  JOIN `user` `s`         ON ur.relation_id = s.id
-            LEFT  JOIN userCampus uc      ON s.id = uc.uid
-            LEFT  JOIN luCampus c         ON uc.campus = c.id
-            LEFT  JOIN house h            ON s.house = h.id
-            WHERE p.enabled IS TRUE
-            AND   s.enabled IS TRUE
-            AND   pg.group_type = 'parent'
-            ORDER BY p.synergy_id ASC
-        ";
+                supp.username       AS student_contact_network_login,
+                parent.external_id  AS student_contact_id,
+                parent.title        AS student_contact_title,
+                parent.firstname    AS student_contact_given_name,
+                parent.firstname    AS student_contact_preferred,
+                parent.lastname     AS student_contact_surname,
+                supp.email          AS student_contact_home_email,
+                supp.email          AS student_contact_default_email,
+                supp.email          AS student_contact_work_email,
+                child.external_id   AS student_id,
+                sups.year_level     AS student_year_level,
+                sups.campus_name    AS student_campus,
+                sups.house_name     AS student_house,
+                sups.gender         AS student_gender,
+                child.firstname     AS student_preferred,
+                child.lastname      AS student_surname
+            FROM    `sis_user_profile` `child`
+            JOIN    sis_user_profile_student sups on child.id = sups.sis_user_profile_id
+            JOIN    sis_user_profile_relation supr ON child.id = supr.child_profile_id
+            JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
+            JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+            ORDER BY parent.external_id ASC
+        ';
 
         return new Iterator\Guardian(
             $this->databaseExternal->getQueryIterator($query)
@@ -100,31 +89,28 @@ class Sync extends Base implements ISync
     public function findAllStaff()
     {
         $query = "
-            SELECT
-                u.synergy_id         AS staff_id,
-                u.username           AS network_login,
-                u.enabled            AS active_flag,
-                u.title              AS staff_title,
-                u.firstname          AS staff_given_name,
-                u.firstname          AS staff_preferred_name,
-                u.lastname           AS staff_surname,
-                ''                   AS home_email,
-                u.alt_email          AS default_email,
-                ''                   AS work_email,
-                c.ext_timetable_code AS staff_campus,
-                ''                   AS staff_category_type,
-                ''                   AS staff_category,
-                ''                   AS staff_house,
-                ''                   AS staff_department,
-                u.year               AS staff_year_level,
-                ''                   AS staff_year_level_description                
-                
-            FROM `user` `u`
-            INNER JOIN userCampus uc        ON u.id = uc.uid
-            INNER JOIN luCampus c           ON uc.campus = c.id
-            INNER JOIN `groups` g           ON u.group_id = g.id
-            WHERE g.group_type = 'staff'
-            ORDER BY u.synergy_id ASC
+            SELECT    sup.external_id        AS staff_id,
+                      sups.username          AS network_login,
+                      ''                     AS active_flag,
+                      sup.title              AS staff_title,
+                      sup.firstname          AS staff_given_name,
+                      sup.firstname          AS staff_preferred_name,
+                      sup.lastname           AS staff_surname,
+                      sups.email             AS default_email_code,
+                      sups.email             AS home_email,
+                      sups.email             AS default_email,
+                      sups.email             AS work_email,
+                      sups.campus_name       AS staff_campus,
+                      ''                     AS staff_category_type,
+                      sups.category          AS staff_category,
+                      sups.position_title    AS staff_position,
+                      sups.department        AS staff_department,
+                      ''                     AS staff_year_level,
+                      ''                     AS staff_year_level_description,
+                      ''                     AS staff_house
+            FROM      `sis_user_profile` sup
+            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+            ORDER BY  sup.external_id ASC
         ";
 
         return new Iterator\Staff(
