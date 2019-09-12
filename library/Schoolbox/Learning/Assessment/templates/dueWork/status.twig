@@ -57,9 +57,7 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-    {% set pActionResponses  = routeLookup('learningDueWorkResponse.getParticularResponse',
-            routeArgs|merge({responseId: participant.findMostRecentInstructorGivenFeedback.getResponse.id})
-        )
+    {% set pActionResponses  = routeLookup('learningDueWorkResponse.getParticularResponse', routeArgs|merge({responseId: latestFeedback.response.id}))
     %}
 
     {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', routeArgs) %}
