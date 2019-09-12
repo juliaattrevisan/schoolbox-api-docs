@@ -13,7 +13,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 // Ensure parameters are correct
 
 $externalClass = new External_Synergetic_Class();
-$groupHandler = new Group();
 
 $class = $externalClass->getClass($_POST['classCode'], $_SESSION['user']);
 
@@ -23,10 +22,6 @@ if (!$class) {
 
 if (!strlen($_POST['attendanceDate'])) {
     error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
-}
-
-if (!is_numeric(preg_replace('/[^0-9]+/', '', $_POST['attendancePeriod']))) {
-    error(ErrorMapper::ERROR_ATTENDANCE_PAST);
 }
 
 // Selected date for which to deal with attendances
@@ -56,74 +51,106 @@ if (!$_SESSION['user']->getRole()->isStaff()) {
 
 // Attendance Period
 
-$attendancePeriod = $_POST['attendancePeriod'];
+$attendancePeriods = $_POST['attendancePeriod'];
 $attendanceDay = $_POST['attendanceDay'];
 $timetableGroup = $_POST['timetableGroup'];
 
 // Deal with it all
-try {
 
-    $externalUserHandler = new External_User();
-
-    $attendanceHandler = new External_Synergetic_Attendance(
-        $class,
-        $attendanceDate,
-        $attendanceDay,
-        $attendancePeriod,
-        $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
-        $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
-        $_SESSION['user']->getExternalId(),
-        $timetableGroup
-    );
-
-} catch (ExternalException $e) {
-    error(ErrorMapper::ERROR_ATTENDANCE_LIST);
-}
-
-// Create everyone's attendance initially
-
-if (is_array($_POST['studentID'])) {
-
-    // This is a pretty hollow shell of a class, it just contains the mssql instance and a query to insert/update
-
-    $attendanceRecord = new Attendance_Synergetic_AttendanceRecord();
-
-    // Then if you could do that, save each person
-
-    if (is_array($_POST['attending'])) {
-        $attending = $_POST['attending'];
-    } else {
-        $attending = [];
+foreach ($attendancePeriods as $attendancePeriod) {
+    // Attendance period must be numeric, otherwise... say it's in the past?
+    // Just copying what was here before.
+    if (!is_numeric(preg_replace('/[^0-9]+/', '', $attendancePeriod))) {
+        error(ErrorMapper::ERROR_ATTENDANCE_PAST);
     }
 
-    for ($i = 0; $_POST['studentID'][$i]; $i++) {
+    try {
 
-        // Create a new record
+        $externalUserHandler = new External_User();
 
-        $data = [
-            'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
-            'ID' => $_POST['studentID'][$i],
-            'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
-            'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
-            'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
-            'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
-        ];
+        $attendanceHandler = new External_Synergetic_Attendance(
+            $class,
+            $attendanceDate,
+            $attendanceDay,
+            $attendancePeriod,
+            $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
+            $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
+            $_SESSION['user']->getExternalId(),
+            $timetableGroup
+        );
 
-        if ($_POST['LateArrivalTime'][$i]) {
-            $data['LateArrivalFlag'] = 1;
-            $data['LateArrivalTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['LateArrivalTime'][$i])));
-        }
-
-        if ($_POST['EarlyDepartureTime'][$i]) {
-            $data['EarlyDepartureFlag'] = 1;
-            $data['EarlyDepartureTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['EarlyDepartureTime'][$i])));
-        }
-
-        $attendanceRecord->update($data);
+    } catch (ExternalException $e) {
+        error(ErrorMapper::ERROR_ATTENDANCE_LIST);
     }
 
-    if (!$attendanceHandler->getAttendanceMaster()->save()) {
-        error(ErrorMapper::ERROR_ATTENDANCE_SAVE);
+    // Find period, so I can ensure I don't save something outside the class' time
+    $periodDefinition = $attendanceHandler->getAttendanceMaster()->findTimetablePeriod();
+    $periodStart      = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeFrom']))->getDatabaseTime();
+    $periodEnd        = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeTo']))->getDatabaseTime();
+
+    // Create everyone's attendance initially
+
+    if (is_array($_POST['studentID'])) {
+
+        // This is a pretty hollow shell of a class, it just contains the mssql instance and a query to insert/update
+
+        $attendanceRecord = new Attendance_Synergetic_AttendanceRecord();
+
+        // Then if you could do that, save each person
+
+        if (is_array($_POST['attending'])) {
+            $attending = $_POST['attending'];
+        } else {
+            $attending = [];
+        }
+
+        for ($i = 0; $_POST['studentID'][$i]; $i++) {
+
+            // Create a new record
+
+            $data = [
+                'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
+                'ID' => $_POST['studentID'][$i],
+                'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
+                'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
+                'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
+                'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
+            ];
+
+
+            // Arrival/Departure for multi-period classes
+            if ($_POST['LateArrivalTime'][$i]) {
+                // if this period starts after the late arrival,
+                // don't mark them as late
+                $arrival     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['LateArrivalTime'][$i])));
+                $arrivalTime = $arrival->getDatabaseTime();
+                if ($arrivalTime > $periodEnd) {
+                    $data['AttendedFlag'] = 0;
+                } elseif ($arrivalTime >= $periodStart) {
+                    $data['LateArrivalFlag'] = 1;
+                    $data['LateArrivalTime'] = $arrival->getDatabase();
+                }
+            }
+
+            if ($_POST['EarlyDepartureTime'][$i]) {
+                // if this period starts before the early departure,
+                // don't mark them as leaving early
+                $departure     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['EarlyDepartureTime'][$i])));
+                $departureTime = $departure->getDatabaseTime();
+                if ($departureTime < $periodStart) {
+                    $data['AttendedFlag'] = 0;
+                } elseif ($departureTime <= $periodEnd) {
+                    $data['EarlyDepartureFlag'] = 1;
+                    $data['EarlyDepartureTime'] = $departure->getDatabase();
+                }
+            }
+
+            $attendanceRecord->update($data);
+        }
+
+        if (!$attendanceHandler->getAttendanceMaster()->save()) {
+            error(ErrorMapper::ERROR_ATTENDANCE_SAVE);
+        }
     }
 }
 

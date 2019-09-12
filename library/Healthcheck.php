@@ -653,6 +653,7 @@ class Healthcheck
             'spiwkAttendances',
             'spswkAttendances',
             'sptwkAttendances',
+            'spsTimetableDefinition',
             'spiExcursions',
             'spuExcursionDetails',
             'spiCommunityEventsCurrent',

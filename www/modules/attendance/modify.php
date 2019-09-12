@@ -43,14 +43,22 @@ $configLoader = new Config();
 if (!$configLoader->get('external_attendance')) {
     $this->pageNotFound();
 }
+
 // Ensure correct parameter count
 if (count($this->arg) < 3) {
     $this->error(ErrorMapper::ERROR_CLASS_CODE_DATE_PERIOD);
 }
 
+// Finagle path parameters
+[$classCampus, $classCode, $date, $attendancePeriods, $timetableGroup] = $this->arg;
+$classCode         = urldecode(urldecode(urldecode($classCode)));
+$attendancePeriods = explode(',', $attendancePeriods);
+
+// Finagle PHPLib
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
+$this->setBlock(TEMPLATE_content, 'attendance_period', 'attendance_period_block');
 
 // Dropdowns and such for each student
 
@@ -65,28 +73,30 @@ $externalClass = new External_Synergetic_Class();
 $externalTimetable = new External_Timetable();
 $externalUserHandler = new External_User();
 
-if ($this->arg[0]) {
-    $class = $externalClass->getClass($this->arg[0] . '/' . urldecode(urldecode(urldecode($this->arg[1]))), $_SESSION['user']);
+if ($classCampus) {
+    $class = $externalClass->getClass($classCampus . '/' . $classCode, $_SESSION['user']);
 } else {
-    $class = $externalClass->getClass(urldecode(urldecode(urldecode($this->arg[1]))), $_SESSION['user']);
+    $class = $externalClass->getClass($classCode, $_SESSION['user']);
 }
 
 if (!$class) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
-if (!strlen($this->arg[2])) {
+if (!strlen($date)) {
     $this->error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
-if (!preg_match('/^\d+$/', $this->arg[3]) || $this->arg[3] < 0 || $this->arg[3] > 100) {
-    $this->error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
+foreach ($attendancePeriods as $attendancePeriod) {
+    if ($attendancePeriod < 0 || $attendancePeriod > 100 || !preg_match('/^\d+$/', $attendancePeriod)) {
+        $this->error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
+    }
 }
 
 // Selected date for which to deal with attendances check that you are allowed to edit something in a particular date range (You cannot edit anything
 // older than the previous week)
 
-$attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
+$attendanceDate = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 if (!$attendanceDate->isValid()) {
     $this->error(ErrorMapper::ERROR_DATE_FORMAT);
 }
@@ -112,15 +122,15 @@ if (!$_SESSION['user']->getRole()->isStaff()) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
-// Attendance Period
-
-$attendancePeriod = $this->arg[3];
+// Attendance Periods
+$firstPeriod = (int)reset($attendancePeriods);
+$lastPeriod  = (int)end($attendancePeriods);
 
 // Check selected campus is one of users campus
 
 try {
     /** @var Campus $selectedCampus */
-    $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $this->arg[4]);
+    $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $timetableGroup);
 } catch (MapperException $e) {
     error(ErrorMapper::ERROR_CAMPUS_CODE);
 }
@@ -135,11 +145,11 @@ $definition = $externalTimetable->getTimetableDefinition(
     $timetableDay
 );
 
-$periods = array_keys($definition['number'], $attendancePeriod);
-$startTime = $definition['start'][$periods[0]];
-$endTime = $definition['end'][$periods[0]];
-$periodName = $definition['desc'][$periods[0]];
-$timetableGroup = $this->arg[4];
+$firstPeriodNumber = array_search($firstPeriod, $definition['number'], true);
+$lastPeriodNumber  = array_search($lastPeriod, $definition['number'], true);
+$startTime   = $definition['start'][$firstPeriodNumber];
+$endTime     = $definition['end'][$lastPeriodNumber];
+$periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);
 
 if ($class) {
 
@@ -153,11 +163,16 @@ if ($class) {
             'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
             'ATTENDANCE_DAY' => $timetableDay,
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
-            'ATTENDANCE_PERIOD' => $attendancePeriod,
-            'ATTENDANCE_PERIOD_LONG' => Scrub::text($periodName),
-            'TIMETABLE_GROUP' => $timetableGroup
+            'ATTENDANCE_PERIOD_LONG' => Scrub::text(implode(' to ', $periodNames)),
+            'TIMETABLE_GROUP' => $timetableGroup,
+            'attendance_period_block' => '',
         )
     );
+
+    foreach ($attendancePeriods as $attendancePeriod) {
+        $this->setVar('ATTENDANCE_PERIOD', $attendancePeriod);
+        $this->parse('attendance_period_block', 'attendance_period', true);
+    }
 
     // Get the attendance record for this class
 
@@ -165,18 +180,44 @@ if ($class) {
 
     try {
 
-        $attendanceHandler = new External_Synergetic_Attendance(
-            $class,
-            $attendanceDate,
-            $timetableDay,
-            $attendancePeriod,
-            $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
-            $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
-            $_SESSION['user']->getExternalId(),
-            $timetableGroup
-        );
+        // Glue the records for all periods together.
+        // TODO make External_Synergetic_Attendance accept multiple periods
+        $allStudents = [];
+        foreach ($attendancePeriods as $attendancePeriod) {
+            $attendanceHandler = new External_Synergetic_Attendance(
+                $class,
+                $attendanceDate,
+                $timetableDay,
+                $attendancePeriod,
+                $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
+                $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
+                $_SESSION['user']->getExternalId(),
+                $timetableGroup
+            );
+            $allStudentsTemp = $attendanceHandler->findAttendanceRecords();
+            $allStudentsTemp = array_combine(
+                array_column($allStudentsTemp, 'ID'),
+                $allStudentsTemp
+            );
+            foreach ($allStudentsTemp as $id => $student) {
+                // Set base student record
+                if (!isset($allStudents[$id])) {
+                    $allStudents[$id] = $student;
+                }
 
-        $allStudents = $attendanceHandler->findAttendanceRecords();
+                // Override late arrival / early departure if set
+                if ($student['LateArrivalFlag']) {
+                    $allStudents[$id]['AttendedFlag']    = 1;
+                    $allStudents[$id]['LateArrivalFlag'] = 1;
+                    $allStudents[$id]['LateArrivalTime'] = $student['LateArrivalTime'];
+                }
+                if ($student['EarlyDepartureFlag']) {
+                    $allStudents[$id]['AttendedFlag']       = 1;
+                    $allStudents[$id]['EarlyDepartureFlag'] = 1;
+                    $allStudents[$id]['EarlyDepartureTime'] = $student['EarlyDepartureTime'];
+                }
+            }
+        }
 
     } catch (ExternalException $e) {
         error(ErrorMapper::ERROR_ATTENDANCE_LIST);

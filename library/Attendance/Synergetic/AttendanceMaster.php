@@ -27,8 +27,8 @@ class Attendance_Synergetic_AttendanceMaster
     /** @var string $classFileType The external file type of class (defined in SynergyOne.dbo.luFileYear) */
     protected $classFileType = 'A';
 
-    /** @var string $attendanceDate The date in `Y-m-d` of the class */
-    protected $attendanceDate = '';
+    /** @var string $attendanceDay The day number of the class date in `Y-m-d` of the class */
+    protected $attendanceDay = '';
 
     /** @var int $attendancePeriod The attendance period of the class */
     protected $attendancePeriod = -1;
@@ -38,6 +38,9 @@ class Attendance_Synergetic_AttendanceMaster
 
     /** @var int $fileSemester From the session, usually; but you can specify your own */
     protected $fileSemester = -1;
+
+    /** @var string $timetableGroup The campus for which we're marking attendance */
+    protected $timetableGroup = '';
 
     /** @var array $data All the keys will be put in here to make it compatible with the database query interface */
     protected $data = [];
@@ -70,9 +73,11 @@ class Attendance_Synergetic_AttendanceMaster
         $this->setClassCampus($class['ClassCampus']);
         $this->setClassCode($class['ClassCode']);
         $this->setClassFileType($class['FileType']);
+        $this->attendanceDay = $attendanceDay;
         $this->setAttendancePeriod($attendancePeriod);
         $this->setFileYear($fileYear);
         $this->setFileSemester($fileSemester);
+        $this->timetableGroup = $timetableGroup;
 
         // Get the attendance master sequence number
 
@@ -116,8 +121,37 @@ class Attendance_Synergetic_AttendanceMaster
             $this->setAttendanceMasterSeq($attendanceMasterSeq);
         } else {
             throw new SchoolboxException('Cannot setup attendance record. Unable to retrieve attendance sequence.');
-        }        
+        }
     }
+
+
+    /**
+     * Find the timetable period for this master record's day and period.
+     *
+     * Used for finding the time at which a period starts and ends, so that a
+     * record exceeding the start/end time of a double period is not saved.
+     *
+     * @return array
+     */
+    public function findTimetablePeriod(): ?array
+    {
+        $timetableDefinition = $this->connector->prepareStoredProcedure('spsTimetableDefinition');
+        $timetableDefinition->bindInputs([
+            'TimetableGroup' => $this->timetableGroup,
+            'FileYear'       => $this->fileYear,
+            'FileSemester'   => $this->fileSemester,
+            'DayNumber'      => $this->attendanceDay,
+            'FileType'       => $this->classFileType,
+        ]);
+        $timetableDefinition->execute();
+        foreach ($timetableDefinition->fetchAll() as $record) {
+            if ((int)$this->attendancePeriod === $record['PeriodNumber']) {
+                return $record;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Function to transfer data from work table to live tables, this
