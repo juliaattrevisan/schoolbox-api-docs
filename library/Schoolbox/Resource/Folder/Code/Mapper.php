@@ -10,7 +10,9 @@ namespace Schoolbox\Resource\Folder\Code;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use function array_unique;
 
 /**
  * @method Model createModel($idValue = null)
@@ -70,49 +72,46 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * Helper method for adding codes to all categories within this collection.
+     * Helper method for adding codes to all folders within this collection.
      *
-     * @todo Consider making this method generic to populate any collection
-     *
-     * @param Collection $collection A list of categories, or objects
-     *                                      containing categories.
-     * @param callable $retrieve_function A callback for retrieving category
-     *                                      from each $category_collection.
+     * @param Collection $collection        A list of folders, or objects
+     *                                      containing folders.
+     * @param callable   $retrieve_function A callback for retrieving folder
+     *                                      from each collection item.
      *                                      If absent, assumes each member is a
-     *                                      Category object.
+     *                                      Folder object.
      *
      * @return void
+     * @throws \UnexpectedValueException
      */
-    public function applyCodesToCategories($collection, $retrieve_function = null)
+    public function applyCodesToCategories(Collection $collection, callable $retrieve_function = null): void
     {
-        $cat_id_list = array();
+        // Retrieve folder set
+        $retrieveFunction = $retrieve_function ?? static function ($item): Folder\Model { return $item; };
 
-        if (!is_callable($retrieve_function)) {
-            $retrieve_function = function ($item) {
-                return $item;
-            };
-        }
-
-        //
-        // Get each folder ID, and then get each code from the folder.
+        /** @var GenericCollection|Folder\Model[] $folders */
+        $folders = new GenericCollection(Folder\Model::class);
         foreach ($collection as $item) {
-            $cat_id_list[] = $retrieve_function($item)->getId();
-        }
-        $grouped_codes = array();
-        foreach ($this->findForCategories(array_unique($cat_id_list)) as $code) {
-            $grouped_codes[$code->getFolder()->getId()][] = $code;
+            $folders->add($retrieveFunction($item));
         }
 
-        //
-        // Add codes to each folder
-        foreach ($collection as $item) {
-            $folder = $retrieve_function($item);
-            $cat_id   = $folder->getId();
-            if (!empty($grouped_codes[$cat_id])) {
-                foreach ($grouped_codes[$cat_id] as $code) {
-                    $folder->addCode($code);
-                }
+        // Retrieve folder ids (don't assume they exist)
+        $folderIds = [];
+        foreach ($folders as $folder) {
+            if ($folder->getId()) {
+                $folderIds[] = $folder->getId();
             }
+        }
+
+        // Fetch folderCodes from DB and group by folder.id
+        $folderCodes = $this->findForCategories(array_unique($folderIds));
+        $folderCodesPerFolderId = $folderCodes->groupByCallback(static function (Model $folderCode) {
+            return $folderCode->getFolder()->getId();
+        });
+
+        // Apply to folders
+        foreach ($folders as $folder) {
+            $folder->setCodes($folderCodesPerFolderId->getOffset($folder->getId()) ?? $this->createCollection());
         }
     }
 
