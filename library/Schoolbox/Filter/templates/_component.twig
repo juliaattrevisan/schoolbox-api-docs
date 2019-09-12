@@ -35,7 +35,13 @@
             {# This intentionally sends an empty string, not an empty array. @see Codec::convertRequestToSelections() #}
             <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
         {% else %}
-            <div id="filter-component-{{ definition.filter.id }}" data-dropdown-content class="f-dropdown content" aria-hidden="true" tabindex="-1">
+            <div id="filter-component-{{ definition.filter.id }}"
+                 data-dropdown-content
+                 class="f-dropdown content"
+                 aria-hidden="true"
+                 tabindex="-1"
+                 aria-autoclose="false"
+            >
 
                 {% block userOptions %}
                     {% for selection in roleSelections %}
