@@ -466,7 +466,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         }
         /** @var Folder\Code\Mapper $code_mapper */
         $code_mapper = $cat_mapper->getJoinMapper('codes');
-        $code_mapper->applyCodesToCategories($collection,
+        $code_mapper->applyCodesToCategories(
+            $collection,
             static function (Activity $item): Folder\Model {
                 return $item->getCategory();
             }

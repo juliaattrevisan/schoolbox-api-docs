@@ -75,20 +75,18 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Helper method for adding codes to all folders within this collection.
      *
-     * @param Collection $collection        A list of folders, or objects
-     *                                      containing folders.
-     * @param callable   $retrieve_function A callback for retrieving folder
-     *                                      from each collection item.
-     *                                      If absent, assumes each member is a
-     *                                      Folder object.
-     *
+     * @param Collection    $collection       A list of folders, or objects containing folders.
+     * @param callable|null $retrieveFunction A callback for retrieving folder from each collection item.
+     *                                        If absent, assumes each member is a Folder object.
      * @return void
      * @throws \UnexpectedValueException
      */
-    public function applyCodesToCategories(Collection $collection, callable $retrieve_function = null): void
+    public function applyCodesToCategories(Collection $collection, callable $retrieveFunction = null): void
     {
         // Retrieve folder set
-        $retrieveFunction = $retrieve_function ?? static function ($item): Folder\Model { return $item; };
+        $retrieveFunction = $retrieveFunction ?? static function ($item): Folder\Model {
+                return $item;
+            };
 
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = new GenericCollection(Folder\Model::class);
