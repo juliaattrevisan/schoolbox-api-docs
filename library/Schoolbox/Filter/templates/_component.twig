@@ -12,20 +12,22 @@
 <li class="checklist item filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
     {% block scripts %}{% endblock %}
 
-    {% if isUserConfigurable %}
-        <span
-                {% if isEmpty %}class="no-option" title="No options available"{% endif %}
-                data-dropdown="filter-component-{{ definition.filter.id }}"
-                aria-controls="{{ definition.filter.id }}"
-                aria-expanded="false"
-                data-filter-name>
-            {%- block filterName %}{{ definition.name }}{% endblock -%}
+    {% block filterComponent %}
+        {% if isUserConfigurable %}
+            <span
+                    {% if isEmpty %}class="no-option" title="No options available"{% endif %}
+                    data-dropdown="filter-component-{{ definition.filter.id }}"
+                    aria-controls="{{ definition.filter.id }}"
+                    aria-expanded="false"
+                    data-filter-name>
+                {%- block filterName %}{{ definition.name }}{% endblock -%}
 
-            {%- if isDisabled -%}
-                <span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>
-            {%- endif -%}
-        </span>
-    {% endif %}
+                {%- if isDisabled -%}
+                    <span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>
+                {%- endif -%}
+            </span>
+        {% endif %}
+    {% endblock filterComponent %}
 
     {# Are any options available? #}
     {% if 0 == roleSelections | length %}
