@@ -14,6 +14,7 @@ use External_Markbook;
 use PDO;
 use PDOStatement;
 use Schoolbox;
+use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
@@ -466,8 +467,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         /** @var Folder\Code\Mapper $code_mapper */
         $code_mapper = $cat_mapper->getJoinMapper('codes');
         $code_mapper->applyCodesToCategories($collection,
-            function ($item) {
-                /** @var SubmissionBox $item */
+            static function (Activity $item): Folder\Model {
                 return $item->getCategory();
             }
         );
