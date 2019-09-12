@@ -34,8 +34,11 @@ class Component extends BaseComponent
     protected function buildUserSelections(GenericCollection $roleSelections)
     {
         $userSelections = $roleSelections->emptyClone();
-        foreach ($this->getUrlOverrides() as $urlOverride) {
-            // Find the selected folder
+        $urlOverrides   = $this->getUrlOverrides();
+        if (is_iterable($urlOverrides)) {
+            foreach ($urlOverrides as $urlOverride) {
+                // Find the selected folder
+            }
         }
         return $userSelections;
     }
