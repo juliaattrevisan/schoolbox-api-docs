@@ -24,11 +24,11 @@ $return = [];
 /** @var User $user */
 $user   = $_SESSION['user'];
 $access = Access::getInstance();
+$query  = $_GET['query'];
 
 // My classes
-// Just return them all: selectize will filter them
 foreach ($_SESSION['subjects'] as $subject) {
-    if ($subject['id']) {
+    if ($subject['id'] && mb_stripos($subject['name'], $query) !== false) {
         $return[$subject['id']] = [
             'id'       => $subject['id'],
             'name'     => $subject['name'],
@@ -43,15 +43,17 @@ foreach (SideMenuMapper::getInstance()->findGroupsForUser($user) as $group) {
     if (isset($return[$group['sid']])) {
         continue;
     }
-    $return[$group['sid']] = [
-        'id'       => $group['sid'],
-        'name'     => $group['name'],
-        'optgroup' => 'group',
-    ];
+    if (mb_stripos($group['name'], $query) !== false) {
+        $return[$group['sid']] = [
+            'id'       => $group['sid'],
+            'name'     => $group['name'],
+            'optgroup' => 'group',
+        ];
+    }
 }
 
 // Other folders
-foreach ($categoryMapper->searchByName($_GET['query']) as $currentResult) {
+foreach ($categoryMapper->searchByName($query) as $currentResult) {
     /** @var Folder\Model $currentResult */
     $folderId = $currentResult->getId();
     if (isset($return[$folderId])) {
