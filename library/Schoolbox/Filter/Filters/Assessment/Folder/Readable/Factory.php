@@ -53,15 +53,10 @@ class Factory extends FolderFilter\Factory
         array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
-        $options = $pageFilter->getOptions();
-
-        $getClasses = $options[Definition::KEY_CLASSES]->getAvailable();
-        $getGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
-
-        if ($getClasses || $getGroups) {
-            // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
-            $groupAccessLevel = $getGroups ? UserAccess::ACCESS_READ : UserAccess::ACCESS_FULL + 1;
-            $folders          = $this->getFolderMapper()->findForUser($user, $getClasses, $groupAccessLevel)->indexBy('id');
+        // Folders: just whatever is in the URL overrides for this filter
+        $thisOverrides = $overrides[$pageFilter->getFilter()->getId()] ?? null;
+        if ($thisOverrides instanceof Collection) {
+            $folders = $this->getFolderMapper()->findByColumn('id', $thisOverrides->getPropertyValues('key'));
         } else {
             $folders = $this->getFolderMapper()->createCollection();
         }
@@ -71,7 +66,7 @@ class Factory extends FolderFilter\Factory
             $user,
             $pageFilter,
             $selections,
-            $overrides[$pageFilter->getFilter()->getId()],
+            $thisOverrides,
             $this->getSelectionMapper(),
             $folders->sortBy('name', 'ASC')
         );
