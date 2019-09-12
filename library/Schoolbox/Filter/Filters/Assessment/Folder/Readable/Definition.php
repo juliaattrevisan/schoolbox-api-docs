@@ -36,26 +36,13 @@ class Definition extends FolderFilter\Definition
     }
 
     /**
+     * This filter has no custom keys.
+     *
      * @inheritdoc
      */
     protected function getCustomKeys(): array
     {
-        return [
-            self::KEY_CLASSES,
-            self::KEY_GROUPS,
-        ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function unsetInvalidOptions(Page\Model $pageFilter): GenericCollection
-    {
-        $options = parent::unsetInvalidOptions($pageFilter);
-
-        // TODO unset options which the current user doesn't have read perms on
-        return $options;
+        return [];
     }
 
 
