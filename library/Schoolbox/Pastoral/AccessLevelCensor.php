@@ -37,14 +37,15 @@ class AccessLevelCensor
      */
     public function filterRecordsForUser(Collection $records, User $user): Collection
     {
-        $resultCache = new Collection();
+        $resultCache     = new Collection();
+        $filteredRecords = Model::createCollection();
         foreach ($records as $idx => $record) {
             $filteredRecord = $this->filterRecordForUserRecursive($record, $user, $resultCache);
-            if (!$filteredRecord) {
-                $records->offsetUnset($idx);
+            if ($filteredRecord) {
+                $filteredRecords->add($filteredRecord);
             }
         }
-        return $records;
+        return $filteredRecords;
     }
 
 

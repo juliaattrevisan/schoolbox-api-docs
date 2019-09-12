@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright   Copyright 2019, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 declare(strict_types=1);
 
@@ -46,39 +46,36 @@ class AccessLevelCensorTest extends TestCase
      * Tests filtering the record, and related records
      *
      * @dataProvider providerRelatedRecordCollection
-     * @param string         $recordType
-     * @param Pastoral\Model $record
-     * @param User           $viewer
-     * @param int|null       $expectedRelatedCount
-     * @param int|null       $expectedCommentCount
-     * @param int|null       $expectedAttachmentCount
+     * @param string              $recordType
+     * @param Pastoral\Model      $originalRecord
+     * @param Pastoral\Model|null $expectedFilteredRecord
+     * @param User                $viewer
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function test_filterRecordsForUser(
         string $recordType,
-        Pastoral\Model $record,
-        User $viewer,
-        ?int $expectedRelatedCount,
-        ?int $expectedCommentCount,
-        ?int $expectedAttachmentCount
+        Pastoral\Model $originalRecord,
+        ?Pastoral\Model $expectedFilteredRecord,
+        User $viewer
     ): void {
         // Apply the filtering logic multiple times to check for idempotence
         for ($i = 0; $i < 10; $i++) {
-            $actual = $this->accessLevelCensor->filterRecordForUser($record, $viewer);
-            if ($expectedRelatedCount === null) {
-                $this->assertNull($actual);
+            $actualFilteredRecord = $this->accessLevelCensor->filterRecordForUser($originalRecord, $viewer);
+            if ($expectedFilteredRecord === null) {
+                $this->assertNull($actualFilteredRecord);
                 continue;
             }
-            $this->assertEquals($expectedRelatedCount, $actual->getRelatedRecords()->count(), "{$recordType} {$viewer->getUsername()} related records");
-            if ($expectedCommentCount === null) {
-                $this->assertEmpty($actual->getComments());
-            } else {
-                $this->assertEquals($expectedCommentCount, $actual->getComments()->count(), "{$recordType} {$viewer->getUsername()} comments");
-            }
-            if ($expectedAttachmentCount === null) {
-                $this->assertEmpty($actual->getAttachments());
-            } else {
-                $this->assertEquals($expectedAttachmentCount, $actual->getAttachments()->count(), "{$recordType} {$viewer->getUsername()} attachments");
-            }
+
+            // Compare the record itself
+            $diff = Pastoral\Mapper::getInstance()->diff($expectedFilteredRecord, $actualFilteredRecord);
+            $this->assertEmpty($diff, "{$recordType} {$viewer->getUsername()} pastoral record: " . count($diff));
+
+            // Compare related records
+            $diffRecords = $expectedFilteredRecord->getRelatedRecords()->diff($actualFilteredRecord->getRelatedRecords(),
+                function ($a, $b) {
+                    return empty(Pastoral\Mapper::getInstance()->diff($a, $b));
+                });
+            $this->assertEmpty($diffRecords, "{$recordType} {$viewer->getUsername()} related records: " . $diffRecords->count());
         }
     }
 
@@ -90,7 +87,7 @@ class AccessLevelCensorTest extends TestCase
      */
     public function providerRelatedRecordCollection(): array
     {
-        // (Pastoral\Model $record, User $user, bool $isNull, ?int $expectedRelatedCount)
+        // (string $recordType, Pastoral\Model $originalRecord, ?Pastoral\Model $expectedFilteredRecord, User $viewer)
         $data = [];
 
         // owner
@@ -109,27 +106,25 @@ class AccessLevelCensorTest extends TestCase
         $pastoralModerator->setAccessList($accessList)->setPastoralGroupsMemberships(PastoralGroupMember::createCollection());
 
         // prepare records without access
-        foreach ($this->buildRelatedRecordCollection($owner) as $record) {
-            $data[] = ['No access', $record, $noAccessUser, null, null, null];
-            $data[] = ['No access', $record, $pastoralModerator, 4, 2, 2];
-            $data[] = ['No access', $record, $owner, 3, 2, 2];
+        foreach ($this->buildRelatedRecordCollection($owner) as $records) {
+            $data[] = ['No access', $records['original'], null, $noAccessUser];
+            $data[] = ['No access', $records['original'], $records['moderator'], $pastoralModerator];
+            $data[] = ['No access', $records['original'], $records['owner'], $owner];
         }
 
         // prepare records with private/public access
         $testAccesses = $this->generateAccessData();
         // check each pastoral access
         foreach ($testAccesses as $testAccess) {
-            foreach ($this->buildRelatedRecordCollection($owner, $testAccess['pastoralAccess']) as $record) {
-                $data[] = [$testAccess['record'], $record, $noAccessUser, null, null, null];
-                $data[] = [$testAccess['record'], $record, $pastoralModerator, 4, 2, 2];
-                $data[] = [$testAccess['record'], $record, $owner, 3, 2, 2];
+            foreach ($this->buildRelatedRecordCollection($owner, $testAccess['pastoralAccess']) as $records) {
+                $data[] = [$testAccess['record'], $records['original'], null, $noAccessUser];
+                $data[] = [$testAccess['record'], $records['original'], $records['moderator'], $pastoralModerator];
+                $data[] = [$testAccess['record'], $records['original'], $records['owner'], $owner];
                 $data[] = [
                     $testAccess['record'],
-                    $record,
+                    $records['original'],
+                    $testAccess['privateAccess'] ? $records['private'] : $records['public'],
                     $testAccess['user'],
-                    $testAccess['expectedRelatedCount'],
-                    $testAccess['expectedCommentCount'],
-                    $testAccess['expectedAttachmentCount'],
                 ];
             }
         }
@@ -148,26 +143,74 @@ class AccessLevelCensorTest extends TestCase
      * @param PastoralAccess|null $pastoralAccess
      * @return GenericCollection|Pastoral\Model[]
      */
-    private function buildRelatedRecordCollection(User $owner, ?PastoralAccess $pastoralAccess = null): GenericCollection
+    private function buildRelatedRecordCollection(User $owner, ?PastoralAccess $pastoralAccess = null): array
     {
-        $recordA = $this->generateRecord('A', $owner, $pastoralAccess);
-        $recordB = $this->generateRecord('B', $owner, $pastoralAccess);
-        $recordC = $this->generateRecord('C', $owner, $pastoralAccess);
-        $recordD = $this->generateRecord('D', $owner, $pastoralAccess);
+        $recordA       = $this->generateRecord('A', $owner, $pastoralAccess);
+        $recordB       = $this->generateRecord('B', $owner, $pastoralAccess);
+        $recordC       = $this->generateRecord('C', $owner, $pastoralAccess);
+        $recordD       = $this->generateRecord('D', $owner, $pastoralAccess);
+        $recordAPublic = $this->filterPrivate($recordA);
+        $recordBPublic = $this->filterPrivate($recordB);
+        $recordCPublic = $this->filterPrivate($recordC);
+        $recordDPublic = $this->filterPrivate($recordD);
 
         // no owner record
-        $ownerX   = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STAFF));
-        $studentX = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT));
-        $recordX  = (new Pastoral\Model())->setHeading('X')->setId(9)->setOwner($ownerX)->setStudent($studentX);
+        $ownerX        = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STAFF));
+        $studentX      = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT));
+        $recordX       = (new Pastoral\Model())->setHeading('X')->setId(9)->setOwner($ownerX)->setStudent($studentX);
+        $recordXPublic = $this->filterPrivate($recordX);
 
-        $recordA->getRelatedRecords()->add($recordB)->add($recordC)->add($recordD)->add($recordX);
-        $recordB->getRelatedRecords()->add($recordA)->add($recordC)->add($recordD)->add($recordX);
-        $recordC->getRelatedRecords()->add($recordA)->add($recordB)->add($recordD)->add($recordX);
-        $recordD->getRelatedRecords()->add($recordA)->add($recordB)->add($recordC)->add($recordX);
+        $recordAForOwner = clone $recordA;
+        $recordA->setRelatedRecords(Pastoral\Model::createCollection()->add($recordB)->add($recordC)->add($recordD)->add($recordX));
+        $recordAForOwner->setRelatedRecords(Pastoral\Model::createCollection()->add($recordB)->add($recordC)->add($recordD));
+        $recordAPublic->setRelatedRecords(Pastoral\Model::createCollection()->add($recordBPublic)->add($recordCPublic)->add($recordDPublic));
 
-        return Pastoral\Model::createCollection()->add($recordA)->add($recordB)->add($recordC)->add($recordD);
+        $recordBForOwner = clone $recordB;
+        $recordB->setRelatedRecords(Pastoral\Model::createCollection()->add($recordA)->add($recordC)->add($recordD)->add($recordX));
+        $recordBForOwner->setRelatedRecords(Pastoral\Model::createCollection()->add($recordA)->add($recordC)->add($recordD));
+        $recordBPublic->setRelatedRecords(Pastoral\Model::createCollection()->add($recordAPublic)->add($recordCPublic)->add($recordDPublic));
+
+        $recordCForOwner = clone $recordC;
+        $recordC->setRelatedRecords(Pastoral\Model::createCollection()->add($recordA)->add($recordB)->add($recordD)->add($recordX));
+        $recordCForOwner->setRelatedRecords(Pastoral\Model::createCollection()->add($recordA)->add($recordB)->add($recordD));
+        $recordCPublic->setRelatedRecords(Pastoral\Model::createCollection()->add($recordAPublic)->add($recordBPublic)->add($recordDPublic));
+
+        $recordDForOwner = clone $recordD;
+        $recordD->setRelatedRecords(Pastoral\Model::createCollection()->add($recordA)->add($recordB)->add($recordC)->add($recordX));
+        $recordDForOwner->setRelatedRecords(Pastoral\Model::createCollection()->add($recordA)->add($recordB)->add($recordC));
+        $recordDPublic->setRelatedRecords(Pastoral\Model::createCollection()->add($recordAPublic)->add($recordBPublic)->add($recordCPublic));
+
+        return [
+            [
+                'original'  => $recordA,
+                'moderator' => $recordA,
+                'owner'     => $recordAForOwner,
+                'private'   => $recordAForOwner,
+                'public'    => $recordAPublic,
+            ],
+            [
+                'original'  => $recordB,
+                'moderator' => $recordB,
+                'owner'     => $recordBForOwner,
+                'private'   => $recordBForOwner,
+                'public'    => $recordBPublic,
+            ],
+            [
+                'original'  => $recordC,
+                'moderator' => $recordC,
+                'owner'     => $recordCForOwner,
+                'private'   => $recordCForOwner,
+                'public'    => $recordCPublic,
+            ],
+            [
+                'original'  => $recordD,
+                'moderator' => $recordD,
+                'owner'     => $recordDForOwner,
+                'private'   => $recordDForOwner,
+                'public'    => $recordDPublic,
+            ],
+        ];
     }
-
 
     /**
      * @var int random guid
@@ -186,6 +229,8 @@ class AccessLevelCensorTest extends TestCase
     {
         $student = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT));
         $record  = (new Pastoral\Model())->setHeading($name)->setId($this->guid++)->setOwner($owner)->setStudent($student)
+                                         ->setBodyPrivate('Private Body')
+                                         ->setBodyPublic('Private Body')
                                          ->setCreatedAt((new Alaress_Date_Format())::now())
                                          ->setUpdatedAt((new Alaress_Date_Format())::now());
         $record->setComments(
@@ -219,6 +264,35 @@ class AccessLevelCensorTest extends TestCase
         }
 
         return $record;
+    }
+
+    /**
+     * Filter out private comments and attachments from the given record, to generate expected public record
+     * @param Pastoral\Model $record
+     * @return Pastoral\Model
+     */
+    private function filterPrivate(Pastoral\Model $record): Pastoral\Model
+    {
+        $publicRecord = clone $record;
+
+        $publicComments = PastoralComment::createCollection();
+        foreach ($record->getComments() as $comment) {
+            if ($comment->isPublic()) {
+                $publicComments->add($comment);
+            }
+        }
+        $publicRecord->setComments($publicComments);
+
+        $publicAttachments = PastoralAttachment::createCollection();
+        foreach ($record->getAttachments() as $attachment) {
+            if ($attachment->isPublic()) {
+                $publicAttachments->add($attachment);
+            }
+        }
+        $publicRecord->setAttachments($publicAttachments);
+        $publicRecord->setBodyPrivate('');
+
+        return $publicRecord;
     }
 
     /**
@@ -258,52 +332,40 @@ class AccessLevelCensorTest extends TestCase
 
         return [
             [
-                'record'                  => 'Private user access',
-                'user'                    => $privateAccessUser,
-                'pastoralAccess'          => (new PastoralAccess())->setUser($privateAccessUser)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE),
-                'expectedRelatedCount'    => 3,
-                'expectedCommentCount'    => 2,
-                'expectedAttachmentCount' => 2,
+                'record'         => 'Private user access',
+                'user'           => $privateAccessUser,
+                'pastoralAccess' => (new PastoralAccess())->setUser($privateAccessUser)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE),
+                'privateAccess'  => true,
             ],
             [
-                'record'                  => 'Public user access',
-                'user'                    => $publicAccessUser,
-                'pastoralAccess'          => (new PastoralAccess())->setUser($publicAccessUser)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
-                'expectedRelatedCount'    => 3,
-                'expectedCommentCount'    => 1,
-                'expectedAttachmentCount' => 1,
+                'record'         => 'Public user access',
+                'user'           => $publicAccessUser,
+                'pastoralAccess' => (new PastoralAccess())->setUser($publicAccessUser)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
+                'privateAccess'  => false,
             ],
             [
-                'record'                  => 'Private role access',
-                'user'                    => $privateAccessRoleUser,
-                'pastoralAccess'          => (new PastoralAccess())->setRole($privateAccessRole)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE),
-                'expectedRelatedCount'    => 3,
-                'expectedCommentCount'    => 2,
-                'expectedAttachmentCount' => 2,
+                'record'         => 'Private role access',
+                'user'           => $privateAccessRoleUser,
+                'pastoralAccess' => (new PastoralAccess())->setRole($privateAccessRole)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE),
+                'privateAccess'  => true,
             ],
             [
-                'record'                  => 'Public role access',
-                'user'                    => $publicAccessRoleUser,
-                'pastoralAccess'          => (new PastoralAccess())->setRole($publicAccessRole)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
-                'expectedRelatedCount'    => 3,
-                'expectedCommentCount'    => 1,
-                'expectedAttachmentCount' => 1,
+                'record'         => 'Public role access',
+                'user'           => $publicAccessRoleUser,
+                'pastoralAccess' => (new PastoralAccess())->setRole($publicAccessRole)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
+                'privateAccess'  => false,
             ],
             [
-                'record'                  => 'Private group access',
-                'user'                    => $privateAccessGroupUser,
-                'pastoralAccess'          => (new PastoralAccess())->setGroup($privateAccessGroup)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE),
-                'expectedRelatedCount'    => 3,
-                'expectedCommentCount'    => 2,
-                'expectedAttachmentCount' => 2,
+                'record'         => 'Private group access',
+                'user'           => $privateAccessGroupUser,
+                'pastoralAccess' => (new PastoralAccess())->setGroup($privateAccessGroup)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE),
+                'privateAccess'  => true,
             ],
             [
-                'record'                  => 'Public group access',
-                'user'                    => $publicAccessGroupUser,
-                'pastoralAccess'          => (new PastoralAccess())->setGroup($publicAccessGroup)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
-                'expectedRelatedCount'    => 3,
-                'expectedCommentCount'    => 1,
-                'expectedAttachmentCount' => 1,
+                'record'         => 'Public group access',
+                'user'           => $publicAccessGroupUser,
+                'pastoralAccess' => (new PastoralAccess())->setGroup($publicAccessGroup)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC),
+                'privateAccess'  => false,
             ],
         ];
 
