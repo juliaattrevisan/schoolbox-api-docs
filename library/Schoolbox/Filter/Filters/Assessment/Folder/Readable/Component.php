@@ -37,7 +37,8 @@ class Component extends BaseComponent
         $urlOverrides   = $this->getUrlOverrides();
         if (is_iterable($urlOverrides)) {
             foreach ($urlOverrides as $urlOverride) {
-                // Find the selected folder
+                $key                  = $urlOverride->getKey();
+                $userSelections[$key] = $this->createSelection($key, true);
             }
         }
         return $userSelections;
