@@ -23,9 +23,9 @@
     {% autoescape 'js' %}
     <script type="text/javascript">
         $(function () {
-            $('#filter-selector-readable').selectizeSelector({
-                // Somehow has to contain values already selected
-                value: {{ userSelectionsSelectize | json_encode | raw }},
+            var $filterSelector = $('#filter-selector-readable');
+            $filterSelector.selectizeSelector({
+                value: $.selectizeSelector.getValueFromSelect($filterSelector),
                 ajax: {
                     url:      '/ajax/findCategory.php',
                     type:     'GET',
@@ -70,8 +70,8 @@
             placeholder="Enter one or more folder names or class codes"
             data-selectize
     >
-        <optgroup label="Class" value="class">Class</optgroup>
-        <optgroup label="Group" value="group">Group</optgroup>
-        <optgroup label="Other" value="other">Other</optgroup>
+        {% for userSelection in userSelections %}
+            <option value="{{ userSelection.key }}" selected>Folder #{{ userSelection.key }}</option>
+        {% endfor %}
     </select>
 {% endblock %}
