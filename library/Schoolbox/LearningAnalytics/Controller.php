@@ -331,7 +331,9 @@ class Controller extends Base
         // Ensure we have folder codes
         /** @var FolderCodeMapper $codeMapper */
         $codeMapper = FolderCodeMapper::getInstance();
-        $codeMapper->applyCodesToCategories($courseImplementationFolders);
+        $codeMapper->applyCodesToCategories($courseImplementationFolders->filter(static function (Folder $folder) {
+            return $folder->getCodes() === null;
+        }));
 
         /** @var Term[]|GenericCollection $navigableTerms */
         $navigableTerms = TermMapper::getInstance()->findAll();
