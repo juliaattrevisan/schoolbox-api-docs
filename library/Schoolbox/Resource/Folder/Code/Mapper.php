@@ -85,8 +85,8 @@ class Mapper extends \Schoolbox\Mapper
     {
         // Retrieve folder set
         $retrieveFunction = $retrieveFunction ?? static function ($item): Folder\Model {
-                return $item;
-            };
+            return $item;
+        };
 
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = new GenericCollection(Folder\Model::class);
