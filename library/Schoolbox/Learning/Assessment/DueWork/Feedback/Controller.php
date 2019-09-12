@@ -109,7 +109,13 @@ class Controller extends Base
             : $participant->findMostRecentInstructorGivenFeedback();
 
         try {
-            $feedback = $this->processFeedback($participant, $post, $reviewRoute, $mostRecentFeedback);
+            $feedback = $this->processFeedback(
+                $participant,
+                $post,
+                $reviewRoute,
+                $mostRecentFeedback,
+                $participant->findMostRecentInstructorGivenFeedback()->getResponse()
+            );
 
             // Try to process a rubric.
             // If there was none, copy it from the last feedback
