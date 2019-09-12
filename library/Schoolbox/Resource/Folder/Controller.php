@@ -914,22 +914,46 @@ class Controller extends BaseController
      */
     public function getFolderSearch(): void
     {
-        $userClasses = $this->getSession()->get('subjects');
-        $userGroups  = $this->folderMapper->findForUser(
+        $userClassIds = array_map('intval', array_column($this->getSession()->get('subjects') ?? [], 'id'));
+        $userGroupIds = $this->folderMapper->findForUser(
             $this->getUser(),
             false,
             UserAccess::ACCESS_READ,
             false,
             true
-        );
+        )->getPropertyValues('id');
 
         $response = [];
         foreach ($this->folderMapper->searchByName($this->request->query->get('query')) as $folder) {
+            if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_READ) {
+                continue;
+            }
+
+            $optgroup   = null;
+            $breadcrumb = null;
+            if ($folder->isClass()) {
+                // My class, or someone else's?
+                $optgroup = in_array($folder->getId(), $userClassIds, true) ? 'class' : 'otherClass';
+            } elseif ($folder->isGroup()) {
+                // My group, or someone else's?
+                $optgroup = in_array($folder->getId(), $userGroupIds, true) ? 'group' : 'otherGroup';
+            } else {
+                // Show breadcrumbs for other folders,
+                // because many folders could have the same or similar names
+                $optgroup   = 'otherFolder';
+                $breadcrumb = $this->folderMapper->breadcrumb($folder)->map(static function (Folder\Model $v) {
+                    return [
+                        'id'   => $v->getId(),
+                        'name' => $v->getNameWithCodes(),
+                    ];
+                });
+            }
+
             $response[] = [
                 'id'         => $folder->getId(),
                 'name'       => $folder->getNameWithCodes(),
-                'optgroup'   => 'other',
-                'breadcrumb' => null,
+                'optgroup'   => $optgroup,
+                'breadcrumb' => $breadcrumb,
             ];
         }
 
