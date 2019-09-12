@@ -12,6 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use function array_filter;
 use function array_unique;
 
 /**
@@ -95,16 +96,8 @@ class Mapper extends \Schoolbox\Mapper
             $folders->add($retrieveFunction($item));
         }
 
-        // Retrieve folder ids (don't assume they exist)
-        $folderIds = [];
-        foreach ($folders as $folder) {
-            if ($folder->getId()) {
-                $folderIds[] = $folder->getId();
-            }
-        }
-
         // Fetch folderCodes from DB and group by folder.id
-        $folderCodes = $this->findForCategories(array_unique($folderIds));
+        $folderCodes            = $this->findForCategories(array_unique(array_filter($folders->getPropertyValues('id'))));
         $folderCodesPerFolderId = $folderCodes->groupByCallback(static function (Model $folderCode) {
             return $folderCode->getFolder()->getId();
         });
