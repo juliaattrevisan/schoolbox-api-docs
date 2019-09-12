@@ -904,4 +904,35 @@ class Controller extends BaseController
             'userAccess'          => $userAccess
         ]));
     }
+
+
+    /**
+     * Return a JSON list of groups which match the given query.
+     *
+     * @api GET /resource/folder/search
+     * @since 19.1.0
+     */
+    public function getFolderSearch(): void
+    {
+        $userClasses = $this->getSession()->get('subjects');
+        $userGroups  = $this->folderMapper->findForUser(
+            $this->getUser(),
+            false,
+            UserAccess::ACCESS_READ,
+            false,
+            true
+        );
+
+        $response = [];
+        foreach ($this->folderMapper->searchByName($this->request->query->get('query')) as $folder) {
+            $response[] = [
+                'id'         => $folder->getId(),
+                'name'       => $folder->getNameWithCodes(),
+                'optgroup'   => 'other',
+                'breadcrumb' => null,
+            ];
+        }
+
+        $this->response->content->set($this->buildJsonOutput($response));
+    }
 }

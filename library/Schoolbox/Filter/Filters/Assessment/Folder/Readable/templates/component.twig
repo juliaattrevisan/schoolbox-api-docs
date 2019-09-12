@@ -27,7 +27,7 @@
             $filterSelector.selectizeSelector({
                 value: $.selectizeSelector.getValueFromSelect($filterSelector),
                 ajax: {
-                    url:      '/ajax/findCategory.php',
+                    url:      '{{ routeLookup('folder.getFolderSearch') }}',
                     type:     'GET',
                     data:     {},
                     dataType: 'json'
