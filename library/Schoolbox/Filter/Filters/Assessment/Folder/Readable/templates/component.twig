@@ -19,10 +19,13 @@
 {% block userOptions %}
     <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
     <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
+    {% autoescape 'js' %}
     <script type="text/javascript">
         $(function () {
             $('#filter-selector-readable').selectizeSelector({
                 // Somehow has to contain values already selected
+                value: {{ userSelectionsSelectize | json_encode | raw }},
                 ajax: {
                     url:      '/ajax/findCategory.php',
                     type:     'GET',
@@ -58,6 +61,7 @@
             });
         });
     </script>
+    {% endautoescape %}
 
     <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
     <select id="filter-selector-readable"
