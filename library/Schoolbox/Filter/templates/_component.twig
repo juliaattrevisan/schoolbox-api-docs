@@ -8,9 +8,10 @@
 #}
 {% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
 {% set isEmpty    = (isUserConfigurable and 0 == roleSelections | length) %}
+{% set hasOptions = roleSelections | length > 0 %}
 
 <li class="checklist item filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
-    {% block scripts %}{% endblock %}
+    {% block scripts %}{% endblock scripts %}
 
     {% block filterComponent %}
         {% if isUserConfigurable %}
@@ -20,33 +21,33 @@
                     aria-controls="{{ definition.filter.id }}"
                     aria-expanded="false"
                     data-filter-name>
-                {%- block filterName %}{{ definition.name }}{% endblock -%}
+                {%- block filterName %}{{ definition.name }}{% endblock filterName -%}
 
                 {%- if isDisabled -%}
                     <span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>
                 {%- endif -%}
             </span>
         {% endif %}
+
+        {# Are any options available? #}
+        {% if not hasOptions %}
+            {# By default, no available concrete options would mean no entities ever match #}
+            {# This intentionally sends an empty string, not an empty array. @see Codec::convertRequestToSelections() #}
+            <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
+        {% else %}
+            <div id="filter-component-{{ definition.filter.id }}" data-dropdown-content class="f-dropdown content" aria-hidden="true" tabindex="-1">
+
+                {% block userOptions %}
+                    {% for selection in roleSelections %}
+                        {% include '@filters/_selectionCheckbox.twig' with {
+                            roleSelection:      selection,
+                            userSelection:      userSelections[selection.key],
+                            label:              definition.label(selection.key),
+                            disabled:           isDisabled
+                        } only %}
+                    {% endfor %}
+                {% endblock userOptions %}
+            </div>
+        {% endif %}
     {% endblock filterComponent %}
-
-    {# Are any options available? #}
-    {% if 0 == roleSelections | length %}
-        {# By default, no available concrete options would mean no entities ever match #}
-        {# This intentionally sends an empty string, not an empty array. @see Codec::convertRequestToSelections() #}
-        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-    {% else %}
-    <div id="filter-component-{{ definition.filter.id }}" data-dropdown-content class="f-dropdown content" aria-hidden="true" tabindex="-1">
-
-        {% block userOptions %}
-            {% for selection in roleSelections %}
-                {% include '@filters/_selectionCheckbox.twig' with {
-                    roleSelection:      selection,
-                    userSelection:      userSelections[selection.key],
-                    label:              definition.label(selection.key),
-                    disabled:           isDisabled
-                } only %}
-            {% endfor %}
-        {% endblock %}
-    </div>
-    {% endif %}
 </li>

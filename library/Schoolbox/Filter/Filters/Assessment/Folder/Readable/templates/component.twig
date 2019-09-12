@@ -10,7 +10,9 @@
 
 {# This component is never empty, for the purpose of selecting a folder #}
 {% block filterComponent %}
-    {% set isEmpty = false %}
+    {% set isEmpty    = false %}
+    {% set isDisabled = false %}
+    {% set hasOptions = true %}
     {{ parent() }}
 {% endblock filterComponent %}
 
