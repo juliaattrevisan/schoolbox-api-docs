@@ -27,9 +27,9 @@
                     attachedFile: "Please attach a file."
                 }
             });
-        $(document).on('click', '#upload', function () {
+        $('#cms-zone').on('success.attachzone', function(event, file) {
             $('#attachedFile-error').remove();
-        })
+        });
     });
 </script>
 <!-- END custom_head -->
