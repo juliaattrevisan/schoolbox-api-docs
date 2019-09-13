@@ -1,9 +1,7 @@
 <?php
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\Folder\Search;
@@ -17,10 +15,22 @@ use function in_array;
 
 class Controller extends BaseController
 {
-    /** @var Mapper */
+    private const FOLDER_TYPE_MY_CLASS     = 'class';
+    private const FOLDER_TYPE_MY_GROUP     = 'group';
+    private const FOLDER_TYPE_OTHER_CLASS  = 'otherClass';
+    private const FOLDER_TYPE_OTHER_GROUP  = 'otherGroup';
+    private const FOLDER_TYPE_OTHER_FOLDER = 'otherFolder';
+
+
+    /**
+     * @var Mapper
+     */
     private $folderMapper;
 
-    /** @var Access */
+
+    /**
+     * @var Access
+     */
     private $access;
 
 
@@ -59,23 +69,37 @@ class Controller extends BaseController
         )->getPropertyValues('id');
 
         $response = [];
+        $types    = (array)$this->request->query->get('types', []);
         foreach ($this->folderMapper->searchByName($this->request->query->get('query')) as $folder) {
             if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_READ) {
                 continue;
             }
 
-            $optgroup   = null;
-            $breadcrumb = null;
+            // Determine option group this folder belongs in
+            $optgroup = null;
             if ($folder->isClass()) {
                 // My class, or someone else's?
-                $optgroup = in_array($folder->getId(), $userClassIds, true) ? 'class' : 'otherClass';
+                $optgroup = in_array($folder->getId(), $userClassIds, true)
+                    ? self::FOLDER_TYPE_MY_CLASS
+                    : self::FOLDER_TYPE_OTHER_CLASS;
             } elseif ($folder->isGroup()) {
                 // My group, or someone else's?
-                $optgroup = in_array($folder->getId(), $userGroupIds, true) ? 'group' : 'otherGroup';
+                $optgroup = in_array($folder->getId(), $userGroupIds, true)
+                    ? self::FOLDER_TYPE_MY_GROUP
+                    : self::FOLDER_TYPE_OTHER_GROUP;
             } else {
-                // Show breadcrumbs for other folders,
-                // because many folders could have the same or similar names
-                $optgroup   = 'otherFolder';
+                $optgroup = self::FOLDER_TYPE_OTHER_FOLDER;
+            }
+
+            // Don't return folder if it's not in the list of types I asked for
+            if (!empty($types) && !in_array($optgroup, $types, true)) {
+                continue;
+            }
+
+            // Show breadcrumbs for other folders,
+            // because many folders could have the same or similar names
+            $breadcrumb = null;
+            if ($optgroup === self::FOLDER_TYPE_OTHER_FOLDER) {
                 $breadcrumb = $this->folderMapper->breadcrumb($folder)->map(static function (Folder\Model $v) {
                     return [
                         'id'   => $v->getId(),
