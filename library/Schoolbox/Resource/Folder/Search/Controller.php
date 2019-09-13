@@ -77,16 +77,14 @@ class Controller extends BaseController
 
             // Determine option group this folder belongs in
             $optgroup = null;
-            if ($folder->isClass()) {
-                // My class, or someone else's?
-                $optgroup = in_array($folder->getId(), $userClassIds, true)
-                    ? self::FOLDER_TYPE_MY_CLASS
-                    : self::FOLDER_TYPE_OTHER_CLASS;
+            if (in_array($folder->getId(), $userClassIds, true)) {
+                $optgroup = self::FOLDER_TYPE_MY_CLASS;
+            } elseif (in_array($folder->getId(), $userGroupIds, true)) {
+                $optgroup = self::FOLDER_TYPE_MY_GROUP;
+            } elseif ($folder->isClass()) {
+                $optgroup = self::FOLDER_TYPE_OTHER_CLASS;
             } elseif ($folder->isGroup()) {
-                // My group, or someone else's?
-                $optgroup = in_array($folder->getId(), $userGroupIds, true)
-                    ? self::FOLDER_TYPE_MY_GROUP
-                    : self::FOLDER_TYPE_OTHER_GROUP;
+                $optgroup = self::FOLDER_TYPE_OTHER_GROUP;
             } else {
                 $optgroup = self::FOLDER_TYPE_OTHER_FOLDER;
             }
