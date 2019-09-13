@@ -21,9 +21,7 @@ use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
 /**
  * @method static GenericCollection|Model[] createCollection()
@@ -528,60 +526,5 @@ class Model implements ISoftDeletable, IModel
         $this->revisions = $revisions;
 
         return $this;
-    }
-
-    /**
-     * Return the specified user's access level to this record
-     *
-     * Order of preference:
-     * 1. Pastoral Moderators and the record owner always have PRIVATE access
-     * 2. If any access rule applies DENY access, then access level is DENY
-     * 3. If no rules apply, then access level is DENY
-     * 4. Rules apply, and none apply DENY, return  max access level
-     *
-     * @param User $user Must have services, role, and pastoral group memberships hydrated
-     * @return int
-     */
-    public function getAccessLevel(User $user): int
-    {
-        // Owners and moderators get private access regardless of any other permission set
-        if ($this->isUserInPastoralService($user) || (int)$user->getId() === (int)$this->getOwner()->getId()) {
-            return PastoralAccessMapper::ACCESS_PRIVATE;
-        }
-
-        // Otherwise start with deny access, and work our way up the permission levels
-        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
-
-        foreach ($this->getAccess() as $access) {
-            $access->setPastoral($this);
-            $accessLevelCurrent = $access->getAccessLevel($user);
-
-            if ($accessLevelCurrent === null) {
-                // The access rule didn't apply to this user, continue to the next one
-                continue;
-            }
-
-            if ($accessLevelCurrent === PastoralAccessMapper::ACCESS_DENY) {
-                return PastoralAccessMapper::ACCESS_DENY;
-            }
-
-            // We want the highest access level
-            $accessLevel = max($accessLevel, $accessLevelCurrent);
-        }
-
-        return $accessLevel;
-    }
-
-
-    /**
-     * Does the given user have access to the pastoral service?
-     *
-     * @param User $user
-     *
-     * @return bool
-     */
-    protected function isUserInPastoralService(User $user)
-    {
-        return $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
     }
 }

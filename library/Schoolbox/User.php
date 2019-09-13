@@ -19,7 +19,6 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
-use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -1407,23 +1406,17 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return '"' . $this->formatName() . '" <' . $this->getEmail() . '>';
     }
 
-
     /**
-     * @return GenericCollection|Pastoral\Group\Member\Model[]
+     * @return GenericCollection|Pastoral\Group\Member\Model[]|null
      */
-    public function getPastoralGroupsMemberships(): GenericCollection
+    public function getPastoralGroupsMemberships(): ?GenericCollection
     {
-        if (!$this->pastoralGroupsMemberships) {
-            throw new InsufficientHydrationException('group membership not set');
-        }
         return $this->pastoralGroupsMemberships;
     }
-
 
     /**
      * @param Collection|Pastoral\Group\Member\Model[] $pastoralGroupsMemberships
      * @return $this
-     * @throws DomainException
      */
     public function setPastoralGroupsMemberships(Collection $pastoralGroupsMemberships): self
     {

@@ -411,18 +411,13 @@ class Controller extends Base
             $record->setRevisions($this->pastoralRevisionDataSource->findForRecord($this->getUser(), $record));
         }
 
-        // Hydrate group members so we can display them in the visibility section
+        // Hydrate group members and their roles so we can display them in the visibility section
 
         foreach ($record->getAccess() as $access) {
             if ($access->getGroup() instanceof PastoralGroup) {
-                try {
-                    $access->setGroup(
-                        $this->pastoralGroupMapper->findById(
-                            $access->getGroup()->getId()
-                        )
-                    );
-                } catch (MapperException $e) {
-                    // Noop- group no longer exists
+                $this->pastoralGroupMapper->findById($access->getGroup()->getId());
+                foreach ($access->getGroup()->getMembers() as $member) {
+                    $this->userMapper->findById($member->getUser()->getId());
                 }
             }
         }
@@ -435,9 +430,9 @@ class Controller extends Base
 
         $access = [];
 
-        $accessLevelCensor = new AccessLevelCensor();
-        $access['public'] = $accessLevelCensor->getAccessLevel($record, $this->getUser()) > PastoralAccessMapper::ACCESS_DENY ;
-        $access['private'] = $accessLevelCensor->getAccessLevel($record, $this->getUser()) > PastoralAccessMapper::ACCESS_PUBLIC ;
+        $accessLevel       = (new AccessLevelCensor())->getAccessLevel($record, $this->getUser());
+        $access['public']  = $accessLevel > PastoralAccessMapper::ACCESS_DENY;
+        $access['private'] = $accessLevel > PastoralAccessMapper::ACCESS_PUBLIC;
 
         // Lets render this thing
 

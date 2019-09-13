@@ -9,6 +9,7 @@ namespace Schoolbox\Pastoral;
 
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -21,6 +22,21 @@ use function spl_object_hash;
  */
 class AccessLevelCensor
 {
+
+    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
+    private $pastoralGroupMemberMapper;
+
+    /**
+     * Gets PastoralGroupMemberMapper
+     * @return PastoralGroupMemberMapper
+     */
+    private function getPastoralGroupMemberMapper(): PastoralGroupMemberMapper
+    {
+        if ($this->pastoralGroupMemberMapper === null) {
+            $this->pastoralGroupMemberMapper = PastoralGroupMemberMapper::getInstance();
+        }
+        return $this->pastoralGroupMemberMapper;
+    }
 
     /**
      * Filters records and record content that the specified user is not permitted to view.
@@ -180,7 +196,6 @@ class AccessLevelCensor
         }
     }
 
-
     /**
      * Return the specified user's access level to this record
      *
@@ -202,8 +217,13 @@ class AccessLevelCensor
         if ($pastoralService || (int)$user->getId() === (int)$record->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
-        $groupsMemberships = \Schoolbox\Pastoral\Group\Member\Mapper::getInstance()->findByColumn('user_id', $user->getId());
-        $user->setPastoralGroupsMemberships($groupsMemberships);
+
+        // Hydrate group membership
+        if ($user->getPastoralGroupsMemberships() === null) {
+            $user->setPastoralGroupsMemberships(
+                $this->getPastoralGroupMemberMapper()->findByColumn('user_id', $user->getId())
+            );
+        }
 
         // Otherwise start with deny access, and work our way up the permission levels
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
