@@ -24,10 +24,10 @@ class Definition extends FolderFilter\Definition
     protected const NAME = 'Classes and Groups';
 
 
-    protected const KEY_MY_CLASSES    = 'myClasses';
-    protected const KEY_MY_GROUPS     = 'myGroups';
-    protected const KEY_OTHER_CLASSES = 'otherClasses';
-    protected const KEY_OTHER_GROUPS  = 'otherGroups';
+    public const KEY_MY_CLASSES    = 'myClasses';
+    public const KEY_MY_GROUPS     = 'myGroups';
+    public const KEY_OTHER_CLASSES = 'otherClasses';
+    public const KEY_OTHER_GROUPS  = 'otherGroups';
 
 
     /**

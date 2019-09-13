@@ -54,6 +54,11 @@ class Factory extends FolderFilter\Factory
         array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
+
+        // Folders: could be ANY and ALL groups or classes. Is this okay?
+        // TODO load the user's groups + classes
+        // TODO then if other groups + classes are enabled, load them
+
         // Folders: just whatever is in the URL overrides for this filter
         // (filtered to groups/classes only, and then by if user has read perms)
         $thisOverrides = $overrides[$pageFilter->getFilter()->getId()] ?? null;
