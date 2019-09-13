@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral;
 
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -92,7 +93,7 @@ class AccessLevelCensor
         $filteredRecord = clone $record;
 
         // Base case 2: User does not have access to this record
-        $accessLevel = $filteredRecord->getAccessLevel($user);
+        $accessLevel = $this->getAccessLevel($filteredRecord, $user);
         if (Access\Mapper::ACCESS_DENY === $accessLevel) {
             $resultCache[$objectHash] = null;
             return null;
@@ -165,7 +166,7 @@ class AccessLevelCensor
             return $comment;
         }
 
-        switch ($comment->getPastoral()->getAccessLevel($user)) {
+        switch ($this->getAccessLevel($comment->getPastoral(), $user)) {
             case Access\Mapper::ACCESS_PRIVATE:
                 // User's with private access can see all comments
                 return $comment;
@@ -177,5 +178,53 @@ class AccessLevelCensor
                 // All other users should not see the comment
                 return null;
         }
+    }
+
+
+    /**
+     * Return the specified user's access level to this record
+     *
+     * Order of preference:
+     * 1. Pastoral Moderators and the record owner always have PRIVATE access
+     * 2. If any access rule applies DENY access, then access level is DENY
+     * 3. If no rules apply, then access level is DENY
+     * 4. Rules apply, and none apply DENY, return  max access level
+     *
+     * @param Model $record
+     * @param User  $user Must have services, role, and pastoral group memberships hydrated
+     * @return int
+     */
+    public function getAccessLevel(Model $record, User $user): int
+    {
+        // Owners and moderators get private access regardless of any other permission set
+        $pastoralService = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
+
+        if ($pastoralService || (int)$user->getId() === (int)$record->getOwner()->getId()) {
+            return PastoralAccessMapper::ACCESS_PRIVATE;
+        }
+        $groupsMemberships = \Schoolbox\Pastoral\Group\Member\Mapper::getInstance()->findByColumn('user_id', $user->getId());
+        $user->setPastoralGroupsMemberships($groupsMemberships);
+
+        // Otherwise start with deny access, and work our way up the permission levels
+        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
+
+        foreach ($record->getAccess() as $access) {
+            $access->setPastoral($record);
+            $accessLevelCurrent = $access->getAccessLevel($user);
+
+            if ($accessLevelCurrent === null) {
+                // The access rule didn't apply to this user, continue to the next one
+                continue;
+            }
+
+            if ($accessLevelCurrent === PastoralAccessMapper::ACCESS_DENY) {
+                return PastoralAccessMapper::ACCESS_DENY;
+            }
+
+            // We want the highest access level
+            $accessLevel = max($accessLevel, $accessLevelCurrent);
+        }
+
+        return $accessLevel;
     }
 }

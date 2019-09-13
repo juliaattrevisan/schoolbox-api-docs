@@ -209,8 +209,6 @@ class Controller extends Base
             return strnatcasecmp($a->getGroup()->getName(), $b->getGroup()->getName());
         });
 
-        $user->setPastoralGroupsMemberships($groupsMemberships);
-
         $this->getResponse()->content->set([
             'template' => '@pastoral/index.twig',
             'data'     => [
@@ -259,8 +257,6 @@ class Controller extends Base
         // Create an audit record of anyone viewing a student record
         // Hydrate user with group membership
         $user              = $this->getUser();
-        $groupsMemberships = $this->pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
-        $user->setPastoralGroupsMemberships($groupsMemberships);
 
         $auditRecord = $this->pastoralAuditMapper->createModel();
         $auditRecord->setStudent($student);
@@ -439,8 +435,9 @@ class Controller extends Base
 
         $access = [];
 
-        $access['public'] = $record->getAccessLevel($this->getUser()) > PastoralAccessMapper::ACCESS_DENY ;
-        $access['private'] = $record->getAccessLevel($this->getUser()) > PastoralAccessMapper::ACCESS_PUBLIC ;
+        $accessLevelCensor = new AccessLevelCensor();
+        $access['public'] = $accessLevelCensor->getAccessLevel($record, $this->getUser()) > PastoralAccessMapper::ACCESS_DENY ;
+        $access['private'] = $accessLevelCensor->getAccessLevel($record, $this->getUser()) > PastoralAccessMapper::ACCESS_PUBLIC ;
 
         // Lets render this thing
 

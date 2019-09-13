@@ -49,6 +49,7 @@ class Model implements ISoftDeletable
      * Return the access level granted to the user via this access record
      *
      * Returns NULL if this record is not relevant for the specified user
+     * Consider using AccessLevelCensor::getAccessLevel instead
      *
      * @param User $user Must have Role and PastoralGroupMembership relations hydrated
      *

@@ -14,6 +14,7 @@ use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
@@ -189,9 +190,10 @@ class Notifier extends AbstractModuleNotifier
             }
         }
 
+        $accessLevelCensor = new AccessLevelCensor();
         foreach ($targetUsers as $userId => $user) {
             // make sure that multiple conditions allow user to access this record
-            if ($pastoral->getAccessLevel($user) === PastoralAccessMapper::ACCESS_DENY) {
+            if ($accessLevelCensor->getAccessLevel($pastoral, $user) === PastoralAccessMapper::ACCESS_DENY) {
                 continue;
             }
             $envelope->targetToUser($userId, $message);
