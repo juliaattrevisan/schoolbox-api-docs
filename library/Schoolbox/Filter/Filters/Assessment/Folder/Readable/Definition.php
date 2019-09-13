@@ -22,7 +22,7 @@ use Schoolbox\GenericCollection;
 class Definition extends FolderFilter\Definition
 {
     // The name to expose in the UI
-    protected const NAME = 'Folders';
+    protected const NAME = 'Classes and Groups';
 
 
     /**

@@ -8,6 +8,8 @@
 #}
 {% extends '@filterDefinitions/Assessment/Folder/templates/component.twig' %}
 
+{% block filterName %}Classes and Groups{% endblock %}
+
 {# This component is never empty, for the purpose of selecting a folder #}
 {% block filterComponent %}
     {% set isEmpty    = false %}
