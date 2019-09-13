@@ -449,8 +449,7 @@ class ReaderTest extends TestCase
 
 
     /**
-     * What happens when you give it a whole bunch of columns that aren't
-     * in the source csv itself
+     * What happens when you give it foreign languages?
      *
      * @throws \RuntimeException
      */
@@ -458,7 +457,7 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
 
-        $reader = (new Reader(__DIR__ . '/strangedata.csv', true, true))
+        $reader = (new Reader(__DIR__ . '/foreignChars.csv', true, true))
             ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
@@ -485,5 +484,73 @@ class ReaderTest extends TestCase
         ];
 
         $this->assertEquals($expected, $outcome);
+    }
+
+
+    /**
+     * What happens when you give it a csv file that's got mismatched columns?
+     * Most apps won't generate this situation, but if you're manually crafting csv data
+     * you might misplace a comma or two and you'll no longer have meaningfully formatted data
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testValidTooManyColumns()
+    {
+        $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
+
+        $reader = (new Reader(__DIR__ . '/tooManyColumns.csv', true, true))
+            ->setExpectedColumns($expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+    }
+
+
+    /**
+     * What happens when you give it a csv file that's got mismatched columns?
+     * Most apps won't generate this situation, but if you're manually crafting csv data
+     * you might misplace a comma or two and you'll no longer have meaningfully formatted data
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testValidNotEnoughColumns()
+    {
+        $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
+
+        $reader = (new Reader(__DIR__ . '/notEnoughColumns.csv', true, true))
+            ->setExpectedColumns($expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+    }
+
+
+    /**
+     * What happens when you give it a csv file that's got mismatched columns?
+     * Most apps won't generate this situation, but if you're manually crafting csv data
+     * you might misplace a comma or two and you'll no longer have meaningfully formatted data
+     *
+     * Blank rows can be caused by end-of-file shenanigans with too many newlines added
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testValidBlankLines()
+    {
+        $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
+
+        $reader = (new Reader(__DIR__ . '/blankLines.csv', true, true))
+            ->setExpectedColumns($expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
     }
 }

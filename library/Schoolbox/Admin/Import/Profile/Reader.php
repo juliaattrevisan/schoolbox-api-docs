@@ -294,9 +294,14 @@ class Reader implements \Iterator
      * the current row has empty/null gaps
      *
      * @return void
+     * @throws \InvalidArgumentException
      */
     private function preprocessSpecifiedColumns(): void
     {
+        if (\count($this->currentRow) !== \count($this->columnList)) {
+            throw new \InvalidArgumentException("Mismatching number of columns for row {$this->currentKey}\n");
+        }
+
         $combined = array_combine($this->columnList, $this->currentRow);
 
         /* We only care about the intersect between expectedColumns and csv columns
