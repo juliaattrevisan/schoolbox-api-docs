@@ -32,6 +32,11 @@ case "$1" in
         chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
+        # Clear cache directories
+        if [ -f /etc/schoolbox/conf.php ]; then
+            /usr/share/schoolbox/tools/clean-cache-dir.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        fi
+
         # Fix ownership and permissions of existing configuration.
         if [ -f /etc/schoolbox/conf.php ]; then
             chown root:www-data /etc/schoolbox/conf.php;
@@ -84,7 +89,6 @@ case "$1" in
         # Fix ownership and permissions of existing configuration.
         if [ -f /etc/schoolbox/conf.php ]; then
           /usr/bin/php /usr/share/schoolbox/tools/skin/builder.php --force 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-          /usr/share/schoolbox/tools/clean-cache-dir.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
           /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/cache 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         fi
     ;;
