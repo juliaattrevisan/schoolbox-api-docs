@@ -10,7 +10,6 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
 use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Filter\Page;
-use Schoolbox\GenericCollection;
 
 /**
  * Display a list of folders (either classes, groups or both) which the current
@@ -23,6 +22,12 @@ class Definition extends FolderFilter\Definition
 {
     // The name to expose in the UI
     protected const NAME = 'Classes and Groups';
+
+
+    protected const KEY_MY_CLASSES    = 'myClasses';
+    protected const KEY_MY_GROUPS     = 'myGroups';
+    protected const KEY_OTHER_CLASSES = 'otherClasses';
+    protected const KEY_OTHER_GROUPS  = 'otherGroups';
 
 
     /**
@@ -42,7 +47,12 @@ class Definition extends FolderFilter\Definition
      */
     protected function getCustomKeys(): array
     {
-        return [];
+        return [
+            self::KEY_MY_CLASSES,
+            self::KEY_MY_GROUPS,
+            self::KEY_OTHER_CLASSES,
+            self::KEY_OTHER_GROUPS,
+        ];
     }
 
 
@@ -61,10 +71,14 @@ class Definition extends FolderFilter\Definition
     public function getLabel(string $key): string
     {
         switch ($key) {
-            case self::KEY_CLASSES:
-                return 'Classes';
-            case self::KEY_GROUPS:
-                return 'Groups';
+            case self::KEY_MY_CLASSES:
+                return 'User\'s Classes';
+            case self::KEY_MY_GROUPS:
+                return 'User\'s Groups';
+            case self::KEY_OTHER_CLASSES:
+                return 'Other Classes';
+            case self::KEY_OTHER_GROUPS:
+                return 'Other Groups';
         }
         throw new InvalidArgumentException("Unknown FolderFilter key: '$key''");
     }
