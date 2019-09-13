@@ -414,6 +414,7 @@ class ReaderTest extends TestCase
         $this->assertEquals($expected, $outcome);
     }
 
+
     /**
      * What happens when you give it a whole bunch of columns that aren't
      * in the source csv itself
@@ -441,6 +442,46 @@ class ReaderTest extends TestCase
             ['catness evergreen' => null],
             ['catness evergreen' => null],
             ['catness evergreen' => null],
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+
+    /**
+     * What happens when you give it a whole bunch of columns that aren't
+     * in the source csv itself
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidForeignCharacters()
+    {
+        $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
+
+        $reader = (new Reader(__DIR__ . '/strangedata.csv', true, true))
+            ->setExpectedColumns($expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            [
+                'External ID' => 'Кошка',
+                'Firstname' => 'לשון הקודש',
+                'Lastname' => '日本語',
+                'Address' => 'Katti - han får unger',
+                'Phone' => 'eikö teillä ole'
+            ],
+            [
+                'External ID' => 'cat',
+                'Firstname' => 'לשון הקודש',
+                'Lastname' => 'Nihongo',
+                'Address' => 'Katti - han får unger',
+                'Phone' => 'don\'t you have it?'
+            ]
         ];
 
         $this->assertEquals($expected, $outcome);
