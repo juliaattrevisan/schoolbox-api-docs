@@ -127,6 +127,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return Model
      * @throws DefinitionException
      * @throws Exception
+     * @throws Exception\NotFound
      * @throws \PDOException
      */
     public function findByExternalId(string $externalId): Model
@@ -158,6 +159,6 @@ class Mapper extends \Schoolbox\Mapper
             }
         }
 
-        throw new Exception('Unknown profile.');
+        throw new Exception\NotFound('Unknown profile.');
     }
 }
