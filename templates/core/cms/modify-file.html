@@ -2,18 +2,34 @@
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('[data-delete]').click(function(event) {
+        $('[data-delete]').click(function (event) {
             event.preventDefault();
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this file?',
-                confirmEvent: function() {
+                confirmEvent: function () {
                     window.location = '/cms/fileForm.php?delete={FILE_ID}&redirect=/homepage/{CATEGORY_ID}';
                 }
             });
         });
-
-        $('#fileForm').alaressValidate();
+        $('#fileForm').alaressValidate(
+            {
+                rules: {
+                    attachedFile: {
+                        required: {
+                            depends: function (element) {
+                                return !$(element).parents('form').find('input[name="attachment[]"]').length;
+                            }
+                        }
+                    }
+                },
+                messages: {
+                    attachedFile: "Please attach a file."
+                }
+            });
+        $('#cms-zone').on('success.attachzone', function(event, file) {
+            $('#attachedFile-error').remove();
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -49,6 +65,7 @@
                         <label for="cms-zone" class="required">
                             Attach File
                         </label>
+                        <input type="hidden" name="attachedFile">
                         {ATTACH_ZONE}
                         <label>
                             Description
