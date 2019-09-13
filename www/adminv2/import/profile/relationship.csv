@@ -2,6 +2,6 @@ Role Type 1,External ID 1,Type,Role Type 2,External ID 2
 parent,321,Father,student,123
 parent,654,Mother,student,123
 parent,864,,student,123
-staff,321,Step Father,student,75323
+parent,321,Step Father,student,75323
 parent,864,Father,student,464773
 parent,865,Guardian,student,123
