@@ -27,9 +27,11 @@
             $filterSelector.selectizeSelector({
                 value: $.selectizeSelector.getValueFromSelect($filterSelector),
                 ajax: {
-                    url:      '{{ routeLookup('folder.getFolderSearch') }}',
+                    url:      '{{ routeLookup('folderSearch.getFolderSearch') }}',
                     type:     'GET',
-                    data:     {},
+                    data:     {
+                        types: ['class', 'group', 'otherClass', 'otherGroup']
+                    },
                     dataType: 'json'
                 },
                 multiple: true,

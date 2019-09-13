@@ -95,7 +95,6 @@ class Module extends BaseModule
         };
 
         $this->register('GET',    '/mygroups',                            'getGroups',        $loggedInAccess);
-        $this->register('GET',    '/folder/search',                       'getFolderSearch',  $loggedInAccess);
         $this->register('GET',    '/folder/{parentId:\d+}/create',        'getFolderCreate',  $parentWriteAccess, $preloadParent);
         $this->register('POST',   '/folder/{parentId:\d+}/create',        'postCreateFolder', $parentWriteAccess, $preloadParent);
         $this->register('GET',    '/folder/{id:\d+}/modify',              'getFolderModify',  $folderWriteAccess, $preloadFolder);

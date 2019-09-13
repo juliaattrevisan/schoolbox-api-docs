@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -35,6 +35,9 @@ class Resource implements ModuleConfigInterface
         $webDavBrowserModule->init('/drives');
 
         $folderModule = new \Schoolbox\Resource\Folder\Module($di);
-        $folderModule ->init('/resource');
+        $folderModule->init('/resource');
+
+        $folderSearchModule = new \Schoolbox\Resource\Folder\Search\Module($di);
+        $folderSearchModule->init('/resource/folder/search');
     }
-} 
+}
