@@ -55,13 +55,15 @@ class Factory extends FolderFilter\Factory
         GenericCollection $overrides
     ): Filter\IComponent {
         // Folders: just whatever is in the URL overrides for this filter
-        // (filtered by whether user can actually read that folder)
+        // (filtered to groups/classes only, and then by if user has read perms)
         $thisOverrides = $overrides[$pageFilter->getFilter()->getId()] ?? null;
         if ($thisOverrides instanceof Collection) {
             $folders = $this->getFolderMapper()
                 ->findByColumn('id', $thisOverrides->getPropertyValues('key'))
                 ->filter(function (FolderModel $folder) use ($user) {
-                    return $this->getAccess()->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
+                    return
+                        ($folder->isGroup() || $folder->isClass())
+                        && $this->getAccess()->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
                 });
         } else {
             $folders = $this->getFolderMapper()->createCollection();
