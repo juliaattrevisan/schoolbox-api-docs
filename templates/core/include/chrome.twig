@@ -72,10 +72,6 @@
             schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
             schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
             schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
-
-            $.datepicker.setDefaults({
-                dateFormat: dateDisplayFormats.datepicker
-            });
         </script>
         {% endautoescape %}
 
@@ -144,7 +140,7 @@
         {% set dockTitle = 'Pin side menu' %}
         {% set undockTitle = 'Unpin side menu' %}
         <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
-            <a 
+            <a
                 href="#"
                 title="{{ user.current.getHideSidenav ? dockTitle : undockTitle }}"
                 class="left-menu-dock"
@@ -174,7 +170,7 @@
                             </li>
                         </ul>
                     </div>
-                {% endif %}	
+                {% endif %}
             {% endblock accountMenuMobile %}
 
             {% block menuTopOffCanvas %}
