@@ -285,33 +285,39 @@
                 ref="fullCalendar"
                 :plugins="calendarPlugins"
                 :views="{
-                day: {
-                    titleFormat: dayTitleFormat,
-                    columnHeader: false,
-                    allDaySlot: false,
-                },
-                week: {
-                    columnHeaderFormat: formats.displayWeekDay,
-                    allDaySlot: false,
-                }
-            }"
+                    day: {
+                        titleFormat: dayTitleFormat,
+                        columnHeader: false,
+                        allDaySlot: false,
+                    },
+                    week: {
+                        columnHeaderFormat: formats.displayWeekDay,
+                        allDaySlot: false,
+                    }
+                }"
                 :event-time-format="helper.eventTimeFormat"
                 content-height="auto"
                 :custom-buttons="{
-                customExport: {
-                    text: 'export',
-                    click: onExportClick
-                },
-                customFilters: {
-                    text: 'filters',
-                    click: onFilterClick
-                },
-            }"
+                    customExport: {
+                        text: 'Export',
+                        click: onExportClick
+                    },
+                    customFilters: {
+                        text: 'Filters',
+                        click: onFilterClick
+                    },
+                }"
+                :buttonText="{
+                    today:    'Today',
+                    month:    'Month',
+                    week:     'Week',
+                    day:      'Day'
+                }"
                 :header="{
-                left: 'prev,today,next',
-                center: 'title',
-                right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
-            }"
+                    left: 'prev,today,next',
+                    center: 'title',
+                    right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                }"
                 :default-date="config.defaultDate"
                 :default-view="config.defaultView || 'dayGridMonth'"
                 :scroll-time="config.dateDisplayFormats.calendarStartTime"
