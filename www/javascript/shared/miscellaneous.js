@@ -7,10 +7,6 @@ $(function () {
         $(this).attr('target', '_blank');
     });
 
-    // jQuery datepickers: close on touchstart as well as mousedown
-    // (Fastclick stops mousedown from triggering?)
-    $(document).on('touchstart', $.datepicker._checkExternalClick);
-
     $('#infoPanel').find('a[data-menu]').flyout();
     $('#nav').touchMenu()
         .scrollToTop({
@@ -213,7 +209,7 @@ $(function () {
         // ^ have to check that the notfications bar isn't docked as well, if it is- it's not part of the #top-menu width
         var extraWidth = profileWidth + searchWidth + notificationsWidth;
 
-        // Store the width left in top nav after subtracting 
+        // Store the width left in top nav after subtracting
         var spaceLeft = $('#top-menu').width() - extraWidth;
 
         $('#top-menu > li').each(function(index) {
@@ -240,9 +236,9 @@ $(function () {
 
     /**
      * Show a top nav item, and hide from the sidebar
-     * 
-     * @param {boolean} show 
-     * @param {Object} $item 
+     *
+     * @param {boolean} show
+     * @param {Object} $item
      */
     function toggleTopNavItem(show, $item) {
         var itemId = $item.data('id');
