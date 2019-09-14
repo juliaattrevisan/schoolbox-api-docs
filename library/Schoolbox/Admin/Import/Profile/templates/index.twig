@@ -1,0 +1,154 @@
+<script type="text/javascript">
+    $(function() {
+        $('#uploadForm').alaressValidate({
+            messages: {
+                file: 'Please select a CSV type.'
+            }
+        });
+    });
+</script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>User Profiles</h1>
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form id="uploadForm" method="post" action="/adminv2/import/profile/upload">
+            <section class="content">
+                <p>
+                    These uploads will help you populate information about the people in your school.
+                    The user provisioning system may use these records to create and update accounts.
+                    In addition this information will be displayed on the user profile screen.
+                    The relationships will be used to link students to parents in the system.
+                </p>
+
+                <p>
+                    The file should be saved in CSV format. When you upload a file, all previous records
+                    of that type will be removed from the database so the CSV must contain the entire list
+                    of records. Any headings that do not match the supplied templates will cause an error.
+                </p>
+
+                <p>
+                    You may upload all the files in the same import, or you can upload them individually.
+                    However, relationships should always be imported last.
+                </p>
+            </section>
+
+            <div class="row" data-equalizer>
+                <div class="small-12 medium-4 island">
+                    <section>
+                        <div class="content" data-equalizer-watch>
+                            <h2>Students</h2>
+
+                            <p>
+                                All fields are required. If you don't provide a field, it will clear that field's data
+                                from every user profile. The fields must have the same heading as provided in the template
+                                but they are case-insensitive and order-insensitive.
+                                Any other field that you add will be ignored.
+                            </p>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="/adminv2/import/profile/student.csv" class="button">Download Student Template</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+                <div class="small-12 medium-4 island">
+                    <section>
+                        <div class="content" data-equalizer-watch>
+                            <h2>Staff</h2>
+                            <p>
+                                All fields are required. If you don't provide a field, it will clear that field's data
+                                from every user profile. The fields must have the same heading as provided in the template
+                                but they are case-insensitive and order-insensitive.
+                                Any other field that you add will be ignored.
+                            </p>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="/adminv2/import/profile/staff.csv" class="button">Download Staff Template</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+                <div class="small-12 medium-4 island">
+                    <section>
+                        <div class="content" data-equalizer-watch>
+                            <h2>Parents</h2>
+                            <p>
+                                All fields are required. If you don't provide a field, it will clear that field's data
+                                from every user profile. The fields must have the same heading as provided in the template
+                                but they are case-insensitive and order-insensitive.
+                                Any other field that you add will be ignored.
+                            </p>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="/adminv2/import/profile/parent.csv" class="button">Download Parent Template</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="row" data-equalizer>
+                <div class="small-12 medium-6 island">
+                    <section>
+                        <div class="content" data-equalizer-watch>
+                            <h2>Relationships</h2>
+                            <p>
+                                This file must contain a Relation ID and a Student ID. The Relation ID must match a parent
+                                record that has previously been uploaded. The Student ID must match an existing student
+                                that has been uploaded. The record will be skipped if either of these do not match.
+                            </p>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="/adminv2/import/profile/relationship.csv" class="button">Download Relationship Template</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+                <div class="small-12 medium-6 island" data-equalizer-watch>
+                    <section>
+                        <div class="content" data-equalizer-watch>
+                            <h2>Emergency Contacts</h2>
+                            <p>
+                                Completely synergize resource taxing relationships via premier niche markets.
+                                Professionally cultivate one-to-one customer service with robust ideas.
+                            </p>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="/adminv2/import/profile/relationship.csv" class="button">Download Relationship Template</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <section class="content">
+                <label for="file" class="required">Choose CSV type</label>
+                <select id="file" name="file" required>
+                    <option disabled selected>Please select</option>
+                    <option value="student">Student</option>
+                    <option value="staff">Staff</option>
+                    <option value="parent">Parent</option>
+                    <option value="relation">Relationship</option>
+                </select>
+
+                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+            </section>
+
+            <input type="submit" class="button" value="Dry Run">
+        </form>
+    </div>
+</div>
+

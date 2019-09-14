@@ -1,0 +1,73 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>User Profiles: {% if perform %}Import{% else %}Dry Run{% endif %}</h1>
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
+    </div>
+</div>
+
+{% if errors|length %}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="alert-box alert">
+            The following errors were detected:
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Results</h2>
+        <section>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="10%">Time</th>
+                        <th width="70%">Heading</th>
+                        <th width="20%" class="text-right">Import Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td>{{ log.timestamp }}</td>
+                        <td>{{ log.message }}</td>
+                        <td class="text-right">{{ log.status }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        {% if not perform %}
+        <script>
+            $(function() {
+                $('#perform').on('click', function (event) {
+                    event.preventDefault();
+
+                    $(this).confirmDialog({
+                        text: 'Are you sure you want to proceed with importing this data?',
+                        confirmEvent: function () {
+                            $('#form').submit();
+                        }
+                    });
+                });
+            });
+        </script>
+        <form id="form" method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}?perform=1">
+            <input type="hidden" name="attachment[]" value="{{ attachment[0] }}" />
+            <input type="hidden" name="file" value="{{ file }}" />
+            <input type="submit" id="perform" value="Perform" />
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+

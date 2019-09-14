@@ -1,5 +1,4 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
-
 <script>
     $(function() {
         $('[data-delete]').click(function(event) {
@@ -8,59 +7,52 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to remove this user\'s photo?',
                 confirmEvent: function() {
-                    $.post('/adminv2/photos/delete', {
+                    $.post('/adminv2/import/photos/delete', {
                         id: $(event.target).attr('data-delete')
                     })
-                    .done(function() {
-                        $(event.target).closest('li').remove();
-                    });
+                        .done(function() {
+                            $(event.target).closest('li').remove();
+                        });
                 }
             });
         });
     });
 </script>
 
-{# Shared navigation menu #}
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="row">
     <div class="small-12 island collapse">
         <h1>User Photos</h1>
-        <dl class="sub-nav">
-            <dd>
-                <a href="/adminv2/import/user">User</a>
-            </dd>
-            <dd class="active">
-                <a href="/adminv2/photos/upload">User Photos</a>
-            </dd>
-            <dd>
-                <a href="/adminv2/import/timetable-structure">Timetable Structure</a>
-            </dd>
-            <dd>
-                <a href="/adminv2/import/timetable">Timetable</a>
-            </dd>
-            <dd>
-                <a href="/adminv2/import/enrolment">Enrolment</a>
-            </dd>
-
-            <dd>
-                <a href="/adminv2/import-pastoral">{{ locale.pastoralCare.proper }} Records</a>
-            </dd>
-        </dl>
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <dl class="tabs">
-            <dd class="active"><a href="/adminv2/photos">User Photos</a></dd>
-            <dd><a href="/adminv2/photos/upload">Upload</a></dd>
-        </dl>
+    <div class="small-12 island collapse">
+        <form method="post" action="/adminv2/import/photos/upload">
+            <section class="content">
+                <p>
+                    This page is for Schools whose SIS product does not store staff/student photos in a format that is accessible by Schoolbox.
+                    If you are using a SIS with photos, you can disable the SIS photos in the <a href="/adminv2/setting/External+DB" title="External DB Settings">External DB</a>.
+                </p>
+                <p>
+                    <b>All photos uploaded must be named using the ID of the individual (e.g. 10255.jpg)</b>
+                </p>
+            </section>
+
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+            <input type="submit" class="button" value="Upload Photos">
+        </form>
     </div>
 </div>
 
+
 <div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Uploaded Photos</h2>
         <section class="content">
             <h3>Filter By Surname</h3>
             <dl class="sub-nav no-margin">
@@ -75,26 +67,14 @@
                 {% endfor %}
             </dl>
         </section>
-    </div>
-</div>
 
-{# Config page contents #}
-
-<div class="row">
-    <div class="small-12 island">
-        <section>
-
-            {% if users | length == 0 %}
-
-                <section class="content">
-                    <div class="empty-state">
-                        <i class="icon-user"></i>
-                        <p>No user photos found for surnames starting with '{{ surname | upper }}'</p>
-                    </div>
-                </section>
-
-            {% else %}
-
+        {% if users | length == 0 %}
+        <div class="empty-state">
+            <i class="icon-user"></i>
+            <p>No user photos found for surnames starting with '{{ surname | upper }}'</p>
+        </div>
+        {% else %}
+            <section>
                 <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                     {% for user in users %}
                         <li class="actions-small-1">
@@ -113,9 +93,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-
-            {% endif %}
-
-        </section>
+            </section>
+        {% endif %}
     </div>
 </div>

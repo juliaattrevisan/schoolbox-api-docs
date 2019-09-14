@@ -1,12 +1,10 @@
-{# Shared navigation menu #}
-
 {{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
     <div class="small-12 columns">
         <h2 class="subheader">Import</h2>
 
-        {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 
     <div class="small-12 island">

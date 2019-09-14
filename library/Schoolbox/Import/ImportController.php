@@ -54,7 +54,7 @@ class ImportController extends Base
     protected function getBaseData()
     {
         return [
-            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
+            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
             'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename'       => $this->basename,
             'hasExternalDb'  => ($this->getDi()->get('config')->get('external_type') != 'schoolbox'),
@@ -70,7 +70,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/upload.twig',
             'data'     => $this->getBaseData() + [
-                'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
                 'attachzone'    => $this->getAttachzone()->getTwigContext(),
                 'uploadMissing' => $this->getSession()->getSegment(static::class)->getFlash('uploadMissing', false)
             ],
@@ -96,7 +96,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/preview.twig',
             'data'     => $this->getBaseData() + [
-                'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
                 'log'        => ['lines' => $this->parseLogLines($logger),],
                 'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
@@ -109,7 +109,7 @@ class ImportController extends Base
     public function import()
     {
         set_time_limit(1800);
-        
+
         $logger = $this->buildLogger();
         try {
             $reader = $this->buildReader($upload = $this->buildUpload());
@@ -122,7 +122,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/import.twig',
             'data'     => $this->getBaseData() + [
-                'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
                 'log' => ['lines' => $this->parseLogLines($logger),],
             ],
         ]);

@@ -81,6 +81,4 @@ class ImporterFactory
 
         return $reader;
     }
-
-
 }

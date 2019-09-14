@@ -1,0 +1,8 @@
+external id,firstname,lastname,address,phone
+1,alpha,bravo,charlie,delta
+2,red's,green,blue,green
+3,,missing,    ,
+4,,,,
+5,whoa,what,happened,here
+6,heh,niceuuu,,
+7,hello,,,

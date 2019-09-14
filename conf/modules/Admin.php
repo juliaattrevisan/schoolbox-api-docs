@@ -1,11 +1,9 @@
 <?php
 /**
- * 
  * @author      Damian SLoane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
@@ -25,118 +23,73 @@ class Admin implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-        // Share navigation element
+        // Admin bulk add folders
+        (new \Schoolbox\Admin\BulkAddFolders\Module($di))->init('/adminv2/bulk-add-folders');
 
-        $navigation = new \Schoolbox\Admin\Navigation\Module($di);
-        $navigation->init('/adminv2/navigation');
+        // Admin course builder page
+        (new \Schoolbox\Admin\CourseBuilder\Module($di))->init('/adminv2/course-builder');
 
-        // Messages
+        // Eportfolio
+        (new \Schoolbox\Admin\Eportfolio\Module($di))->init('/adminv2/eportfolio');
 
-        $messagesModule = new \Schoolbox\Realtime\Admin\Module($di);
-        $messagesModule->init('/adminv2/messages');
+        // Feature Tours
+        (new \Schoolbox\Admin\FeatureTours\Module($di))->init('/adminv2/feature-tours');
 
-        // Messages
+        // Admin Home
+        (new \Schoolbox\Admin\Home\Module($di))->init('/adminv2/home');
 
-        $modifyUser = new \Schoolbox\Admin\User\Module($di);
-        $modifyUser->init('/adminv2/user');
-
-        // Admin home
-
-        $home = new \Schoolbox\Admin\Home\Module($di);
-        $home->init('/adminv2/home');
-
-        // Admin lists
-
-        $lists = new \Schoolbox\Admin\Lists\Module($di);
-        $lists->init('/adminv2/lists');
-
-        // Eporfolio
-
-        $lists = new \Schoolbox\Admin\Eportfolio\Module($di);
-        $lists->init('/adminv2/eportfolio');
+        // Admin Lists
+        (new \Schoolbox\Admin\Lists\Module($di))->init('/adminv2/lists');
 
         // LTI
-
-        $lti = new \Schoolbox\Admin\LTI\Module($di);
-        $lti->init('/adminv2/lti');
-
-        // Admin course builder page
-
-        $courseBuilder = new \Schoolbox\Admin\CourseBuilder\Module($di);
-        $courseBuilder->init('/adminv2/course-builder');
-
-        // Custom Terminology
-
-        $terminology = new \Schoolbox\Admin\Terminology\Module($di);
-        $terminology->init('/adminv2/terminology');
-
-        // Admin course builder page
-
-        $photos = new \Schoolbox\Admin\Photos\Module($di);
-        $photos->init('/adminv2/photos');
-
-        // Admin bulk add folders
-
-        $bulkAddFolders = new \Schoolbox\Admin\BulkAddFolders\Module($di);
-        $bulkAddFolders->init('/adminv2/bulk-add-folders');
-
-        // Admin terms manager page
-        $terms = new \Schoolbox\Admin\Terms\Module($di);
-        $terms->init('/adminv2/terms');
-
-        // Top menu manager
-        $menuTop = new \Schoolbox\Admin\Menu\Top\Module($di);
-        $menuTop->init('/adminv2/menu-top');
+        (new \Schoolbox\Admin\LTI\Module($di))->init('/adminv2/lti');
 
         // Side menu manager
-        $menuSide = new \Schoolbox\Admin\Menu\Side\Module($di);
-        $menuSide->init('/adminv2/menu-side');
+        (new \Schoolbox\Admin\Menu\Side\Module($di))->init('/adminv2/menu-side');
+
+        // Top menu manager
+        (new \Schoolbox\Admin\Menu\Top\Module($di))->init('/adminv2/menu-top');
 
         // Profile button manager
-        $profileButtons = new \Schoolbox\Admin\Profile\Button\Module($di);
-        $profileButtons->init('/adminv2/profile-button');
+        (new \Schoolbox\Admin\Profile\Button\Module($di))->init('/adminv2/profile-button');
 
-        // Pastoral care import page
-
-        if ($di->get('config')->get('pastoral_enabled')) {
-            $courseBuilder = new \Schoolbox\Admin\Import\Pastoral\Module($di);
-            $courseBuilder->init('/adminv2/import-pastoral');
-        }
-
-        // Route list
-        $routes = new \Schoolbox\Admin\RouteSummary\Module($di);
-        $routes->init('/adminv2/routes');
-
-        // Video Queue
-        $video = new \Schoolbox\Admin\Video\Module($di);
-        $video->init('/adminv2/video');
-
-        // Filters
-        $filters = new FilterModule($di);
-        $filters->init('/adminv2/filters');
-
-        //Feature Tours
-        $featureTours = new \Schoolbox\Admin\FeatureTours\Module($di);
-        $featureTours->init('/adminv2/feature-tours');
-
-        // Service Roster
-        $featureTours = new \Schoolbox\Admin\Service\Module($di);
-        $featureTours->init('/adminv2/service');
-
-        // SHAPS
-        $shaps = new \Schoolbox\Admin\SHAPS\Module($di);
-        $shaps->init('/adminv2/shaps');
-
-        // News
-        $news = new \Schoolbox\Comms\News\Policy\Module($di);
-        $news->init('/adminv2/news');
-
-        // Settings
-        $news = new \Schoolbox\Admin\Settings\Module($di);
-        $news->init('/adminv2/setting');
+        // Admin navigation
+        (new \Schoolbox\Admin\Navigation\Module($di))->init('/adminv2/navigation');
 
         // oAuth-specific settings
-        $oauth = new \Schoolbox\Admin\Oauth\Module($di);
-        $oauth->init('/adminv2/oauth');
+        (new \Schoolbox\Admin\Oauth\Module($di))->init('/adminv2/oauth');
+
+        // Route list
+        (new \Schoolbox\Admin\RouteSummary\Module($di))->init('/adminv2/routes');
+
+        // Service Roster
+        (new \Schoolbox\Admin\Service\Module($di))->init('/adminv2/service');
+
+        // Settings
+        (new \Schoolbox\Admin\Settings\Module($di))->init('/adminv2/setting');
+
+        // SHAPS
+        (new \Schoolbox\Admin\SHAPS\Module($di))->init('/adminv2/shaps');
+
+        // Custom Terminology
+        (new \Schoolbox\Admin\Terminology\Module($di))->init('/adminv2/terminology');
+
+        // Admin terms manager page
+        (new \Schoolbox\Admin\Terms\Module($di))->init('/adminv2/terms');
+
+        // Admin Modify User
+        (new \Schoolbox\Admin\User\Module($di))->init('/adminv2/user');
+
+        // Video Queue
+        (new \Schoolbox\Admin\Video\Module($di))->init('/adminv2/video');
+
+        // News
+        (new \Schoolbox\Comms\News\Policy\Module($di))->init('/adminv2/news');
+
+        // Messages
+        (new \Schoolbox\Realtime\Admin\Module($di))->init('/adminv2/messages');
+
+        // Filters
+        (new FilterModule($di))->init('/adminv2/filters');
     }
-} 
+}

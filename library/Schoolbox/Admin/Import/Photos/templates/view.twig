@@ -1,0 +1,21 @@
+
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island collapse">
+        <h1>User Photos</h1>
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <dl class="tabs">
+            <dd class="active"><a href="/adminv2/import/photos">User Photos</a></dd>
+            <dd><a href="/adminv2/import/photos/upload">Upload</a></dd>
+        </dl>
+    </div>
+</div>
+

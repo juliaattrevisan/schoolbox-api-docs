@@ -1,12 +1,11 @@
-{# Shared navigation menu #}
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>
+        <h2 class="subheader">
             {% block title %}
             {% endblock %}
-        </h1>
+        </h2>
 
         {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
     </div>

@@ -27,7 +27,6 @@ class IntroController extends Base
             'template' => '@adminImport/intro.twig',
             'data'     => [
                 'pageCurrent' => 'import',
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter())->getAllNodes(),
             ],
         ]);

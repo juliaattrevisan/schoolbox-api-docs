@@ -22,11 +22,28 @@ class AdminImport implements ModuleConfigInterface
      *
      * @param Kernel $kernel
      * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        $ruleset = new IntroModule($di);
-        $ruleset->init('/adminv2/import');
+
+        /* Introduction to Admin Importers
+         */
+        (new IntroModule($di))->init('/adminv2/import');
+
+        /* User Photos
+         */
+        (new \Schoolbox\Admin\Import\Photos\Module($di))->init('/adminv2/import/photos');
+
+        /* User Profile
+         */
+        (new \Schoolbox\Admin\Import\Profile\Module($di))->init('/adminv2/import/profile');
+
+        /* Pastoral Care
+         */
+        if ($di->get('config')->get('pastoral_enabled')) {
+            (new \Schoolbox\Admin\Import\Pastoral\Module($di))->init('/adminv2/import-pastoral');
+        }
     }
 }

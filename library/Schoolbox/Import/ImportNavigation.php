@@ -4,10 +4,11 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Import;
 
 use Aura\Router\Router;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 
@@ -18,65 +19,78 @@ use Schoolbox\Sync\Navigator\Node;
  */
 trait ImportNavigation
 {
+
     /**
      * Builds breadcrumbs for this page.
      *
-     * @param  Router $router
-     * @return Navigator
+     * @param Router $router
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    protected function buildBreadcrumbs(Router $router)
+    protected function buildBreadcrumbs(Router $router): array
     {
-        return new Navigator(
-            new Node('Administration', '/adminv2/home', false),
-            new Node('Importer', $router->generate('adminImport.intro'), true)
-        );
+        return [
+            ['Administration', '/adminv2/home'],
+            ['Importer', $router->generate('adminImport.intro')],
+        ];
     }
 
     /**
      * Builds navigation for this page.
      *
-     * @param  Router $router
-     * @param  string $currentPage
+     * @param Router $router
+     * @param string $currentPage
      * @return Navigator
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \ReflectionException
      */
-    protected function buildNavigation(Router $router, $currentPage = '')
+    protected function buildNavigation(Router $router, string $currentPage = ''): Navigator
     {
-        $reflection = new \ReflectionClass(Navigator::class);
-        $args       = [
+        $args = [
             new Node(
                 'User',
                 $router->generate('adminImportUser.upload'),
-                ($currentPage == 'adminImportUser')
+                $currentPage === 'adminImportUser'
             ),
             new Node(
                 'User Photos',
-                $router->generate('adminPhotos.getIndex'),
-                ($currentPage == 'adminUserPhotos')
+                $router->generate('adminImportPhotos.getIndex'),
+                $currentPage === 'adminImportPhotos'
+            ),
+            new Node(
+                'User Profiles',
+                $router->generate('adminImportProfile.getIndex'),
+                $currentPage === 'adminImportProfile'
             ),
             new Node(
                 'Timetable Structure',
                 $router->generate('adminImportStructure.upload'),
-                ($currentPage == 'adminImportStructure')
+                $currentPage === 'adminImportStructure'
             ),
             new Node(
                 'Timetable',
                 $router->generate('adminImportTimetable.upload'),
-                ($currentPage == 'adminImportTimetable')
+                $currentPage === 'adminImportTimetable'
             ),
             new Node(
                 'Enrolment',
                 $router->generate('adminImportEnrolment.upload'),
-                ($currentPage == 'adminImportEnrolment')
+                $currentPage === 'adminImportEnrolment'
             ),
-
         ];
+
+        /* Optional Pastoral Module
+         */
         if ($this->getConfigLoader()->get('pastoral_enabled')) {
+            $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
+
             $args[] = new Node(
-                'Pastoral Care Records',
+                $rosettaStone->translate('pastoralCare', false, true) . ' Records',
                 $router->generate('adminImportPastoral.getIndex'),
-                ($currentPage == 'adminPastoralCare')
+                $currentPage === 'adminImportPastoral'
             );
         }
-        return $reflection->newInstanceArgs($args);
+
+        return new Navigator($args);
     }
 }
