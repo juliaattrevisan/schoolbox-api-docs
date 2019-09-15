@@ -60,8 +60,6 @@ class Factory extends FolderFilter\Factory
         }
 
         // Folders: could be ANY and ALL groups or classes. Is this okay?
-        // TODO load the user's groups + classes
-        // TODO then if other groups + classes are enabled, load them
         $getMyClasses    = $options[Definition::KEY_MY_CLASSES]->getAvailable();
         $getMyGroups     = $options[Definition::KEY_MY_GROUPS]->getAvailable();
         $getOtherClasses = $options[Definition::KEY_OTHER_CLASSES]->getAvailable();
