@@ -14,7 +14,6 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 
 
@@ -54,24 +53,52 @@ class Factory extends FolderFilter\Factory
         array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
+        $options = $pageFilter->getOptions();
+
+        if (!$viewee) {
+            throw new InvalidArgumentException('$viewee cannot be null for Readable Folders filter');
+        }
 
         // Folders: could be ANY and ALL groups or classes. Is this okay?
         // TODO load the user's groups + classes
         // TODO then if other groups + classes are enabled, load them
+        $getMyClasses    = $options[Definition::KEY_MY_CLASSES]->getAvailable();
+        $getMyGroups     = $options[Definition::KEY_MY_GROUPS]->getAvailable();
+        $getOtherClasses = $options[Definition::KEY_OTHER_CLASSES]->getAvailable();
+        $getOtherGroups  = $options[Definition::KEY_OTHER_GROUPS]->getAvailable();
+        $folderMapper    = $this->getFolderMapper();
+        $folders         = $folderMapper->createCollection();
+        $folderIdColumn  = 'id';
 
-        // Folders: just whatever is in the URL overrides for this filter
-        // (filtered to groups/classes only, and then by if user has read perms)
-        $thisOverrides = $overrides[$pageFilter->getFilter()->getId()] ?? null;
-        if ($thisOverrides instanceof Collection) {
-            $folders = $this->getFolderMapper()
-                ->findByColumn('id', $thisOverrides->getPropertyValues('key'))
-                ->filter(function (FolderModel $folder) use ($user) {
-                    return
-                        ($folder->isGroup() || $folder->isClass())
-                        && $this->getAccess()->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
-                });
-        } else {
-            $folders = $this->getFolderMapper()->createCollection();
+        if ($getMyClasses || $getMyGroups) {
+            // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
+            $groupAccessLevel = $getMyGroups ? UserAccess::ACCESS_READ : UserAccess::ACCESS_FULL + 1;
+            $folders          = $folderMapper->findForUser(
+                $viewee,
+                $getMyClasses,
+                $groupAccessLevel
+            )->indexBy($folderIdColumn);
+        }
+
+        if ($getOtherClasses) {
+            $folders = $folders->mergeUnique(
+                $folderMapper->findByPredicates(
+                    $folderMapper->getPredicateBuilder()
+                                 ->notNull('cc.code')
+                                 ->isNull('cc.deleted_at')
+                )->indexBy($folderIdColumn),
+                $folderIdColumn
+            );
+        }
+
+        if ($getOtherGroups) {
+            $folders = $folders->mergeUnique(
+                $folderMapper->findByPredicates(
+                    $folderMapper->getPredicateBuilder()
+                                 ->notNull('ug.cid')
+                )->indexBy($folderIdColumn),
+                $folderIdColumn
+            );
         }
 
         return new Component(
@@ -79,7 +106,7 @@ class Factory extends FolderFilter\Factory
             $user,
             $pageFilter,
             $selections,
-            $thisOverrides,
+            $overrides[$pageFilter->getFilter()->getId()] ?? null,
             $this->getSelectionMapper(),
             $folders->sortBy('name', 'ASC')
         );
