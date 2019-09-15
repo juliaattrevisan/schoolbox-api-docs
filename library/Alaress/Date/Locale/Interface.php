@@ -9,19 +9,27 @@
  * @link        https://schoolbox.com.au/
  */
 
-interface Alaress_Date_Locale_Interface {
-	public function localShortFormat();
-	public function longFormat();
-	public function shortFormat();
-	public function dateOnlyFormat();
-	public function timeOnlyFormat();
+interface Alaress_Date_Locale_Interface
+{
+    public function localShortFormat(): string;
 
-	public function localFormat();
-	public function longDateOnlyFormat();
-    public function shortDateOnlyFormat();
+    public function longFormat(): string;
 
-	public function calendarDate();
-	public function calendarDateTime();
+    public function shortFormat(): string;
 
-    public function weekendDays();
+    public function dateOnlyFormat(): string;
+
+    public function timeOnlyFormat(): string;
+
+    public function localFormat(): string;
+
+    public function longDateOnlyFormat(): string;
+
+    public function shortDateOnlyFormat(): string;
+
+    public function calendarDate(): string;
+
+    public function calendarDateTime(): string;
+
+    public function weekendDays(): array;
 }
