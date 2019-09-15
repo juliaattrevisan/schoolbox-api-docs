@@ -200,9 +200,9 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
     }
 
     /**
-     * Get the calendar datetime format
+     * Get the days which are the weekends for this locale
      *
-     * @return string
+     * @return array
      */
     public function weekendDays(): array
     {

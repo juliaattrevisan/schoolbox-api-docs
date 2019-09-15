@@ -127,6 +127,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 
     /**
      * Get the days which are the weekends for this locale
+     *
      * @return array
      */
     public function weekendDays(): array
