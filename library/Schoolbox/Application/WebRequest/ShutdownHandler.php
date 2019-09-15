@@ -12,7 +12,6 @@ class ShutdownHandler {
     private $functions;
 
     private function __construct() {
-        register_shutdown_function(array($this, 'onShutdown'));
         $this->functions = array();
     }
 

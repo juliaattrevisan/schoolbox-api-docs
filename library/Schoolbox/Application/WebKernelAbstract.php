@@ -148,7 +148,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * @inheritdoc
      */
     protected function registerShutdownHandling(): void {
-        ShutdownHandler::instance()->registerFunction([$this, 'shutdownSafely']);
+        register_shutdown_function(array(ShutdownHandler::instance(), 'onShutdown'));
     }
 
 
