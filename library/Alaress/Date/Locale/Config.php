@@ -29,7 +29,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
     /**
      * @return IConfigLoader
      */
-    public function getConfig() : IConfigLoader
+    public function getConfig(): IConfigLoader
     {
         if (!$this->config instanceof IConfigLoader) {
             $this->setConfig(ConfigMapper::getInstance());
@@ -43,7 +43,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return $this
      */
-    public function setConfig(IConfigLoader $loader) : self
+    public function setConfig(IConfigLoader $loader): self
     {
         $this->config = new class($loader) implements IConfigLoader
         {
@@ -103,7 +103,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function localFormat() :string
+    public function localFormat(): string
     {
 
         return $this->getConfig()->get('date_local') . ' ' . $this->getConfig()->get('date_time');
@@ -114,7 +114,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function localShortFormat() :string
+    public function localShortFormat(): string
     {
         return $this->getConfig()->get('date_local');
     }
@@ -124,7 +124,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function longFormat() :string
+    public function longFormat(): string
     {
         return $this->getConfig()->get('date_long') . ' ' . $this->getConfig()->get('date_time');
     }
@@ -134,7 +134,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function longDateOnlyFormat() :string
+    public function longDateOnlyFormat(): string
     {
         return $this->getConfig()->get('date_long');
     }
@@ -144,7 +144,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function shortFormat() :string
+    public function shortFormat(): string
     {
         return $this->getConfig()->get('date_short') . ' ' . $this->getConfig()->get('date_time');
     }
@@ -154,7 +154,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function shortDateOnlyFormat() :string
+    public function shortDateOnlyFormat(): string
     {
         return $this->getConfig()->get('date_short');
     }
@@ -164,7 +164,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function dateOnlyFormat() :string
+    public function dateOnlyFormat(): string
     {
         return $this->getConfig()->get('date_only');
     }
@@ -174,7 +174,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function timeOnlyFormat() :string
+    public function timeOnlyFormat(): string
     {
         return $this->getConfig()->get('date_time');
     }
@@ -184,7 +184,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function calendarDate() :string
+    public function calendarDate(): string
     {
         return $this->getConfig()->get('date_only');
     }
@@ -194,7 +194,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function calendarDateTime() :string
+    public function calendarDateTime(): string
     {
         return $this->getConfig()->get('date_only') . ' ' . $this->getConfig()->get('date_time');
     }
@@ -204,7 +204,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      *
      * @return string
      */
-    public function weekendDays() :array
+    public function weekendDays(): array
     {
         return explode(',', $this->getConfig()->get('locale_weekend'));
     }
