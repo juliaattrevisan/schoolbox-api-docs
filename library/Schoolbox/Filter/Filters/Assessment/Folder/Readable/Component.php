@@ -110,22 +110,4 @@ class Component extends BaseComponent
 
         return $availableSelections;
     }
-
-
-    /**
-     * @param GenericCollection $roleSelections
-     * @return Filter\Selection\Model[]|GenericCollection
-     */
-    protected function buildUserSelections(GenericCollection $roleSelections)
-    {
-        $userSelections = $roleSelections->emptyClone();
-        $urlOverrides   = $this->getUrlOverrides();
-        if (is_iterable($urlOverrides)) {
-            foreach ($urlOverrides as $urlOverride) {
-                $key                  = $urlOverride->getKey();
-                $userSelections[$key] = $this->createSelection($key, true);
-            }
-        }
-        return $userSelections;
-    }
 }
