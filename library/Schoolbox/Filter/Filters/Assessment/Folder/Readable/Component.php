@@ -10,10 +10,55 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\Component as BaseComponent;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder\Model;
+use Schoolbox\User;
 
 
 class Component extends BaseComponent
 {
+    /**
+     * A list of folders that are eligible for selection, that the current user
+     * is NOT directly involved in.
+     *
+     * @var GenericCollection|Model[]
+     */
+    private $otherFolders;
+
+    /**
+     * Constructor
+     *
+     * @param Filter\IDefinition      $definition
+     * @param User                    $user
+     * @param Filter\Page\Model       $pageFilter
+     * @param GenericCollection|null  $userSelections
+     * @param GenericCollection|null  $urlOverrides
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param GenericCollection       $folders
+     * @param GenericCollection       $otherFolders
+     */
+    public function __construct(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        ?GenericCollection $userSelections,
+        ?GenericCollection $urlOverrides,
+        Filter\Selection\Mapper $filterSelectionMapper,
+        GenericCollection $folders,
+        GenericCollection $otherFolders
+    ) {
+        parent::__construct(
+            $definition,
+            $user,
+            $pageFilter,
+            $userSelections,
+            $urlOverrides,
+            $filterSelectionMapper,
+            $folders
+        );
+        $this->otherFolders = $otherFolders;
+    }
+
+
     /**
      * This component has no role selections.
      *
@@ -35,20 +80,9 @@ class Component extends BaseComponent
         $urlOverrides = $this->getUrlOverrides();
 
         foreach ($this->folders as $folder) {
+            // TODO Should this filter fetch folders that were classes?
             $key        = (string)$folder->getId();
-            /* The factory will have injected folders where the:
-             * - folder is injected via URL overrides
-             * - folder is a class, and admin has configured taught classes to be available
-             * - user has group WRITE+ perm to the folder and admin configured groups to be available
-             *
-             * We may have cases where a teacher has WRITE+ access to a group (via userAccess) that does not
-             * exist (in userGroups). In this case, the relevant folder will be injected, but isGroup() will be false.
-             *
-             * Therefore if a folder was not injected, and is not a class, assume it is/was a group (whether due to
-             * userGroups or userAccess).
-             * TODO remove this when we can guarantee this data inconsistency to not exist: SA-5448
-             */
-            $isClass    = $folder->isClass() || $folder->wasClass();
+            $isClass    = $folder->isClass();
             $isInjected = $urlOverrides && $urlOverrides->offsetExists($key);
             $isGroup    = !$isClass && !$isInjected;
 
@@ -57,9 +91,23 @@ class Component extends BaseComponent
              * - is group and roleDefault for group is true
              * - is/was class and roleDefault for class is true
              */
-            $selected = $isInjected || ($selectMyGroups && $isGroup) || ($selectMyClasses && $isClass);
+            $selected = $isInjected
+                || ($selectMyGroups && $isGroup)
+                || ($selectMyClasses && $isClass);
             $availableSelections[$key] = $this->createSelection($key, $selected);
         }
+
+        foreach ($this->otherFolders as $folder) {
+            $key        = (string)$folder->getId();
+            $isClass    = $folder->isClass();
+            $isInjected = $urlOverrides && $urlOverrides->offsetExists($key);
+            $isGroup    = !$isClass && !$isInjected;
+            $selected   = $isInjected
+                || ($selectOtherGroups && $isGroup)
+                || ($selectOtherClasses && $isClass);
+            $availableSelections[$key] = $this->createSelection($key, $selected);
+        }
+
         return $availableSelections;
     }
 

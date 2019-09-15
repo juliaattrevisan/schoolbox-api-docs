@@ -64,13 +64,14 @@ class Factory extends FolderFilter\Factory
         $getOtherClasses = $options[Definition::KEY_OTHER_CLASSES]->getAvailable();
         $getOtherGroups  = $options[Definition::KEY_OTHER_GROUPS]->getAvailable();
         $folderMapper    = $this->getFolderMapper();
-        $folders         = $folderMapper->createCollection();
+        $myFolders       = $folderMapper->createCollection();
+        $otherFolders    = $folderMapper->createCollection();
         $folderIdColumn  = 'id';
 
         if ($getMyClasses || $getMyGroups) {
             // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
             $groupAccessLevel = $getMyGroups ? UserAccess::ACCESS_READ : UserAccess::ACCESS_FULL + 1;
-            $folders          = $folderMapper->findForUser(
+            $myFolders        = $folderMapper->findForUser(
                 $viewee,
                 $getMyClasses,
                 $groupAccessLevel
@@ -78,18 +79,15 @@ class Factory extends FolderFilter\Factory
         }
 
         if ($getOtherClasses) {
-            $folders = $folders->mergeUnique(
-                $folderMapper->findByPredicates(
-                    $folderMapper->getPredicateBuilder()
-                                 ->notNull('cc.code')
-                                 ->isNull('cc.deleted_at')
-                )->indexBy($folderIdColumn),
-                $folderIdColumn
-            );
+            $otherFolders = $folderMapper->findByPredicates(
+                $folderMapper->getPredicateBuilder()
+                             ->notNull('cc.code')
+                             ->isNull('cc.deleted_at')
+            )->indexBy($folderIdColumn);
         }
 
         if ($getOtherGroups) {
-            $folders = $folders->mergeUnique(
+            $otherFolders = $otherFolders->mergeUnique(
                 $folderMapper->findByPredicates(
                     $folderMapper->getPredicateBuilder()
                                  ->notNull('ug.cid')
@@ -98,6 +96,7 @@ class Factory extends FolderFilter\Factory
             );
         }
 
+        // Ensure other folders don't intersect with my folders
         return new Component(
             $definition,
             $user,
@@ -105,7 +104,8 @@ class Factory extends FolderFilter\Factory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()] ?? null,
             $this->getSelectionMapper(),
-            $folders->sortBy('name', 'ASC')
+            $myFolders,
+            $otherFolders->diffBy($myFolders, 'id')
         );
     }
 }
