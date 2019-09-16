@@ -336,9 +336,9 @@ class Profile implements ImporterInterface
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-//            /* Add their parents' profile data
-//             */
-//            $this->importParentsOfStudent($student, $studentBaseProfile);
+            /* Add their parents' profile data
+             */
+            $this->importParentsOfStudent($externalId, $studentBaseProfile);
         }
     }
 
@@ -378,7 +378,7 @@ class Profile implements ImporterInterface
     /**
      * Import parent profile data for a given student
      *
-     * @param Student           $student
+     * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
      * @throws Mapper\DefinitionException
@@ -388,31 +388,53 @@ class Profile implements ImporterInterface
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function importParentsOfStudent(Student $student, UserProfile\Model $studentBaseProfile)
+    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile)
     {
-        /* Find any associated parents
+        /* Find the parents/guardians of this student
+         * To do it, we need a specific id value for $student
+         * ($student contains multiple ids, some of which seem internal to usams)
          */
-        $parents = $this->findParentsNodes($student);
+        $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$studentExternalId}')]";
+        $node = $this->batchxml->fetchXml($path)[0];
+
+        /* This isn't the primary identifier that we use in $student
+         * This is some sort of internal relation id in the xml
+         */
+        $studentId = trim((string)$node->xpath('@Id')[0]);
+
+        /* Use that to find the parents in similar fashion
+         * https://stackoverflow.com/questions/3005370/xpath-to-find-nearest-ancestor-element-that-contains-an-element-that-has-an-attr/40333166
+         *
+         * TODO: I would think there was alternative syntax than "position()=2" but I don't know what it is
+         * If isams changes this structure, this will snap (obviously) so yeah, we should pay attention
+         */
+        $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
+        $parents = $this->batchxml->fetchXml($path);
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
          */
         foreach ($parents as $parent) {
+            $externalId = trim((string)$parent->xpath('@Id')[0]);
+            $username = trim((string)$parent->EmailAddress);
+            $firstname = trim((string)$parent->Forename);
+            $lastname = trim((string)$parent->Surname);
+            $relationship = trim((string)$parent->RelationshipRaw);
 
             /* Parents without usernames are skipped
              */
-            if (!\strlen($parent['username'])) {
+            if (!\strlen($username)) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for parent %s - no username detected',
-                    trim("{$parent['firstname']} {$parent['lastname']}")
+                    trim("{$firstname} {$lastname}")
                 ));
 
                 continue;
             }
 
             try {
-                $parentProfile = $this->parentProfileMapper->findByExternalId($parent['id']);
+                $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
             } catch (Exception $e) {
                 $parentProfile = $this->parentProfileMapper->createModel();
@@ -422,10 +444,10 @@ class Profile implements ImporterInterface
             }
 
             $parentBaseProfile
-                ->setExternalId($parent['id'])
-                ->setTitle($parent['title'])
-                ->setFirstname($parent['firstname'])
-                ->setLastname($parent['lastname']);
+                ->setExternalId($externalId)
+                ->setTitle(trim((string)$parent->Title))
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
 
             /* Log it
              */
@@ -441,11 +463,11 @@ class Profile implements ImporterInterface
             }
 
             $parentProfile
-                ->setPhoneHome($parent['phone']['home'])
-                ->setPhoneWork($parent['phone']['work'])
-                ->setMobile($parent['phone']['mobile'])
-                ->setEmail($parent['email'])
-                ->setUsername($parent['username']);
+                ->setPhoneHome(trim((string)$parent->Telephone))
+                ->setPhoneWork(trim((string)$parent->Telephone))
+                ->setMobile(trim((string)$parent->Mobile))
+                ->setEmail(trim((string)$parent->EmailAddress))
+                ->setUsername($username);
 
             /* Log it
              */
@@ -468,7 +490,7 @@ class Profile implements ImporterInterface
             $this->log->info(sprintf(
                 'Adding relation between %s, the %s of %s',
                 trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
-                trim($parent['relationship']),
+                trim($relationship),
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
 
@@ -479,70 +501,11 @@ class Profile implements ImporterInterface
                     ->setUserProfileId($parentBaseProfile->getId())
                     ->setChildProfileId($studentBaseProfile->getId())
                     ->setEmergencyContact(false)
-                    ->setType($parent['relationship']);
+                    ->setType($relationship);
 
                 $this->relationMapper->save($relation);
             }
         }
-    }
-
-
-
-
-    /**
-     * Find the parents of $student
-     *
-     * @param Student $student
-     * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
-     */
-    private function findParentsNodes(Student $student): array
-    {
-        /* Find the parents/guardians of this student
-         * To do it, we need a specific id value for $student
-         * ($student contains multiple ids, some of which seem internal to usams)
-         */
-        $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$student->getId()}')]";
-        $node = $this->batchxml->fetchXml($path)[0];
-
-        /* This isn't the primary identifier that we use in $student
-         * This is some sort of internal relation id in the xml
-         */
-        $studentId = trim((string)$node->xpath('@Id')[0]);
-
-        /* Use that to find the parents in similar fashion
-         * https://stackoverflow.com/questions/3005370/xpath-to-find-nearest-ancestor-element-that-contains-an-element-that-has-an-attr/40333166
-         *
-         * TODO: I would think there was alternative syntax than "position()=2" but I don't know what it is
-         * If isams changes this structure, this will snap (obviously) so yeah, we should pay attention
-         */
-        $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
-        $parents = $this->batchxml->fetchXml($path);
-
-        $stack = [];
-
-        /* Stack 'em up
-         */
-        foreach ($parents as $parent) {
-            $stack[] = [
-                'id' => trim((string)$parent->xpath('@Id')[0]),
-                'title' => trim((string)$parent->Title),
-                'firstname' => trim((string)$parent->Forename),
-                'lastname' => trim((string)$parent->Surname),
-                'relationship' => trim((string)$parent->RelationshipRaw),
-                'phone' => [
-                    'home' =>  trim((string)$parent->Telephone),
-                    'work' => trim((string)$parent->Telephone),
-                    'mobile' => trim((string)$parent->Mobile),
-                ],
-                'username' => trim((string)$parent->EmailAddress),
-                'email' => trim((string)$parent->EmailAddress),
-            ];
-        }
-
-        return $stack;
     }
 
 
