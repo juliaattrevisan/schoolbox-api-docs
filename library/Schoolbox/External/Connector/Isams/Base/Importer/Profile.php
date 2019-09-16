@@ -278,6 +278,14 @@ class Profile implements ImporterInterface
             $housemasterId = trim((string)$house->HouseMaster);
             $housemaster = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$housemasterId}')]")[0];
 
+            /* Find out enrolment date if it exists
+             */
+            $enrolmentDate = null;
+
+            if (trim((string)$student->EnrolmentDate)) {
+                $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->EnrolmentDate)));
+            }
+
             /* Smoosh it all together
              */
             $studentProfile
@@ -289,7 +297,7 @@ class Profile implements ImporterInterface
                 ->setCampusName($campusName)
                 ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
                 ->setEmail(trim((string)$student->EmailAddress))
-                ->setEnrolmentDate(null)
+                ->setEnrolmentDate($enrolmentDate)
                 ->setFormName(trim((string)$student->Form))
                 ->setFormTeacherId(null)
                 ->setFormTeacherName(null)
