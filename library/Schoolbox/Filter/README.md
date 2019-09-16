@@ -1,5 +1,7 @@
 # Filters - a quick developer's guide
 
+> This documentation is a work in progress, and subject to change and expansion.
+
 ## tl;dr
 
 In short, filters are for letting the end user display a subset of the entire
@@ -30,7 +32,9 @@ panel.
 > TODO filter panel and factory building sound like dual responsibilities
 
 It is expected there will only be one Factory Factory per type of object that is
-being filtered. (Currently, only assessment filters exist.)
+being filtered. (Currently, only assessment filters exist: these are created by
+the `\Schoolbox\Filter\Filters\Assessment\FactoryFactory` implementation of this
+interface.)
 
 ### Factory (`\Schoolbox\Filter\IFactory`)
 
@@ -76,8 +80,13 @@ for performant retrieval of matching items.
 
 ### Adding filters to a page that doesn't have filters
 
-* Add to the `filter_page.page` enum
-* Add a corresponding `\Schoolbox\Filter\Page\Model::PAGE_*` constant
+* Add a `\Schoolbox\Filter\Page\Model::PAGE_*` constant for the new page
+* Alter the required database columns to recognize the new filters
+  * the `filter_page.page` and `filter_selection.page` enums need to have an
+    option added, which matches the value of the constant added above
+* Add this constant to the `params` parameter for the `page` column mappings in
+  `\Schoolbox\Filter\Page\Mapper::mapping` and
+  `\Schoolbox\Filter\Selection\Mapper::mapping`
 * Update these methods with cases for the new constant:
   * `\Schoolbox\Filter\Controller::buildFilteredPageLabels`
   * `\Schoolbox\Filter\Module::registerRoutes`
@@ -87,7 +96,7 @@ for performant retrieval of matching items.
   * inject a Factory Factory as a constructor param
   * generate the filter panel's Twig data:
     ```php
-    $page        = Filter\Page\Model::PAGE_NEW_FILTER;
+    $page        = \Schoolbox\Filter\Page\Model::PAGE_NEW_FILTER;
     $filterPanel = $this->filterFactoryFactory->buildPanel(
         $this->getUser(),
         $page,
@@ -115,7 +124,7 @@ for performant retrieval of matching items.
             'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
                 /** @var RosettaStone $rosettaStone */
                 $rosettaStone = $injector->get('l10n');
-                return new Filter\Filters\Assessment\FactoryFactory(
+                return new \Schoolbox\Filter\Filters\Assessment\FactoryFactory(
                     $this->getMapperFactory(),
                     $rosettaStone
                 );
@@ -123,14 +132,41 @@ for performant retrieval of matching items.
         ];
     }
     ```
+* > TODO write about how to develop filters on the front end
 
-### Adding an existing filter to a page which has filters
 
-### Creating a new filter
+### Creating a new filter implementation
 
-* Add a Factory class for it
-* Add a build case for that class name to the appropriate Factory Factory
-  implementation
+* Determine the entity that the filter will actually operate on
+  * As mentioned under Factory Factory, all existing filters operate on the
+    Assessment object `\Schoolbox\Learning\Assessment\DataModel\Mapper`
+* Create a Factory implementation for the new filter
+  * Depending on how closely related the new filter is to existing ones, its
+    `buildComponent` and `buildKeyConverter` might be able to create instances
+    of already existing classes. `buildDefinition` will have to create a new
+    class though
+* Create a Definition implementation for the new filter
+  * The `getPages` method will determine the filter pages on which this filter
+    will show: see "Adding an existing filter" below
+* Insert a new row into the `filter` database table for the new filter
+  * the `entity` column value needs to be the fully-qualified class name of the
+    entity the filter will operate on
+  * the `class` column is the fully-qualified class name of the new filter's
+    Definition class
+* Find the Factory Factory implementation which creates filters for the entity
+  that is being filtered
+  * Each Factory Factory has an `ENTITY` class constant: find the one that
+    matches the entity's class name, or create a new Factory Factory if none
+    exists
+  * Update that implementation's `buildFilterFactoryForFilter` method to be able
+    to create an instance of the new filter
+
+
+### Adding an existing filter to a page which already supports filters
+
+* Update the Definition implementation's `getPages` to return the page's
+  `\Schoolbox\Filter\Page\Model::PAGE_*` constant
 
 ## Technical discussion
 
+> TODO isn't technical discussion covered by everything above?
