@@ -27,10 +27,11 @@
         $(function () {
             var $filterSelector = $('#filter-selector-readable');
             $filterSelector.selectizeSelector({
-                value: $.selectizeSelector.getValueFromSelect($filterSelector),
                 multiple: true,
                 selectize: {
                     load: null,
+                    onInitialize: null,
+                    items: $.selectizeSelector.getItemsFromSelect($filterSelector),
                     lockOptgroupOrder: true,
                     render: {
                         option: function (option, escape) {
@@ -46,7 +47,8 @@
                                 + (breadcrumb ? ('<p><em>(' + escape(breadcrumb) + ')</em></p>') : '')
                                 + '</div>';
                         }
-                    }
+                    },
+                    maxOptions: 10
                 }
             });
         });
