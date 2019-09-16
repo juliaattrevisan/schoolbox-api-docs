@@ -271,6 +271,13 @@ class Profile implements ImporterInterface
             $tutorId = trim((string)$student->Tutor);
             $tutor = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$tutorId}')]")[0];
 
+            /* Fish out a staff member via their user code
+             */
+            $houseName = trim((string)$student->AcademicHouse);
+            $house = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]")[0];
+            $housemasterId = trim((string)$house->HouseMaster);
+            $housemaster = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$housemasterId}')]")[0];
+
             /* Smoosh it all together
              */
             $studentProfile
@@ -287,8 +294,8 @@ class Profile implements ImporterInterface
                 ->setFormTeacherId(null)
                 ->setFormTeacherName(null)
                 ->setGender(trim((string)$student->Gender))
-                ->setHeadOfHouseId(null)
-                ->setHeadOfHouseName(null)
+                ->setHeadOfHouseId($housemasterId)
+                ->setHeadOfHouseName(trim((string)$housemaster->FullName))
                 ->setHouseName(trim((string)$student->AcademicHouse))
                 ->setLeavingDate(null)
                 ->setMobile(trim((string)$student->MobileNumber))
