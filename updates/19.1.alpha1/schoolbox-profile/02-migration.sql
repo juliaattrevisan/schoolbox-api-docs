@@ -22,14 +22,16 @@ INSERT INTO `sis_user_profile` (external_id, title, firstname, lastname, created
 /*
  Migrate data from user, user_profile and sis_user_profile_student to sis_profile_user table of the new schema
  */
-INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `username`, `email`, `gender`, `campus_name`, `head_of_house_id`, `head_of_house_name`, `house_name`, `form_name`,
-                                        `form_teacher_id`, `form_teacher_name`,`tutor_group`, `tutor_teacher_id`, `tutor_teacher_name`, `year_level`,
-                                        `year_level_coordinator_id`, `year_level_coordinator_name`,`mobile`, `studies_code`,`alert_medical`,`alert_comment`,
-                                        `alert_message`,`alert_legal`,`enrolment_date`,`leaving_date`, `ib`, `individual_learning_plans`,`esl`, `special_needs`,
-                                        `boarding_status`, `created_at`, `updated_at`)
-    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user`.`username`, `user`.`alt_email`,`user_profile`.`gender`,`luCampus`.`name`, NULL, NULL,`house`.`house`, NULL, NULL, NULL, NULL, NULL, NULL,
-           `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,`user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`,
-    NULL, `user`.`boarding_status` , NOW(), NOW()
+INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `username`, `email`, `gender`, `emergency_contact_name_1`, `emergency_contact_phone_1`,
+                                        `emergency_contact_phone_alt_1`, `emergency_contact_name_2`, `emergency_contact_phone_2`, `emergency_contact_phone_alt_2`,
+                                        `emergency_contact_name_3`, `emergency_contact_phone_3`, `emergency_contact_phone_alt_3`, `campus_name`, `head_of_house_id`,
+                                        `head_of_house_name`, `house_name`, `form_name`, `form_teacher_id`, `form_teacher_name`,`tutor_group`, `tutor_teacher_id`,
+                                        `tutor_teacher_name`, `year_level`, `year_level_coordinator_id`, `year_level_coordinator_name`,`mobile`, `studies_code`,
+                                        `alert_medical`,`alert_comment`,`alert_message`,`alert_legal`,`enrolment_date`,`leaving_date`, `ib`, `individual_learning_plans`
+                                        ,`esl`, `special_needs`, `boarding_status`, `created_at`, `updated_at`)
+    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user`.`username`, `user`.`alt_email`,`user_profile`.`gender`, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+           NULL, NULL, `luCampus`.`name`, NULL, NULL,`house`.`house`, NULL, NULL, NULL, NULL, NULL, NULL, `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL,
+           NULL, NULL, NULL, NULL, NULL,`user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`, NULL, `user`.`boarding_status` , NOW(), NOW()
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
