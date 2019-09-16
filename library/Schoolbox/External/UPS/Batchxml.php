@@ -35,15 +35,7 @@ class Batchxml implements ISync
     private $nodes;
 
 
-    /**
-     * A mapping between (NCYear, Campus) instances
-     *
-     * Campuses are stored separately from Students and are joined on NCYear
-     * so create a lookup instead of traversing every time
-     *
-     * @var array
-     */
-    private $campusMapping = [];
+
 
 
     /**
@@ -74,44 +66,12 @@ class Batchxml implements ISync
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }
 
-        /* Prefetch (Campus, NCYear) relations as a lookup
-         */
-        if (!\count($this->campusMapping)) {
-            $this->campusMapping = $this->prefetchCampuses();
-        }
 
         return $this->nodes->xpath($path);
     }
 
 
-    /**
-     * Mine $nodes for Campus elements and the NCYear levels to which they relate
-     *
-     * @return array
-     */
-    private function prefetchCampuses(): array
-    {
-        $campuses = $this->nodes->xpath('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
 
-        $mapping = [];
-
-        foreach ($campuses as $currentResult) {
-            $campus = (new User\Common\Campus())
-                ->setId(trim((string)$currentResult->xpath('@Id')[0]))
-                ->setCode(trim((string)$currentResult->Code))
-                ->setName(trim((string)$currentResult->Name));
-
-            /* Map campuses to their NCYear levels
-             */
-            $years = $currentResult->xpath('Years/Year[@YearId]');
-
-            foreach ($years as $year) {
-                $mapping[(int)$year->xpath('@YearId')[0]->YearId] = $campus;
-            }
-        }
-
-        return $mapping;
-    }
 
 
     /**
@@ -125,37 +85,37 @@ class Batchxml implements ISync
         $student = new User\Student();
 
         $student
-            ->setId(trim((string)$currentResult->SchoolCode))
-            ->setTitle(trim((string)$currentResult->Title))
-            ->setGivenName(trim((string)$currentResult->Forename))
-            ->setPreferredName(trim((string)$currentResult->Preferredname))
-            ->setLastname(trim((string)$currentResult->Surname))
-            ->setGender(trim((string)$currentResult->Gender))
-            ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$currentResult->DOB))));
+            ->setId(null)
+            ->setTitle(null)
+            ->setGivenName(null)
+            ->setPreferredName(null)
+            ->setLastname(null)
+            ->setGender(null)
+            ->setDob(null);
 
         $student
             ->getYear()
-            ->setDescription(trim((string)$currentResult->NCYear))
-            ->setLevel((int)$currentResult->NCYear);
+                ->setDescription(null)
+                ->setLevel(null);
 
         /* "Form" seems to be some kind of string, not an int
          * so we don't use setLevel()
          */
         $student
             ->getForm()
-            ->setDescription(trim((string)$currentResult->Form));
+                ->setDescription(null);
         $student
             ->getHouse()
-            ->setName(trim((string)$currentResult->AcademicHouse))
-            ->setCode(trim((string)$currentResult->AcademicHouse));
+                ->setName(null)
+                ->setCode(null);
 
         $student
             ->getAccount()
-            ->setLogin(trim((string)$currentResult->SchoolCode))
-            ->setActive(true);
+                ->setLogin(null)
+                ->setActive(true);
 
         $student
-            ->addEmail((new User\Common\Email())->setAddress(trim((string)$currentResult->EmailAddress)));
+            ->addEmail((new User\Common\Email())->setAddress(null));
 
         /* Assign campuses if they exist in the mapping
          * Otherwise quietly disregard bad data

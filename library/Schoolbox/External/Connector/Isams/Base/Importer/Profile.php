@@ -14,6 +14,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
+use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
@@ -83,6 +84,17 @@ class Profile implements ImporterInterface
 
 
     /**
+     * A mapping between (NCYear, Campus) instances
+     *
+     * Campuses are stored separately from Students and are joined on NCYear
+     * so create a lookup instead of traversing every time
+     *
+     * @var array
+     */
+    private $campusMapping = [];
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface             $log
@@ -94,6 +106,9 @@ class Profile implements ImporterInterface
      * @param UserProfile\Parent\Mapper   $parentProfileMapper
      * @param UserProfile\Staff\Mapper    $staffProfileMapper
      * @param UserProfile\Relation\Mapper $relationMapper
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
     public function __construct(
         LoggerInterface $log,
@@ -116,6 +131,10 @@ class Profile implements ImporterInterface
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationMapper = $relationMapper;
+
+        /* Prefetch (Campus, NCYear) relations as a lookup
+         */
+        $this->campusMapping = $this->prefetchCampuses();
     }
 
 
@@ -143,15 +162,15 @@ class Profile implements ImporterInterface
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-//        $this->log->info('Processing students and their parents.');
-//
-//        $this->importStudents();
+        $this->log->info('Processing students and their parents.');
+
+        $this->importStudents();
 
         /* Import staff profile data
          */
-        $this->log->info('Processing staff.');
-
-        $this->importStaff();
+//        $this->log->info('Processing staff.');
+//
+//        $this->importStaff();
 
         /* Remove any orphaned profiles
          */
@@ -185,17 +204,22 @@ class Profile implements ImporterInterface
      */
     private function importStudents()
     {
-        $students = $this->batchxml->findAllStudents();
+        $students = $this->batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         /** @var Student $student */
         foreach ($students as $student) {
+            print_r($student);
+            $externalId = trim((string)$student->SchoolCode);
+            $username = trim((string)$student->SchoolCode);
+            $firstname = trim((string)$student->Preferredname);
+            $lastname = trim((string)$student->Surname);
 
             /* Students without usernames are skipped
              */
-            if (!\strlen($student->getAccount()->getLogin())) {
+            if (!\strlen($username)) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for student %s - no username detected',
-                    trim("{$student->getPreferredName()} {$student->getLastname()}")
+                    trim("{$firstname} {$lastname}")
                 ));
 
                 continue;
@@ -206,7 +230,7 @@ class Profile implements ImporterInterface
              * Otherwise make a new one for the given id
              */
             try {
-                $studentProfile = $this->studentProfileMapper->findByExternalId($student->getId());
+                $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
                 $studentBaseProfile = $studentProfile->getBaseProfile();
             } catch (Exception $e) {
                 $studentProfile = $this->studentProfileMapper->createModel();
@@ -216,10 +240,10 @@ class Profile implements ImporterInterface
             }
 
             $studentBaseProfile
-                ->setExternalId($student->getId())
-                ->setTitle($student->getTitle())
-                ->setFirstname($student->getPreferredName())
-                ->setLastname($student->getLastname());
+                ->setExternalId($externalId)
+                ->setTitle(trim((string)$student->Title))
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
 
             /* Log it
              */
@@ -234,40 +258,49 @@ class Profile implements ImporterInterface
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
 
-            $studentProfile
-                ->setAlertMedical($student->getMedical())
-                ->setAlertComment($student->getAlert())
-                ->setBoardingStatus((bool)$student->getBoardingHouse()->getName())
-                ->setCampusName($student->getCampus()->count() ? $student->getCampus()->first()->getName() : null)
-                ->setDateOfBirth($student->getDob())
-                ->setEmail($student->getEmail()->count() ? $student->getEmail()->first()->getAddress() : null)
-                ->setFormName((string)$student->getForm()->getDescription())
-                ->setFormTeacherId($student->getForm()->getCoordinator()->getId())
-                ->setFormTeacherName(trim("{$student->getForm()->getCoordinator()->getPreferredName()} {$student->getForm()->getCoordinator()->getLastname()}"))
-                ->setGender($student->getGender())
-                ->setHeadOfHouseId($student->getHouse()->getHousemaster()->getId())
-                ->setHeadOfHouseName(trim("{$student->getHouse()->getHousemaster()->getPreferredName()} {$student->getHouse()->getHouseMaster()->getLastname()}"))
-                ->setHouseName($student->getHouse()->getName())
-                ->setMobile($student->getPhoneMobile()->getNumber())
-                ->setSpecialNeeds((bool)$student->getSpecialNeeds())
-                ->setTutorGroup($student->getTutor()->getGroup())
-                ->setTutorTeacherId($student->getTutor()->getId())
-                ->setTutorTeacherName(trim("{$student->getTutor()->getPreferredName()} {$student->getTutor()->getLastname()}"))
-                ->setYearLevel((string)$student->getYear()->getLevel())
-                ->setYearLevelCoordinatorId($student->getYear()->getCoordinator()->getId())
-                ->setYearLevelCoordinatorName(trim("{$student->getYear()->getCoordinator()->getPreferredName()} {$student->getYear()->getCoordinator()->getLastname()}"))
-                ->setUsername($student->getAccount()->getLogin())
+            /* Assign campuses if they exist in the mapping
+             * Otherwise quietly disregard bad data
+             */
+            $campusName = null;
 
-                /* These fields aren't supported by our Normalise adapter layer
-                 */
+            if (isset($this->campusMapping[(int)$student->NCYear])) {
+                $campusName = $this->campusMapping[(int)$student->NCYear]->getName();
+            }
+
+            $studentProfile
+                ->setUsername($username)
+                ->setAlertComment(null)
                 ->setAlertLegal(null)
+                ->setAlertMedical(null)
                 ->setAlertMessage(null)
+                ->setCampusName($campusName)
+                ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
+                ->setEmail(trim((string)$student->EmailAddress))
                 ->setEnrolmentDate(null)
+                ->setFormName(trim((string)$student->Form))
+                ->setFormTeacherId(null)
+                ->setFormTeacherName(null)
+                ->setGender(trim((string)$student->Gender))
+                ->setHeadOfHouseId(null)
+                ->setHeadOfHouseName(null)
+                ->setHouseName(trim((string)$student->AcademicHouse))
                 ->setLeavingDate(null)
+                ->setMobile(trim((string)$student->MobileNumber))
                 ->setStudiesCode(null)
+                ->setTutorGroup(null)
+                ->setTutorTeacherId(trim((string)$student->Tutor))
+                ->setTutorTeacherName(null)
+                ->setYearLevel((string)$student->NCYear)
+                ->setYearLevelCoordinatorId(null)
+                ->setYearLevelCoordinatorName(null)
+
+                /* Flags
+                 */
+                ->setBoardingStatus(false)
                 ->setEsl(null)
                 ->setIb(null)
-                ->setIndividualLearningPlans(null);
+                ->setIndividualLearningPlans(null)
+                ->setSpecialNeeds(false);
 
             /* Log it
              */
@@ -282,12 +315,44 @@ class Profile implements ImporterInterface
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            /* Add their parents' profile data
-             */
-            $this->importParentsOfStudent($student, $studentBaseProfile);
+//            /* Add their parents' profile data
+//             */
+//            $this->importParentsOfStudent($student, $studentBaseProfile);
         }
     }
 
+
+    /**
+     * Mine $nodes for Campus elements and the NCYear levels to which they relate
+     *
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function prefetchCampuses(): array
+    {
+        $campuses = $this->batchxml->fetchXml('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
+
+        $mapping = [];
+
+        foreach ($campuses as $currentResult) {
+            $campus = (new Campus())
+                ->setId(trim((string)$currentResult->xpath('@Id')[0]))
+                ->setCode(trim((string)$currentResult->Code))
+                ->setName(trim((string)$currentResult->Name));
+
+            /* Map campuses to their NCYear levels
+             */
+            $years = $currentResult->xpath('Years/Year[@YearId]');
+
+            foreach ($years as $year) {
+                $mapping[(int)$year->xpath('@YearId')[0]->YearId] = $campus;
+            }
+        }
+
+        return $mapping;
+    }
 
     /**
      * Import parent profile data for a given student
@@ -399,6 +464,8 @@ class Profile implements ImporterInterface
             }
         }
     }
+
+
 
 
     /**
