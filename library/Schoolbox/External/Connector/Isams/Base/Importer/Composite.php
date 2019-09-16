@@ -218,10 +218,10 @@ class Composite implements ImporterInterface
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationMapper
-            ));
-//            ->add(new Importer\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
-//            ->add(new Importer\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
-//            ->add(new Importer\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
+            ))
+            ->add(new Importer\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
+            ->add(new Importer\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
+            ->add(new Importer\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();
