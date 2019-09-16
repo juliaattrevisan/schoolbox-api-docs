@@ -140,6 +140,74 @@ class Profile implements ImporterInterface
                 $studentProfile->setBaseProfile($baseProfile);
             }
 
+            $baseProfile
+                ->setExternalId($student->getId())
+                ->setTitle($student->getTitle())
+                ->setFirstname($student->getPreferredName())
+                ->setLastname($student->getLastname());
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$baseProfile->getFirstname()} {$baseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($baseProfile);
+            }
+
+            $studentProfile
+                ->setBaseProfile($baseProfile)
+                ->setAlertMedical($student->getMedical())
+                ->setAlertComment($student->getAlert())
+                ->setBoardingStatus((bool)$student->getBoardingHouse())
+                ->setDateOfBirth($student->getDob())
+                ->setEmail($student->getEmail()->first() ? $student->getEmail()->first()->getAddress() : null)
+                ->setFormName((string)$student->getForm()->getDescription())
+                ->setFormTeacherId($student->getForm()->getCoordinator()->getId())
+                ->setFormTeacherName(trim("{$student->getForm()->getCoordinator()->getPreferredName()} {$student->getForm()->getCoordinator()->getLastname()}"))
+                ->setGender($student->getGender())
+                ->setHeadOfHouseId($student->getHouse()->getHousemaster()->getId())
+                ->setHeadOfHouseName(trim("{$student->getHouse()->getHousemaster()->getPreferredName()} {$student->getHouse()->getHouseMaster()->getLastname()}"))
+                ->setHouseName($student->getHouse()->getName())
+                ->setMobile($student->getPhoneMobile()->getNumber())
+                ->setSpecialNeeds((bool)$student->getSpecialNeeds())
+                ->setTutorGroup($student->getTutor()->getGroup())
+                ->setTutorTeacherId($student->getTutor()->getId())
+                ->setTutorTeacherName(trim("{$student->getTutor()->getPreferredName()} {$student->getTutor()->getLastname()}"))
+                ->setYearLevel((string)$student->getYear()->getLevel())
+                ->setYearLevelCoordinatorId($student->getYear()->getCoordinator()->getId())
+                ->setYearLevelCoordinatorName(trim("{$student->getYear()->getCoordinator()->getPreferredName()} {$student->getYear()->getCoordinator()->getLastname()}"))
+
+                /* These fields aren't supported by our Normalise adapter layer
+                 * TODO: Students don't have a campus???
+                 */
+                ->setAlertLegal(null)
+                ->setAlertMessage(null)
+                ->setEnrolmentDate(null)
+                ->setLeavingDate(null)
+                ->setStudiesCode(null)
+                ->setEsl(null)
+                ->setIb(null)
+                ->setIndividualLearningPlans(null);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding student profile for %s',
+                trim("{$baseProfile->getFirstname()} {$baseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->studentProfileMapper->save($studentProfile);
+            }
+
+die();
             /* Find any associated parents
              * For every associated parent, find out if they have a parent profile
              * If one already exists, load it, update it, then save it
@@ -232,12 +300,12 @@ class Profile implements ImporterInterface
 //                'Adding profile for %s',
 //                $user->getFullName()
 //            ));
-
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->userProfileMapper->save($profile);
-            }
+//
+//            /* Then save it
+//             */
+//            if ($this->perform) {
+//                $this->userProfileMapper->save($profile);
+//            }
         }
 
         if (!$this->perform) {
