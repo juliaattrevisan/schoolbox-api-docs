@@ -237,7 +237,7 @@ class Profile implements ImporterInterface
             $studentProfile
                 ->setAlertMedical($student->getMedical())
                 ->setAlertComment($student->getAlert())
-                ->setBoardingStatus((bool)$student->getBoardingHouse())
+                ->setBoardingStatus((bool)$student->getBoardingHouse()->getName())
                 ->setCampusName($student->getCampus()->count() ? $student->getCampus()->first()->getName() : null)
                 ->setDateOfBirth($student->getDob())
                 ->setEmail($student->getEmail()->count() ? $student->getEmail()->first()->getAddress() : null)
