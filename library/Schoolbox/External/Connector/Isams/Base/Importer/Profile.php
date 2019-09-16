@@ -182,6 +182,7 @@ class Profile implements ImporterInterface
                 ->setYearLevel((string)$student->getYear()->getLevel())
                 ->setYearLevelCoordinatorId($student->getYear()->getCoordinator()->getId())
                 ->setYearLevelCoordinatorName(trim("{$student->getYear()->getCoordinator()->getPreferredName()} {$student->getYear()->getCoordinator()->getLastname()}"))
+                ->setUsername($student->getAccount()->getLogin())
 
                 /* These fields aren't supported by our Normalise adapter layer
                  * TODO: Students don't have a campus???
@@ -208,7 +209,7 @@ class Profile implements ImporterInterface
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-die();
+
             /* Find any associated parents
              * For every associated parent, find out if they have a parent profile
              * If one already exists, load it, update it, then save it
