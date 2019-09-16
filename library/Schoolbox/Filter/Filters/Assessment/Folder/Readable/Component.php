@@ -118,9 +118,34 @@ class Component extends BaseComponent
      */
     public function toContext()
     {
+        $myClasses    = $this->folders->emptyClone();
+        $myGroups     = $this->folders->emptyClone();
+        $otherClasses = $this->otherFolders->emptyClone();
+        $otherGroups  = $this->otherFolders->emptyClone();
+        foreach ($this->folders as $folder) {
+            $folderId = $folder->getId();
+            if ($folder->isClass()) {
+                $myClasses[$folderId] = $folder;
+            } else {
+                $myGroups[$folderId] = $folder;
+            }
+        }
+        foreach ($this->otherFolders as $folder) {
+            $folderId = $folder->getId();
+            if ($folder->isClass()) {
+                $otherClasses[$folderId] = $folder;
+            } else {
+                $otherGroups[$folderId] = $folder;
+            }
+        }
         return array_merge(
             parent::toContext(),
-            ['otherFolders' => $this->otherFolders,]
+            [
+                'myClasses'    => $myClasses,
+                'myGroups'     => $myGroups,
+                'otherClasses' => $otherClasses,
+                'otherGroups'  => $otherGroups,
+            ]
         );
     }
 }

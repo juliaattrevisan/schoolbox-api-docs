@@ -71,24 +71,48 @@
             data-selectize
     >
         {# For this filter, folders are just all the URL override folders #}
-        {% for folder in folders %}
-            {% set roleSelection = roleSelections[folder.id] %}
-            {% set userSelection = userSelections[roleSelection.key] %}
-            <option value="{{ folder.id }}"
-                    label="{{ folder.nameWithCodes }}"
-                    data-value-object="{optgroup: {{ folder.class ? 'class' : 'group' }} }"
-                    {% if userSelection.selected %}selected{% endif %}
-            >{{ folder.nameWithCodes }}</option>
-        {% endfor %}
+        <optgroup label="My Classes" value="class">
+            {% for folder in myClasses %}
+                {% set roleSelection = roleSelections[folder.id] %}
+                {% set userSelection = userSelections[roleSelection.key] %}
+                <option value="{{ folder.id }}"
+                        label="{{ folder.nameWithCodes }}"
+                        {% if userSelection.selected %}selected{% endif %}
+                >{{ folder.nameWithCodes }}</option>
+            {% endfor %}
+        </optgroup>
 
-        {% for folder in otherFolders %}
-            {% set roleSelection = roleSelections[folder.id] %}
-            {% set userSelection = userSelections[roleSelection.key] %}
-            <option value="{{ folder.id }}"
-                    label="{{ folder.nameWithCodes }}"
-                    data-value-object="{optgroup: {{ folder.class ? 'otherClass' : 'otherGroup' }} }"
-                    {% if userSelection.selected %}selected{% endif %}
-            >{{ folder.nameWithCodes }}</option>
-        {% endfor %}
+        <optgroup label="My Groups" value="group">
+            {% for folder in myGroups %}
+                {% set roleSelection = roleSelections[folder.id] %}
+                {% set userSelection = userSelections[roleSelection.key] %}
+                <option value="{{ folder.id }}"
+                        label="{{ folder.nameWithCodes }}"
+                        {% if userSelection.selected %}selected{% endif %}
+                >{{ folder.nameWithCodes }}</option>
+            {% endfor %}
+        </optgroup>
+
+        <optgroup label="Other Classes" value="otherClass">
+            {% for folder in otherClasses %}
+                {% set roleSelection = roleSelections[folder.id] %}
+                {% set userSelection = userSelections[roleSelection.key] %}
+                <option value="{{ folder.id }}"
+                        label="{{ folder.nameWithCodes }}"
+                        {% if userSelection.selected %}selected{% endif %}
+                >{{ folder.nameWithCodes }}</option>
+            {% endfor %}
+        </optgroup>
+
+        <optgroup label="Other Groups" value="otherGroup">
+            {% for folder in otherGroups %}
+                {% set roleSelection = roleSelections[folder.id] %}
+                {% set userSelection = userSelections[roleSelection.key] %}
+                <option value="{{ folder.id }}"
+                        label="{{ folder.nameWithCodes }}"
+                        {% if userSelection.selected %}selected{% endif %}
+                >{{ folder.nameWithCodes }}</option>
+            {% endfor %}
+        </optgroup>
     </select>
 {% endblock %}
