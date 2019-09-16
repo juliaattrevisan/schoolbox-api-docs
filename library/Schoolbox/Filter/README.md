@@ -74,9 +74,57 @@ for performant retrieval of matching items.
 
 ## Practical guides
 
-### Adding an existing filter to a page which has filters
+### Adding filters to a page that doesn't have filters
 
-### Adding a filter page
+* Add to the `filter_page.page` enum
+* Add a corresponding `\Schoolbox\Filter\Page\Model::PAGE_*` constant
+* Update these methods with cases for the new constant:
+  * `\Schoolbox\Filter\Controller::buildFilteredPageLabels`
+  * `\Schoolbox\Filter\Module::registerRoutes`
+  * `\Schoolbox\Filter\Page\Model::getPageRoleTypes`
+* Update the `getPages` of each Definition implementation that the page uses
+* In your controller:
+  * inject a Factory Factory as a constructor param
+  * generate the filter panel's Twig data:
+    ```php
+    $page        = Filter\Page\Model::PAGE_NEW_FILTER;
+    $filterPanel = $this->filterFactoryFactory->buildPanel(
+        $this->getUser(),
+        $page,
+        null,
+        $this->getUser(),
+        []
+    );
+    ```
+  * inject the Twig data into the controller action's Twig template
+* In the Twig template:
+  * ```twig
+    {% include '@filters/panel.twig' with {
+        contentId: reportContentId,
+        panel:     filterPanel,
+        quickload: true
+    } only %}
+    ```
+* In the controller's module:
+  * inject the Factory Factory as a constructor param:
+    ```php
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
+                /** @var RosettaStone $rosettaStone */
+                $rosettaStone = $injector->get('l10n');
+                return new Filter\Filters\Assessment\FactoryFactory(
+                    $this->getMapperFactory(),
+                    $rosettaStone
+                );
+            }),
+        ];
+    }
+    ```
+
+### Adding an existing filter to a page which has filters
 
 ### Creating a new filter
 
