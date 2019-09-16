@@ -11,43 +11,56 @@
 
 namespace Schoolbox\External;
 
-class Subject {
-	/**
-	 * @var int
-	 */
-	protected $id;
+use Schoolbox\IModel;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 
-	/**
-	 * @var string
-	 */
-	protected $name;
+class Subject implements IModel
+{
 
-	/**
-	 * @var string
-	 */
-	protected $code;
+    use CreateCollection;
 
-	public function setCode($code) {
-		$this->code = $code;
-	}
+    /**
+     * @var int
+     */
+    protected $id;
 
-	public function getCode() {
-		return $this->code;
-	}
+    /**
+     * @var string
+     */
+    protected $name;
 
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * @var string
+     */
+    protected $code;
 
-	public function getId() {
-		return $this->id;
-	}
+    public function setCode($code)
+    {
+        $this->code = $code;
+    }
 
-	public function setName($name) {
-		$this->name = $name;
-	}
+    public function getCode()
+    {
+        return $this->code;
+    }
 
-	public function getName() {
-		return $this->name;
-	}
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
 }

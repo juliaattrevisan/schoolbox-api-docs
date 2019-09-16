@@ -201,9 +201,10 @@ class Notifier extends AbstractModuleNotifier
             }
         }
 
+        $accessLevelCensor = new AccessLevelCensor();
         foreach ($targetUsers as $userId => $user) {
             // make sure that multiple conditions allow user to access this record
-            if ($pastoral->getAccessLevel($user) === PastoralAccessMapper::ACCESS_DENY) {
+            if ($accessLevelCensor->getAccessLevel($pastoral, $user) === PastoralAccessMapper::ACCESS_DENY) {
                 continue;
             }
             $envelope->targetToUser($userId, $message);

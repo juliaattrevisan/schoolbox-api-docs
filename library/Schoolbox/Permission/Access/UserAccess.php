@@ -8,11 +8,13 @@
 
 namespace Schoolbox\Permission\Access;
 
-
+use Schoolbox\IModel;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\User;
 
-class UserAccess
+class UserAccess implements IModel
 {
+    use CreateCollection;
 
     /**
      * Value for $this->service:
@@ -213,4 +215,4 @@ class UserAccess
     }
 
 
-} 
+}

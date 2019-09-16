@@ -11,6 +11,8 @@ namespace Alaress\Application;
 use Aura\Di;
 use Config\Modules\ModuleConfigInterface;
 use Predis;
+use Schoolbox\Pastoral\AccessLevelCensor;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Throwable;
 use RuntimeException;
 use Alaress\Authorizer\Rule;
@@ -1273,14 +1275,21 @@ abstract class Kernel
             'pastoralDataSource',
             $di->lazyNew(
                 PastoralDataSource::class,
-                ['mapper' => $mapperFactory->getLazy(PastoralMapper::class)]
+                [
+                    'mapper'              => $mapperFactory->getLazy(PastoralMapper::class),
+                    'accessLevelCensor'   => $di->lazyNew(AccessLevelCensor::class),
+                    'pastoralAuditMapper' => $mapperFactory->getLazy(PastoralAuditMapper::class),
+                ]
             )
         );
         $di->set(
             'pastoralRevisionDataSource',
             $di->lazyNew(
                 PastoralRevisionDataSource::class,
-                ['mapper' => $mapperFactory->getLazy(PastoralRevisionMapper::class)]
+                [
+                    'mapper'            => $mapperFactory->getLazy(PastoralRevisionMapper::class),
+                    'accessLevelCensor' => $di->lazyNew(AccessLevelCensor::class),
+                ]
             )
         );
 

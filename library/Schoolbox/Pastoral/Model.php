@@ -10,7 +10,9 @@ namespace Schoolbox\Pastoral;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\IModel;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -19,16 +21,18 @@ use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
-class Model implements ISoftDeletable
+/**
+ * @method static GenericCollection|Model[] createCollection()
+ */
+class Model implements ISoftDeletable, IModel
 {
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use CreateCollection;
 
     /** @var Alaress_Date_Format $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
     private $updatedAtDisplay;
@@ -69,8 +73,12 @@ class Model implements ISoftDeletable
     /** @var null|float */
     protected $points;
 
-    /** @var User */
-    protected $owner;
+    /**
+     * The user who created the record.
+     *
+     * @var User
+     */
+    private $owner;
 
     /** @var null|User Null if imported from SIS */
     private $modifiedBy;
@@ -93,21 +101,13 @@ class Model implements ISoftDeletable
     /** @var Collection|PastoralRevision[] */
     private $revisions;
 
-    /**
-     * Has this record already been filtered? If so, it should not be filtered
-     * again.
-     *
-     * (This is an unmapped property.)
-     *
-     * @var bool
-     */
-    private $filtered = false;
 
     /**
      * Model constructor
      */
     public function __construct()
     {
+        // TODO tighten collection types
         $this->access = new Collection();
         $this->comments = new Collection();
         $this->attachments = new Collection();
@@ -526,75 +526,5 @@ class Model implements ISoftDeletable
         $this->revisions = $revisions;
 
         return $this;
-    }
-
-    /**
-     * Return the specified users access level to this record
-     *
-     * @param User $user
-     * @return int
-     */
-    public function getAccessLevel(User $user)
-    {
-        // Owners and moderators get private access regardless of any other permission set
-
-        if ($this->isUserInPastoralService($user) || $user->getId() == $this->getOwner()->getId()) {
-            return PastoralAccessMapper::ACCESS_PRIVATE;
-        }
-
-        // Otherwise start with deny access, and work our way up the permission levels
-
-        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
-
-        foreach ($this->getAccess() as $access) {
-            $access->setPastoral($this);
-            $accessLevelCurrent = $access->getAccessLevel($user);
-
-            if ($accessLevelCurrent === null) {
-                // The access rule didn't apply to this user, continue to the next one
-                continue;
-            }
-
-            if ($accessLevelCurrent == PastoralAccessMapper::ACCESS_DENY) {
-                return PastoralAccessMapper::ACCESS_DENY;
-            }
-
-            // We want the highest access level
-
-            $accessLevel = max($accessLevel, $accessLevelCurrent);
-        }
-
-        return $accessLevel;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFiltered(): bool
-    {
-        return $this->filtered;
-    }
-
-    /**
-     * @param bool $filtered
-     * @return static
-     */
-    public function setFiltered($filtered)
-    {
-        $this->filtered = $filtered;
-        return $this;
-    }
-
-
-    /**
-     * Does the given user have access to the pastoral service?
-     *
-     * @param User $user
-     *
-     * @return bool
-     */
-    protected function isUserInPastoralService(User $user)
-    {
-        return $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
     }
 }

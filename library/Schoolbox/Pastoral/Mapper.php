@@ -1,11 +1,5 @@
 <?php
 /**
- * Please don't use this mapper directly in web requests!
- *
- * Use `\Schoolbox\Pastoral\DataSource` instead; it wraps this mapper with
- * calls that automatically filter and censor records and fields that a user
- * does not have permission to view.
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -25,10 +19,8 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
-use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
-use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -40,6 +32,12 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
+ * Please don't use this mapper directly in web requests!
+ *
+ * Use `\Schoolbox\Pastoral\DataSource` instead; it wraps this mapper with
+ * calls that automatically filter and censor records and fields that a user
+ * does not have permission to view.
+ *
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)
@@ -87,8 +85,8 @@ class Mapper extends BaseMapper
         $this->joinsReverseMulti('pastoral_id', PastoralTagMapper::class, 'tags', 'tags');
         $this->joinsReverseMulti('root_id', PastoralRevisionMapper::class, 'revisions', 'revisions');
 
-        $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
-        $this->registerCallback(Mapper::CALLBACK_PRESOFTDELETE, [$this, 'deleteReferences']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleteReferences']);
     }
 
     /**
@@ -372,22 +370,20 @@ class Mapper extends BaseMapper
     /**
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
-     * @param User $user
      * @param int  $limit
      * @return Collection|Model[]
      * @throws MapperException
      */
-    public function findRecentDashboard(User $user, $limit = 5)
+    public function findRecentDashboard($limit = 5)
     {
-        return $this->filterRecordsForUser(
+        return
             $this->findByColumnList([
                 'sv.dashboard' => 1,
             ], [
-                'order' => ['created_at' => 'DESC'], 'limit' => $limit
-            ]
-            ),
-            $user
-        );
+                    'order' => ['created_at' => 'DESC'],
+                    'limit' => $limit,
+                ]
+            );
     }
 
     /**
@@ -458,10 +454,9 @@ class Mapper extends BaseMapper
         }
 
         $statement->execute($params);
-        $results = $this->hydrateSelect($statement);
-
-        return $results;
+        return $this->hydrateSelect($statement);
     }
+
 
     /**
      * Perform a search of pastoral records (currently searches the heading, body and comments)
@@ -470,18 +465,11 @@ class Mapper extends BaseMapper
      * @param User   $user The user who is searching
      *
      * @return Collection|Model[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getSearchResults($search, User $user)
     {
         $search = trim($search);
-
-        // Keep an audit trail of searches
-
-        $pastoralAuditMapper = PastoralAuditMapper::getInstance();
-
-        $auditRecord = $pastoralAuditMapper->createModel();
-        $auditRecord->setUser($user);
-        $auditRecord->setSearch($search);
 
         $words = [];
 
@@ -772,33 +760,10 @@ class Mapper extends BaseMapper
         $statement = $this->database->prepare($sql);
         $statement->execute($parameters);
 
-        $results = $this->filterRecordsForUser($this->hydrateSelect($statement), $user);
-
-        // --------------------------------------------------------------------------------------------------------
-        // Keep a record of all searches performed by users, and what results were displayed
-        // --------------------------------------------------------------------------------------------------------
-
-        $searchResults = [];
-
-        /** @var Model $record */
-        foreach ($results as $result) {
-            $searchResults[] = $result->getId();
-        }
-
-        // Record the search results that were returned by the search by imploding their IDs down into CSV
-
-        if (count($searchResults) > 0) {
-            $auditRecord->setSearchResult(implode(',', $searchResults));
-        }
-
-        // Save the audit record of the search
-        $pastoralAuditMapper->save($auditRecord);
-
         // --------------------------------------------------------------------------------------------------------
         // Return the search results
         // --------------------------------------------------------------------------------------------------------
-
-        return $results;
+        return $this->hydrateSelect($statement);
     }
 
     /**
@@ -966,14 +931,9 @@ class Mapper extends BaseMapper
         $statement->execute($this->bindings);
 
         // Hydrate records for return
-
         $results = $this->hydrateSelect($statement);
 
-        // Filter out any I can't view
-        $results = $this->filterRecordsForUser($results, $user);
-
         // If there are no tags to filter, just return the results now
-
         if ($tags->count() == 0) {
             return $results;
         }

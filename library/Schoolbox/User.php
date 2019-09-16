@@ -12,26 +12,29 @@ namespace Schoolbox;
 
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
+use Alaress\Json\Serializable;
 use House;
 use HouseResidential;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Pastoral;
 
-
-class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
+class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
     use SerializeTrait;
+    use CreateCollection;
 
     /** @var int */
     private $id;
@@ -231,6 +234,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      * @var GenericCollection|User[]
      */
     private $children;
+
+    /** @var GenericCollection|Pastoral\Group\Member\Model[] */
+    private $pastoralGroupsMemberships;
 
 
     public function __construct()
@@ -1009,7 +1015,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     public function getAccessList(): GenericCollection
     {
         /** @var UserAccessMapper $uaMapper */
-        if(!isset($this->accessList)) {
+        if (!isset($this->accessList)) {
             $uaMapper = UserAccessMapper::getInstance();
             $this->setAccessList($uaMapper->findAllForUser($this));
         }
@@ -1400,4 +1406,25 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         return '"' . $this->formatName() . '" <' . $this->getEmail() . '>';
     }
 
+    /**
+     * @return GenericCollection|Pastoral\Group\Member\Model[]|null
+     */
+    public function getPastoralGroupsMemberships(): ?GenericCollection
+    {
+        return $this->pastoralGroupsMemberships;
+    }
+
+    /**
+     * @param Collection|Pastoral\Group\Member\Model[] $pastoralGroupsMemberships
+     * @return $this
+     */
+    public function setPastoralGroupsMemberships(Collection $pastoralGroupsMemberships): self
+    {
+        if (!$this->pastoralGroupsMemberships) {
+            $this->pastoralGroupsMemberships = Pastoral\Group\Member\Model::createCollection();
+        }
+
+        $this->pastoralGroupsMemberships->replaceWith($pastoralGroupsMemberships);
+        return $this;
+    }
 }

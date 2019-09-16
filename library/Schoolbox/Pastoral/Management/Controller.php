@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -79,6 +80,17 @@ class Controller extends Base
      */
     public function getGroupsModify(Pastoral\Group\Model $group): void
     {
+        // Hydrate roles
+        if ($group->getMembers()) {
+            foreach ($group->getMembers() as $member) {
+                try {
+                    $this->userMapper->findById($member->getUser()->getId());
+                } catch (Exception $e) {
+                    // noop
+                }
+            }
+        }
+
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/groups_modify.twig',
             'data'     => [

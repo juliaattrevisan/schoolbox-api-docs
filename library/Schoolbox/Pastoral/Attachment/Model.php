@@ -7,7 +7,10 @@
 
 namespace Schoolbox\Pastoral\Attachment;
 
+use Schoolbox\IModel;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -20,18 +23,33 @@ use Schoolbox\Resource\Storage\IStorage;
  *
  * @package Schoolbox\Pastoral\Attachment
  */
-class Model implements IStorage, ISoftDeletable
+class Model implements IStorage, ISoftDeletable, IModel
 {
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
     use StorableTrait;
+    use CreateCollection;
 
     /** @var Pastoral $pastoral */
     private $pastoral;
 
     /** @var bool $private */
     private $private;
+
+    /**
+     * Returns whether this is a public attachment
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isPublic(): bool
+    {
+        if ($this->private === null) {
+            throw new InsufficientHydrationException("Expected bool, found null");
+        }
+        return !$this->private;
+    }
 
     /**
      * @param Pastoral $pastoral

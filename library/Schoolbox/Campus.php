@@ -6,93 +6,107 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox;
 
-class Campus implements ValueLabelInterface {
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 
-	/** @var string */
+class Campus implements ValueLabelInterface, IModel
+{
+
+    use CreateCollection;
+
+    /** @var string */
     private $name;
 
-	/** @var int */
+    /** @var int */
     private $id;
 
-	/** @var string */
-	private $extTimetableCode;
+    /** @var string */
+    private $extTimetableCode;
 
-	/** @var int */
-	private $timetableDay;
+    /** @var int */
+    private $timetableDay;
 
 
-	/**
-	 * @param int $id
-	 * @return self
-	 */
-	public function setId($id) {
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
         $this->id = $id;
-	    return $this;
+        return $this;
     }
 
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
+    /**
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
 
-	/**
-	 * @param string $name
-	 * @return self
-	 */
-	public function setName($name) {
+    /**
+     * @param string $name
+     * @return self
+     */
+    public function setName($name)
+    {
         $this->name = $name;
-	    return $this;
+        return $this;
     }
 
 
-	/**
-	 * @return string
-	 */
-	public function getName() {
+    /**
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
 
-	/**
-	 * @param string $extTimetableCode
-	 * @return self
-	 */
-	public function setExtTimetableCode($extTimetableCode) {
-		$this->extTimetableCode = $extTimetableCode;
-		return $this;
-	}
+    /**
+     * @param string $extTimetableCode
+     * @return self
+     */
+    public function setExtTimetableCode($extTimetableCode)
+    {
+        $this->extTimetableCode = $extTimetableCode;
+        return $this;
+    }
 
 
-	/**
-	 * @return string
-	 */
-	public function getExtTimetableCode() {
-		return $this->extTimetableCode;
-	}
+    /**
+     * @return string
+     */
+    public function getExtTimetableCode()
+    {
+        return $this->extTimetableCode;
+    }
 
 
-	/**
-	 * @param int $timetableDay
-	 * @return self
-	 */
-	public function setTimetableDay($timetableDay) {
-		$this->timetableDay = $timetableDay;
-		return $this;
-	}
+    /**
+     * @param int $timetableDay
+     * @return self
+     */
+    public function setTimetableDay($timetableDay)
+    {
+        $this->timetableDay = $timetableDay;
+        return $this;
+    }
 
 
-	/**
-	 * @return int
-	 */
-	public function getTimetableDay() {
-		return $this->timetableDay;
-	}
+    /**
+     * @return int
+     */
+    public function getTimetableDay()
+    {
+        return $this->timetableDay;
+    }
 
     /**
      * Find a key/value representation of this model's data
@@ -110,7 +124,7 @@ class Campus implements ValueLabelInterface {
     {
         return [
             'value' => $this->getId(),
-            'label' => $this->getName()
+            'label' => $this->getName(),
         ];
     }
 }

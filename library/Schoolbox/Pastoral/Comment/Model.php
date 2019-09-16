@@ -7,7 +7,10 @@
 
 namespace Schoolbox\Pastoral\Comment;
 
+use Schoolbox\IModel;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -15,12 +18,13 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, IModel
 {
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use CreateCollection;
 
     /** @var Pastoral */
     protected $pastoral;
@@ -36,10 +40,25 @@ class Model implements ISoftDeletable
     protected $body;
 
     /** @var bool */
-    protected $private;
+    private $private;
 
     /** @var User */
     protected $owner;
+
+
+    /**
+     * Returns whether this is a public comment
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isPublic(): bool
+    {
+        if ($this->private === null) {
+            throw new InsufficientHydrationException("Expected bool, found null");
+        }
+        return !$this->private;
+    }
 
     /**
      * @param Pastoral $pastoral
