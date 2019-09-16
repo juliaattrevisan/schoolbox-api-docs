@@ -27,12 +27,11 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
+use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
-use Schoolbox\External\UserProfileMapper;
-use Schoolbox\External\UserRelationMapper;
 use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -81,14 +80,17 @@ HELP;
             new Batchxml($api),
             CampusMapper::getInstance(),
             UserMapper::getInstance(),
-            UserProfileMapper::getInstance(),
-            UserRelationMapper::getInstance(),
             TimetableCampusMapper::getInstance(),
             TimetableCycleMapper::getInstance(),
             TimetablePeriodMapper::getInstance(),
             ClassEntryMapper::getInstance(),
             ClassInvolvementMapper::getInstance(),
-            ClassPeriodMapper::getInstance()
+            ClassPeriodMapper::getInstance(),
+            UserProfile\Mapper::getInstance(),
+            UserProfile\Student\Mapper::getInstance(),
+            UserProfile\Parent\Mapper::getInstance(),
+            UserProfile\Staff\Mapper::getInstance(),
+            UserProfile\Relation\Mapper::getInstance()
         );
 
         try {

@@ -15,8 +15,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
-use Schoolbox\External\UserProfile;
-use Schoolbox\External\UserProfileMapper;
+use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -51,32 +50,69 @@ class Profile implements ImporterInterface
 
 
     /**
-     * @var UserProfileMapper
+     * @var UserProfile\Mapper
      */
-    private $userProfileMapper;
+    private $baseProfileMapper;
+
+
+    /**
+     * @var UserProfile\Student\Mapper
+     */
+    private $studentProfileMapper;
+
+
+    /**
+     * @var UserProfile\Parent\Mapper
+     */
+    private $parentProfileMapper;
+
+
+    /**
+     * @var UserProfile\Staff\Mapper
+     */
+    private $staffProfileMapper;
+
+
+    /**
+     * @var UserProfile\Relation\Mapper
+     */
+    private $relationMapper;
 
 
     /**
      * Profile constructor.
      *
-     * @param LoggerInterface   $log
-     * @param bool              $perform
-     * @param Batchxml          $batchxml
-     * @param UserMapper        $userMapper
-     * @param UserProfileMapper $userProfileMapper
+     * @param LoggerInterface             $log
+     * @param bool                        $perform
+     * @param Batchxml                    $batchxml
+     * @param UserMapper                  $userMapper
+     * @param UserProfile\Mapper          $baseProfileMapper
+     * @param UserProfile\Student\Mapper  $studentProfileMapper
+     * @param UserProfile\Parent\Mapper   $parentProfileMapper
+     * @param UserProfile\Staff\Mapper    $staffProfileMapper
+     * @param UserProfile\Relation\Mapper $relationMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
         UserMapper $userMapper,
-        UserProfileMapper $userProfileMapper
+        UserProfile\Mapper $baseProfileMapper,
+        UserProfile\Student\Mapper $studentProfileMapper,
+        UserProfile\Parent\Mapper $parentProfileMapper,
+        UserProfile\Staff\Mapper $staffProfileMapper,
+        UserProfile\Relation\Mapper $relationMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
         $this->userMapper = $userMapper;
-        $this->userProfileMapper = $userProfileMapper;
+
+        $this->baseProfileMapper = $baseProfileMapper;
+        $this->studentProfileMapper = $studentProfileMapper;
+        $this->parentProfileMapper = $parentProfileMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
+        $this->relationMapper = $relationMapper;
     }
 
 
@@ -90,86 +126,91 @@ class Profile implements ImporterInterface
         /** @var Student $student */
         foreach ($students as $student) {
 
-            /* Firstly try to find out if the user already exists in schoolbox
-             * If they don't exist, we can't assign a profile to them yet
-             * We have to wait for the UPS to make this user
-             */
-            try {
-                $user = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
-            } catch (Mapper\Exception $e) {
-                $this->log->warning(sprintf(
-                    'Skipping profile for %s %s (%d) - schoolbox account could not be found',
-                    $student->getPreferredName(),
-                    $student->getLastname(),
-                    $student->getId()
-                ));
+print_r($student->getId());
+die();
 
-                continue;
-            }
 
-            /* Secondly try to find an existing profile for this user
-             * If it already exists, update it; otherwise create it
-             */
-            try {
-                $profile = $this->userProfileMapper->findById($user->getId());
-            } catch (Mapper\Exception $e) {
-                $profile = $this->userProfileMapper->createModel()->setUser($user);
-            }
-
-            /* Thirdly populate the profile instance with relevant data
-             */
-            /** @var UserProfile $profile */
-            $profile
-                ->setUser($user)
-                ->setTitle($student->getTitle())
-                ->setGivenName($student->getGivenName())
-                ->setPreferredName($student->getPreferredName())
-                ->setLastName($student->getLastname())
-
-                /* Gender is stored as an int(11) !!!! field in our schema, wot
-                 * This string will always end up getting cast to zero for now
-                 */
-                ->setGender($student->getGender())
-                ->setEmail($student->getEmail()->first() ? $student->getEmail()->first()->getAddress() : '')
-                ->setDob($student->getDob());
-
-            $profile
-                ->setLevel((string)$student->getYear()->getLevel())
-                ->setHomegroup($student->getForm()->getDescription())
-                ->setHouse($student->getHouse()->getName());
-
-            /* Assemble parents into profile instance
-             */
-            $parents = $this->findParentsNodes($student);
-
-            if (isset($parents[0])) {
-                $profile
-                    ->setGuardian1Name($parents[0]['name'])
-                    ->setGuardian1HomePhone($parents[0]['phone']['home'])
-                    ->setGuardian1WorkPhone($parents[0]['phone']['work'])
-                    ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
-                    ->setGuardian1Email($parents[0]['email'])
-                ;
-            }
-
-            if (isset($parents[1])) {
-                $profile
-                    ->setGuardian2Name($parents[1]['name'])
-                    ->setGuardian2HomePhone($parents[1]['phone']['home'])
-                    ->setGuardian2WorkPhone($parents[1]['phone']['work'])
-                    ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
-                    ->setGuardian2Email($parents[1]['email'])
-                ;
-            }
-
-            /* TODO: ESL and IB Flags indeterminate
-             * But the model doesn't support these columns??
-             */
-
-            $this->log->info(sprintf(
-                'Adding profile for %s',
-                $user->getFullName()
-            ));
+//
+//            /* Firstly try to find out if the user already exists in schoolbox
+//             * If they don't exist, we can't assign a profile to them yet
+//             * We have to wait for the UPS to make this user
+//             */
+//            try {
+//                $user = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
+//            } catch (Mapper\Exception $e) {
+//                $this->log->warning(sprintf(
+//                    'Skipping profile for %s %s (%d) - schoolbox account could not be found',
+//                    $student->getPreferredName(),
+//                    $student->getLastname(),
+//                    $student->getId()
+//                ));
+//
+//                continue;
+//            }
+//
+//            /* Secondly try to find an existing profile for this user
+//             * If it already exists, update it; otherwise create it
+//             */
+//            try {
+//                $profile = $this->userProfileMapper->findById($user->getId());
+//            } catch (Mapper\Exception $e) {
+//                $profile = $this->userProfileMapper->createModel()->setUser($user);
+//            }
+//
+//            /* Thirdly populate the profile instance with relevant data
+//             */
+//            /** @var UserProfile $profile */
+//            $profile
+//                ->setUser($user)
+//                ->setTitle($student->getTitle())
+//                ->setGivenName($student->getGivenName())
+//                ->setPreferredName($student->getPreferredName())
+//                ->setLastName($student->getLastname())
+//
+//                /* Gender is stored as an int(11) !!!! field in our schema, wot
+//                 * This string will always end up getting cast to zero for now
+//                 */
+//                ->setGender($student->getGender())
+//                ->setEmail($student->getEmail()->first() ? $student->getEmail()->first()->getAddress() : '')
+//                ->setDob($student->getDob());
+//
+//            $profile
+//                ->setLevel((string)$student->getYear()->getLevel())
+//                ->setHomegroup($student->getForm()->getDescription())
+//                ->setHouse($student->getHouse()->getName());
+//
+//            /* Assemble parents into profile instance
+//             */
+//            $parents = $this->findParentsNodes($student);
+//
+//            if (isset($parents[0])) {
+//                $profile
+//                    ->setGuardian1Name($parents[0]['name'])
+//                    ->setGuardian1HomePhone($parents[0]['phone']['home'])
+//                    ->setGuardian1WorkPhone($parents[0]['phone']['work'])
+//                    ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
+//                    ->setGuardian1Email($parents[0]['email'])
+//                ;
+//            }
+//
+//            if (isset($parents[1])) {
+//                $profile
+//                    ->setGuardian2Name($parents[1]['name'])
+//                    ->setGuardian2HomePhone($parents[1]['phone']['home'])
+//                    ->setGuardian2WorkPhone($parents[1]['phone']['work'])
+//                    ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
+//                    ->setGuardian2Email($parents[1]['email'])
+//                ;
+//            }
+//
+//            /* TODO: ESL and IB Flags indeterminate
+//             * But the model doesn't support these columns??
+//             */
+//
+//            $this->log->info(sprintf(
+//                'Adding profile for %s',
+//                $user->getFullName()
+//            ));
 
             /* Then save it
              */
