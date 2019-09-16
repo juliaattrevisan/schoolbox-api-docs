@@ -143,10 +143,14 @@ class Profile implements ImporterInterface
         /* Import students' profile data
          * Import their specific parents' profile data
          */
+        $this->log->info('Processing students and their parents.');
+
         $this->importStudents();
 
         /* Import staff profile data
          */
+        $this->log->info('Processing staff.');
+
         $this->importStaff();
 
         /* Remove any orphaned profiles
