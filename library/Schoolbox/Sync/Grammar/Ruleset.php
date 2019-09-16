@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -137,7 +137,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                     if ($this->isCollection($property)) {
 
                         // first, read the value out of the object
-                        $modelProperty = $this->mapper->getModelProperty($object, $property);
+                        $modelProperty = $this->mapper->getModelProperty($object, $property) ?? [];
 
                         // wrap value in an array if not already one
                         $value = (array)$value;
