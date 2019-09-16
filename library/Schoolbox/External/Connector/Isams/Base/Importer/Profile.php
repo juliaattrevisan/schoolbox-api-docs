@@ -161,7 +161,6 @@ class Profile implements ImporterInterface
             }
 
             $studentProfile
-                ->setBaseProfile($baseProfile)
                 ->setAlertMedical($student->getMedical())
                 ->setAlertComment($student->getAlert())
                 ->setBoardingStatus((bool)$student->getBoardingHouse())
