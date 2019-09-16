@@ -168,9 +168,9 @@ class Profile implements ImporterInterface
 
         /* Import staff profile data
          */
-//        $this->log->info('Processing staff.');
-//
-//        $this->importStaff();
+        $this->log->info('Processing staff.');
+
+        $this->importStaff();
 
         /* Remove any orphaned profiles
          */
