@@ -1,18 +1,6 @@
 #!/usr/bin/php
 <?php
 /**
- * ISAMS Importer
- *
- * Imports from an xml file and populates the following tables:
- *   user_profile
- *   user_relation
- *   class
- *   class_period
- *   class_user
- *   timetable_campus
- *   timetable_cycle
- *   timetable_period
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -37,6 +25,22 @@ use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
+/**
+ * ISAMS Importer
+ *
+ * Imports from an xml file and populates the following tables:
+ *   sis_user_profile
+ *   sis_user_profile_staff
+ *   sis_user_profile_student
+ *   sis_user_profile_parent
+ *   sis_user_profile_relation
+ *   class
+ *   class_period
+ *   class_user
+ *   timetable_campus
+ *   timetable_cycle
+ *   timetable_period
+ */
 $app = new class extends CliTool\App
 {
     // --help: print help
