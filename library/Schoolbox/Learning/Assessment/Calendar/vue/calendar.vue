@@ -11,6 +11,7 @@
     import axios              from 'axios'
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
     import {stringify}        from 'qs';
+    import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 
     // Various URLs that FullCalendar may make use of.
     const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -36,10 +37,11 @@
         },
         data() {
             return {
-                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
+                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, resourceTimelinePlugin, momentPlugin ],
                 currentEvent: {},
                 newEvent: {},
                 selectedFilters: null,
+                newResources: [],
             }
         },
         computed: {
@@ -79,10 +81,11 @@
              * @param successCallback A function to call with the list of events.
              */
             events(fetchInfo, successCallback) {
+                var self = this;
                 // No filters loaded yet? Render nothing.
                 // The selected filters get populated by `onFilterChange`:
                 // this is called by the filter's `filterContentLoaded` trigger.
-                if (this.selectedFilters === null) {
+                if (self.selectedFilters === null) {
                     successCallback([]);
                     return;
                 }
@@ -95,13 +98,16 @@
                         params: {
                             start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                             end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            filters: this.selectedFilters,
+                            filters: self.selectedFilters,
                         },
                         paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
                     }
                 ).then(
                     function (response) {
                         successCallback(response.data.filter(function (v) {
+                            self.newResources.push({'id': v.data.meta.folderId, 'title':  v.data.meta.folderName});
+                            v.resourceId = v.data.meta.folderId;
+
                             return 'start' in v;
                         }));
                     }
@@ -173,6 +179,10 @@
                 this.selectedFilters = selectedFilters;
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
+
+            eventPositioned(info) {
+                console.log(info);
+            }
         }
     }
 
@@ -192,35 +202,58 @@
             ref="fullCalendar"
             :plugins="calendarPlugins"
             :views="{
-                day: {
-                    titleFormat: dayTitleFormat,
-                    columnHeader: false
+                resourceTimelineSemester: {
+                    type: 'resourceTimelineYear',
+                    duration: { weeks: 22 },
+                    slotDuration: { weeks: 1 },
+                    weekNumbers: true,
+                    slotLabelFormat: [
+                        'MMMM',
+                        'w'
+                    ],
+                    resourceAreaWidth: '15%',
+                    filterResourcesWithEvents: true,
+                    eventLimit: 1
                 },
-                week: {
-                    columnHeaderFormat: formats.displayWeekDay
+                resourceTimelineWeek: {
+                    columnHeaderFormat: formats.displayWeekDay,
+                    duration: { weeks: 1 },
+                    slotDuration: { days: 1 },
+                    slotLabelFormat: [
+                        'ddd DD',
+                    ],
+                    resourceAreaWidth: '15%',
+                    filterResourcesWithEvents: true,
+                },
+                dayGridMonth: {
+                    eventLimit: config.eventLimit
                 }
             }"
+            :week-label="''"
             :event-time-format="helper.eventTimeFormat"
             content-height="auto"
             :header="{
                 left: 'today,prev,next',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: 'resourceTimelineSemester,dayGridMonth,resourceTimelineWeek'
             }"
             :buttonText="{
-                today:    'Today',
-                month:    'Month',
-                week:     'Week',
-                day:      'Day'
+                today:'Today',
+                month:'Month',
+                resourceTimelineWeek:'Week',
+                resourceTimelineSemester:'Semester',
             }"
-            default-view="dayGridMonth"
+            default-view="resourceTimelineSemester"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
-            :event-limit="config.eventLimit"
-            :first-day="config.firstDay"
             :event-render="eventRender"
-            :events="events"
             @loading="onLoading"
             @eventClick="onEventClick"
+            :events="events"
+            :resources="this.newResources"
+            :scheduler-license-key="config.schedulerLicenseKey"
+            :first-day="1"
+            :event-limit="1"
+            :progressive-event-rendering="true"
         />
     </div>
 </template>
@@ -230,4 +263,6 @@
     @import '~@fullcalendar/daygrid/main.css';
     @import '~@fullcalendar/timegrid/main.css';
     @import '~@fullcalendar/list/main.css';
+    @import '~@fullcalendar/timeline/main.css';
+    @import '~@fullcalendar/resource-timeline/main.css';
 </style>
