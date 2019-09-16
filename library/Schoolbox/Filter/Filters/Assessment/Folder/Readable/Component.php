@@ -18,7 +18,16 @@ class Component extends BaseComponent
 {
     /**
      * A list of folders that are eligible for selection, that the current user
-     * is NOT directly involved in.
+     * IS directly involved in.
+     *
+     * @var GenericCollection|Model[]
+     */
+    private $myFolders;
+
+
+    /**
+     * A list of folders that are eligible for selection, that the current user
+     * IS NOT directly involved in.
      *
      * @var GenericCollection|Model[]
      */
@@ -33,7 +42,9 @@ class Component extends BaseComponent
      * @param GenericCollection|null  $userSelections
      * @param GenericCollection|null  $urlOverrides
      * @param Filter\Selection\Mapper $filterSelectionMapper
-     * @param GenericCollection       $folders
+     * @param GenericCollection       $folders      Empty and unused in this context:
+     *                                              split into `$myFolders` and `$otherFolders`
+     * @param GenericCollection       $myFolders
      * @param GenericCollection       $otherFolders
      */
     public function __construct(
@@ -44,6 +55,7 @@ class Component extends BaseComponent
         ?GenericCollection $urlOverrides,
         Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $folders,
+        GenericCollection $myFolders,
         GenericCollection $otherFolders
     ) {
         parent::__construct(
@@ -55,6 +67,7 @@ class Component extends BaseComponent
             $filterSelectionMapper,
             $folders
         );
+        $this->myFolders    = $myFolders;
         $this->otherFolders = $otherFolders;
     }
 
@@ -80,7 +93,7 @@ class Component extends BaseComponent
         $urlOverrides = $this->getUrlOverrides();
 
         // TODO clean this whole thing up
-        foreach ($this->folders as $folder) {
+        foreach ($this->myFolders as $folder) {
             // TODO Should this filter fetch folders that were classes?
             $key        = (string)$folder->getId();
             $isClass    = $folder->isClass();
@@ -118,11 +131,11 @@ class Component extends BaseComponent
      */
     public function toContext()
     {
-        $myClasses    = $this->folders->emptyClone();
-        $myGroups     = $this->folders->emptyClone();
+        $myClasses    = $this->myFolders->emptyClone();
+        $myGroups     = $this->myFolders->emptyClone();
         $otherClasses = $this->otherFolders->emptyClone();
         $otherGroups  = $this->otherFolders->emptyClone();
-        foreach ($this->folders as $folder) {
+        foreach ($this->myFolders as $folder) {
             $folderId = $folder->getId();
             if ($folder->isClass()) {
                 $myClasses[$folderId] = $folder;

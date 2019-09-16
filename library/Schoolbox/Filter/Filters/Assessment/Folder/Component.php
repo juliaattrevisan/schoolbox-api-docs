@@ -22,7 +22,7 @@ class Component extends Filter\BaseComponent
      *
      * @var GenericCollection|Folder\Model[]
      */
-    protected $folders;
+    private $folders;
 
 
     /**

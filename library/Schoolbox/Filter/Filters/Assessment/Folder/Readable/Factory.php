@@ -105,6 +105,7 @@ class Factory extends FolderFilter\Factory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()] ?? null,
             $this->getSelectionMapper(),
+            $folderMapper->createCollection(),
             $myFolders,
             $otherFolders->diffBy($myFolders, 'id')
         );
