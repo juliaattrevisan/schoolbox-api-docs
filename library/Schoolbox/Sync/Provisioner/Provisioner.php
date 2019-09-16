@@ -11,8 +11,10 @@ use Alaress\Rules\Lang\SkipException;
 use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Campus;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
@@ -23,7 +25,6 @@ use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
 use UnexpectedValueException;
-use Schoolbox\Collection;
 
 /**
  * The User Provisioning System.
@@ -225,7 +226,8 @@ class Provisioner
                         $action = 'update';
 
                     } catch (MapperException $e) {
-                        $internalUser = $this->userMapper->createModel();
+                        $internalUser = (new User())
+                            ->setCampusCollection(new GenericCollection(Campus::class));
                         $internalUser->getRole()->setType($roleType);
                         $this->logger->debug("No existing user to retrieve: new user", $commonContext);
                         $action = 'create';
