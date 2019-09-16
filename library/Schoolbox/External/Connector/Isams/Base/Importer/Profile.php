@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\Profile as UserProfile;
@@ -309,99 +310,22 @@ class Profile implements ImporterInterface
                     $this->relationMapper->save($relation);
                 }
             }
+        }
 
-            /* Remove any orphaned profiles
-             * TODO: Reuse the one from CSV Importer
-             */
+        /* Process staff
+         */
 
+        /* Remove any orphaned profiles
+         */
+        if ($this->perform) {
+            $this->log->info('Removing orphaned profiles.');
 
-
-//            /* Firstly try to find out if the user already exists in schoolbox
-//             * If they don't exist, we can't assign a profile to them yet
-//             * We have to wait for the UPS to make this user
-//             */
-//            try {
-//                $user = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
-//            } catch (Mapper\Exception $e) {
-//                $this->log->warning(sprintf(
-//                    'Skipping profile for %s %s (%d) - schoolbox account could not be found',
-//                    $student->getPreferredName(),
-//                    $student->getLastname(),
-//                    $student->getId()
-//                ));
-//
-//                continue;
-//            }
-//
-//            /* Secondly try to find an existing profile for this user
-//             * If it already exists, update it; otherwise create it
-//             */
-//            try {
-//                $profile = $this->userProfileMapper->findById($user->getId());
-//            } catch (Mapper\Exception $e) {
-//                $profile = $this->userProfileMapper->createModel()->setUser($user);
-//            }
-//
-//            /* Thirdly populate the profile instance with relevant data
-//             */
-//            /** @var UserProfile $profile */
-//            $profile
-//                ->setUser($user)
-//                ->setTitle($student->getTitle())
-//                ->setGivenName($student->getGivenName())
-//                ->setPreferredName($student->getPreferredName())
-//                ->setLastName($student->getLastname())
-//
-//                /* Gender is stored as an int(11) !!!! field in our schema, wot
-//                 * This string will always end up getting cast to zero for now
-//                 */
-//                ->setGender($student->getGender())
-//                ->setEmail($student->getEmail()->first() ? $student->getEmail()->first()->getAddress() : '')
-//                ->setDob($student->getDob());
-//
-//            $profile
-//                ->setLevel((string)$student->getYear()->getLevel())
-//                ->setHomegroup($student->getForm()->getDescription())
-//                ->setHouse($student->getHouse()->getName());
-//
-//            /* Assemble parents into profile instance
-//             */
-//            $parents = $this->findParentsNodes($student);
-//
-//            if (isset($parents[0])) {
-//                $profile
-//                    ->setGuardian1Name($parents[0]['name'])
-//                    ->setGuardian1HomePhone($parents[0]['phone']['home'])
-//                    ->setGuardian1WorkPhone($parents[0]['phone']['work'])
-//                    ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
-//                    ->setGuardian1Email($parents[0]['email'])
-//                ;
-//            }
-//
-//            if (isset($parents[1])) {
-//                $profile
-//                    ->setGuardian2Name($parents[1]['name'])
-//                    ->setGuardian2HomePhone($parents[1]['phone']['home'])
-//                    ->setGuardian2WorkPhone($parents[1]['phone']['work'])
-//                    ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
-//                    ->setGuardian2Email($parents[1]['email'])
-//                ;
-//            }
-//
-//            /* TODO: ESL and IB Flags indeterminate
-//             * But the model doesn't support these columns??
-//             */
-//
-//            $this->log->info(sprintf(
-//                'Adding profile for %s',
-//                $user->getFullName()
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->userProfileMapper->save($profile);
-//            }
+            (new OrphanRemover(
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper
+            ))->remove();
         }
 
         if (!$this->perform) {
