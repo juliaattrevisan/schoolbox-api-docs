@@ -108,13 +108,15 @@ class Controller extends Base
             ? $participant->findMostRecentSelfAssessedFeedback()
             : $participant->findMostRecentInstructorGivenFeedback();
 
+        $mostRecentInstructorGivenFeedback = $participant->findMostRecentInstructorGivenFeedback();
+
         try {
             $feedback = $this->processFeedback(
                 $participant,
                 $post,
                 $reviewRoute,
                 $mostRecentFeedback,
-                $participant->findMostRecentInstructorGivenFeedback()->getResponse()
+                ($mostRecentInstructorGivenFeedback !== null) ? $mostRecentInstructorGivenFeedback->getResponse() : null
             );
 
             // Try to process a rubric.
