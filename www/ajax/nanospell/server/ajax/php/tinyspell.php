@@ -8,7 +8,7 @@ $broker = enchant_broker_init();
 // Dictionaries, in order of preference
 // TODO figure out how dictionaries should be installed
 $dicts = [
-    enchant_broker_request_dict($broker, 'en_AU'),
+    enchant_broker_request_dict($broker, Config::get('spelling_checking_language')),
 ];
 
 if (!$post->id) {
