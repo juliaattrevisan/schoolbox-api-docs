@@ -97,7 +97,7 @@ class External_Tass_Class implements External_ClassInterface {
             $subCodeArray = explode(',',$classCode);
             foreach($subCodeArray as $code) {
                 list($year, $code, $class) = self::parseClassCode($code);
-                $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
+                $yearQuery = $year !== '' ?  "(year_grp = '$year' OR year_grp IS NULL) AND" : '';
 
 
                 $classQuery .= " ( $yearQuery sub_code = '$code' AND class = '$class' ) OR ";
@@ -106,7 +106,7 @@ class External_Tass_Class implements External_ClassInterface {
         }
         else {
             list($year, $code, $class) = self::parseClassCode($classCode);
-            $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
+            $yearQuery = $year !== '' ?  "(year_grp = '$year' OR year_grp IS NULL) AND" : '';
 
             $classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
         }
@@ -114,8 +114,9 @@ class External_Tass_Class implements External_ClassInterface {
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-        $query = "SELECT DISTINCT tch_code FROM tchsub WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
-                       AND ( $classQuery )";
+        $query = "SELECT DISTINCT tch_code FROM tchsub 
+                    WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
+                    AND ( $classQuery )";
 
         $statement = $this->getDatabase()->query($query);
         $teachers = [];
