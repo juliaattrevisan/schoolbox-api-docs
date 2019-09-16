@@ -17,6 +17,7 @@ use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -133,7 +134,7 @@ class Profile implements ImporterInterface
             try {
                 $studentProfile = $this->studentProfileMapper->findByExternalId($student->getId());
                 $baseProfile = $studentProfile->getBaseProfile();
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Exception $e) {
                 $studentProfile = $this->studentProfileMapper->createModel();
                 $baseProfile = $this->baseProfileMapper->createModel();
 
