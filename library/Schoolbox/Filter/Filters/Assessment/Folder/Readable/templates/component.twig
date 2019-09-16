@@ -31,13 +31,6 @@
                 multiple: true,
                 selectize: {
                     load: null,
-                    optgroups: [
-                        {value: 'class',       label: 'My Classes'},
-                        {value: 'group',       label: 'My Groups'},
-                        {value: 'otherClass',  label: 'Other Classes'},
-                        {value: 'otherGroup',  label: 'Other Groups'},
-                        {value: 'otherFolder', label: 'Other Folders'}
-                    ],
                     lockOptgroupOrder: true,
                     render: {
                         option: function (option, escape) {
@@ -71,48 +64,48 @@
             data-selectize
     >
         {# For this filter, folders are just all the URL override folders #}
-        <optgroup label="My Classes" value="class">
-            {% for folder in myClasses %}
+        <optgroup label="My Classes">
+            {%- for folder in myClasses %}
                 {% set roleSelection = roleSelections[folder.id] %}
                 {% set userSelection = userSelections[roleSelection.key] %}
                 <option value="{{ folder.id }}"
                         label="{{ folder.nameWithCodes }}"
                         {% if userSelection.selected %}selected{% endif %}
                 >{{ folder.nameWithCodes }}</option>
-            {% endfor %}
+            {% endfor -%}
         </optgroup>
 
-        <optgroup label="My Groups" value="group">
-            {% for folder in myGroups %}
+        <optgroup label="My Groups">
+            {%- for folder in myGroups %}
                 {% set roleSelection = roleSelections[folder.id] %}
                 {% set userSelection = userSelections[roleSelection.key] %}
                 <option value="{{ folder.id }}"
                         label="{{ folder.nameWithCodes }}"
                         {% if userSelection.selected %}selected{% endif %}
                 >{{ folder.nameWithCodes }}</option>
-            {% endfor %}
+            {% endfor -%}
         </optgroup>
 
-        <optgroup label="Other Classes" value="otherClass">
-            {% for folder in otherClasses %}
+        <optgroup label="Other Classes">
+            {%- for folder in otherClasses %}
                 {% set roleSelection = roleSelections[folder.id] %}
                 {% set userSelection = userSelections[roleSelection.key] %}
                 <option value="{{ folder.id }}"
                         label="{{ folder.nameWithCodes }}"
                         {% if userSelection.selected %}selected{% endif %}
                 >{{ folder.nameWithCodes }}</option>
-            {% endfor %}
+            {% endfor -%}
         </optgroup>
 
-        <optgroup label="Other Groups" value="otherGroup">
-            {% for folder in otherGroups %}
+        <optgroup label="Other Groups">
+            {%- for folder in otherGroups %}
                 {% set roleSelection = roleSelections[folder.id] %}
                 {% set userSelection = userSelections[roleSelection.key] %}
                 <option value="{{ folder.id }}"
                         label="{{ folder.nameWithCodes }}"
                         {% if userSelection.selected %}selected{% endif %}
                 >{{ folder.nameWithCodes }}</option>
-            {% endfor %}
+            {% endfor -%}
         </optgroup>
     </select>
 {% endblock %}
