@@ -79,6 +79,7 @@ class Component extends BaseComponent
 
         $urlOverrides = $this->getUrlOverrides();
 
+        // TODO clean this whole thing up
         foreach ($this->folders as $folder) {
             // TODO Should this filter fetch folders that were classes?
             $key        = (string)$folder->getId();
@@ -91,23 +92,35 @@ class Component extends BaseComponent
              * - is group and roleDefault for group is true
              * - is/was class and roleDefault for class is true
              */
-            $selected = $isInjected
+            $selected                  = $isInjected
                 || ($selectMyGroups && $isGroup)
                 || ($selectMyClasses && $isClass);
             $availableSelections[$key] = $this->createSelection($key, $selected);
         }
 
         foreach ($this->otherFolders as $folder) {
-            $key        = (string)$folder->getId();
-            $isClass    = $folder->isClass();
-            $isInjected = $urlOverrides && $urlOverrides->offsetExists($key);
-            $isGroup    = !$isClass && !$isInjected;
-            $selected   = $isInjected
+            $key                       = (string)$folder->getId();
+            $isClass                   = $folder->isClass();
+            $isInjected                = $urlOverrides && $urlOverrides->offsetExists($key);
+            $isGroup                   = !$isClass && !$isInjected;
+            $selected                  = $isInjected
                 || ($selectOtherGroups && $isGroup)
                 || ($selectOtherClasses && $isClass);
             $availableSelections[$key] = $this->createSelection($key, $selected);
         }
 
         return $availableSelections;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function toContext()
+    {
+        return array_merge(
+            parent::toContext(),
+            ['otherFolders' => $this->otherFolders,]
+        );
     }
 }

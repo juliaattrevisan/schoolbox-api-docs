@@ -28,16 +28,9 @@
             var $filterSelector = $('#filter-selector-readable');
             $filterSelector.selectizeSelector({
                 value: $.selectizeSelector.getValueFromSelect($filterSelector),
-                ajax: {
-                    url:      '{{ routeLookup('folderSearch.getFolderSearch') }}',
-                    type:     'GET',
-                    data:     {
-                        types: ['class', 'group', 'otherClass', 'otherGroup']
-                    },
-                    dataType: 'json'
-                },
                 multiple: true,
                 selectize: {
+                    load: null,
                     optgroups: [
                         {value: 'class',       label: 'My Classes'},
                         {value: 'group',       label: 'My Groups'},
@@ -68,6 +61,9 @@
     {% endautoescape %}
 
     <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+
+
+    {# Folders that are selected but not configurable: need to be iterated here #}
     <select id="filter-selector-readable"
             name="filter_selection[{{ definition.filter.id }}][]"
             multiple
@@ -76,7 +72,23 @@
     >
         {# For this filter, folders are just all the URL override folders #}
         {% for folder in folders %}
-            <option value="{{ folder.id }}" label="{{ folder.nameWithCodes }}" selected>{{ folder.nameWithCodes }}</option>
+            {% set roleSelection = roleSelections[folder.id] %}
+            {% set userSelection = userSelections[roleSelection.key] %}
+            <option value="{{ folder.id }}"
+                    label="{{ folder.nameWithCodes }}"
+                    data-value-object="{optgroup: {{ folder.class ? 'class' : 'group' }} }"
+                    {% if userSelection.selected %}selected{% endif %}
+            >{{ folder.nameWithCodes }}</option>
+        {% endfor %}
+
+        {% for folder in otherFolders %}
+            {% set roleSelection = roleSelections[folder.id] %}
+            {% set userSelection = userSelections[roleSelection.key] %}
+            <option value="{{ folder.id }}"
+                    label="{{ folder.nameWithCodes }}"
+                    data-value-object="{optgroup: {{ folder.class ? 'otherClass' : 'otherGroup' }} }"
+                    {% if userSelection.selected %}selected{% endif %}
+            >{{ folder.nameWithCodes }}</option>
         {% endfor %}
     </select>
 {% endblock %}
