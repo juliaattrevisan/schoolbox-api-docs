@@ -392,6 +392,7 @@ class Profile implements ImporterInterface
                 $relation = $this->relationMapper->createModel()
                     ->setUserProfileId($parentBaseProfile->getId())
                     ->setChildProfileId($studentBaseProfile->getId())
+                    ->setEmergencyContact(false)
                     ->setType($parent['relationship']);
 
                 $this->relationMapper->save($relation);
