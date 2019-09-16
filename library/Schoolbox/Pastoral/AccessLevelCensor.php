@@ -14,7 +14,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use function spl_object_hash;
-use function count;
 
 /**
  * Responsible for stripping the content/relationships from a pastoral record that a
@@ -219,19 +218,15 @@ class AccessLevelCensor
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
 
-        // Otherwise start with deny access, and work our way up the permission levels
-        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
-
-        if (null === $record->getAccess() || count($record->getAccess()) === 0) {
-            return $accessLevel;
-        }
-
         // Hydrate group membership
         if ($user->getPastoralGroupsMemberships() === null) {
             $user->setPastoralGroupsMemberships(
                 $this->getPastoralGroupMemberMapper()->findByColumn('user_id', $user->getId())
             );
         }
+
+        // Otherwise start with deny access, and work our way up the permission levels
+        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
         foreach ($record->getAccess() as $access) {
             $access->setPastoral($record);
