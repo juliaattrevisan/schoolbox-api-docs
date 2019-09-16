@@ -33,21 +33,6 @@
                     onInitialize: null,
                     items: $.selectizeSelector.getItemsFromSelect($filterSelector),
                     lockOptgroupOrder: true,
-                    render: {
-                        option: function (option, escape) {
-                            // Add breadcrumb if there is one
-                            var breadcrumb = null;
-                            if (option.breadcrumb && option.breadcrumb.length) {
-                                breadcrumb = option.breadcrumb
-                                    .map(function (v) { return v.name; })
-                                    .join(' > ');
-                            }
-                            return '<div class="option">'
-                                + escape(option.name)
-                                + (breadcrumb ? ('<p><em>(' + escape(breadcrumb) + ')</em></p>') : '')
-                                + '</div>';
-                        }
-                    },
                     maxOptions: 10
                 }
             });
