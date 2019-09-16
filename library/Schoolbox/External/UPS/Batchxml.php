@@ -233,9 +233,17 @@ class Batchxml implements ISync
                 ->setGender(trim((string)$currentResult->Gender))
                 ->setPhoneWork((new User\Common\Phone())->setNumber(trim((string)$currentResult->SchoolMobileNumber)))
                 ->setPhoneMobile((new User\Common\Phone())->setNumber(trim((string)$currentResult->SchoolMobileNumber)))
-                ->setPhoneHome((new User\Common\Phone())->setNumber(trim((string)$currentResult->PersonalMobileNumber)))
-                ->getMeta()
-                    ->getPosition()->add((new User\Staff\Position())->setDescription(trim((string)$currentResult->Roles->Role->Name)));
+                ->setPhoneHome((new User\Common\Phone())->setNumber(trim((string)$currentResult->PersonalMobileNumber)));
+
+            /* Multiple positions
+             */
+            if ($currentResult->Roles->Role) {
+                foreach ($currentResult->Roles->Role as $currentRole) {
+                    $position = (new User\Staff\Position())->setDescription(trim((string)$currentRole->Name));
+
+                    $staff->getMeta()->getPosition()->add($position);
+                }
+            }
 
             /* Account
              */
