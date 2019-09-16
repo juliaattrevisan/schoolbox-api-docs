@@ -90,36 +90,22 @@ class Component extends BaseComponent
         $selectOtherGroups  = $abstractOptions[Definition::KEY_OTHER_GROUPS]->getDefaults()[$roleType]->getSelected();
         $selectOtherClasses = $abstractOptions[Definition::KEY_OTHER_CLASSES]->getDefaults()[$roleType]->getSelected();
 
-        $urlOverrides = $this->getUrlOverrides();
-
-        // TODO clean this whole thing up
         foreach ($this->myFolders as $folder) {
-            // TODO Should this filter fetch folders that were classes?
-            $key        = (string)$folder->getId();
-            $isClass    = $folder->isClass();
-            $isInjected = $urlOverrides && $urlOverrides->offsetExists($key);
-            $isGroup    = !$isClass && !$isInjected;
-
-            /* Should folder be selected?
-             * - if injected via URL override
-             * - is group and roleDefault for group is true
-             * - is/was class and roleDefault for class is true
-             */
-            $selected                  = $isInjected
-                || ($selectMyGroups && $isGroup)
-                || ($selectMyClasses && $isClass);
-            $availableSelections[$key] = $this->createSelection($key, $selected);
+            $key                       = (string)$folder->getId();
+            $availableSelections[$key] = $this->convertFolderToSelection(
+                $folder,
+                $selectMyGroups,
+                $selectMyClasses
+            );
         }
 
         foreach ($this->otherFolders as $folder) {
             $key                       = (string)$folder->getId();
-            $isClass                   = $folder->isClass();
-            $isInjected                = $urlOverrides && $urlOverrides->offsetExists($key);
-            $isGroup                   = !$isClass && !$isInjected;
-            $selected                  = $isInjected
-                || ($selectOtherGroups && $isGroup)
-                || ($selectOtherClasses && $isClass);
-            $availableSelections[$key] = $this->createSelection($key, $selected);
+            $availableSelections[$key] = $this->convertFolderToSelection(
+                $folder,
+                $selectOtherGroups,
+                $selectOtherClasses
+            );
         }
 
         return $availableSelections;
@@ -160,5 +146,37 @@ class Component extends BaseComponent
                 'otherGroups'  => $otherGroups,
             ]
         );
+    }
+
+
+    /**
+     * Converts a folder to a selection object.
+     *
+     * @param Model $folder
+     * @param bool  $selectGroups  Are group folders selected by default?
+     * @param bool  $selectClasses Are class folders selected by default?
+     * @return Filter\Selection\Model
+     */
+    protected function convertFolderToSelection(
+        Model $folder,
+        bool $selectGroups,
+        bool $selectClasses
+    ): Filter\Selection\Model {
+        // TODO Should this filter fetch folders that were classes?
+        $key          = (string)$folder->getId();
+        $isClass      = $folder->isClass();
+        $urlOverrides = $this->getUrlOverrides();
+        $isInjected   = $urlOverrides && $urlOverrides->offsetExists($key);
+        $isGroup      = !$isClass && !$isInjected;
+
+        /* Should folder be selected?
+         * - if injected via URL override
+         * - is group and roleDefault for group is true
+         * - is/was class and roleDefault for class is true
+         */
+        $selected = $isInjected
+            || ($selectGroups && $isGroup)
+            || ($selectClasses && $isClass);
+        return $this->createSelection($key, $selected);
     }
 }
