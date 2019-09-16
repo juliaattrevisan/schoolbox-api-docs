@@ -55,7 +55,7 @@ abstract class Factory extends Filter\AbstractFactory
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->indexByCallback(function ($folderId) {
+            ->indexByCallback(static function ($folderId) {
                 return $folderId;
             });
         return new KeyConverter($filter, $folderIds, $this->getAccess());
