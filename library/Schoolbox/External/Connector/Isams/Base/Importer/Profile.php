@@ -122,6 +122,14 @@ class Profile implements ImporterInterface
      */
     public function import(): void
     {
+        /* Purge old relations before re-inserting them
+         */
+        if ($this->perform) {
+            $this->relationMapper->getDatabase()->query("
+                DELETE FROM {$this->relationMapper->getTable()}
+            ");
+        }
+
         $students = $this->batchxml->findAllStudents();
 
         /** @var Student $student */
@@ -277,10 +285,30 @@ class Profile implements ImporterInterface
                 if ($this->perform) {
                     $this->parentProfileMapper->save($parentProfile);
                 }
+
+                /* Manufacture relations
+                 */
+
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding relation between %s, the %s of %s',
+                    trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                    trim($parent['relationship']),
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                ));
+
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $relation = $this->relationMapper->createModel()
+                        ->setUserProfileId($parentBaseProfile->getId())
+                        ->setChildProfileId($studentBaseProfile->getId())
+                        ->setType($parent['relationship']);
+
+                    $this->relationMapper->save($relation);
+                }
             }
-
-            die();
-
 
             /* Remove any orphaned profiles
              * TODO: Reuse the one from CSV Importer
