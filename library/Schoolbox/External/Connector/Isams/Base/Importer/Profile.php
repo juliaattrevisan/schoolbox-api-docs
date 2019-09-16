@@ -133,15 +133,15 @@ class Profile implements ImporterInterface
              */
             try {
                 $studentProfile = $this->studentProfileMapper->findByExternalId($student->getId());
-                $baseProfile = $studentProfile->getBaseProfile();
+                $studentBaseProfile = $studentProfile->getBaseProfile();
             } catch (Exception $e) {
                 $studentProfile = $this->studentProfileMapper->createModel();
-                $baseProfile = $this->baseProfileMapper->createModel();
+                $studentBaseProfile = $this->baseProfileMapper->createModel();
 
-                $studentProfile->setBaseProfile($baseProfile);
+                $studentProfile->setBaseProfile($studentBaseProfile);
             }
 
-            $baseProfile
+            $studentBaseProfile
                 ->setExternalId($student->getId())
                 ->setTitle($student->getTitle())
                 ->setFirstname($student->getPreferredName())
@@ -151,13 +151,13 @@ class Profile implements ImporterInterface
              */
             $this->log->info(sprintf(
                 'Adding base profile for %s',
-                trim("{$baseProfile->getFirstname()} {$baseProfile->getLastname()}")
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
 
             /* Then save it
              */
             if ($this->perform) {
-                $this->baseProfileMapper->save($baseProfile);
+                $this->baseProfileMapper->save($studentBaseProfile);
             }
 
             $studentProfile
@@ -199,7 +199,7 @@ class Profile implements ImporterInterface
              */
             $this->log->info(sprintf(
                 'Adding student profile for %s',
-                trim("{$baseProfile->getFirstname()} {$baseProfile->getLastname()}")
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
 
             /* Then save it
@@ -208,12 +208,79 @@ class Profile implements ImporterInterface
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-
             /* Find any associated parents
-             * For every associated parent, find out if they have a parent profile
+             */
+            $parents = $this->findParentsNodes($student);
+
+            /* For every associated parent, find out if they have a parent profile
              * If one already exists, load it, update it, then save it
              * Otherwise make a new one for the given id
              */
+            foreach ($parents as $parent) {
+
+                /* Parents without usernames are skipped
+                 */
+                if (!\strlen($parent['username'])) {
+                    $this->log->warning(sprintf(
+                        'Skipping base profile for %s - no username detected',
+                        trim("{$parent['firstname']} {$parent['lastname']}")
+                    ));
+
+                    continue;
+                }
+
+                try {
+                    $parentProfile = $this->parentProfileMapper->findByExternalId($parent['id']);
+                    $parentBaseProfile = $parentProfile->getBaseProfile();
+                } catch (Exception $e) {
+                    $parentProfile = $this->parentProfileMapper->createModel();
+                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+
+                    $parentProfile->setBaseProfile($parentBaseProfile);
+                }
+
+                $parentBaseProfile
+                    ->setExternalId($parent['id'])
+                    ->setTitle($parent['title'])
+                    ->setFirstname($parent['firstname'])
+                    ->setLastname($parent['lastname']);
+
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding base profile for %s',
+                    trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                ));
+
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($parentBaseProfile);
+                }
+
+                $parentProfile
+                    ->setPhoneHome($parent['phone']['home'])
+                    ->setPhoneWork($parent['phone']['work'])
+                    ->setMobile($parent['phone']['mobile'])
+                    ->setEmail($parent['email'])
+                    ->setUsername($parent['username']);
+
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding parent profile for %s',
+                    trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                ));
+
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->parentProfileMapper->save($parentProfile);
+                }
+            }
+
+            die();
+
 
             /* Remove any orphaned profiles
              * TODO: Reuse the one from CSV Importer
@@ -349,40 +416,21 @@ class Profile implements ImporterInterface
 
         $stack = [];
 
+        /* Stack 'em up
+         */
         foreach ($parents as $parent) {
-
-            /* Implode non-empty address fields into one big string for our schema
-             */
-            $address = implode(', ', array_filter([
-                trim((string)$parent->Address->AddressLines->Address1),
-                trim((string)$parent->Address->AddressLines->Address2),
-                trim((string)$parent->Address->AddressLines->Address3)
-            ]));
-
-            /* Full, formal address that you could paste on an envelope
-             */
-            $mailAddress = implode(', ', [
-                $address,
-                trim((string)$parent->Address->Town),
-                trim((string)$parent->Address->Postcode),
-                trim((string)$parent->Address->Country)
-            ]);
-
-            /* Stack 'em up
-             */
             $stack[] = [
-                'name' => trim((string)$parent->Forename) . ' ' . trim((string)$parent->Surname),
+                'id' => trim((string)$parent->xpath('@Id')[0]),
+                'title' => trim((string)$parent->Title),
+                'firstname' => trim((string)$parent->Forename),
+                'lastname' => trim((string)$parent->Surname),
+                'relationship' => trim((string)$parent->RelationshipRaw),
                 'phone' => [
                     'home' =>  trim((string)$parent->Telephone),
                     'work' => trim((string)$parent->Telephone),
                     'mobile' => trim((string)$parent->Mobile),
                 ],
-                'address' => [
-                    'home' => $address,
-                    'mail' => $mailAddress,
-                    'suburb' => trim((string)$parent->Address->Town),
-                    'postcode' => trim((string)$parent->Address->Postcode),
-                ],
+                'username' => trim((string)$parent->EmailAddress),
                 'email' => trim((string)$parent->EmailAddress),
             ];
         }
