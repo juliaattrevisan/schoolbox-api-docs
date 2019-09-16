@@ -14,6 +14,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
+use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\Profile as UserProfile;
@@ -140,12 +141,13 @@ class Profile implements ImporterInterface
         }
 
         /* Import students' profile data
-         * Import their parents' profile data
+         * Import their specific parents' profile data
          */
         $this->importStudents();
 
-        /* TODO: Import staff profile data
+        /* Import staff profile data
          */
+        $this->importStaff();
 
         /* Remove any orphaned profiles
          */
@@ -183,6 +185,17 @@ class Profile implements ImporterInterface
 
         /** @var Student $student */
         foreach ($students as $student) {
+
+            /* Students without usernames are skipped
+             */
+            if (!\strlen($student->getAccount()->getLogin())) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for student %s - no username detected',
+                    trim("{$student->getPreferredName()} {$student->getLastname()}")
+                ));
+
+                continue;
+            }
 
             /* Find out if this externalId already has a student profile
              * If one already exists, load it, update it, then save it
@@ -301,7 +314,7 @@ class Profile implements ImporterInterface
              */
             if (!\strlen($parent['username'])) {
                 $this->log->warning(sprintf(
-                    'Skipping base profile for %s - no username detected',
+                    'Skipping base profile for parent %s - no username detected',
                     trim("{$parent['firstname']} {$parent['lastname']}")
                 ));
 
@@ -437,5 +450,94 @@ class Profile implements ImporterInterface
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Import staff profile data
+     */
+    private function importStaff()
+    {
+        $staffs = $this->batchxml->findAllStaff();
+
+        /** @var Staff $staff */
+        foreach ($staffs as $staff) {
+
+            /* Staff without usernames are skipped
+             */
+            if (!\strlen($staff->getAccount()->getLogin())) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for staff %s - no username detected',
+                    trim("{$staff->getPreferredName()} {$staff->getLastname()}")
+                ));
+
+                continue;
+            }
+
+            /* Find out if this externalId already has a staff profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            try {
+                $staffProfile = $this->staffProfileMapper->findByExternalId($staff->getId());
+                $staffBaseProfile = $staffProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $staffProfile = $this->staffProfileMapper->createModel();
+                $staffBaseProfile = $this->baseProfileMapper->createModel();
+
+                $staffProfile->setBaseProfile($staffBaseProfile);
+            }
+
+            $staffBaseProfile
+                ->setExternalId($staff->getId())
+                ->setTitle($staff->getTitle())
+                ->setFirstname($staff->getPreferredName())
+                ->setLastname($staff->getLastname());
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($staffBaseProfile);
+            }
+
+            /* Concat all the position titles, I guess
+             */
+            $positions = [];
+
+            foreach ($staff->getMeta()->getPosition() as $position) {
+                $positions[] = $position->getDescription();
+            }
+
+            $staffProfile
+                ->setBuilding(null)
+                ->setCampusName($staff->getCampus()->count() ? $staff->getCampus()->first()->getName() : null)
+                ->setCategory(null)
+                ->setDepartment(null)
+                ->setEmail($staff->getWorkEmail()->count() ? $staff->getWorkEmail()->first()->getAddress() : null)
+                ->setPhone($staff->getPhoneWork()->getNumber())
+                ->setPositionTitle(implode(', ', $positions))
+                ->setRoom(null)
+                ->setUsername($staff->getAccount()->getLogin());
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding staff profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->staffProfileMapper->save($staffProfile);
+            }
+        }
     }
 }
