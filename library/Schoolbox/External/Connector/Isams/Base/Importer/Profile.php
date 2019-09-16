@@ -143,9 +143,9 @@ class Profile implements ImporterInterface
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
-
-        $this->importStudents();
+//        $this->log->info('Processing students and their parents.');
+//
+//        $this->importStudents();
 
         /* Import staff profile data
          */
@@ -463,17 +463,21 @@ class Profile implements ImporterInterface
      */
     private function importStaff()
     {
-        $staffs = $this->batchxml->findAllStaff();
+        $staffs = $this->batchxml->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
         /** @var Staff $staff */
         foreach ($staffs as $staff) {
+            $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
+            $username = trim((string)$staff->UserName);
+            $firstname = trim((string)$staff->PreferredName);
+            $lastname = trim((string)$staff->Surname);
 
             /* Staff without usernames are skipped
              */
-            if (!\strlen($staff->getAccount()->getLogin())) {
+            if (!\strlen($username)) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for staff %s - no username detected',
-                    trim("{$staff->getPreferredName()} {$staff->getLastname()}")
+                    trim("{$firstname} {$lastname}")
                 ));
 
                 continue;
@@ -484,7 +488,7 @@ class Profile implements ImporterInterface
              * Otherwise make a new one for the given id
              */
             try {
-                $staffProfile = $this->staffProfileMapper->findByExternalId($staff->getId());
+                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
                 $staffBaseProfile = $staffProfile->getBaseProfile();
             } catch (Exception $e) {
                 $staffProfile = $this->staffProfileMapper->createModel();
@@ -494,10 +498,10 @@ class Profile implements ImporterInterface
             }
 
             $staffBaseProfile
-                ->setExternalId($staff->getId())
-                ->setTitle($staff->getTitle())
-                ->setFirstname($staff->getPreferredName())
-                ->setLastname($staff->getLastname());
+                ->setExternalId($externalId)
+                ->setTitle(trim((string)$staff->Title))
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
 
             /* Log it
              */
@@ -516,20 +520,30 @@ class Profile implements ImporterInterface
              */
             $positions = [];
 
-            foreach ($staff->getMeta()->getPosition() as $position) {
-                $positions[] = $position->getDescription();
+            if ($staff->Roles->Role) {
+                foreach ($staff->Roles->Role as $currentRole) {
+                    $positions[] = trim((string)$currentRole->Name);
+                }
+            }
+
+            /* Select the first campus (schoolbox connector only supports one campus per profile)
+             */
+            $campusName = '';
+
+            if ($staff->Divisions->Division) {
+                $campusName = trim((string)$staff->Divisions->Division[0]->Name);
             }
 
             $staffProfile
                 ->setBuilding(null)
-                ->setCampusName($staff->getCampus()->count() ? $staff->getCampus()->first()->getName() : null)
+                ->setCampusName($campusName)
                 ->setCategory(null)
                 ->setDepartment(null)
-                ->setEmail($staff->getWorkEmail()->count() ? $staff->getWorkEmail()->first()->getAddress() : null)
-                ->setPhone($staff->getPhoneWork()->getNumber())
+                ->setEmail(trim((string)$staff->SchoolEmailAddress))
+                ->setPhone(trim((string)$staff->SchoolMobileNumber))
                 ->setPositionTitle(implode(', ', $positions))
                 ->setRoom(null)
-                ->setUsername($staff->getAccount()->getLogin());
+                ->setUsername($username);
 
             /* Log it
              */

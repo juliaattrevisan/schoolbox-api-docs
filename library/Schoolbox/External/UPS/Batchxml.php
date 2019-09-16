@@ -225,51 +225,51 @@ class Batchxml implements ISync
             $staff = new User\Staff();
 
             $staff
-                ->setId(trim((string)$currentResult->xpath('@PersonId')[0]->PersonId))
-                ->setTitle(trim((string)$currentResult->Title))
-                ->setPreferredName(trim((string)$currentResult->PreferredName))
-                ->setGivenName(trim((string)$currentResult->Forename))
-                ->setLastname(trim((string)$currentResult->Surname))
-                ->setGender(trim((string)$currentResult->Gender))
-                ->setPhoneWork((new User\Common\Phone())->setNumber(trim((string)$currentResult->SchoolMobileNumber)))
-                ->setPhoneMobile((new User\Common\Phone())->setNumber(trim((string)$currentResult->SchoolMobileNumber)))
-                ->setPhoneHome((new User\Common\Phone())->setNumber(trim((string)$currentResult->PersonalMobileNumber)));
+                ->setId(null)
+                ->setTitle(null)
+                ->setPreferredName(null)
+                ->setGivenName(null)
+                ->setLastname(null)
+                ->setGender(null)
+                ->setPhoneWork((new User\Common\Phone())->setNumber(null))
+                ->setPhoneMobile((new User\Common\Phone())->setNumber(null))
+                ->setPhoneHome((new User\Common\Phone())->setNumber(null));
 
             /* Multiple positions
              */
-            if ($currentResult->Roles->Role) {
-                foreach ($currentResult->Roles->Role as $currentRole) {
-                    $position = (new User\Staff\Position())->setDescription(trim((string)$currentRole->Name));
-
-                    $staff->getMeta()->getPosition()->add($position);
-                }
-            }
+//            if ($currentResult->Roles->Role) {
+//                foreach ($currentResult->Roles->Role as $currentRole) {
+//                    $position = (new User\Staff\Position())->setDescription(trim((string)$currentRole->Name));
+//
+//                    $staff->getMeta()->getPosition()->add($position);
+//                }
+//            }
 
             /* Account
              */
             $staff
                 ->getAccount()
-                    ->setLogin(trim((string)$currentResult->UserName))
+                    ->setLogin(null)
                     ->setActive(true);
 
             /* Email - one for every item in stack
              */
             $staff
                 ->getEmail()
-                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->SchoolEmailAddress)));
+                    ->add((new User\Common\Email())->setAddress(null));
 
             $staff
                 ->getWorkEmail()
-                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->SchoolEmailAddress)));
+                    ->add((new User\Common\Email())->setAddress(null));
 
             $staff
                 ->getHomeEmail()
-                    ->add((new User\Common\Email())->setAddress(trim((string)$currentResult->SchoolEmailAddress)));
+                    ->add((new User\Common\Email())->setAddress(null));
 
             /* Campus
              */
             foreach ($currentResult->Divisions->Division as $division) {
-                $staff->getCampus()->add((new User\Common\Campus())->setName(trim((string)$division->Name)));
+                $staff->getCampus()->add((new User\Common\Campus())->setName(null));
             }
 
             yield $staff;
