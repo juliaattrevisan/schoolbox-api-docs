@@ -489,8 +489,9 @@ Usage:
                 var $component = $(component),
                     filterId   = $component.data('component'),
                     $available = $component.find('input[type=checkbox]'),
-                    $selected  = $component.find('input:checked[type=checkbox]'),
-                    $selectize = $component.find('select[data-selectize]');
+                    $selected  = $component.find('input:checked[type=checkbox], :selected'),
+                    $selectize = $component.find('select[data-selectize]'),
+                    selectize  = $selectize.length > 0 ? $selectize[0].selectize : null;
 
                 // These will be deleted if the filter's not in use
                 componentsInUse[filterId]           = {};
@@ -498,17 +499,21 @@ Usage:
                 componentsInUse[filterId]['labels'] = [];
 
                 // Maybe this is a selectize?
-                if ($selectize.length !== 0) {
-                    var selectize = $selectize[0].selectize;
-                    if (selectize && selectize.items && selectize.items.length) {
-                        selectize.items.forEach(function (v) {
-                            componentsInUse[filterId]['labels'].push(selectize.options[v].name);
-                        });
-                    }
+                if (selectize) {
+                    selectize.items.forEach(function (v) {
+                        componentsInUse[filterId]['labels'].push(selectize.options[v].name);
+                    });
                 } else if ($selected.length !== 0) {
+                    // Not a selectize, or it's not yet initialized
                     // Filter is being applied, add its name and selected option labels.
-                    $selected.each(function(idx, elem){
-                        var label = $component.find('label[for='+$(elem).attr('id')+']').html();
+                    $selected.each(function(idx, elem) {
+                        var $elem = $(elem),
+                            label = null;
+                        if ($elem.is('option')) {
+                            label = $elem.text();
+                        } else {
+                            label = $component.find('label[for='+$(elem).attr('id')+']').html();
+                        }
                         componentsInUse[filterId]['labels'].push(label);
                     });
 
