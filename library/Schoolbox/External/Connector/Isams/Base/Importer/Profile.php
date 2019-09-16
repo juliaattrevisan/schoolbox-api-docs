@@ -126,11 +126,23 @@ class Profile implements ImporterInterface
         /** @var Student $student */
         foreach ($students as $student) {
 
-print_r($student->getId());
-die();
+            /* Find out if this externalId already has a student profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+
+            /* Find any associated parents
+             * For every associated parent, find out if they have a parent profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+
+            /* Remove any orphaned profiles
+             * TODO: Reuse the one from CSV Importer
+             */
 
 
-//
+
 //            /* Firstly try to find out if the user already exists in schoolbox
 //             * If they don't exist, we can't assign a profile to them yet
 //             * We have to wait for the UPS to make this user
