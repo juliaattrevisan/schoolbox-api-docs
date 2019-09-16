@@ -185,7 +185,6 @@ class Profile implements ImporterInterface
                 ->setUsername($student->getAccount()->getLogin())
 
                 /* These fields aren't supported by our Normalise adapter layer
-                 * TODO: Students don't have a campus???
                  */
                 ->setAlertLegal(null)
                 ->setAlertMessage(null)
