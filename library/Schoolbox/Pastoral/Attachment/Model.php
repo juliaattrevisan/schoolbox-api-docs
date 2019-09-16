@@ -37,7 +37,6 @@ class Model implements IStorage, ISoftDeletable, IModel
     /** @var bool $private */
     private $private;
 
-
     /**
      * Returns whether this is a public attachment
      *
@@ -45,21 +44,6 @@ class Model implements IStorage, ISoftDeletable, IModel
      * @throws InsufficientHydrationException
      */
     public function isPublic(): bool
-    {
-        if ($this->private === null) {
-            throw new InsufficientHydrationException("Expected bool, found null");
-        }
-        return !$this->private;
-    }
-
-
-    /**
-     * Returns whether this is a private attachment
-     *
-     * @return bool
-     * @throws InsufficientHydrationException
-     */
-    public function isPrivate(): bool
     {
         if ($this->private === null) {
             throw new InsufficientHydrationException("Expected bool, found null");

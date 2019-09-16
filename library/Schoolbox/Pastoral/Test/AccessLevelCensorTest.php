@@ -230,7 +230,7 @@ class AccessLevelCensorTest extends TestCase
         $student = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT));
         $record  = (new Pastoral\Model())->setHeading($name)->setId($this->guid++)->setOwner($owner)->setStudent($student)
                                          ->setBodyPrivate('Private Body')
-                                         ->setBodyPublic('Private Body')
+                                         ->setBodyPublic('Public Body')
                                          ->setCreatedAt((new Alaress_Date_Format())::now())
                                          ->setUpdatedAt((new Alaress_Date_Format())::now());
         $record->setComments(
@@ -290,7 +290,7 @@ class AccessLevelCensorTest extends TestCase
             }
         }
         $publicRecord->setAttachments($publicAttachments);
-        $publicRecord->setBodyPrivate('');
+        $publicRecord->setBodyPrivate(null);
 
         return $publicRecord;
     }

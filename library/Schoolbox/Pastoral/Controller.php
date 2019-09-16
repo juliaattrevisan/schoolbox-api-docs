@@ -412,12 +412,13 @@ class Controller extends Base
         }
 
         // Hydrate group members and their roles so we can display them in the visibility section
-
-        foreach ($record->getAccess() as $access) {
-            if ($access->getGroup() instanceof PastoralGroup) {
-                $this->pastoralGroupMapper->findById($access->getGroup()->getId());
-                foreach ($access->getGroup()->getMembers() as $member) {
-                    $this->userMapper->findById($member->getUser()->getId());
+        if ($record->getAccess()) {
+            foreach ($record->getAccess() as $access) {
+                if ($access->getGroup() instanceof PastoralGroup) {
+                    $this->pastoralGroupMapper->findById($access->getGroup()->getId());
+                    foreach ($access->getGroup()->getMembers() as $member) {
+                        $this->userMapper->findById($member->getUser()->getId());
+                    }
                 }
             }
         }

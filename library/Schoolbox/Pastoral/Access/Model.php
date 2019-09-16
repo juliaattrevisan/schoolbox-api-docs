@@ -117,8 +117,11 @@ class Model implements ISoftDeletable
             return null;
         }
 
-        // Roles match, and roleType is not parent
-        return $this->access;
+        // Roles match, and roleType is staff
+        if ($user->getRole()->isStaff()) {
+            return $this->access;
+        }
+        return null;
     }
 
 
@@ -151,7 +154,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setPastoral(Pastoral\Model $pastoral)
+    public function setPastoral(Pastoral\Model $pastoral): self
     {
         $this->pastoral = $pastoral;
 
@@ -161,7 +164,7 @@ class Model implements ISoftDeletable
     /**
      * @return Pastoral\Model
      */
-    public function getPastoral()
+    public function getPastoral(): Pastoral\Model
     {
         return $this->pastoral;
     }
@@ -171,7 +174,7 @@ class Model implements ISoftDeletable
      *
      * @return $this
      */
-    public function setRole(Role $role = null)
+    public function setRole(Role $role = null): self
     {
         $this->role = $role;
 
@@ -181,7 +184,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|Role
      */
-    public function getRole()
+    public function getRole(): ?Role
     {
         return $this->role;
     }
@@ -191,7 +194,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setUser(User $user = null)
+    public function setUser(User $user = null): self
     {
         $this->user = $user;
 
@@ -201,7 +204,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|User
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -211,7 +214,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setGroup(Group $group = null)
+    public function setGroup(Group $group = null): self
     {
         $this->group = $group;
 
@@ -221,7 +224,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|Group
      */
-    public function getGroup()
+    public function getGroup(): ?Group
     {
         return $this->group;
     }
@@ -231,7 +234,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setAccess($access)
+    public function setAccess($access): self
     {
         $this->access = $access;
 
@@ -239,9 +242,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getAccess()
+    public function getAccess(): ?int
     {
         return $this->access;
     }

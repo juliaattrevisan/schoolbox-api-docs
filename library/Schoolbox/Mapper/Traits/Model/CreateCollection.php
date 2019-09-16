@@ -21,13 +21,6 @@ trait CreateCollection
      */
     public static function createCollection(): GenericCollection
     {
-        try {
-            $collection = new GenericCollection(static::class);
-        } catch (\UnexpectedValueException $e) {
-            // This logically cannot happen, but just in case something changes elsewhere.
-            \trigger_error($e->getMessage());
-            $collection = null;
-        }
-        return $collection;
+        return new GenericCollection(static::class);
     }
 }

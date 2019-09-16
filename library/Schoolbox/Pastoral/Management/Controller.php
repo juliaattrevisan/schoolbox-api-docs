@@ -81,11 +81,13 @@ class Controller extends Base
     public function getGroupsModify(Pastoral\Group\Model $group): void
     {
         // Hydrate roles
-        foreach ($group->getMembers() as $member) {
-            try {
-                $this->userMapper->findById($member->getUser()->getId());
-            } catch (Exception $e) {
-                // noop
+        if ($group->getMembers()) {
+            foreach ($group->getMembers() as $member) {
+                try {
+                    $this->userMapper->findById($member->getUser()->getId());
+                } catch (Exception $e) {
+                    // noop
+                }
             }
         }
 

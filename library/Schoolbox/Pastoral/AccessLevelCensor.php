@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use function spl_object_hash;
+use function count;
 
 /**
  * Responsible for stripping the content/relationships from a pastoral record that a
@@ -121,7 +122,7 @@ class AccessLevelCensor
 
         // Only has public access? Strip the private body and files
         if (Access\Mapper::ACCESS_PUBLIC === $accessLevel) {
-            $filteredRecord->setBodyPrivate("");
+            $filteredRecord->setBodyPrivate(null);
             $filteredRecord->setAttachments($filteredRecord->getAttachments()->filter(function (Attachment\Model $attachment) {
                 return $attachment->isPublic();
             }));
@@ -172,7 +173,7 @@ class AccessLevelCensor
     private function filterCommentForUser(Comment\Model $comment, User $user): ?Comment\Model
     {
         // Pastoral moderators get all comments
-        if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
+        if (null !== $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
             return $comment;
         }
 
@@ -212,10 +213,17 @@ class AccessLevelCensor
     public function getAccessLevel(Model $record, User $user): int
     {
         // Owners and moderators get private access regardless of any other permission set
-        $pastoralService = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
+        $pastoralService = $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
 
         if ($pastoralService || (int)$user->getId() === (int)$record->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
+        }
+
+        // Otherwise start with deny access, and work our way up the permission levels
+        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
+
+        if (null === $record->getAccess() || count($record->getAccess()) === 0) {
+            return $accessLevel;
         }
 
         // Hydrate group membership
@@ -224,9 +232,6 @@ class AccessLevelCensor
                 $this->getPastoralGroupMemberMapper()->findByColumn('user_id', $user->getId())
             );
         }
-
-        // Otherwise start with deny access, and work our way up the permission levels
-        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
         foreach ($record->getAccess() as $access) {
             $access->setPastoral($record);

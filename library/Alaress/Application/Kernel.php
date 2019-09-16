@@ -12,6 +12,7 @@ use Aura\Di;
 use Config\Modules\ModuleConfigInterface;
 use Predis;
 use Schoolbox\Pastoral\AccessLevelCensor;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Throwable;
 use RuntimeException;
 use Alaress\Authorizer\Rule;
@@ -1275,8 +1276,9 @@ abstract class Kernel
             $di->lazyNew(
                 PastoralDataSource::class,
                 [
-                    'mapper'            => $mapperFactory->getLazy(PastoralMapper::class),
-                    'accessLevelCensor' => $di->lazyNew(AccessLevelCensor::class),
+                    'mapper'              => $mapperFactory->getLazy(PastoralMapper::class),
+                    'accessLevelCensor'   => $di->lazyNew(AccessLevelCensor::class),
+                    'pastoralAuditMapper' => $mapperFactory->getLazy(PastoralAuditMapper::class),
                 ]
             )
         );

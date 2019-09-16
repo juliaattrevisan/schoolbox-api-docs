@@ -13,6 +13,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 
 /**
  * Data source for pastoral care records.
@@ -39,14 +40,15 @@ class DataSource
     /**
      * Constructor
      *
-     * @param Mapper            $mapper
-     * @param AccessLevelCensor $accessLevelCensor
+     * @param Mapper              $mapper
+     * @param AccessLevelCensor   $accessLevelCensor
+     * @param PastoralAuditMapper $pastoralAuditMapper
      */
-    public function __construct(Mapper $mapper, AccessLevelCensor $accessLevelCensor)
+    public function __construct(Mapper $mapper, AccessLevelCensor $accessLevelCensor, PastoralAuditMapper $pastoralAuditMapper)
     {
         $this->mapper              = $mapper;
         $this->accessLevelCensor   = $accessLevelCensor;
-        $this->pastoralAuditMapper = Audit\Mapper::getInstance(); //TODO inject
+        $this->pastoralAuditMapper = $pastoralAuditMapper;
     }
 
 
@@ -88,7 +90,7 @@ class DataSource
                          ->findByColumn('pastoral_id', $model->getId())
         );
 
-        $model = $this->accessLevelCensor->filterRecordsForUser($this->mapper->createCollection([$model]), $currentUser)->first();
+        $model = $this->accessLevelCensor->filterRecordsForUser(Model::createCollection()->add($model), $currentUser)->first();
 
         if (!$model instanceof Model) {
             throw new MapperException\NotFound();
@@ -268,10 +270,7 @@ class DataSource
         // Keep a record of all searches performed by users, and what results were displayed
         // --------------------------------------------------------------------------------------------------------
 
-        $searchResults = [];
-        foreach ($filteredRecords as $filteredRecord) {
-            $searchResults[] = $filteredRecord->getId();
-        }
+        $searchResults = $filteredRecords->indexBy('id')->keys();
 
         // Record the search results that were returned by the search by imploding their IDs down into CSV
         if (\count($searchResults)) {

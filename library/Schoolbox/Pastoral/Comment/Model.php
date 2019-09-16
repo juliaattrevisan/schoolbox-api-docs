@@ -60,22 +60,6 @@ class Model implements ISoftDeletable, IModel
         return !$this->private;
     }
 
-
-    /**
-     * Returns whether this is a private comment
-     *
-     * @return bool
-     * @throws InsufficientHydrationException
-     */
-    public function isPrivate(): bool
-    {
-        if ($this->private === null) {
-            throw new InsufficientHydrationException("Expected bool, found null");
-        }
-        return !$this->private;
-    }
-
-
     /**
      * @param Pastoral $pastoral
      *
