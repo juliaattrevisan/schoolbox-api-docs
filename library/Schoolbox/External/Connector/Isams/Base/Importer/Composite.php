@@ -214,7 +214,6 @@ class Composite implements ImporterInterface
             $this->log,
             $this->perform,
             $this->batchxml,
-            $this->userMapper,
             $this->baseProfileMapper,
             $this->studentProfileMapper,
             $this->parentProfileMapper,

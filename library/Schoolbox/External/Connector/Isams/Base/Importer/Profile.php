@@ -1,9 +1,5 @@
 <?php
 /**
- * Profile
- *
- * Imports user_profile data from ISAMS xml feed
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -21,9 +17,14 @@ use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Role;
-use Schoolbox\UserMapper;
 
+/**
+ * Class Profile
+ *
+ * Imports sis_user_profile* data from ISAMS xml feed
+ *
+ * @package Schoolbox\External\Connector\Isams\Base\Importer
+ */
 class Profile implements ImporterInterface
 {
 
@@ -45,12 +46,6 @@ class Profile implements ImporterInterface
      * @var Batchxml
      */
     private $batchxml;
-
-
-    /**
-     * @var Usermapper
-     */
-    private $userMapper;
 
 
     /**
@@ -100,7 +95,6 @@ class Profile implements ImporterInterface
      * @param LoggerInterface             $log
      * @param bool                        $perform
      * @param Batchxml                    $batchxml
-     * @param UserMapper                  $userMapper
      * @param UserProfile\Mapper          $baseProfileMapper
      * @param UserProfile\Student\Mapper  $studentProfileMapper
      * @param UserProfile\Parent\Mapper   $parentProfileMapper
@@ -114,7 +108,6 @@ class Profile implements ImporterInterface
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
-        UserMapper $userMapper,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -124,7 +117,6 @@ class Profile implements ImporterInterface
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
-        $this->userMapper = $userMapper;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
