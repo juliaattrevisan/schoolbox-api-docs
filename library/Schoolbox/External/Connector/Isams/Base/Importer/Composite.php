@@ -21,11 +21,9 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\UserRelationMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidUriPartException;
-
 
 /**
  * Class Composite
@@ -210,19 +208,17 @@ class Composite implements ImporterInterface
      */
     public function import(): void
     {
-        $profile = new Importer\Profile(
-            $this->log,
-            $this->perform,
-            $this->batchxml,
-            $this->baseProfileMapper,
-            $this->studentProfileMapper,
-            $this->parentProfileMapper,
-            $this->staffProfileMapper,
-            $this->relationMapper
-        );
-
         $this->registry
-            ->add($profile);
+            ->add(new Importer\Profile(
+                $this->log,
+                $this->perform,
+                $this->batchxml,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationMapper
+            ));
 //            ->add(new Importer\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
 //            ->add(new Importer\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
 //            ->add(new Importer\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
