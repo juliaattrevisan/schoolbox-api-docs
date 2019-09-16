@@ -49,50 +49,47 @@
             multiple
             placeholder="Enter one or more folder names or class codes"
             data-selectize
+            {% if isDisabled %}disabled{% endif %}
     >
         {# For this filter, folders are just all the URL override folders #}
         <optgroup label="My Classes">
-            {%- for folder in myClasses %}
-                {% set roleSelection = roleSelections[folder.id] %}
-                {% set userSelection = userSelections[roleSelection.key] %}
-                <option value="{{ folder.id }}"
-                        label="{{ folder.nameWithCodes }}"
-                        {% if userSelection.selected %}selected{% endif %}
-                >{{ folder.nameWithCodes }}</option>
-            {% endfor -%}
+            {% for folder in myClasses %}
+                {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                    folder:         folder,
+                    userSelections: userSelections,
+                    roleSelections: roleSelections,
+                } only %}
+            {% endfor %}
         </optgroup>
 
         <optgroup label="My Groups">
-            {%- for folder in myGroups %}
-                {% set roleSelection = roleSelections[folder.id] %}
-                {% set userSelection = userSelections[roleSelection.key] %}
-                <option value="{{ folder.id }}"
-                        label="{{ folder.nameWithCodes }}"
-                        {% if userSelection.selected %}selected{% endif %}
-                >{{ folder.nameWithCodes }}</option>
-            {% endfor -%}
+            {% for folder in myGroups %}
+                {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                    folder:         folder,
+                    userSelections: userSelections,
+                    roleSelections: roleSelections,
+                } only %}
+            {% endfor %}
         </optgroup>
 
         <optgroup label="Other Classes">
-            {%- for folder in otherClasses %}
-                {% set roleSelection = roleSelections[folder.id] %}
-                {% set userSelection = userSelections[roleSelection.key] %}
-                <option value="{{ folder.id }}"
-                        label="{{ folder.nameWithCodes }}"
-                        {% if userSelection.selected %}selected{% endif %}
-                >{{ folder.nameWithCodes }}</option>
-            {% endfor -%}
+            {% for folder in otherClasses %}
+                {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                    folder:         folder,
+                    userSelections: userSelections,
+                    roleSelections: roleSelections,
+                } only %}
+            {% endfor %}
         </optgroup>
 
         <optgroup label="Other Groups">
-            {%- for folder in otherGroups %}
-                {% set roleSelection = roleSelections[folder.id] %}
-                {% set userSelection = userSelections[roleSelection.key] %}
-                <option value="{{ folder.id }}"
-                        label="{{ folder.nameWithCodes }}"
-                        {% if userSelection.selected %}selected{% endif %}
-                >{{ folder.nameWithCodes }}</option>
-            {% endfor -%}
+            {% for folder in otherGroups %}
+                {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                    folder:         folder,
+                    userSelections: userSelections,
+                    roleSelections: roleSelections,
+                } only %}
+            {% endfor %}
         </optgroup>
     </select>
 {% endblock %}
