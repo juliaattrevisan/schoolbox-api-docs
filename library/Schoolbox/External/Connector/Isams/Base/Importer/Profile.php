@@ -260,15 +260,11 @@ class Profile implements ImporterInterface
 
             /* Fish out a staff member via their user code
              */
-            $tutorId = trim((string)$student->Tutor);
-            $tutor = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$tutorId}')]")[0];
+            $tutor = $this->findTutor((string)$student->Tutor);
 
             /* Fish out a staff member via their user code
              */
-            $houseName = trim((string)$student->AcademicHouse);
-            $house = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]")[0];
-            $housemasterId = trim((string)$house->HouseMaster);
-            $housemaster = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$housemasterId}')]")[0];
+            $housemaster = $this->findHousemaster((string)$student->AcademicHouse);
 
             /* Find out enrolment date if it exists
              */
@@ -294,15 +290,15 @@ class Profile implements ImporterInterface
                 ->setFormTeacherId(null)
                 ->setFormTeacherName(null)
                 ->setGender(trim((string)$student->Gender))
-                ->setHeadOfHouseId($housemasterId)
-                ->setHeadOfHouseName(trim((string)$housemaster->FullName))
+                ->setHeadOfHouseId($housemaster['housemasterId'])
+                ->setHeadOfHouseName($housemaster['housemasterName'])
                 ->setHouseName(trim((string)$student->AcademicHouse))
                 ->setLeavingDate(null)
                 ->setMobile(trim((string)$student->MobileNumber))
                 ->setStudiesCode(null)
                 ->setTutorGroup(null)
-                ->setTutorTeacherId(trim((string)$tutor->UserCode))
-                ->setTutorTeacherName(trim((string)$tutor->FullName))
+                ->setTutorTeacherId($tutor['tutorId'])
+                ->setTutorTeacherName($tutor['tutorName'])
                 ->setYearLevel((string)$student->NCYear)
                 ->setYearLevelCoordinatorId(null)
                 ->setYearLevelCoordinatorName(null)
@@ -332,6 +328,70 @@ class Profile implements ImporterInterface
              */
             $this->importParentsOfStudent($externalId, $studentBaseProfile);
         }
+    }
+
+
+    /**
+     * Find a tutor from their id
+     *
+     * @param string $tutorId
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findTutor(string $tutorId): array
+    {
+        $tutorName = null;
+
+        $tutorId = trim($tutorId);
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$tutorId}')]");
+
+        if ($node) {
+            $tutor = $node[0];
+            $tutorName = trim((string)$tutor->FullName);
+        }
+
+        return [
+            'tutorId' => $tutorId,
+            'tutorName' => $tutorName,
+        ];
+    }
+
+
+    /**
+     * Find a housemaster from their house name
+     *
+     * @param string $houseName
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findHousemaster(string $houseName): array
+    {
+        $housemasterId = null;
+        $housemasterName = null;
+
+        $houseName = trim($houseName);
+        $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
+
+        if ($node) {
+            $house = $node[0];
+
+            $housemasterId = trim((string)$house->HouseMaster);
+            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$housemasterId}')]");
+
+            if ($node) {
+                $housemaster = $node[0];
+                $housemasterName = trim((string)$housemaster->FullName);
+            }
+        }
+
+        return [
+            'housemasterId' => $housemasterId,
+            'housemasterName' => $housemasterName
+        ];
     }
 
 
@@ -366,6 +426,7 @@ class Profile implements ImporterInterface
 
         return $mapping;
     }
+
 
     /**
      * Import parent profile data for a given student
