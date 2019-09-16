@@ -223,7 +223,6 @@ class Composite implements ImporterInterface
 
         $this->registry
             ->add($profile);
-//            ->add(new Importer\Relations($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userRelationMapper));
 //            ->add(new Importer\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
 //            ->add(new Importer\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
 //            ->add(new Importer\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
