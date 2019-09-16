@@ -130,6 +130,15 @@ class Profile implements ImporterInterface
              * If one already exists, load it, update it, then save it
              * Otherwise make a new one for the given id
              */
+            try {
+                $studentProfile = $this->studentProfileMapper->findByExternalId($student->getId());
+                $baseProfile = $studentProfile->getBaseProfile();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $studentProfile = $this->studentProfileMapper->createModel();
+                $baseProfile = $this->baseProfileMapper->createModel();
+
+                $studentProfile->setBaseProfile($baseProfile);
+            }
 
             /* Find any associated parents
              * For every associated parent, find out if they have a parent profile
