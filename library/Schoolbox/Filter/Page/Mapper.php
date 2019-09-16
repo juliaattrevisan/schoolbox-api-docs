@@ -31,7 +31,22 @@ class Mapper extends \Schoolbox\Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('filter_id', Filter\Mapper::class, 'id', self::TYPE_MODEL, null, 'filter', 'filter');
-        $this->uses('page', self::TYPE_STRING);
+        $this->uses(
+            'page',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'page',
+            [
+                Model::PAGE_PENDING_ASSESSMENTS,
+                Model::PAGE_GRADES,
+                Model::PAGE_CLASS_MARK_BOOK,
+                Model::PAGE_COURSE_MARK_BOOK,
+                Model::PAGE_RUBRIC_MARK_BOOK,
+                Model::PAGE_LEARNING_ANALYTICS,
+                Model::PAGE_UPCOMING_ASSESSMENTS,
+                Model::PAGE_ASSESSMENT_CALENDAR,
+            ]
+        );
         $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('user_configurable', self::TYPE_BOOLEAN);
 
