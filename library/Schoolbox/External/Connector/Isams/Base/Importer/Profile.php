@@ -208,7 +208,6 @@ class Profile implements ImporterInterface
 
         /** @var Student $student */
         foreach ($students as $student) {
-            print_r($student);
             $externalId = trim((string)$student->SchoolCode);
             $username = trim((string)$student->SchoolCode);
             $firstname = trim((string)$student->Preferredname);
@@ -267,6 +266,13 @@ class Profile implements ImporterInterface
                 $campusName = $this->campusMapping[(int)$student->NCYear]->getName();
             }
 
+            /* Fish out a staff member via their user code
+             */
+            $tutorId = trim((string)$student->Tutor);
+            $tutor = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$tutorId}')]")[0];
+
+            /* Smoosh it all together
+             */
             $studentProfile
                 ->setUsername($username)
                 ->setAlertComment(null)
@@ -288,8 +294,8 @@ class Profile implements ImporterInterface
                 ->setMobile(trim((string)$student->MobileNumber))
                 ->setStudiesCode(null)
                 ->setTutorGroup(null)
-                ->setTutorTeacherId(trim((string)$student->Tutor))
-                ->setTutorTeacherName(null)
+                ->setTutorTeacherId(trim((string)$tutor->UserCode))
+                ->setTutorTeacherName(trim((string)$tutor->FullName))
                 ->setYearLevel((string)$student->NCYear)
                 ->setYearLevelCoordinatorId(null)
                 ->setYearLevelCoordinatorName(null)
