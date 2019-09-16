@@ -151,7 +151,7 @@ class Batchxml implements ISync
 
         $student
             ->getAccount()
-            ->setLogin(trim((string)$currentResult->UserName))
+            ->setLogin(trim((string)$currentResult->SchoolCode))
             ->setActive(true);
 
         $student
