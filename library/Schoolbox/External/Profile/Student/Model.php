@@ -642,7 +642,7 @@ class Model
      */
     public function setEmergencyContactPhone3(?string $emergencyContactPhone3): self
     {
-        $this->emergencyContactPhone3 = $emergencyContactPhone1;
+        $this->emergencyContactPhone3 = $emergencyContactPhone3;
         return $this;
     }
 
