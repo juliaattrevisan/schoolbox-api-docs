@@ -378,18 +378,6 @@
                 config.blur($(element));
             });
 
-            CKEDITOR.instances[identifier].on('focus', function(event) {
-                /* Close any datepickers on the page
-                 * (this doesn't fire normally because this is an iframe)
-                 */
-                var datepickers = $('[data-datepicker]');
-                if (datepickers.length !== 0) {
-                    $.each(datepickers, function() {
-                        $(this).datepicker('hide');
-                    });
-                }
-            });
-
             CKEDITOR.instances[identifier].on('key', function(event) {
 
                 /* Disable Nanospell if keycode 229 is pressed (sign of IME use)
@@ -415,7 +403,7 @@
 
         if (dialogName === 'table' || dialogName === 'tableProperties') {
             var contents = dialogDefinition.getContents('info');
-            
+
             contents.remove('txtCellSpace'); // Cell spacing table attribute is overridden by css, and deprecated in HTML5
             contents.remove('txtCellPad'); // Cell padding table attribute is overridden by css, and deprecated in HTML5
             contents.remove('txtCaption'); // table caption is deprecated HTML5
