@@ -20,40 +20,6 @@
 
 <script>
     $(function() {
-
-        var courseWorkStage = $('#import_assessments');
-
-        courseWorkStage.find('[data-datepicker]')
-            .datepicker('option', 'showButtonPanel', true)
-            .datepicker('option', 'closeText', 'Use Unit Date')
-        ;
-
-        // Copy dates from Unit to Assessment when user clicks 'Use Unit Date'
-        $(document).on('click', '[data-handler="hide"]', function () {
-
-            if (typeof $.datepicker._curInst.id === 'string') {
-
-                var $input = $('#' + $.datepicker._curInst.id);
-
-                {# for task, will be 'publish_date' or 'due_date' #}
-                {# for quiz, will be either 'finish_date' or 'start_date' -#}
-                {# for work, will one one of 'publish_date', 'open_date' ,'due_date' or 'close_date' -#}
-                var side = $input.data('role');
-
-                // cast dates to unit equivalent
-                if ([ 'publish_date', 'open_date' ].indexOf(side) >= 0) {
-                    side = 'start_date'
-                } else if ([ 'due_date', 'close_date' ].indexOf(side) >= 0) {
-                    side = 'finish_date'
-                }
-
-                var $unit = $input.closest('[data-' + side + ']');
-                if ($unit.length) {
-                    $input.val($unit.data(side));
-                }
-            }
-        });
-
         $('[data-collapser]').click(function(e) {
             e.preventDefault();
             var unit = $('#' + $(e.target).attr('data-collapser'));
