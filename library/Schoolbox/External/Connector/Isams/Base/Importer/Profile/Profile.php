@@ -6,10 +6,12 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Importer\Profile;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
+use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Importer\ImporterInterface;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;

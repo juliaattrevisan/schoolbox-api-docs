@@ -208,7 +208,7 @@ class Composite implements ImporterInterface
     public function import(): void
     {
         $this->registry
-            ->add(new Importer\Profile(
+            ->add(new Importer\Profile\Profile(
                 $this->log,
                 $this->perform,
                 $this->batchxml,
