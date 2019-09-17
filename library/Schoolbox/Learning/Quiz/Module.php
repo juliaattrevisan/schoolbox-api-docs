@@ -92,10 +92,11 @@ class Module extends RestfulModule
                 new Rule\HasRole(Role::STAFF),
                 new Rule\IsSuperuser(),
                 new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE,
-                    function ($params) {
+                    static function ($params) {
                         if ($params['assessment'] instanceof IAssessable) {
                             return $params['assessment']->getBaseContext()->getFolder()->getId();
                         }
+                        return null;
                     },
                     Access::getInstance()
                 )
