@@ -13,9 +13,8 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Api;
-use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
+use Schoolbox\External\Connector\Isams\Base\Importer\CompositeTimetable;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
-use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -26,14 +25,9 @@ use Zend\Uri\Exception\InvalidUriPartException;
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
- * ISAMS Importer
+ * ISAMS Timetable Importer
  *
  * Imports from an xml file and populates the following tables:
- *   sis_user_profile
- *   sis_user_profile_staff
- *   sis_user_profile_student
- *   sis_user_profile_parent
- *   sis_user_profile_relation
  *   class
  *   class_period
  *   class_user
@@ -64,9 +58,10 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Import user_profile and user_relation data from ISAMS xml into local schema
+Import Timetable data from ISAMS xml into local schema. This requires UPS to have created user
+accounts in order to assign them to timetable classes.
 
-Usage: importer.php
+Usage: timetableImporter.php --perform
 
 
 HELP;
@@ -78,7 +73,7 @@ HELP;
          */
         $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
 
-        $composite = new Composite(
+        $composite = new CompositeTimetable(
             $this->getLogger(),
             $this->perform(),
             new Batchxml($api),
@@ -89,12 +84,7 @@ HELP;
             TimetablePeriodMapper::getInstance(),
             ClassEntryMapper::getInstance(),
             ClassInvolvementMapper::getInstance(),
-            ClassPeriodMapper::getInstance(),
-            UserProfile\Mapper::getInstance(),
-            UserProfile\Student\Mapper::getInstance(),
-            UserProfile\Parent\Mapper::getInstance(),
-            UserProfile\Staff\Mapper::getInstance(),
-            UserProfile\Relation\Mapper::getInstance()
+            ClassPeriodMapper::getInstance()
         );
 
         try {
