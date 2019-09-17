@@ -366,37 +366,33 @@ class Classes
          * - class_id comes from $timetableClass->getId()
          */
 
+        /** @var ClassPeriod $timetableClassPeriod */
+        $timetableClassPeriod = $this->classPeriodMapper->createModel()
+            ->setClass($timetableClass)
+            ->setPeriod($period)
+            ->setRoom($class['period']['room']['name']);
+
         /* If we have no record of this teacher id existing then we
          * we can't assign them to any classes - they don't have a
          * schoolbox user account
          */
-        if (!isset($users[$class['teachers']['username']])) {
+        if (isset($users[$class['teachers']['username']])) {
+            $timetableClassPeriod->setTeacher($this->userMapper->createModel()->setId($users[$class['teachers']['username']]));
+
+            $this->log->info(sprintf(
+                'Creating class period relation for teacher %s %s in room %s',
+                $class['teachers']['firstname'],
+                $class['teachers']['surname'],
+                $class['period']['room']['name']
+            ));
+        } else {
             $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; skipping',
+                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s',
                 $class['teachers']['username'],
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
         }
-
-        /* Minimum user
-         */
-        $teacher = $this->userMapper->createModel()
-            ->setId($users[$class['teachers']['username']]);
-
-        /** @var ClassPeriod $timetableClassPeriod */
-        $timetableClassPeriod = $this->classPeriodMapper->createModel()
-            ->setClass($timetableClass)
-            ->setPeriod($period)
-            ->setTeacher($teacher)
-            ->setRoom($class['period']['room']['name']);
-
-        $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s',
-            $class['teachers']['firstname'],
-            $class['teachers']['surname'],
-            $class['period']['room']['name']
-        ));
 
         $this->log->info(sprintf(
             'This occurs on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',
