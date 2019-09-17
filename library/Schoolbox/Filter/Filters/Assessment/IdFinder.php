@@ -76,20 +76,26 @@ class IdFinder extends Filter\AbstractIdFinder
         $teacherFolderIds      = $completeFilters[Folder\TeacherInvolved\Definition::class];
         $studentFolderIds      = $completeFilters[Folder\StudentInteractions\Definition::class];
         $courseImportFolderIds = $completeFilters[Folder\CourseImports\Definition::class];
+        $readableFolderIds     = $completeFilters[Folder\Readable\Definition::class];
         $projectIds            = $completeFilters[NullableContext\Project\Definition::class];
         $unitImplIds           = $completeFilters[NullableContext\UnitImpl\Definition::class];
         $unitSpecIds           = $completeFilters[NullableContext\UnitSpec\Definition::class];
         $unitImpSpcIds         = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
         $folderYearLevels      = $completeFilters[FolderYearLevel\Definition::class];
 
-        [$folderWhere, $folderParams]     = $this->getClauseFolder($teacherFolderIds, $studentFolderIds, $courseImportFolderIds);
+        [$folderWhere, $folderParams]     = $this->getClauseFolder(
+            $teacherFolderIds,
+            $studentFolderIds,
+            $courseImportFolderIds,
+            $readableFolderIds
+        );
         [$yearLevelJoin, $yearLevelWhere, $yearLevelParams] = $this->getClauseFolderYearLevels($folderYearLevels);
         [$projectWhere, $projectParams]   = $this->getClauseProject($projectIds);
         [$unitImplWhere, $unitImplParams] = $this->getClauseUnitImpl($unitImplIds);
         [$unitSpecWhere, $unitSpecParams] = $this->getClauseUnitSpec($unitSpecIds);
 
         // This filter affects which sub-queries are used, and also potentially modifies the unit-impl-context sub-queries
-        list($uImpSpcJoin, $uImpSpcWhere, $uImpSpcParams) = $this->getClauseUnitImplSpec($unitImpSpcIds);
+        [$uImpSpcJoin, $uImpSpcWhere, $uImpSpcParams] = $this->getClauseUnitImplSpec($unitImpSpcIds);
 
         // Sub-query modifiers
         $aTypes         = $completeFilters[AssessmentType\Definition::class];
@@ -107,12 +113,12 @@ class IdFinder extends Filter\AbstractIdFinder
         [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
         [$markPerCapWhere]                                        = $this->getClauseMarkPerCap($markPerCap, $dueWorkAlias);
         [$temporalWhere, $temporalParams, $participantPlanJoin]   = $this->getClauseTemporalState($temporalStates);
-        list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
-        list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
-        list($weightingWhere, $weightingParams)     = $this->getClauseWeighting($weightings);
-        list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypeIds);
-        list($yearDueWhere, $yearDueParams)         = $this->getClauseYear($yearsDue, self::DATE_COL_DUE);
-        list($deletedWhere)                         = $this->getClauseDeleted($deleted);
+        [$termDJoin, $termDWhere, $termDParams]                   = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
+        [$termCJoin, $termCWhere, $termCParams]                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
+        [$weightingWhere, $weightingParams]                       = $this->getClauseWeighting($weightings);
+        [$workTypeWhere,  $workTypeParams]                        = $this->getClauseWorkType($workTypeIds);
+        [$yearDueWhere, $yearDueParams]                           = $this->getClauseYear($yearsDue, self::DATE_COL_DUE);
+        [$deletedWhere]                                           = $this->getClauseDeleted($deleted);
 
         // Build the non-context JOINs
         $nonContextJoins = [
@@ -158,7 +164,15 @@ class IdFinder extends Filter\AbstractIdFinder
         );
 
         $subQueries = [];
-        if ($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $studentFolderIds, $projectIds, $unitImplIds, $unitSpecIds, $folderYearLevels)) {
+        if ($this->subQueryBase(
+            $unitImpSpcIds,
+            $teacherFolderIds,
+            $studentFolderIds,
+            $readableFolderIds,
+            $projectIds,
+            $unitImplIds,
+            $unitSpecIds
+        , $folderYearLevels)) {
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$nonContextJoin}
@@ -268,6 +282,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param null|Collection|int[] $uImpSpcIds
      * @param null|Collection|int[] $teacherFolderIds
      * @param null|Collection|int[] $studentFolderIds
+     * @param null|Collection|int[] $readableFolderIds
      * @param null|Collection|int[] $projectIds
      * @param null|Collection|int[] $unitImplIds
      * @param null|Collection|int[] $unitSpecIds
@@ -278,6 +293,7 @@ class IdFinder extends Filter\AbstractIdFinder
         ?Collection $uImpSpcIds,
         ?Collection $teacherFolderIds,
         ?Collection $studentFolderIds,
+        ?Collection $readableFolderIds,
         ?Collection $projectIds,
         ?Collection $unitImplIds,
         ?Collection $unitSpecIds,
@@ -287,6 +303,7 @@ class IdFinder extends Filter\AbstractIdFinder
             null === $uImpSpcIds &&
             null === $teacherFolderIds &&
             null === $studentFolderIds &&
+            null === $readableFolderIds &&
             null === $projectIds &&
             null === $unitImplIds &&
             null === $unitSpecIds &&
@@ -681,6 +698,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param null|Collection|int[] $teacherFolderIds
      * @param null|Collection|int[] $studentFolderIds
      * @param null|Collection|int[] $courseImportFolderIds
+     * @param null|Collection|int[] $readableFolderIds
      * @return mixed[]
      * @throws InvalidColumnException
      * @throws UnderflowException
@@ -688,12 +706,17 @@ class IdFinder extends Filter\AbstractIdFinder
     private function getClauseFolder(
         ?Collection $teacherFolderIds,
         ?Collection $studentFolderIds,
-        ?Collection $courseImportFolderIds
+        ?Collection $courseImportFolderIds,
+        ?Collection $readableFolderIds
     ): array {
         // Different filters are always combined using INTERSECT
 
         // All NULL ?
-        if (null === $teacherFolderIds && null === $studentFolderIds && null === $courseImportFolderIds) {
+        if (null === $teacherFolderIds
+            && null === $studentFolderIds
+            && null === $courseImportFolderIds
+            && null === $readableFolderIds
+        ) {
             return ['TRUE', []];
         }
 
@@ -711,6 +734,12 @@ class IdFinder extends Filter\AbstractIdFinder
                 ? $courseImportFolderIds :
                 array_intersect($folderIds, $courseImportFolderIds->getAll());
         }
+        if ($readableFolderIds) {
+            $folderIds = null === $folderIds
+                ? $readableFolderIds :
+                array_intersect($folderIds, $readableFolderIds->getAll());
+        }
+
         $builder = $this->getMapper()->getPredicateBuilder();
         $builder->in('f.id', $folderIds);
 

@@ -106,19 +106,4 @@ class Factory extends FolderFilter\Factory
             $folders->sortBy('name', 'ASC', null, true)
         );
     }
-
-
-    /**
-     * @inheritdoc
-     * @param Filter\Model $filter
-     * @return Filter\IKeyConverter|KeyConverter
-     */
-    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
-    {
-        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->indexByCallback(function ($folderId) {
-                return $folderId;
-            });
-        return new KeyConverter($filter, $folderIds, $this->getAccess());
-    }
 }

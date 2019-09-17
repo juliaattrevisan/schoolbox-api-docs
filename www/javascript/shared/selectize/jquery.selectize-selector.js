@@ -42,6 +42,21 @@
             .toArray();
     };
 
+    /**
+     * Helper method for retrieving a selectize's selected items from its
+     * select box.
+     *
+     * @param select
+     * @returns {*[]}
+     */
+    $.selectizeSelector.getItemsFromSelect = function(select) {
+        return $(select).find(':selected')
+            .map(function() {
+                return this.value;
+            })
+            .toArray();
+    };
+
     $.fn.selectizeSelector = function(options) {
         var element  = this;
         var settings = {}

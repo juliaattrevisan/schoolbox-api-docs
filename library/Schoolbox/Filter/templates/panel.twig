@@ -35,7 +35,7 @@ Usage:
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
-        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden]');
+        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden], select');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
@@ -126,7 +126,9 @@ Usage:
          * @param {int} filterId
          */
         function clearFilter(filterId) {
-            $panelComponents.filter('[data-component='+filterId+']').find('input[type=checkbox]').prop('checked', false);
+            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']');
+            $panelComponent.find('input[type=checkbox]').prop('checked', false);
+            $panelComponent.find('[data-selectize]')[0].selectize.clear(true);
             updateFiltersInUseLabel();
         }
 
@@ -226,32 +228,70 @@ Usage:
          *
          * Includes all options, regardless of whether checked or unchecked. (ie [0|1])
          *
+         * TODO consider replacing with qs.parse
+         *
          * @param {string} serialised
          * @return {object}
          */
         function deserialize(serialised){
-            var decodedData = decodeURIComponent(serialised),
-                flatArray   = decodedData.split('&'),
-                nestedObj   = {},
-                regEx       = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/; // eg 'filter_selection[1][task]=1'
+            var decodedData    = decodeURIComponent(serialised),
+                flatArray      = decodedData.split('&'),
+                nestedObj      = {},
+                regEx          = /^filter_selection\[(\d+)]\[(\w*)]=([01])$/, // eg 'filter_selection[1][task]=1'
+                emptyRegEx     = /^filter_selection\[(\d+)]=$/,               // eg 'filter_selection[17]='
+                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(\d+)$/;       // eg 'filter_selection[17][]=22'
 
             // Convert flat string array to nested object
-            for (var i in flatArray) {
-                var result = regEx.exec(flatArray[i]);
-                if(!result){
-                    // TODO make this more elegant. This happens if a filter has no options, eg course import not imported to any classes
-                    continue;
+            flatArray.forEach(function (keyValue) {
+                var filterId  = null,
+                    optionKey = null,
+                    optionVal = null,
+                    result    = regEx.exec(keyValue);
+
+                // First: try the main regex
+                if (result) {
+                    filterId  = result[1];
+                    optionKey = result[2];
+                    optionVal = result[3];
+                } else {
+                    // Second: try the selectize regex
+                    result = selectizeRegEx.exec(keyValue);
+                    if (result) {
+                        filterId  = result[1];
+                        optionKey = result[2];
+                        optionVal = 1;
+                    } else {
+                        // Finally: try the empty regex
+                        result = emptyRegEx.exec(keyValue);
+                        if (result) {
+                            filterId = result[1];
+                        }
+                    }
                 }
-                var filterId = result[1];
-                var optionKey = result[2];
-                var optionVal = result[3];
+
+                // Did none of the regexes match? exit
+                if (filterId === null) {
+                    return;
+                }
 
                 if (!nestedObj.hasOwnProperty(filterId)) {
                     nestedObj[filterId] = {};
                 }
 
-                nestedObj[filterId][optionKey] = optionVal;
-            }
+                if (optionKey !== null) {
+                    nestedObj[filterId][optionKey] = optionVal;
+                }
+            });
+
+            // Set all nested values to NULL if they're empty
+            // This is required so that qs.stringify serializes an empty value
+            // into an actual key.
+            Object.keys(nestedObj).forEach(function (filterId) {
+                if (Object.keys(nestedObj[filterId]).length === 0) {
+                    nestedObj[filterId] = null;
+                }
+            });
+
             return nestedObj;
         }
 
@@ -282,7 +322,7 @@ Usage:
                     var optionVal = decodedSelections[filterId][optionKey];
 
                     // We only need to know about checked values
-                    if ("1" === optionVal) {
+                    if (1 === Number(optionVal)) {
                         nestedObj[filterId][optionKey] = optionVal;
                     }
                 }
@@ -449,18 +489,44 @@ Usage:
                 var $component = $(component),
                     filterId   = $component.data('component'),
                     $available = $component.find('input[type=checkbox]'),
-                    $selected  = $component.find('input:checked[type=checkbox]');
+                    $selected  = $component.find('input:checked[type=checkbox], :selected'),
+                    $selectize = $component.find('select[data-selectize]'),
+                    selectize  = $selectize.length > 0 ? $selectize[0].selectize : null;
 
-                // Are a subset of available options selected ?
-                if($selected.length !== 0 && $selected.length !== $available.length){
+                // These will be deleted if the filter's not in use
+                componentsInUse[filterId]           = {};
+                componentsInUse[filterId]['name']   = $component.find('[data-filter-name]').html();
+                componentsInUse[filterId]['labels'] = [];
+
+                // Maybe this is a selectize?
+                if (selectize) {
+                    selectize.items.forEach(function (v) {
+                        componentsInUse[filterId]['labels'].push(selectize.options[v].name);
+                    });
+                } else if ($selected.length !== 0) {
+                    // Not a selectize, or it's not yet initialized
                     // Filter is being applied, add its name and selected option labels.
-                    componentsInUse[filterId]           = {};
-                    componentsInUse[filterId]['name']   = $component.find('[data-filter-name]').html();
-                    componentsInUse[filterId]['labels'] = [];
-                    $selected.each(function(idx, elem){
-                        var label = $component.find('label[for='+$(elem).attr('id')+']').html();
+                    $selected.each(function(idx, elem) {
+                        var $elem = $(elem),
+                            label = null;
+                        if ($elem.is('option')) {
+                            label = $elem.text();
+                        } else {
+                            label = $component.find('label[for='+$(elem).attr('id')+']').html();
+                        }
                         componentsInUse[filterId]['labels'].push(label);
                     });
+
+                    // Hide the filter in use if all its options are selected
+                    // (all options is functionally equivalent to none selected)
+                    if ($selected.length === $available.length) {
+                        componentsInUse[filterId]['labels'] = [];
+                    }
+                }
+
+                // Remove components with no selected options
+                if (componentsInUse[filterId].labels.length === 0) {
+                    delete componentsInUse[filterId];
                 }
             });
 
@@ -512,17 +578,25 @@ Usage:
         function updateCountMoreModal(filterId)
         {
             var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
-                decodedData = deserialize($optionCheckboxes.serialize())[filterId];
+                decodedData = deserialize($optionCheckboxes.serialize())[filterId],
+                $selectize  = $component.find('[data-selectize]'),
+                selectize   = $selectize.length ? $selectize[0].selectize : null;
 
             $countMoreModalName.html($component.find('[data-filter-name]').html());
-
             $countMoreModalList.html('');
-            for(var key in decodedData){
-                if(decodedData.hasOwnProperty(key) && decodedData[key] === "1"){
-                    var label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html();
+
+            Object.keys(decodedData).forEach(function (key) {
+                if (Number(decodedData[key]) === 1) {
+                    // This key is selected: use it
+                    var label = null;
+                    if (selectize) {
+                        label = selectize.options[key].name;
+                    } else {
+                        label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html()
+                    }
                     $countMoreModalList.append($modalListItem.clone().html(label));
                 }
-            }
+            });
         }
 
         /**

@@ -1,0 +1,24 @@
+{#
+    Rendering of options for folder filters
+
+    Usage:
+        roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        folder:         Folder\Model[]
+#}
+
+{% set roleSelection = roleSelections[folder.id] %}
+{% set userSelection = userSelections[roleSelection.key] %}
+
+{% if not userSelection %}
+    <option value="{{ folder.id }}"
+            label="{{ folder.nameWithCodes }}"
+            {% if roleSelection.selected %}selected{% endif %}
+            readonly
+    >{{ folder.nameWithCodes }}</option>
+{% else %}
+    <option value="{{ folder.id }}"
+            label="{{ folder.nameWithCodes }}"
+            {% if userSelection.selected %}selected{% endif %}
+    >{{ folder.nameWithCodes }}</option>
+{% endif %}

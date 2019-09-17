@@ -1,0 +1,89 @@
+{#
+    Usage:
+        definition:     IFilterDefinition
+        roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        folders:        Folder\Model[]
+
+#}
+{% extends '@filterDefinitions/Assessment/Folder/templates/component.twig' %}
+
+{% block filterName %}Classes and Groups{% endblock %}
+
+{% block userOptions %}
+    {# Selectize is only created if the item is user-configurable #}
+    {% if isUserConfigurable %}
+        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+        <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
+        {% autoescape 'js' %}
+            <script type="text/javascript">
+                $(function () {
+                    var $filterSelector = $('#filter-selector-readable');
+                    $filterSelector.selectizeSelector({
+                        multiple: true,
+                        selectize: {
+                            load: null,
+                            onInitialize: null,
+                            items: $.selectizeSelector.getItemsFromSelect($filterSelector),
+                            lockOptgroupOrder: true,
+                            maxOptions: 10
+                        }
+                    });
+                });
+            </script>
+        {% endautoescape %}
+
+        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+
+        <select id="filter-selector-readable"
+                name="filter_selection[{{ definition.filter.id }}][]"
+                multiple
+                placeholder="Enter one or more folder names or class codes"
+                data-selectize
+        >
+            {# For this filter, folders are just all the URL override folders #}
+            <optgroup label="My Classes">
+                {% for folder in myClasses %}
+                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                        folder:         folder,
+                        userSelections: userSelections,
+                        roleSelections: roleSelections,
+                    } only %}
+                {% endfor %}
+            </optgroup>
+
+            <optgroup label="My Groups">
+                {% for folder in myGroups %}
+                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                        folder:         folder,
+                        userSelections: userSelections,
+                        roleSelections: roleSelections,
+                    } only %}
+                {% endfor %}
+            </optgroup>
+
+            <optgroup label="Other Classes">
+                {% for folder in otherClasses %}
+                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                        folder:         folder,
+                        userSelections: userSelections,
+                        roleSelections: roleSelections,
+                    } only %}
+                {% endfor %}
+            </optgroup>
+
+            <optgroup label="Other Groups">
+                {% for folder in otherGroups %}
+                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
+                        folder:         folder,
+                        userSelections: userSelections,
+                        roleSelections: roleSelections,
+                    } only %}
+                {% endfor %}
+            </optgroup>
+        </select>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock userOptions %}

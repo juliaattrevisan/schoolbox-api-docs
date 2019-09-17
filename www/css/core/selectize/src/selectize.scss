@@ -40,6 +40,9 @@ $selectize-color-dropdown-item-create-text: rgba(red($selectize-color-text), gre
 $selectize-color-dropdown-item-create-active-text: $selectize-color-dropdown-item-active-text !default;
 $selectize-color-optgroup: $selectize-color-dropdown !default;
 $selectize-color-optgroup-text: $selectize-color-text !default;
+$selectize-text-align-optgroup: inherit !default;
+$selectize-font-style-optgroup: italic !default;
+$selectize-font-weight-optgroup: bolder !default;
 $selectize-lighten-disabled-item: 30% !default;
 $selectize-lighten-disabled-item-text: 30% !default;
 $selectize-lighten-disabled-item-border: 30% !default;
@@ -256,6 +259,10 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
     .optgroup-header {
         color: $selectize-color-optgroup-text;
         background: $selectize-color-optgroup;
+        text-align: $selectize-text-align-optgroup;
+        font-weight: $selectize-font-weight-optgroup;
+        font-style: $selectize-font-style-optgroup;
+
         cursor: default;
     }
     .active {
