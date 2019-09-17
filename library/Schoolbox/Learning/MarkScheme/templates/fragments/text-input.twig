@@ -36,22 +36,23 @@
 
 {% if not readonly %}
     <script type="text/javascript">
+        $(function() {
+            $('#mark-{{ participant.user.id }}').combobox({{ errors | json_encode | raw }});
 
-        $(window).load(function () {
             $("[data-feedback-form]").alaressValidate(
                 {
                     rules: {
                         mark: {
                             min: {
                                 depends: function () {
-                                    if ($.isNumeric($(this).val()) && $(this).val() < 0) {
+                                    if ($.isNumeric($(this).val()) && parseInt($(this).val()) < 0) {
                                         return true;
                                     }
                                 }
                             },
                             max: {
                                 depends: function () {
-                                    if ($.isNumeric($(this).val()) && $(this).val() > $(this).attr('data-validation-limit')) {
+                                    if ($.isNumeric($(this).val()) && $(this).val() > parseInt($(this).attr('data-validation-limit'))) {
                                         return $(this).attr('data-validation-limit');
                                     }
                                 }
