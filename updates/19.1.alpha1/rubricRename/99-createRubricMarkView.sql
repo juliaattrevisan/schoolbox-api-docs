@@ -1,16 +1,16 @@
--- This view is to populate rubric_descriptor mark in v_rubric_mark
-CREATE OR REPLACE VIEW v_rubric_descriptor_mark AS
+-- This view is to populate rubric_indicator mark in v_rubric_mark
+CREATE OR REPLACE VIEW v_rubric_indicator_mark AS
   SELECT
-    rubric_group_mark_id,
+    rubric_capability_mark_id,
     descriptor_id,
-    criterion_id,
+    rubric_indicator_id,
     `value`,
     valid,
     -- Rubric descriptor fields
     -- (Not a valid descriptor mark? Don't select it)
     IF (valid, rd.description, NULL) AS descriptor_name
-  FROM rubric_descriptor_mark
-  LEFT JOIN rubric_descriptor rd ON rd.id = rubric_descriptor_mark.descriptor_id
+  FROM rubric_indicator_mark
+  LEFT JOIN rubric_descriptor rd ON rd.id = rubric_indicator_mark.descriptor_id
   WHERE descriptor_id IS NOT NULL AND valid = 1;
 
 CREATE OR REPLACE VIEW v_rubric_mark AS
@@ -31,29 +31,29 @@ CREATE OR REPLACE VIEW v_rubric_mark AS
     vr.capability_id                     AS capability_id,
     vr.capability_name                   AS capability_name,
     vr.capability_max_value              AS capability_max_value,
-    IF (rgm.valid, rgm.value, NULL)      AS capability_mark,
+    IF (rcm.valid, rcm.value, NULL)      AS capability_mark,
 
     -- Rubric indicator mark fields
     vr.indicator_id                      AS indicator_id,
     vr.indicator_name                    AS indicator_name,
     vr.indicator_max_value               AS indicator_max_value,
-    IF (rdm.valid, rdm.value, NULL)      AS indicator_mark,
+    IF (rim.valid, rim.value, NULL)      AS indicator_mark,
 
     -- Rubric descriptor fields
     -- (Not a valid descriptor mark? Don't select it)
-    rdm.descriptor_name                  AS descriptor_name
+    rim.descriptor_name                  AS descriptor_name
 
-  FROM rubric_group_mark rgm
-  INNER JOIN submission_return sr         ON rgm.return_id = sr.id
+  FROM rubric_capability_mark rcm
+  INNER JOIN submission_return sr         ON rcm.return_id = sr.id
   INNER JOIN submission_box sb            ON sr.box_id = sb.id
-  INNER JOIN v_rubric vr                  ON rgm.rubric_group_id = vr.capability_id
-  LEFT JOIN  v_rubric_descriptor_mark rdm ON rdm.criterion_id = vr.indicator_id AND rdm.rubric_group_mark_id = rgm.id
+  INNER JOIN v_rubric vr                  ON rcm.rubric_capability_id = vr.capability_id
+  LEFT JOIN  v_rubric_indicator_mark rim  ON rim.rubric_indicator_id = vr.indicator_id AND rim.rubric_capability_mark_id = rcm.id
 
   -- Only valid published rubric
   WHERE
     sr.deleted_at IS NULL AND
     sr.published_at IS NOT NULL AND
-    (rgm.valid IS TRUE OR rdm.valid IS TRUE)
+    (rcm.valid IS TRUE OR rim.valid IS TRUE)
 
   ORDER BY
     sb.assessment_id       ASC,
