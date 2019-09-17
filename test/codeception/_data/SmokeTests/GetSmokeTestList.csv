@@ -45,7 +45,7 @@ Admin,Superuser,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/h
 ,Superuser,Setup UPS rules for students,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student
 ,Superuser,View Media Queue,https://vagrant.dev.schoolbox.cloud/adminv2/video
 ,Superuser,Import users,https://vagrant.dev.schoolbox.cloud/adminv2/import/user
-,Superuser,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/photos/upload
+,Superuser,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload
 ,Superuser,Config filters,https://vagrant.dev.schoolbox.cloud/adminv2/filters
 ,Superuser,Configure filters on pending assessment,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending
 ,Superuser,Configre feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours

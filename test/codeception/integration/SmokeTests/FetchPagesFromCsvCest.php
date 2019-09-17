@@ -6,8 +6,7 @@ namespace SmokeTests;
 
 use Codeception\Exception\ConditionalAssertionFailed;
 use IntegrationTester;
-use Payload\GetPage;
-use Payload\Login as LoginPayload;
+use Payload;
 
 class FetchPagesFromCsvCest
 {
@@ -37,18 +36,19 @@ class FetchPagesFromCsvCest
     {
         $persona=$example[1];
         $url=$example[3];
-
         $user_details=$this->personas[$persona];
 
+        #WHEN
         #Need to login to the right user
         $this->loginUser($i, $user_details['username'], $user_details['password']);
-        #State the intention of the test.
 
         #proceed to test the url which is below.
-        $getPayload = new GetPage();
-        $getPayload->setURL($url);
-        $response = $i->sendCurlRequest($getPayload, true, 'fetch - '.$url);
-        $i->assertEquals(200, $response->getStatusCode());
+        $getPayload = new Payload\Base('GET', '/', $url);
+
+        $i->sendRequest($getPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
     }
 
     /** Url Provider - reads a csv file to provide an array of data for the fetch all pages test.
@@ -72,10 +72,10 @@ class FetchPagesFromCsvCest
 
     protected function loginUser(IntegrationTester $i, string $username, string $password)
     {
-        $loginPayload = new LoginPayload();
+        $loginPayload = new Payload\Authentication\Login();
         $loginPayload->setUsername($username);
         $loginPayload->setPassword($password);
 
-        $i->sendCurlRequest($loginPayload, false);
+        $i->sendRequest($loginPayload);
     }
 }
