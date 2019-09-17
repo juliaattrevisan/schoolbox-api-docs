@@ -5,9 +5,5 @@
 DELETE FROM ups_custom_hydrator
 WHERE class = 'Schoolbox\\Sync\\Hydrator\\Custom\\BatchxmlParentCampuses';
 
--- External UPS Provider only uses the default connector behaviour
--- there are no custom behaviours anymore
--- Hide this config option for now
-UPDATE `config`
-SET `value`='', `options`='default;Default', `hidden`='true'
-WHERE `name`='external_ups_provider';
+-- Having spoke with Duane we probably don't need that config option at all
+DELETE FROM config where name = 'external_ups_provider';
