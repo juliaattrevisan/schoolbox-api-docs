@@ -657,9 +657,10 @@ Calendar.prototype.init = function() {
         }
     });
 
+    // The old datepicker is gone, and was removed from the new calendar anyway.
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
-    $('#datepicker').datepicker(c.options.datepicker);
+    // $('#datepicker').datepicker(c.options.datepicker);
 
     return this;
 };
