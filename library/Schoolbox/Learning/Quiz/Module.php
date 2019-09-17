@@ -10,12 +10,15 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Alaress\Authorizer\Rule;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Assessment\LockedChecker;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\Assessment\Term;
 
@@ -87,7 +90,16 @@ class Module extends RestfulModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\HasRole(Role::STAFF),
-                new Rule\IsSuperuser()
+                new Rule\IsSuperuser(),
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE,
+                    static function ($params) {
+                        if ($params['assessment'] instanceof IAssessable) {
+                            return $params['assessment']->getBaseContext()->getFolder()->getId();
+                        }
+                        return null;
+                    },
+                    Access::getInstance()
+                )
             )
         );
 
