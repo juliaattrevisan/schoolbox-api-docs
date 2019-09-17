@@ -137,7 +137,7 @@ class Controller extends Base
      */
     private function buildResponse(User $user, ?string $selectedDate): void
     {
-        $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
+        $groups           = (new Group($user, $this->folderMapper))->generate();
         $campus           = (new Campus($user, $this->campusMapper))->generate();
         $eventType        = (new EventType($this->eventTypeMapper))->generate();
         $sourceList       = (new SourceList($this->calApiConfigMapper, $this->moduleChecker))->generate();
