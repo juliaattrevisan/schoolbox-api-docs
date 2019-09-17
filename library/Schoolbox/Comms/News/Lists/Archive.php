@@ -13,7 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
-use Schoolbox\News\Topic;
+use Schoolbox\Comms\News\Topic\Model as Topic;
 use Schoolbox\User;
 
 class Archive extends Base

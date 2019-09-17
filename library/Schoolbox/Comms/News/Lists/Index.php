@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Lists;
 
+use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\User;
 
@@ -42,6 +43,8 @@ class Index extends Base
      */
     public function find(Querystring $params, User $user): array
     {
+        $slug = $params->getSlug();
+        $topicId = Mapper::TOPIC_ALL_ID;
 
         /* You are in the audience of these articles
          * or you accepted/authored them
@@ -56,9 +59,10 @@ class Index extends Base
         /* If $topicId was provided, restrict data set to articles
          * that were in the specified topic
          */
-        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
-
-        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
+        if ($slug !== null) {
+            $topics = $this->topicMapper->findAll(['order' => ['sequence' => 'ASC']]);
+            $topicId = $this->determineSelectedTopicId($topics, $slug);
+        }
 
         /* Push those article ids through the topic filter which also circumstantially happens to
          * restrict to published, but not expired, articles because we pass null as year and month values.
