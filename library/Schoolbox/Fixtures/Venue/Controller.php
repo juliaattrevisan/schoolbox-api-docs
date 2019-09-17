@@ -130,6 +130,7 @@ class Controller extends AbstractController
                 'lon' => $entity->getLongitude(),
             ];
         } else {
+            // selecting centre of Australia by default
             $data['location'] = [
                 'lat' => '-27.299860',
                 'lon' => '133.622357',

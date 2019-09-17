@@ -303,6 +303,7 @@ class Controller extends AbstractController
         $apiUrl = $this->getConfigLoader()->get('weather_api_url');
         $apixuClient = new ApixuClient($apiKey, $apiUrl);
         $forecast = new MatchWeather($match, $apixuClient);
+        $forecast->loadForecast();
 
         /* Determine whether you've got write access or not
          * when viewing this page

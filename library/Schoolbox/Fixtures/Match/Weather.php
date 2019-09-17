@@ -71,23 +71,21 @@ class Weather
      */
     public function __construct(Match $match, ApixuClient $api)
     {
-        $this->setMatch($match);
-        $this->api = $api;
-
-        $this->findForecast();
+        $this->match = $match;
+        $this->api   = $api;
     }
 
     /**
-     * Find the forecast
+     * Load the forecast
      *
      */
-    private function findForecast()
+    public function loadForecast(): void
     {
-        $forecast = $this->findWeather($this->getMatch());
+        $forecast = $this->findWeather($this->match);
         if (!empty($forecast)) {
-            $this->setIcon($forecast['condition']['icon']);
-            $this->setCondition($forecast['condition']['text']);
-            $this->setTemp($forecast['avgtemp_c']);
+            $this->icon      = $forecast['condition']['icon'];
+            $this->condition = $forecast['condition']['text'];
+            $this->temp      = $forecast['avgtemp_c'];
         }
     }
 
@@ -97,10 +95,10 @@ class Weather
      * @param Match $match
      * @return array
      */
-    private function findWeather(Match $match)
+    private function findWeather(Match $match): array
     {
         $matchDayDiff = \Alaress_Date_Format::now()->diffInDays($match->getStartAt(), false);
-        $matchDay     = $match->getStartAt()->getDatabaseDate();
+        $matchDay     = $match->getStartAt();
 
         /* Only return data if the match hasn't already occurred
          */
@@ -109,10 +107,10 @@ class Weather
             /* Extract all the datums
              * Don't bother if the match day is too far into the future (10 days)
              */
-            if ($matchDayDiff < $this->getForecastLength()) {
+            if ($matchDayDiff < $this->forecastLength) {
                 $forecast = $this->api->getForecastByDate($matchDay, $match->getVenue()->getLatitude(), $match->getVenue()->getLongitude());
                 if (!empty($forecast)) {
-                    $this->setHasResults(true);
+                    $this->hasResults = true;
                 }
                 return $forecast;
             }
@@ -125,98 +123,34 @@ class Weather
      */
 
     /**
-     * @return Model
+     * @return bool
      */
-    private function getMatch()
-    {
-        return $this->match;
-    }
-
-    /**
-     * @param Model $match
-     */
-    private function setMatch($match)
-    {
-        $this->match = $match;
-    }
-
-    /**
-     * @return int
-     */
-    private function getForecastLength()
-    {
-        return $this->forecastLength;
-    }
-
-    /**
-     * @param int $forecastLength
-     */
-    private function setForecastLength($forecastLength)
-    {
-        $this->forecastLength = $forecastLength;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function hasResults()
+    public function hasResults(): bool
     {
         return $this->hasResults;
     }
 
     /**
-     * @param boolean $hasResults
-     */
-    private function setHasResults($hasResults)
-    {
-        $this->hasResults = $hasResults;
-    }
-
-    /**
      * @return string
      */
-    public function getCondition()
+    public function getCondition(): string
     {
         return $this->condition;
     }
 
     /**
-     * @param string $condition
-     */
-    private function setCondition($condition)
-    {
-        $this->condition = $condition;
-    }
-
-    /**
      * @return string
      */
-    public function getIcon()
+    public function getIcon(): string
     {
         return $this->icon;
     }
 
     /**
-     * @param string $icon
-     */
-    private function setIcon($icon)
-    {
-        $this->icon = $icon;
-    }
-
-    /**
      * @return string
      */
-    public function getTemp()
+    public function getTemp(): string
     {
         return $this->temp;
-    }
-
-    /**
-     * @param string $temp
-     */
-    private function setTemp($temp)
-    {
-        $this->temp = $temp;
     }
 }

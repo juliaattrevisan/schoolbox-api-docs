@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Weather;
 
+use Alaress_Date_Format;
+
 /**
  * Class ApixuClient
  * Helper class for making API calls to the Apixu weather API.
@@ -67,16 +69,16 @@ class ApixuClient
     /**
      * Get weather for particular date and location
      *
-     * @param string $date
-     * @param        $latitude
-     * @param        $longitude
+     * @param Alaress_Date_Format $date
+     * @param                     $latitude
+     * @param                     $longitude
      *
      * @return array|mixed
      */
-    public function getForecastByDate(string $date, $latitude, $longitude)
+    public function getForecastByDate(Alaress_Date_Format $date, $latitude, $longitude)
     {
         try {
-            $requestUrl = "forecast.json?date={$date}&q={$latitude},{$longitude}&key={$this->apiKey}";
+            $requestUrl = "forecast.json?date={$date->getDatabaseDate()}&q={$latitude},{$longitude}&key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             if (isset($response['forecast']['forecastday'][0]['day'])) {
                 return $response['forecast']['forecastday'][0]['day'];
