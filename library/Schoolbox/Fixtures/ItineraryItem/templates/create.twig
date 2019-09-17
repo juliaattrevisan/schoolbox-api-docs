@@ -23,15 +23,6 @@
                 $.alaressValidate.defaultErrorPlacement(error, element);
             }
         });
-
-        $('#itineraryItemForm').find('[data-datepicker]').datepicker();
-
-        $('#itineraryItemForm').find('[data-timepicker]').timepicker({
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            },
-            scrollDefault: '08:00'
-        });
     });
 </script>
 
