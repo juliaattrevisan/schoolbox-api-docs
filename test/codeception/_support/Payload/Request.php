@@ -145,23 +145,22 @@ abstract class Request
     /**
      * Adds a file to request.
      *
+     * The REST Module API supports both internal and external file uploads.
+     * In our case, we are always executing the tests against the web API and don't wish
+     * to directly set the $_FILES super global, so only a subset of the functionality is exposed here.
+     *
      * @param string $name     The 'name' attribute of the file input form field, eg 'myAttachmentFile'
      * @param string $fileName eg 'document.pdf'
-     * @param string $type     eg 'application/pdf'
-     * @param int    $error    One of the UPLOAD_ERR_* constants
-     * @param int    $size     eg filesize(codecept_data_dir('sample_file.pdf'))
      * @param string $tempName eg codecept_data_dir('sample_file.pdf')
      * @return $this
-     *
-     * @see UPLOAD_ERR_OK as an example error code
      */
-    public function setFile(string $name, string $fileName, string $type, int $error, int $size, string $tempName): self
+    public function setFile(string $name, string $fileName, string $tempName): self
     {
+        // The transport will automatically populate the 'Content-Type' to include the multi-part boundary.
+        $this->unsetHeader('Content-Type');
+
         $this->files[$name] = [
             'name'     => $fileName,
-            'type'     => $type,
-            'error'    => $error,
-            'size'     => $size,
             'tmp_name' => $tempName,
         ];
         return $this;
@@ -198,5 +197,15 @@ abstract class Request
     {
         $this->headers[$key] = $value;
         return $this;
+    }
+
+    /**
+     * Unset a header
+     *
+     * @param string $key
+     */
+    private function unsetHeader(string $key): void
+    {
+        unset($this->headers[$key]);
     }
 }
