@@ -58,5 +58,9 @@ class Integration extends REST
             $request->getFormParams(),
             $request->getFiles()
         );
+
+        foreach ($request->getHeaders() as $name => $value) {
+            $this->deleteHeader($name);
+        }
     }
 }
