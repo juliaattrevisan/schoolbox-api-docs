@@ -1,7 +1,5 @@
 <?php
 /**
- * Factory
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,11 +10,16 @@ namespace Schoolbox\External\UPS;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\Loader;
-use Schoolbox\External\Connector\Isams\Base\Api;
-use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
+/**
+ * Class Factory
+ *
+ * Unlock the ability to provide UPS data in a different way for the same connector
+ *
+ * @package Schoolbox\External\UPS
+ */
 class Factory
 {
 
@@ -30,12 +33,6 @@ class Factory
      * its External DB setting is - no special case for ups
      */
     private const EXTERNAL_UPS_PROVIDER_DEFAULT = ['', 'default'];
-
-
-    /**
-     * ISAMS batch xml reader
-     */
-    private const PROVIDER_ISAMS_BATCH_XML = 'Batchxml';
 
 
     /**
@@ -60,29 +57,29 @@ class Factory
      */
     public function build(IConfigLoader $config, ?IConnector $databaseExternal, string $type)
     {
-        // Check if external DB is unavailable and return offline class if we can't access
-        $classOffline = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";
 
+        // Check if external DB is unavailable and return offline class if we can't access
         if (!$databaseExternal instanceof IConnector) {
+            $classOffline = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";
+
             return new $classOffline($config, null);
         }
 
         /* If config->get('external_ups_provider') is '' or 'default', use the same value as External Db
          * Otherwise, use its value which is one of a set of hardcoded options
+         *
+         * TODO: Reinstate when required. This might not be be necessary because schoolbox connector
+         * now takes prime position; but this does unlock the ability to process ups data differently
+         *
+         * Originally built for isams so that schoolbox can use the schoolbox connector but UPS could
+         * be populated differently via some other mechanism (not the schoolbox connector itself)
          */
-        if ($this->hasUPSProvider($config->get('external_ups_provider'))) {
-            $providerName = ucwords($config->get('external_ups_provider'));
-
-            /* ISAMS batch xml reader
-             * TODO: This can probably evolve into a switch-case statement when other providers exist
-             */
-            if ($providerName === self::PROVIDER_ISAMS_BATCH_XML) {
-//                $config = new Loader();
-//                $api = new Api($config->get('external_ups_provider_batchxml_host'), $config->get('external_ups_provider_batchxml_key'));
+//        if ($this->hasUPSProvider($config->get('external_ups_provider'))) {
+//            $providerName = ucwords($config->get('external_ups_provider'));
 //
-//                return new Batchxml($api);
-            }
-        }
+//            // spawn and return a new instance, like any other factory
+//
+//        }
 
         /* Default: fall back to SIS classes
          */
