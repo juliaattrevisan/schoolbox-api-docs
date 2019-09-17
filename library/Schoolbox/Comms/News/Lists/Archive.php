@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Paginator\Paginator as BasePaginator;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
