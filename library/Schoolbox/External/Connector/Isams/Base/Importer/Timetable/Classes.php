@@ -1,9 +1,5 @@
 <?php
 /**
- * Classes
- *
- * Import all the classes and their involvements for all the timetables in the xml
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -19,14 +15,21 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
+/**
+ * Class Classes
+ *
+ * Import all the classes and their involvements for all the timetables in the xml
+ *
+ * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ */
 class Classes
 {
 
@@ -82,6 +85,7 @@ class Classes
 
     /**
      * TimetableClass constructor.
+     *
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Batchxml               $batchxml

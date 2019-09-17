@@ -13,7 +13,6 @@ use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
-use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;

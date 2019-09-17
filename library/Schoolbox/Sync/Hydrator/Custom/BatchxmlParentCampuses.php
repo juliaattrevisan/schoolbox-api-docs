@@ -22,7 +22,7 @@ use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
 use Schoolbox\External\Normalise\User\Student;
-use Schoolbox\External\UPS\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User as InternalUser;

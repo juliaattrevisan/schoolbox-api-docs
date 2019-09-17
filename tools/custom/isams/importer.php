@@ -19,7 +19,7 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\External\UPS\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
 use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidUriPartException;
 

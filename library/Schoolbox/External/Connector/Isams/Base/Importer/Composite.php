@@ -19,7 +19,6 @@ use Schoolbox\External\Connector\Isams\Base\Importer;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
