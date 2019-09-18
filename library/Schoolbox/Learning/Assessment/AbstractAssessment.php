@@ -157,6 +157,13 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $plans;
 
+    /**
+     * External system identifier
+     *
+     * @var null|string
+     */
+    private $externalId;
+
 
     /**
      * Assessable constructor.
@@ -1141,5 +1148,25 @@ abstract class AbstractAssessment implements IAssessable
     public function getFeedbackClass()
     {
         return IFeedback::class;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): IAssessable
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

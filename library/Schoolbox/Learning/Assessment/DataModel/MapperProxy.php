@@ -914,6 +914,27 @@ class MapperProxy
         $this->baseMapper->sequenceAssessments($assessables->getColumnValues('id'));
     }
 
+
+    /**
+     * Returns a collection of models filtered by column value/s
+     *
+     * @param string $columnName
+     * @param        $columnValue
+     * @param array  $options
+     * @return GenericCollection|IAssessable[]
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     */
+    public function findByColumn(string $columnName, $columnValue, array $options = []): GenericCollection
+    {
+        return $this->translateToDomainModelCollection(
+            $this->baseMapper->findByColumn($columnName, $columnValue, $options)
+        );
+    }
+
+
     /**
      * Helper method for retrieving an assessable data model's primary key value
      * (as distinct from its assessment ID).
