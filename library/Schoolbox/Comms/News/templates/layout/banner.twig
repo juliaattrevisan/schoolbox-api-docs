@@ -7,7 +7,7 @@
         </section>
     {% endif %}
 
-    <article class="content">
+    <section class="article content">
         <div class="title-section">
             <h1>{{ article.title |default("(untitled)") }}</h1>
             {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
@@ -62,8 +62,10 @@
                 </div>
             </span>
         </div>
-        {{ article.body|purify }}
-    </article>
+        <article>
+            {{ article.body|purify }}
+        </article>
+    </section>
 </div>
 
 {% if commentsIsEnabled %}

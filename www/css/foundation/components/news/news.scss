@@ -7,15 +7,16 @@
     .banner img {
         align-self: center;
     }
+    .article,
     article {
         margin: 0 auto;
         max-width: 45rem;
     }
-    article h1 {
+    .article h1 {
         margin-left: 0;
         margin-right: 0;
     }
-    article > .meta {
+    .article > .meta {
         border-bottom: 1px solid $gainsboro;
         margin: 0 0 2rem;
         padding-bottom: .5rem;
