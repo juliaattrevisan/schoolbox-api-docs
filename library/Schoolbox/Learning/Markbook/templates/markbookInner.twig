@@ -154,6 +154,10 @@
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
+                            {% set feedback = participant.authoritativeFeedback(false) %}
+                            {% if feedback and feedback.isDraft %}
+                                <span class="indicator indicator-pending"  title="Unpublished Draft"></span>
+                            {% endif %}
                         </td>
                     {% endfor %}
                 </tr>
