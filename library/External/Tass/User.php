@@ -19,10 +19,20 @@ class External_Tass_User implements External_UserInterface
      */
     private const FORMAT_ISO8601 = 126;
 
+
+    /**
+     * Default spouse prefix
+     *
+     * @var string
+     */
+    private const DEFAULT_SPOUSE_PREFIX = 'S';
+
+
     /**
      * @var MSSQL
     */
     private $database;
+
 
     /**
      * The TASS company code to use, for queries which require it.
@@ -31,17 +41,35 @@ class External_Tass_User implements External_UserInterface
      */
     private $companyCode;
 
-    /** @var External_Tass_Helper */
+
+    /**
+     * @var External_Tass_Helper
+     */
     private $helper;
+
+
+    /**
+     * Spouse Prefix, usually a letter; default is 'S'
+     *
+     * @var string
+     */
+    private $spousePrefix;
+
 
     /**
      * External_Tass_User constructor.
      */
-    function __construct()
+    public function __construct()
     {
         $this->database = MSSQL::getInstance();
         $this->companyCode  = Config::get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
+
+        /* Figure out an always-valid spouse prefix
+         */
+        $spousePrefix = trim(Config::get('external_tass_spouse_prefix'));
+
+        $this->spousePrefix = '' !== $spousePrefix ?: self::DEFAULT_SPOUSE_PREFIX;
     }
 
 
@@ -240,7 +268,7 @@ class External_Tass_User implements External_UserInterface
             UNION
 
             SELECT DISTINCT
-                'S' + RTRIM(parent.par_code)
+                '{$this->spousePrefix}' + RTRIM(parent.par_code)
                                     AS StudentContactID,
                 pa.add_num          AS StudentContactAddressNumber,
                 parent.m_name       AS StudentContactPreferred,
@@ -292,7 +320,7 @@ class External_Tass_User implements External_UserInterface
             UNION
 
             SELECT DISTINCT
-                'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                '{$this->spousePrefix}' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                     AS StudentContactID,
                 pa.add_num          AS StudentContactAddressNumber,
                 parent.m_name       AS StudentContactPreferred,
@@ -424,7 +452,7 @@ class External_Tass_User implements External_UserInterface
          */
 
         // id has to have a [P]arent prefix (or [S]pouse)
-        if (!preg_match('#(?:P|S)[0-9A-Za-z]+#s', $externalUserId)) {
+        if (!preg_match("#(?:P|{$this->spousePrefix})[0-9A-Za-z]+#s", $externalUserId)) {
             return array();
         }
 
@@ -463,8 +491,7 @@ class External_Tass_User implements External_UserInterface
             ";
 
             if ($commrules) {
-
-                $query = $query . "
+                $query .= "
                     UNION
 
                     SELECT DISTINCT
@@ -505,7 +532,7 @@ class External_Tass_User implements External_UserInterface
                 AND (s.dol IS NULL OR s.dol >= getdate())
             ";
             if ($commrules) {
-                $query = $query . "
+                $query .= "
                     UNION
 
                     SELECT DISTINCT
@@ -525,8 +552,8 @@ class External_Tass_User implements External_UserInterface
         }
 
         return $return;
-
     }
+
 
     /**
     * @inheritDoc
@@ -541,6 +568,7 @@ class External_Tass_User implements External_UserInterface
 
         return 'Day';
     }
+
 
     /**
      * {@inheritDoc}
