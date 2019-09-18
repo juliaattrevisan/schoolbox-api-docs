@@ -85,14 +85,14 @@ class Factory extends NullableContext\Factory
     /**
      * @inheritdoc
      * @param Filter\Model $filter
-     * @return Filter\IKeyConverter|KeyConverter
+     * @return Filter\IKeyConverter|NullableContext\KeyConverter
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         $unitSpecIds = (new Collection($this->courseSpecMapper->findAllIds(['deleted' => true])))
-            ->indexByCallback(function ($unitSpecId) {
+            ->indexByCallback(static function ($unitSpecId) {
                 return $unitSpecId;
             });
-        return new KeyConverter($filter, $unitSpecIds);
+        return new NullableContext\KeyConverter($filter, $unitSpecIds);
     }
 }
