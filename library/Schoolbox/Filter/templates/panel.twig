@@ -126,9 +126,13 @@ Usage:
          * @param {int} filterId
          */
         function clearFilter(filterId) {
-            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']');
+            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
+                $selectize      = $panelComponent.find('[data-selectize]'),
+                selectize       = $selectize.length ? $selectize[0].selectize : null;
             $panelComponent.find('input[type=checkbox]').prop('checked', false);
-            $panelComponent.find('[data-selectize]')[0].selectize.clear(true);
+            if (selectize) {
+                selectize.clear(true);
+            }
             updateFiltersInUseLabel();
         }
 
