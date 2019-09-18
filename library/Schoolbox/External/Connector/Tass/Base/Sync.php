@@ -167,8 +167,8 @@ class Sync extends Base implements ISync
                     CASE
                         WHEN
                             (sf.sfa_num) IS NULL
-                        THEN 'S' + RTRIM(p.par_code)
-                        ELSE 'S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
+                        THEN '{$this->helper->getSpousePrefix()}' + RTRIM(p.par_code)
+                        ELSE '{$this->helper->getSpousePrefix()}' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
                     END              AS student_contact_id,
                     f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
