@@ -10,6 +10,7 @@ namespace External\Canvas\Sync;
 use External\Canvas\Sync\Connector as CanvasConnector;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -42,7 +43,12 @@ class CliImporter extends CliTool\App
         ];
     }
 
-    /** @inheritDoc */
+
+    /** @inheritDoc
+     * @throws \UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
     public function run(): void
     {
         // Did user request help?
@@ -159,10 +165,13 @@ class CliImporter extends CliTool\App
         return $tempDir;
     }
 
+
     /**
      * Downloads data files
-     * @param $tableList
-     * @param $tempDir
+     *
+     * @param array $tableList
+     * @param string $tempDir
+     * @throws InvalidArgumentException If we attempt to create a Guzzle client with invalid handler/s
      */
     public function downloadDataFiles(array $tableList, string $tempDir): void
     {
@@ -172,9 +181,9 @@ class CliImporter extends CliTool\App
                 continue;
             }
             $tableFile = $tableData['files'][0];
-            $tableDataFile = fopen("$tempDir/$tableName.gz", 'w');
+            $tableDataFile = fopen("$tempDir/$tableName.gz", 'wb');
             try {
-                $response = $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
+                $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
                 $this->getLogger()->debug("Downloading $tableName to $tempDir/$tableName.gz.");
             } catch (GuzzleException $e) {
                 $this->getLogger()->warning("Failed to download $tempDir/$tableName.gz: {$e->getMessage()}");

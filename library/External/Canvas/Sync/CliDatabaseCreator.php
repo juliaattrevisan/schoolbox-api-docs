@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync;
 
-use Alaress\Database\Exception;
+use Alaress\Database;
 use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy;
 use Schoolbox\Application\CliKernelAbstract;
@@ -58,7 +58,10 @@ class CliDatabaseCreator extends CliTool\App
         return null;
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @throws Database\Exception
+     */
     public function run(): void
     {
         // Did user request help?
@@ -86,8 +89,8 @@ class CliDatabaseCreator extends CliTool\App
         // Check whether the credential is correct by connecting to schoolbox database.
         $rootDb = new Base(new Broker(), new Transactor(new Strategy\Savepoint()));
         try {
-            $result = $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
-        } catch (Exception $e) {
+            $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
+        } catch (Database\Exception $e) {
             $this->getLogger()->warning('Could not connect to schoolbox db using the credentials provided: ' . $e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
@@ -97,7 +100,7 @@ class CliDatabaseCreator extends CliTool\App
             $rootDb->connect($this->dbHost, $canvasDbName, $this->dbRootUser, $this->dbRootPassword);
             $this->getLogger()->info("Database {$canvasDbName} already exists.");
             exit(CliKernelAbstract::EXIT_STATUS_OK);
-        } catch (Exception $e) {
+        } catch (Database\Exception $e) {
             // Expected
         }
 
@@ -120,7 +123,7 @@ class CliDatabaseCreator extends CliTool\App
                 $rootDb->execute(
                     "CREATE DATABASE {$rootDb->quoteIdentifier($canvasDbName)} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'"
                 );
-            } catch (Exception $e) {
+            } catch (Database\Exception $e) {
                 $this->getLogger()->warning("Error creating database {$canvasDbName}: {$e->getMessage()}");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
@@ -131,7 +134,7 @@ class CliDatabaseCreator extends CliTool\App
                 $rootDb->execute(
                     "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* to {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHosts[0])}"
                 );
-            } catch (Exception $e) {
+            } catch (Database\Exception $e) {
                 $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}: {$e->getMessage()}");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }

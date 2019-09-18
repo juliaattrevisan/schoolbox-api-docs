@@ -62,6 +62,7 @@ class Base implements Serializable, IConnector
         $this->transactor = $transactor;
     }
 
+
     /**
      * Connect to the database
      *
@@ -71,6 +72,7 @@ class Base implements Serializable, IConnector
      * @param string $password
      * @param array $options Database connection options
      * @return bool
+     * @throws \Alaress\Database\Exception
      */
     public function connect($hostname, $database, $username, $password, $options = [])
     {

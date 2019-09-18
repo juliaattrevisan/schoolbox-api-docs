@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace External\Canvas\Sync;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Exception;
+use Alaress\Database;
 use Psr\Log\LoggerInterface;
 use function count;
 use InvalidArgumentException;
@@ -49,9 +49,12 @@ class DataRestorer
         $this->canvasDbName = $canvasDbName;
     }
 
+
     /**
      * Creates schema from schema json file.
+     *
      * @param array $schema
+     * @throws UnexpectedValueException
      */
     public function restoreSchema(array $schema): void
     {
@@ -149,7 +152,7 @@ class DataRestorer
                     }
                     $this->canvasDb->execute("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
                 }
-            } catch (Exception $e) {
+            } catch (Database\Exception $e) {
                 $errors = true;
                 $this->log->error($e->getMessage());
             }
@@ -160,10 +163,13 @@ class DataRestorer
         }
     }
 
+
     /**
      * Stores data from the data file in the data dir to tables
+     *
      * @param $tableName
      * @param $tableFile
+     * @throws Database\Exception
      */
     public function restoreTableData($tableName, $tableFile): void
     {
@@ -173,7 +179,7 @@ class DataRestorer
         $sql = "LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
         try {
             $this->canvasDb->execute($sql);
-        } catch (Exception $e) {
+        } catch (Database\Exception $e) {
             $this->log->warning("Loading data failed for $tableFile: " . $e->getMessage());
         }
         $warnings = $this->canvasDb->executeQuery('show warnings')->fetchAll();
