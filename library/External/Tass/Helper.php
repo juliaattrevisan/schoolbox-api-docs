@@ -42,7 +42,7 @@ class External_Tass_Helper
     {
         $spousePrefix = trim(Config::get('external_tass_spouse_prefix'));
 
-        return '' !== $spousePrefix ?: self::DEFAULT_SPOUSE_PREFIX;
+        return '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
     }
 
 
