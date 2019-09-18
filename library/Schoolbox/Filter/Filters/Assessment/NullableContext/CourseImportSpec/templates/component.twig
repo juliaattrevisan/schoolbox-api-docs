@@ -1,0 +1,33 @@
+{#
+    Usage:
+        isUserConfigurable: bool              - If false, just hidden input. If true, render a checkbox to clobber hidden value
+        definition:         IFilterDefinition
+        roleSelections:     FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections:     FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        courseSpecs:        CourseSpec[]      - Course Specifications containing Unit Specifications
+        keyNone:            string            - The '(none)' key
+        hideCourseTitle:    bool              - Optional. If true, don't render the course title above each set of units
+
+#}
+{% extends '@filters/_component.twig' %}
+
+{% block filterName %}{{ locale.course.proper }}{% endblock %}
+
+{% block userOptions %}
+    {% include '@filters/_selectionCheckbox.twig' with {
+        roleSelection:      roleSelections[keyNone],
+        userSelection:      userSelections[keyNone],
+        label:              '(none)',
+        disabled:           isDisabled
+    } only %}
+
+    {% for course in courseSpecs %}
+        {% set roleSelection = roleSelections[course.id] %}
+        {% include '@filters/_selectionCheckbox.twig' with {
+            roleSelection:      roleSelection,
+            userSelection:      userSelections[course.id],
+            label:              course.title,
+            disabled:           isDisabled
+        } only %}
+    {% endfor %}
+{% endblock %}
