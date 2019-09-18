@@ -50,6 +50,44 @@ class HomePageCest
         $i->canSeeHttpHeader('location', '/');
     }
 
+    /**
+     * @param IntegrationTester $i
+     */
+    public function homepageUploadFileAjax(IntegrationTester $i): void
+    {
+        $ajaxUploadFileHomepage = new Payload\Resource\File\AjaxUpload(110, 'file', 'fish2.png', '/UploadTestFiles/fish2.png');
+        $ajaxUploadFileHomepage->setHidden(0);
+        $i->sendRequest($ajaxUploadFileHomepage);
+        $i->seeResponseCodeIs(201);
+    }
+
+    /**
+     * @param IntegrationTester $i
+     */
+    public function resourcesUploadFileAjax(IntegrationTester $i): void
+    {
+        $ajaxUploadFile = new Payload\Resource\File\AjaxUpload(263, 'file', 'fish2.png', '/UploadTestFiles/fish2.png');
+        $ajaxUploadFile->setVisibility(1);
+        $i->sendRequest($ajaxUploadFile);
+        $i->seeResponseCodeIs(201);
+    }
+
+    /**
+     * @param IntegrationTester $i
+     */
+    public function postFileUploadFileForm(IntegrationTester $i): void
+    {
+        $storageUpload = new Payload\Resource\File\StorageUpload('upload', 'fish2.png', '/UploadTestFiles/fish2.png');
+        $i->sendRequest($storageUpload);
+        $i->seeResponseCodeIs(200);
+        $json_reply=json_decode($i->grabResponse(), true);
+        $uploadFile = new Payload\Resource\File\FileUploadForm(263, 'potato.png', 'Fish in disguise', $json_reply['hash']);
+        $i->sendRequest($uploadFile);
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', "https://vagrant.dev.schoolbox.cloud/");
+        $i->sendGET("https://vagrant.dev.schoolbox.cloud/");
+        $i->seeResponseCodeIs(200);
+    }
 
     /**
      * Creates a Group folder, adds Group members, updates their access level

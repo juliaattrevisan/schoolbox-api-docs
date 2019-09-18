@@ -100,6 +100,17 @@ abstract class Request
     }
 
     /**
+     * Unsets a query param
+     *
+     * @param string $name
+     * @param string $value
+     */
+    protected function unsetQueryParam(string $name): void
+    {
+        unset($this->queryParams[$name]);
+    }
+
+    /**
      * Returns this request's form params
      *
      * @return array
@@ -140,6 +151,20 @@ abstract class Request
     public function getFiles(): array
     {
         return $this->files;
+    }
+
+
+    /**
+     * Adds a file to request, requiring less information.
+     *
+     * @param string $name     The 'name' attribute of the file input form field, eg 'myAttachmentFile'
+     * @param string $fileName eg 'document.pdf'
+     * @param string $type     eg 'application/pdf'
+     * @return $this
+     */
+    public function setSimpleFile(string $name, string $uploaded_filename, string $file_location): self
+    {
+        return $this->setFile($name, $uploaded_filename, mime_content_type(codecept_data_dir($file_location)), 0, filesize(codecept_data_dir($file_location)), codecept_data_dir($file_location));
     }
 
     /**
@@ -193,19 +218,21 @@ abstract class Request
      * @param string $value
      * @return $this
      */
-    private function setHeader(string $key, string $value): self
+    protected function setHeader(string $key, string $value): self
     {
         $this->headers[$key] = $value;
         return $this;
     }
 
     /**
-     * Unset a header
+     * Unsets a request header
      *
      * @param string $key
+     * @return $this
      */
-    private function unsetHeader(string $key): void
+    protected function unsetHeader(string $key): self
     {
         unset($this->headers[$key]);
+        return $this;
     }
 }
