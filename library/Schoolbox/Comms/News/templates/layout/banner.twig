@@ -7,7 +7,7 @@
         </section>
     {% endif %}
 
-    <section class="article content">
+    <section class="detail content">
         <div class="title-section">
             <h1>{{ article.title |default("(untitled)") }}</h1>
             {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
