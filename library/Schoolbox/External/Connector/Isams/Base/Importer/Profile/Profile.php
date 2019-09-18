@@ -446,7 +446,7 @@ class Profile implements ImporterInterface
     {
         /* Find the parents/guardians of this student
          * To do it, we need a specific id value for $student
-         * ($student contains multiple ids, some of which seem internal to usams)
+         * ($student contains multiple ids, some of which seem internal to isams)
          */
         $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$studentExternalId}')]";
         $node = $this->batchxml->fetchXml($path)[0];
