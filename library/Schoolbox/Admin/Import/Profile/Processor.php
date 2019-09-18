@@ -516,7 +516,9 @@ class Processor
             /* Remove their base profile
              * ...but only if it isn't connected to any other profiles
              */
-            $this->removeOrphanedProfiles();
+            $orphans = $this->removeOrphanedProfiles();
+
+            $this->log("Removed orphaned profiles {$orphans}", self::LOG_OK);
         }
     }
 
@@ -524,10 +526,12 @@ class Processor
     /**
      * Remove any base profiles that are no longer connected to an extension profile
      * student, staff or parent
+     *
+     * @return string
      */
-    private function removeOrphanedProfiles(): void
+    private function removeOrphanedProfiles(): string
     {
-        (new OrphanRemover(
+        return (new OrphanRemover(
             $this->baseProfileMapper,
             $this->studentProfileMapper,
             $this->parentProfileMapper,

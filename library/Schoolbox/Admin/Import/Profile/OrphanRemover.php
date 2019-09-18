@@ -66,8 +66,10 @@ class OrphanRemover
     /**
      * Remove any base profiles that are no longer connected to an extension profile
      * student, staff or parent
+     *
+     * @return string
      */
-    public function remove(): void
+    public function remove(): string
     {
         $statement = $this->baseProfileMapper->getDatabase()->query("
             SELECT GROUP_CONCAT(profile.id) AS orphans
@@ -87,6 +89,10 @@ class OrphanRemover
                 DELETE FROM {$this->baseProfileMapper->getTable()}
                 WHERE {$this->baseProfileMapper->getIdentifierColumn()} IN ({$orphans})
             ");
+
+            return $orphans;
         }
+
+        return '';
     }
 }

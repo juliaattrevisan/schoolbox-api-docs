@@ -168,14 +168,14 @@ class Profile implements ImporterInterface
         /* Remove any orphaned profiles
          */
         if ($this->perform) {
-            $this->log->info('Removing orphaned profiles.');
-
-            (new OrphanRemover(
+            $orphans = (new OrphanRemover(
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper
             ))->remove();
+
+            $this->log->info("Removed orphaned profiles {$orphans}");
         }
 
         if (!$this->perform) {
