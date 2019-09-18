@@ -208,6 +208,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function isClass()
     {
+        if (!is_iterable($this->codes)) {
+            return false;
+        }
         foreach ($this->codes as $code) {
             if (!$code->isDeleted()) {
                 return true;
