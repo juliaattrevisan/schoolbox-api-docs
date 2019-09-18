@@ -1,4 +1,13 @@
 <?php
+
+use Schoolbox\Application\BasicRequest\Kernel;
+use Schoolbox\IConfigLoader;
+
+require_once __DIR__ . '/../../../../../../conf/core/require.php';
+$kernel = new Kernel();
+/** @var IConfigLoader $config */
+$config = $kernel->getDependencyInjector()->get('config');
+
 // Nanospell, rewritten to use PHP pspell for its backend.
 $rawPostData = file_get_contents('php://input');
 $post        = json_decode($rawPostData);
@@ -6,9 +15,8 @@ $post        = json_decode($rawPostData);
 $broker = enchant_broker_init();
 
 // Dictionaries, in order of preference
-// TODO figure out how dictionaries should be installed
 $dicts = [
-    enchant_broker_request_dict($broker, 'en_AU'),
+    enchant_broker_request_dict($broker, $config->get('spelling_checking_language')),
 ];
 
 if (!$post->id) {
