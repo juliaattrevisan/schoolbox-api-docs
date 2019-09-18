@@ -41,21 +41,21 @@ class Factory extends NullableContext\Factory
     }
 
 
-//    /**
-//     * @inheritdoc
-//     * @param Filter\Model $filter
-//     * @return Definition|Filter\IDefinition
-//     */
-//    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
-//    {
-//        return new Definition(
-//            $filter,
-//            $this->getOptionMapper(),
-//            $this->getDefaultsMapper()
-//        );
-//    }
-//
-//
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
+     */
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
+
 //    /**
 //     * @inheritDoc
 //     * @return Filter\IComponent|Component
