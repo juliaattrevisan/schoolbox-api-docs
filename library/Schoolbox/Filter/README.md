@@ -163,6 +163,7 @@ for performant retrieval of matching items.
     exists
   * Update that implementation's `buildFilterFactoryForFilter` method to be able
     to create an instance of the new filter
+* Add a case to the ID finder for this class
 
 
 ### Adding an existing filter to a page which already supports filters
