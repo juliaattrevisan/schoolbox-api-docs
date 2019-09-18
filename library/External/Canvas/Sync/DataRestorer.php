@@ -9,9 +9,9 @@ namespace External\Canvas\Sync;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database;
+use PDO;
 use Psr\Log\LoggerInterface;
 use function count;
-use InvalidArgumentException;
 use function sprintf;
 use function strtoupper;
 use UnexpectedValueException;
@@ -31,22 +31,22 @@ class DataRestorer
     /** @var string */
     private $canvasDbName;
 
-    /**
-     * @param IConnector $canvasDb
-     * @param LoggerInterface $log
-     * @param string $canvasDbName
-     * @throws InvalidArgumentException
-     */
-    public function __construct(IConnector $canvasDb, LoggerInterface $log, string $canvasDbName)
-    {
-        $errors = [];
-        if (count($errors)) {
-            throw new InvalidArgumentException(implode(';', $errors));
-        }
+    /** @var bool */
+    private $persistChanges;
 
+
+    /**
+     * @param IConnector      $canvasDb
+     * @param LoggerInterface $log
+     * @param string          $canvasDbName
+     * @param bool            $persistChanges If false, don't persist changes to staging database
+     */
+    public function __construct(IConnector $canvasDb, LoggerInterface $log, string $canvasDbName, bool $persistChanges)
+    {
         $this->canvasDb = $canvasDb;
         $this->log = $log;
         $this->canvasDbName = $canvasDbName;
+        $this->persistChanges = $persistChanges;
     }
 
 
@@ -55,9 +55,12 @@ class DataRestorer
      *
      * @param array $schema
      * @throws UnexpectedValueException
+     * @throws Database\Exception
      */
     public function restoreSchema(array $schema): void
     {
+        $this->dropCanvasDbTables();
+
         $errors = false;
 
         foreach ($schema as $tableIndex => $tableData) {
@@ -142,7 +145,7 @@ class DataRestorer
             $createSql = "CREATE TABLE IF NOT EXISTS `{$this->canvasDbName}`.`{$tableName}` (\n$columnSql\n) COMMENT \"{$description}\";";
 
             try {
-                $this->canvasDb->execute($createSql);
+                $this->executeIfPersisting($createSql);
 
                 foreach ($indexes as $columnName) {
                     $indexName = "idx_{$tableName}_{$columnName}";
@@ -150,7 +153,7 @@ class DataRestorer
                     if (strlen($indexName) > 64) {
                         $indexName = 'idx_' . md5($tableName) . '_' . substr(md5($columnName), 0, 27); // 4 + 32 + 1 + 27 = 64
                     }
-                    $this->canvasDb->execute("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
+                    $this->executeIfPersisting("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
                 }
             } catch (Database\Exception $e) {
                 $errors = true;
@@ -174,20 +177,55 @@ class DataRestorer
     public function restoreTableData($tableName, $tableFile): void
     {
         $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
-        $this->canvasDb->execute($sql);
+        $this->executeIfPersisting($sql);
 
         $sql = "LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
         try {
-            $this->canvasDb->execute($sql);
+            $this->executeIfPersisting($sql);
         } catch (Database\Exception $e) {
             $this->log->warning("Loading data failed for $tableFile: " . $e->getMessage());
         }
-        $warnings = $this->canvasDb->executeQuery('show warnings')->fetchAll();
+        $warnings = $this->persistChanges ? $this->canvasDb->executeQuery('show warnings')->fetchAll() : [];
         if (count($warnings) > 0) {
             $this->log->warning("MySQL warning occurred while loading $tableFile");
             foreach ($warnings as $warning) {
                 $this->log->warning(implode(': ', $warning));
             }
+        }
+    }
+
+
+    /**
+     * Drops all tables in the Canvas staging database
+     *
+     * @throws Database\Exception
+     */
+    private function dropCanvasDbTables(): void
+    {
+        $this->log->info("Dropping all tables from {$this->canvasDbName}");
+        $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 0');
+        $tables = $this->canvasDb->executeQuery(
+            'SELECT table_name FROM information_schema.tables WHERE table_schema = :db_name',
+            ['db_name' => $this->canvasDbName]
+        )->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($tables as $table) {
+            $this->log->debug("Dropping table $table");
+            $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->quoteIdentifier($table)}");
+        }
+        $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 1');
+    }
+
+
+    /**
+     * Optionally execute the specified SQL
+     *
+     * @param string $sql
+     * @throws Database\Exception
+     */
+    private function executeIfPersisting(string $sql): void
+    {
+        if ($this->persistChanges) {
+            $this->canvasDb->execute($sql);
         }
     }
 }

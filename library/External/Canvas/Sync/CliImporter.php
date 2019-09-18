@@ -7,15 +7,18 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync;
 
-use External\Canvas\Sync\Connector as CanvasConnector;
+use Alaress\Database;
+use Alaress\Database\Connector\IConnector;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\Exception;
+use Schoolbox\External;
 use RuntimeException;
+use UnexpectedValueException;
+use function json_decode;
 
 /**
  * Command line application for syncing canvas-data
@@ -24,8 +27,11 @@ class CliImporter extends CliTool\App
 {
     use CanvasDatabaseTrait;
 
-    private const OPT_SHORT_HELP = 'h';                 // print help
-    private const OPT_LONG_HELP  = 'help';              // print help
+    private const OPT_SHORT_HELP       = 'h';           // print help
+    private const OPT_LONG_HELP        = 'help';        // print help
+    private const OPT_LONG_SKIP_FETCH  = 'skip-fetch';  // Don't re-fetch files from Canvas API, use previously downloaded
+    private const OPT_LONG_SKIP_IMPORT = 'skip-import'; // Don't re-import files into staging DB
+    private const OPT_LONG_SKIP_SYNC   = 'skip-sync';   // Don't sync from staging DB to schoolbox DB
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -40,12 +46,15 @@ class CliImporter extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_SKIP_FETCH,
+            self::OPT_LONG_SKIP_IMPORT,
+            self::OPT_LONG_SKIP_SYNC,
         ];
     }
 
 
     /** @inheritDoc
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
@@ -63,23 +72,27 @@ class CliImporter extends CliTool\App
             $this->getLogger()->info('Running in dry-run mode: use -p to write changes to database');
         }
 
-        // Get DB
-        try {
-            $db = $this->buildCanvasDbConnection();
-            if ($this->perform()) {
-                $this->dropCanvasDbTables($db);
-            }
-        } catch (\Alaress\Database\Exception $e) {
-            $this->getLogger()->warning(
-                sprintf(
-                    'Unable to connect to database %s: %s. Use tools/canvas/create_database.php to create database.',
-                    $this->getCanvasDbName(),
-                    $e->getMessage()
-                )
-            );
-            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
-        }
+        // Ensure we can connect to canvas API + staging DB prior to executing any actions.
+        $canvasApi = $this->buildCanvasApiConnectionOrExit();
+        $canvasDb  = $this->buildCanvasDbConnectionOrExit();
 
+        $tempDir    = $this->createTempDir();
+        $schemaFile = $tempDir . '/schema.json';
+
+        // Execute tool actions.
+        $this->fetchCanvasDataFilesFromApi($canvasApi, $tempDir, $schemaFile);
+        $this->loadCanvasDataFilesToStagingDatabase($canvasDb, $tempDir, $schemaFile);
+        $this->syncStagingDataWithSchoolbox($canvasDb);
+    }
+
+
+    /**
+     * Builds and returns a connection to Canvas Data API. Exits if unable to do so.
+     *
+     * @return Connector
+     */
+    private function buildCanvasApiConnectionOrExit(): Connector
+    {
         // Check api config
         if (!$this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY) ||
             !$this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)) {
@@ -87,60 +100,138 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        $tempDir = $this->createTempDir();
-        $dumpFile = $tempDir . '/dump.json';
-        $schemaFile = $tempDir . '/schema.json';
-        $connector = new CanvasConnector(
+        return new Connector(
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)
         );
+    }
+
+
+    /**
+     * Builds and returns a Canvas DB connection if possible, otherwise exits
+     *
+     * @return IConnector
+     */
+    private function buildCanvasDbConnectionOrExit(): IConnector
+    {
+        try {
+            return $this->buildCanvasDbConnection();
+        } catch (Database\Exception $e) {
+            $this->getLogger()->error(
+                sprintf(
+                    'Unable to connect to database %s: %s. Use tools/canvas/create_database.php to create database.',
+                    $this->getCanvasDbName(),
+                    $e->getMessage()
+                )
+            );
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+    }
+
+
+    /**
+     * Downloads data from CanvasData API and saves to local temp files
+     *
+     * @param Connector $connector
+     * @param string    $tempDir
+     * @param string    $schemaFile
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    private function fetchCanvasDataFilesFromApi(Connector $connector, string $tempDir, string $schemaFile): void
+    {
+        if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
+            $this->getLogger()->info("File download skipped");
+            return;
+        }
+        $dumpFile = $tempDir . '/dump.json';
 
         // Fetch latest dump
+        $this->getLogger()->info('Getting latest data urls.');
         try {
-            $this->getLogger()->info('Getting latest data urls.');
             $dumpResponse = $connector->fetchLatestDump();
-            $this->storeTempFile($dumpResponse, $dumpFile);
-            $dump = json_decode($dumpResponse, true);
-            $this->getLogger()->info("Getting schema version {$dump[$connector::SCHEMA_VERSION]}.");
-            $schemaResponse = $connector->fetchSchema($dump[$connector::SCHEMA_VERSION]);
-            $this->storeTempFile($schemaResponse, $schemaFile);
-        } catch (Exception $e) {
+        } catch (External\Exception $e) {
             $this->getLogger()->warning('Could not get dump file.' . $e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        $dump = json_decode($dumpResponse, true);
+        $this->getLogger()->info("Getting schema version {$dump[$connector::SCHEMA_VERSION]}.");
+
+        try {
+            $schemaResponse = $connector->fetchSchema($dump[$connector::SCHEMA_VERSION]);
+        } catch (External\Exception $e) {
+            $this->getLogger()->warning('Could not fetch schema.' . $e->getMessage());
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        if ($this->perform()) {
+            $this->storeTempFile($dumpResponse, $dumpFile);
+            $this->storeTempFile($schemaResponse, $schemaFile);
         }
 
         // Download data files
         $this->getLogger()->info('Downloading latest data.');
         $this->downloadDataFiles($dump['artifactsByTable'], $tempDir);
+    }
 
-        if ($this->perform()) {
-            // Create schema in the staging database
-            $dataRestorer = new DataRestorer($db, $this->getLogger(), $this->getCanvasDbName());
-            $this->getLogger()->info("Importing schema from json file: $schemaFile.");
-            $schemaContainer = json_decode(file_get_contents($schemaFile), true);
-            $schema = $schemaContainer['schema'];
-            $dataRestorer->restoreSchema($schema);
 
-            // Store downloaded data to tables in the staging database
-            $this->getLogger()->info('Restoring data to tables.');
-            $tableGzFiles = scandir($tempDir);
-            if (!$tableGzFiles || !count($tableGzFiles)) {
-                $this->getLogger()->warning("Failed to open directory $tempDir.");
-                exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+    /**
+     * Processes local files to build schema and data in local canvas staging database
+     *
+     * @param IConnector $canvasDb
+     * @param string     $tempDir
+     * @param string     $schemaFile
+     * @throws Database\Exception
+     * @throws UnexpectedValueException
+     */
+    private function loadCanvasDataFilesToStagingDatabase(IConnector $canvasDb, string $tempDir, string $schemaFile): void
+    {
+        if ($this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
+            $this->getLogger()->info("File import to staging database skipped");
+            return;
+        }
+
+        // Create schema in the staging database
+        $dataRestorer = new DataRestorer($canvasDb, $this->getLogger(), $this->getCanvasDbName(), $this->perform());
+        $this->getLogger()->info("Importing schema from json file: $schemaFile.");
+        $schemaContainer = json_decode(file_get_contents($schemaFile), true);
+        $schema          = $schemaContainer['schema'];
+        $dataRestorer->restoreSchema($schema);
+
+        // Store downloaded data to tables in the staging database
+        $this->getLogger()->info('Restoring data to tables.');
+        $tableGzFiles = scandir($tempDir);
+        if (!$tableGzFiles || !count($tableGzFiles)) {
+            $this->getLogger()->warning("Failed to open directory $tempDir.");
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        foreach ($tableGzFiles as $tableGzFile) {
+            $posExt = strpos($tableGzFile, '.gz');
+            if (!$posExt) {
+                continue;
             }
-            foreach ($tableGzFiles as $tableGzFile) {
-                $posExt = strpos($tableGzFile, '.gz');
-                if (!$posExt) {
-                    continue;
-                }
-                $tableName = substr($tableGzFile, 0, $posExt);
-                $tableFile = "$tempDir/$tableName";
-                $this->getLogger()->debug("Loading $tableFile.");
+            $tableName = substr($tableGzFile, 0, $posExt);
+            $tableFile = "$tempDir/$tableName";
+            $this->getLogger()->debug("Loading $tableFile.");
 
-                exec("gunzip " . escapeshellarg("$tempDir/$tableGzFile"));
-                $dataRestorer->restoreTableData($tableName, $tableFile);
-                exec("gzip " . escapeshellarg($tableFile));
-            }
+            exec("gunzip " . escapeshellarg("$tempDir/$tableGzFile"));
+            $dataRestorer->restoreTableData($tableName, $tableFile);
+            exec("gzip " . escapeshellarg($tableFile));
+        }
+    }
+
+
+    /**
+     * Syncs data from canvas staging db to schoolbox db
+     *
+     * @param IConnector $canvasDb
+     */
+    private function syncStagingDataWithSchoolbox(IConnector $canvasDb): void
+    {
+        if ($this->getOpt(self::OPT_LONG_SKIP_SYNC)) {
+            $this->getLogger()->info("Sync from staging to schoolbox database skipped");
+            return;
         }
     }
 
@@ -173,7 +264,7 @@ class CliImporter extends CliTool\App
      * @param string $tempDir
      * @throws InvalidArgumentException If we attempt to create a Guzzle client with invalid handler/s
      */
-    public function downloadDataFiles(array $tableList, string $tempDir): void
+    private function downloadDataFiles(array $tableList, string $tempDir): void
     {
         $client = new Client();
         foreach ($tableList as $tableName => $tableData) {
@@ -181,10 +272,10 @@ class CliImporter extends CliTool\App
                 continue;
             }
             $tableFile = $tableData['files'][0];
-            $tableDataFile = fopen("$tempDir/$tableName.gz", 'wb');
+            $tableDataFile = fopen($this->perform() ? "$tempDir/$tableName.gz" : '/dev/null', 'wb');
             try {
-                $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
                 $this->getLogger()->debug("Downloading $tableName to $tempDir/$tableName.gz.");
+                $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
             } catch (GuzzleException $e) {
                 $this->getLogger()->warning("Failed to download $tempDir/$tableName.gz: {$e->getMessage()}");
             }
@@ -210,6 +301,14 @@ class CliImporter extends CliTool\App
     {
         $file = __FILE__;
 
+        $options = [
+            [self::OPT_SHORT_HELP, self::OPT_LONG_HELP, 'Print this help and exit'],
+            [CliTool\Kernel::OPT_SHORT_PERFORM, CliTool\Kernel::OPT_LONG_PERFORM, 'If not set, no changes to local files, staging db, or schoolbox db will be persisted.'],
+            [null, self::OPT_LONG_SKIP_FETCH, "If set, use most recently downloaded files, rather that fetching from API"],
+            [null, self::OPT_LONG_SKIP_IMPORT, "If set, use most recent state of staging db, don't re-import files"],
+            [null, self::OPT_LONG_SKIP_SYNC, "If set, don't sync staging data with schoolbox data"],
+        ];
+
         $green = self::COLOUR_GREEN;
         $white = self::COLOUR_WHITE;
         $yellow = self::COLOUR_YELLOW;
@@ -224,13 +323,17 @@ WHAT THIS DOES:
 SYNOPSIS:
     $green{$file} {$yellow}[OPTION]...$white
 
-OPTIONS:
-    $yellow-h, --help$white
-        Print this help and exit
-        
-    $yellow-p, --perform$white
-        If set, updates canvas staging DB - otherwise, only downloads data
+OPTIONS:";
+        foreach($options as $option){
+            $short = $option[0] ? "-{$option[0]}" : '';
+            $long  = $option[1] ? "--{$option[1]}" : '';
+            $shortLong = implode(', ', array_filter([rtrim($short, ':') , rtrim($long, ':')]));
+            $help .= "
+    $yellow{$shortLong}$white
+        $option[2]
+
 ";
+        }
         \fwrite(STDOUT, $help);
     }
 }

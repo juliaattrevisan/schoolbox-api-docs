@@ -69,12 +69,14 @@ class Connector
 
 
     /**
+     * Executes a CanvasData API call and returns the response body
+     *
      * @param string $command
      * @param array  $queryParams
      * @return string
      * @throws External\Exception
      * @throws RuntimeException if unable to read or an error occurs while reading.
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException If Guzzle client instantiated with invalid handler
      */
     private function executeCanvasDataCmd(string $command, array $queryParams = []): string
     {
