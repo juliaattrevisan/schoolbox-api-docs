@@ -56,30 +56,30 @@ class Factory extends NullableContext\Factory
     }
 
 
-//    /**
-//     * @inheritDoc
-//     * @return Filter\IComponent|Component
-//     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
-//     */
-//    public function buildComponent(
-//        Filter\IDefinition $definition,
-//        User $user,
-//        Filter\Page\Model $pageFilter,
-//        ?GenericCollection $selections,
-//        ?User $viewee,
-//        array $routeArgs,
-//        GenericCollection $overrides
-//    ): Filter\IComponent {
-//        // TODO inject any units that belong to folder in route args, depending on page
-//        return new Component(
-//            $definition,
-//            $user,
-//            $pageFilter,
-//            $selections,
-//            $overrides[$pageFilter->getFilter()->getId()],
-//            $this->getSelectionMapper()
-//        );
-//    }
+    /**
+     * @inheritDoc
+     * @return Filter\IComponent|Component
+     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        ?GenericCollection $selections,
+        ?User $viewee,
+        array $routeArgs,
+        GenericCollection $overrides
+    ): Filter\IComponent {
+        return new Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $selections,
+            $overrides[$pageFilter->getFilter()->getId()],
+            $this->getSelectionMapper(),
+            $this->courseSpecMapper->findAll()
+        );
+    }
 
 
     /**
