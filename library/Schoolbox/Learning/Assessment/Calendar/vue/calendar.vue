@@ -117,19 +117,7 @@
                         }));
                     }
                 ).finally(function() {
-                    if (self.currentView === 'resourceTimelineSemester') {
-                        if (self.cursor <= 0 && self.config.termDates.past[Math.abs(self.cursor)]) {
-                            $(".fc-prev-button").prop('disabled', false);
-                        } else {
-                            $(".fc-prev-button").prop('disabled', true);
-                        }
-
-                        if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length)) {
-                            $(".fc-next-button").prop('disabled', false);
-                        } else {
-                            $(".fc-next-button").prop('disabled', true);
-                        }
-                    }
+                    // Do something here... Probably we can do the grouping of events here..
                 });
                 // Fail callback: consider a message saying something failed
             },
@@ -230,11 +218,14 @@
                 }
             },
 
+            /**
+             * Customise previous button behaviour for semester view. Clicking previous button while on semester view will
+             * navigate into the previous available semester
+             */
             clickPrev() {
                 var self = this;
 
                 if (self.currentView === 'resourceTimelineSemester') {
-
                     if ((self.cursor > 0) || (self.cursor === 0 && self.config.termDates.past.length) ||
                         (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)) {
 
@@ -245,7 +236,6 @@
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
                         }
                     }
-
                 } else {
                     self.$refs.fullCalendar.getApi().prev();
                 }
@@ -264,11 +254,34 @@
                 }
             },
 
-            getCurrentEndDate()
+            /**
+             * Get the latest available term end date for fullCalendar's validRange config.
+             * @see: https://fullcalendar.io/docs/validRange
+             */
+            getMaxTermDate()
             {
                 var self = this;
 
-                return self.config.termDates.current?.end;
+                var termStartDates = Object.values(self.config.termDates).flat().map(function(row){
+                    return new Date(row.end);
+                });
+
+                return moment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
+            },
+
+            /**
+             * Get the earliest available term start date for fullCalendar's validRange config.
+             * @see: https://fullcalendar.io/docs/validRange
+             */
+            getMinTermDate()
+            {
+                var self = this;
+
+                var termStartDates = Object.values(self.config.termDates).flat().map(function(row){
+                    return new Date(row.start);
+                });
+
+                return moment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
             }
         }
     }
@@ -301,7 +314,8 @@
                     filterResourcesWithEvents: true,
                     eventLimit: 1,
                     validRange: {
-                        end: this.getCurrentEndDate()
+                        start: this.getMinTermDate(),
+                        end: this.getMaxTermDate()
                     }
                 },
                 resourceTimelineWeek: {
@@ -314,13 +328,15 @@
                     resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
                     validRange: {
-                        end: this.getCurrentEndDate()
+                        start: this.getMinTermDate(),
+                        end: this.getMaxTermDate()
                     }
                 },
                 dayGridMonth: {
                     eventLimit: config.eventLimit,
                     validRange: {
-                        end: this.getCurrentEndDate()
+                        start: this.getMinTermDate(),
+                        end: this.getMaxTermDate()
                     }
                 }
             }"
