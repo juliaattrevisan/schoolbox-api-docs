@@ -6,7 +6,9 @@ declare(strict_types=1);
 namespace Helper;
 
 use Codeception\Module\REST;
+use Codeception\TestInterface;
 use Payload\Request;
+use Symfony\Component\BrowserKit\Cookie;
 
 /**
  * This Helper provides custom extensions to the REST module
@@ -24,6 +26,23 @@ use Payload\Request;
  */
 class Integration extends REST
 {
+
+    /**
+     * **HOOK** executed before test
+     *
+     * @param TestInterface $test
+     * @throws \UnexpectedValueException
+     */
+    public function _before(TestInterface $test): void
+    {
+        parent::_before($test);
+
+        if ($this->_getConfig('xdebug') ?? false) {
+            $this->client->getCookieJar()->set(new Cookie('XDEBUG_SESSION', 'PHPSTORM'));
+        }
+    }
+
+
     /**
      * @param \Payload\Request $request
      */
@@ -39,5 +58,9 @@ class Integration extends REST
             $request->getFormParams(),
             $request->getFiles()
         );
+
+        foreach ($request->getHeaders() as $name => $value) {
+            $this->deleteHeader($name);
+        }
     }
 }

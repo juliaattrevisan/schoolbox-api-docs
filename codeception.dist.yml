@@ -35,6 +35,7 @@ suites:
                 - \Helper\Integration:
                     depends: PhpBrowser
                     url: 'https://vagrant.dev.schoolbox.cloud'
+                    xdebug: false
                 - \Helper\SchoolboxCli:
                 - Asserts:
 
