@@ -520,7 +520,6 @@ class Processor
         $orphans = $this->removeOrphanedProfiles();
 
         $this->log("Removed {$orphans} orphaned profiles", self::LOG_OK);
-
     }
 
 
