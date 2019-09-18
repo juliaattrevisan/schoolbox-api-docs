@@ -9,10 +9,12 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
+use RangeException;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use PDOStatement;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\GenericCollection;
@@ -80,10 +82,24 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'persistFiles'));
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateNormMark']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
+    /**
+     * @param ReturnedWork $object
+     * @return bool
+     */
+    public function validateNormMark(ReturnedWork $object): bool
+    {
+        if ($object->getNormalizedMark() < IMarkScheme::NORMALISED_MARK_MIN || $object->getNormalizedMark() > IMarkScheme::NORMALISED_MARK_MAX) {
+            $msg = 'Normalised mark must lie between ' . IMarkScheme::NORMALISED_MARK_MIN .
+                ' and ' . IMarkScheme::NORMALISED_MARK_MAX . ' inclusive: ' . $object->getNormalizedMark();
+            throw new RangeException($msg);
+        }
+        return true;
+    }
 
     /**
      * @param ReturnedWork      $object
