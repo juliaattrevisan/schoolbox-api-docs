@@ -6,22 +6,13 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Importer\Profile;
 
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Importer;
-use Schoolbox\External\TimetableCampusMapper;
-use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
@@ -31,7 +22,7 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Importer
  */
-class CompositeProfile implements ImporterInterface
+class Composite implements Importer\ImporterInterface
 {
 
     /**
@@ -49,7 +40,7 @@ class CompositeProfile implements ImporterInterface
 
 
     /**
-     * @var Batchxml
+     * @var Importer\Batchxml
      */
     private $batchxml;
 
@@ -95,7 +86,7 @@ class CompositeProfile implements ImporterInterface
      *
      * @param LoggerInterface             $log
      * @param bool                        $perform
-     * @param Batchxml                    $batchxml
+     * @param Importer\Batchxml           $batchxml
      * @param UserProfile\Mapper          $baseProfileMapper
      * @param UserProfile\Student\Mapper  $studentProfileMapper
      * @param UserProfile\Parent\Mapper   $parentProfileMapper
@@ -105,7 +96,7 @@ class CompositeProfile implements ImporterInterface
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml,
+        Importer\Batchxml $batchxml,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -131,7 +122,6 @@ class CompositeProfile implements ImporterInterface
      * @throws \RuntimeException
      * @throws InvalidUriPartException
      * @throws InvalidArgumentException
-     * @throws Exception
      */
     public function import(): void
     {

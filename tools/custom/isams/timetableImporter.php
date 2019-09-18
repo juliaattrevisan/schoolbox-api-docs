@@ -13,7 +13,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Api;
-use Schoolbox\External\Connector\Isams\Base\Importer\CompositeTimetable;
+use Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
@@ -73,7 +73,7 @@ HELP;
          */
         $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
 
-        $composite = new CompositeTimetable(
+        $composite = new Timetable\Composite(
             $this->getLogger(),
             $this->perform(),
             new Batchxml($api),

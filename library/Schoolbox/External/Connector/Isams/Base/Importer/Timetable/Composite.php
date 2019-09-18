@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
@@ -27,7 +27,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Importer
  */
-class CompositeTimetable implements ImporterInterface
+class Composite implements Importer\ImporterInterface
 {
 
     /**
@@ -45,7 +45,7 @@ class CompositeTimetable implements ImporterInterface
 
 
     /**
-     * @var Batchxml
+     * @var Importer\Batchxml
      */
     private $batchxml;
 
@@ -107,22 +107,22 @@ class CompositeTimetable implements ImporterInterface
     /**
      * Composite constructor.
      *
-     * @param LoggerInterface             $log
-     * @param bool                        $perform
-     * @param Batchxml                    $batchxml
-     * @param CampusMapper                $campusMapper
-     * @param UserMapper                  $userMapper
-     * @param TimetableCampusMapper       $timetableCampusMapper
-     * @param TimetableCycleMapper        $timetableCycleMapper
-     * @param TimetablePeriodMapper       $timetablePeriodMapper
-     * @param ClassEntryMapper            $classEntryMapper
-     * @param ClassInvolvementMapper      $classInvolvementMapper
-     * @param ClassPeriodMapper           $classPeriodMapper
+     * @param LoggerInterface        $log
+     * @param bool                   $perform
+     * @param Importer\Batchxml      $batchxml
+     * @param CampusMapper           $campusMapper
+     * @param UserMapper             $userMapper
+     * @param TimetableCampusMapper  $timetableCampusMapper
+     * @param TimetableCycleMapper   $timetableCycleMapper
+     * @param TimetablePeriodMapper  $timetablePeriodMapper
+     * @param ClassEntryMapper       $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper      $classPeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml,
+        Importer\Batchxml $batchxml,
         CampusMapper $campusMapper,
         UserMapper $userMapper,
         TimetableCampusMapper $timetableCampusMapper,

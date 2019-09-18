@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Isams\Base\Api;
-use Schoolbox\External\Connector\Isams\Base\Importer\CompositeProfile;
+use Schoolbox\External\Connector\Isams\Base\Importer\Profile;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
@@ -64,7 +64,7 @@ HELP;
          */
         $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
 
-        $composite = new CompositeProfile(
+        $composite = new Profile\Composite(
             $this->getLogger(),
             $this->perform(),
             new Batchxml($api),
