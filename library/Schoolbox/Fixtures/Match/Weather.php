@@ -10,6 +10,7 @@
 namespace Schoolbox\Fixtures\Match;
 
 use \Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Weather\ApixuClient;
 
 class Weather
 {
@@ -50,71 +51,42 @@ class Weather
 
     /**
      * Did we find any data?
-     * 
+     *
      * @var bool
      */
     private $hasResults = false;
 
     /**
+     * The weather API
+     *
+     * @var ApixuClient
+     */
+    private $api;
+
+    /**
      * Weather constructor.
      *
-     * @param Match $match
+     * @param Match       $match
+     * @param ApixuClient $api
      */
-    public function __construct(Match $match)
+    public function __construct(Match $match, ApixuClient $api)
     {
-        $this->setMatch($match);
-
-        $this->findForecast();
+        $this->match = $match;
+        $this->api   = $api;
     }
 
     /**
-     * Find the forecast
+     * Load the forecast
      *
      */
-    private function findForecast()
+    public function loadForecast(): void
     {
-        $forecast = $this->findWeather($this->getMatch());
-
-        $this->setIcon($this->parseIcon($forecast));
-        $this->setCondition($forecast['conditions']);
-        $this->setTemp($forecast['temp']['high']);
-    }
-
-    /**
-     * Spawn our own icon
-     *
-     * @param $forecast
-     * @return string
-     */
-    private function parseIcon($forecast)
-    {
-        /* Map of conditions => icon
-         */
-        $map = [
-            'chanceflurries' => 'icon-rain',
-            'chancerain' => 'icon-rain',
-            'chancesleet' => 'icon-rain',
-            'chancesnow' => 'icon-rain',
-            'chancetstorms' => 'icon-storm',
-            'clear' => 'icon-clear',
-            'cloudy' => 'icon-cloudy',
-            'flurries' => 'icon-rain',
-            'fog' => 'icon-cloudy',
-            'hazy' => 'icon-cloudy',
-            'mostlycloudy' => 'icon-mostly-cloudy',
-            'mostlysunny' => 'icon-clear',
-            'partlycloudy' => 'icon-mostly-cloudy',
-            'partlysunny' => 'icon-clear',
-            'rain' => 'icon-rain',
-            'sleet' => 'icon-rain',
-            'snow' => 'icon-rain',
-            'sunny' => 'icon-clear',
-            'tstorms' => 'icon-storm',
-        ];
-
-        $key = $forecast['styles']['foreground'];
-
-        return $map[$key];
+        $forecast = $this->findWeather($this->match);
+        if (!empty($forecast)) {
+            $this->icon      = $forecast['condition']['icon'];
+            $this->condition = $forecast['condition']['text'];
+            $this->temp      = $forecast['avgtemp_c'];
+        }
     }
 
     /**
@@ -123,10 +95,10 @@ class Weather
      * @param Match $match
      * @return array
      */
-    private function findWeather(Match $match)
+    private function findWeather(Match $match): array
     {
         $matchDayDiff = \Alaress_Date_Format::now()->diffInDays($match->getStartAt(), false);
-        $matchDay = $match->getStartAt()->getDatabaseDate();
+        $matchDay     = $match->getStartAt();
 
         /* Only return data if the match hasn't already occurred
          */
@@ -135,26 +107,12 @@ class Weather
             /* Extract all the datums
              * Don't bother if the match day is too far into the future (10 days)
              */
-            if ($matchDayDiff < $this->getForecastLength()) {
-                $weatherController = new \Weather_Wunderground();
-                $locationString = "{$match->getVenue()->getLatitude()},{$match->getVenue()->getLongitude()}";
-                $weatherController->guessLocation($locationString);
-                $forecast = $weatherController->getForecast();
-
-                /* Can probably find the data a little faster than spawning
-                 * adf instances but there are not many to tests to conduct
-                 */
-                if (count($forecast['forecast'])) {
-                    foreach ($forecast['forecast'] as $currentForecast) {
-                        $adf = new \Alaress_Date_Format($currentForecast['datetime'], 'U');
-
-                        if ($adf->getDatabaseDate() == $matchDay) {
-                            $this->setHasResults(true);
-
-                            return $currentForecast;
-                        }
-                    }
+            if ($matchDayDiff < $this->forecastLength) {
+                $forecast = $this->api->getForecastByDate($matchDay, $match->getVenue()->getLatitude(), $match->getVenue()->getLongitude());
+                if (!empty($forecast)) {
+                    $this->hasResults = true;
                 }
+                return $forecast;
             }
         }
 
@@ -165,98 +123,34 @@ class Weather
      */
 
     /**
-     * @return Model
+     * @return bool
      */
-    private function getMatch()
-    {
-        return $this->match;
-    }
-
-    /**
-     * @param Model $match
-     */
-    private function setMatch($match)
-    {
-        $this->match = $match;
-    }
-
-    /**
-     * @return int
-     */
-    private function getForecastLength()
-    {
-        return $this->forecastLength;
-    }
-
-    /**
-     * @param int $forecastLength
-     */
-    private function setForecastLength($forecastLength)
-    {
-        $this->forecastLength = $forecastLength;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function hasResults()
+    public function hasResults(): bool
     {
         return $this->hasResults;
     }
 
     /**
-     * @param boolean $hasResults
-     */
-    private function setHasResults($hasResults)
-    {
-        $this->hasResults = $hasResults;
-    }
-
-    /**
      * @return string
      */
-    public function getCondition()
+    public function getCondition(): string
     {
         return $this->condition;
     }
 
     /**
-     * @param string $condition
-     */
-    private function setCondition($condition)
-    {
-        $this->condition = $condition;
-    }
-
-    /**
      * @return string
      */
-    public function getIcon()
+    public function getIcon(): string
     {
         return $this->icon;
     }
 
     /**
-     * @param string $icon
-     */
-    private function setIcon($icon)
-    {
-        $this->icon = $icon;
-    }
-
-    /**
      * @return string
      */
-    public function getTemp()
+    public function getTemp(): string
     {
         return $this->temp;
-    }
-
-    /**
-     * @param string $temp
-     */
-    private function setTemp($temp)
-    {
-        $this->temp = $temp;
     }
 }
