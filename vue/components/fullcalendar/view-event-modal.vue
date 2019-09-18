@@ -104,6 +104,9 @@
                             },
                         },
                     },
+                    classAttendance: {
+                        url: data?.classAttendance?.url,
+                    },
                     task: {
                         isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
                         completed: metadata?.completed,
@@ -563,6 +566,7 @@
                     eventExtendedProps.attendance.actions.toggle.isAvailable ||
                     eventExtendedProps.links.modify ||
                     eventExtendedProps.links.delete ||
+                    eventExtendedProps.classAttendance.url ||
                     eventExtendedProps.booking.actions.length > 0">
                         <div class="component-action">
                             <section>
@@ -583,6 +587,10 @@
                                     <a class="button"
                                        @click.prevent="toggleAttendance"
                                        href="#">{{ eventExtendedProps.attendance.actions.toggle.text }}</a>
+                                </span>
+                                <span v-if="eventExtendedProps.classAttendance.url">
+                                    <a class="button"
+                                       :href="eventExtendedProps.classAttendance.url">Mark Attendance</a>
                                 </span>
                                 <span v-if="eventExtendedProps.links.modify">
                                     <a class="button"
