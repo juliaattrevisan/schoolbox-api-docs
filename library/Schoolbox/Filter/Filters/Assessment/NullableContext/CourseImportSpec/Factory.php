@@ -77,7 +77,12 @@ class Factory extends NullableContext\Factory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
-            $this->courseSpecMapper->findAll()
+            $this->courseSpecMapper->findAll()->sortByCallback(
+                static function (CourseSpec\Model $a, CourseSpec\Model $b) {
+                    return strnatcasecmp($a->getTitle(), $b->getTitle());
+                },
+                true
+            )
         );
     }
 
