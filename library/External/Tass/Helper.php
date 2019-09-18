@@ -38,7 +38,7 @@ class External_Tass_Helper
     /**
      * Figure out an always-valid spouse prefix
      */
-    public function getSpousePrefix()
+    public function getSpousePrefix(): string
     {
         $spousePrefix = trim(Config::get('external_tass_spouse_prefix'));
 
