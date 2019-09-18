@@ -127,7 +127,7 @@ class Factory extends NullableContext\Factory
     /**
      * @inheritdoc
      * @param Filter\Model $filter
-     * @return Filter\IKeyConverter|KeyConverter
+     * @return Filter\IKeyConverter|NullableContext\KeyConverter
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
@@ -135,7 +135,7 @@ class Factory extends NullableContext\Factory
             ->indexByCallback(function ($projectId) {
                 return $projectId;
             });
-        return new KeyConverter($filter, $projectIds);
+        return new NullableContext\KeyConverter($filter, $projectIds);
     }
 
 
