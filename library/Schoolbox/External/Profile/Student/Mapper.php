@@ -38,6 +38,15 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('username', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
         $this->uses('gender', self::TYPE_STRING);
+        $this->uses('emergency_contact_name_1', self::TYPE_STRING);
+        $this->uses('emergency_contact_phone_1', self::TYPE_STRING);
+        $this->uses('emergency_contact_phone_alt_1', self::TYPE_STRING);
+        $this->uses('emergency_contact_name_2', self::TYPE_STRING);
+        $this->uses('emergency_contact_phone_2', self::TYPE_STRING);
+        $this->uses('emergency_contact_phone_alt_2', self::TYPE_STRING);
+        $this->uses('emergency_contact_name_3', self::TYPE_STRING);
+        $this->uses('emergency_contact_phone_3', self::TYPE_STRING);
+        $this->uses('emergency_contact_phone_alt_3', self::TYPE_STRING);
         $this->uses('head_of_house_id', self::TYPE_STRING);
         $this->uses('head_of_house_name', self::TYPE_STRING);
         $this->uses('house_name', self::TYPE_STRING);

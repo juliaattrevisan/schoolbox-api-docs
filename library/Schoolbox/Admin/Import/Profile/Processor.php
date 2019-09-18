@@ -81,6 +81,15 @@ class Processor
         'Surname',
         'Email',
         'Gender',
+        'Emergency Contact Name 1',
+        'Emergency Contact Phone 1',
+        'Emergency Contact Phone Alt 1',
+        'Emergency Contact Name 2',
+        'Emergency Contact Phone 2',
+        'Emergency Contact Phone Alt 2',
+        'Emergency Contact Name 3',
+        'Emergency Contact Phone 3',
+        'Emergency Contact Phone Alt 3',
         'Mobile',
         'Date of Birth',
         'House',
@@ -397,6 +406,15 @@ class Processor
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
                 ->setGender($row['Gender'])
+                ->setEmergencyContactName1($row['Emergency Contact Name 1'])
+                ->setEmergencyContactPhone1($row['Emergency Contact Phone 1'])
+                ->setEmergencyContactPhoneAlt1($row['Emergency Contact Phone Alt 1'])
+                ->setEmergencyContactName2($row['Emergency Contact Name 2'])
+                ->setEmergencyContactPhone2($row['Emergency Contact Phone 2'])
+                ->setEmergencyContactPhoneAlt2($row['Emergency Contact Phone Alt 2'])
+                ->setEmergencyContactName3($row['Emergency Contact Name 3'])
+                ->setEmergencyContactPhone3($row['Emergency Contact Phone 3'])
+                ->setEmergencyContactPhoneAlt3($row['Emergency Contact Phone Alt 3'])
                 ->setHeadOfHouseId($row['Head of House ID'])
                 ->setHeadOfHouseName($row['Head of House Name'])
                 ->setHouseName($row['House'])

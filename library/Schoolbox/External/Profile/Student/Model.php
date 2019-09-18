@@ -40,6 +40,51 @@ class Model
     /**
      * @var string|null
      */
+    private $emergencyContactName1;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactPhone1;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactPhoneAlt1;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactName2;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactPhone2;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactPhoneAlt2;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactName3;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactPhone3;
+
+    /**
+     * @var string|null
+     */
+    private $emergencyContactPhoneAlt3;
+
+    /**
+     * @var string|null
+     */
     private $headOfHouseId;
 
     /**
@@ -198,6 +243,78 @@ class Model
     public function getGender(): ?string
     {
         return $this->gender;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactName1(): ?string
+    {
+        return $this->emergencyContactName1;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactPhone1(): ?string
+    {
+        return $this->emergencyContactPhone1;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactPhoneAlt1(): ?string
+    {
+        return $this->emergencyContactPhoneAlt1;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactName2(): ?string
+    {
+        return $this->emergencyContactName2;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactPhone2(): ?string
+    {
+        return $this->emergencyContactPhone2;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactPhoneAlt2(): ?string
+    {
+        return $this->emergencyContactPhoneAlt2;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactName3(): ?string
+    {
+        return $this->emergencyContactName3;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactPhone3(): ?string
+    {
+        return $this->emergencyContactPhone3;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmergencyContactPhoneAlt3(): ?string
+    {
+        return $this->emergencyContactPhoneAlt3;
     }
 
     /**
@@ -446,6 +563,96 @@ class Model
     public function setGender(?string $gender): self
     {
         $this->gender = $gender;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactName1
+     * @return Model
+     */
+    public function setEmergencyContactName1(?string $emergencyContactName1): self
+    {
+        $this->emergencyContactName1 = $emergencyContactName1;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactPhone1
+     * @return Model
+     */
+    public function setEmergencyContactPhone1(?string $emergencyContactPhone1): self
+    {
+        $this->emergencyContactPhone1 = $emergencyContactPhone1;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactPhoneAlt1
+     * @return Model
+     */
+    public function setEmergencyContactPhoneAlt1(?string $emergencyContactPhoneAlt1): self
+    {
+        $this->emergencyContactPhoneAlt1 = $emergencyContactPhoneAlt1;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactName2
+     * @return Model
+     */
+    public function setEmergencyContactName2(?string $emergencyContactName2): self
+    {
+        $this->emergencyContactName2 = $emergencyContactName2;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactPhone2
+     * @return Model
+     */
+    public function setEmergencyContactPhone2(?string $emergencyContactPhone2): self
+    {
+        $this->emergencyContactPhone2 = $emergencyContactPhone2;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactPhoneAlt2
+     * @return Model
+     */
+    public function setEmergencyContactPhoneAlt2(?string $emergencyContactPhoneAlt2): self
+    {
+        $this->emergencyContactPhoneAlt2 = $emergencyContactPhoneAlt2;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactName3
+     * @return Model
+     */
+    public function setEmergencyContactName3(?string $emergencyContactName3): self
+    {
+        $this->emergencyContactName3 = $emergencyContactName3;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactPhone3
+     * @return Model
+     */
+    public function setEmergencyContactPhone3(?string $emergencyContactPhone3): self
+    {
+        $this->emergencyContactPhone3 = $emergencyContactPhone3;
+        return $this;
+    }
+
+    /**
+     * @param string|null $emergencyContactPhoneAlt3
+     * @return Model
+     */
+    public function setEmergencyContactPhoneAlt3(?string $emergencyContactPhoneAlt3): self
+    {
+        $this->emergencyContactPhoneAlt3 = $emergencyContactPhoneAlt3;
         return $this;
     }
 
