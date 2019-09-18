@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Assessment\NullableContext\CourseSpec;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\CourseImportSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -80,19 +80,19 @@ class Factory extends NullableContext\Factory
 //            $this->getSelectionMapper()
 //        );
 //    }
-//
-//
-//    /**
-//     * @inheritdoc
-//     * @param Filter\Model $filter
-//     * @return Filter\IKeyConverter|KeyConverter
-//     */
-//    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
-//    {
-//        $unitSpecIds = (new Collection($this->courseSpecMapper->findAllIds(['deleted' => true])))
-//            ->indexByCallback(function ($unitSpecId) {
-//                return $unitSpecId;
-//            });
-//        return new KeyConverter($filter, $unitSpecIds);
-//    }
+
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $unitSpecIds = (new Collection($this->courseSpecMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($unitSpecId) {
+                return $unitSpecId;
+            });
+        return new KeyConverter($filter, $unitSpecIds);
+    }
 }
