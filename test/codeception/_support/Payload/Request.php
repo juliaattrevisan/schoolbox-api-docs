@@ -153,20 +153,6 @@ abstract class Request
         return $this->files;
     }
 
-
-    /**
-     * Adds a file to request, requiring less information.
-     *
-     * @param string $name     The 'name' attribute of the file input form field, eg 'myAttachmentFile'
-     * @param string $fileName eg 'document.pdf'
-     * @param string $type     eg 'application/pdf'
-     * @return $this
-     */
-    public function setSimpleFile(string $name, string $uploaded_filename, string $file_location): self
-    {
-        return $this->setFile($name, $uploaded_filename, mime_content_type(codecept_data_dir($file_location)), 0, filesize(codecept_data_dir($file_location)), codecept_data_dir($file_location));
-    }
-
     /**
      * Adds a file to request.
      *
