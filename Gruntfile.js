@@ -137,7 +137,9 @@ var jsSrc = {
         'node_modules/lodash/lodash.js',
 
         // Promise polyfill
-        'node_modules/promise-polyfill/dist/polyfill.js'
+        'node_modules/promise-polyfill/dist/polyfill.js',
+
+        'www/javascript/shared/calendar/jquery.calendar.js'
     ],
     masonry: [
         // Colour handling
