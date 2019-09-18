@@ -29,7 +29,7 @@
             {% set classLink = '0/' ~ encodedClass %}
         {% endif %}
 
-        <a class="button icon-class-list" href="/modules/attendance/modify/{{ classLink }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.getPeriod() }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Mark Attendance</a>
+        <a class="button icon-class-list" href="/modules/attendance/modify/{{ classLink }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.attendancePeriods | join(',') }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Mark Attendance</a>
     {% endif %}
 
 </div>
