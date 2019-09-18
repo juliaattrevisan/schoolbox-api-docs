@@ -21,14 +21,6 @@ class External_Tass_User implements External_UserInterface
 
 
     /**
-     * Default spouse prefix
-     *
-     * @var string
-     */
-    private const DEFAULT_SPOUSE_PREFIX = 'S';
-
-
-    /**
      * @var MSSQL
     */
     private $database;
@@ -49,14 +41,6 @@ class External_Tass_User implements External_UserInterface
 
 
     /**
-     * Spouse Prefix, usually a letter; default is 'S'
-     *
-     * @var string
-     */
-    private $spousePrefix;
-
-
-    /**
      * External_Tass_User constructor.
      */
     public function __construct()
@@ -64,12 +48,6 @@ class External_Tass_User implements External_UserInterface
         $this->database = MSSQL::getInstance();
         $this->companyCode  = Config::get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
-
-        /* Figure out an always-valid spouse prefix
-         */
-        $spousePrefix = trim(Config::get('external_tass_spouse_prefix'));
-
-        $this->spousePrefix = '' !== $spousePrefix ?: self::DEFAULT_SPOUSE_PREFIX;
     }
 
 
@@ -268,7 +246,7 @@ class External_Tass_User implements External_UserInterface
             UNION
 
             SELECT DISTINCT
-                '{$this->spousePrefix}' + RTRIM(parent.par_code)
+                '{$this->helper->getSpousePrefix()}' + RTRIM(parent.par_code)
                                     AS StudentContactID,
                 pa.add_num          AS StudentContactAddressNumber,
                 parent.m_name       AS StudentContactPreferred,
@@ -320,7 +298,7 @@ class External_Tass_User implements External_UserInterface
             UNION
 
             SELECT DISTINCT
-                '{$this->spousePrefix}' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                '{$this->helper->getSpousePrefix()}' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                     AS StudentContactID,
                 pa.add_num          AS StudentContactAddressNumber,
                 parent.m_name       AS StudentContactPreferred,

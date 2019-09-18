@@ -2,11 +2,29 @@
 
 class External_Tass_Helper
 {
+
+    /**
+     * Default spouse prefix
+     *
+     * @var string
+     */
+    private const DEFAULT_SPOUSE_PREFIX = 'S';
+
+
+    /**
+     * Spouse Prefix, usually a letter; default is 'S'
+     *
+     * @var string
+     */
+    private $spousePrefix;
+
+
     /**
      * An instance of MSSQL
      * @var MSSQL
      */
-    private $database = null;
+    private $database;
+
 
     /**
      * Constructor
@@ -15,6 +33,18 @@ class External_Tass_Helper
     {
         $this->setDatabase(MSSQL::getInstance());
     }
+
+
+    /**
+     * Figure out an always-valid spouse prefix
+     */
+    public function getSpousePrefix()
+    {
+        $spousePrefix = trim(Config::get('external_tass_spouse_prefix'));
+
+        return '' !== $spousePrefix ?: self::DEFAULT_SPOUSE_PREFIX;
+    }
+
 
     /**
      * @param MSSQL $database
@@ -31,6 +61,7 @@ class External_Tass_Helper
     {
         return $this->database;
     }
+
 
     /**
      * @return string
