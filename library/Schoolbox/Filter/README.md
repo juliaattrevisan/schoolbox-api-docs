@@ -148,11 +148,14 @@ for performant retrieval of matching items.
 * Create a Definition implementation for the new filter
   * The `getPages` method will determine the filter pages on which this filter
     will show: see "Adding an existing filter" below
+  * > TODO document the process of creating new classes
 * Insert a new row into the `filter` database table for the new filter
   * the `entity` column value needs to be the fully-qualified class name of the
     entity the filter will operate on
   * the `class` column is the fully-qualified class name of the new filter's
     Definition class
+  * leave the leading `\` character off both values
+    * note that `\` is escaped by another `\` in MySQL/MariaDB queries
 * Find the Factory Factory implementation which creates filters for the entity
   that is being filtered
   * Each Factory Factory has an `ENTITY` class constant: find the one that
