@@ -81,7 +81,31 @@ class IdFinder extends Filter\AbstractIdFinder
         $unitImplIds           = $completeFilters[NullableContext\UnitImpl\Definition::class];
         $unitSpecIds           = $completeFilters[NullableContext\UnitSpec\Definition::class];
         $unitImpSpcIds         = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
+        $courseImpSpcIds       = $completeFilters[NullableContext\CourseImportSpec\Definition::class];
         $folderYearLevels      = $completeFilters[FolderYearLevel\Definition::class];
+
+
+        // Augment unit imp spc ids with course imp's unit imp spc ids
+        // That's easier than writing it into the query.
+        if ($courseImpSpcIds && count($courseImpSpcIds)) {
+            $findUnitsQuery = $this->getMapper()->getDatabase()->prepare('
+                SELECT id FROM course_unit_specification where course_specification_id = ?
+            ');
+            foreach ($courseImpSpcIds as $courseImpSpcId => $value) {
+                if ($courseImpSpcId === NullableContext\Definition::KEY_NONE) {
+                    $unitImpSpcIds[$courseImpSpcId] = $value;
+                    continue;
+                }
+                $findUnitsQuery->execute([$courseImpSpcId]);
+                foreach ($findUnitsQuery->fetchAll(\PDO::FETCH_COLUMN) as $unitImpSpcId) {
+                    $unitImpSpcIds[$unitImpSpcId] = $value;
+                }
+            }
+        }
+        if (is_array($unitImpSpcIds)) {
+            $unitImpSpcIds = new Collection($unitImpSpcIds);
+        }
+
 
         [$folderWhere, $folderParams]     = $this->getClauseFolder(
             $teacherFolderIds,
