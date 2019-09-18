@@ -13,6 +13,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
@@ -30,21 +31,27 @@ class Controller extends Base
      */
     private $rosettaStone;
 
+    /**
+     * @var TermMapper
+     */
+    private $termMapper;
 
     /**
      * Controller constructor.
      *
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      * @param RosettaStone                             $rosettaStone
+     * @param TermMapper                               $termMapper
      */
     public function __construct(
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        TermMapper $termMapper
     ) {
         $this->filterFactoryFactory = $filterFactoryFactory;
         $this->rosettaStone         = $rosettaStone;
+        $this->termMapper           = $termMapper;
     }
-
 
     /**
      * Displays the synchronous portion of the Assessment Calendar page.
@@ -80,13 +87,73 @@ class Controller extends Base
             $queryArgs
         );
 
+        $currentTermDates = $this->getCurrentTermDates();
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessmentCalendar/index.twig',
-                ['filterPanel' => $filterPanel,],
+                [
+                    'filterPanel' => $filterPanel,
+                    'termDates'   => $this->getAvailableTermDates(),
+                ],
                 'Assessment Calendar',
                 $pageTitle
             )
         );
+    }
+
+    /**
+     * @return array
+     */
+    private function getAvailableTermDates(): array
+    {
+        $termDates['past'] = [];
+        $termDates['future'] = [];
+
+        $terms = $this->termMapper
+            ->findByColumn('archived', false)
+            ->sortBy('start', 'DESC');
+
+        $currentTermStartDate = $this->getCurrentTermDates()->getStart()->getUsingFormat('Y-m-d');
+
+        /** @var TermMapper $term */
+        foreach ($terms as $term) {
+
+            if ($term->getStart()->getUsingFormat('Y-m-d') < $currentTermStartDate) {
+                $termDates['past'][] = [
+                    'start' => $term->getStart()->getUsingFormat('Y-m-d'),
+                    'end'   => $term->getDisplayFinish()->getUsingFormat('Y-m-d'),
+                ];
+            } elseif ($term->getStart()->getUsingFormat('Y-m-d') > $currentTermStartDate) {
+                $termDates['future'][] = [
+                    'start' => $term->getStart()->getUsingFormat('Y-m-d'),
+                    'end'   => $term->getDisplayFinish()->getUsingFormat('Y-m-d'),
+                ];
+            }
+        }
+
+        return array_merge(
+            [
+                'past' => $termDates['past']
+            ],
+            [
+                'current' => [
+                    'start' => $currentTermStartDate,
+                    'end' => $this->getCurrentTermDates()->getDisplayFinish()->getUsingFormat('Y-m-d'),
+                ]
+            ],
+            [
+                'future' => $termDates['future']
+            ]
+
+        );
+    }
+
+    /**
+     * @return \Schoolbox\Assessment\Term\Model
+     */
+    private function getCurrentTermDates(): \Schoolbox\Assessment\Term\Model
+    {
+        return $this->termMapper->findForDate(\Alaress_Date_Format::now());
     }
 }

@@ -15,7 +15,6 @@
 
     // Various URLs that FullCalendar may make use of.
     const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
-    const EVENT_SOURCE_ID  = 1;
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -34,6 +33,8 @@
         },
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
+            this.termStartDate = this.config.termDates.current.start;
+            this.termEndDate = this.config.termDates.current.end;
         },
         data() {
             return {
@@ -42,6 +43,10 @@
                 newEvent: {},
                 selectedFilters: null,
                 newResources: [],
+                currentView: null,
+                termStartDate: null,
+                termEndDate: null,
+                cursor: 0,
             }
         },
         computed: {
@@ -111,7 +116,21 @@
                             return 'start' in v;
                         }));
                     }
-                );
+                ).finally(function() {
+                    if (self.currentView === 'resourceTimelineSemester') {
+                        if (self.cursor <= 0 && self.config.termDates.past[Math.abs(self.cursor)]) {
+                            $(".fc-prev-button").prop('disabled', false);
+                        } else {
+                            $(".fc-prev-button").prop('disabled', true);
+                        }
+
+                        if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length)) {
+                            $(".fc-next-button").prop('disabled', false);
+                        } else {
+                            $(".fc-next-button").prop('disabled', true);
+                        }
+                    }
+                });
                 // Fail callback: consider a message saying something failed
             },
 
@@ -156,19 +175,6 @@
             },
 
             /**
-             * Helper for rendering the title of the day view.
-             * Without this the calendar renders the date twice for some reason.
-             *
-             * @param dateObject
-             * @return {*}
-             */
-            dayTitleFormat(dateObject) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading` in the main fullCalendar)
-                return this.helper.dayTitleFormat(dateObject);
-            },
-
-            /**
              * Callback for when the filters for this calendar are updated.
              *
              * Fired from outer space (i.e. from the outside window).
@@ -180,12 +186,92 @@
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
 
-            eventPositioned(info) {
-                console.log(info);
+            /**
+             * Get terms duration based on start and finish date
+             * @returns {*}
+             */
+            getTermDateDurations()
+            {
+                return this.helper.dateDiff(this.termStartDate, this.termEndDate);
+            },
+
+            /**
+             * Callback for when the calendar view changes: preserve the
+             * newly selected view for this user.
+             * @see https://fullcalendar.io/docs/viewSkeletonRender
+             *
+             * @param info
+             */
+            viewSkeletonRender(info) {
+                var self = this;
+
+                self.currentView = info.view.type;
+            },
+
+            /**
+             * Customise next button behaviour for semester view. Clicking next button while on semester view will
+             * navigate into the next available semester
+             */
+            clickNext() {
+                var self = this;
+
+                if (self.currentView === 'resourceTimelineSemester') {
+                    if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length) ||
+                        (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])) {
+                        self.cursor++;
+                        var startDateByCursor = self.getStartDateByCursor();
+
+                        if (startDateByCursor !== undefined) {
+                            self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
+                        }
+                    }
+                } else {
+                    self.$refs.fullCalendar.getApi().next();
+                }
+            },
+
+            clickPrev() {
+                var self = this;
+
+                if (self.currentView === 'resourceTimelineSemester') {
+
+                    if ((self.cursor > 0) || (self.cursor === 0 && self.config.termDates.past.length) ||
+                        (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)) {
+
+                        self.cursor--;
+                        var startDateByCursor = self.getStartDateByCursor();
+
+                        if (startDateByCursor !== undefined) {
+                            self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
+                        }
+                    }
+
+                } else {
+                    self.$refs.fullCalendar.getApi().prev();
+                }
+            },
+
+            getStartDateByCursor()
+            {
+                var self = this;
+
+                if (self.cursor === 0) {
+                    return self.config.termDates.current?.start;
+                } else if (self.cursor < 0) {
+                    return self.config.termDates.past[Math.abs(self.cursor) - 1]?.start;
+                } else {
+                    return self.config.termDates.future[Math.abs(self.cursor) - 1]?.start;
+                }
+            },
+
+            getCurrentEndDate()
+            {
+                var self = this;
+
+                return self.config.termDates.current?.end;
             }
         }
     }
-
 </script>
 
 <template>
@@ -204,7 +290,7 @@
             :views="{
                 resourceTimelineSemester: {
                     type: 'resourceTimelineYear',
-                    duration: { weeks: 22 },
+                    duration: { days: getTermDateDurations() },
                     slotDuration: { weeks: 1 },
                     weekNumbers: true,
                     slotLabelFormat: [
@@ -213,7 +299,10 @@
                     ],
                     resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
-                    eventLimit: 1
+                    eventLimit: 1,
+                    validRange: {
+                        end: this.getCurrentEndDate()
+                    }
                 },
                 resourceTimelineWeek: {
                     columnHeaderFormat: formats.displayWeekDay,
@@ -224,9 +313,15 @@
                     ],
                     resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
+                    validRange: {
+                        end: this.getCurrentEndDate()
+                    }
                 },
                 dayGridMonth: {
-                    eventLimit: config.eventLimit
+                    eventLimit: config.eventLimit,
+                    validRange: {
+                        end: this.getCurrentEndDate()
+                    }
                 }
             }"
             :week-label="''"
@@ -243,6 +338,14 @@
                 resourceTimelineWeek:'Week',
                 resourceTimelineSemester:'Semester',
             }"
+            :custom-buttons="{
+                next: {
+                    click: this.clickNext.bind(this),
+                },
+                prev: {
+                    click: this.clickPrev.bind(this)
+                }
+            }"
             default-view="resourceTimelineSemester"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-render="eventRender"
@@ -254,6 +357,8 @@
             :first-day="1"
             :event-limit="1"
             :progressive-event-rendering="true"
+            :default-date="this.termStartDate"
+            :view-skeleton-render="viewSkeletonRender"
         />
     </div>
 </template>

@@ -149,6 +149,20 @@ export default class FullCalendarHelper {
     dayTitleFormat(dateObject) {
         return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
     }
+
+    /**
+     * Helper function to get the difference between two dates.
+     * @param start
+     * @param end
+     * @param type
+     * @returns {*}
+     */
+    dateDiff(start, end, type = 'days') {
+        var startDate = moment(start);
+        var endDate = moment(end);
+
+        return endDate.diff(startDate, type);
+    }
 }
 
 
