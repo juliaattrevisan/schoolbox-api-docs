@@ -430,7 +430,7 @@ class External_Tass_User implements External_UserInterface
          */
 
         // id has to have a [P]arent prefix (or [S]pouse)
-        if (!preg_match("#(?:P|{$this->spousePrefix})[0-9A-Za-z]+#s", $externalUserId)) {
+        if (!preg_match("#(?:P|{$this->helper->getSpousePrefix()})[0-9A-Za-z]+#s", $externalUserId)) {
             return array();
         }
 
