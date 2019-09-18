@@ -209,17 +209,35 @@ class Comments extends Base
             $courseName = $current['CourseDescription'];
             $term = $current['Term'];
             $comment = $current['Comment'];
+            $classCode = $current['ClassCode'];
 
-            /* Initialise an array of Terms
+            /* Comment data
              */
-            if (!isset($comments[$year]['courses'][$courseName])) {
-                $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
-            }
-
-            $comments[$year]['courses'][$courseName]['terms'][$term] = [
+            $data = [
                 'comment' => $comment,
                 'teachers' => $teacherNormaliser->normalise($current)
             ];
+
+            /* Initialise an array of Terms
+             *
+             * The Comments screen is grouped by classCode
+             * Other screens (School Grades, NCEA) are grouped by Course Description
+             */
+            if (!isset($comments[$year]['courses'][$courseName])) {
+                $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
+                $comments[$year]['courses'][$courseName]['classCode'] = $classCode;
+            }
+
+            if (!isset($comments[$year]['classCodes'][$classCode])) {
+                $comments[$year]['classCodes'][$classCode]['terms'] = self::INITIAL_TERMS;
+                $comments[$year]['classCodes'][$classCode]['course'] = $courseName;
+            }
+
+            /* Compile data grouped by Course Description and also by Class Code
+             * Different screens use different structures
+             */
+            $comments[$year]['courses'][$courseName]['terms'][$term] = $data;
+            $comments[$year]['classCodes'][$classCode]['terms'][$term] = $data;
         }
 
         return $comments;

@@ -14,16 +14,18 @@
             <div class="scrollable">
                 <table>
                     <thead>
-                        <th>Subject</th>
-                        <th class="centered">Term</th>
-                        <th>Comment</th>
-                        <th>Teacher</th>
+                        <tr>
+                            <th>Subject</th>
+                            <th class="centered">Term</th>
+                            <th>Comment</th>
+                            <th>Teacher</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {% for year, courseData in comments %}
-                        {% for course, termData in courseData.courses %}
+                    {% for year, data in comments %}
+                        {% for classCode, termData in data.classCodes %}
                             <tr>
-                                <td class="subheading" colspan="4">{{ course }}</td>
+                                <td class="subheading" colspan="4">{{ termData.course }}</td>
                             </tr>
 
                             {# Inspect every term for content
