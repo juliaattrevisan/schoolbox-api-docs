@@ -78,7 +78,7 @@ for performant retrieval of matching items.
 
 ## Practical guides
 
-### Adding filters to a page that doesn't have filters
+### Enabling filters on a page
 
 * Add a `\Schoolbox\Filter\Page\Model::PAGE_*` constant for the new page
 * Alter the required database columns to recognize the new filters
