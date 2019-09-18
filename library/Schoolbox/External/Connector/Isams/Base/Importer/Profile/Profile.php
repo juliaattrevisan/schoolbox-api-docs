@@ -195,7 +195,7 @@ class Profile implements ImporterInterface
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function importStudents()
+    private function importStudents(): void
     {
         $students = $this->batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
@@ -442,7 +442,7 @@ class Profile implements ImporterInterface
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile)
+    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
     {
         /* Find the parents/guardians of this student
          * To do it, we need a specific id value for $student
@@ -566,7 +566,7 @@ class Profile implements ImporterInterface
     /**
      * Import staff profile data
      */
-    private function importStaff()
+    private function importStaff(): void
     {
         $staffs = $this->batchxml->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
