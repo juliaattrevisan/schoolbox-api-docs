@@ -512,14 +512,15 @@ class Processor
                 DELETE FROM {$mapper->getTable()}
                 WHERE sis_user_profile_id IN ({$deletions})
             ");
-
-            /* Remove their base profile
-             * ...but only if it isn't connected to any other profiles
-             */
-            $orphans = $this->removeOrphanedProfiles();
-
-            $this->log("Removed orphaned profiles {$orphans}", self::LOG_OK);
         }
+
+        /* Remove their base profile
+         * ...but only if it isn't connected to any other profiles
+         */
+        $orphans = $this->removeOrphanedProfiles();
+
+        $this->log("Removed {$orphans} orphaned profiles", self::LOG_OK);
+
     }
 
 
@@ -527,9 +528,9 @@ class Processor
      * Remove any base profiles that are no longer connected to an extension profile
      * student, staff or parent
      *
-     * @return string
+     * @return int
      */
-    private function removeOrphanedProfiles(): string
+    private function removeOrphanedProfiles(): int
     {
         return (new OrphanRemover(
             $this->baseProfileMapper,

@@ -175,7 +175,7 @@ class Profile implements ImporterInterface
                 $this->staffProfileMapper
             ))->remove();
 
-            $this->log->info("Removed orphaned profiles {$orphans}");
+            $this->log->info("Removed {$orphans} orphaned profiles.");
         }
 
         if (!$this->perform) {
