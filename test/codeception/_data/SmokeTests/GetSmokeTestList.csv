@@ -53,8 +53,8 @@ Calendar,Teacher,View calendar,https://vagrant.dev.schoolbox.cloud/calendar
 ,Teacher,Export calendar,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809
 ,Teacher,Create event,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1
 CMS,Admin,View all folders,https://vagrant.dev.schoolbox.cloud/resources/
-,Admin,Add folder,https://vagrant.dev.schoolbox.cloud/resource/folder/create/57
-,Admin,Modify folder,https://vagrant.dev.schoolbox.cloud/resource/folder/modify/57
+,Admin,Add folder,https://vagrant.dev.schoolbox.cloud/resource/folder/57/create
+,Admin,Modify folder,https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify
 ,Admin,Post file,https://vagrant.dev.schoolbox.cloud/cms/file/new/57
 ,Admin,Post link,https://vagrant.dev.schoolbox.cloud/cms/link/new/57
 ,Teacher,Add tile,https://vagrant.dev.schoolbox.cloud/tile/add/25
