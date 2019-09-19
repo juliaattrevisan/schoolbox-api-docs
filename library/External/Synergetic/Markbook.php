@@ -418,7 +418,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     ResultType,
                     MarkOutOf,
                     WeightingFactor,
-                    TestDate,
+                    TestDate
                 ) VALUES (
                     :fileType,
                     :fileYear,
