@@ -51,6 +51,8 @@ class HomePageCest
     }
 
     /**
+     * Create a homepage and uploads the file to the homepage component directly. Drag drop path
+     *
      * @param IntegrationTester $i
      */
     public function homepageUploadFileAjax(IntegrationTester $i): void
@@ -83,6 +85,8 @@ class HomePageCest
     }
 
     /**
+     * Create folder and uploads file to folder directly. Drag drop path.
+     *
      * @param IntegrationTester $i
      */
     public function resourcesUploadFileAjax(IntegrationTester $i): void
@@ -114,6 +118,8 @@ class HomePageCest
     }
 
     /**
+     * Uploads a file to storage on schoolbox.
+     *
      * @param IntegrationTester $i
      */
     public function storageUploadDragDrop(IntegrationTester $i): void
@@ -132,6 +138,8 @@ class HomePageCest
     }
 
     /**
+     * Creates a resource folder and uploads a file via storing it first. The file upload form path.
+     *
      * @param IntegrationTester $i
      */
     public function postFileUploadFileForm(IntegrationTester $i): void

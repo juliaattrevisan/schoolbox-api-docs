@@ -11,6 +11,12 @@ class StorageUpload extends Request
 {
     use PostTrait;
 
+    /**
+     * StorageUpload constructor.
+     * @param $container_name
+     * @param $filename
+     * @param $file_location_in_data
+     */
     public function __construct($container_name, $filename, $file_location_in_data)
     {
         $this->unsetHeader('Content-Type');

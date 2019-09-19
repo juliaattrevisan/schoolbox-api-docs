@@ -7,6 +7,13 @@ namespace Payload\Resource\File;
 class FileUploadForm extends Upload
 {
 
+    /**
+     * FileUploadForm constructor.
+     * @param        $folder_id
+     * @param string $fileName
+     * @param string $description
+     * @param string $fileHashInStorage
+     */
     public function __construct($folder_id, string $fileName, string $description, string $fileHashInStorage)
     {
         $this->unsetHeader('Content-Type');

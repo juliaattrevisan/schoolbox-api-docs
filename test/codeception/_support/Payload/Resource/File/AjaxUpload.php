@@ -12,6 +12,13 @@ use Payload;
 class AjaxUpload extends Upload
 {
 
+    /**
+     * AjaxUpload constructor.
+     * @param $folder_id
+     * @param $container_name
+     * @param $filename
+     * @param $file_location_in_data
+     */
     public function __construct($folder_id, $container_name, $filename, $file_location_in_data)
     {
         $this->unsetHeader('Content-Type');
