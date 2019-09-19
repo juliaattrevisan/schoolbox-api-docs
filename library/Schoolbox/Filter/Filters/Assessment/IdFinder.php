@@ -1462,14 +1462,14 @@ class IdFinder extends Filter\AbstractIdFinder
                 foreach ($findUnitsQuery->fetchAll(\PDO::FETCH_COLUMN) as $unitImpSpcId) {
                     $courseImpUnitSpcIds[$unitImpSpcId] = $unitImpSpcId;
                 }
+            }
 
-                // If there's already unit impl spec IDs: the list is the intersect
-                // Otherwise it's the list I built
-                if ($unitImpSpcIds instanceof Collection) {
-                    $unitImpSpcIds = $unitImpSpcIds->intersect($courseImpUnitSpcIds);
-                } else {
-                    $unitImpSpcIds = $courseImpUnitSpcIds;
-                }
+            // If there's already unit impl spec IDs: the list is the intersect
+            // Otherwise it's the list I built
+            if ($unitImpSpcIds instanceof Collection) {
+                $unitImpSpcIds = $unitImpSpcIds->intersect($courseImpUnitSpcIds);
+            } else {
+                $unitImpSpcIds = $courseImpUnitSpcIds;
             }
         }
         return $unitImpSpcIds;
