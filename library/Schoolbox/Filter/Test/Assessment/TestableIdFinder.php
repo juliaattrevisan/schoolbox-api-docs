@@ -104,6 +104,7 @@ class TestableIdFinder extends IdFinder
             Assessment\Folder\StudentInteractions\Definition::class,
             Assessment\Folder\Readable\Definition::class,
             Assessment\Folder\CourseImports\Definition::class,
+            Assessment\NullableContext\CourseImportSpec\Definition::class,
             Assessment\NullableContext\UnitImportSpec\Definition::class,
             Assessment\NullableContext\Project\Definition::class,
             Assessment\NullableContext\UnitImpl\Definition::class,
