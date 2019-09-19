@@ -806,6 +806,10 @@ class DataSource
                 if ($indicatorMark->getDescriptor()) {
                     $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
                 }
+                if ($descriptorModel === null) {
+                    // Do not create, if descriptor is not set
+                    continue;
+                }
                 $indicatorMarksToSave[$indicatorId] = $indicatorMarkMapper->createModel()
                     ->setCapabilityMark($capabilityMarkModel)
                     ->setDescriptor($descriptorModel)
