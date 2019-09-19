@@ -112,7 +112,12 @@
                 ).then(
                     function (response) {
                         successCallback(response.data.filter(function (v) {
-                            self.newResources.push({'id': v.data.meta.folderId, 'title':  v.data.meta.folderName});
+
+                            // Check if resource is already added
+                            if (!self.newResources.some(el => el.id === v.data.meta.folderId)) {
+                                self.newResources.push({'id': v.data.meta.folderId, 'title': v.data.meta.folderName});
+                            }
+
                             v.resourceId = v.data.meta.folderId;
                             v.eventGrouping = moment(v.start).format('YYYY') + String(moment(v.start).week()).padStart(2,0) + v.data.meta.folderId;
 
@@ -309,16 +314,21 @@
 
                 if (self.currentView === 'resourceTimelineSemester') {
                     self.eventGroups.forEach(function(element) {
-
                         if ($("[event-group-id-placeholder='" + element + "']").length < 1) {
 
-                            var a = document.createElement('a');
-                                a.setAttribute('event-group-id-placeholder', element);
-                                a.className = 'fc-timeline-event fc-h-event fc-event fc-start fc-end source personal';
-                                a.style = $("[event-group-id='" + element + "']:first")[0].attributes.style.value;
-                                a.innerHTML = '<span class="fc-title-wrap" style="padding: 5px; text-align: center">'+ $("[event-group-id='" + element + "']").length +'</span>';
+                            var wrapper = document.createElement('a');
+                                wrapper.setAttribute('event-group-id-placeholder', element);
+                                wrapper.className = 'fc-timeline-event fc-event fc-draggable fc-resizable';
 
-                            $("[event-group-id='" + element + "']:first").before(a);
+                                wrapper.setAttribute('style',
+                                    "left:" + $("[event-group-id='" + element + "']:first")[0].style.left + ";" +
+                                    "right:" + $("[event-group-id='" + element + "']:first")[0].style.right + ";" +
+                                    "top:2px;"
+                                );
+
+                                wrapper.innerHTML = '<div class="fc-title-wrap" style="text-align: center; padding: 5px;">'+ $("[event-group-id='" + element + "']").length +'</div>';
+
+                                $("[event-group-id='" + element + "']:first").before(wrapper);
                         }
                     });
                 }
@@ -350,7 +360,7 @@
                         'MMMM',
                         'w'
                     ],
-                    resourceAreaWidth: '15%',
+                    resourceAreaWidth: '20%',
                     filterResourcesWithEvents: true,
 
                     validRange: {
@@ -365,7 +375,7 @@
                     slotLabelFormat: [
                         'ddd DD',
                     ],
-                    resourceAreaWidth: '15%',
+                    resourceAreaWidth: '20%',
                     filterResourcesWithEvents: true,
                     validRange: {
                         start: this.getMinTermDate(),
@@ -379,7 +389,6 @@
                     }
                 }
             }"
-            :week-number-calculation="'ISO'"
             :week-label="''"
             :event-time-format="helper.eventTimeFormat"
             content-height="auto"
