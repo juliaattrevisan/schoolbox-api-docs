@@ -736,12 +736,14 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         // known limitation: 23:00am fails to parse
         // replace / with - so that strtotime recognises D/M/Y instead of heretical M/D/Y format
         return text
+            .trim()
             .toLowerCase()
+            .replace(/\s+/g, ' ')
             .replace(/^in\s+/g, '')
-            .replace(/from\s+now$/g, '')
-            .replace(/at/g, '')
-            .replace(/on/g, '')
-            .replace(/,/g, '')
+            .replace(/\s+from\s+now$/g, '')
+            .replace(/\s+at\s+/g, '')
+            .replace(/\s+on\s+/g, '')
+            .replace(/,\s/g, '')
             .replace(/zero/g, '0')
             .replace(/one/g, '1')
             .replace(/two/g, '2')
