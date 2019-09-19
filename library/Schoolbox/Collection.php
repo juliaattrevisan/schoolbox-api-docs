@@ -751,6 +751,37 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
         return $diff;
     }
 
+
+    /**
+     * Returns a new collection containing items that are in both $this and
+     * $otherCollection.
+     *
+     * @param Collection    $otherCollection
+     * @param callable|null $compare The callback method to use for deciding
+     *                               whether two items are the same.
+     *                               Defaults to == comparison.
+     * @return Collection
+     */
+    public function intersect(Collection $otherCollection, callable $compare = null): Collection
+    {
+        if (!is_callable($compare)) {
+            $compare = static function ($a, $b) {
+                return $a == $b;
+            };
+        }
+
+        $result = $this->emptyClone();
+        foreach ($this as $item) {
+            foreach ($otherCollection as $otherItem) {
+                if ($compare($item, $otherItem)) {
+                    $result->add($item);
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
+
     /**
      * Applies a callable to all items in this collection, and returns a new
      * collection with the result. If $includeNull == false, iterations that
