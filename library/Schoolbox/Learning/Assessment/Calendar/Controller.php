@@ -84,7 +84,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningAssessmentCalendar/index.twig',
                 ['filterPanel' => $filterPanel,],
-                'submission',
+                'Assessment Calendar',
                 $pageTitle
             )
         );
