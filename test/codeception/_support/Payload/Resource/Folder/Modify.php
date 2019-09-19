@@ -15,7 +15,7 @@ use Payload\PostTrait;
  */
 abstract class Modify extends Payload\Request
 {
-    public const TEMPLATE_BLANK = 9;
+    public const TEMPLATE_BLANK = 11;
 
     use PostTrait;
 
