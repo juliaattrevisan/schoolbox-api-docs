@@ -241,9 +241,9 @@ Usage:
             var decodedData    = decodeURIComponent(serialised),
                 flatArray      = decodedData.split('&'),
                 nestedObj      = {},
-                regEx          = /^filter_selection\[(\d+)]\[(\w*)]=([01])$/, // eg 'filter_selection[1][task]=1'
+                regEx          = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/, // eg 'filter_selection[1][task]=1'
                 emptyRegEx     = /^filter_selection\[(\d+)]=$/,               // eg 'filter_selection[17]='
-                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(\w*)$/;       // eg 'filter_selection[17][]=22'
+                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(\w+)$/;       // eg 'filter_selection[17][]=22'
 
             // Convert flat string array to nested object
             flatArray.forEach(function (keyValue) {
