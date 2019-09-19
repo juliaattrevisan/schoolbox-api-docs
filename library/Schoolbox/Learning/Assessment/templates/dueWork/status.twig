@@ -157,7 +157,7 @@
     {% set fileCount = latestFeedback ? latestFeedback.allFiles.count : 0 %}
     {% set hasRubricMarks = rubricMarks[participant.user.id]|default(false) %}
 
-    {% if hasKami or fileCount or hasRubricMarks %}
+    {% if hasKami or fileCount or (assessment.useRubric and hasRubricMarks) %}
         {% set meta = [] %}
 
         {# Kami #}
@@ -166,7 +166,7 @@
         {% endif %}
 
         {# Rubric #}
-        {% if hasRubricMarks %}
+        {% if assessment.useRubric and hasRubricMarks %}
             {% set meta = meta|merge(['rubric']) %}
         {% endif %}
 
