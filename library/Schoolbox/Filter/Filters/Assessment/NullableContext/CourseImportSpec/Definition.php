@@ -33,6 +33,8 @@ class Definition extends NullableContext\Definition
     // The name to expose in the UI
     protected const NAME = "Course Specification";
 
+    // match assessments that exist within any course
+    protected const KEY_READ_ACCESS = 'readAccess';
 
     /**
      * @inheritdoc
@@ -46,12 +48,28 @@ class Definition extends NullableContext\Definition
 
 
     /**
+     * This filter has no custom keys.
+     *
+     * @inheritdoc
+     */
+    protected function getCustomKeys(): array
+    {
+        return [
+            self::KEY_NONE,
+            self::KEY_READ_ACCESS,
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function getLabel(string $key): string
     {
         if ($key === self::KEY_NONE) {
             return '(none)';
+        }
+        if ($key === self::KEY_READ_ACCESS) {
+            return 'Read Access (searchable)';
         }
         throw new InvalidArgumentException("Unknown 'CourseSpec' filter key: $key");
     }
