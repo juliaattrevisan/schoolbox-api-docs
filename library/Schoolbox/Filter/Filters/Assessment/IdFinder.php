@@ -87,18 +87,38 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Augment unit imp spc ids with course imp's unit imp spc ids
         // That's easier than writing it into the query.
-        if ($courseImpSpcIds && count($courseImpSpcIds)) {
-            $findUnitsQuery = $this->getMapper()->getDatabase()->prepare('
-                SELECT id FROM course_unit_specification where course_specification_id = ?
-            ');
+        if ($courseImpSpcIds instanceof Collection) {
+
+            // Build the list of course spec IDs to pass into the query
+            $params = [];
             foreach ($courseImpSpcIds as $courseImpSpcId => $value) {
                 if ($courseImpSpcId === NullableContext\Definition::KEY_NONE) {
-                    $unitImpSpcIds[$courseImpSpcId] = $value;
                     continue;
                 }
-                $findUnitsQuery->execute([$courseImpSpcId]);
+                $params[] = $courseImpSpcId;
+            }
+
+            if (!empty($params)) {
+                // Find the list of unit specs that are in these course specs
+                $findUnitsQuery = $this->getMapper()->getDatabase()->prepare(
+                    sprintf(
+                        'SELECT id FROM course_unit_specification where course_specification_id IN (%s)',
+                        implode(',', array_fill(0, count($params), '?'))
+                    )
+                );
+                $findUnitsQuery->execute($params);
+
+                $courseImpUnitSpcIds = new Collection();
                 foreach ($findUnitsQuery->fetchAll(\PDO::FETCH_COLUMN) as $unitImpSpcId) {
-                    $unitImpSpcIds[$unitImpSpcId] = $value;
+                    $courseImpUnitSpcIds[$unitImpSpcId] = $unitImpSpcId;
+                }
+
+                // If there's already unit impl spec IDs: the list is the intersect
+                // Otherwise it's the list I built
+                if ($unitImpSpcIds instanceof Collection) {
+                    $unitImpSpcIds = $unitImpSpcIds->intersect($courseImpUnitSpcIds);
+                } else {
+                    $unitImpSpcIds = $courseImpUnitSpcIds;
                 }
             }
         }
