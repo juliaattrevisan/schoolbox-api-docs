@@ -143,31 +143,9 @@
                     self.eventGroups.push(eventGrouping);
                 }
 
-                eventRenderInfo.el.classList.add('hide');
-
-                // if (self.currentBatchCursor === null || (self.currentBatchCursor !== eventRenderInfo.event.extendedProps.eventGrouping)) {
-                    // console.log($( "[event-group-id='20190552']").length);
-                    // let $element = self.jQuery(eventRenderInfo.el),
-                    //     content = $element.find('.fc-content');
-
-
-                    // content.prepend($('<a class="progress-tick small no-bling" />'));
-
-                    // $('<div>test</div>').insertAfter(content);
-
-                    // self.jQuery(content).after('<div>test</div>');
-                    // $(content).after('<div>test</div>');
-                    // console.log(content);
-
-                    // eventRenderInfo.el.insertAdjacentHTML('beforeend', '<div id="two">two</div>');
-
-                    // $( '[event-group-id="201905"]:first' ).clone().appendTo( '[event-group-id="201905"]' );
-
-                    // self.currentBatchCursor = null;
-                // }
-
-                // eventRenderInfo.el.classList.add('fc-limited');
-                // self.currentBatchCursor = eventRenderInfo.event.extendedProps.eventGrouping;
+                if (self.currentView === 'resourceTimelineSemester') {
+                    eventRenderInfo.el.classList.add('hide');
+                }
             },
 
             /**
