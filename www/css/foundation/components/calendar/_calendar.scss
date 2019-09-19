@@ -123,11 +123,7 @@
 
 .fc-event {
     border-radius: 0 !important;
-
-    .fc-title,
-    .fc-title:hover {
-        color: $black;
-    }
+    color: $black !important;
 }
 
 @media #{$medium-down} {
