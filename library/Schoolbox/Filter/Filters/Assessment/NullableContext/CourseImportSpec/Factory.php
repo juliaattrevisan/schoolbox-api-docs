@@ -98,6 +98,6 @@ class Factory extends NullableContext\Factory
             ->indexByCallback(static function ($unitSpecId) {
                 return $unitSpecId;
             });
-        return new NullableContext\KeyConverter($filter, $unitSpecIds);
+        return new KeyConverter($filter, $unitSpecIds);
     }
 }
