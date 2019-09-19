@@ -503,6 +503,8 @@ Usage:
                 componentsInUse[filterId]['labels'] = [];
 
                 // Maybe this is a selectize?
+                // TODO figure out how to handle combination selectize/checkbox lists
+                // (i.e. "No course" checkbox, and a list of courses)
                 if (selectize) {
                     selectize.items.forEach(function (v) {
                         componentsInUse[filterId]['labels'].push(selectize.options[v].name);
