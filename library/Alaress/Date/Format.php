@@ -1563,6 +1563,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function isWeekday()
     {
+        //Set weekend from localisation, should be done on construction but locale is only reliable on use
+        $this->getDateTimeObject()->setWeekendDays($this->getLocale()->weekendDays());
         return $this->getDateTimeObject()->isWeekday();
     }
 
@@ -1571,6 +1573,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function isWeekend()
     {
+        //Set weekend from localisation, should be done on construction but locale is only reliable on use
+        $this->getDateTimeObject()->setWeekendDays($this->getLocale()->weekendDays());
         return $this->getDateTimeObject()->isWeekend();
     }
 

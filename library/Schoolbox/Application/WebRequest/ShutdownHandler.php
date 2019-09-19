@@ -5,25 +5,28 @@
 
 namespace Schoolbox\Application\WebRequest;
 
-class ShutdownHandler {
+class ShutdownHandler
+{
 
     private static $instance = false;
-    private $enabled = true;
-    private $functions;
+    private        $enabled  = true;
+    private        $functions;
 
-    private function __construct() {
-        register_shutdown_function(array($this, 'onShutdown'));
-        $this->functions = array();
+    private function __construct()
+    {
+        $this->functions = [];
     }
 
-    public static function instance() {
+    public static function instance()
+    {
         if (self::$instance == false) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    public function onShutdown() {
+    public function onShutdown()
+    {
 
         // If the shutdown handler has been disabled don't execute any registered functions
 
@@ -42,25 +45,29 @@ class ShutdownHandler {
         }
     }
 
-    public function setEnabled($value) {
+    public function setEnabled($value)
+    {
         $this->enabled = (bool)$value;
     }
 
-    public function getEnabled() {
+    public function getEnabled()
+    {
         return $this->enabled;
     }
 
-    public function unregisterFunction($priority) {
+    public function unregisterFunction($priority)
+    {
         // Allow cancelling of all functions with a given priority number
         unset($this->functions[$priority]);
     }
 
-    public function registerFunction(callable $fnc, $priority = PHP_INT_MAX) {
+    public function registerFunction(callable $fnc, $priority = PHP_INT_MAX)
+    {
         // Each shutdown function is given a priority number. If none is supplied it just gets dumped into
         // the lowest priority possible. Functions will be executed in this order.
 
         if (!isset($this->functions[$priority])) {
-            $this->functions[$priority] = array();
+            $this->functions[$priority] = [];
         }
 
         $this->functions[$priority][] = $fnc;
