@@ -762,7 +762,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *                               Defaults to == comparison.
      * @return Collection
      */
-    public function intersect(Collection $otherCollection, callable $compare = null): Collection
+    public function intersect(Collection $otherCollection, ?callable $compare = null): Collection
     {
         if (!is_callable($compare)) {
             $compare = static function ($a, $b) {
