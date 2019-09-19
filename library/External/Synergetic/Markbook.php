@@ -241,7 +241,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'resultType'           => $resultType,
             'fileYear'             => $this->getSystemFileYear(),
             'fileSemester'         => $this->getSystemFileSemester(),
-            'dueDate'              => $assessment->getDate()->getDatabaseDate(),
+            'dueDate'              => $assessment->getDate()->getDatabase()
         ], $bindings->getParams());
 
         return $this->getConnector()->prepareQuery($sql, $params)->execute();
@@ -433,7 +433,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     :resultType,
                     '100',
                     :weightingFactor,
-                    :dueDate,
+                    :dueDate
                 )
             ";
 
@@ -449,7 +449,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
             'resultType'           => $resultType,
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
-            'dueDate'              => $assessment->getDate()->getDatabaseDate()
+            'dueDate'              => $assessment->getDate()->getDatabase()
         ]);
 
         return $statement->execute();
