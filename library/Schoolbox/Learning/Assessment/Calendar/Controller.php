@@ -110,9 +110,7 @@ class Controller extends Base
         $termDates['past'] = [];
         $termDates['future'] = [];
 
-        $terms = $this->termMapper
-            ->findByColumn('archived', false)
-            ->sortBy('start', 'DESC');
+        $terms = $this->termMapper->findAll()->sortBy('start', 'DESC');
 
         $currentTermStartDate = $this->getCurrentTermDates()->getStart()->getUsingFormat('Y-m-d');
 
