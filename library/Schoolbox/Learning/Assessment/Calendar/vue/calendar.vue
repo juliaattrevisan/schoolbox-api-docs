@@ -47,6 +47,8 @@
                 termStartDate: null,
                 termEndDate: null,
                 cursor: 0,
+                currentBatchCursor: null,
+                eventGroups: []
             }
         },
         computed: {
@@ -112,6 +114,7 @@
                         successCallback(response.data.filter(function (v) {
                             self.newResources.push({'id': v.data.meta.folderId, 'title':  v.data.meta.folderName});
                             v.resourceId = v.data.meta.folderId;
+                            v.eventGrouping = moment(v.start).format('YYYY') + String(moment(v.start).week()).padStart(2,0) + v.data.meta.folderId;
 
                             return 'start' in v;
                         }));
@@ -131,9 +134,40 @@
              * @return {boolean}
              */
             eventRender(eventRenderInfo) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading` in the main fullCalendar)
-                return this.helper.eventRender(eventRenderInfo);
+                let self = this,
+                    eventGrouping = eventRenderInfo.event.extendedProps.eventGrouping;
+
+                eventRenderInfo.el.setAttribute('event-group-id', eventGrouping);
+
+                if (!self.eventGroups.includes(eventGrouping)) {
+                    self.eventGroups.push(eventGrouping);
+                }
+
+                eventRenderInfo.el.classList.add('hide');
+
+                // if (self.currentBatchCursor === null || (self.currentBatchCursor !== eventRenderInfo.event.extendedProps.eventGrouping)) {
+                    // console.log($( "[event-group-id='20190552']").length);
+                    // let $element = self.jQuery(eventRenderInfo.el),
+                    //     content = $element.find('.fc-content');
+
+
+                    // content.prepend($('<a class="progress-tick small no-bling" />'));
+
+                    // $('<div>test</div>').insertAfter(content);
+
+                    // self.jQuery(content).after('<div>test</div>');
+                    // $(content).after('<div>test</div>');
+                    // console.log(content);
+
+                    // eventRenderInfo.el.insertAdjacentHTML('beforeend', '<div id="two">two</div>');
+
+                    // $( '[event-group-id="201905"]:first' ).clone().appendTo( '[event-group-id="201905"]' );
+
+                    // self.currentBatchCursor = null;
+                // }
+
+                // eventRenderInfo.el.classList.add('fc-limited');
+                // self.currentBatchCursor = eventRenderInfo.event.extendedProps.eventGrouping;
             },
 
             /**
@@ -241,6 +275,9 @@
                 }
             },
 
+            /**
+             * Navigate through the dates via the cursor
+             */
             getStartDateByCursor()
             {
                 var self = this;
@@ -282,6 +319,31 @@
                 });
 
                 return moment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+            },
+
+            /**
+             * @see https://fullcalendar.io/docs/eventPositioned
+             * @param info
+             */
+            eventPositioned(info)
+            {
+                var self = this;
+
+                if (self.currentView === 'resourceTimelineSemester') {
+                    self.eventGroups.forEach(function(element) {
+
+                        if ($("[event-group-id-placeholder='" + element + "']").length < 1) {
+
+                            var a = document.createElement('a');
+                                a.setAttribute('event-group-id-placeholder', element);
+                                a.className = 'fc-timeline-event fc-h-event fc-event fc-start fc-end source personal';
+                                a.style = $("[event-group-id='" + element + "']:first")[0].attributes.style.value;
+                                a.innerHTML = '<span class="fc-title-wrap" style="padding: 5px; text-align: center">'+ $("[event-group-id='" + element + "']").length +'</span>';
+
+                            $("[event-group-id='" + element + "']:first").before(a);
+                        }
+                    });
+                }
             }
         }
     }
@@ -312,7 +374,7 @@
                     ],
                     resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
-                    eventLimit: 1,
+
                     validRange: {
                         start: this.getMinTermDate(),
                         end: this.getMaxTermDate()
@@ -330,16 +392,16 @@
                     validRange: {
                         start: this.getMinTermDate(),
                         end: this.getMaxTermDate()
-                    }
+                    },
                 },
                 dayGridMonth: {
-                    eventLimit: config.eventLimit,
                     validRange: {
                         start: this.getMinTermDate(),
                         end: this.getMaxTermDate()
                     }
                 }
             }"
+            :week-number-calculation="'ISO'"
             :week-label="''"
             :event-time-format="helper.eventTimeFormat"
             content-height="auto"
@@ -371,10 +433,10 @@
             :resources="this.newResources"
             :scheduler-license-key="config.schedulerLicenseKey"
             :first-day="1"
-            :event-limit="1"
-            :progressive-event-rendering="true"
+            :event-limit="true"
             :default-date="this.termStartDate"
             :view-skeleton-render="viewSkeletonRender"
+            @eventPositioned="eventPositioned"
         />
     </div>
 </template>
