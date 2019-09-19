@@ -133,3 +133,31 @@ Fixtures,Fixtures Administrator,Go to fixtures,https://vagrant.dev.schoolbox.clo
 ,Teacher,Fixture match details,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1
 ,Teacher,View team matches,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches
 ,Student,Fixture match details,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1
+ePortfolio,Student,View their ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio
+,Student,View their ePortfolio via home button nav,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+,Student,View one of my pages.,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+,Student,Add a new page,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+,Teacher,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+,Teacher,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+,Teacher,Create a page on their students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+,Superuser,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+,Superuser,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+,Superuser,Create a page on the students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+,Admin,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+,Admin,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+,Admin,Create a page on the students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+Search,Admin,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1"
+,Admin,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1"
+,Admin,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1"
+,Admin,View only news results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1"
+,Admin,Search and resieve no results.,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash
+,Teacher,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1"
+,Teacher,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1"
+,Teacher,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1"
+,Teacher,View only news results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1"
+,Teacher,Search and resieve no results.,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash
+,Student,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1"
+,Student,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1"
+,Student,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1"
+,Student,View only news results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1"
+,Student,Search and resieve no results.,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash
