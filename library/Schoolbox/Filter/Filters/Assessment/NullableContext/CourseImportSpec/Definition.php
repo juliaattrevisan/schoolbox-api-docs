@@ -34,7 +34,7 @@ class Definition extends NullableContext\Definition
     protected const NAME = "Course Specification";
 
     // match assessments that exist within any course
-    protected const KEY_READ_ACCESS = 'readAccess';
+    public const KEY_READ_ACCESS = 'readAccess';
 
     /**
      * @inheritdoc

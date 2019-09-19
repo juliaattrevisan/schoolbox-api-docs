@@ -61,11 +61,24 @@ class Component extends Filter\BaseComponent
      */
     protected function buildRoleSelections(GenericCollection $abstractOptions)
     {
-        // Nothing is ever selected on a role level
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
-        $availableSelections[Definition::KEY_NONE] = $this->createSelection(Definition::KEY_NONE, false);
+        $roleType            = $this->getUser()->getRole()->getType();
+
+        // Piece the selections together
+        $selectNoneOption       = $abstractOptions[Definition::KEY_NONE]->getDefaults()[$roleType]->getSelected();
+        $selectAllCourseOptions = $abstractOptions[Definition::KEY_READ_ACCESS]->getDefaults()[$roleType]->getSelected();
+        $urlOverrides           = $this->getUrlOverrides();
+
+        $availableSelections[Definition::KEY_NONE] = $this->createSelection(
+            Definition::KEY_NONE,
+            $selectNoneOption || ($urlOverrides && $urlOverrides->offsetExists(Definition::KEY_NONE))
+        );
+
         foreach ($this->importedCourseSpecs as $courseSpecId => $courseSpec) {
-            $availableSelections[$courseSpecId] = $this->createSelection($courseSpecId, false);
+            $availableSelections[$courseSpecId] = $this->createSelection(
+                $courseSpecId,
+                $selectAllCourseOptions || ($urlOverrides && $urlOverrides->offsetExists($courseSpecId))
+            );
         }
         return $availableSelections;
     }
