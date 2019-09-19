@@ -39,20 +39,21 @@
 
         <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
 
-        {# show NONE selector #}
-        {% include '@filters/_selectionCheckbox.twig' with {
-            roleSelection:      roleSelections[keyNone],
-            userSelection:      userSelections[keyNone],
-            label:              '(none)',
-            disabled:           isDisabled
-        } only %}
-
         <select id="filter-selector-course-import-spec"
                 name="filter_selection[{{ definition.filter.id }}][]"
                 multiple
                 placeholder="Enter one or more course names"
                 data-selectize
         >
+            {# show NONE selector #}
+            {% include '@filters/_option.twig' with {
+                roleSelection:      roleSelections[keyNone],
+                userSelection:      userSelections[keyNone],
+                label:              '(none)',
+                value:              keyNone,
+                disabled:           isDisabled,
+            } only %}
+
             {% for courseSpec in courseSpecs %}
                 {% set roleSelection = roleSelections[courseSpec.id] %}
                 {% set userSelection = userSelections[courseSpec.id] %}
@@ -62,6 +63,7 @@
                     roleSelection: roleSelection,
                     label:         courseSpec.title,
                     value:         courseSpec.id,
+                    disabled:      isDisabled,
                 } only %}
             {% endfor %}
         </select>
