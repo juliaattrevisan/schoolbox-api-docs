@@ -552,7 +552,23 @@ class CollectionMethodsTest extends TestCase
             'A ∩ B, A ⊂ B'          => [new Collection([2]), new Collection([1, 2, 5]), null, new Collection([2])],
             'A ∩ B, A ⊃ B'          => [new Collection([2]), new Collection([1, 2, 5]), null, new Collection([2])],
             'A ∩ B, A = B'          => [new Collection([2, 3, 4]), new Collection([2, 3, 4]), null, new Collection([2, 3, 4])],
-            'A ∩ B, custom compare' => [new Collection([2, 3, 4]), new Collection([2, 3, 4]), null, new Collection([2, 3, 4])],
+            'A ∩ B, custom compare' => [
+                new Collection([
+                    ['id' => 2, 'name' => 'B'],
+                    ['id' => 3, 'name' => 'B'],
+                    ['id' => 4, 'name' => 'B'],
+                ]),
+                new Collection([
+                    ['id' => 3, 'name' => 'C'],
+                    ['id' => 4, 'name' => 'C'],
+                    ['id' => 5, 'name' => 'C'],
+                ]),
+                static function ($a, $b) { return $a['id'] === $b['id']; },
+                new Collection([
+                    ['id' => 3, 'name' => 'B'],
+                    ['id' => 4, 'name' => 'B'],
+                ]),
+            ],
         ];
     }
 }
