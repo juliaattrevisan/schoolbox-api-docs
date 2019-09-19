@@ -143,9 +143,20 @@
                                     {% endif %}
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(true) %}
-                                    {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
-                                        ? "Pending" : participant.humanReadableMark(true) | default('–')
-                                    %}
+
+                                    {% if participant.hasSubmittedResponse and not participant.hasPublishedFeedback %}
+                                        {# Work submitted, but no feedback yet #}
+                                        {% set label= "Pending" %}
+                                    {% elseif participant.hasPublishedFeedback and not participant.humanReadableMark(true) %}
+                                        {# Feedback given with comment, but no mark #}
+                                        {% set label= "Reviewed" %}
+                                    {% elseif participant.humanReadableMark(true) %}
+                                        {# Feedback given, with mark #}
+                                        {% set label= participant.humanReadableMark(true) %}
+                                    {% else %}
+                                        {% set label= "-" %}
+                                    {% endif %}
+
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                        title="{{ participant.authoritativeFeedback(true).comment }}">{{ label }}</a>
