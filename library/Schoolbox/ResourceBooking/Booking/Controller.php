@@ -695,6 +695,7 @@ class Controller extends Base
                     'item'              => $item,
                     'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
+                    'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
                     'validationData'    => [
                         'start' => Validation::START_DATETIME,
