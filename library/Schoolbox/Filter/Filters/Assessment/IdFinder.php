@@ -90,25 +90,29 @@ class IdFinder extends Filter\AbstractIdFinder
         if ($courseImpSpcIds instanceof Collection) {
 
             // Build the list of course spec IDs to pass into the query
-            $params = [];
+            $queryParams         = [];
+            $courseImpUnitSpcIds = new Collection();
+
             foreach ($courseImpSpcIds as $courseImpSpcId => $value) {
+                // Is this the special "NONE" selection?
+                // Set it directly into the course impl unit specs
                 if ($courseImpSpcId === NullableContext\Definition::KEY_NONE) {
+                    $courseImpUnitSpcIds[$courseImpSpcId] = $value;
                     continue;
                 }
-                $params[] = $courseImpSpcId;
+                $queryParams[] = $courseImpSpcId;
             }
 
-            if (!empty($params)) {
+            if (!empty($queryParams)) {
                 // Find the list of unit specs that are in these course specs
                 $findUnitsQuery = $this->getMapper()->getDatabase()->prepare(
                     sprintf(
                         'SELECT id FROM course_unit_specification where course_specification_id IN (%s)',
-                        implode(',', array_fill(0, count($params), '?'))
+                        implode(',', array_fill(0, count($queryParams), '?'))
                     )
                 );
-                $findUnitsQuery->execute($params);
+                $findUnitsQuery->execute($queryParams);
 
-                $courseImpUnitSpcIds = new Collection();
                 foreach ($findUnitsQuery->fetchAll(\PDO::FETCH_COLUMN) as $unitImpSpcId) {
                     $courseImpUnitSpcIds[$unitImpSpcId] = $unitImpSpcId;
                 }
