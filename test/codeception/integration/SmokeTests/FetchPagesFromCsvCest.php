@@ -21,10 +21,75 @@ class FetchPagesFromCsvCest
         'News Moderator'=> ['username'=>'rwhite', 'password'=>'password']
     ];
 
+    /**
+     * @param IntegrationTester $i
+     */
     public function _before(IntegrationTester $i)
     {
         #Might not need this login any more as I think this runs each test, so the login differs each test now.
         #$i->loginAdmin(); #we logged in as alaress
+    }
+
+    /**
+     * Fail test to ensure we can get a 404 response from schoolbox.
+     *
+     * @param IntegrationTester $i
+     */
+    public function getFailure404(IntegrationTester $i)
+    {
+        #GIVEN
+        $url='https://vagrant.dev.schoolbox.cloud/i_dont_exist_at_all_anywhere';
+        $student_user_details=$this->personas['Student'];
+
+        #WHEN
+        $this->loginUser($i, $student_user_details['username'], $student_user_details['password']);
+
+        $getPayload = new Payload\Base('GET', '/', $url);
+        $i->sendRequest($getPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(404);
+    }
+
+    /**
+     * Fail test to ensure we can get a permission denied from schoolbox using sitepage
+     *
+     * @param IntegrationTester $i
+     */
+    public function getFailureSitePagePermissionDenied(IntegrationTester $i)
+    {
+        #GIVEN
+        $url='https://vagrant.dev.schoolbox.cloud/adminv2/home';
+        $student_user_details=$this->personas['Student'];
+
+        #WHEN
+        $this->loginUser($i, $student_user_details['username'], $student_user_details['password']);
+
+        $getPayload = new Payload\Base('GET', '/', $url);
+        $i->sendRequest($getPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
+
+    /**
+     * Fail test to ensure we can get a permission denied from schoolbox using aurura
+     *
+     * @param IntegrationTester $i
+     */
+    public function getFailureAururaPermissionDenied(IntegrationTester $i)
+    {
+        $url='https://vagrant.dev.schoolbox.cloud/adminv2/setting';
+        $student_user_details=$this->personas['Student'];
+
+        #WHEN
+        $this->loginUser($i, $student_user_details['username'], $student_user_details['password']);
+
+        $getPayload = new Payload\Base('GET', '/', $url);
+        $i->sendRequest($getPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(401);
     }
 
     /** Get all the pages, uses the url provider, data that is read from a csv to fetch all the pages stated and
@@ -34,17 +99,18 @@ class FetchPagesFromCsvCest
      */
     public function getAllThePages(IntegrationTester $i, \Codeception\Example $example)
     {
+        #GIVEN
         $persona=$example[1];
         $url=$example[3];
         $user_details=$this->personas[$persona];
 
-        #WHEN
         #Need to login to the right user
         $this->loginUser($i, $user_details['username'], $user_details['password']);
 
         #proceed to test the url which is below.
         $getPayload = new Payload\Base('GET', '/', $url);
 
+        #WHEN
         $i->sendRequest($getPayload);
 
         #THEN
@@ -65,11 +131,18 @@ class FetchPagesFromCsvCest
      */
     protected function urlProvider()
     {
-        $csvData = array_map('str_getcsv', file('test/codeception/_data/SmokeTests/GetSmokeTestList.csv'));
+        $csvData = array_map('str_getcsv', file(codecept_data_dir('/SmokeTests/GetSmokeTestList.csv')));
 
         return $csvData;
     }
 
+    /**
+     * login the specific user. Used during the test for fetching URLs on the csv
+     *
+     * @param IntegrationTester $i
+     * @param string            $username
+     * @param string            $password
+     */
     protected function loginUser(IntegrationTester $i, string $username, string $password)
     {
         $loginPayload = new Payload\Authentication\Login();
