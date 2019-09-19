@@ -87,48 +87,7 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Augment unit imp spc ids with course imp's unit imp spc ids
         // That's easier than writing it into the query.
-        if ($courseImpSpcIds instanceof Collection) {
-
-            // Build the list of course spec IDs to pass into the query
-            $queryParams         = [];
-            $courseImpUnitSpcIds = new Collection();
-
-            foreach ($courseImpSpcIds as $courseImpSpcId => $value) {
-                // Is this the special "NONE" selection?
-                // Set it directly into the course impl unit specs
-                if ($courseImpSpcId === NullableContext\Definition::KEY_NONE) {
-                    $courseImpUnitSpcIds[$courseImpSpcId] = $value;
-                    continue;
-                }
-                $queryParams[] = $courseImpSpcId;
-            }
-
-            if (!empty($queryParams)) {
-                // Find the list of unit specs that are in these course specs
-                $findUnitsQuery = $this->getMapper()->getDatabase()->prepare(
-                    sprintf(
-                        'SELECT id FROM course_unit_specification where course_specification_id IN (%s)',
-                        implode(',', array_fill(0, count($queryParams), '?'))
-                    )
-                );
-                $findUnitsQuery->execute($queryParams);
-
-                foreach ($findUnitsQuery->fetchAll(\PDO::FETCH_COLUMN) as $unitImpSpcId) {
-                    $courseImpUnitSpcIds[$unitImpSpcId] = $unitImpSpcId;
-                }
-
-                // If there's already unit impl spec IDs: the list is the intersect
-                // Otherwise it's the list I built
-                if ($unitImpSpcIds instanceof Collection) {
-                    $unitImpSpcIds = $unitImpSpcIds->intersect($courseImpUnitSpcIds);
-                } else {
-                    $unitImpSpcIds = $courseImpUnitSpcIds;
-                }
-            }
-        }
-        if (is_array($unitImpSpcIds)) {
-            $unitImpSpcIds = new Collection($unitImpSpcIds);
-        }
+        $unitImpSpcIds = $this->augmentUnitImplSpecIds($courseImpSpcIds, $unitImpSpcIds);
 
 
         [$folderWhere, $folderParams]     = $this->getClauseFolder(
@@ -1448,5 +1407,71 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Unable to conclude that result set is guaranteed to be empty
         return false;
+    }
+
+
+    /**
+     * Augments imported unit specs with the units specs within imported course
+     * specs.
+     *
+     * @param Collection|null $courseImpSpcIds Selected values (if any) from the
+     *                                         course spec import filter
+     *                                         `NullableContext\CourseImportSpec\Definition`
+     * @param Collection|null $unitImpSpcIds   Selected values (if any) from the
+     *                                         unit spec import filter
+     *                                         `NullableContext\UnitImportSpec\Definition`
+     *
+     * @return Collection|null A selection of unit spec imports.
+     *                         If both `$courseImpSpcIds` and `$unitImpSpcIds`
+     *                         exist: the intersection of the units calculated
+     *                         from `$courseImpSpcIds`, and the units from
+     *                         `$unitImpSpcIds`.
+     *                         If `$unitImpSpcIds` doesn't exist: this is the
+     *                         units calculated from `$courseImpSpcIds`.
+     *                         If `$courseImpSpcIds` doesn't exist: this is
+     *                         `$unitImpSpcIds`.
+     */
+    private function augmentUnitImplSpecIds(?Collection $courseImpSpcIds, ?Collection $unitImpSpcIds): ?Collection
+    {
+        if ($courseImpSpcIds instanceof Collection) {
+
+            // Build the list of course spec IDs to pass into the query
+            $queryParams         = [];
+            $courseImpUnitSpcIds = new Collection();
+
+            foreach ($courseImpSpcIds as $courseImpSpcId => $value) {
+                // Is this the special "NONE" selection?
+                // Set it directly into the course impl unit specs
+                if ($courseImpSpcId === NullableContext\Definition::KEY_NONE) {
+                    $courseImpUnitSpcIds[$courseImpSpcId] = $value;
+                    continue;
+                }
+                $queryParams[] = $courseImpSpcId;
+            }
+
+            if (!empty($queryParams)) {
+                // Find the list of unit specs that are in these course specs
+                $findUnitsQuery = $this->getMapper()->getDatabase()->prepare(
+                    sprintf(
+                        'SELECT id FROM course_unit_specification where course_specification_id IN (%s)',
+                        implode(',', array_fill(0, count($queryParams), '?'))
+                    )
+                );
+                $findUnitsQuery->execute($queryParams);
+
+                foreach ($findUnitsQuery->fetchAll(\PDO::FETCH_COLUMN) as $unitImpSpcId) {
+                    $courseImpUnitSpcIds[$unitImpSpcId] = $unitImpSpcId;
+                }
+
+                // If there's already unit impl spec IDs: the list is the intersect
+                // Otherwise it's the list I built
+                if ($unitImpSpcIds instanceof Collection) {
+                    $unitImpSpcIds = $unitImpSpcIds->intersect($courseImpUnitSpcIds);
+                } else {
+                    $unitImpSpcIds = $courseImpUnitSpcIds;
+                }
+            }
+        }
+        return $unitImpSpcIds;
     }
 }
