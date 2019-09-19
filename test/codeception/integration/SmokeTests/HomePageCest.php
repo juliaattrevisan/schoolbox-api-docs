@@ -55,9 +55,30 @@ class HomePageCest
      */
     public function homepageUploadFileAjax(IntegrationTester $i): void
     {
-        $ajaxUploadFileHomepage = new Payload\Resource\File\AjaxUpload(110, 'file', 'fish2.png', '/UploadTestFiles/fish2.png');
+        #GIVEN
+        $timestamp      = time();
+        $homepage_title = 'Testing Homepage - Homepage File Uploads using drag and drop ' . $timestamp;
+
+        $folderPayload = new Payload\Resource\Folder\Create();
+        $folderPayload->setName($homepage_title);
+        $folderPayload->setTemplate(11);
+
+        $i->amGoingTo('Send request create homepage');
+        $i->sendRequest($folderPayload);
+        $i->seeResponseCodeIs(303);
+        $homePage = $i->grabFirstFolderByTitle($homepage_title);
+        $i->seeHttpHeader('location', "/");
+
+        $image_name = "homepageUploadTestDragDrop{$timestamp}.png";
+        $image_location = '/UploadTestFiles/fish2.png';
+
+        #WHEN
+        $ajaxUploadFileHomepage = new Payload\Resource\File\AjaxUpload($homePage->getId(), 'file', $image_name, $image_location);
         $ajaxUploadFileHomepage->setHidden(0);
+        $i->amGoingTo('Drag drop upload a file');
         $i->sendRequest($ajaxUploadFileHomepage);
+
+        #THEN
         $i->seeResponseCodeIs(201);
     }
 
@@ -66,10 +87,48 @@ class HomePageCest
      */
     public function resourcesUploadFileAjax(IntegrationTester $i): void
     {
-        $ajaxUploadFile = new Payload\Resource\File\AjaxUpload(263, 'file', 'fish2.png', '/UploadTestFiles/fish2.png');
+        #GIVEN
+        $timestamp      = time();
+        $folder_title = 'Testing Folder - Resource File Uploads using drag drop ' . $timestamp;
+
+        $folderPayload = new Payload\Resource\Folder\Create();
+        $folderPayload->setName($folder_title);
+
+        $i->amGoingTo('Send request create folder');
+        $i->sendRequest($folderPayload);
+        $i->seeResponseCodeIs(303);
+        $folder = $i->grabFirstFolderByTitle($folder_title);
+        $i->seeHttpHeader('location', "/");
+
+        $image_name = "resourcesUploadTestDragDrop{$timestamp}.png";
+        $image_location = '/UploadTestFiles/fish2.png';
+
+        #WHEN
+        $ajaxUploadFile = new Payload\Resource\File\AjaxUpload($folder->getId(), 'file', $image_name, $image_location);
         $ajaxUploadFile->setVisibility(1);
+        $i->amGoingTo('Drag drop upload a file');
         $i->sendRequest($ajaxUploadFile);
+
+        #THEN
         $i->seeResponseCodeIs(201);
+    }
+
+    /**
+     * @param IntegrationTester $i
+     */
+    public function storageUploadDragDrop(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp      = time();
+        $image_name = "storageUploadTestDragDrop{$timestamp}.png";
+        $image_location = '/UploadTestFiles/fish2.png';
+
+        #WHEN
+        $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
+        $i->sendRequest($storageUpload);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -77,12 +136,34 @@ class HomePageCest
      */
     public function postFileUploadFileForm(IntegrationTester $i): void
     {
-        $storageUpload = new Payload\Resource\File\StorageUpload('upload', 'fish2.png', '/UploadTestFiles/fish2.png');
+        #GIVEN
+        $timestamp      = time();
+        $folder_title = 'Testing Folder - Resource File Uploads using file upload form' . $timestamp;
+        $image_name = "fileFormUploadTest{$timestamp}.png";
+        $image_location = '/UploadTestFiles/fish2.png';
+        $image_description= 'Automated uploaded file';
+
+        $folderPayload = new Payload\Resource\Folder\Create();
+        $folderPayload->setName($folder_title);
+
+        $i->amGoingTo('Send request create folder');
+        $i->sendRequest($folderPayload);
+        $i->seeResponseCodeIs(303);
+        $folder = $i->grabFirstFolderByTitle($folder_title);
+        $i->seeHttpHeader('location', "/");
+
+        $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
+        $i->amGoingTo('Upload image to storage');
         $i->sendRequest($storageUpload);
         $i->seeResponseCodeIs(200);
         $json_reply=json_decode($i->grabResponse(), true);
-        $uploadFile = new Payload\Resource\File\FileUploadForm(263, 'potato.png', 'Fish in disguise', $json_reply['hash']);
+
+        #WHEN
+        $uploadFile = new Payload\Resource\File\FileUploadForm($folder->getId(), $image_name, $image_description, $json_reply['hash']);
+        $i->amGoingTo('Submit the upload file form');
         $i->sendRequest($uploadFile);
+
+        #THEN
         $i->seeResponseCodeIs(302);
         $i->seeHttpHeader('location', "https://vagrant.dev.schoolbox.cloud/");
         $i->sendGET("https://vagrant.dev.schoolbox.cloud/");
