@@ -1,0 +1,23 @@
+{#
+    Renders an <option> tag, suitable for the filter panel.
+
+    Usage:
+        roleSelection: Selection\Model       - The default selections for user's role (if we 'reset' filters)
+        userSelection: null|Selection\Model  - This user's current selection (used if we 'clear' filters). Null if not user-configurable
+        label:         string                - The option tag's text and label
+        value:         string                - The option tag's value
+        disabled:      bool                  - (optional) If true and userSelection exists, set value in hidden field, and disable checkbox
+#}
+
+{% if not userSelection %}
+    <option value="{{ value }}"
+            label="{{ label }}"
+            {% if roleSelection.selected %}selected{% endif %}
+            readonly
+    >{{ label }}</option>
+{% else %}
+    <option value="{{ value }}"
+            label="{{ label }}"
+            {% if userSelection.selected %}selected{% endif %}
+    >{{ label }}</option>
+{% endif %}
