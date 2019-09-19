@@ -74,7 +74,8 @@ class Component extends Filter\BaseComponent
             $selectNoneOption || ($urlOverrides && $urlOverrides->offsetExists(Definition::KEY_NONE))
         );
 
-        foreach ($this->importedCourseSpecs as $courseSpecId => $courseSpec) {
+        foreach ($this->importedCourseSpecs as $courseSpec) {
+            $courseSpecId = $courseSpec->getId();
             $availableSelections[$courseSpecId] = $this->createSelection(
                 $courseSpecId,
                 $selectAllCourseOptions || ($urlOverrides && $urlOverrides->offsetExists($courseSpecId))
