@@ -432,6 +432,9 @@ class Profile implements ImporterInterface
     /**
      * Import parent profile data for a given student
      *
+     * $studentExternalId came from a node in the CurrentPupils node so I make the assumption that
+     * we're only getting parents of current pupils and therefore only getting current parents
+     *
      * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
