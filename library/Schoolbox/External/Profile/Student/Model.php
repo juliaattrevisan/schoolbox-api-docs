@@ -40,6 +40,11 @@ class Model
     /**
      * @var string|null
      */
+    private $campusName;
+
+    /**
+     * @var string|null
+     */
     private $emergencyContactName1;
 
     /**
@@ -913,6 +918,24 @@ class Model
     public function setBaseProfile(?ProfileModel $baseProfile): self
     {
         $this->baseProfile = $baseProfile;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCampusName(): ?string
+    {
+        return $this->campusName;
+    }
+
+    /**
+     * @param string|null $campusName
+     * @return Model
+     */
+    public function setCampusName(?string $campusName): self
+    {
+        $this->campusName = $campusName;
         return $this;
     }
 }
