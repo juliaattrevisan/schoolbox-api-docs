@@ -116,6 +116,8 @@ var jsSrc = {
         'www/javascript/shared/datetime/attacher.datepicker.js',
         'www/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
         'www/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
+
+        // This is a Webpack-built module for strtotime
         'www/javascript/components/strtotime.bundle.js',
 
         // Allow deference of form submit actions
