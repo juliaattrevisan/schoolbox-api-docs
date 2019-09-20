@@ -132,20 +132,20 @@
 
                                 newResponse.push({
                                     allDay: true,
-                                    color: '#fff',
+                                    color: '#fffff',
                                     backgroundColor: '#0066b0',
                                     editable: false,
                                     resourceId: element.resourceId,
                                     title: itemCountByGroup,
                                     start: element.start,
                                     end: null,
-                                    top: 0,
                                     data: {
                                         placeholder: true,
                                         meta: {
                                             folderId: element.data.meta.folderId,
                                             folderName: element.data.meta.folderName,
                                             eventGrouping: element.data.meta.eventGrouping,
+                                            weekNo: moment(element.start).isoWeek(),
                                         }
                                     },
                                 });
@@ -177,14 +177,27 @@
              * @return {boolean}
              */
             eventRender(eventRenderInfo) {
+                var self = this,
+                    eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping;
 
-                if (eventRenderInfo.event.extendedProps.data.placeholder) {
-                    eventRenderInfo.el.setAttribute('event-group-id-placeholder', eventRenderInfo.event.extendedProps.data.meta.eventGrouping);
-                    eventRenderInfo.el.classList.add('source');
-                    eventRenderInfo.el.classList.add('personal');
-                } else {
-                    eventRenderInfo.el.setAttribute('event-group-id', eventRenderInfo.event.extendedProps.data.meta.eventGrouping);
-                    eventRenderInfo.el.classList.add('hide');
+                if (!self.eventGroups.includes(eventGrouping)) {
+                    self.eventGroups.push(eventGrouping);
+                }
+
+                if (self.currentView === 'resourceTimelineSemester') {
+                    var element = eventRenderInfo.el;
+                    if (eventRenderInfo.event.extendedProps.data.placeholder) {
+                        element.setAttribute('event-group-id-placeholder', eventGrouping);
+                        element.classList.add('placeholder');
+                        element.classList.add('source');
+                        element.classList.add('personal');
+                        element.classList.add('fc-more');
+
+                    } else {
+                        element.setAttribute('event-group-id', eventGrouping);
+                        element.style.width = '100%';
+                        element.classList.add('hide');
+                    }
                 }
             },
 
@@ -196,10 +209,72 @@
              * @param eventInfo
              */
             onEventClick(eventInfo) {
-                // Ideally the current event would be a part of the modal,
-                // not this component, but :shrug:
-                this.currentEvent = eventInfo.event;
-                this.$refs.event.open();
+                var self = this;
+
+                if (self.currentView !== 'resourceTimelineSemester') {
+                    // Ideally the current event would be a part of the modal,
+                    // not this component, but :shrug:
+                    this.currentEvent = eventInfo.event;
+                    this.$refs.event.open();
+                } else {
+                    this.renderPopOver(eventInfo);
+                }
+            },
+
+            /**
+             * Custom method to render event popover for semester view
+             */
+            renderPopOver(eventInfo) {
+                var popOver = document.getElementById('popOver'),
+                    popOverContent = '',
+                    popOverHeader = '',
+                    eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
+                    eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
+                    tmpEvent = [];
+
+                // Always destroy the current popover, as there should only be one.
+                if (popOver) {
+                    popOver.parentNode.removeChild(popOver);
+                }
+
+                popOver = document.createElement('div');
+                popOver.setAttribute('id', 'popOver');
+                popOver.setAttribute('style', 'left:' + eventInfo.el.style.left + ';right:' + eventInfo.el.style.right + ';z-index:10000');
+                popOver.className = 'fc-popover fc-more-popover';
+
+                popOverHeader = '<div class="fc-header fc-widget-header">' +
+                    '<span class="fc-title">Week '+ eventInfo.event.extendedProps.data.meta.weekNo +'</span>' +
+                    '</div><span class="fc-close fc-icon fc-icon-x"></span>';
+
+                for (var i = 0; i < eventGroup.length; i++) {
+                    var event = eventGroup[i];
+
+                    if (event.style.removeProperty) {
+                        event.style.removeProperty('left');
+                        event.style.removeProperty('right');
+                        event.style.removeProperty('top');
+                    } else {
+                        // Because IE < 9 doesn't support removeProperty so ¯\_(ツ)_/¯
+                        event.style.removeAttribute('left');
+                        event.style.removeAttribute('right');
+                        event.style.removeAttribute('top');
+                    }
+
+                    tmpEvent.push(event.outerHTML);
+                }
+
+                for (var i = 0; i < tmpEvent.length; i++) {
+                    var tmpPopOverEvent = $(tmpEvent[i])[0];
+                        tmpPopOverEvent.classList.remove('hide');
+                        // tmpPopOverEvent.style.display = 'inline-block';
+                        // tmpPopOverEvent.style.height = '100%';
+                        popOverContent += '<p style="padding-bottom: 10px">' + tmpPopOverEvent.outerHTML + '</p><br />';
+                }
+
+                popOver.innerHTML = popOverHeader + popOverContent;
+
+                // TODO: To replace this with a non jQuery approach
+                $("[event-group-id='"+ eventInfo.event.extendedProps.data.meta.eventGrouping +"']:first").before(popOver);
             },
 
             /**
@@ -361,9 +436,8 @@
                         'MMMM',
                         'w'
                     ],
-                    resourceAreaWidth: '20%',
+                    resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
-
                     validRange: {
                         start: this.getMinTermDate(),
                         end: this.getMaxTermDate()
@@ -376,7 +450,7 @@
                     slotLabelFormat: [
                         'ddd DD',
                     ],
-                    resourceAreaWidth: '20%',
+                    resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
                     validRange: {
                         start: this.getMinTermDate(),
@@ -423,18 +497,21 @@
             :event-limit="true"
             :default-date="this.termStartDate"
             :view-skeleton-render="viewSkeletonRender"
-            :progressive-event-rendering="true"
             :week-number-calculation="'ISO'"
-            :content-height="2"
+            :content-height="1"
         />
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
     @import '~@fullcalendar/core/main.css';
     @import '~@fullcalendar/daygrid/main.css';
     @import '~@fullcalendar/timegrid/main.css';
     @import '~@fullcalendar/list/main.css';
     @import '~@fullcalendar/timeline/main.css';
     @import '~@fullcalendar/resource-timeline/main.css';
+
+    a.placeholder {
+        text-align: center !important;
+    }
 </style>
