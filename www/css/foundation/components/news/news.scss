@@ -1,4 +1,4 @@
-.news-article {
+.news-post {
     .banner {
         display: flex;
         justify-content: center;
@@ -7,15 +7,16 @@
     .banner img {
         align-self: center;
     }
-    .article {
+    .detail,
+    article {
         margin: 0 auto;
         max-width: 45rem;
     }
-    .article h1 {
+    .detail h1 {
         margin-left: 0;
         margin-right: 0;
     }
-    .article > .meta {
+    .detail > .meta {
         border-bottom: 1px solid $gainsboro;
         margin: 0 0 2rem;
         padding-bottom: .5rem;

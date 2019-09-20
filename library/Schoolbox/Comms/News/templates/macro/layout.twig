@@ -41,9 +41,9 @@
  #}
 {% macro textonly(article) %}
     <div class="small-12 columns">
-        <article class="article content">
+        <section class="content">
             {{ article.body|purify }}
-        </article>
+        </section>
     </div>
 {% endmacro %}
 
