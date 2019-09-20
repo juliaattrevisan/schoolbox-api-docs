@@ -209,8 +209,10 @@
 
                 if (markIsDifferent) {
                     $this.find("[data-use-descriptor-values]").show();
+                    $this.attr('data-customised', true);
                 } else {
                     $this.find("[data-use-descriptor-values]").hide();
+                    $this.removeAttr('data-customised');
                 }
             });
         }
@@ -241,7 +243,6 @@
                 }
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', scaledGroupMark);
-                $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
@@ -264,6 +265,7 @@
                 if ($groupSummary.length) {
                     if (! $groupSummary.attr('data-customised')) {
                         // Only update dropdown/input field if the mark has not been customised
+                        $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
                         switch (markType) {
                             case 'letter':
                                 assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));

@@ -80,4 +80,12 @@ interface IMarkScheme
      * @return array
      */
     public function generateContext(): array;
+
+    /**
+     * Converts the mark to Javascript Comparable format
+     * @param            $mark
+     * @param float|null $maxValue
+     * @return string
+     */
+    public function getValueForJS($mark, ?float $maxValue);
 }

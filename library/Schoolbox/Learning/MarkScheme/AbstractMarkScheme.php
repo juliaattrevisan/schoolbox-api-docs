@@ -113,4 +113,12 @@ abstract class AbstractMarkScheme implements IMarkScheme
             'mode' => static::SLUG,
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getValueForJS($mark, ?float $maxValue)
+    {
+        return $mark;
+    }
 }

@@ -65,4 +65,11 @@ class Percentage extends AbstractMarkScheme
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
     }
+
+
+    public function getValueForJS($mark, ?float $maxValue)
+    {
+        $normMark = $maxValue ? ($mark / $maxValue) * 100 : 0;
+        return round($normMark, self::PRECISION);
+    }
 }
