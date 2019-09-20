@@ -89,6 +89,7 @@
              */
             events(fetchInfo, successCallback) {
                 var self = this;
+
                 // No filters loaded yet? Render nothing.
                 // The selected filters get populated by `onFilterChange`:
                 // this is called by the filter's `filterContentLoaded` trigger.
@@ -111,22 +112,59 @@
                     }
                 ).then(
                     function (response) {
-                        successCallback(response.data.filter(function (v) {
+                        // Massage the data to inject placeholders
+                        let newResponse = [],
+                            eventGroupingCursor = '';
 
-                            // Check if resource is already added
-                            if (!self.newResources.some(el => el.id === v.data.meta.folderId)) {
-                                self.newResources.push({'id': v.data.meta.folderId, 'title': v.data.meta.folderName});
+                        // Assign event grouping and resourceIds into every event
+                        response.data.forEach(function(element, index) {
+                            response.data[index].resourceId = element.data.meta.folderId;
+                            response.data[index].data.meta.eventGrouping = moment(element.start).format('YYYY') + String(moment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                        });
+
+                        response.data.forEach(function(element) {
+                            // Create a place holder
+                            if (eventGroupingCursor !== element.data.meta.eventGrouping) {
+
+                                var itemCountByGroup = response.data.filter(function(val) {
+                                    return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
+                                }).length;
+
+                                newResponse.push({
+                                    allDay: true,
+                                    color: '#fff',
+                                    backgroundColor: '#0066b0',
+                                    editable: false,
+                                    resourceId: element.resourceId,
+                                    title: itemCountByGroup,
+                                    start: element.start,
+                                    end: null,
+                                    top: 0,
+                                    data: {
+                                        placeholder: true,
+                                        meta: {
+                                            folderId: element.data.meta.folderId,
+                                            folderName: element.data.meta.folderName,
+                                            eventGrouping: element.data.meta.eventGrouping,
+                                        }
+                                    },
+                                });
                             }
 
-                            v.resourceId = v.data.meta.folderId;
-                            v.eventGrouping = moment(v.start).format('YYYY') + String(moment(v.start).week()).padStart(2,0) + v.data.meta.folderId;
+                            eventGroupingCursor = element.data.meta.eventGrouping;
+                            newResponse.push(element);
+                        });
+
+                        successCallback(newResponse.filter(function (v) {
+                            // Check if resource is already added
+                            if (!self.newResources.some(el => el.id === v.data.meta?.folderId)) {
+                                self.newResources.push({'id': v.data.meta.folderId, 'title': v.data.meta.folderName});
+                            }
 
                             return 'start' in v;
                         }));
                     }
-                ).finally(function() {
-                    // Do something here... Probably we can do the grouping of events here..
-                });
+                );
                 // Fail callback: consider a message saying something failed
             },
 
@@ -139,16 +177,13 @@
              * @return {boolean}
              */
             eventRender(eventRenderInfo) {
-                let self = this,
-                    eventGrouping = eventRenderInfo.event.extendedProps.eventGrouping;
 
-                eventRenderInfo.el.setAttribute('event-group-id', eventGrouping);
-
-                if (!self.eventGroups.includes(eventGrouping)) {
-                    self.eventGroups.push(eventGrouping);
-                }
-
-                if (self.currentView === 'resourceTimelineSemester') {
+                if (eventRenderInfo.event.extendedProps.data.placeholder) {
+                    eventRenderInfo.el.setAttribute('event-group-id-placeholder', eventRenderInfo.event.extendedProps.data.meta.eventGrouping);
+                    eventRenderInfo.el.classList.add('source');
+                    eventRenderInfo.el.classList.add('personal');
+                } else {
+                    eventRenderInfo.el.setAttribute('event-group-id', eventRenderInfo.event.extendedProps.data.meta.eventGrouping);
                     eventRenderInfo.el.classList.add('hide');
                 }
             },
@@ -195,8 +230,7 @@
              * Get terms duration based on start and finish date
              * @returns {*}
              */
-            getTermDateDurations()
-            {
+            getTermDateDurations() {
                 return this.helper.dateDiff(this.termStartDate, this.termEndDate);
             },
 
@@ -261,8 +295,7 @@
             /**
              * Navigate through the dates via the cursor
              */
-            getStartDateByCursor()
-            {
+            getStartDateByCursor() {
                 var self = this;
 
                 if (self.cursor === 0) {
@@ -278,8 +311,7 @@
              * Get the latest available term end date for fullCalendar's validRange config.
              * @see: https://fullcalendar.io/docs/validRange
              */
-            getMaxTermDate()
-            {
+            getMaxTermDate() {
                 var self = this;
 
                 var termStartDates = Object.values(self.config.termDates).flat().map(function(row){
@@ -293,8 +325,7 @@
              * Get the earliest available term start date for fullCalendar's validRange config.
              * @see: https://fullcalendar.io/docs/validRange
              */
-            getMinTermDate()
-            {
+            getMinTermDate() {
                 var self = this;
 
                 var termStartDates = Object.values(self.config.termDates).flat().map(function(row){
@@ -302,36 +333,6 @@
                 });
 
                 return moment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
-            },
-
-            /**
-             * @see https://fullcalendar.io/docs/eventPositioned
-             * @param info
-             */
-            eventPositioned(info)
-            {
-                var self = this;
-
-                if (self.currentView === 'resourceTimelineSemester') {
-                    self.eventGroups.forEach(function(element) {
-                        if ($("[event-group-id-placeholder='" + element + "']").length < 1) {
-
-                            var wrapper = document.createElement('a');
-                                wrapper.setAttribute('event-group-id-placeholder', element);
-                                wrapper.className = 'fc-timeline-event fc-event fc-draggable fc-resizable';
-
-                                wrapper.setAttribute('style',
-                                    "left:" + $("[event-group-id='" + element + "']:first")[0].style.left + ";" +
-                                    "right:" + $("[event-group-id='" + element + "']:first")[0].style.right + ";" +
-                                    "top:2px;"
-                                );
-
-                                wrapper.innerHTML = '<div class="fc-title-wrap" style="text-align: center; padding: 5px;">'+ $("[event-group-id='" + element + "']").length +'</div>';
-
-                                $("[event-group-id='" + element + "']:first").before(wrapper);
-                        }
-                    });
-                }
             }
         }
     }
@@ -391,7 +392,6 @@
             }"
             :week-label="''"
             :event-time-format="helper.eventTimeFormat"
-            content-height="auto"
             :header="{
                 left: 'today,prev,next',
                 center: 'title',
@@ -423,7 +423,9 @@
             :event-limit="true"
             :default-date="this.termStartDate"
             :view-skeleton-render="viewSkeletonRender"
-            @eventPositioned="eventPositioned"
+            :progressive-event-rendering="true"
+            :week-number-calculation="'ISO'"
+            :content-height="2"
         />
     </div>
 </template>
