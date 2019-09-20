@@ -85,7 +85,8 @@ interface IMarkScheme
      * Converts the mark to Javascript Comparable format
      * @param            $mark
      * @param float|null $maxValue
-     * @return string
+     * @param float|null $rowMaxSum
+     * @return mixed
      */
-    public function getValueForJS($mark, ?float $maxValue);
+    public function getValueForJS($mark, ?float $maxValue, ?float $rowMaxSum);
 }
