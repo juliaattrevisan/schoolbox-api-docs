@@ -116,7 +116,7 @@ var jsSrc = {
         'www/javascript/shared/datetime/attacher.datepicker.js',
         'www/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
         'www/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
-        'www/javascript/shared/alaress-datetime-picker/strtotime.js',
+        'www/javascript/components/strtotime.bundle.js',
 
         // Allow deference of form submit actions
         'www/javascript/shared/jquery.stallSubmit.js',

@@ -3,6 +3,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
+    strtotime: "./www/javascript/shared/alaress-datetime-picker/strtotime.main.js",
     hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
     fullCalendar: "./library/Schoolbox/Calendar/vue/fullCalendar.main.js",
     assessmentCalendar: "./library/Schoolbox/Learning/Assessment/Calendar/vue/calendar.main.js",
