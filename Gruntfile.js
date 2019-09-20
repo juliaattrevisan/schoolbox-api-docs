@@ -182,7 +182,7 @@ module.exports = function(grunt) {
         },
         concat: { // Concat JS files (used for development)
             options: {
-                separator: ';'
+                separator: ";\n;"
             },
             main: {
                 src: jsSrc.main,
