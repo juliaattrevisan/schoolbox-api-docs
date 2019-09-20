@@ -596,8 +596,8 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     /**
      * Massages the datetime picker's value into a valid format, or errors out if it cannot.
      *
-     * This uses an AJAX call to /ajax/strtotime.php, which uses method strtotime()
-     * to convert the input's value to a recognisable date value.
+     * This uses a client-side strtotime implementation to convert the input's
+     * value to a recognisable date value.
      *
      * @param {jQuery.Event} e       a jQuery event
      * @param {jQuery}       staller if given, the element to attach the AJAX promise to
@@ -609,12 +609,8 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             $.trim($(t).val()) != "" &&
             $.trim($(t).val()) !== $(t).data("originalValue")
         ) {
-            // set up params to guide server-side parsing
+            // set up params to guide parsing
             var opts = adtp.getOptions($(t));
-            // var params = {
-            //   string: t.value
-            // };
-            // var xhr = $.get("/ajax/strtotime.php", params);
             var $fieldError = $("#" + $(t).attr("id") + "-error"); // A possible validation error for this field
 
             // Hide any validation error while this is processing
@@ -699,15 +695,8 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             $(t).prop("readonly", false);
 
-            // Fire a custom event for change of this
-            // This has to happen here (rather than on xhr done above) so that the staller can pick up on this
+            // Fire a custom event for change of this value
             $(t).trigger("datepickerChange");
-
-            // // this listener needs to be installed last in this case
-            // if (staller) {
-            //   // install this XHR as stalling form submit
-            //   staller.stallSubmit(xhr);
-            // }
         }
     }
 
