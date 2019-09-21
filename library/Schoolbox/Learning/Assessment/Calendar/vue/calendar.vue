@@ -48,8 +48,13 @@
                 termEndDate: null,
                 cursor: 0,
                 currentBatchCursor: null,
-                eventGroups: []
+                eventGroups: [],
             }
+        },
+        mounted() {
+            // document.querySelector('.fc-timeline-event').addEventListener('click', (ev)=>{
+            //     console.log('test');
+            // });
         },
         computed: {
             jQuery: () => window.jQuery,
@@ -75,6 +80,9 @@
              *                  false once they are finished.
              */
             onLoading(isLoading) {
+
+                this.destroyPopOver();
+
                 // TODO this method should be unnecessary
                 // (for the same reason as `onLoading` in the main fullCalendar)
                 this.helper.onLoading(isLoading);
@@ -124,7 +132,7 @@
 
                         response.data.forEach(function(element) {
                             // Create a place holder
-                            if (eventGroupingCursor !== element.data.meta.eventGrouping) {
+                            if (self.currentView === 'resourceTimelineSemester' && eventGroupingCursor !== element.data.meta.eventGrouping) {
 
                                 var itemCountByGroup = response.data.filter(function(val) {
                                     return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
@@ -133,8 +141,9 @@
                                 newResponse.push({
                                     allDay: true,
                                     color: '#fffff',
-                                    backgroundColor: '#0066b0',
+                                    backgroundColor: '#0066b0', // Update this with folder color code
                                     editable: false,
+                                    draggable: false,
                                     resourceId: element.resourceId,
                                     title: itemCountByGroup,
                                     start: element.start,
@@ -192,10 +201,12 @@
                         element.classList.add('source');
                         element.classList.add('personal');
                         element.classList.add('fc-more');
-
                     } else {
                         element.setAttribute('event-group-id', eventGrouping);
-                        element.style.width = '100%';
+                        element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
+                        element.setAttribute('event-group-date', moment(eventRenderInfo.event.start).format('MMMM DD, YYYY'))
+                        element.style.width = '95%';
+                        // element.setAttribute('style', '-moz-opacity: 0; filter:alpha(opacity: 0); opacity: 0; height: 0px;');
                         element.classList.add('hide');
                     }
                 }
@@ -211,7 +222,8 @@
             onEventClick(eventInfo) {
                 var self = this;
 
-                if (self.currentView !== 'resourceTimelineSemester') {
+                if (self.currentView !== 'resourceTimelineSemester' ||
+                    (self.currentView === 'resourceTimelineSemester' && eventInfo.el.getAttribute('event-group-id-placeholder') === null)) {
                     // Ideally the current event would be a part of the modal,
                     // not this component, but :shrug:
                     this.currentEvent = eventInfo.event;
@@ -225,26 +237,27 @@
              * Custom method to render event popover for semester view
              */
             renderPopOver(eventInfo) {
+                this.destroyPopOver();
+
                 var popOver = document.getElementById('popOver'),
                     popOverContent = '',
                     popOverHeader = '',
+                    dateGroup = '',
                     eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
+                    folderId = eventInfo.event.extendedProps.data.meta.folderId,
                     eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
+                    resourceCol = document.querySelectorAll("[data-resource-id='"+ folderId +"']"),
+                    popOverPlaceholder = document.querySelector('.fc-body .fc-time-area .fc-rows'),
                     tmpEvent = [];
-
-                // Always destroy the current popover, as there should only be one.
-                if (popOver) {
-                    popOver.parentNode.removeChild(popOver);
-                }
 
                 popOver = document.createElement('div');
                 popOver.setAttribute('id', 'popOver');
-                popOver.setAttribute('style', 'left:' + eventInfo.el.style.left + ';right:' + eventInfo.el.style.right + ';z-index:10000');
+                popOver.setAttribute('style', 'left:' + eventInfo.el.offsetLeft + 'px;top:' + resourceCol[0].offsetTop +'px;z-index:100000;padding:5px');
                 popOver.className = 'fc-popover fc-more-popover';
 
                 popOverHeader = '<div class="fc-header fc-widget-header">' +
                     '<span class="fc-title">Week '+ eventInfo.event.extendedProps.data.meta.weekNo +'</span>' +
-                    '</div><span class="fc-close fc-icon fc-icon-x"></span>';
+                    '</div>';
 
                 for (var i = 0; i < eventGroup.length; i++) {
                     var event = eventGroup[i];
@@ -264,17 +277,39 @@
                 }
 
                 for (var i = 0; i < tmpEvent.length; i++) {
-                    var tmpPopOverEvent = $(tmpEvent[i])[0];
-                        tmpPopOverEvent.classList.remove('hide');
-                        // tmpPopOverEvent.style.display = 'inline-block';
-                        // tmpPopOverEvent.style.height = '100%';
-                        popOverContent += '<p style="padding-bottom: 10px">' + tmpPopOverEvent.outerHTML + '</p><br />';
+                    var tmpPopOverEvent = $(tmpEvent[i])[0],
+                        popOverContentDate = '';
+
+                        tmpPopOverEvent.classList.remove('hide', 'fc-draggable', 'fc-resizable');
+
+                        if (tmpPopOverEvent.getAttribute('event-group-date') !== dateGroup) {
+                            dateGroup = tmpPopOverEvent.getAttribute('event-group-date');
+                            popOverContentDate = '<p style="font-weight: bold; margin-bottom: 0">' + dateGroup + '</ p>';
+                        }
+
+                        popOverContent += popOverContentDate + '<div class="fc-timeline-event-div" style="padding-bottom:40px;display:flex">' + tmpPopOverEvent.outerHTML + '</div>';
                 }
 
                 popOver.innerHTML = popOverHeader + popOverContent;
 
-                // TODO: To replace this with a non jQuery approach
-                $("[event-group-id='"+ eventInfo.event.extendedProps.data.meta.eventGrouping +"']:first").before(popOver);
+                popOverPlaceholder.insertBefore(popOver, popOverPlaceholder.firstChild);
+
+                this.registerSemViewEventClickListener();
+            },
+
+            /**
+             * Listen on popover event clicks with semester view
+             */
+            registerSemViewEventClickListener() {
+                var popOverEvents = document.querySelectorAll("#popOver .fc-timeline-event-div");
+
+                var openModal = function() {
+                    document.querySelectorAll('.fc-event-container [event-id="'+ this.firstChild.getAttribute("event-id") +'"]')[0].click();
+                };
+
+                popOverEvents.forEach(function(event, index) {
+                    popOverEvents[index].addEventListener('click', openModal, false);
+                });
             },
 
             /**
@@ -320,6 +355,8 @@
                 var self = this;
 
                 self.currentView = info.view.type;
+
+                this.destroyPopOver();
             },
 
             /**
@@ -408,6 +445,22 @@
                 });
 
                 return moment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+            },
+
+            /**
+             * As much as possible, destroy the popover holder whenever it's created on every calendar transitions.
+             */
+            destroyPopOver() {
+                var popOver = document.getElementById('popOver');
+
+                // Always destroy the current popover, as there should only be one.
+                if (popOver) {
+                    popOver.parentNode.removeChild(popOver);
+                }
+            },
+
+            eventPositioned() {
+
             }
         }
     }
@@ -458,6 +511,7 @@
                     },
                 },
                 dayGridMonth: {
+                    eventLimit: config.eventLimit,
                     validRange: {
                         start: this.getMinTermDate(),
                         end: this.getMaxTermDate()
@@ -494,16 +548,15 @@
             :resources="this.newResources"
             :scheduler-license-key="config.schedulerLicenseKey"
             :first-day="1"
-            :event-limit="true"
             :default-date="this.termStartDate"
             :view-skeleton-render="viewSkeletonRender"
             :week-number-calculation="'ISO'"
-            :content-height="1"
+            @eventPositioned="eventPositioned"
         />
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
     @import '~@fullcalendar/core/main.css';
     @import '~@fullcalendar/daygrid/main.css';
     @import '~@fullcalendar/timegrid/main.css';
@@ -511,7 +564,39 @@
     @import '~@fullcalendar/timeline/main.css';
     @import '~@fullcalendar/resource-timeline/main.css';
 
-    a.placeholder {
+    // Please don't hate me with these....
+
+    .fc-resourceTimelineSemester-view .fc-timeline-event .fc-title-wrap {
         text-align: center !important;
     }
+
+    .fc-resourceTimelineSemester-view .fc-event .fc-title, .fc-event .fc-title:hover {
+        color: #FFF !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-ltr .fc-timeline-event {
+        margin-right: 0 !important;
+    }
+
+    .fc-resourceTimelineSemester-view a.fc-more {
+        margin: 0 !important;
+    }
+
+    .fc-resourceTimelineSemester-view span.fc-title.fc-sticky {
+        left: 0 !important;
+        width: 100% !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-popover .fc-timeline-event .fc-title-wrap {
+        text-align: left !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-popover .fc-timeline-event {
+        padding: 0 !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-timeline-event {
+        position: absolute !important;
+    }
+
 </style>
