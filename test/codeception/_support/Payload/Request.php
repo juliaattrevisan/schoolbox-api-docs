@@ -100,6 +100,17 @@ abstract class Request
     }
 
     /**
+     * Unsets a query param
+     *
+     * @param string $name
+     * @param string $value
+     */
+    protected function unsetQueryParam(string $name): void
+    {
+        unset($this->queryParams[$name]);
+    }
+
+    /**
      * Returns this request's form params
      *
      * @return array
@@ -193,19 +204,21 @@ abstract class Request
      * @param string $value
      * @return $this
      */
-    private function setHeader(string $key, string $value): self
+    protected function setHeader(string $key, string $value): self
     {
         $this->headers[$key] = $value;
         return $this;
     }
 
     /**
-     * Unset a header
+     * Unsets a request header
      *
      * @param string $key
+     * @return $this
      */
-    private function unsetHeader(string $key): void
+    protected function unsetHeader(string $key): self
     {
         unset($this->headers[$key]);
+        return $this;
     }
 }
