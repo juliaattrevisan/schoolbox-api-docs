@@ -49,6 +49,7 @@
                 cursor: 0,
                 currentBatchCursor: null,
                 eventGroups: [],
+                defaultBgColour: '#0066b0',
             }
         },
         computed: {
@@ -136,7 +137,7 @@
                                 newResponse.push({
                                     allDay: true,
                                     color: '#fffff',
-                                    backgroundColor: '#0066b0', // Update this with folder color code
+                                    backgroundColor: (element.data.meta.colour) ? element.data.meta.colour : self.defaultBgColour,
                                     editable: false,
                                     draggable: false,
                                     resourceId: element.resourceId,
@@ -182,14 +183,15 @@
              */
             eventRender(eventRenderInfo) {
                 var self = this,
-                    eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping;
+                    eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping,
+                    backgroundColour = (eventRenderInfo.event.extendedProps.data.meta.colour) ? eventRenderInfo.event.extendedProps.data.meta.colour : self.defaultBgColour,
+                    element = eventRenderInfo.el;
 
                 if (!self.eventGroups.includes(eventGrouping)) {
                     self.eventGroups.push(eventGrouping);
                 }
 
                 if (self.currentView === 'resourceTimelineSemester') {
-                    var element = eventRenderInfo.el;
                     if (eventRenderInfo.event.extendedProps.data.placeholder) {
                         element.setAttribute('event-group-id-placeholder', eventGrouping);
                         element.classList.add('placeholder');
@@ -202,7 +204,10 @@
                         element.setAttribute('event-group-date', moment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
                         element.style.width = '95%';
                         element.classList.add('hide');
+                        element.style.backgroundColor = backgroundColour;
                     }
+                } else {
+                    element.style.backgroundColor = backgroundColour;
                 }
             },
 
@@ -554,13 +559,17 @@
     @import '~@fullcalendar/timeline/main.css';
     @import '~@fullcalendar/resource-timeline/main.css';
 
-    // Please don't hate me with these....
+    // Please forgive me...
 
     .fc-resourceTimelineSemester-view .fc-timeline-event .fc-title-wrap {
         text-align: center !important;
     }
 
-    .fc-resourceTimelineSemester-view .fc-event .fc-title, .fc-event .fc-title:hover {
+    .fc-resourceTimelineSemester-view .fc-timeline-event {
+        border: 0 !important;
+    }
+
+    .fc-event .fc-title, .fc-event .fc-title:hover {
         color: #FFF !important;
     }
 
