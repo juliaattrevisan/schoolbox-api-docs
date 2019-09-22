@@ -53,7 +53,7 @@ abstract class AbstractFolder implements IFolder
      *
      * @var null|Color
      */
-    private $colour;
+    protected $colour;
 
     /**
      * Cover image
