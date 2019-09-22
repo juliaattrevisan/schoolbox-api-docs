@@ -111,15 +111,9 @@ class CourseAccounts
         if (count($canvasAccountTree) !== 1) {
             throw new UnexpectedValueException('Unable to locate root canvas account');
         }
-        $rootAccount = reset($canvasAccountTree);
 
-        $folderTree = $this->buildCourseFacultyFolderTree($rootAccount['canvas_id']);
-
-        // Start the sync
-        foreach ($rootAccount['children'] as $topLevelAccount) {
-            $this->syncAccountWithFolders($topLevelAccount, $folderTree);
-        }
-
+        $folderTree  = $this->buildCourseFacultyFolderTree();
+        $this->syncAccountWithFolders(reset($canvasAccountTree), $folderTree);
         $this->deleteOldSchoolboxCourseAccountFolders($canvasAccountTree, $folderTree);
         $this->outputResults();
     }
@@ -141,19 +135,23 @@ class CourseAccounts
     /**
      * Build and return a fast, in-memory, mutable representation of the schoolbox course folder hierarchy
      *
-     * @param string $rootAccountCanvasId
      * @return ObjectTree
      * @throws Database\Exception
      * @throws UnexpectedValueException
      */
-    private function buildCourseFacultyFolderTree(string $rootAccountCanvasId): ObjectTree
+    private function buildCourseFacultyFolderTree(): ObjectTree
     {
         // Index folders by their Canvas id so we can process them purely in memory
-        $folderTree = new ObjectTree(function (Folder\Model $folder) {
+        $hashFunction = function (Folder\Model $folder) {
+            if ($folder->getId() === $this->facultyFolderId) {
+                return -1;
+            }
             return $this->getCanvasIdFromFolderName($folder->getName());
-        });
+        };
 
-        // Ensure the faculty folder aligns
+        $folderTree = new ObjectTree($hashFunction);
+
+        // Insert faculty folder as root
         $sql  = "SELECT name, parent FROM folder WHERE id = :id AND deleted_at IS NULL";
         $rows = $this->schoolboxDb->executeQuery($sql, ['id' => $this->facultyFolderId])->fetchAll();
 
@@ -165,17 +163,9 @@ class CourseAccounts
             ->setId($this->facultyFolderId)
             ->setName($rows[0]['name']);
 
-        // Check the faculty folder name is valid, update it if required.
-        try {
-            $this->getCanvasIdFromFolderName($folder->getName());
-        } catch (UnexpectedValueException $e) {
-            $folder->setName($this->generateLinkedFolderName($folder->getName(), $rootAccountCanvasId));
-            $this->updateFolder($folder->getId(), $folder->getName(), (int)$rows[0]['parent']);
-            $this->log->info("Faculty folder name updated to '{$folder->getName()}'");
-        }
         $folderTree->addElement($folder);
 
-
+        // Check the faculty folder name is valid, update it if required.
         $this->addFoldersToTree($folderTree, [$this->facultyFolderId]);
 
         return $folderTree;
@@ -282,8 +272,15 @@ class CourseAccounts
     {
         $this->countFoldersSynchronised++;
 
-        /** @var Folder\Model $parent */
-        $parent     = $sbFolderTree->getElementByHash($canvasAccount['parent_canvas_id']);
+        // Is this a root account?
+        if (($canvasAccount['parent_canvas_id'] ?? null) === null) {
+            // Place it in the faculty folder.
+            $parent = (new Folder\Model())->setId($this->facultyFolderId);
+        } else {
+            /** @var Folder\Model $parent */
+            $parent = $sbFolderTree->getElementByHash($canvasAccount['parent_canvas_id']);
+        }
+
         $folder     = $sbFolderTree->getElementByHash($canvasAccount['canvas_id']);
         $folderName = $this->generateLinkedFolderName($canvasAccount['name'], $canvasAccount['canvas_id']);
 
