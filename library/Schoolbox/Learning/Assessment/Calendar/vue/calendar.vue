@@ -259,8 +259,8 @@
                     '<span class="fc-title">Week '+ eventInfo.event.extendedProps.data.meta.weekNo +'</span>' +
                     '</div>';
 
-                for (var i = 0; i < eventGroup.length; i++) {
-                    var event = eventGroup[i];
+                eventGroup.forEach(function(group, index) {
+                    var event = eventGroup[index];
 
                     if (event.style.removeProperty) {
                         event.style.removeProperty('left');
@@ -274,21 +274,21 @@
                     }
 
                     tmpEvent.push(event.outerHTML);
-                }
+                });
 
-                for (var i = 0; i < tmpEvent.length; i++) {
-                    var tmpPopOverEvent = $(tmpEvent[i])[0],
+                tmpEvent.forEach(function(event, index) {
+                    var tmpPopOverEvent = $(tmpEvent[index])[0],
                         popOverContentDate = '';
 
-                        tmpPopOverEvent.classList.remove('hide', 'fc-draggable', 'fc-resizable');
+                    tmpPopOverEvent.classList.remove('hide', 'fc-draggable', 'fc-resizable');
 
-                        if (tmpPopOverEvent.getAttribute('event-group-date') !== dateGroup) {
-                            dateGroup = tmpPopOverEvent.getAttribute('event-group-date');
-                            popOverContentDate = '<p style="font-weight: bold; margin-bottom: 0">' + dateGroup + '</ p>';
-                        }
+                    if (tmpPopOverEvent.getAttribute('event-group-date') !== dateGroup) {
+                        dateGroup = tmpPopOverEvent.getAttribute('event-group-date');
+                        popOverContentDate = '<p style="font-weight: bold; margin-bottom: 0">' + dateGroup + '</ p>';
+                    }
 
-                        popOverContent += popOverContentDate + '<div class="fc-timeline-event-div" style="padding-bottom:40px;display:flex">' + tmpPopOverEvent.outerHTML + '</div>';
-                }
+                    popOverContent += popOverContentDate + '<div class="fc-timeline-event-div" style="padding-bottom:40px;display:flex">' + tmpPopOverEvent.outerHTML + '</div>';
+                });
 
                 popOver.innerHTML = popOverHeader + popOverContent;
 
