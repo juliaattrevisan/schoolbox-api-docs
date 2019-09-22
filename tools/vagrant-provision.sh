@@ -276,6 +276,9 @@ then
 fi
 cd /vagrant;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Removing cache directories";
+/vagrant/tools/clean-cache-dir.sh;
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Building SQL updates";
 cd tools;
 ./build-sql-update.sh >/dev/null;
