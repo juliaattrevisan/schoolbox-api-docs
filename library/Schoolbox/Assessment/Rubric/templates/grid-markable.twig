@@ -193,7 +193,6 @@
 
                     var grades = getLetterGrades($this);
                     customMark = getLetterGradeFromNumeric($this.find("[data-group-mark]").val(), grades);
-
                     if (displayedMark !== customMark) {
                         markIsDifferent = true;
                     }
@@ -207,7 +206,8 @@
                     }
                 }
 
-                if (markIsDifferent) {
+                // $this.attr('data-mark') is '', if capability mark is not provided yet ('0' if provided)
+                if (($this.attr('data-mark') !== '') && markIsDifferent) {
                     $this.find("[data-use-descriptor-values]").show();
                     $this.attr('data-customised', true);
                 } else {
