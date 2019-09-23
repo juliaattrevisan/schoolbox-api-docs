@@ -1,8 +1,5 @@
--- The recreated v_rubric_mark view expects rubric_descriptor_mark table not to have any null descriptor_id.
-DELETE FROM rubric_indicator_mark WHERE descriptor_id IS NULL;
-
--- This view is to populate rubric_indicator mark in v_rubric_mark
-CREATE OR REPLACE VIEW v_rubric_indicator_mark AS
+-- This view is to populate rubric_descriptor mark in v_rubric_mark
+CREATE OR REPLACE VIEW v_rubric_indicator_mark_extend AS
   SELECT
     rubric_capability_mark_id,
     descriptor_id,
@@ -18,7 +15,7 @@ CREATE OR REPLACE VIEW v_rubric_indicator_mark AS
 
 CREATE OR REPLACE VIEW v_rubric_mark AS
 
-  SELECT
+SELECT
     -- Assessment fields
     sb.assessment_id                     AS assessment_id,
     vr.assessment_mark_per_capability    AS assessment_mark_per_capability,
@@ -50,7 +47,7 @@ CREATE OR REPLACE VIEW v_rubric_mark AS
   INNER JOIN submission_box sb            ON vr.assessment_id = sb.assessment_id
   INNER JOIN submission_return sr         ON sb.id = sr.box_id
   INNER JOIN rubric_capability_mark rcm   ON rcm.return_id = sr.id and rcm.rubric_capability_id = vr.capability_id
-  LEFT JOIN v_rubric_indicator_mark rim   ON rim.rubric_indicator_id = vr.indicator_id and rcm.id = rim.rubric_capability_mark_id
+  LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_indicator_id = vr.indicator_id and rcm.id = rim.rubric_capability_mark_id
   -- Only valid published rubric
   WHERE
     sr.deleted_at IS NULL AND
