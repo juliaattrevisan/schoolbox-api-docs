@@ -129,27 +129,24 @@ class Controller extends Base
     {
         set_time_limit(600);
 
-        $allFolders = null;
-        if (is_array($this->getRequest()->post['attachment'])) {
-            $factory = new CollectorFactory();
-            $csvFile = $factory->build($this->getRequest()->post['attachment'])->getFirst();
-
-            $bulkHandler = new Bulk_Folder($csvFile->readStream(), Scrub::text($this->getRequest()->post['template']));
-            $allFolders = $bulkHandler->addFolders();
-        } else {
+        if (!is_array($this->getRequest()->post['attachment'])) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
+        $factory = new CollectorFactory();
+        $csvFile = $factory->build($this->getRequest()->post['attachment'])->getFirst();
+
+        $bulkHandler = new Bulk_Folder($csvFile->readStream(), Scrub::text($this->getRequest()->post['template']));
+        $allFolders  = $bulkHandler->addFolders();
 
         // Render this thing out
-
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@adminBulkAddFolders/importResults.twig',
-                'data'     => array(
+                'data'     => [
                     'pageCurrent' => 'bulk-add-folders',
-                    'folders' => $allFolders
-                ),
-            )
+                    'folders'     => $allFolders,
+                ],
+            ]
         );
     }
 
