@@ -96,7 +96,10 @@ class Javascript extends Base
         foreach ($booking->getRelatedBookingList() as $relatedBooking) {
             $reviewHref = $this->getRouteIfAuthorized(
                 'resourceItem.read',
-                ['id' => $relatedBooking->getResource()->getId()]
+                [
+                    'id' => $relatedBooking->getResource()->getId(),
+                    'format' => ''
+                ]
             );
             if ($reviewHref) {
                 $reviewHref .= '?date=' . urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());

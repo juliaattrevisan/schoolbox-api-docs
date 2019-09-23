@@ -33,7 +33,6 @@ class Module extends BaseModule
     {
         $this->attachResourceRoutes($router, $basePath);
         $this->addRoute($router, 'search', $basePath, '/search');
-        $this->addRoute($router, 'read', $basePath, '/{id:\d+}');
     }
 
     /**
