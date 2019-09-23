@@ -55,7 +55,13 @@
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
             // Disable the button if the rubric value is same as input value
-            $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+            var isValueCustomised = rubricSum !== '' && rubricSum !== currentMarkInput;
+            $assignFromRubricButton.prop('disabled', !isValueCustomised);
+            if (isValueCustomised) {
+                $status.find(markInputSelector).attr('data-customised', true);
+            } else {
+                $status.find(markInputSelector).removeAttr('data-customised');
+            }
         }
 
         function getRubricSum() {
@@ -91,16 +97,20 @@
             $markInput.trigger("change");
         });
 
-        $status.find(markInputSelector).change(function() {
-            // Did we manually change the overall grade? Record that it's customised
-            $status.find(markInputSelector).attr('data-customised', true);
+        $status.find(markInputSelector).change(function () {
 
             var rubricSum = getRubricSum();
 
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
             // Disable the button if the rubric value is same as input value
-            $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+            var isValueCustomised = rubricSum !== currentMarkInput;
+            $assignFromRubricButton.prop('disabled', !isValueCustomised);
+            if (isValueCustomised) {
+                $(this).attr('data-customised', true);
+            } else {
+                $(this).removeAttr('data-customised');
+            }
         })
 
         // Update the input val when manually assigning grades from descriptor vals

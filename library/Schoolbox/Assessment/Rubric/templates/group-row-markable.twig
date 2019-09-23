@@ -11,7 +11,6 @@
 {% set markType   = markScheme.generateContext %}
 {% if showGroupTotal %}
     {% set letterGradeBracket = false %}
-    {% set letterGradeValue   = '' %}
 
     {# TODO assumes values are always descending which might not be the case? #}
     {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
@@ -20,12 +19,10 @@
             {# Is this below the last? If so use the last one #}
             {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
                 {% set letterGradeBracket = gradeLevel.lowerBound %}
-                {% set letterGradeValue   = gradeLevel.caption %}
             {% endif %}
         {% elseif loop.last %}
             {# If no cap mark has been given yet, default to selecting the lowest bracket in the dropdown #}
             {% set letterGradeBracket = gradeLevel.lowerBound %}
-            {% set letterGradeValue   = gradeLevel.caption %}
         {% endif %}
     {% endfor %}
 
@@ -40,7 +37,7 @@
                       data-group-id="{{ capabilityId }}"
                       data-rubric-id="{{ rubricGrid.id }}"
                       data-mark-type="{{ markType.mode }}">
-                    
+
                     {# This is the value we insert into the database. #}
                     <input type="hidden"
                            data-db-mark
@@ -89,16 +86,7 @@
 
                     {% if groupUsage.containsDescriptorsWithValue %}
                         <a data-use-descriptor-values class="fieldAssign">Assign <span class="descriptor-sum" data-group-descriptor-sum>
-                            {% if markType.mode == 'raw' %}
-                                {{ capabilityMark.value }}
-
-                            {% elseif markType.mode == 'letter' %}
-                                {{ letterGradeValue }}
-
-                            {% elseif markType.mode == 'percent' %}
-                                {{ capabilityMark.retrieveNormalizedMark | round(2)  }}
-
-                            {% endif %}
+                                {{ capabilityMark.indicatorMarkSumScaled }}
                             </span> from descriptors</a>
                     {% endif %}
                     {% if markType.mode == 'letter' or markType.mode == 'percent' %}

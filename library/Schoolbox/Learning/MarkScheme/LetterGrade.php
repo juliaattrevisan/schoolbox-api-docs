@@ -129,4 +129,14 @@ class LetterGrade extends AbstractMarkScheme
         }
         return $context;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getValueForJS($mark, ?float $maxValue, ?float $rowMaxSum)
+    {
+        $max      = $rowMaxSum ?: $maxValue;
+        $normMark = $max ? ($mark / $max) * 100 : 0;
+        return $this->getHumanReadableMark($normMark);
+    }
 }

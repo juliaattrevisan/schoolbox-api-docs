@@ -12,6 +12,7 @@ use RangeException;
 abstract class AbstractMarkScheme implements IMarkScheme
 {
     public const SLUG = 'raw';
+    public const PRECISION = 2;
 
     const TITLE = 'Abstract Mark Scheme';
 
@@ -112,5 +113,16 @@ abstract class AbstractMarkScheme implements IMarkScheme
         return [
             'mode' => static::SLUG,
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getValueForJS($mark, ?float $maxValue, ?float $rowMaxSum)
+    {
+        if ($maxValue && $rowMaxSum && $rowMaxSum > 0) {
+            return round($mark * ($maxValue / $rowMaxSum), self::PRECISION);
+        }
+        return $mark;
     }
 }

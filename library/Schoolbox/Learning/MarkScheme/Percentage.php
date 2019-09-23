@@ -14,7 +14,6 @@ use Schoolbox\Learning\Assessment\IResponse;
 class Percentage extends AbstractMarkScheme
 {
     public const SLUG = 'percent';
-    public const PRECISION = 2;
 
     const TITLE = 'Percentage';
 
@@ -64,5 +63,15 @@ class Percentage extends AbstractMarkScheme
         $floatVal = floatval($matches[1]);
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getValueForJS($mark, ?float $maxValue, ?float $rowMaxSum)
+    {
+        $max      = $rowMaxSum ?: $maxValue;
+        $normMark = $max ? ($mark / $max) * 100 : 0;
+        return $this->getHumanReadableMark($normMark);
     }
 }

@@ -108,6 +108,18 @@ class CapabilityMark
 
 
     /**
+     * Gets the sum of all indicator marks and return in the comparable format
+     * @return mixed
+     */
+    public function getIndicatorMarkSumScaled()
+    {
+        $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
+        $rowMaxSum = $this->capabilityUsage->calculateMaxValueFromIndicators();
+        return $this->markScheme->getValueForJS($this->calculateIndicatorMarkSum(), $maxCapabilityValue, $rowMaxSum);
+    }
+
+
+    /**
      * Render the capability's mark in normalized format.
      *
      * @return float
