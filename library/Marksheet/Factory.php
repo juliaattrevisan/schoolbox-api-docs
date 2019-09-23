@@ -29,8 +29,8 @@ class Marksheet_Factory
     {
         $className = "Marksheet_" . ucwords(strtolower($slug));
 
-        $subHandler = new Submission();
-        $markType = $subHandler->getMarkTypeBySlug($slug);
+        $markTypeMapper = SubmissionBox\MarkTypeMapper::getInstance();
+        $markType       = $markTypeMapper->findByColumn('slug', $slug);
 
         if (class_exists($className) && in_array(strtolower($slug), self::$marktypes)) {
             return new $className($markType, $submissionBox, $extraParams);
