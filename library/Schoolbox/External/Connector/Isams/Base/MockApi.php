@@ -13,20 +13,35 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base;
 
-use RuntimeException;
-
-class MockApi extends Api
+class MockApi implements IApi
 {
+
+    /**
+     * Path to the local xml file from which to read
+     *
+     * @var string
+     */
+    private $file;
+
+
+    /**
+     * MockApi constructor.
+     *
+     * @param string $file
+     */
+    public function __construct(string $file)
+    {
+        $this->file = $file;
+    }
 
     /**
      * Retrieves a XML document representing the result from the API call.
      *
      * @param string $filter An XML document representing a filter
-     * @return string
-     * @throws RuntimeException if the retrieval of the XML doc failed
+     * @return string|null
      */
     public function retrieveDocument(string $filter = ''): ?string
     {
-        return file_get_contents(__DIR__ .'/../../../../../../www/test.xml');
+        return file_get_contents($this->file);
     }
 }

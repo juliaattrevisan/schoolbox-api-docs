@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Schoolbox\External\Connector\Isams\Base\Api;
+use Schoolbox\External\Connector\Isams\Base\IApi;
 
 /**
  * Class Batchxml
@@ -43,9 +44,9 @@ class Batchxml
     /**
      * Batchxml constructor.
      *
-     * @param Api $api
+     * @param IApi $api
      */
-    public function __construct(Api $api)
+    public function __construct(IApi $api)
     {
         $this->api = $api;
     }

@@ -15,7 +15,7 @@ use RuntimeException;
 use Zend\Uri\Exception;
 use Zend\Uri\Uri;
 
-class Api
+class Api implements IApi
 {
     /**
      * The host of the iSAMS server
@@ -48,7 +48,7 @@ class Api
      * Retrieves a XML document representing the result from the API call.
      *
      * @param string $filter An XML document representing a filter
-     * @return string
+     * @return string|null
      * @throws RuntimeException if the retrieval of the XML doc failed
      * @throws Exception\InvalidArgumentException
      * @throws Exception\InvalidUriPartException

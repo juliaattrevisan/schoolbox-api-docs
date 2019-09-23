@@ -40,12 +40,20 @@ $app = new class extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+    /**
+     * --file
+     *
+     * Load xml contents from a file path specified by this arg
+     */
+    private const OPT_LONG_FILE = 'file:';
+
 
     /** @inheritdoc */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_FILE
         ];
     }
 
@@ -61,17 +69,30 @@ $app = new class extends CliTool\App
 Import Timetable data from ISAMS xml into local schema. This requires UPS to have created user
 accounts in order to assign them to timetable classes.
 
-Usage: timetableImporter.php --perform
+Usage: profileImporter.php [--file] [--perform]
+        --perform   Persist changes
+        --file      Optional path to a locally-cached xml file e.g. ../../../www/test.xml
+                    Absence of this arg will cause the tool to access the api endpoint instead
 
 
 HELP;
             exit;
         }
 
-        /* Spawn api
-         * TODO: Swap with actual live connection when ready
+        /* Spawn api based on args
+         *
+         * This gives you the cli choice of loading from an api endpoint
+         * or a locally-cached xml file instead
          */
-        $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
+        $file = $this->getOpt(self::OPT_LONG_FILE);
+
+        if ($file) {
+            $this->getLogger()->info("Loading from locally-cached xml file: {$file}");
+            $api = new MockApi($file);
+        } else {
+            $this->getLogger()->info('Accessing api endpoint');
+            $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
+        }
 
         $composite = new Timetable\Composite(
             $this->getLogger(),
