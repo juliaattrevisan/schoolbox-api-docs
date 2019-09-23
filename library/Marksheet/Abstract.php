@@ -39,12 +39,14 @@ abstract class Marksheet_Abstract
      */
     protected $extraParams;
 
-    public function __construct(MarkType $markType, $submissionBox, $extraParams)
+    public function __construct(?MarkType $markType, $submissionBox, $extraParams)
     {
-        $this->id = $markType->getId();
-        $this->setName($markType->getName());
-        $this->setSlug($markType->getSlug());
-        $this->setComment($markType->getComment());
+        if ($markType) {
+            $this->id = $markType->getId();
+            $this->setName($markType->getName());
+            $this->setSlug($markType->getSlug());
+            $this->setComment($markType->getComment());
+        }
         $this->setSubmissionHandler(new Submission());
         $this->setSubmissionReturnHandler(new SubmissionReturn());
         $this->setExtraParams($extraParams);
