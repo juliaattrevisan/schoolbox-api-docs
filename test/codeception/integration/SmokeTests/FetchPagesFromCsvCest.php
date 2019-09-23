@@ -73,11 +73,11 @@ class FetchPagesFromCsvCest
     }
 
     /**
-     * Fail test to ensure we can get a permission denied from schoolbox using aurura
+     * Fail test to ensure we can get a permission denied from schoolbox using Aura
      *
      * @param IntegrationTester $i
      */
-    public function getFailureAururaPermissionDenied(IntegrationTester $i)
+    public function getFailureAuraPermissionDenied(IntegrationTester $i)
     {
         $url='https://vagrant.dev.schoolbox.cloud/adminv2/setting';
         $student_user_details=$this->personas['Student'];
