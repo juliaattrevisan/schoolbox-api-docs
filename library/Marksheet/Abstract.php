@@ -47,7 +47,6 @@ abstract class Marksheet_Abstract
             $this->setSlug($markType->getSlug());
             $this->setComment($markType->getComment());
         }
-        $this->setSubmissionHandler(new Submission());
         $this->setSubmissionReturnHandler(new SubmissionReturn());
         $this->setExtraParams($extraParams);
         $this->setSubmissionBox($submissionBox);
@@ -88,19 +87,6 @@ abstract class Marksheet_Abstract
     public function getComment()
     {
         return $this->comment;
-    }
-
-    public function setSubmissionHandler($handler)
-    {
-        $this->subHandler = $handler;
-    }
-
-    /**
-     * @return Submission
-     */
-    public function getSubmissionHandler()
-    {
-        return $this->subHandler;
     }
 
     public function setSubmissionReturnHandler($handler)
