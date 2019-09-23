@@ -38,7 +38,7 @@ class FetchPagesFromCsvCest
     public function getFailure404(IntegrationTester $i)
     {
         #GIVEN
-        $page                  = '/i_dont_exist_at_all_anywhere';
+        $page                 = '/i_dont_exist_at_all_anywhere';
         $student_user_details = $this->personas['Student'];
 
         #WHEN
@@ -59,7 +59,7 @@ class FetchPagesFromCsvCest
     public function getFailureSitePagePermissionDenied(IntegrationTester $i)
     {
         #GIVEN
-        $page                  = '/adminv2/home';
+        $page                 = '/adminv2/home';
         $student_user_details = $this->personas['Student'];
 
         #WHEN
@@ -79,7 +79,7 @@ class FetchPagesFromCsvCest
      */
     public function getFailureAuraPermissionDenied(IntegrationTester $i)
     {
-        $page                  = '/adminv2/setting';
+        $page                 = '/adminv2/setting';
         $student_user_details = $this->personas['Student'];
 
         #WHEN
