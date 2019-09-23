@@ -1,5 +1,5 @@
 -- This view is to populate rubric_descriptor mark in v_rubric_mark
-CREATE OR REPLACE VIEW v_rubric_descriptor_mark AS
+CREATE OR REPLACE VIEW v_rubric_descriptor_mark_extend AS
   SELECT
     rubric_group_mark_id,
     descriptor_id,
@@ -47,7 +47,7 @@ CREATE OR REPLACE VIEW v_rubric_mark AS
   INNER JOIN submission_box sb            ON sb.assessment_id = vr.assessment_id
   INNER JOIN submission_return sr         ON sr.box_id = sb.id
   INNER JOIN rubric_group_mark rgm        ON sr.id = rgm.return_id AND vr.capability_id = rgm.rubric_group_id
-  LEFT JOIN  v_rubric_descriptor_mark rdm ON rdm.rubric_group_mark_id = rgm.id AND rdm.criterion_id = vr.indicator_id
+  LEFT JOIN  v_rubric_descriptor_mark_extend rdm ON rdm.rubric_group_mark_id = rgm.id AND rdm.criterion_id = vr.indicator_id
 
   -- Only valid published rubric
   WHERE
