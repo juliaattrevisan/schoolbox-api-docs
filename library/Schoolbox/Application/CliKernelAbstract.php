@@ -95,6 +95,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         try {
             $class = \get_class($e);
             $this->logger()->alert("FATAL $class: {$e->getMessage()} on line {$e->getLine()} in {$e->getFile()}", ['exception' => $e]);
+            $this->logger()->error($e->getTraceAsString());
         } /** @noinspection PhpRedundantCatchClauseInspection */
         catch (IOException $e) {
             // can't do anything, logging stream has been closed
