@@ -16,7 +16,6 @@ abstract class Marksheet_Abstract
     protected $name;
     protected $slug;
     protected $comment;
-    protected $subHandler;
     protected $subReturnHandler;
 
     /**
