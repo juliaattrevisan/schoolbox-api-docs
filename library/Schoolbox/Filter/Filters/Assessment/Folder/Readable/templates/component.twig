@@ -38,6 +38,40 @@
             </script>
         {% endautoescape %}
 
+        {# Add select boxes for every available option #}
+        {% for folder in myClasses %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelections[folder.id],
+                userSelection:      false,
+                label:              null,
+                disabled:           isDisabled
+            } only %}
+        {% endfor %}
+        {% for folder in myGroups %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelections[folder.id],
+                userSelection:      false,
+                label:              null,
+                disabled:           isDisabled
+            } only %}
+        {% endfor %}
+        {% for folder in otherClasses %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelections[folder.id],
+                userSelection:      false,
+                label:              null,
+                disabled:           isDisabled
+            } only %}
+        {% endfor %}
+        {% for folder in otherGroups %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelections[folder.id],
+                userSelection:      false,
+                label:              null,
+                disabled:           isDisabled
+            } only %}
+        {% endfor %}
+
         <select id="filter-selector-readable"
                 name="filter_selection[{{ definition.filter.id }}][]"
                 multiple
@@ -53,6 +87,7 @@
                         folder:         folder,
                         userSelections: userSelections,
                         roleSelections: roleSelections,
+                        DEBUG_WRAP:     false,
                     } only %}
                 {% endfor %}
             </optgroup>
@@ -63,6 +98,7 @@
                         folder:         folder,
                         userSelections: userSelections,
                         roleSelections: roleSelections,
+                        DEBUG_WRAP:     false,
                     } only %}
                 {% endfor %}
             </optgroup>
@@ -73,6 +109,7 @@
                         folder:         folder,
                         userSelections: userSelections,
                         roleSelections: roleSelections,
+                        DEBUG_WRAP:     false,
                     } only %}
                 {% endfor %}
             </optgroup>
@@ -83,6 +120,7 @@
                         folder:         folder,
                         userSelections: userSelections,
                         roleSelections: roleSelections,
+                        DEBUG_WRAP:     false,
                     } only %}
                 {% endfor %}
             </optgroup>
