@@ -227,6 +227,11 @@
                     this.$refs.event.open();
                 } else {
                     this.renderPopOver(eventInfo);
+
+                    // Add event listener for our customised popover
+                    document.querySelector(".fc-close").addEventListener('click', function (element) {
+                        self.destroyPopOver();
+                    });
                 }
             },
 
@@ -254,7 +259,7 @@
 
                 popOverHeader = '<div class="fc-header fc-widget-header">' +
                     '<span class="fc-title">Week '+ eventInfo.event.extendedProps.data.meta.weekNo +'</span>' +
-                    '</div>';
+                    '<span class="fc-close fc-icon fc-icon-x"></span></div>';
 
                 eventGroup.forEach(function(group, index) {
                     var event = eventGroup[index];
