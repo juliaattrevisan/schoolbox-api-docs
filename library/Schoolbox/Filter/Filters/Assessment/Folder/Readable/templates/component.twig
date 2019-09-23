@@ -83,44 +83,52 @@
             {# For this filter, folders are just all the URL override folders #}
             <optgroup label="My Classes">
                 {% for folder in myClasses %}
-                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
-                        folder:         folder,
-                        userSelections: userSelections,
-                        roleSelections: roleSelections,
-                        DEBUG_WRAP:     false,
+                    {% include '@filters/_option.twig' with {
+                        roleSelection:      roleSelections[folder.id],
+                        userSelection:      userSelections[folder.id],
+                        label:              folder.nameWithCodes,
+                        value:              folder.id,
+                        disabled:           isDisabled,
+                        DEBUG_WRAP:         false,
                     } only %}
                 {% endfor %}
             </optgroup>
 
             <optgroup label="My Groups">
                 {% for folder in myGroups %}
-                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
-                        folder:         folder,
-                        userSelections: userSelections,
-                        roleSelections: roleSelections,
-                        DEBUG_WRAP:     false,
+                    {% include '@filters/_option.twig' with {
+                        roleSelection:      roleSelections[folder.id],
+                        userSelection:      userSelections[folder.id],
+                        label:              folder.nameWithCodes,
+                        value:              folder.id,
+                        disabled:           isDisabled,
+                        DEBUG_WRAP:         false,
                     } only %}
                 {% endfor %}
             </optgroup>
 
             <optgroup label="Other Classes">
                 {% for folder in otherClasses %}
-                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
-                        folder:         folder,
-                        userSelections: userSelections,
-                        roleSelections: roleSelections,
-                        DEBUG_WRAP:     false,
+                    {% include '@filters/_option.twig' with {
+                        roleSelection:      roleSelections[folder.id],
+                        userSelection:      userSelections[folder.id],
+                        label:              folder.nameWithCodes,
+                        value:              folder.id,
+                        disabled:           isDisabled,
+                        DEBUG_WRAP:         false,
                     } only %}
                 {% endfor %}
             </optgroup>
 
             <optgroup label="Other Groups">
                 {% for folder in otherGroups %}
-                    {% include '@filterDefinitions/Assessment/Folder/templates/_option.twig' with {
-                        folder:         folder,
-                        userSelections: userSelections,
-                        roleSelections: roleSelections,
-                        DEBUG_WRAP:     false,
+                    {% include '@filters/_option.twig' with {
+                        roleSelection:      roleSelections[folder.id],
+                        userSelection:      userSelections[folder.id],
+                        label:              folder.nameWithCodes,
+                        value:              folder.id,
+                        disabled:           isDisabled,
+                        DEBUG_WRAP:         false,
                     } only %}
                 {% endfor %}
             </optgroup>
