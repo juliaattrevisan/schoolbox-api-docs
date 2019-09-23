@@ -195,8 +195,6 @@
                     if (eventRenderInfo.event.extendedProps.data.placeholder) {
                         element.setAttribute('event-group-id-placeholder', eventGrouping);
                         element.classList.add('placeholder');
-                        element.classList.add('source');
-                        element.classList.add('personal');
                         element.classList.add('fc-more');
                     } else {
                         element.setAttribute('event-group-id', eventGrouping);
@@ -251,7 +249,7 @@
 
                 popOver = document.createElement('div');
                 popOver.setAttribute('id', 'popOver');
-                popOver.setAttribute('style', 'left:' + eventInfo.el.offsetLeft + 'px;top:' + resourceCol[0].offsetTop +'px;z-index:100000;padding:5px');
+                popOver.setAttribute('style', 'left:' + eventInfo.el.offsetLeft + 'px;top:' + resourceCol[0].offsetTop +'px;z-index:1000;padding:5px');
                 popOver.className = 'fc-popover fc-more-popover';
 
                 popOverHeader = '<div class="fc-header fc-widget-header">' +
@@ -456,6 +454,12 @@
                 if (popOver) {
                     popOver.parentNode.removeChild(popOver);
                 }
+            },
+
+            onDateClick(dateClickInfo) {
+                if (dateClickInfo.view.type === 'resourceTimelineSemester') {
+                    this.destroyPopOver();
+                }
             }
         }
     }
@@ -473,6 +477,7 @@
 
         <full-calendar
             ref="fullCalendar"
+            default-view="resourceTimelineSemester"
             :plugins="calendarPlugins"
             :views="{
                 resourceTimelineSemester: {
@@ -534,11 +539,8 @@
                     click: this.clickPrev.bind(this)
                 }
             }"
-            default-view="resourceTimelineSemester"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-render="eventRender"
-            @loading="onLoading"
-            @eventClick="onEventClick"
             :events="events"
             :resources="this.newResources"
             :scheduler-license-key="config.schedulerLicenseKey"
@@ -546,7 +548,10 @@
             :default-date="this.termStartDate"
             :view-skeleton-render="viewSkeletonRender"
             :week-number-calculation="'ISO'"
-            :content-height="1"
+            :content-height="5"
+            @loading="onLoading"
+            @eventClick="onEventClick"
+            @dateClick="onDateClick"
         />
     </div>
 </template>
@@ -565,7 +570,7 @@
         text-align: center !important;
     }
 
-    .fc-resourceTimelineSemester-view .fc-timeline-event {
+    .fc-timeline-event, .fc-day-grid-event {
         border: 0 !important;
     }
 
@@ -596,6 +601,11 @@
 
     .fc-resourceTimelineSemester-view .fc-timeline-event {
         position: absolute !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-event-container .fc-timeline-event:not(.placeholder),
+    .fc-dayGridMonth-view .placeholder {
+        display: none;
     }
 
 </style>
