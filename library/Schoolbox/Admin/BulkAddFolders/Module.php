@@ -13,9 +13,14 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
-use Schoolbox\Admin\BulkAddFolders\Controller as BulkAddFoldersController;
 use Alaress\Twig\Loader\IChainLoader;
+use InvalidArgumentException;
+use Schoolbox\Error;
+use Schoolbox\MapperFactory;
+use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
 {
@@ -43,9 +48,21 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
+     * @throws ServiceNotFound
+     * @throws InvalidArgumentException
      */
-    public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(BulkAddFoldersController::class));
+    public function initControllers(ContainerInterface $injector): void
+    {
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $injector->get('mapperFactory');
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(
+            Controller::class,
+            [
+                'roleMapper'             => $mapperFactory->getLazy(RoleMapper::class),
+                'errorMapper'            => $mapperFactory->getLazy(Error\Mapper::class),
+                'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class)
+            ]
+        ));
     }
 
     /**

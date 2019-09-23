@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\YearLevel;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\HasSequence;
@@ -26,6 +27,7 @@ use Schoolbox\Sequential;
  */
 class Model implements ISoftDeletable, Sequential
 {
+    use CreateCollection;
     use Id;
     use HasSequence;
     use CreatedAtDate;

@@ -973,7 +973,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param $column
      * @return string
      */
-    protected function getPropertyFromColumn($column)
+    public function getPropertyFromColumn($column)
     {
         foreach($this->map as $map) {
             if($map['column'] == $column) {
