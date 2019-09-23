@@ -225,7 +225,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             SET     Heading = :heading,
                     HdgAbbrev1 = :headingAbbreviation1,
                     WeightingFactor = :weightingFactor,
-                    ResultType = :resultType
+                    ResultType = :resultType,
+                    TestDate = :dueDate
             WHERE   HdgAbbrev2 = :headingAbbreviation2 AND 
                     FileYear = :fileYear AND  
                     FileSemester = :fileSemester AND
@@ -240,6 +241,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'resultType'           => $resultType,
             'fileYear'             => $this->getSystemFileYear(),
             'fileSemester'         => $this->getSystemFileSemester(),
+            'dueDate'              => $assessment->getDate()->getDatabase()
         ], $bindings->getParams());
 
         return $this->getConnector()->prepareQuery($sql, $params)->execute();
@@ -415,7 +417,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     HdgAbbrev2,
                     ResultType,
                     MarkOutOf,
-                    WeightingFactor
+                    WeightingFactor,
+                    TestDate
                 ) VALUES (
                     :fileType,
                     :fileYear,
@@ -429,7 +432,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     :headingAbbreviation2,
                     :resultType,
                     '100',
-                    :weightingFactor
+                    :weightingFactor,
+                    :dueDate
                 )
             ";
 
@@ -445,6 +449,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
             'resultType'           => $resultType,
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
+            'dueDate'              => $assessment->getDate()->getDatabase()
         ]);
 
         return $statement->execute();
