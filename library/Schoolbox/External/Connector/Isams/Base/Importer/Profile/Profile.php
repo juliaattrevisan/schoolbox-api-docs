@@ -80,17 +80,6 @@ class Profile implements ImporterInterface
 
 
     /**
-     * A mapping between (NCYear, Campus) instances
-     *
-     * Campuses are stored separately from Students and are joined on NCYear
-     * so create a lookup instead of traversing every time
-     *
-     * @var array
-     */
-    private $campusMapping = [];
-
-
-    /**
      * Profile constructor.
      *
      * @param LoggerInterface             $log
@@ -124,10 +113,6 @@ class Profile implements ImporterInterface
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationMapper = $relationMapper;
-
-        /* Prefetch (Campus, NCYear) relations as a lookup
-         */
-        $this->campusMapping = $this->prefetchCampuses();
     }
 
 
@@ -197,6 +182,13 @@ class Profile implements ImporterInterface
      */
     private function importStudents(): void
     {
+        /* Prefetch (NCYear, Campus) relations as a lookup
+         *
+         * Campuses are stored separately from Students and are joined on NCYear
+         * so create a lookup instead of traversing every time
+         */
+        $campusMapping = $this->prefetchCampuses();
+
         $students = $this->batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         /** @var Student $student */
@@ -255,8 +247,8 @@ class Profile implements ImporterInterface
              */
             $campusName = null;
 
-            if (isset($this->campusMapping[(int)$student->NCYear])) {
-                $campusName = $this->campusMapping[(int)$student->NCYear]->getName();
+            if (isset($campusMapping[(int)$student->NCYear])) {
+                $campusName = $campusMapping[(int)$student->NCYear]->getName();
             }
 
             /* Fish out a staff member via their user code
