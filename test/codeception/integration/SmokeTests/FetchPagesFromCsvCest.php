@@ -11,14 +11,14 @@ use Payload;
 class FetchPagesFromCsvCest
 {
     #Need some constants to represent users or logic in the before that sets the users.
-    protected $personas=[
-        'Superuser' => ['username'=>'alaress', 'password'=>'alaress'],
-        'Admin' => ['username'=>'alaress', 'password'=>'alaress'],
-        'Teacher'=> ['username'=>'jcoles', 'password'=>'password'],
-        'Student'=> ['username'=>'jreed', 'password'=>'password'],
-        'Pastoral Moderator'=> ['username'=>'jcoles', 'password'=>'password'],
-        'Fixtures Administrator'=> ['username'=>'jcoles', 'password'=>'password'],
-        'News Moderator'=> ['username'=>'rwhite', 'password'=>'password']
+    protected $personas = [
+        'Superuser'              => ['username' => 'alaress', 'password' => 'alaress'],
+        'Admin'                  => ['username' => 'alaress', 'password' => 'alaress'],
+        'Teacher'                => ['username' => 'jcoles', 'password' => 'password'],
+        'Student'                => ['username' => 'jreed', 'password' => 'password'],
+        'Pastoral Moderator'     => ['username' => 'jcoles', 'password' => 'password'],
+        'Fixtures Administrator' => ['username' => 'jcoles', 'password' => 'password'],
+        'News Moderator'         => ['username' => 'rwhite', 'password' => 'password'],
     ];
 
     /**
@@ -38,8 +38,8 @@ class FetchPagesFromCsvCest
     public function getFailure404(IntegrationTester $i)
     {
         #GIVEN
-        $url='https://vagrant.dev.schoolbox.cloud/i_dont_exist_at_all_anywhere';
-        $student_user_details=$this->personas['Student'];
+        $url                  = 'https://vagrant.dev.schoolbox.cloud/i_dont_exist_at_all_anywhere';
+        $student_user_details = $this->personas['Student'];
 
         #WHEN
         $this->loginUser($i, $student_user_details['username'], $student_user_details['password']);
@@ -59,8 +59,8 @@ class FetchPagesFromCsvCest
     public function getFailureSitePagePermissionDenied(IntegrationTester $i)
     {
         #GIVEN
-        $url='https://vagrant.dev.schoolbox.cloud/adminv2/home';
-        $student_user_details=$this->personas['Student'];
+        $url                  = 'https://vagrant.dev.schoolbox.cloud/adminv2/home';
+        $student_user_details = $this->personas['Student'];
 
         #WHEN
         $this->loginUser($i, $student_user_details['username'], $student_user_details['password']);
@@ -79,8 +79,8 @@ class FetchPagesFromCsvCest
      */
     public function getFailureAuraPermissionDenied(IntegrationTester $i)
     {
-        $url='https://vagrant.dev.schoolbox.cloud/adminv2/setting';
-        $student_user_details=$this->personas['Student'];
+        $url                  = 'https://vagrant.dev.schoolbox.cloud/adminv2/setting';
+        $student_user_details = $this->personas['Student'];
 
         #WHEN
         $this->loginUser($i, $student_user_details['username'], $student_user_details['password']);
@@ -100,9 +100,9 @@ class FetchPagesFromCsvCest
     public function getAllThePages(IntegrationTester $i, \Codeception\Example $example)
     {
         #GIVEN
-        $persona=$example[1];
-        $url=$example[3];
-        $user_details=$this->personas[$persona];
+        $persona      = $example[1];
+        $url          = $example[3];
+        $user_details = $this->personas[$persona];
 
         #Need to login to the right user
         $this->loginUser($i, $user_details['username'], $user_details['password']);
