@@ -129,10 +129,6 @@ class Controller extends Base
     {
         set_time_limit(600);
 
-        if (!$this->getUser()->isSuperuser()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
-
         $allFolders = null;
         if (is_array($this->getRequest()->post['attachment'])) {
             $factory = new CollectorFactory();
