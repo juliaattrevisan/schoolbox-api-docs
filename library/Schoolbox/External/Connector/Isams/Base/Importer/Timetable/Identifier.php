@@ -10,7 +10,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Importer\ImporterInterface;
+use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
 
 /**
  * Class Identifier
@@ -20,7 +20,7 @@ use Schoolbox\External\Connector\Isams\Base\Importer\ImporterInterface;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
  */
-class Identifier implements ImporterInterface
+class Identifier implements IStrategy
 {
 
     /**

@@ -11,7 +11,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Importer\ImporterInterface;
+use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
@@ -26,7 +26,7 @@ use Schoolbox\External\TimetablePeriodMapper;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
  */
-class Definition implements ImporterInterface
+class Definition implements IStrategy
 {
 
     /**

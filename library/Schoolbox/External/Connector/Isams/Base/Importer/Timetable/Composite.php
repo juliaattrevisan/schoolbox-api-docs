@@ -27,7 +27,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Importer
  */
-class Composite implements Importer\ImporterInterface
+class Composite implements Importer\IStrategy
 {
 
     /**

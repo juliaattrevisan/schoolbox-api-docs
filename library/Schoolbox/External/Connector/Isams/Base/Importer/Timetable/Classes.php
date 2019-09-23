@@ -16,6 +16,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
@@ -30,7 +31,7 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
  */
-class Classes
+class Classes implements IStrategy
 {
 
     /**
