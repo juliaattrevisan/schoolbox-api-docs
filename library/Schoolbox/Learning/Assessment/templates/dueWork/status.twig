@@ -153,9 +153,9 @@
     #}
     {% set hasKami = latestFeedback and latestFeedback.hasResponseWithKamiDocs %}
     {% set fileCount = latestFeedback ? latestFeedback.allFiles.count : 0 %}
-    {% set hasRubricMarks = rubricMarks[participant.user.id]|default(false) %}
+    {% set showRubricLink = assessment.useRubric and (rubricMarks[participant.user.id]|default(false)) %}
 
-    {% if hasKami or fileCount or hasRubricMarks %}
+    {% if hasKami or fileCount or showRubricLink %}
         {% set meta = [] %}
 
         {# Kami #}
@@ -164,7 +164,7 @@
         {% endif %}
 
         {# Rubric #}
-        {% if hasRubricMarks %}
+        {% if showRubricLink %}
             {% set meta = meta|merge(['rubric']) %}
         {% endif %}
 
