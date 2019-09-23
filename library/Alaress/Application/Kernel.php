@@ -94,7 +94,6 @@ use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-use Schoolbox\External\UPS\Factory as ExternalUPSFactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
@@ -977,12 +976,7 @@ abstract class Kernel
 
                         $customSync = new CustomSync($config, $databaseExternal);
 
-                        $factory = new ExternalUPSFactory();
-                        $defaultSync = $factory->build(
-                            $config,
-                            $databaseExternal,
-                            ExternalConnectorFactory::EXTERNAL_SYNC
-                        );
+                        $defaultSync = (new ExternalConnectorFactory())->build($config, $databaseExternal, ExternalConnectorFactory::EXTERNAL_SYNC);
 
                         return (new CompositeSync())
                             ->addSubSync($customSync)

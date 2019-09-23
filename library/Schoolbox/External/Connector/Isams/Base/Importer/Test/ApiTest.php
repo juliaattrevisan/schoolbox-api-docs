@@ -8,11 +8,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Test;
+namespace Schoolbox\External\Connector\Isams\Base\Importer\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\Isams\Base\MockApi;
-use Schoolbox\External\UPS\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Importer\MockApi;
+use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
 
 
 class ApiTest extends TestCase

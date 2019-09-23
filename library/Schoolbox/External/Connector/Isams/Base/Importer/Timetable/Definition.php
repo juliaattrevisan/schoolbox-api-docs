@@ -1,9 +1,5 @@
 <?php
 /**
- * Definition
- *
- * Timetable definition of days and periods
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,16 +10,23 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
-use Schoolbox\External\Connector\Isams\Base\Importer\ImporterInterface;
+use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\External\UPS\Batchxml;
 
-class Definition implements ImporterInterface
+/**
+ * Class Definition
+ *
+ * Timetable definition of days and periods
+ *
+ * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ */
+class Definition implements IStrategy
 {
 
     /**

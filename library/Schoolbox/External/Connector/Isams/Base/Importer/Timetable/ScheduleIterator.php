@@ -1,10 +1,5 @@
 <?php
 /**
- * ScheduleIterator
- *
- * Iterate a series of Schedule elements (these correspond to when periods occur)
- * and collate all the people and details involved
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -15,9 +10,17 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Iterator;
 use RuntimeException;
-use Schoolbox\External\UPS\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
 use SimpleXMLElement;
 
+/**
+ * Class ScheduleIterator
+ *
+ * Iterate a series of Schedule elements (these correspond to when periods occur)
+ * and collate all the people and details involved
+ *
+ * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ */
 class ScheduleIterator implements Iterator
 {
     /**
