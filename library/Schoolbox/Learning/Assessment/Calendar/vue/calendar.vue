@@ -359,6 +359,11 @@
                 self.currentView = info.view.type;
 
                 self.destroyPopOver();
+
+                if (self.currentView === 'resourceTimelineSemester') {
+                    self.redrawWeekNumbers();
+                    self.cleanupMonthHeaderInlineStyles();
+                }
             },
 
             /**
@@ -383,8 +388,8 @@
                         self.termEndDate = endDateByCursor;
                     }
 
-                    self.redrawWeekNumber();
-
+                    self.redrawWeekNumbers();
+                    self.cleanupMonthHeaderInlineStyles();
                 } else {
                     self.$refs.fullCalendar.getApi().next();
                 }
@@ -402,13 +407,19 @@
                         (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)) {
 
                         self.cursor--;
-                        var startDateByCursor = self.getStartDateByCursor();
+
+                        var startDateByCursor = self.getStartDateByCursor(),
+                            endDateByCursor = self.getEndDateByCursor();
 
                         if (startDateByCursor !== undefined) {
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
                         }
 
-                        self.redrawWeekNumber();
+                        self.termStartDate = startDateByCursor;
+                        self.termEndDate = endDateByCursor;
+
+                        self.redrawWeekNumbers();
+                        self.cleanupMonthHeaderInlineStyles();
                     }
                 } else {
                     self.$refs.fullCalendar.getApi().prev();
@@ -420,7 +431,9 @@
 
                 if (self.currentView === 'resourceTimelineSemester') {
                     self.$refs.fullCalendar.getApi().gotoDate(self.config.termDates.current.start);
-                    self.redrawWeekNumber();
+
+                    self.redrawWeekNumbers();
+                    self.cleanupMonthHeaderInlineStyles();
                 } else {
                     self.$refs.fullCalendar.getApi().gotoDate(moment().format('YYYY-MM-DD'));
                 }
@@ -502,9 +515,38 @@
                 }
             },
 
-            redrawWeekNumber() {
+            redrawWeekNumbers() {
                 document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach(function (element, index) {
                     element.innerHTML = index + 1;
+                });
+
+            },
+
+            redrawCalendar() {
+                var self = this;
+
+                if (self.currentView === 'resourceTimelineSemester') {
+                    this.redrawWeekNumbers();
+                    this.redrawEventRows();
+                }
+            },
+
+            cleanupMonthHeaderInlineStyles() {
+                document.querySelectorAll('.fc-time-area .fc-content tr')[0].querySelectorAll('div').forEach(function (element) {
+                    element.removeAttribute('style');
+                    element.querySelector('span').removeAttribute('style');
+                });
+            },
+
+            redrawEventRows() {
+                document.querySelectorAll('.fc-resourceTimelineSemester-view .fc-time-area [data-resource-id]').forEach(function (element, index) {
+                    var resourceColHeight = document.querySelector('.fc-resourceTimelineSemester-view .fc-resource-area [data-resource-id="'+ element.getAttribute('data-resource-id') +'"]').offsetHeight;
+
+                    element.querySelector('div').style.height = resourceColHeight + 'px';
+
+                    element.querySelectorAll('div .placeholder').forEach(function (placeholders) {
+                        placeholders.style.height = (resourceColHeight - 3) + 'px';
+                    })
                 });
             }
         }
@@ -602,6 +644,8 @@
             @loading="onLoading"
             @eventClick="onEventClick"
             @dateClick="onDateClick"
+            @eventPositioned="redrawCalendar"
+            @windowResize="redrawCalendar"
         />
     </div>
 </template>
@@ -618,6 +662,12 @@
 
     .fc-resourceTimelineSemester-view .fc-timeline-event .fc-title-wrap {
         text-align: center !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-timeline-event.placeholder .fc-title-wrap {
+        padding: 5px;
+        font-size: .8rem;
+        line-height: 1.7;
     }
 
     .fc-timeline-event, .fc-day-grid-event {
@@ -656,6 +706,10 @@
     .fc-resourceTimelineSemester-view .fc-event-container .fc-timeline-event:not(.placeholder),
     .fc-dayGridMonth-view .placeholder {
         display: none;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
+        height: auto !important;
     }
 
 </style>
