@@ -8,9 +8,9 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Connector\Isams\Base\Api;
+use Schoolbox\External\Connector\Isams\Base\Importer\Api;
+use Schoolbox\External\Connector\Isams\Base\Importer\MockApi;
 use Schoolbox\External\Connector\Isams\Base\Importer\Profile;
-use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
 use Zend\Uri\Exception\InvalidUriPartException;

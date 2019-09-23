@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base;
+namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 interface IApi
 {

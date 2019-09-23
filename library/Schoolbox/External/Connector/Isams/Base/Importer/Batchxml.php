@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
-use Schoolbox\External\Connector\Isams\Base\Api;
-use Schoolbox\External\Connector\Isams\Base\IApi;
 
 /**
  * Class Batchxml
