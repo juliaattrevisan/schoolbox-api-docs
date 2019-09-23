@@ -13,6 +13,13 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper;
 use function in_array;
 
+/**
+ * Controller for folder searches.
+ *
+ * Currently not connected to an endpoint: it's no longer required for the
+ * assessment calendar it was developed for, and also conflicts with the search
+ * page's folder search.
+ */
 class Controller extends BaseController
 {
     private const FOLDER_TYPE_MY_CLASS     = 'class';
@@ -53,9 +60,6 @@ class Controller extends BaseController
      * Accepts these query string parameters:
      * * query: a search term
      * * types: a list of types of folder which this request may fetch
-     *
-     * @api   GET /resource/folder/search
-     * @since 19.1.0
      */
     public function getFolderSearch(): void
     {
