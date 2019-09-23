@@ -11,14 +11,18 @@ namespace Schoolbox\Admin\BulkAddFolders;
 
 use Alaress\Web\Controller\Base;
 use Bulk_Folder;
+use InvalidArgumentException;
+use Schoolbox\Application;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Scrub;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -111,10 +115,19 @@ class Controller extends Base
         );
     }
 
+
+    /** @noinspection PhpUnused */
     /**
      * Create folders and render results
+     *
+     * @api   POST /adminv2/bulk-add-folders
+     * @since 16.0.0
+     * @throws Application\Exception\Exception
+     * @throws InvalidArgumentException
+     * @throws Resource\Exception
+     * @throws UnexpectedValueException
      */
-    public function postImportResults()
+    public function postImportResults(): void
     {
         set_time_limit(600);
 
