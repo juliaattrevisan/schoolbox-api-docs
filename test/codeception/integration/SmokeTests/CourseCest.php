@@ -37,9 +37,9 @@ class CourseCest
         #GIVEN
         $timestamp      = time();
         $folder_title   = 'Test Folder For Create Course at ' . $timestamp;
-        $faculty_folder = $i->grabFirstFolderByTitle('Faculties');
+        $course_base_folder = $i->grabFirstFolderByTitle('Courses');
 
-        $folderPayload = new Payload\Resource\Folder\Create($faculty_folder->getId());
+        $folderPayload = new Payload\Resource\Folder\Create($course_base_folder->getId());
         $folderPayload->setTemplate(HomepageTemplate::HOMEPAGE_NONE);
         $folderPayload->setName($folder_title);
         $i->amGoingTo('Send request create a Folder in faculty folder');
@@ -104,9 +104,9 @@ class CourseCest
         #GIVEN
         $timestamp      = time();
         $folder_title   = 'Test Folder For Create Course with assessments at ' . $timestamp;
-        $faculty_folder = $i->grabFirstFolderByTitle('Faculties');
+        $course_base_folder = $i->grabFirstFolderByTitle('Courses');
 
-        $folderPayload = new Payload\Resource\Folder\Create($faculty_folder->getId());
+        $folderPayload = new Payload\Resource\Folder\Create($course_base_folder->getId());
         $folderPayload->setTemplate(HomepageTemplate::HOMEPAGE_NONE);
         $folderPayload->setName($folder_title);
         $i->amGoingTo('Send request create a Folder in faculty folder');
@@ -163,8 +163,8 @@ class CourseCest
 
         $classpage_title = 'Testing Class Page for Course Sync and Assessment at ' . $timestamp;
         $class_code      = 'test' . $timestamp;
-        $student         = $i->grabUser('drhodes');
-        $teacher         = $i->grabUser('zsmith');
+        $student         = $i->grabUser('jreed');
+        $teacher         = $i->grabUser('jcoles');
         $admin           = $i->grabUser('alaress');
 
         $folderPayload = new Payload\Resource\Folder\Create();

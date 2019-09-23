@@ -145,8 +145,8 @@ class AssessmentOnGroupCest
         $timestamp  = time();
         $groupPage = $this->createHomepage($i, 'Testing Submit Assessment on Group Page at ' . $timestamp);
 
-        $student = $i->grabUser('drhodes');
-        $teacher = $i->grabUser('zsmith');
+        $student = $i->grabUser('jreed');
+        $teacher = $i->grabUser('jcoles');
         $admin   = $i->grabUser('alaress');
 
         $addMembers = new AddMembers($groupPage->getId());
@@ -196,8 +196,8 @@ class AssessmentOnGroupCest
         $timestamp  = time();
         $groupPage = $this->createHomepage($i, 'Testing Mark Assessment with rubric on Group Page at ' . $timestamp);
 
-        $student = $i->grabUser('drhodes');
-        $teacher = $i->grabUser('zsmith');
+        $student = $i->grabUser('jreed');
+        $teacher = $i->grabUser('jcoles');
         $admin   = $i->grabUser('alaress');
 
         $memberPayload = new AddMembers($groupPage->getId());
@@ -253,8 +253,8 @@ class AssessmentOnGroupCest
         $timestamp  = time();
         $groupPage = $this->createHomepage($i, 'Testing Mark Assessment on Group Page at ' . $timestamp);
 
-        $student = $i->grabUser('drhodes');
-        $teacher = $i->grabUser('zsmith');
+        $student = $i->grabUser('jreed');
+        $teacher = $i->grabUser('jcoles');
         $admin   = $i->grabUser('alaress');
 
         $memberPayload = new AddMembers($groupPage->getId());

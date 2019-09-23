@@ -187,8 +187,8 @@ class HomePageCest
     {
         #GIVEN
         $timestamp      = time();
-        $student        = $i->grabUser('drhodes');
-        $teacher        = $i->grabUser('zsmith');
+        $student        = $i->grabUser('jreed');
+        $teacher        = $i->grabUser('jcoles');
         $admin          = $i->grabUser('alaress');
         $homepage_title = 'Testing Home Page Add Members with Permissions at ' . $timestamp;
 

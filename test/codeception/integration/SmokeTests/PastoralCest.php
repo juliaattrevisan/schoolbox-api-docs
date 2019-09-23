@@ -36,11 +36,11 @@ class PastoralCest
     public function createPastoralRecord(IntegrationTester $i): void
     {
         # GIVEN
-        $student_drhodes = $i->grabUser('drhodes');
-        $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral record create at ' . time());
+        $student_jreed = $i->grabUser('jreed');
+        $this->createDefaultPastoralRecord($i, $student_jreed, 'Automated Test Pastoral record create at ' . time());
 
         #THEN
-        $i->sendGET("/pastoral/student/{$student_drhodes->getId()}");
+        $i->sendGET("/pastoral/student/{$student_jreed->getId()}");
         $i->seeResponseCodeIs(200);
     }
 
@@ -54,18 +54,18 @@ class PastoralCest
     public function modifyPastoralRecord(IntegrationTester $i): void
     {
         #GIVEN
-        $student_drhodes = $i->grabUser('drhodes');
-        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral record modify at ' . time());
+        $student_jreed = $i->grabUser('jreed');
+        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_jreed, 'Automated Test Pastoral record modify at ' . time());
 
         #WHEN
         $updatePastoral = new Payload\Pastoral\Update($pastoral_record);
         $updatePastoral->setFormParam('body_public', '<p>automated public statement - Edited</p>');
-        $i->amGoingTo('Send request update pastoral record for student #' . $student_drhodes->getId());
+        $i->amGoingTo('Send request update pastoral record for student #' . $student_jreed->getId());
         $i->sendRequest($updatePastoral);
 
         #THEN
         $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}");
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}");
 
         $i->sendGET($i->grabHttpHeader('location'));
         $i->seeResponseCodeIs(200);
@@ -81,19 +81,19 @@ class PastoralCest
     public function duplicatePastoralRecord(IntegrationTester $i): void
     {
         #GIVEN
-        $student_drhodes = $i->grabUser('drhodes');
-        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral record duplicate at ' . time());
+        $student_jreed = $i->grabUser('jreed');
+        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_jreed, 'Automated Test Pastoral record duplicate at ' . time());
 
         #WHEN
-        $student_duplicate_target = $i->grabUser('rrhodes');
+        $student_duplicate_target = $i->grabUser('ereed');
         $updatePastoral           = new Payload\Pastoral\Update($pastoral_record);
         $updatePastoral->setDuplicateToUser($student_duplicate_target->getId());
-        $i->amGoingTo("Send request duplicate pastoral record for student #{$student_drhodes->getId()} to student #{$student_duplicate_target->getId()}");
+        $i->amGoingTo("Send request duplicate pastoral record for student #{$student_jreed->getId()} to student #{$student_duplicate_target->getId()}");
         $i->sendRequest($updatePastoral);
 
         #THEN
         $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}");
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}");
 
         $i->sendGET($i->grabHttpHeader('location'));
         $i->seeResponseCodeIs(200);
@@ -109,28 +109,28 @@ class PastoralCest
     public function commentOnPastoralRecord(IntegrationTester $i): void
     {
         #GIVEN
-        $student_drhodes = $i->grabUser('drhodes');
-        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_drhodes, 'Automated Test Pastoral create comments at ' . time());
+        $student_jreed = $i->grabUser('jreed');
+        $pastoral_record = $this->createDefaultPastoralRecord($i, $student_jreed, 'Automated Test Pastoral create comments at ' . time());
 
         #WHEN
         $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
         $pastoralCommentPayload->setPublicComment('A very public comment');
-        $i->amGoingTo("Send request add comment to student #{$student_drhodes->getId()} record # {$pastoral_record->getId()}");
+        $i->amGoingTo("Send request add comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
         $i->sendRequest($pastoralCommentPayload);
 
         #THEN
         $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}/record/{$pastoral_record->getId()}");
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}");
 
         #WHEN
         $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
         $pastoralCommentPayload->setPrivateComment('A very private comment');
-        $i->amGoingTo("Send request add private comment to student #{$student_drhodes->getId()} record # {$pastoral_record->getId()}");
+        $i->amGoingTo("Send request add private comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
         $i->sendRequest($pastoralCommentPayload);
 
         #THEN
         $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_drhodes->getId()}/record/{$pastoral_record->getId()}");
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}");
 
         #WHEN
         $i->sendGET($i->grabHttpHeader('location'));
@@ -148,9 +148,9 @@ class PastoralCest
      */
     private function createDefaultPastoralRecord(IntegrationTester $i, User $student, string $heading): Pastoral\Model
     {
-        $teacher         = $i->grabUser('zsmith');
-        $blocked_teacher = $i->grabUser('jbenson');
-        $teacher_role    = $i->grabRoleByTitle('Teachers');
+        $teacher         = $i->grabUser('jcoles');
+        $blocked_teacher = $i->grabUser('staff1');
+        $teacher_role    = $i->grabRoleByTitle('Teacher');
 
         $createPastoral = new Payload\Pastoral\Create($student->getId());
         $createPastoral->setHeading($heading);
