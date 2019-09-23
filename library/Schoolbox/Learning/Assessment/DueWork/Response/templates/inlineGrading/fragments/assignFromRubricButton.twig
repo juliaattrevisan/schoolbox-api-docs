@@ -55,7 +55,7 @@
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
             // Disable the button if the rubric value is same as input value
-            var isValueCustomised = rubricSum !== currentMarkInput;
+            var isValueCustomised = rubricSum !== '' && rubricSum !== currentMarkInput;
             $assignFromRubricButton.prop('disabled', !isValueCustomised);
             if (isValueCustomised) {
                 $status.find(markInputSelector).attr('data-customised', true);
