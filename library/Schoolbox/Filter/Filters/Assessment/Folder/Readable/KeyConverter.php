@@ -91,16 +91,16 @@ class KeyConverter extends BaseKeyConverter
                 if ($pageOptions[$availableOption] && $pageOptions[$availableOption]->getAvailable()) {
                     switch ($availableOption) {
                         case Definition::KEY_MY_CLASSES:
-                            $selectedItems = $selectedItems->merge(new Collection($userClasses));
+                            $selectedItems = $selectedItems->mergeUnique(new Collection($userClasses));
                             break;
                         case Definition::KEY_MY_GROUPS:
-                            $selectedItems = $selectedItems->merge(new Collection($userGroups));
+                            $selectedItems = $selectedItems->mergeUnique(new Collection($userGroups));
                             break;
                         case Definition::KEY_OTHER_CLASSES:
-                            $selectedItems = $selectedItems->merge(new Collection($otherClasses));
+                            $selectedItems = $selectedItems->mergeUnique(new Collection($otherClasses));
                             break;
                         case Definition::KEY_OTHER_GROUPS:
-                            $selectedItems = $selectedItems->merge(new Collection($otherGroups));
+                            $selectedItems = $selectedItems->mergeUnique(new Collection($otherGroups));
                             break;
                     }
 
@@ -115,7 +115,7 @@ class KeyConverter extends BaseKeyConverter
 //                    }
                 }
             }
-            return $selectedItems;
+            return $selectedItems->indexByCallback(static function ($v) { return $v; });
         }
         return parent::getSelectedItems($availableSelections, $user, $page);
     }
