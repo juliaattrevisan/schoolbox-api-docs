@@ -267,6 +267,10 @@ class Profile implements IStrategy
                 $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->EnrolmentDate)));
             }
 
+            /* Find out a staff member via their user code
+             */
+            $formTeacher = $this->findFormTeacher(trim((string)$student->Form));
+
             /* Smoosh it all together
              */
             $studentProfile
@@ -280,8 +284,8 @@ class Profile implements IStrategy
                 ->setEmail(trim((string)$student->EmailAddress))
                 ->setEnrolmentDate($enrolmentDate)
                 ->setFormName(trim((string)$student->Form))
-                ->setFormTeacherId(null)
-                ->setFormTeacherName(null)
+                ->setFormTeacherId($formTeacher['formTeacherId'])
+                ->setFormTeacherName($formTeacher['formTeacherName'])
                 ->setGender(trim((string)$student->Gender))
                 ->setHeadOfHouseId($housemaster['housemasterId'])
                 ->setHeadOfHouseName($housemaster['housemasterName'])
@@ -384,6 +388,42 @@ class Profile implements IStrategy
         return [
             'housemasterId' => $housemasterId,
             'housemasterName' => $housemasterName
+        ];
+    }
+
+
+    /**
+     * Find a form teacher from their form code
+     *
+     * @param string $form
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findFormTeacher(string $form): array
+    {
+        $formTeacherId = null;
+        $formTeacherName = null;
+
+        $form = trim($form);
+        $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Forms/Form[@Id='{$form}']");
+
+        if ($node) {
+            $form = $node[0];
+
+            $formTeacherId = trim((string)$form->Tutor);
+            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$formTeacherId}')]");
+
+            if ($node) {
+                $formTeacher = $node[0];
+                $formTeacherName = trim((string)$formTeacher->FullName);
+            }
+        }
+
+        return [
+            'formTeacherId' => $formTeacherId,
+            'formTeacherName' => $formTeacherName
         ];
     }
 
