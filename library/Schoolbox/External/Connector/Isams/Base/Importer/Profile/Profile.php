@@ -304,7 +304,14 @@ class Profile implements IStrategy
                 ->setYearLevelCoordinatorId(null)
                 ->setYearLevelCoordinatorName(null)
 
-                /* Flags
+                /**
+                 * Flags
+                 */
+
+                /* Boarding Status comes from ISAMS as a client-configurable value
+                 *
+                 * We can't check for this effectively unless we predetermine what these
+                 * statuses could contain and what those statuses mean
                  */
                 ->setBoardingStatus(false)
                 ->setEsl(null)
