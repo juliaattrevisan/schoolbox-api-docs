@@ -733,18 +733,24 @@ class IdFinder extends Filter\AbstractIdFinder
         }
         if ($studentFolderIds) {
             $folderIds = null === $folderIds
-                ? $studentFolderIds
+                ? $studentFolderIds->getAll()
                 : array_intersect($folderIds, $studentFolderIds->getAll());
         }
         if ($courseImportFolderIds) {
             $folderIds = null === $folderIds
-                ? $courseImportFolderIds :
+                ? $courseImportFolderIds->getAll() :
                 array_intersect($folderIds, $courseImportFolderIds->getAll());
         }
         if ($readableFolderIds) {
             $folderIds = null === $folderIds
-                ? $readableFolderIds :
+                ? $readableFolderIds->getAll() :
                 array_intersect($folderIds, $readableFolderIds->getAll());
+        }
+
+        // No folder IDs (but search not null)?
+        // Return a predicate that matches nothing
+        if (empty($folderIds)) {
+            return ['FALSE', []];
         }
 
         $builder = $this->getMapper()->getPredicateBuilder();
