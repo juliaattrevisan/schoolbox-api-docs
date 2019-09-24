@@ -55,8 +55,9 @@ class KeyConverter extends BaseKeyConverter
      */
     public function getSelectedItems(GenericCollection $availableSelections, User $user, string $page): ?Collection
     {
-        // If one or more is not available:
-        // If none are selected, pass empty collection instead of NULL
+        // If nothing is selected, the default selection is:
+        // every folder within the options that are enabled for this user's
+        // role type.
         if ($availableSelections->count() === 0) {
             $allItems      = $this->getAllPossibleItems();
             $selectedItems = $allItems->emptyClone();
@@ -70,11 +71,9 @@ class KeyConverter extends BaseKeyConverter
                 Definition::KEY_OTHER_GROUPS,
             ];
 
-
+            // TODO consider this to another class, as Factory::buildComponent uses the same lookups
             $userClasses  = $this->folderMapper->findFolderIdsForUser($user, true, UserAccess::ACCESS_FULL + 1);
-//            $userClasses  = array_combine($userClasses, $userClasses);
             $userGroups   = $this->folderMapper->findFolderIdsForUser($user, false);
-//            $userGroups   = array_combine($userGroups, $userGroups);
             $otherClasses = $this->folderMapper->findIdsByPredicates(
                 $this->folderMapper->getPredicateBuilder()
                                    ->notNull('cc.code')
@@ -103,60 +102,10 @@ class KeyConverter extends BaseKeyConverter
                             $selectedItems = $selectedItems->mergeUnique(new Collection($otherGroups));
                             break;
                     }
-
-//                    // Available:
-//                    // add all of the items in this option to the selected list
-//                    // Unavailable: ... don't?
-//                    // (At least one page option will be available)
-//                    foreach ($allItems as $item) {
-//                        if ($this->filterByKeyType($item, $user, $availableOption)) {
-//                            $selectedItems[] = $item;
-//                        }
-//                    }
                 }
             }
             return $selectedItems->indexByCallback(static function ($v) { return $v; });
         }
         return parent::getSelectedItems($availableSelections, $user, $page);
-    }
-
-
-    /**
-     * Filter by key type
-     *
-     * @param int    $folderId
-     * @param User   $user
-     * @param string $keyType
-     * @return bool
-     */
-    private function filterByKeyType(int $folderId, User $user, string $keyType): bool
-    {
-        // Folder IDs:
-        // Classes have a folder ID, groups don't
-        // My folders will be in $user, others won't
-        // How do I tell if a folder is mine? groups aren't in $user object
-
-        switch ($keyType) {
-            case Definition::KEY_MY_CLASSES:
-                // Is this folder a class of $user?
-                // How do I figure that out from here?
-                break;
-
-            case Definition::KEY_MY_GROUPS:
-                // Is this folder a group of $user?
-                break;
-
-            case Definition::KEY_OTHER_CLASSES:
-                // All folders that are classes will have an extant folder code
-                // Is this folder a class not belonging to $user?
-                break;
-
-            case Definition::KEY_OTHER_GROUPS:
-                // I don't have an actual object here :[
-                // Is this folder a group not belonging to $user?
-                break;
-        }
-
-        return false;
     }
 }
