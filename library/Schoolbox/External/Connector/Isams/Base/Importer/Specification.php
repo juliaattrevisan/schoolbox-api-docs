@@ -99,6 +99,11 @@ class Specification
             '/iSAMS/SchoolManager/Forms/Form',
             '/iSAMS/SchoolManager/Forms/Form[@Id]',
 
+            /* There is at least one medical record
+             */
+            '/iSAMS/PupilManager/CurrentPupilsHealth/Pupil',
+            '/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id]',
+
             /**
              * Parent Profile nodes
              */

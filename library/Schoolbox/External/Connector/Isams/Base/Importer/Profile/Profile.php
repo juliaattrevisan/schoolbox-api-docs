@@ -271,13 +271,17 @@ class Profile implements IStrategy
              */
             $formTeacher = $this->findFormTeacher(trim((string)$student->Form));
 
+            /* Find out any medical alerts
+             */
+            $medicalAlert = $this->findMedialAlert(trim((string)$student->xpath('@Id')[0]));
+
             /* Smoosh it all together
              */
             $studentProfile
                 ->setUsername($username)
                 ->setAlertComment(null)
                 ->setAlertLegal(null)
-                ->setAlertMedical(null)
+                ->setAlertMedical($medicalAlert)
                 ->setAlertMessage(null)
                 ->setCampusName($campusName)
                 ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
@@ -427,6 +431,27 @@ class Profile implements IStrategy
         ];
     }
 
+
+    /**
+     * Find medical data for student id $studentId
+     * This isn't their external id. It's their isams internal PupilId
+     *
+     * @param string $studentId
+     * @return string|null
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findMedialAlert(string $studentId): ?string
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id='{$studentId}']");
+
+        if ($node && $node[0]->HealthNotes) {
+            return trim((string)$node[0]->HealthNotes);
+        }
+
+        return null;
+    }
 
     /**
      * Mine $nodes for Campus elements and the NCYear levels to which they relate
