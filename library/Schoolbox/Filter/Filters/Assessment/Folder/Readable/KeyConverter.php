@@ -59,19 +59,8 @@ class KeyConverter extends BaseKeyConverter
         // every folder within the options that are enabled for this user's
         // role type.
         if ($availableSelections->count() === 0) {
-            $allItems      = $this->getAllPossibleItems();
-            $selectedItems = $allItems->emptyClone();
-            // Look at $this->filter to see what availableSelections should be
-            $pageModel        = $this->getFilter()->getPages()[$page];
-            $pageOptions      = $pageModel->getOptions();
-            $availableOptions = [
-                Definition::KEY_MY_CLASSES,
-                Definition::KEY_MY_GROUPS,
-                Definition::KEY_OTHER_CLASSES,
-                Definition::KEY_OTHER_GROUPS,
-            ];
-
-            // TODO consider this to another class, as Factory::buildComponent uses the same lookups
+            // Build the list of user/other groups/classes
+            // TODO consider moving this to another class, as Factory::buildComponent uses the same lookups
             $userClasses  = $this->folderMapper->findFolderIdsForUser($user, true, UserAccess::ACCESS_FULL + 1);
             $userGroups   = $this->folderMapper->findFolderIdsForUser($user, false);
             $otherClasses = $this->folderMapper->findIdsByPredicates(
@@ -86,8 +75,19 @@ class KeyConverter extends BaseKeyConverter
             );
             $otherGroups  = array_diff($otherGroups, $otherClasses, $userClasses, $userGroups);
 
+            // Start building the list of selected items
+            // Only select folders which are available for this user's role type
+            $selectedItems    = $this->getAllPossibleItems()->emptyClone();
+            $pageModel        = $this->getFilter()->getPages()[$page];
+            $availableOptions = [
+                Definition::KEY_MY_CLASSES,
+                Definition::KEY_MY_GROUPS,
+                Definition::KEY_OTHER_CLASSES,
+                Definition::KEY_OTHER_GROUPS,
+            ];
             foreach ($availableOptions as $availableOption) {
-                if ($pageOptions[$availableOption] && $pageOptions[$availableOption]->getAvailable()) {
+                $pageOption = $pageModel->getOptions()[$availableOption] ?? null;
+                if ($pageOption && $pageOption->getAvailable()) {
                     switch ($availableOption) {
                         case Definition::KEY_MY_CLASSES:
                             $selectedItems = $selectedItems->mergeUnique(new Collection($userClasses));
