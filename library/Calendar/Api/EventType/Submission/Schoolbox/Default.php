@@ -66,7 +66,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     * @return Collection|Submission[]
+     * @return Collection|Event[]
      * @throws DomainException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Mapper\DefinitionException

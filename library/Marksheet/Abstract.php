@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,7 +16,6 @@ abstract class Marksheet_Abstract
     protected $name;
     protected $slug;
     protected $comment;
-    protected $subHandler;
     protected $subReturnHandler;
 
     /**
@@ -36,13 +38,14 @@ abstract class Marksheet_Abstract
      */
     protected $extraParams;
 
-    public function __construct($mark_type, $submissionBox, $extraParams)
+    public function __construct(?MarkType $markType, $submissionBox, $extraParams)
     {
-        $this->id = $mark_type['mark_type_id'];
-        $this->setName($mark_type['hr_name']);
-        $this->setSlug($mark_type['slug']);
-        $this->setComment($mark_type['comment']);
-        $this->setSubmissionHandler(new Submission());
+        if ($markType) {
+            $this->id = $markType->getId();
+            $this->setName($markType->getName());
+            $this->setSlug($markType->getSlug());
+            $this->setComment($markType->getComment());
+        }
         $this->setSubmissionReturnHandler(new SubmissionReturn());
         $this->setExtraParams($extraParams);
         $this->setSubmissionBox($submissionBox);
@@ -83,19 +86,6 @@ abstract class Marksheet_Abstract
     public function getComment()
     {
         return $this->comment;
-    }
-
-    public function setSubmissionHandler($handler)
-    {
-        $this->subHandler = $handler;
-    }
-
-    /**
-     * @return Submission
-     */
-    public function getSubmissionHandler()
-    {
-        return $this->subHandler;
     }
 
     public function setSubmissionReturnHandler($handler)
