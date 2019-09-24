@@ -104,6 +104,12 @@ class Specification
             '/iSAMS/PupilManager/CurrentPupilsHealth/Pupil',
             '/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id]',
 
+            /* There is at least one special education registry record for an identifiable student
+             */
+            '/iSAMS/SENManager/SEN/Register',
+            '/iSAMS/SENManager/SEN/Register[@PupilId]',
+            '/iSAMS/SENManager/SEN/Register/Screened',
+
             /**
              * Parent Profile nodes
              */

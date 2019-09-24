@@ -63,6 +63,11 @@ class Batchxml
      */
     public function fetchXml(string $path): array
     {
+        /* Use this to print a vaguely-formatted version
+         */
+//        print_r(str_replace(['<', '/>'], ["\n<", "/>\n"],$this->api->retrieveDocument()));
+//        die();
+
         if (!$this->nodes) {
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }

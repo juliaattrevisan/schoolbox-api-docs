@@ -197,6 +197,7 @@ class Profile implements IStrategy
             $username = trim((string)$student->SchoolCode);
             $firstname = trim((string)$student->Preferredname);
             $lastname = trim((string)$student->Surname);
+            $studentId = trim((string)$student->xpath('@Id')[0]);
 
             /* Students without usernames are skipped
              */
@@ -273,7 +274,11 @@ class Profile implements IStrategy
 
             /* Find out any medical alerts
              */
-            $medicalAlert = $this->findMedialAlert(trim((string)$student->xpath('@Id')[0]));
+            $medicalAlert = $this->findMedialAlert($studentId);
+
+            /* Find out their existence in the SEN (Special Education Needs) registry
+             */
+            $sen = $this->findSpecialNeeds($studentId);
 
             /* Smoosh it all together
              */
@@ -317,7 +322,7 @@ class Profile implements IStrategy
                 ->setEsl(null)
                 ->setIb(null)
                 ->setIndividualLearningPlans(null)
-                ->setSpecialNeeds(false);
+                ->setSpecialNeeds($sen);
 
             /* Log it
              */
@@ -458,6 +463,28 @@ class Profile implements IStrategy
         }
 
         return null;
+    }
+
+
+    /**
+     * Find out if $studentId is on the SEN (Special Education Needs) Registry
+     * and that they were screened
+     *
+     * @param string $studentId
+     * @return bool
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findSpecialNeeds(string $studentId): bool
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/SENManager/SEN/Register[@PupilId='{$studentId}'][contains(Screened, '1')]");
+
+        if ($node) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
