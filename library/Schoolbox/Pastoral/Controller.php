@@ -263,34 +263,20 @@ class Controller extends Base
         $auditRecord->setUser($user);
         $this->pastoralAuditMapper->save($auditRecord);
 
-        if (!is_numeric($get['type'])) {
-            // Retrieve all of the students pastoral records
-
-            $records = $this->pastoralDataSource->findByColumn(
-                $user,
-                'student_id',
-                $student->getId()
-            );
-        } else {
-            // Retrieve results filtered by pastoral type
-
-            $records = $this->pastoralDataSource->findByColumnList(
-                $user,
-                [
-                    'student_id' => $student->getId(),
-                    'type_id'    => $get['type'],
-                ]
-            );
+        $groups   = $this->pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
+        $groupIds = [];
+        foreach ($groups as $group) {
+            /** @var PastoralGroupMember $group */
+            $groupIds[] = $group->getGroup()->getId();
         }
 
-        $records = $records->sortBy('updatedAtDisplay', 'desc');
+        $typeId  = is_numeric($get['type']) ? (int)$get['type'] : null;
+        $records = $this->pastoralDataSource->findForStudent($user, $student, $typeId, $groupIds);
 
         // Limit the number of pastoral records to display on each page of pastoral records
-
         $resultsPerPage = $this->config->get('pastoral_page_size');
 
         // Set the current page number
-
         $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? $get['pageCurrent'] : 1;
 
         if ($pageCurrent > ceil($records->count() / $resultsPerPage)) {
@@ -301,19 +287,23 @@ class Controller extends Base
             }
         }
 
+        $pageRecords = $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, true);
+        // populate related records
+        $pageRecords = $this->pastoralDataSource->addLinkedInfo($pageRecords, $user, $typeId, $groupIds);
+
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
             'data'     => [
                 'user'           => $user,
                 'recordCount'    => $records->count(),
-                'records'        => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
+                'records'        => $pageRecords,
                 'student'        => $student,
                 'pageCurrent'    => $pageCurrent,
                 'types'          => $this->pastoralTypeMapper->findAll(),
                 'linkedStudents' => $this->pastoralDataSource->getLinkedStudents($student),
                 'typeSelected'   => $get['type'],
             ],
-            'title' => $student->getFullName(),
+            'title'    => $student->getFullName(),
         ]);
     }
 
