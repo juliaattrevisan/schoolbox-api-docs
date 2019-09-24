@@ -123,7 +123,7 @@ class CalendarCest
         $timestamp      = time();
         $admin          = $i->grabUser('alaress');
         $title          = 'Test Event, campus create from modify event at ' . $timestamp;
-        $targetCampuses = [$i->grabCampusByName('Senior')->getId(), $i->grabCampusByName('Junior')->getId()];
+        $targetCampuses = [$i->grabCampusByName('Secondary')->getId(), $i->grabCampusByName('Primary')->getId()];
         $targetRoles    = [$i->grabRoleByTitle('Administration')->getId(), $i->grabRoleByTitle('Teacher')->getId()];
 
         #WHEN
@@ -189,7 +189,7 @@ class CalendarCest
         $timestamp      = time();
         $admin          = $i->grabUser('alaress');
         $title          = 'Test Event, rsvp campus event at ' . $timestamp;
-        $targetCampuses = [$i->grabCampusByName('Senior')->getId(), $i->grabCampusByName('Junior')->getId()];
+        $targetCampuses = [$i->grabCampusByName('Secondary')->getId(), $i->grabCampusByName('Primary')->getId()];
         $targetRoles    = [$i->grabRoleByTitle('Administration')->getId(), $i->grabRoleByTitle('Teacher')->getId()];
 
         $createEventRequest = new Payload\Calendar\Event\Create($admin->getId(), $admin->getId());
@@ -230,7 +230,7 @@ class CalendarCest
         $timestamp      = time();
         $admin          = $i->grabUser('alaress');
         $title          = 'Test Event, rsvp campus event and approve the rsvp at ' . $timestamp;
-        $targetCampuses = [$i->grabCampusByName('Senior')->getId(), $i->grabCampusByName('Junior')->getId()];
+        $targetCampuses = [$i->grabCampusByName('Secondary')->getId(), $i->grabCampusByName('Primary')->getId()];
         $targetRoles    = [$i->grabRoleByTitle('Administration')->getId(), $i->grabRoleByTitle('Teacher')->getId()];
 
         #WHEN
