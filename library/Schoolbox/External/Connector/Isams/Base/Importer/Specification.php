@@ -94,6 +94,11 @@ class Specification
             '/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision/Years/Year',
             '/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision/Years/Year[@YearId]',
 
+            /* There is at least one identifiable form with a name
+             */
+            '/iSAMS/SchoolManager/Forms/Form',
+            '/iSAMS/SchoolManager/Forms/Form[@Id]',
+
             /**
              * Parent Profile nodes
              */
