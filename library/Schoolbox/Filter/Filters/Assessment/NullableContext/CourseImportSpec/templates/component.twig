@@ -1,0 +1,73 @@
+{#
+    Usage:
+        isUserConfigurable: bool              - If false, just hidden input. If true, render a checkbox to clobber hidden value
+        definition:         IFilterDefinition
+        roleSelections:     FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections:     FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        courseSpecs:        CourseSpec[]      - Course Specifications containing Unit Specifications
+        keyNone:            string            - The '(none)' key
+        hideCourseTitle:    bool              - Optional. If true, don't render the course title above each set of units
+
+#}
+{% extends '@filters/_component.twig' %}
+
+{% block filterName %}Courses{% endblock %}
+
+{% block userOptions %}
+    {# Selectize is only created if the item is user-configurable #}
+    {% if isUserConfigurable %}
+        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+        <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
+        {% autoescape 'js' %}
+            <script type="text/javascript">
+                $(function () {
+                    var $filterSelector = $('#filter-selector-course-import-spec');
+                    $filterSelector.selectizeSelector({
+                        multiple: true,
+                        selectize: {
+                            load: null,
+                            onInitialize: null,
+                            items: $.selectizeSelector.getItemsFromSelect($filterSelector),
+                            lockOptgroupOrder: true,
+                            maxOptions: 10
+                        }
+                    });
+                });
+            </script>
+        {% endautoescape %}
+
+        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+
+        <select id="filter-selector-course-import-spec"
+                name="filter_selection[{{ definition.filter.id }}][]"
+                multiple
+                placeholder="Enter one or more course names"
+                data-selectize
+        >
+            {# show NONE selector #}
+            {% include '@filters/_option.twig' with {
+                roleSelection:      roleSelections[keyNone],
+                userSelection:      userSelections[keyNone],
+                label:              '(none)',
+                value:              keyNone,
+                disabled:           isDisabled,
+            } only %}
+
+            {% for courseSpec in courseSpecs %}
+                {% set roleSelection = roleSelections[courseSpec.id] %}
+                {% set userSelection = userSelections[courseSpec.id] %}
+
+                {% include '@filters/_option.twig' with {
+                    userSelection: userSelection,
+                    roleSelection: roleSelection,
+                    label:         courseSpec.title,
+                    value:         courseSpec.id,
+                    disabled:      isDisabled,
+                } only %}
+            {% endfor %}
+        </select>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock userOptions %}

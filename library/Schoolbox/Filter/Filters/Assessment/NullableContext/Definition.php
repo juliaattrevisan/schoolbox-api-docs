@@ -30,7 +30,7 @@ use Schoolbox\Filter;
 abstract class Definition extends Filter\AbstractDefinition
 {
 
-    const KEY_NONE = 'none';  // match assessments that do NOT reside in this context
+    public const KEY_NONE = 'none';  // match assessments that do NOT reside in this context
 
 
     /**

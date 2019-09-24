@@ -126,9 +126,13 @@ Usage:
          * @param {int} filterId
          */
         function clearFilter(filterId) {
-            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']');
+            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
+                $selectize      = $panelComponent.find('[data-selectize]'),
+                selectize       = $selectize.length ? $selectize[0].selectize : null;
             $panelComponent.find('input[type=checkbox]').prop('checked', false);
-            $panelComponent.find('[data-selectize]')[0].selectize.clear(true);
+            if (selectize) {
+                selectize.clear(true);
+            }
             updateFiltersInUseLabel();
         }
 
@@ -237,9 +241,9 @@ Usage:
             var decodedData    = decodeURIComponent(serialised),
                 flatArray      = decodedData.split('&'),
                 nestedObj      = {},
-                regEx          = /^filter_selection\[(\d+)]\[(\w*)]=([01])$/, // eg 'filter_selection[1][task]=1'
+                regEx          = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/, // eg 'filter_selection[1][task]=1'
                 emptyRegEx     = /^filter_selection\[(\d+)]=$/,               // eg 'filter_selection[17]='
-                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(\d+)$/;       // eg 'filter_selection[17][]=22'
+                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(\w+)$/;       // eg 'filter_selection[17][]=22'
 
             // Convert flat string array to nested object
             flatArray.forEach(function (keyValue) {
@@ -499,6 +503,8 @@ Usage:
                 componentsInUse[filterId]['labels'] = [];
 
                 // Maybe this is a selectize?
+                // TODO figure out how to handle combination selectize/checkbox lists
+                // (i.e. "No course" checkbox, and a list of courses)
                 if (selectize) {
                     selectize.items.forEach(function (v) {
                         componentsInUse[filterId]['labels'].push(selectize.options[v].name);

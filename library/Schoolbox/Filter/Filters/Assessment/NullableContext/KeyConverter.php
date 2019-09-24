@@ -8,8 +8,10 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 use Schoolbox\Collection;
+use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Filter;
+use Schoolbox\User;
 
 
 /**
@@ -47,15 +49,37 @@ use Schoolbox\Filter;
  * * * If nullable context-filter is enabled and user-configurable, its available options must correspond to the folder filter.
  *     Eg do not permit admin to configure folder groups to not be available, but units imported to groups to be available.
  */
-abstract class KeyConverter extends Filter\AbstractKeyConverter
+class KeyConverter extends Filter\AbstractKeyConverter
 {
+    /**
+     * All IDs known to the system (regardless of whether they are available for
+     * selection for current user)
+     *
+     * We use IDs instead of Models as too slow for no value
+     *
+     * @var Collection|int[]
+     */
+    private $ids;
+
+
+    /**
+     * @param Filter\Model     $filter
+     * @param Collection|int[] $ids
+     */
+    public function __construct(Filter\Model $filter, Collection $ids)
+    {
+        parent::__construct($filter);
+        $this->ids = $ids->shallowClone();
+    }
+
+
     /**
      * The returned Collection contains ids and/or 'KEY_NONE' => null
      *
      * @inheritdoc
      * @todo This is almost identical to parent. Need to abstract out common bits. See inline comments for different logic.
      */
-    public function getSelectedItems(GenericCollection $availableSelections, \Schoolbox\User $user, string $page): ?Collection
+    public function getSelectedItems(GenericCollection $availableSelections, User $user, string $page): ?Collection
     {
         /** @var Collection|int[] $allItems */
         $allItems       = $this->getAllPossibleItems();
@@ -106,5 +130,47 @@ abstract class KeyConverter extends Filter\AbstractKeyConverter
 
         // Either not all possible items were available for selection, or a subset of items was selected.
         return $selectedItems;
+    }
+
+
+
+    /**
+     * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
+     *
+     * @inheritdoc
+     * @return null|int
+     */
+    public function getItem(string $key, User $user, string $page): ?int
+    {
+        if (Definition::KEY_NONE === $key) {
+            return null;
+        }
+        $this->assertValidKey($key, $user, $page);
+        return $this->ids[$key];
+    }
+
+
+    /**
+     * Return all available concrete items
+     *
+     * @return Collection|int[]
+     */
+    public function getAllPossibleItems(): Collection
+    {
+        return $this->ids->shallowClone();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function assertValidKey(string $key, User $user, string $page): void
+    {
+        if (Definition::KEY_NONE === $key) {
+            return;
+        }
+        if (!$this->ids->offsetExists($key)) {
+            throw new \InvalidArgumentException("No ID found for key: $key");
+        }
     }
 }

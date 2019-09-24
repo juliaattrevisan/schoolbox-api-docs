@@ -18,6 +18,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -195,6 +196,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getFolderMapper(),
                     $this->getAccess()
                 );
+            case NullableContext\CourseImportSpec\Definition::class:
+                return new NullableContext\CourseImportSpec\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getCourseSpecMapper()
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -280,6 +288,16 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
     private function getWorkTypeMapper(): WorkType\Mapper
     {
         return $this->getMapperFactory()->get(WorkType\Mapper::class);
+    }
+
+
+    /**
+     * @return CourseSpec\Mapper|Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getCourseSpecMapper(): CourseSpec\Mapper
+    {
+        return $this->getMapperFactory()->get(CourseSpec\Mapper::class);
     }
 
 

@@ -281,6 +281,21 @@ class CollectionMethodsTest extends TestCase
         $this->assertSame($expected, $input->last());
     }
 
+
+    /**
+     * Tests intersection
+     *
+     * @param Collection    $first
+     * @param Collection    $second
+     * @param callable|null $compare
+     * @param Collection    $expected
+     * @dataProvider provider_intersect
+     */
+    public function testIntersect(Collection $first, Collection $second, ?callable $compare, Collection $expected): void
+    {
+        $this->assertSame($expected->getAll(), $first->intersect($second, $compare)->getAll());
+    }
+
     // ============= Data Providers =============
 
     public function provider_limit()
@@ -517,6 +532,43 @@ class CollectionMethodsTest extends TestCase
             [(new Collection())->setOffset('key1', 'value1'), 'value1'],
             [(new Collection())->setOffset('key1', 'value1')->setOffset('key2', 'value2'), 'value2'],
             [(new Collection())->setOffset('key1', 'value1')->setOffset(0, 0), 0],
+        ];
+    }
+
+    public function provider_intersect(): iterable
+    {
+        // Set notation refresher:
+        // ∅:     Empty set
+        // ∩:     Intersection
+        // |A|:   Cardinality (number of members) of set A
+        // A ⊂ B: A is a proper subset of B (B contains all A, but is not equal)
+        // A ⊃ B: A is a proper superset of B
+        return [
+            '∅ ∩ ∅ = ∅'             => [new Collection(), new Collection(), null, new Collection()],
+            'A ∩ ∅ = ∅'             => [new Collection([1]), new Collection(), null, new Collection()],
+            '∅ ∩ B = ∅'             => [new Collection(), new Collection([1]), null, new Collection()],
+            'A ∩ B, disjoint'       => [new Collection([2, 3, 4]), new Collection([1, 5]), null, new Collection()],
+            'A ∩ B, non-disjoint'   => [new Collection([2, 3, 4]), new Collection([1, 2, 5]), null, new Collection([2])],
+            'A ∩ B, A ⊂ B'          => [new Collection([2]), new Collection([1, 2, 5]), null, new Collection([2])],
+            'A ∩ B, A ⊃ B'          => [new Collection([2]), new Collection([1, 2, 5]), null, new Collection([2])],
+            'A ∩ B, A = B'          => [new Collection([2, 3, 4]), new Collection([2, 3, 4]), null, new Collection([2, 3, 4])],
+            'A ∩ B, custom compare' => [
+                new Collection([
+                    ['id' => 2, 'name' => 'B'],
+                    ['id' => 3, 'name' => 'B'],
+                    ['id' => 4, 'name' => 'B'],
+                ]),
+                new Collection([
+                    ['id' => 3, 'name' => 'C'],
+                    ['id' => 4, 'name' => 'C'],
+                    ['id' => 5, 'name' => 'C'],
+                ]),
+                static function ($a, $b) { return $a['id'] === $b['id']; },
+                new Collection([
+                    ['id' => 3, 'name' => 'B'],
+                    ['id' => 4, 'name' => 'B'],
+                ]),
+            ],
         ];
     }
 }
