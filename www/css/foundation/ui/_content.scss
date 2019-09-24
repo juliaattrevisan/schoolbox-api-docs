@@ -769,10 +769,10 @@ $rotate-span-width: 11rem;
 }
 
 .marksheet .individualisation {
-    border-bottom-left-radius: 50%;
     position: absolute;
-    top: 0;
+    bottom: 0;
     right: 0;
+    line-height: 1.2;
 }
 
 .card .individualisation {
