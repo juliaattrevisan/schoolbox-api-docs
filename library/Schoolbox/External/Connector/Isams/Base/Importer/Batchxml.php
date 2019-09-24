@@ -63,15 +63,24 @@ class Batchxml
      */
     public function fetchXml(string $path): array
     {
-        /* Use this to print a vaguely-formatted version
-         */
-//        print_r(str_replace(['<', '/>'], ["\n<", "/>\n"],$this->api->retrieveDocument()));
-//        die();
+        $this->printXml();
 
         if (!$this->nodes) {
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }
 
         return $this->nodes->xpath($path);
+    }
+
+
+    /**
+     * Use this to print a vaguely-formatted version to a file for manual inspection
+     *
+     * e.g. php profileImporter.php > test.xml
+     */
+    private function printXml(): void
+    {
+        print_r(str_replace(['<', '/>'], ["\n<", "/>\n"],$this->api->retrieveDocument()));
+        die();
     }
 }
