@@ -670,6 +670,11 @@
         line-height: 1.7;
     }
 
+    .placeholder .fc-title {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+
     .fc-timeline-event, .fc-day-grid-event {
         border: 0 !important;
     }
@@ -711,5 +716,6 @@
     .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
         height: auto !important;
     }
+
 
 </style>
