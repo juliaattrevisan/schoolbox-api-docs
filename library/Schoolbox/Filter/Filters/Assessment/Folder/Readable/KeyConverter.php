@@ -8,8 +8,12 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
 
 use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter as BaseKeyConverter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
 /**
@@ -22,13 +26,137 @@ use Schoolbox\User;
 class KeyConverter extends BaseKeyConverter
 {
     /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param Filter\Model  $filter
+     * @param Collection    $folderIds
+     * @param Access        $access
+     * @param Folder\Mapper $folderMapper
+     */
+    public function __construct(
+        Filter\Model $filter,
+        Collection $folderIds,
+        Access $access,
+        Folder\Mapper $folderMapper
+    ) {
+        parent::__construct($filter, $folderIds, $access);
+        $this->folderMapper = $folderMapper;
+    }
+
+
+    /**
      * @inheritDoc
      */
     public function getSelectedItems(GenericCollection $availableSelections, User $user, string $page): ?Collection
     {
+        // If one or more is not available:
+        // If none are selected, pass empty collection instead of NULL
         if ($availableSelections->count() === 0) {
-            return null;
+            $allItems      = $this->getAllPossibleItems();
+            $selectedItems = $allItems->emptyClone();
+            // Look at $this->filter to see what availableSelections should be
+            $pageModel        = $this->getFilter()->getPages()[$page];
+            $pageOptions      = $pageModel->getOptions();
+            $availableOptions = [
+                Definition::KEY_MY_CLASSES,
+                Definition::KEY_MY_GROUPS,
+                Definition::KEY_OTHER_CLASSES,
+                Definition::KEY_OTHER_GROUPS,
+            ];
+
+
+            $userClasses  = $this->folderMapper->findFolderIdsForUser($user, true, UserAccess::ACCESS_FULL + 1);
+//            $userClasses  = array_combine($userClasses, $userClasses);
+            $userGroups   = $this->folderMapper->findFolderIdsForUser($user, false);
+//            $userGroups   = array_combine($userGroups, $userGroups);
+            $otherClasses = $this->folderMapper->findIdsByPredicates(
+                $this->folderMapper->getPredicateBuilder()
+                                   ->notNull('cc.code')
+                                   ->isNull('cc.deleted_at')
+            );
+            $otherClasses = array_diff($otherClasses, $userClasses, $userGroups);
+            $otherGroups  = $this->folderMapper->findIdsByPredicates(
+                $this->folderMapper->getPredicateBuilder()
+                                   ->notNull('ug.cid')
+            );
+            $otherGroups  = array_diff($otherGroups, $otherClasses, $userClasses, $userGroups);
+
+            foreach ($availableOptions as $availableOption) {
+                if ($pageOptions[$availableOption] && $pageOptions[$availableOption]->getAvailable()) {
+                    switch ($availableOption) {
+                        case Definition::KEY_MY_CLASSES:
+                            $selectedItems = $selectedItems->merge(new Collection($userClasses));
+                            break;
+                        case Definition::KEY_MY_GROUPS:
+                            $selectedItems = $selectedItems->merge(new Collection($userGroups));
+                            break;
+                        case Definition::KEY_OTHER_CLASSES:
+                            $selectedItems = $selectedItems->merge(new Collection($otherClasses));
+                            break;
+                        case Definition::KEY_OTHER_GROUPS:
+                            $selectedItems = $selectedItems->merge(new Collection($otherGroups));
+                            break;
+                    }
+
+//                    // Available:
+//                    // add all of the items in this option to the selected list
+//                    // Unavailable: ... don't?
+//                    // (At least one page option will be available)
+//                    foreach ($allItems as $item) {
+//                        if ($this->filterByKeyType($item, $user, $availableOption)) {
+//                            $selectedItems[] = $item;
+//                        }
+//                    }
+                }
+            }
+            return $selectedItems;
         }
         return parent::getSelectedItems($availableSelections, $user, $page);
+    }
+
+
+    /**
+     * Filter by key type
+     *
+     * @param int    $folderId
+     * @param User   $user
+     * @param string $keyType
+     * @return bool
+     */
+    private function filterByKeyType(int $folderId, User $user, string $keyType): bool
+    {
+        // Folder IDs:
+        // Classes have a folder ID, groups don't
+        // My folders will be in $user, others won't
+        // How do I tell if a folder is mine? groups aren't in $user object
+
+        switch ($keyType) {
+            case Definition::KEY_MY_CLASSES:
+                // Is this folder a class of $user?
+                // How do I figure that out from here?
+                break;
+
+            case Definition::KEY_MY_GROUPS:
+                // Is this folder a group of $user?
+                break;
+
+            case Definition::KEY_OTHER_CLASSES:
+                // All folders that are classes will have an extant folder code
+                // Is this folder a class not belonging to $user?
+                break;
+
+            case Definition::KEY_OTHER_GROUPS:
+                // I don't have an actual object here :[
+                // Is this folder a group not belonging to $user?
+                break;
+        }
+
+        return false;
     }
 }
