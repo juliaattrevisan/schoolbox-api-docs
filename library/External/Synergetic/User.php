@@ -795,6 +795,30 @@ class External_Synergetic_User implements External_UserInterface
 
 
     /**
+     * If Synergetic Filetypes were provided, filter based on the value given
+     *
+     * @return string|null
+     */
+    private function getAllowedFileTypes(): ?string
+    {
+        $allowedFileTypes = trim($this->config->get('external_synergetic_allowed_file_types'));
+
+        if (!$allowedFileTypes) {
+            return null;
+        }
+
+        /* Check that everything is in the correct format, removing empty values
+         */
+        $values = explode(',', $allowedFileTypes);
+        $values = array_map('trim', $values);
+        $values = array_filter($values);
+        $values = "'" . implode("','", $values) . "'";
+
+        return $values;
+    }
+
+
+    /**
      * @inheritdoc
      * @throws \Alaress\Database\Exception
      */
@@ -806,12 +830,18 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
+        /* Filter by filetype
+         */
+        $allowedFileTypesSql = '';
+        $allowedFileTypes = $this->getAllowedFileTypes();
+
         if ($user->getRole()->isStudent()) {
+            if (null !== $allowedFileTypes) {
+                $allowedFileTypesSql = " AND luFileType.Code IN ({$allowedFileTypes})";
+            }
 
             // Retrieve student subjects
-
-            $sql =
-            "
+            $sql = "
                 SELECT            StudentClasses.ClassCode as code,
                                   SubjectClasses.ClassCampus as campusCode,
                                   SubjectClasses.Description as name,
@@ -831,16 +861,17 @@ class External_Synergetic_User implements External_UserInterface
                 LEFT JOIN         luFileType ON StudentClasses.FileType = luFileType.Code
                 WHERE             StudentClasses.StartDate <= getdate() AND
                                   (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+                                  {$allowedFileTypesSql}
                 ORDER BY          SubjectClasses.FileType ASC, 
                                   SubjectClasses.Description ASC
             ";
-
         } else if ($user->getRole()->isStaff()) {
+            if (null !== $allowedFileTypes) {
+                $allowedFileTypesSql = "WHERE luFileType.Code IN ({$allowedFileTypes})";
+            }
 
             // Retrieve staff subjects
-
-            $sql =
-            "
+            $sql = "
                 SELECT DISTINCT   (c1.ClassCode) AS code,
                                   c1.ClassCampus as campusCode,
                                   c2.description as name,
@@ -858,10 +889,10 @@ class External_Synergetic_User implements External_UserInterface
                                       Semester.FileYear = c2.FileYear AND
                                       Semester.SystemCurrentFlag = 1
                 LEFT JOIN         luFileType ON c2.FileType = luFileType.Code
+                {$allowedFileTypesSql}
                 ORDER BY          luFileType.Description ASC, 
                                   c2.Description ASC
             ";
-
         } else {
 
             // If they're neither staff/student- they have no business being here
