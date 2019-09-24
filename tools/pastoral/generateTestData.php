@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Mapper;
@@ -20,36 +21,42 @@ require __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
 
+    private const NUM_RECORDS = 200;
+
     /** @inheritDoc */
     public function run(): void
     {
         // get teacher
         $roleMapper = new RoleMapper();
-        $roles      = $roleMapper->findByColumn('group_type', 'staff');
+        $staffRoles = $roleMapper->findByColumn('group_type', 'staff');
 
         $userMapper = new UserMapper();
-        $users = $userMapper->findByColumn('group_id', $roles->getPropertyValues('id'));
-        foreach ($users as $user) {
-            if ($user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
-                $moderator = $user;
+        $staffs     = $userMapper->findByColumn('group_id', $staffRoles->getPropertyValues('id'));
+
+        $testStaffs = $userMapper->createCollection();
+        $moderator  = null;
+        foreach ($staffs as $staff) {
+            if (!$moderator && $staff->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
+                $moderator = $staff;
                 continue;
             }
-            if (!isset($firstTeacher)) {
-                $firstTeacher = $user;
-            } else {
-                if (!isset($secondTeacher)) {
-                    $secondTeacher = $user;
-                } else {
-                    break;
-                }
+            $testStaffs->add($staff);
+            if ($testStaffs->count() > 3) {
+                break;
             }
         }
 
         // get students
         $studentRoles = $roleMapper->findByColumn('group_type', 'student');
 
-        $users        = $userMapper->findByColumn('group_id', $studentRoles->getPropertyValues('id'));
-        $firstStudent = $users->first();
+        $students     = $userMapper->findByColumn('group_id', $studentRoles->getPropertyValues('id'));
+        $testStudents = $userMapper->createCollection();
+        foreach ($students as $student) {
+            $testStudents->add($student);
+            if ($testStudents->count() > 5) {
+                break;
+            }
+        }
 
         // pastoral types
         $pastoralTypeMapper = \Schoolbox\Pastoral\Type\Mapper::getInstance();
@@ -59,33 +66,41 @@ $app = new class extends CliTool\App
 
         // pastoral group
         $pastoralGroupMapper = \Schoolbox\Pastoral\Group\Mapper::getInstance();
-        $pastoralGroup = (new \Schoolbox\Pastoral\Group\Model())
+        $pastoralGroup       = (new \Schoolbox\Pastoral\Group\Model())
             ->setName('Test ' . Alaress_Date_Format::now()->getDatabaseTime())
-            ->setUser($moderator ?? $firstTeacher);
+            ->setUser($moderator ?? $testStaffs->first());
         $pastoralGroupMapper->save($pastoralGroup);
 
         $memberMapper = \Schoolbox\Pastoral\Group\Member\Mapper::getInstance();
-        $memberMapper->save((new \Schoolbox\Pastoral\Group\Member\Model())->setGroup($pastoralGroup)->setUser($secondTeacher)->setAuthor($moderator ?? $firstTeacher));
+        $memberMapper->save((new \Schoolbox\Pastoral\Group\Member\Model())->setGroup($pastoralGroup)->setUser($testStaffs->current())->setAuthor($moderator ?? $testStaffs->current()));
 
-        for ($i = 0; $i < 200; $i++) {
+        for ($i = 0; $i < $this::NUM_RECORDS; $i++) {
+            $currentStaff   = $testStaffs->offsetGet(rand(0, 2));
+            $currentStudent = $testStudents->offsetGet(rand(0, 4));
+            $currentType    = $types->offsetGet(rand(1, $types->count()));
             $pastoral       = (new Model())->setHeading("Record {$i}")
-                                           ->setOwner($firstTeacher)
-                                           ->setStudent($firstStudent)
+                                           ->setOwner($currentStaff)
+                                           ->setStudent($currentStudent)
                                            ->setBodyPrivate("Private {$i}")
                                            ->setBodyPublic("Public {$i}")
-                                           ->setType($types->first());
+                                           ->setType($currentType);
             $pastoralMapper = Mapper::getInstance();
             $pastoralMapper->save($pastoral);
 
             if ($i % 3 == 0) {
                 continue;
+            } elseif ($i % 3 == 1) {
+                $access = (new PastoralAccess())->setUser($currentStaff)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
+                                                ->setPastoral($pastoral);
+            } elseif ($i % 3 == 2) {
+                $access = (new PastoralAccess())->setRole($staffRoles->current())->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
+                                                ->setPastoral($pastoral);
+            } else {
+                $access = (new PastoralAccess())->setGroup($pastoralGroup)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
+                                                ->setPastoral($pastoral);
             }
 
             // pastoral access
-//            $access = (new PastoralAccess())->setUser($secondTeacher)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE)
-//                                            ->setPastoral($pastoral);
-            $access = (new PastoralAccess())->setGroup($pastoralGroup)->setAccess(PastoralAccessMapper::ACCESS_PRIVATE)
-                                            ->setPastoral($pastoral);
             $accessMapper->save($access);
         }
     }

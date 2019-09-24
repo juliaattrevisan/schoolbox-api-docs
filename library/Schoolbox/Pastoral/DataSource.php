@@ -185,6 +185,7 @@ class DataSource
 
         $outerPb = (new Builder($this->mapper->getDatabase(), ''));
 
+        $params = [];
         if (!$pastoralService) {
             $innerPb = (new Builder($this->mapper->getDatabase(), ''));
             $innerPb->equals('p.owner_id', $viewer->getId());
@@ -194,6 +195,7 @@ class DataSource
                 $innerPb->in('pa.group_id', $pastoralGroupIds);
             }
             $outerPb->any($innerPb);
+            $params = $innerPb->getParams();
         }
 
         // This query expects either parent record ids or student id is set.
@@ -239,7 +241,7 @@ class DataSource
         ORDER BY p.updated_at DESC
         ";
 
-        $stmt = $this->mapper->getDatabase()->query($sql, array_merge($innerPb->getParams(), $outerPb->getParams()));
+        $stmt = $this->mapper->getDatabase()->query($sql, array_merge($params, $outerPb->getParams()));
         return $stmt->fetchAll();
     }
 
