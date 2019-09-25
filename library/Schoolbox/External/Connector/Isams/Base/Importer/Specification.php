@@ -134,6 +134,7 @@ class Specification
             '/iSAMS/PupilManager/Contacts/Contact/Forename',
             '/iSAMS/PupilManager/Contacts/Contact/Mobile',
             '/iSAMS/PupilManager/Contacts/Contact/RelationshipRaw',
+            '/iSAMS/PupilManager/Contacts/Contact/SOS',
             '/iSAMS/PupilManager/Contacts/Contact/Surname',
             '/iSAMS/PupilManager/Contacts/Contact/Telephone',
             '/iSAMS/PupilManager/Contacts/Contact/Title',

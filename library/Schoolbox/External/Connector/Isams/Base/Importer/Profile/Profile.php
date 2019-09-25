@@ -288,6 +288,11 @@ class Profile implements IStrategy
              */
             $comments = $this->findComments($studentId);
 
+            /* Add their parents' profile data
+             * Messages come from parents' nodes
+             */
+            $messages = $this->importParentsOfStudent($externalId, $studentBaseProfile);
+
             /* Smoosh it all together
              */
             $studentProfile
@@ -295,7 +300,7 @@ class Profile implements IStrategy
                 ->setAlertComment($comments)
                 ->setAlertLegal(null)
                 ->setAlertMedical($medicalAlert)
-                ->setAlertMessage(null)
+                ->setAlertMessage($messages)
                 ->setCampusName($campusName)
                 ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
                 ->setEmail(trim((string)$student->EmailAddress))
@@ -344,10 +349,6 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->studentProfileMapper->save($studentProfile);
             }
-
-            /* Add their parents' profile data
-             */
-            $this->importParentsOfStudent($externalId, $studentBaseProfile);
         }
     }
 
@@ -606,6 +607,7 @@ class Profile implements IStrategy
      *
      * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
+     * @return string
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws \PDOException
@@ -614,7 +616,7 @@ class Profile implements IStrategy
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): string
     {
         /* Find the parents/guardians of this student
          * To do it, we need a specific id value for $student
@@ -636,6 +638,11 @@ class Profile implements IStrategy
          */
         $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
         $parents = $this->batchxml->fetchXml($path);
+
+        /* As per Duane's conclusion:
+         * A contact's aggregated SOS field equates to Message Alerts for their student
+         */
+        $messages = [];
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
@@ -731,7 +738,13 @@ class Profile implements IStrategy
 
                 $this->relationMapper->save($relation);
             }
+
+            /* Accumulate messages
+             */
+            $messages[] = trim((string)$parent->SOS);
         }
+
+        return implode("\n", $messages);
     }
 
 
