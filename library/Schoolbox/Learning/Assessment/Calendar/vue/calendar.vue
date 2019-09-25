@@ -574,7 +574,8 @@
                     validRange: {
                         start: this.getMinTermDate(),
                         end: this.getMaxTermDate()
-                    }
+                    },
+                    resourceLabelText: 'Week'
                 },
                 resourceTimelineWeek: {
                     columnHeaderFormat: formats.displayWeekDay,
@@ -707,6 +708,10 @@
 
     .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
         height: auto !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-head tr td:first-child .fc-widget-header div {
+        position: absolute !important;
     }
 
 </style>
