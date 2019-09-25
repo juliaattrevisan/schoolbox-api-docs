@@ -26,6 +26,8 @@ use function preg_replace;
 
 /**
  * Responsible for the logical link between a Canvas CourseSection.SisSourceId and a Schoolbox Folder.FolderCode
+ *
+ * This encapsulates the link between a logical 'Class' in both systems.
  */
 class CourseSectionToFolderCodeMap
 {
@@ -180,7 +182,7 @@ class CourseSectionToFolderCodeMap
         $treeBuilder  = new FolderTreeBuilder($this->folderMapper);
 
         // The class structure is by far the largest, so not much saving to root in the 'Classes' top-level folder
-        $this->log->info(sprintf('Build folder tree from root %d', IFolder::ROOT_ID));
+        $this->log->info(sprintf('Building folder tree from root %d', IFolder::ROOT_ID));
         $this->folderTree = $treeBuilder->buildTree(IFolder::ROOT_ID, $hashFunction);
 
         // Get all folders that ARE or WERE classes
@@ -240,7 +242,7 @@ class CourseSectionToFolderCodeMap
     private function parseRolledOverFolderCodeFromFolderName(string $folderName): string
     {
         // search for square bracket suffix
-        if (preg_match('/.+\[(.+)\]$/', $folderName, $matches)) {
+        if (preg_match('/.+\[(.+)]$/', $folderName, $matches)) {
             return $matches[1];
         }
         throw new UnexpectedValueException("Unable to parse rolled-over folder code from folder name '$folderName'");
