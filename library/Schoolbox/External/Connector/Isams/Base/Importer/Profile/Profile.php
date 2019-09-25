@@ -246,14 +246,9 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
 
-            /* Assign campuses if they exist in the mapping
-             * Otherwise quietly disregard bad data
+            /* Find out the campus name for this student
              */
-            $campusName = null;
-
-            if (isset($campusMapping[(int)$student->NCYear])) {
-                $campusName = $campusMapping[(int)$student->NCYear]->getName();
-            }
+            $campusName = $this->findCampusName($campusMapping, (int)$student->NCYear);
 
             /* Fish out a staff member via their user code
              */
@@ -351,6 +346,25 @@ class Profile implements IStrategy
         }
     }
 
+
+    /**
+     * Find campus name
+     *
+     * Assign campuses if they exist in the mapping
+     * Otherwise quietly disregard bad data
+     *
+     * @param array $campusMapping
+     * @param int   $yearLevel
+     * @return string|null
+     */
+    private function findCampusName(array $campusMapping, int $yearLevel): ?string
+    {
+        if (isset($campusMapping[$yearLevel])) {
+            return $campusMapping[$yearLevel]->getName();
+        }
+
+        return null;
+    }
 
     /**
      * Find the enrolment date for student
