@@ -129,6 +129,19 @@ Usage:
                 $checkbox.data('value-original', checkedState);
                 $checkbox.attr('data-value-original', checkedState);
             });
+            $filterPanel.find('[data-selectize]').each(function () {
+                var selectize = this.selectize;
+                if (selectize) {
+                    var itemsJson = JSON.stringify(
+                        selectize.items.map(function (v) {
+                            return Number(v);
+                        })
+                    );
+                    $(this)
+                        .data('valueOriginal', itemsJson)
+                        .attr('data-value-original', itemsJson);
+                }
+            });
             updateFiltersInUseLabel();
         }
 
