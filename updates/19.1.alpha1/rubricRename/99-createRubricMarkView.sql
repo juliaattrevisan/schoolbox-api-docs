@@ -1,4 +1,5 @@
 -- This view is to populate rubric_descriptor mark in v_rubric_mark
+DROP VIEW IF EXISTS v_rubric_descriptor_mark_extend;
 CREATE OR REPLACE VIEW v_rubric_indicator_mark_extend AS
   SELECT
     rubric_capability_mark_id,
