@@ -1,16 +1,52 @@
 <?php
 declare(strict_types=1);
 
-if(($_GET['password'] ?? '') !== 'skIeu6dYhd'){die('Password missing or incorrect');}
-$perform = ($_GET['perform'] ?? '') === '1';
-
-echo $perform ? "<p>Running in PERFORM mode</p>\n" : "<p>Running in DRY RUN mode</p>\n";
-
 use Alaress\Database;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LogLevel;
 use Schoolbox\Application\WebRequest;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../conf/core/require.php';
+
+if (($_GET['password'] ?? '') !== 'skIeu6dYhd') {
+    die('Password missing or incorrect');
+}
+$perform = ($_GET['perform'] ?? '') === '1';
+
+$logger = new class extends AbstractLogger
+{
+
+    public function log($level, $message, array $context = []): void
+    {
+        $colour = $this->getColour($level);
+        echo "<span style='color: $colour'>$message</span><br>\n";
+    }
+
+
+    private function getColour(string $level): string
+    {
+        switch ($level) {
+            case LogLevel::EMERGENCY;
+            case LogLevel::ALERT;
+            case LogLevel::CRITICAL;
+            case LogLevel::ERROR;
+                return 'red';
+            case LogLevel::WARNING;
+                return 'orange';
+            case LogLevel::NOTICE;
+                return 'cyan';
+            case LogLevel::INFO;
+            default;
+                return 'black';
+            case LogLevel::DEBUG;
+                return 'blue';
+        }
+    }
+};
+
+$logger->warning($perform ? "Running in PERFORM mode" : "Running in DRY RUN mode");
+
 
 $kernel = new WebRequest\Kernel();
 
@@ -18,10 +54,13 @@ $kernel = new WebRequest\Kernel();
 $db = $kernel->get('databaseInternal');
 $userMapper = UserMapper::getInstance();
 
-
 $yearLevel = 12;
 $semester  = 2;
 $year      = 2019;
+
+$logger->info("YearLevel: $yearLevel");
+$logger->info("Semester: $semester");
+$logger->info("Year: $year");
 
 
 $data = [
@@ -123,9 +162,10 @@ switch ($yearLevel) {
         $monthAndDay = $semester === 1 ? '03-25' : '09-12';  // Mar 25th : Sep 12th
         break;
     default:
-        throw new LogicException("Unknown year level: $yearLevel");
+        $logger->error("Unknown year level: $yearLevel");
+        exit(1);
 }
-
+$logger->info("Month and Day: $monthAndDay");
 
 $date = new Alaress_Date_Format("$year-$monthAndDay", Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
@@ -163,17 +203,23 @@ foreach ($data as $rowId => $row) {
 
     // Sanity check
     if ($student->getLastname() !== $surname) {
-        echo "Lastname: {$student->getLastname()}, Surname: {$surname}<br>\n";
+        $logger->warning("Lastname: {$student->getLastname()} !== Surname: {$surname}");
+    } else {
+        $logger->debug("Lastname: {$student->getLastname()} === Surname: {$surname}");
     }
     if ($student->getFirstname() !== $preferred) {
-        echo "Lastname: {$student->getFirstname()}, Surname: {$preferred}<br>\n";
+        echo "Lastname: {$student->getFirstname()} !== Surname: {$preferred}<br>\n";
+    } else {
+        $logger->debug("Lastname: {$student->getFirstname()} === Surname: {$preferred}");
     }
 
+    $heading = "Year $yearLevel $year Semester $semester Dean's Comment";
+    $logger->info("Inserting comment for student {$student->getId()} '$heading'");
     if($perform){
         $insertStatement->execute([
             'owner_id'            => $dean->getId(),
             'student_id'          => $student->getId(),
-            'heading'             => "Year $yearLevel $year Semester $semester Dean's Comment",
+            'heading'             => $heading,
             'body_public'         => $comment,
             'modified_by_user_id' => $dean->getId(),
             'created_at'          => $date->getDatabase(),
