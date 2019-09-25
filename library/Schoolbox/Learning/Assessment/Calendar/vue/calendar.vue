@@ -263,17 +263,9 @@
 
                 eventGroup.forEach(function(group, index) {
                     var event = eventGroup[index];
-
-                    if (event.style.removeProperty) {
                         event.style.removeProperty('left');
                         event.style.removeProperty('right');
                         event.style.removeProperty('top');
-                    } else {
-                        // Because IE < 9 doesn't support removeProperty so ¯\_(ツ)_/¯
-                        event.style.removeAttribute('left');
-                        event.style.removeAttribute('right');
-                        event.style.removeAttribute('top');
-                    }
 
                     tmpEvent.push(event.outerHTML);
                 });
@@ -716,6 +708,5 @@
     .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
         height: auto !important;
     }
-
 
 </style>
