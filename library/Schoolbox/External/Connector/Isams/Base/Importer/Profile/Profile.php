@@ -246,10 +246,6 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
 
-            /* Find out the campus name for this student
-             */
-            $campusName = $this->findCampusName($campusMapping, (int)$student->NCYear);
-
             /* Fish out a staff member via their user code
              */
             $tutor = $this->findTutor((string)$student->Tutor);
@@ -258,10 +254,6 @@ class Profile implements IStrategy
              */
             $housemaster = $this->findHousemaster($academicHouse);
 
-            /* Find out enrolment date if it exists
-             */
-            $enrolmentDate = $this->findEnrolmentDate(trim((string)$student->EnrolmentDate));
-
             /* Find out a staff member via their user code
              */
             $formTeacher = $this->findFormTeacher($form);
@@ -269,18 +261,6 @@ class Profile implements IStrategy
             /* Find out a staff member via their user code
              */
             $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
-
-            /* Find out any medical alerts
-             */
-            $medicalAlert = $this->findMedialAlert($studentId);
-
-            /* Find out their existence in the SEN (Special Education Needs) registry
-             */
-            $sen = $this->findSpecialNeeds($studentId);
-
-            /* Find comments content
-             */
-            $comments = $this->findComments($studentId);
 
             /* Add their parents' profile data
              * Messages come from parents' nodes
@@ -291,14 +271,14 @@ class Profile implements IStrategy
              */
             $studentProfile
                 ->setUsername($username)
-                ->setAlertComment($comments)
+                ->setAlertComment($this->findComments($studentId))
                 ->setAlertLegal(null)
-                ->setAlertMedical($medicalAlert)
+                ->setAlertMedical($this->findMedialAlert($studentId))
                 ->setAlertMessage($messages)
-                ->setCampusName($campusName)
+                ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
                 ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
                 ->setEmail(trim((string)$student->EmailAddress))
-                ->setEnrolmentDate($enrolmentDate)
+                ->setEnrolmentDate($this->findEnrolmentDate(trim((string)$student->EnrolmentDate)))
                 ->setFormName($form)
                 ->setFormTeacherId($formTeacher['id'])
                 ->setFormTeacherName($formTeacher['name'])
@@ -329,7 +309,10 @@ class Profile implements IStrategy
                 ->setEsl(null)
                 ->setIb(null)
                 ->setIndividualLearningPlans(null)
-                ->setSpecialNeeds($sen);
+
+                /* SEN (Special Education Needs)
+                 */
+                ->setSpecialNeeds($this->findSpecialNeeds($studentId));
 
             /* Log it
              */
