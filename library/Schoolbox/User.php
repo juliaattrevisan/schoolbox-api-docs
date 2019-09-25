@@ -30,6 +30,9 @@ use Schoolbox\Pastoral;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
+    // Username of the accounts used by Schoolbox staff
+    public const USERNAME_SCHOOLBOX_ADMIN = 'alaress';
+
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
