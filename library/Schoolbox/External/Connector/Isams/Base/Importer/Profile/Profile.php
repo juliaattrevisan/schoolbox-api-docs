@@ -499,6 +499,9 @@ class Profile implements IStrategy
     {
         $node = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id='{$studentId}']");
 
+        /* TODO: HealthNotes DentalNotes HearingNotes OpthalmicNotes could denote Medical Alerts
+         * We keep it simple for now
+         */
         if ($node && $node[0]->HealthNotes) {
             return trim((string)$node[0]->HealthNotes);
         }
