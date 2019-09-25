@@ -272,6 +272,10 @@ class Profile implements IStrategy
              */
             $formTeacher = $this->findFormTeacher(trim((string)$student->Form));
 
+            /* Find out a staff member via their user code
+             */
+            $yearLevelCoordinator = $this->findYearLevelCoordinator(trim((string)$student->NCYear));
+
             /* Find out any medical alerts
              */
             $medicalAlert = $this->findMedialAlert($studentId);
@@ -306,8 +310,8 @@ class Profile implements IStrategy
                 ->setTutorTeacherId($tutor['tutorId'])
                 ->setTutorTeacherName($tutor['tutorName'])
                 ->setYearLevel((string)$student->NCYear)
-                ->setYearLevelCoordinatorId(null)
-                ->setYearLevelCoordinatorName(null)
+                ->setYearLevelCoordinatorId($yearLevelCoordinator['yearLevelCoordinatorId'])
+                ->setYearLevelCoordinatorName($yearLevelCoordinator['yearLevelCoordinatorName'])
 
                 /**
                  * Flags
@@ -442,6 +446,43 @@ class Profile implements IStrategy
             'formTeacherName' => $formTeacherName
         ];
     }
+
+
+    /**
+     * Find a year level coordinator from their year level
+     *
+     * @param string $year
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findYearLevelCoordinator(string $year): array
+    {
+        $yearLevelCoordinatorId = null;
+        $yearLevelCoordinatorName = null;
+
+        $year = trim($year);
+        $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[contains(Code, '{$year}')]");
+
+        if ($node) {
+            $year = $node[0];
+
+            $yearLevelCoordinatorId = trim((string)$year->Tutor);
+            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$yearLevelCoordinatorId}')]");
+
+            if ($node) {
+                $yearLevelCoordinator = $node[0];
+                $yearLevelCoordinatorName = trim((string)$yearLevelCoordinator->FullName);
+            }
+        }
+
+        return [
+            'yearLevelCoordinatorId' => $yearLevelCoordinatorId,
+            'yearLevelCoordinatorName' => $yearLevelCoordinatorName
+        ];
+    }
+
 
 
     /**
