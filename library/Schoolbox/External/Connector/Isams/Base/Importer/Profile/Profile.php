@@ -368,9 +368,6 @@ class Profile implements IStrategy
 
         $comments = [];
 
-        $n = \count($nodes);
-        $this->log->info("Found {$n} nodes for {$studentId}");
-
         if ($nodes) {
             foreach($nodes as $node) {
                 $comments[] = trim((string)$node->Type);
