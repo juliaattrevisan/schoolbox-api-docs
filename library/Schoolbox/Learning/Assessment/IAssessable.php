@@ -10,6 +10,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
@@ -25,9 +26,9 @@ use Schoolbox\Curriculum\Node;
 
 interface IAssessable extends ISoftDeletable
 {
-    public const MARK_VISIBILITY_PRIVATE = 0;
-    public const MARK_VISIBILITY_STUDENT = 1;
-    public const MARK_VISIBILITY_PARENT_STUDENT = 2;
+    public const MARK_VISIBILITY_PRIVATE        = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
+    public const MARK_VISIBILITY_STUDENT        = SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
+    public const MARK_VISIBILITY_PARENT_STUDENT = SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
 
 
     /**
