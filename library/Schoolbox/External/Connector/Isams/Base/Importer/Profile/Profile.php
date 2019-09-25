@@ -305,7 +305,7 @@ class Profile implements IStrategy
                 ->setHouseName(trim((string)$student->AcademicHouse))
                 ->setLeavingDate(null)
                 ->setMobile(trim((string)$student->MobileNumber))
-                ->setStudiesCode(null)
+                ->setStudiesCode(trim((string)$student->UPN))
                 ->setTutorGroup(null)
                 ->setTutorTeacherId($tutor['tutorId'])
                 ->setTutorTeacherName($tutor['tutorName'])
