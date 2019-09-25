@@ -18,6 +18,23 @@ use Psr\Log\LoggerInterface;
  */
 class Specification
 {
+    /**
+     * Status text for existing nodes
+     */
+    private const STATUS_OK = 'OK';
+
+
+    /**
+     * Status text for missing nodes
+     */
+    private const STATUS_MISSING = 'MISSING';
+
+
+    /**
+     * Number of spaces for output formatting
+     */
+    private const PADDING = 20;
+
 
     /**
      * @var LoggerInterface
@@ -214,10 +231,12 @@ class Specification
             '/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id]',
         ];
 
-        foreach ($paths as $path) {
-            $n = $this->batchxml->fetchXml($path);
+        $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
 
-            $n ? $this->log->info("{$path} OK") : $this->log->warning("{$path} MISSING");
+        foreach ($paths as $path) {
+            $paddedPath = str_pad($path, $paddedLength);
+
+            $this->batchxml->fetchXml($path) ? $this->log->info("{$paddedPath} " . self::STATUS_OK) : $this->log->warning("{$paddedPath} " . self::STATUS_MISSING);
         }
     }
 }
