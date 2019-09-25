@@ -125,7 +125,7 @@ class Specification
              */
             '/iSAMS/SENManager/SEN/Register',
             '/iSAMS/SENManager/SEN/Register[@PupilId]',
-            '/iSAMS/SENManager/SEN/Register/Screened',
+            '/iSAMS/SENManager/SEN/Register/RegisterFlag',
 
             /* There is at least one Comments record
              */

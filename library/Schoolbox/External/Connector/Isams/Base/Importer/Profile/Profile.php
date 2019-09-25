@@ -533,7 +533,7 @@ class Profile implements IStrategy
 
     /**
      * Find out if $studentId is on the SEN (Special Education Needs) Registry
-     * and that they were screened
+     * and that their RegisterFlag > 0
      *
      * @param string $studentId
      * @return bool
@@ -543,7 +543,7 @@ class Profile implements IStrategy
      */
     private function findSpecialNeeds(string $studentId): bool
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/SENManager/SEN/Register[@PupilId='{$studentId}'][contains(Screened, '1')]");
+        $node = $this->batchxml->fetchXml("/iSAMS/SENManager/SEN/Register[@PupilId='{$studentId}']/RegisterFlag[. > 0]");
 
         if ($node) {
             return true;
