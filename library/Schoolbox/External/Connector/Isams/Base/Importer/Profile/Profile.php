@@ -198,6 +198,9 @@ class Profile implements IStrategy
             $firstname = trim((string)$student->Preferredname);
             $lastname = trim((string)$student->Surname);
             $studentId = trim((string)$student->xpath('@Id')[0]);
+            $yearLevel = trim((string)$student->NCYear);
+            $form = trim((string)$student->Form);
+            $academicHouse = trim((string)$student->AcademicHouse);
 
             /* Students without usernames are skipped
              */
@@ -258,7 +261,7 @@ class Profile implements IStrategy
 
             /* Fish out a staff member via their user code
              */
-            $housemaster = $this->findHousemaster(trim((string)$student->AcademicHouse));
+            $housemaster = $this->findHousemaster($academicHouse);
 
             /* Find out enrolment date if it exists
              */
@@ -266,11 +269,11 @@ class Profile implements IStrategy
 
             /* Find out a staff member via their user code
              */
-            $formTeacher = $this->findFormTeacher(trim((string)$student->Form));
+            $formTeacher = $this->findFormTeacher($form);
 
             /* Find out a staff member via their user code
              */
-            $yearLevelCoordinator = $this->findYearLevelCoordinator(trim((string)$student->NCYear));
+            $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
 
             /* Find out any medical alerts
              */
@@ -301,20 +304,20 @@ class Profile implements IStrategy
                 ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
                 ->setEmail(trim((string)$student->EmailAddress))
                 ->setEnrolmentDate($enrolmentDate)
-                ->setFormName(trim((string)$student->Form))
+                ->setFormName($form)
                 ->setFormTeacherId($formTeacher['id'])
                 ->setFormTeacherName($formTeacher['name'])
                 ->setGender(trim((string)$student->Gender))
                 ->setHeadOfHouseId($housemaster['id'])
                 ->setHeadOfHouseName($housemaster['name'])
-                ->setHouseName(trim((string)$student->AcademicHouse))
+                ->setHouseName($academicHouse)
                 ->setLeavingDate(null)
                 ->setMobile(trim((string)$student->MobileNumber))
                 ->setStudiesCode(trim((string)$student->UPN))
                 ->setTutorGroup(null)
                 ->setTutorTeacherId($tutor['id'])
                 ->setTutorTeacherName($tutor['name'])
-                ->setYearLevel((string)$student->NCYear)
+                ->setYearLevel($yearLevel)
                 ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
                 ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
 
