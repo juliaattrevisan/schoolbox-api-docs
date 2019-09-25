@@ -125,6 +125,17 @@ class CourseSectionToFolderCodeMap
     }
 
 
+    public function getFolderByBySisSourceId(string $courseSectionSisSourceId): ?Folder\Model
+    {
+        $yearAndFolderCode = $this->getYearAndFolderCodeBySisSourceId($courseSectionSisSourceId);
+
+        if ($yearAndFolderCode !== null) {
+            return $this->yearAndFolderCodeToFolderMap[$yearAndFolderCode[0]][$yearAndFolderCode[1]];
+        }
+        return null;
+    }
+
+
     /**
      * Returns a Year+FolderCode for the specified CourseSection.SisSourceId
      *
@@ -325,24 +336,12 @@ class CourseSectionToFolderCodeMap
         $regexMatchButNoFolderCodeMatch = [];
         $regexMatchAndFolderCodeMatch   = [];
 
-        foreach (array_keys($this->sisSourceIdToYearAndFolderCodeMap) as $sisSourceId) {
-            // Parse Year
-            if (preg_match("/^Y(\d{4})C.+$/", $sisSourceId, $canonicalYearMatch)) {
-                // This is the canonical form.
-                $year = $canonicalYearMatch[1];
-            } elseif (preg_match("/(\d{4})/", $sisSourceId, $fuzzyYearMatch)) {
-                // Fall back to any four digits
-                $year = $fuzzyYearMatch[1];
-            } else {
-                // No year found
-                $year = '';
-            }
+        $sisSourceIdParser = new CourseSectionSisCodeParser();
 
-            // Parse subject code (exact match only, no fuzzy fall back for now)
-            if (preg_match("/^Y\d{4}C(.+)$/", $sisSourceId, $canonicalSubjectMatch)) {
-                // This is the canonical form.
-                $subjectCode = preg_replace("/NOT$/", '', $canonicalSubjectMatch[1]);
-            } else {
+        foreach (array_keys($this->sisSourceIdToYearAndFolderCodeMap) as $sisSourceId) {
+            $year        = $sisSourceIdParser->parseYearFromSisSourceId($sisSourceId) ?? '';
+            $subjectCode = $sisSourceIdParser->parseSubjectCodeFromSisSourceId($sisSourceId);
+            if ($subjectCode === null) {
                 $regexNotMatch[] = $sisSourceId;
                 continue;
             }
