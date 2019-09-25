@@ -11,10 +11,13 @@ use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\DataStructures\ObjectTree;
+use Schoolbox\Resource\Folder\TreeBuilder;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use SplQueue;
+use UnderflowException;
 use UnexpectedValueException;
 use function array_key_exists;
 use function array_keys;
@@ -32,13 +35,14 @@ use function reset;
  * We can then import courses from canvas to these schoolbox folders
  *
  * @todo  : For now, the link between a canvas account and schoolbox folder is via the canvas id
- *        being embedded in the folder name, eg 'History (canvas-123)' where '123' is the canvas account id.
+ *        being embedded in the folder name, eg 'History (canvas-account-123)' where '123' is the canvas account id.
  *        This needs to be moved to folder.externalId when it becomes available
  *
  * @todo  We probably should only import accounts that either have relevant courses, or are parents of such accounts.
  */
 class CourseAccounts
 {
+    private const FACULTY_FOLDER_CANVAS_ID = -1;
 
     /** @var IConnector */
     private $canvasDb;
@@ -48,9 +52,6 @@ class CourseAccounts
 
     /** @var Folder\Mapper */
     private $folderMapper;
-
-    /** @var bool */
-    private $persistChanges;
 
     /** @var LoggerInterface */
     private $log;
@@ -71,7 +72,6 @@ class CourseAccounts
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
      * @param ConfigMapper    $configMapper
-     * @param bool            $persistChanges
      * @param LoggerInterface $log
      * @throws UnexpectedValueException
      */
@@ -80,13 +80,11 @@ class CourseAccounts
         IConnector $schoolboxDb,
         Folder\Mapper $folderMapper,
         ConfigMapper $configMapper,
-        bool $persistChanges,
         LoggerInterface $log
     ) {
         $this->canvasDb       = $canvasDb;
         $this->schoolboxDb    = $schoolboxDb;
         $this->folderMapper   = $folderMapper;
-        $this->persistChanges = $persistChanges;
         $this->log            = $log;
 
         $facultyFolderId = preg_replace('/[\D]/', '', $configMapper->get('course_homepage'));
@@ -100,6 +98,9 @@ class CourseAccounts
 
     /**
      * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws UnderflowException
      * @throws UnexpectedValueException
      */
     public function synchronise(): void
@@ -112,8 +113,8 @@ class CourseAccounts
             throw new UnexpectedValueException('Unable to locate root canvas account');
         }
 
-        $folderTree  = $this->buildCourseFacultyFolderTree();
-        $this->syncAccountWithFolders(reset($canvasAccountTree), $folderTree);
+        $folderTree = $this->buildCourseFacultyFolderTree();
+        $this->syncAccountsWithFolders(reset($canvasAccountTree), $folderTree);
         $this->deleteOldSchoolboxCourseAccountFolders($canvasAccountTree, $folderTree);
         $this->outputResults();
     }
@@ -137,38 +138,27 @@ class CourseAccounts
      *
      * @return ObjectTree
      * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException
+     * @throws Mapper\Exception
+     * @throws UnderflowException
      */
     private function buildCourseFacultyFolderTree(): ObjectTree
     {
         // Index folders by their Canvas id so we can process them purely in memory
         $hashFunction = function (Folder\Model $folder) {
             if ($folder->getId() === $this->facultyFolderId) {
-                return -1;
+                return self::FACULTY_FOLDER_CANVAS_ID;
             }
             return $this->getCanvasIdFromFolderName($folder->getName());
         };
 
-        $folderTree = new ObjectTree($hashFunction);
+        $treeBuilder = new TreeBuilder($this->folderMapper);
 
-        // Insert faculty folder as root
-        $sql  = "SELECT name, parent FROM folder WHERE id = :id AND deleted_at IS NULL";
-        $rows = $this->schoolboxDb->executeQuery($sql, ['id' => $this->facultyFolderId])->fetchAll();
+        // We only want canvas account folders in our tree
+        $pb = $this->folderMapper->getPredicateBuilder()->regex('name', '.+\(canvas-account-\d+\)');
 
-        if (count($rows) !== 1) {
-            throw new UnexpectedValueException("Unable to locate faculty folder");
-        }
-
-        $folder = (new Folder\Model())
-            ->setId($this->facultyFolderId)
-            ->setName($rows[0]['name']);
-
-        $folderTree->addElement($folder);
-
-        // Check the faculty folder name is valid, update it if required.
-        $this->addFoldersToTree($folderTree, [$this->facultyFolderId]);
-
-        return $folderTree;
+        return $treeBuilder->buildTree($this->facultyFolderId, $hashFunction, $pb);
     }
 
 
@@ -213,48 +203,6 @@ class CourseAccounts
 
 
     /**
-     * Recursively add schoolbox folders to folder tree structure
-     *
-     * @param ObjectTree $folderTree
-     * @param array      $parentIds
-     * @throws Database\Exception
-     * @throws UnexpectedValueException
-     */
-    private function addFoldersToTree(ObjectTree $folderTree, array $parentIds): void
-    {
-        // Base Case:
-        if (!count($parentIds)) {
-            return;
-        }
-
-        // Recursive case
-        $bindings = Builder::getBindings($parentIds, 'pi');
-
-        $sql  = "
-            SELECT f.id 'f.id', f.name 'f.name', p.name 'p.name'
-            FROM folder f
-            JOIN folder p ON f.parent = p.id
-            WHERE p.id IN ({$bindings->getPlaceholder()}) AND f.deleted_at IS NULL";
-        $rows = $this->schoolboxDb->executeQuery($sql, $bindings->getParams())->fetchAll();
-
-        $folderIds = [];
-        foreach ($rows as $row) {
-            $folderIds[]          = $row['f.id'];
-            $parentFolderCanvasId = $this->getCanvasIdFromFolderName($row['p.name']);
-            /** @var Folder\Model|null $parent */
-            $parent = $folderTree->getElementByHash($parentFolderCanvasId);
-            $folder = (new Folder\Model())
-                ->setId((int)$row['f.id'])
-                ->setName($row['f.name'])
-                ->setParent($parent);
-            $folderTree->addElement($folder);
-        }
-
-        $this->addFoldersToTree($folderTree, $folderIds);
-    }
-
-
-    /**
      * Recursively sync the canvas course account structure to the schoolbox course folder structure
      *
      * @param array      $canvasAccount
@@ -268,7 +216,7 @@ class CourseAccounts
      * @internal string $canvasAccount['name']                      'Training'
      * @internal array  $canvasAccount['children']
      */
-    private function syncAccountWithFolders(array $canvasAccount, ObjectTree $sbFolderTree): void
+    private function syncAccountsWithFolders(array $canvasAccount, ObjectTree $sbFolderTree): void
     {
         $this->countFoldersSynchronised++;
 
@@ -311,7 +259,7 @@ class CourseAccounts
         }
 
         foreach ($canvasAccount['children'] as $childAccount) {
-            $this->syncAccountWithFolders($childAccount, $sbFolderTree);
+            $this->syncAccountsWithFolders($childAccount, $sbFolderTree);
         }
     }
 
@@ -372,12 +320,12 @@ class CourseAccounts
      */
     private function generateLinkedFolderName(string $folderNamePrefix, string $canvasId): string
     {
-        return "$folderNamePrefix (canvas-{$canvasId})";
+        return "$folderNamePrefix (canvas-account-{$canvasId})";
     }
 
 
     /**
-     * Returns the canvas-id embedded inside the folderName
+     * Returns the canvas-id from a folder name
      *
      * @param string $folderName
      * @return string
@@ -386,7 +334,7 @@ class CourseAccounts
      */
     private function getCanvasIdFromFolderName(string $folderName): string
     {
-        if (preg_match('/\(canvas-(\d+)\)/', $folderName, $matches)) {
+        if (preg_match('/\(canvas-account-(\d+)\)/', $folderName, $matches)) {
             return $matches[1];
         }
         throw new UnexpectedValueException("Unable to determine canvas.id from folder name '$folderName'");
@@ -427,9 +375,7 @@ class CourseAccounts
             if (!array_key_exists($canvasId, $canvasIds)) {
                 $this->log->info("Deleting folder '{$folder->getName()}'");
                 $this->countFoldersDeleted++;
-                if ($this->persistChanges) {
-                    $this->folderMapper->deleteByColumn('id', $folder->getId());
-                }
+                $this->folderMapper->deleteByColumn('id', $folder->getId());
             }
         }
     }

@@ -9,14 +9,18 @@ namespace External\Canvas\Sync;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
+use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
+use PDOException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
+use Schoolbox\Resource\Folder;
 use RuntimeException;
+use Schoolbox\MapperFactory;
 use UnexpectedValueException;
 use function json_decode;
 
@@ -53,10 +57,12 @@ class CliImporter extends CliTool\App
     }
 
 
-    /** @inheritDoc
+    /**
+     * @inheritDoc
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws RuntimeException
+     * @throws ServiceNotFound
      */
     public function run(): void
     {
@@ -226,6 +232,11 @@ class CliImporter extends CliTool\App
      * Syncs data from canvas staging db to schoolbox db
      *
      * @param IConnector $canvasDb
+     * @throws Database\Exception
+     * @throws InvalidArgumentException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
+     * @throws PDOException
      */
     private function syncStagingDataWithSchoolbox(IConnector $canvasDb): void
     {
@@ -233,6 +244,26 @@ class CliImporter extends CliTool\App
             $this->getLogger()->info("Sync from staging to schoolbox database skipped");
             return;
         }
+
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $this->getDi()->get('mapperFactory');
+        /** @var Folder\Mapper $folderMapper */
+        $folderMapper = $mapperFactory->get(Folder\Mapper::class);
+        /** @var ConfigMapper $configMapper */
+        $configMapper = $mapperFactory->get(ConfigMapper::class);
+
+        /** @var IConnector $externalDb */
+        $externalDb = $this->getDi()->get('databaseExternal');
+        $dataSync   = new DataSync(
+            $canvasDb,
+            $this->getDatabaseInternal(),
+            $externalDb,
+            $folderMapper,
+            $configMapper,
+            $this->perform(),
+            $this->getLogger()
+        );
+        $dataSync->synchronise();
     }
 
     /**

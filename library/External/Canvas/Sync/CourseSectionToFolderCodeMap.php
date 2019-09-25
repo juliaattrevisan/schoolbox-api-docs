@@ -16,6 +16,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
+use Schoolbox\Resource\Folder\TreeBuilder;
 use UnderflowException;
 use UnexpectedValueException;
 use function array_keys;
@@ -179,7 +180,7 @@ class CourseSectionToFolderCodeMap
         $hashFunction = static function (Folder\Model $folder) {
             return $folder->getId();
         };
-        $treeBuilder  = new FolderTreeBuilder($this->folderMapper);
+        $treeBuilder  = new TreeBuilder($this->folderMapper);
 
         // The class structure is by far the largest, so not much saving to root in the 'Classes' top-level folder
         $this->log->info(sprintf('Building folder tree from root %d', IFolder::ROOT_ID));
