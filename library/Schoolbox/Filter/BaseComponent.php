@@ -93,12 +93,16 @@ class BaseComponent implements IComponent
             ? $this->buildUserSelections($roleSelections)
             : $this->filterSelectionMapper->createCollection();
 
+        // Output IDs only for role/user selections, to make it easier for
+        // selectize elements to reset back to a previous state
         return [
             'isUserConfigurable' => $this->pageFilter->getUserConfigurable(),
             'hasOptions'         => (bool)$roleSelections->count(),
             'definition'         => $this->definition,
             'roleSelections'     => $roleSelections,
             'userSelections'     => $userSelections,
+            'roleSelectionIds'   => $roleSelections->filterBy('selected', true)->keys(),
+            'userSelectionIds'   => $userSelections->filterBy('selected', true)->keys(),
         ];
     }
 
