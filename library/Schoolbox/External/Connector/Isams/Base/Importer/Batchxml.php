@@ -63,7 +63,7 @@ class Batchxml
      */
     public function fetchXml(string $path): array
     {
-        $this->printXml();
+//        $this->printXml();
 
         if (!$this->nodes) {
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());

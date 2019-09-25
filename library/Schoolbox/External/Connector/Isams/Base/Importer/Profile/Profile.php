@@ -284,11 +284,15 @@ class Profile implements IStrategy
              */
             $sen = $this->findSpecialNeeds($studentId);
 
+            /* Find comments content
+             */
+            $comments = $this->findComments($studentId);
+
             /* Smoosh it all together
              */
             $studentProfile
                 ->setUsername($username)
-                ->setAlertComment(null)
+                ->setAlertComment($comments)
                 ->setAlertLegal(null)
                 ->setAlertMedical($medicalAlert)
                 ->setAlertMessage(null)
@@ -347,6 +351,36 @@ class Profile implements IStrategy
         }
     }
 
+
+    /**
+     * Find comments info for a given student
+     *
+     * @param string $studentId
+     * @return string
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findComments(string $studentId): string
+    {
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SENManager/Requirements/Type[@PupilId='{$studentId}']");
+
+        $comments = [];
+
+        $n = \count($nodes);
+        $this->log->info("Found {$n} nodes for {$studentId}");
+
+        if ($nodes) {
+            foreach($nodes as $node) {
+
+                $comments[] = trim((string)$node->Type);
+            }
+        }
+
+        /* Glue together
+         */
+        return implode("\n", $comments);
+    }
 
     /**
      * Find a tutor from their id

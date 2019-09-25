@@ -110,6 +110,11 @@ class Specification
             '/iSAMS/SENManager/SEN/Register[@PupilId]',
             '/iSAMS/SENManager/SEN/Register/Screened',
 
+            /* There is at least one Comments record
+             */
+            '/iSAMS/SENManager/Requirements/Type',
+            '/iSAMS/SENManager/Requirements/Type[@PupilId]',
+
             /**
              * Parent Profile nodes
              */
