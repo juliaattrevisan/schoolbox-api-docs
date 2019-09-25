@@ -262,11 +262,7 @@ class Profile implements IStrategy
 
             /* Find out enrolment date if it exists
              */
-            $enrolmentDate = null;
-
-            if (trim((string)$student->EnrolmentDate)) {
-                $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->EnrolmentDate)));
-            }
+            $enrolmentDate = $this->findEnrolmentDate(trim((string)$student->EnrolmentDate));
 
             /* Find out a staff member via their user code
              */
@@ -352,6 +348,23 @@ class Profile implements IStrategy
         }
     }
 
+
+    /**
+     * Find the enrolment date for student
+     *
+     * @param string $date
+     * @return \Alaress_Date_Format|null
+     */
+    private function findEnrolmentDate(string $date): ?\Alaress_Date_Format
+    {
+        $enrolmentDate = null;
+
+        if ($date) {
+            $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime($date));
+        }
+
+        return $enrolmentDate;
+    }
 
     /**
      * Find comments info for a given student
