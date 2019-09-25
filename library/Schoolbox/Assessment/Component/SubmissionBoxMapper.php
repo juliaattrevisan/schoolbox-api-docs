@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component;
 
+use Alaress\Database\Predicate\Builder;
 use Eportfolio\ShowcaseMapper;
 use External_Markbook;
 use PDO;
@@ -33,6 +34,7 @@ use UnexpectedValueException;
  * @method SubmissionBox[]|GenericCollection createCollection($contents = [])
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
+ * @method GenericCollection|SubmissionBox[] findByPredicates(Builder $pb, array $options = [])
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, array $options = [])
  * @method SubmissionBox findOneByColumnList($columnList, array $options = [])
  */
