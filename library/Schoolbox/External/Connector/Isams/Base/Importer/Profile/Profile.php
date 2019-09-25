@@ -306,21 +306,21 @@ class Profile implements IStrategy
                 ->setEmail(trim((string)$student->EmailAddress))
                 ->setEnrolmentDate($enrolmentDate)
                 ->setFormName(trim((string)$student->Form))
-                ->setFormTeacherId($formTeacher['formTeacherId'])
-                ->setFormTeacherName($formTeacher['formTeacherName'])
+                ->setFormTeacherId($formTeacher['id'])
+                ->setFormTeacherName($formTeacher['name'])
                 ->setGender(trim((string)$student->Gender))
-                ->setHeadOfHouseId($housemaster['housemasterId'])
-                ->setHeadOfHouseName($housemaster['housemasterName'])
+                ->setHeadOfHouseId($housemaster['id'])
+                ->setHeadOfHouseName($housemaster['name'])
                 ->setHouseName(trim((string)$student->AcademicHouse))
                 ->setLeavingDate(null)
                 ->setMobile(trim((string)$student->MobileNumber))
                 ->setStudiesCode(trim((string)$student->UPN))
                 ->setTutorGroup(null)
-                ->setTutorTeacherId($tutor['tutorId'])
-                ->setTutorTeacherName($tutor['tutorName'])
+                ->setTutorTeacherId($tutor['id'])
+                ->setTutorTeacherName($tutor['name'])
                 ->setYearLevel((string)$student->NCYear)
-                ->setYearLevelCoordinatorId($yearLevelCoordinator['yearLevelCoordinatorId'])
-                ->setYearLevelCoordinatorName($yearLevelCoordinator['yearLevelCoordinatorName'])
+                ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
+                ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
 
                 /**
                  * Flags
@@ -373,7 +373,6 @@ class Profile implements IStrategy
 
         if ($nodes) {
             foreach($nodes as $node) {
-
                 $comments[] = trim((string)$node->Type);
             }
         }
@@ -386,27 +385,27 @@ class Profile implements IStrategy
     /**
      * Find a tutor from their id
      *
-     * @param string $tutorId
+     * @param string $id
      * @return array
      * @throws \RuntimeException
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function findTutor(string $tutorId): array
+    private function findTutor(string $id): array
     {
-        $tutorName = null;
+        $name = null;
 
-        $tutorId = trim($tutorId);
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$tutorId}')]");
+        $id = trim($id);
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
 
         if ($node) {
-            $tutor = $node[0];
-            $tutorName = trim((string)$tutor->FullName);
+            $staffMember = $node[0];
+            $name = trim((string)$staffMember->FullName);
         }
 
         return [
-            'tutorId' => $tutorId,
-            'tutorName' => $tutorName,
+            'id' => $id,
+            'name' => $name,
         ];
     }
 
@@ -422,8 +421,8 @@ class Profile implements IStrategy
      */
     private function findHousemaster(string $houseName): array
     {
-        $housemasterId = null;
-        $housemasterName = null;
+        $id = null;
+        $name = null;
 
         $houseName = trim($houseName);
         $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
@@ -431,18 +430,18 @@ class Profile implements IStrategy
         if ($node) {
             $house = $node[0];
 
-            $housemasterId = trim((string)$house->HouseMaster);
-            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$housemasterId}')]");
+            $id = trim((string)$house->HouseMaster);
+            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
 
             if ($node) {
-                $housemaster = $node[0];
-                $housemasterName = trim((string)$housemaster->FullName);
+                $staffMember = $node[0];
+                $name = trim((string)$staffMember->FullName);
             }
         }
 
         return [
-            'housemasterId' => $housemasterId,
-            'housemasterName' => $housemasterName
+            'id' => $id,
+            'name' => $name
         ];
     }
 
@@ -458,8 +457,8 @@ class Profile implements IStrategy
      */
     private function findFormTeacher(string $form): array
     {
-        $formTeacherId = null;
-        $formTeacherName = null;
+        $id = null;
+        $name = null;
 
         $form = trim($form);
         $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Forms/Form[@Id='{$form}']");
@@ -467,18 +466,18 @@ class Profile implements IStrategy
         if ($node) {
             $form = $node[0];
 
-            $formTeacherId = trim((string)$form->Tutor);
-            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$formTeacherId}')]");
+            $id = trim((string)$form->Tutor);
+            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
 
             if ($node) {
-                $formTeacher = $node[0];
-                $formTeacherName = trim((string)$formTeacher->FullName);
+                $staffMember = $node[0];
+                $name = trim((string)$staffMember->FullName);
             }
         }
 
         return [
-            'formTeacherId' => $formTeacherId,
-            'formTeacherName' => $formTeacherName
+            'id' => $id,
+            'name' => $name
         ];
     }
 
@@ -494,8 +493,8 @@ class Profile implements IStrategy
      */
     private function findYearLevelCoordinator(string $year): array
     {
-        $yearLevelCoordinatorId = null;
-        $yearLevelCoordinatorName = null;
+        $id = null;
+        $name = null;
 
         $year = trim($year);
         $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[contains(Code, '{$year}')]");
@@ -503,18 +502,18 @@ class Profile implements IStrategy
         if ($node) {
             $year = $node[0];
 
-            $yearLevelCoordinatorId = trim((string)$year->Tutor);
-            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$yearLevelCoordinatorId}')]");
+            $id = trim((string)$year->Tutor);
+            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
 
             if ($node) {
-                $yearLevelCoordinator = $node[0];
-                $yearLevelCoordinatorName = trim((string)$yearLevelCoordinator->FullName);
+                $staffMember = $node[0];
+                $name = trim((string)$staffMember->FullName);
             }
         }
 
         return [
-            'yearLevelCoordinatorId' => $yearLevelCoordinatorId,
-            'yearLevelCoordinatorName' => $yearLevelCoordinatorName
+            'id' => $id,
+            'name' => $name
         ];
     }
 
