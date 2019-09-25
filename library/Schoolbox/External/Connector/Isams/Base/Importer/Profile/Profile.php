@@ -90,9 +90,6 @@ class Profile implements IStrategy
      * @param UserProfile\Parent\Mapper   $parentProfileMapper
      * @param UserProfile\Staff\Mapper    $staffProfileMapper
      * @param UserProfile\Relation\Mapper $relationMapper
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
     public function __construct(
         LoggerInterface $log,
@@ -273,7 +270,7 @@ class Profile implements IStrategy
                 ->setUsername($username)
                 ->setAlertComment($this->findComments($studentId))
                 ->setAlertLegal(null)
-                ->setAlertMedical($this->findMedialAlert($studentId))
+                ->setAlertMedical($this->findMedicalAlert($studentId))
                 ->setAlertMessage($messages)
                 ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
                 ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
@@ -418,9 +415,6 @@ class Profile implements IStrategy
      */
     private function findHousemaster(string $houseName): array
     {
-        $id = null;
-        $name = null;
-
         $houseName = trim($houseName);
         $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
 
@@ -429,8 +423,8 @@ class Profile implements IStrategy
         }
 
         return [
-            'id' => $id,
-            'name' => $name
+            'id' => null,
+            'name' => null
         ];
     }
 
@@ -522,7 +516,7 @@ class Profile implements IStrategy
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function findMedialAlert(string $studentId): ?string
+    private function findMedicalAlert(string $studentId): ?string
     {
         $node = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id='{$studentId}']");
 
