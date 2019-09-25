@@ -66,6 +66,8 @@ class Model extends AbstractUnit
 
     /**
      * @return CourseSpecification
+     * @deprecated To get from unitSpec to courseSpec, please use canonical relationship: unitSpec.folder.parent.courseSpec
+     * @see https://schoolbox.atlassian.net/browse/SA-9187
      */
     public function getCourse()
     {
@@ -75,6 +77,8 @@ class Model extends AbstractUnit
     /**
      * @param CourseSpecification $courseSpecification
      * @return static
+     * @deprecated To get from unitSpec to courseSpec, please use canonical relationship: unitSpec.folder.parent.courseSpec
+     * @see https://schoolbox.atlassian.net/browse/SA-9187
      */
     public function setCourse(CourseSpecification $courseSpecification)
     {
