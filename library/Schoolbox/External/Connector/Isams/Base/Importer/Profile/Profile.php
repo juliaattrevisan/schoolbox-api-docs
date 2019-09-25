@@ -258,7 +258,7 @@ class Profile implements IStrategy
 
             /* Fish out a staff member via their user code
              */
-            $housemaster = $this->findHousemaster((string)$student->AcademicHouse);
+            $housemaster = $this->findHousemaster(trim((string)$student->AcademicHouse));
 
             /* Find out enrolment date if it exists
              */
@@ -393,20 +393,7 @@ class Profile implements IStrategy
      */
     private function findTutor(string $id): array
     {
-        $name = null;
-
-        $id = trim($id);
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
-
-        if ($node) {
-            $staffMember = $node[0];
-            $name = trim((string)$staffMember->FullName);
-        }
-
-        return [
-            'id' => $id,
-            'name' => $name,
-        ];
+        return $this->findStaffMemberById(trim($id));
     }
 
 
@@ -425,18 +412,10 @@ class Profile implements IStrategy
         $name = null;
 
         $houseName = trim($houseName);
-        $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
 
-        if ($node) {
-            $house = $node[0];
-
-            $id = trim((string)$house->HouseMaster);
-            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
-
-            if ($node) {
-                $staffMember = $node[0];
-                $name = trim((string)$staffMember->FullName);
-            }
+        if ($nodes) {
+            return $this->findStaffMemberById(trim((string)$nodes[0]->HouseMaster));
         }
 
         return [
@@ -457,27 +436,16 @@ class Profile implements IStrategy
      */
     private function findFormTeacher(string $form): array
     {
-        $id = null;
-        $name = null;
-
         $form = trim($form);
-        $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Forms/Form[@Id='{$form}']");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Forms/Form[@Id='{$form}']");
 
-        if ($node) {
-            $form = $node[0];
-
-            $id = trim((string)$form->Tutor);
-            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
-
-            if ($node) {
-                $staffMember = $node[0];
-                $name = trim((string)$staffMember->FullName);
-            }
+        if ($nodes) {
+            return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
         }
 
         return [
-            'id' => $id,
-            'name' => $name
+            'id' => null,
+            'name' => null
         ];
     }
 
@@ -493,22 +461,38 @@ class Profile implements IStrategy
      */
     private function findYearLevelCoordinator(string $year): array
     {
-        $id = null;
-        $name = null;
-
         $year = trim($year);
-        $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[contains(Code, '{$year}')]");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[contains(Code, '{$year}')]");
+
+        if ($nodes) {
+            return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
+        }
+
+        return [
+            'id' => null,
+            'name' => null
+        ];
+    }
+
+
+    /**
+     * Find a staff member's node based on identifier $id
+     *
+     * @param string $id
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findStaffMemberById(string $id): array
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
+
+        $name = '';
 
         if ($node) {
-            $year = $node[0];
-
-            $id = trim((string)$year->Tutor);
-            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
-
-            if ($node) {
-                $staffMember = $node[0];
-                $name = trim((string)$staffMember->FullName);
-            }
+            $staffMember = $node[0];
+            $name = trim((string)$staffMember->FullName);
         }
 
         return [
@@ -516,7 +500,6 @@ class Profile implements IStrategy
             'name' => $name
         ];
     }
-
 
 
     /**
@@ -564,6 +547,7 @@ class Profile implements IStrategy
 
         return false;
     }
+
 
     /**
      * Mine $nodes for Campus elements and the NCYear levels to which they relate
