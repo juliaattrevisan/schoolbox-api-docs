@@ -55,12 +55,9 @@
             } only %}
 
             {% for courseSpec in courseSpecs %}
-                {% set roleSelection = roleSelections[courseSpec.id] %}
-                {% set userSelection = userSelections[courseSpec.id] %}
-
                 {% include '@filters/_option.twig' with {
-                    userSelection: userSelection,
-                    roleSelection: roleSelection,
+                    userSelection: userSelections[courseSpec.id],
+                    roleSelection: roleSelections[courseSpec.id],
                     label:         courseSpec.title,
                     value:         courseSpec.id,
                     disabled:      isDisabled,
@@ -68,6 +65,13 @@
             {% endfor %}
         </select>
     {% else %}
-        {{ parent() }}
+        {% for courseSpec in courseSpecs %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                userSelection: userSelections[courseSpec.id],
+                roleSelection: roleSelections[courseSpec.id],
+                label:         courseSpec.title,
+                disabled:      isDisabled
+            } only %}
+        {% endfor %}
     {% endif %}
 {% endblock userOptions %}
