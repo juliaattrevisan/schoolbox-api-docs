@@ -35,4 +35,13 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('child_profile_id', Profile\Mapper::class, 'id', null, null, 'childProfileId', 'childProfileId');
         $this->joins('user_profile_id', Profile\Mapper::class, 'id', null, null, 'userProfileId', 'userProfileId');
     }
+
+
+    /**
+     * Remove all the Relations
+     */
+    public function purge()
+    {
+        $this->getDatabase()->query("DELETE FROM {$this->getTable()}");
+    }
 }

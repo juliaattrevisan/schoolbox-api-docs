@@ -129,9 +129,7 @@ class Profile implements IStrategy
         /* Purge old relations before re-inserting them
          */
         if ($this->perform) {
-            $this->relationMapper->getDatabase()->query("
-                DELETE FROM {$this->relationMapper->getTable()}
-            ");
+            $this->relationMapper->purge();
         }
 
         /* Import students' profile data
@@ -346,6 +344,7 @@ class Profile implements IStrategy
         return null;
     }
 
+
     /**
      * Find the enrolment date for student
      *
@@ -362,6 +361,7 @@ class Profile implements IStrategy
 
         return $enrolmentDate;
     }
+
 
     /**
      * Find comments info for a given student
@@ -388,6 +388,7 @@ class Profile implements IStrategy
          */
         return implode("\n", $comments);
     }
+
 
     /**
      * Find a tutor from their id
