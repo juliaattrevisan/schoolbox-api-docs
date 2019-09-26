@@ -87,8 +87,6 @@ class Controller extends Base
             $queryArgs
         );
 
-        $currentTermDates = $this->getCurrentTermDates();
-
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessmentCalendar/index.twig',
@@ -112,20 +110,20 @@ class Controller extends Base
 
         $terms = $this->termMapper->findAll()->sortBy('start', 'DESC');
 
-        $currentTermStartDate = $this->getCurrentTermDates()->getStart()->getUsingFormat('Y-m-d');
+        $currentTermStartDate = $this->getCurrentTermDates()->getStart()->getDatabaseDate();
 
         /** @var TermMapper $term */
         foreach ($terms as $term) {
 
-            if ($term->getStart()->getUsingFormat('Y-m-d') < $currentTermStartDate) {
+            if ($term->getStart()->getDatabaseDate() < $currentTermStartDate) {
                 $termDates['past'][] = [
-                    'start' => $term->getStart()->getUsingFormat('Y-m-d'),
-                    'end'   => $term->getDisplayFinish()->getUsingFormat('Y-m-d'),
+                    'start' => $term->getStart()->getDatabaseDate(),
+                    'end'   => $term->getDisplayFinish()->getDatabaseDate(),
                 ];
-            } elseif ($term->getStart()->getUsingFormat('Y-m-d') > $currentTermStartDate) {
+            } elseif ($term->getStart()->getDatabaseDate() > $currentTermStartDate) {
                 $termDates['future'][] = [
-                    'start' => $term->getStart()->getUsingFormat('Y-m-d'),
-                    'end'   => $term->getDisplayFinish()->getUsingFormat('Y-m-d'),
+                    'start' => $term->getStart()->getDatabaseDate(),
+                    'end'   => $term->getDisplayFinish()->getDatabaseDate(),
                 ];
             }
         }
@@ -137,7 +135,7 @@ class Controller extends Base
             [
                 'current' => [
                     'start' => $currentTermStartDate,
-                    'end' => $this->getCurrentTermDates()->getDisplayFinish()->getUsingFormat('Y-m-d'),
+                    'end' => $this->getCurrentTermDates()->getDisplayFinish()->getDatabaseDate(),
                 ]
             ],
             [
