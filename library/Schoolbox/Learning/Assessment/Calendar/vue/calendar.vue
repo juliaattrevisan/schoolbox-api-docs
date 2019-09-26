@@ -25,6 +25,8 @@
     const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
     const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
+    const VIEW_RESOURCE_TIMELINE_SEMESTER = 'resourceTimelineSemester';
+
     export default {
         components: {
             ViewEventModal,
@@ -128,7 +130,7 @@
 
                         response.data.forEach(function(element) {
                             // Create a place holder
-                            if (self.currentView === 'resourceTimelineSemester' && eventGroupingCursor !== element.data.meta.eventGrouping) {
+                            if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
 
                                 var itemCountByGroup = response.data.filter(function(val) {
                                     return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
@@ -191,7 +193,7 @@
                     self.eventGroups.push(eventGrouping);
                 }
 
-                if (self.currentView === 'resourceTimelineSemester') {
+                if (self.currentViewIsSemester()) {
                     if (eventRenderInfo.event.extendedProps.data.placeholder) {
                         element.setAttribute('event-group-id-placeholder', eventGrouping);
                         element.classList.add('placeholder');
@@ -219,8 +221,8 @@
             onEventClick(eventInfo) {
                 var self = this;
 
-                if (self.currentView !== 'resourceTimelineSemester' ||
-                    (self.currentView === 'resourceTimelineSemester' && eventInfo.el.getAttribute('event-group-id-placeholder') === null)) {
+                if (!self.currentViewIsSemester() ||
+                    (self.currentViewIsSemester() && eventInfo.el.getAttribute('event-group-id-placeholder') === null)) {
                     // Ideally the current event would be a part of the modal,
                     // not this component, but :shrug:
                     this.currentEvent = eventInfo.event;
@@ -352,7 +354,7 @@
 
                 self.destroyPopOver();
 
-                if (self.currentView === 'resourceTimelineSemester') {
+                if (self.currentViewIsSemester()) {
                     self.redrawWeekNumbers();
                     self.cleanupMonthHeaderInlineStyles();
                 }
@@ -365,7 +367,7 @@
             clickNext() {
                 var self = this;
 
-                if (self.currentView === 'resourceTimelineSemester') {
+                if (self.currentViewIsSemester()) {
                     if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length) ||
                         (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])) {
                         self.cursor++;
@@ -394,7 +396,7 @@
             clickPrev() {
                 var self = this;
 
-                if (self.currentView === 'resourceTimelineSemester') {
+                if (self.currentViewIsSemester()) {
                     if ((self.cursor > 0) || (self.cursor === 0 && self.config.termDates.past.length) ||
                         (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)) {
 
@@ -421,7 +423,7 @@
             clickToday() {
                 var self = this;
 
-                if (self.currentView === 'resourceTimelineSemester') {
+                if (self.currentViewIsSemester()) {
                     self.$refs.fullCalendar.getApi().gotoDate(self.config.termDates.current.start);
 
                     self.redrawWeekNumbers();
@@ -502,7 +504,7 @@
             },
 
             onDateClick(dateClickInfo) {
-                if (dateClickInfo.view.type === 'resourceTimelineSemester') {
+                if (dateClickInfo.view.type === VIEW_RESOURCE_TIMELINE_SEMESTER) {
                     this.destroyPopOver();
                 }
             },
@@ -517,7 +519,7 @@
             redrawCalendar() {
                 var self = this;
 
-                if (self.currentView === 'resourceTimelineSemester') {
+                if (self.currentViewIsSemester()) {
                     this.redrawWeekNumbers();
                     this.redrawEventRows();
                 }
@@ -540,6 +542,14 @@
                         placeholders.style.height = (resourceColHeight - 3) + 'px';
                     })
                 });
+            },
+
+            /**
+             * Check if the current calendar view is in semester
+             * @returns {boolean}
+             */
+            currentViewIsSemester() {
+                return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
             }
         }
     }
