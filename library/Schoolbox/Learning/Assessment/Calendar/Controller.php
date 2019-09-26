@@ -141,7 +141,6 @@ class Controller extends Base
             [
                 'future' => $termDates['future']
             ]
-
         );
     }
 

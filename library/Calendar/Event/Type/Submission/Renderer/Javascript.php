@@ -12,7 +12,6 @@
 namespace Calendar\Event\Type\Submission\Renderer;
 
 use Alaress\Color\Color;
-use Alaress\Color\ColorFactory;
 use \Scrub;
 
 /**
