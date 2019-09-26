@@ -37,7 +37,10 @@ class Resource implements ModuleConfigInterface
         $folderModule = new \Schoolbox\Resource\Folder\Module($di);
         $folderModule->init('/resource');
 
-        $folderSearchModule = new \Schoolbox\Resource\Folder\Search\Module($di);
-        $folderSearchModule->init('/resource/folder/search');
+        // Commented out as:
+        // * it's unused
+        // * it collides with folder search page www/resource/folder/search.php
+//        $folderSearchModule = new \Schoolbox\Resource\Folder\Search\Module($di);
+//        $folderSearchModule->init('/resource/folder/search');
     }
 }
