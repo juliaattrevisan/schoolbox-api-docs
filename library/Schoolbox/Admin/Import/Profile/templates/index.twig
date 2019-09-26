@@ -23,97 +23,122 @@
         <form id="uploadForm" method="post" action="/adminv2/import/profile/upload">
             <section class="content">
                 <p>
-                    These uploads will help you populate information about the people in your school.
-                    The user provisioning system may use these records to create and update accounts.
-                    In addition this information will be displayed on the user profile screen.
-                    The relationships will be used to link students to parents in the system.
+                    These uploads will help you populate records for the people in your school.
+                    Once the User Provisioning System runs, it may use these records to create and update user accounts.
                 </p>
 
-                <p>
-                    The file should be saved in CSV format. When you upload a file, all previous records
-                    of that type will be removed from the database so the CSV must contain the entire list
-                    of records. Any headings that do not match the supplied templates will cause an error.
-                </p>
+                <h2>File Requirements</h2>
 
-                <p>
-                    You may upload all the files in the same import, or you can upload them individually.
-                    However, relationships should always be imported last.
-                </p>
+                <ul>
+                    <li>The files should be saved in CSV format.</li>
+                    <li>When you upload a file, all previous records will be removed from the database, so the CSV must contain the entire list of current records.</li>
+                    <li>All fields are required, if you don’t provide a field, it will clear that field’s data for each user.</li>
+                    <li>The fields must have the same heading as provided in the template, but they are case insensitive and order insensitive.</li>
+                    <li>Any other field that you add will be ignored.</li>
+                </ul>
             </section>
 
-            <div class="row" data-equalizer>
-                <div class="small-12 medium-6 island">
-                    <section>
-                        <div class="content" data-equalizer-watch>
-                            <h2>Students</h2>
+            <div class="row">
+                <div class="small-12 island">
+                    <section class="content">
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
+                                <h2>Students</h2>
 
-                            <p>
-                                All fields are required. If you don't provide a field, it will clear that field's data
-                                from every user profile. The fields must have the same heading as provided in the template
-                                but they are case-insensitive and order-insensitive.
-                                Any other field that you add will be ignored.
-                            </p>
-                        </div>
-                        <div class="component-action">
-                            <section>
-                                <a href="/adminv2/import/profile/student.csv" class="button">Download Student Template</a>
-                            </section>
+                                <p>
+                                    This file will populate the records for Students in your school.
+                                </p>
+
+                                <h3>Instructions</h3>
+
+                                <ul>
+                                    <li>Download the template for this user type and populate all fields.</li>
+                                    <li>Information for the Emergency Contact columns of CSV.</li>
+                                    <li>Any details entered in these columns will be shown on the User Profile page of a current Student, if viewed by a Staff member.</li>
+                                    <li>The User Profile will display any text provided in these columns, it does not link to a Parent User ID.</li>
+                                    <li>Once your CSV is ready, drop it in the attach zone.</li>
+                                </ul>
+
+                                <a href="/adminv2/import/profile/student.csv" class="icon-download button">Download Student Template</a>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                attachzone
+                            </div>
                         </div>
                     </section>
                 </div>
-                <div class="small-12 medium-6 island">
-                    <section>
-                        <div class="content" data-equalizer-watch>
-                            <h2>Staff</h2>
-                            <p>
-                                All fields are required. If you don't provide a field, it will clear that field's data
-                                from every user profile. The fields must have the same heading as provided in the template
-                                but they are case-insensitive and order-insensitive.
-                                Any other field that you add will be ignored.
-                            </p>
-                        </div>
-                        <div class="component-action">
-                            <section>
-                                <a href="/adminv2/import/profile/staff.csv" class="button">Download Staff Template</a>
-                            </section>
-                        </div>
-                    </section>
-                </div>
-
             </div>
-            <div class="row" data-equalizer>
-                <div class="small-12 medium-6 island">
-                    <section>
-                        <div class="content" data-equalizer-watch>
-                            <h2>Parents</h2>
-                            <p>
-                                All fields are required. If you don't provide a field, it will clear that field's data
-                                from every user profile. The fields must have the same heading as provided in the template
-                                but they are case-insensitive and order-insensitive.
-                                Any other field that you add will be ignored.
-                            </p>
+
+            <div class="row">
+                <div class="small-12 island">
+                    <section class="content">
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
+                                <h2>Parents</h2>
+
+                                <p>
+                                    This file will populate the records for Parents in your school.
+                                </p>
+
+                                <h3>Instructions</h3>
+
+                                <ul>
+                                    <li>Download the template for this user type and populate all fields.</li>
+                                    <li>Once your CSV is ready, drop it in the attach zone.</li>
+                                </ul>
+
+                                <a href="/adminv2/import/profile/parent.csv" class="icon-download button">Download Parent Template</a>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                attachzone
+                            </div>
                         </div>
-                        <div class="component-action">
-                            <section>
-                                <a href="/adminv2/import/profile/parent.csv" class="button">Download Parent Template</a>
-                            </section>
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
+                                <h2>Relationships</h2>
+
+                                <p>
+                                    This file will establish relationships between Parents and Students or between connected Parents.
+                                </p>
+
+                                <h3>Instructions</h3>
+
+                                <ul>
+                                    <li>Each record must contain the relationship information for two people including Role Types, External IDs, and Relationship Type.</li>
+                                    <li>The record will be skipped if either External ID does not match.</li>
+                                    <li>The Relationship Type is an open field that can contain any relationship description required, eg parent, guardian, spouse, aunt, etc.</li>
+                                </ul>
+
+                                <a href="/adminv2/import/profile/relationship.csv" class="icon-download button">Download Relationship Template</a>
+                            </div>
                         </div>
                     </section>
                 </div>
-                <div class="small-12 medium-6 island">
-                    <section>
-                        <div class="content" data-equalizer-watch>
-                            <h2>Relationships</h2>
-                            <p>
-                                This file must contain a Relation ID and a Student ID. The Relation ID must match a parent
-                                record that has previously been uploaded. The Student ID must match an existing student
-                                that has been uploaded. The record will be skipped if either of these do not match.
-                            </p>
-                        </div>
-                        <div class="component-action">
-                            <section>
-                                <a href="/adminv2/import/profile/relationship.csv" class="button">Download Relationship Template</a>
-                            </section>
+            </div>
+
+            <div class="row">
+                <div class="small-12 island">
+                    <section class="content">
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
+                                <h2>Staff</h2>
+
+                                <p>
+                                    This file will populate the records for Staff in your school.
+                                </p>
+
+                                <h3>Instructions</h3>
+
+                                <ul>
+                                    <li>Download the template for this user type and populate all fields.</li>
+                                    <li>Once your CSV is ready, drop it in the attach zone.</li>
+                                </ul>
+
+                                <a href="/adminv2/import/profile/staff.csv" class="icon-download button">Download Student Template</a>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                attachzone
+                            </div>
                         </div>
                     </section>
                 </div>
