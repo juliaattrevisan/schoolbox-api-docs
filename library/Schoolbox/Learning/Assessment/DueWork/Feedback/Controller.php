@@ -217,9 +217,11 @@ class Controller extends Base
             $this->rubricMapper->persistMarkedGrid($markedGrid);
             return true;
         }
-
         // If from inline grader, save empty marks
-        if (array_key_exists('fromInlineGrader', $post) && $post['fromInlineGrader']) {
+        if (array_key_exists('fromInlineGrader', $post) &&
+            $post['fromInlineGrader'] &&
+            $feedback->getAssessable()->getUseRubric()
+        ) {
             $markedGrid = $factory->buildFromPostData(
                 $this->rubricMapper->retrieveMarkedGrid($feedback),
                 []
