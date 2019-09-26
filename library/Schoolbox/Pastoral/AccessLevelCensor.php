@@ -172,7 +172,7 @@ class AccessLevelCensor
     private function filterCommentForUser(Comment\Model $comment, User $user): ?Comment\Model
     {
         // Pastoral moderators get all comments
-        if (null !== $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
+        if ($this->isPastoralModerator($user)) {
             return $comment;
         }
 
@@ -212,9 +212,7 @@ class AccessLevelCensor
     public function getAccessLevel(Model $record, User $user): int
     {
         // Owners and moderators get private access regardless of any other permission set
-        $pastoralService = $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
-
-        if ($pastoralService || (int)$user->getId() === (int)$record->getOwner()->getId()) {
+        if ($this->isPastoralModerator($user) || (int)$user->getId() === (int)$record->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
 
@@ -246,5 +244,16 @@ class AccessLevelCensor
         }
 
         return $accessLevel;
+    }
+
+
+    /**
+     * Checks whether the user has pastoral moderator permission
+     * @param User $user
+     * @return bool
+     */
+    public function isPastoralModerator(User $user): bool
+    {
+        return null !== $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
     }
 }

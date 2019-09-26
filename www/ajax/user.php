@@ -34,13 +34,13 @@ if (!empty($residentialHouseID)) {
 $filterParents = false;
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (strlen($groupID) || strlen($roleTypeID))) {
-    
+
     if (strlen($roleTypeID)) {
-        
+
         // Search in a list of role types.
-        
+
         $groupID = [];
-        
+
         foreach (explode(';', strtolower($roleTypeID)) as $roleType) {
             $thisRoleGroups = [];
             switch ($roleType) {
@@ -108,6 +108,9 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
             if ($filterParents && $student != null) {
                 if ($userSchoolbox = $userMapper->findById($user["uid"])) {
                     if ($userSchoolbox->getRole()->isParent()) {
+                        if (!$userSchoolbox->getChildren()) {
+                            $userSchoolbox->setChildren(\Schoolbox\User::createCollection());
+                        }
                         if (!$userSchoolbox->isParentOf($student)) {
                             continue;
                         }

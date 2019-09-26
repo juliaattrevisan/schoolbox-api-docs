@@ -11,7 +11,7 @@
 
 {# TODO: Front-end developer needs to make this thing properly pretty #}
 
-{% macro buttons(pageCurrent, recordCount, resultsPerPage, pagesToDisplay) %}
+{% macro buttons(pageCurrent, recordCount, resultsPerPage, pagesToDisplay, typeSelected) %}
     {% spaceless %}
 
         <style>
@@ -50,7 +50,7 @@
                             {# Jump to first page link #}
 
                             <li class="arrow  {% if pageCurrent == 1 %}unavailable{% endif %}">
-                                <a href="?pageCurrent=1">
+                                <a href="?pageCurrent=1&{% if typeSelected %}type={{ typeSelected }}{% endif %}">
                                     &lt;&lt;
                                 </a>
                             </li>
@@ -58,7 +58,7 @@
                             {# Previous page link #}
 
                             <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}">
-                                <a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}{% endif %}">
+                                <a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}{% if typeSelected %}&type={{ typeSelected }}{% endif %}{% endif %}">
                                     &lt;
                                 </a>
                             </li>
@@ -91,14 +91,14 @@
                             )
                             ) %}
                                 <li {% if i | round(0, 'ceil') == pageCurrent %} class='active' {% endif %}>
-                                    <a href="?pageCurrent={{ i | round(0, 'ceil') }}">{{ i | round(0, 'ceil') }}</a>
+                                    <a href="?pageCurrent={{ i | round(0, 'ceil') }}{% if typeSelected %}&type={{ typeSelected }}{% endif %}">{{ i | round(0, 'ceil') }}</a>
                                 </li>
                             {% endfor %}
 
                             {# Next page link #}
 
                             <li class="arrow {% if pageCurrent == totalPages %}unavailable{% endif %}">
-                                <a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}{% endif %}">
+                                <a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}{% if typeSelected %}&type={{ typeSelected }}{% endif %}{% endif %}">
                                     &gt;
                                 </a>
                             </li>
@@ -106,7 +106,7 @@
                             {# Jump to last page link #}
 
                             <li class="arrow {% if pageCurrent == totalPages %}unavailable{% endif %}">
-                                <a href="?pageCurrent={{ totalPages }}">
+                                <a href="?pageCurrent={{ totalPages }}{% if typeSelected %}&type={{ typeSelected }}{% endif %}">
                                     &gt;&gt;
                                 </a>
                             </li>
