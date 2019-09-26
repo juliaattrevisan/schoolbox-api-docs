@@ -1,13 +1,3 @@
-<script type="text/javascript">
-    $(function() {
-        $('#uploadForm').alaressValidate({
-            messages: {
-                file: 'Please select a CSV type.'
-            }
-        });
-    });
-</script>
-
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -20,145 +10,183 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="uploadForm" method="post" action="/adminv2/import/profile/upload">
-            <section class="content">
-                <p>
-                    These uploads will help you populate records for the people in your school.
-                    Once the User Provisioning System runs, it may use these records to create and update user accounts.
-                </p>
+        <section class="content">
+            <p>
+                These uploads will help you populate records for the people in your school.
+                Once the User Provisioning System runs, it may use these records to create and update user accounts.
+            </p>
 
-                <h2>File Requirements</h2>
+            <h2>File Requirements</h2>
 
-                <ul>
-                    <li>The files should be saved in CSV format.</li>
-                    <li>When you upload a file, all previous records will be removed from the database, so the CSV must contain the entire list of current records.</li>
-                    <li>All fields are required, if you don’t provide a field, it will clear that field’s data for each user.</li>
-                    <li>The fields must have the same heading as provided in the template, but they are case insensitive and order insensitive.</li>
-                    <li>Any other field that you add will be ignored.</li>
-                </ul>
-            </section>
+            <ul>
+                <li>The files should be saved in CSV format.</li>
+                <li>When you upload a file, all previous records will be removed from the database, so the CSV must contain the entire list of current records.</li>
+                <li>All fields are required, if you don’t provide a field, it will clear that field’s data for each user.</li>
+                <li>The fields must have the same heading as provided in the template, but they are case insensitive and order insensitive.</li>
+                <li>Any other field that you add will be ignored.</li>
+            </ul>
+        </section>
 
-            <div class="row">
-                <div class="small-12 island">
-                    <section class="content">
-                        <div class="row">
-                            <div class="small-12 medium-6 columns">
-                                <h2>Students</h2>
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    <div class="row">
+                        <div class="small-12 medium-6 columns">
+                            <h2>Staff</h2>
 
-                                <p>
-                                    This file will populate the records for Students in your school.
-                                </p>
+                            <p>
+                                This file will populate the records for Staff in your school.
+                            </p>
 
-                                <h3>Instructions</h3>
+                            <h3>Instructions</h3>
 
-                                <ul>
-                                    <li>Download the template for this user type and populate all fields.</li>
-                                    <li>Information for the Emergency Contact columns of CSV.</li>
-                                    <li>Any details entered in these columns will be shown on the User Profile page of a current Student, if viewed by a Staff member.</li>
-                                    <li>The User Profile will display any text provided in these columns, it does not link to a Parent User ID.</li>
-                                    <li>Once your CSV is ready, drop it in the attach zone.</li>
-                                </ul>
+                            <ul>
+                                <li>Download the template for this user type and populate all fields.</li>
+                                <li>Once your CSV is ready, drop it in the attach zone.</li>
+                            </ul>
 
-                                <a href="/adminv2/import/profile/student.csv" class="icon-download button">Download Student Template</a>
-                            </div>
-                            <div class="small-12 medium-6 columns">
-                                attachzone
-                            </div>
                         </div>
-                    </section>
-                </div>
+                        <div class="small-12 medium-6 columns">
+
+
+                            <form method="post" action="/adminv2/import/profile/upload">
+                                <input type="hidden" name="file" value="staff" />
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone.staff} %}
+
+                                <ul class="flex-list buttons">
+                                    <li>
+                                        <a href="/adminv2/import/profile/staff.csv" class="icon-download button expand">Download Staff Template</a>
+                                    </li>
+                                    <li>
+                                        <input type="submit" class="button" value="Dry Run">
+                                    </li>
+                                </ul>
+                            </form>
+                        </div>
+                    </div>
+                </section>
             </div>
+        </div>
 
-            <div class="row">
-                <div class="small-12 island">
-                    <section class="content">
-                        <div class="row">
-                            <div class="small-12 medium-6 columns">
-                                <h2>Parents</h2>
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    <div class="row">
+                        <div class="small-12 medium-6 columns">
+                            <h2>Students</h2>
+                            <p>
+                                This file will populate the records for Students in your school.
+                            </p>
 
-                                <p>
-                                    This file will populate the records for Parents in your school.
-                                </p>
+                            <h3>Instructions</h3>
 
-                                <h3>Instructions</h3>
-
-                                <ul>
-                                    <li>Download the template for this user type and populate all fields.</li>
-                                    <li>Once your CSV is ready, drop it in the attach zone.</li>
-                                </ul>
-
-                                <a href="/adminv2/import/profile/parent.csv" class="icon-download button">Download Parent Template</a>
-                            </div>
-                            <div class="small-12 medium-6 columns">
-                                attachzone
-                            </div>
+                            <ul>
+                                <li>Download the template for this user type and populate all fields.</li>
+                                <li>Information for the Emergency Contact columns of CSV.</li>
+                                <li>
+                                    <ul>
+                                        <li>Any details entered in these columns will be shown on the User Profile page of a current Student, if viewed by a Staff member.</li>
+                                        <li>The User Profile will display any text provided in these columns, it does not link to a Parent User ID.</li>
+                                    </ul>
+                                </li>
+                                <li>Once your CSV is ready, drop it in the attach zone.</li>
+                            </ul>
                         </div>
-                        <div class="row">
-                            <div class="small-12 medium-6 columns">
-                                <h2>Relationships</h2>
+                        <div class="small-12 medium-6 columns">
+                            <form method="post" action="/adminv2/import/profile/upload">
+                                <input type="hidden" name="file" value="student" />
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone.student} %}
 
-                                <p>
-                                    This file will establish relationships between Parents and Students or between connected Parents.
-                                </p>
-
-                                <h3>Instructions</h3>
-
-                                <ul>
-                                    <li>Each record must contain the relationship information for two people including Role Types, External IDs, and Relationship Type.</li>
-                                    <li>The record will be skipped if either External ID does not match.</li>
-                                    <li>The Relationship Type is an open field that can contain any relationship description required, eg parent, guardian, spouse, aunt, etc.</li>
+                                <ul class="flex-list buttons">
+                                    <li>
+                                        <a href="/adminv2/import/profile/student.csv" class="icon-download button expand">Download Student Template</a>
+                                    </li>
+                                    <li>
+                                        <input type="submit" class="button" value="Dry Run">
+                                    </li>
                                 </ul>
-
-                                <a href="/adminv2/import/profile/relationship.csv" class="icon-download button">Download Relationship Template</a>
-                            </div>
+                            </form>
                         </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
             </div>
+        </div>
 
-            <div class="row">
-                <div class="small-12 island">
-                    <section class="content">
-                        <div class="row">
-                            <div class="small-12 medium-6 columns">
-                                <h2>Staff</h2>
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    <div class="row">
+                        <div class="small-12 medium-6 columns">
+                            <h2>Parents</h2>
+                            <p>
+                                This file will populate the records for Parents in your school.
+                            </p>
 
-                                <p>
-                                    This file will populate the records for Staff in your school.
-                                </p>
+                            <h3>Instructions</h3>
 
-                                <h3>Instructions</h3>
-
-                                <ul>
-                                    <li>Download the template for this user type and populate all fields.</li>
-                                    <li>Once your CSV is ready, drop it in the attach zone.</li>
-                                </ul>
-
-                                <a href="/adminv2/import/profile/staff.csv" class="icon-download button">Download Student Template</a>
-                            </div>
-                            <div class="small-12 medium-6 columns">
-                                attachzone
-                            </div>
+                            <ul>
+                                <li>Download the template for this user type and populate all fields.</li>
+                                <li>Once your CSV is ready, drop it in the attach zone.</li>
+                            </ul>
                         </div>
-                    </section>
-                </div>
+                        <div class="small-12 medium-6 columns">
+                            <form method="post" action="/adminv2/import/profile/upload">
+                                <input type="hidden" name="file" value="student" />
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone.parent} %}
+
+                                <ul class="flex-list buttons">
+                                    <li>
+                                        <a href="/adminv2/import/profile/parent.csv" class="icon-download button expand">Download Parent Template</a>
+                                    </li>
+                                    <li>
+                                        <input type="submit" class="button" value="Dry Run">
+                                    </li>
+                                </ul>
+                            </form>
+                        </div>
+                    </div>
+                </section>
             </div>
+        </div>
 
-            <section class="content">
-                <label for="file" class="required">Choose CSV type</label>
-                <select id="file" name="file" required>
-                    <option disabled selected>Please select</option>
-                    <option value="student">Student</option>
-                    <option value="staff">Staff</option>
-                    <option value="parent">Parent</option>
-                    <option value="relation">Relationship</option>
-                </select>
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    <div class="row">
+                        <div class="small-12 medium-6 columns">
+                            <h2>Relationships</h2>
 
-                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-            </section>
+                            <p>
+                                This file will establish relationships between Parents and Students or between connected Parents.
+                            </p>
 
-            <input type="submit" class="button" value="Dry Run">
-        </form>
+                            <h3>Instructions</h3>
+
+                            <ul>
+                                <li>Each record must contain the relationship information for two people including Role Types, External IDs, and Relationship Type.</li>
+                                <li>The record will be skipped if either External ID does not match.</li>
+                                <li>The Relationship Type is an open field that can contain any relationship description required, eg parent, guardian, spouse, aunt, etc.</li>
+                            </ul>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <form method="post" action="/adminv2/import/profile/upload">
+                                <input type="hidden" name="file" value="student" />
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone.relation} %}
+
+                                <ul class="flex-list buttons">
+                                    <li>
+                                        <a href="/adminv2/import/profile/relationship.csv" class="icon-download button expand">Download Relationship Template</a>
+                                    </li>
+                                    <li>
+                                        <input type="submit" class="button" value="Dry Run">
+                                    </li>
+                                </ul>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 

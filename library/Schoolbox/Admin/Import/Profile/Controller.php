@@ -43,7 +43,12 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
             'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
-            'attachzone' => $this->getAttachZone(),
+            'attachzone' => [
+                'student' => $this->getAttachZone('student', 'Upload Student CSV file'),
+                'parent' => $this->getAttachZone('parent', 'Upload Parent CSV file'),
+                'relation' => $this->getAttachZone('relation', 'Upload Relationship CSV file'),
+                'staff' => $this->getAttachZone('staff', 'Upload Staff CSV file'),
+            ]
         ])->setTitle('Import User Profile'));
     }
 
@@ -51,15 +56,17 @@ class Controller extends Base
     /**
      * Insert an attach zone into the template
      *
+     * @param string $id
+     * @param string $prompt
      * @return array
      * @throws \UnexpectedValueException
      */
-    private function getAttachZone(): array
+    private function getAttachZone(string $id, string $prompt): array
     {
-        return (new Zone('attachment'))
+        return (new Zone($id))
             ->setModalTitle('Select CSV Files')
             ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload CSV Files')
+            ->setAttachPrompt($prompt)
             ->setMimeFilter('text/csv')
             ->setReadOnly(false)
             ->setMulti(false)
