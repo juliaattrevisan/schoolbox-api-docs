@@ -11,10 +11,13 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database;
 use PDO;
 use Psr\Log\LoggerInterface;
-use function count;
-use function sprintf;
-use function strtoupper;
 use UnexpectedValueException;
+use function count;
+use function md5;
+use function sprintf;
+use function strlen;
+use function strtoupper;
+use function substr;
 
 /**
  * Responsible for fetching data from canvas into staging database
@@ -148,12 +151,7 @@ class DataRestorer
                 $this->executeIfPersisting($createSql);
 
                 foreach ($indexes as $columnName) {
-                    $indexName = "idx_{$tableName}_{$columnName}";
-                    // If index is too long, shorten it to something that very likely will be sufficiently unique
-                    if (strlen($indexName) > 64) {
-                        $indexName = 'idx_' . md5($tableName) . '_' . substr(md5($columnName), 0, 27); // 4 + 32 + 1 + 27 = 64
-                    }
-                    $this->executeIfPersisting("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
+                    $this->addIndex($tableName, $columnName);
                 }
             } catch (Database\Exception $e) {
                 $errors = true;
@@ -196,6 +194,29 @@ class DataRestorer
 
 
     /**
+     * Adds extra indexes to table columns
+     *
+     * We know from experience that we need indexes on some columns that are not indexed by default.
+     * This is essentially a whitelist of known cases that require indexes, or the sync tool is too slow for practical use.
+     *
+     * @throws Database\Exception
+     */
+    public function addExtraIndexes(): void
+    {
+        $extra = [
+             'course_section_dim' => [
+                 'sis_source_id',
+             ],
+        ];
+        foreach($extra as $tableName => $columnNames){
+            foreach($columnNames as $columnName) {
+                $this->addIndex($tableName, $columnName);
+            }
+        }
+    }
+
+
+    /**
      * Drops all tables in the Canvas staging database
      *
      * @throws Database\Exception
@@ -213,6 +234,24 @@ class DataRestorer
             $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->quoteIdentifier($table)}");
         }
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 1');
+    }
+
+
+    /**
+     * Adds a database index so our subsequent SQL statements can join on the columns efficiently
+     *
+     * @param string $tableName
+     * @param string $columnName
+     * @throws Database\Exception
+     */
+    private function addIndex(string $tableName, string $columnName): void
+    {
+        $indexName = "idx_{$tableName}_{$columnName}";
+        // If index is too long, shorten it to something that very likely will be sufficiently unique
+        if (strlen($indexName) > 64) {
+            $indexName = 'idx_' . md5($tableName) . '_' . substr(md5($columnName), 0, 27); // 4 + 32 + 1 + 27 = 64
+        }
+        $this->executeIfPersisting("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
     }
 
 
