@@ -65,6 +65,12 @@
             {% endfor %}
         </select>
     {% else %}
+        {% include '@filters/_selectionCheckbox.twig' with {
+            roleSelection:      roleSelections[keyNone],
+            userSelection:      userSelections[keyNone],
+            label:              '(none)',
+            disabled:           isDisabled,
+        } only %}
         {% for courseSpec in courseSpecs %}
             {% include '@filters/_selectionCheckbox.twig' with {
                 userSelection: userSelections[courseSpec.id],
