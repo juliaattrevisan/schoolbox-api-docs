@@ -277,16 +277,19 @@ class Controller extends Base
         $resultsPerPage = (int)$this->config->get('pastoral_page_size');
 
         // Set the current page number
-        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? $get['pageCurrent'] : 1;
+        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? (int)$get['pageCurrent'] : 1;
 
         $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $pastoralGroupIds);
 
-        if ($pageCurrent > ceil($recordCount / $resultsPerPage)) {
-            $pageCurrent = ceil($recordCount / $resultsPerPage);
-        } else {
-            if ($pageCurrent < 1) {
-                $pageCurrent = 1;
-            }
+        $maxPage = (int)ceil($recordCount / $resultsPerPage);
+        if ($maxPage < 1) {
+            $maxPage = 1;
+        }
+
+        if ($pageCurrent > $maxPage) {
+            $pageCurrent = $maxPage;
+        } elseif ($pageCurrent < 1) {
+            $pageCurrent = 1;
         }
         // populate related records
         $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $pastoralGroupIds, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage);
@@ -301,7 +304,7 @@ class Controller extends Base
                 'pageCurrent'    => $pageCurrent,
                 'types'          => $this->pastoralTypeMapper->findAll(),
                 'linkedStudents' => $this->pastoralDataSource->getLinkedStudents($student),
-                'typeSelected'   => $get['type'],
+                'typeSelected'   => $typeId,
             ],
             'title'    => $student->getFullName(),
         ]);
