@@ -125,7 +125,7 @@
                         // Assign event grouping and resourceIds into every event
                         response.data.map(function(element, index) {
                             element.resourceId = element.data.meta.folderId;
-                            element.data.meta.eventGrouping = moment(element.start).format('YYYY') + String(moment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                            element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
 
                         response.data.forEach(function(element) {
@@ -151,7 +151,7 @@
                                             folderId: element.data.meta.folderId,
                                             folderName: element.data.meta.folderName,
                                             eventGrouping: element.data.meta.eventGrouping,
-                                            weekNo: moment(element.start).isoWeek(),
+                                            weekNo: self.toMoment(element.start).isoWeek(),
                                         }
                                     },
                                 });
@@ -200,7 +200,7 @@
                     } else {
                         element.setAttribute('event-group-id', eventGrouping);
                         element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
-                        element.setAttribute('event-group-date', moment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
+                        element.setAttribute('event-group-date', self.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
                         element.style.width = '95%';
                         element.classList.add('hide');
                         element.style.backgroundColor = backgroundColour;
@@ -428,7 +428,7 @@
                     self.redrawWeekNumbers();
                     self.cleanupMonthHeaderInlineStyles();
                 } else {
-                    self.$refs.fullCalendar.getApi().gotoDate(moment().format('YYYY-MM-DD'));
+                    self.$refs.fullCalendar.getApi().gotoDate(self.toMoment().format('YYYY-MM-DD'));
                 }
             },
 
