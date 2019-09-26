@@ -123,9 +123,9 @@
                             eventGroupingCursor = '';
 
                         // Assign event grouping and resourceIds into every event
-                        response.data.forEach(function(element, index) {
-                            response.data[index].resourceId = element.data.meta.folderId;
-                            response.data[index].data.meta.eventGrouping = moment(element.start).format('YYYY') + String(moment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                        response.data.map(function(element, index) {
+                            element.resourceId = element.data.meta.folderId;
+                            element.data.meta.eventGrouping = moment(element.start).format('YYYY') + String(moment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
 
                         response.data.forEach(function(element) {
