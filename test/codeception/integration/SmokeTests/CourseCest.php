@@ -103,7 +103,7 @@ class CourseCest
     {
         #GIVEN
         $timestamp      = time();
-        $folder_title   = 'Test Folder For Create Course with assessments at ' . $timestamp;
+        $folder_title   = 'Test Folder For Create Course and import assessments at ' . $timestamp;
         $course_base_folder = $i->grabFirstFolderByTitle('Courses');
 
         $folderPayload = new Payload\Resource\Folder\Create($course_base_folder->getId());
@@ -122,7 +122,7 @@ class CourseCest
         $i->sendRequest($coursePayload);
 
         $course_spec = $i->grabFirstCourseSpecByTitle($title);
-        $unit_name   = $title . ' EmptyUnit';
+        $unit_name   = $title . ' With 1 project';
 
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
         $unitSpecPayload->setFormParam('name', $unit_name);
@@ -159,7 +159,7 @@ class CourseCest
         $modifyCourse = new Payload\Course\Specification\Update($course_spec);
         $modifyCourse->addUnitSpec($unitSpec->getId(), $unit_name);
         $i->amGoingTo('Send save request for the newly created course');
-        $i->sendRequest($coursePayload);
+        $i->sendRequest($modifyCourse);
 
         $classpage_title = 'Testing Class Page for Course Sync and Assessment at ' . $timestamp;
         $class_code      = 'test' . $timestamp;
@@ -193,7 +193,7 @@ class CourseCest
         $unitClose = strtotime('+ 35 day');
         $part2->setUnitImport(1, $unitSpec->getId(), null, true, $unitOpen, $unitClose);
         $i->amGoingTo('Send import Step 2. unit specs to group page course, group page #' . $groupFolder->getId());
-        $i->sendRequest($importCourseSpecPayload);
+        $i->sendRequest($part2);
 
         #THEN
         $i->seeResponseCodeIs(200);
@@ -203,15 +203,15 @@ class CourseCest
             [
                 'spec_id' => $unitSpec->getId(),
                 'impl_id' => '',
-                'open'    => strtotime('- 5 day'),
-                'close'   => strtotime('+ 35 day'),
+                'open'    => date('d/m/Y', strtotime('- 5 day')),
+                'close'   => date('d/m/Y', strtotime('+ 35 day')),
             ],
         ];
         $part3 = new Payload\Course\Import\Part3($course_spec->getId(), $groupFolder->getId(), 0, '', $course_spec->getId(), (string)$groupFolder->getId(), null, $selectedUnits);
         $part3->setAssessmentImport($unitSpec->getId(), $projectSpec->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
         $part3->setSubAssessmentImport($unitSpec->getId(), $projectSpec->getId(), $dueWorkSpec->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
         $i->amGoingTo('Send import Step 3. assessments to class page course unit spec, class page #' . $groupFolder->getId());
-        $i->sendRequest($importCourseSpecPayload);
+        $i->sendRequest($part3);
 
         #THEN
         $i->seeResponseCodeIs(200);
