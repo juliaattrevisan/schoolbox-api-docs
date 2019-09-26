@@ -138,7 +138,6 @@
 
                                 newResponse.push({
                                     allDay: true,
-                                    color: '#fffff',
                                     backgroundColor: (element.data.meta.colour) ? element.data.meta.colour : self.defaultBgColour,
                                     editable: false,
                                     draggable: false,
