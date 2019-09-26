@@ -105,13 +105,17 @@ Pastoral,Pastoral Moderator,View pastoral dashboard,https://vagrant.dev.schoolbo
 ,Teacher,Create a record for student,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert
 ,Teacher,View a record,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2
 News,News Moderator,Get an RSS feed,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all
+,News Moderator,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
 ,News Moderator,View created by me,https://vagrant.dev.schoolbox.cloud/news/me
 ,News Moderator,View require moderation,https://vagrant.dev.schoolbox.cloud/news/moderation
 ,News Moderator,Create news,https://vagrant.dev.schoolbox.cloud/news/create
 ,Teacher,Read news,https://vagrant.dev.schoolbox.cloud/news
+,Teacher,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
 ,Teacher,View an individual news item,https://vagrant.dev.schoolbox.cloud/news/34
 ,Teacher,View saved news,https://vagrant.dev.schoolbox.cloud/news/saved
 ,Teacher,View news archive,https://vagrant.dev.schoolbox.cloud/news/archive
+,Student,Read news,https://vagrant.dev.schoolbox.cloud/news
+,Student,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
 Fixtures,Fixtures Administrator,Go to fixtures,https://vagrant.dev.schoolbox.cloud/fixtures
 ,Fixtures Administrator,See all seasons,https://vagrant.dev.schoolbox.cloud/fixtures/seasons
 ,Fixtures Administrator,Change a seacon,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit
