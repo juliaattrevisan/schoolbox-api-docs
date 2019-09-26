@@ -511,6 +511,7 @@ class Builder implements IBuilder
         } elseif ($columnValue === false) {
             $this->where[] = "$escapedOperand IS {$whereNot}FALSE";
         } elseif (\is_iterable($columnValue)) {
+            $param = $this->paramPrefix ? "{$this->paramPrefix}_{$param}" : $param;
             $placeHolders  = self::getArrayPlaceholders($columnValue, $param);
             $this->where[] = "$escapedOperand {$whereNot}IN {$placeHolders}";
             $this->params  = array_merge($this->params, self::getArrayParameters($columnValue, $param));

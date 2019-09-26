@@ -7,7 +7,6 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Mapper;
@@ -21,7 +20,7 @@ require __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
 
-    private const NUM_RECORDS = 200;
+    private const NUM_RECORDS = 2000;
 
     /** @inheritDoc */
     public function run(): void
@@ -52,6 +51,7 @@ $app = new class extends CliTool\App
         $students     = $userMapper->findByColumn('group_id', $studentRoles->getPropertyValues('id'));
         $testStudents = $userMapper->createCollection();
         foreach ($students as $student) {
+            $student->loadParents();
             $testStudents->add($student);
             if ($testStudents->count() > 5) {
                 break;
@@ -75,11 +75,15 @@ $app = new class extends CliTool\App
         $memberMapper->save((new \Schoolbox\Pastoral\Group\Member\Model())->setGroup($pastoralGroup)->setUser($testStaffs->current())->setAuthor($moderator ?? $testStaffs->current()));
 
         for ($i = 0; $i < $this::NUM_RECORDS; $i++) {
-            $currentStaff   = $testStaffs->offsetGet(rand(0, 2));
+            /** @var \Schoolbox\User $ownerStaff */
+            $ownerStaff = $testStaffs->offsetGet(rand(0, 2));
+            $viewStaff  = $testStaffs->offsetGet(rand(0, 2));
+            /** @var \Schoolbox\User $currentStudent */
             $currentStudent = $testStudents->offsetGet(rand(0, 4));
             $currentType    = $types->offsetGet(rand(1, $types->count()));
-            $pastoral       = (new Model())->setHeading("Record {$i}")
-                                           ->setOwner($currentStaff)
+            $pastoral       = (new Model())->setHeading("Record {$i} {$ownerStaff->getFullName()}")
+                                           ->setOwner($ownerStaff)
+                                           ->setModifiedBy($ownerStaff)
                                            ->setStudent($currentStudent)
                                            ->setBodyPrivate("Private {$i}")
                                            ->setBodyPublic("Public {$i}")
@@ -88,9 +92,10 @@ $app = new class extends CliTool\App
             $pastoralMapper->save($pastoral);
 
             if ($i % 3 == 0) {
-                continue;
+                $access = (new PastoralAccess())->setUser($currentStudent->getParents()->first())->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
+                                                ->setPastoral($pastoral);
             } elseif ($i % 3 == 1) {
-                $access = (new PastoralAccess())->setUser($currentStaff)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
+                $access = (new PastoralAccess())->setUser($viewStaff)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
                                                 ->setPastoral($pastoral);
             } elseif ($i % 3 == 2) {
                 $access = (new PastoralAccess())->setRole($staffRoles->current())->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)

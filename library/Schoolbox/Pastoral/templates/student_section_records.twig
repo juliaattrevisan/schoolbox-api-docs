@@ -48,7 +48,7 @@
 
                                             <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}"> {{ linkedRecord.student.fullName }} - {{ headingCurrent }}</a><br>
                                         {% endfor %}
-                                        
+
                                     {% else %}
 
                                         {% set recordId = record.id %}
@@ -61,10 +61,21 @@
                                     {% endif %}
 
                                     {# Display name of poster #}
-                                    Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a><span title="{{ record.createdAt.short }}"> {{ record.createdAt.relativeDay }}</span>
+                                        Created by
+                                        {% if record.owner.deletedAt.isNull %}
+                                            <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
+                                        {% else %}
+                                            {{ record.owner.fullName }}
+                                        {% endif %}
+                                        <span title="{{ record.createdAt.short }}"> {{ record.createdAt.relativeDay }}</span>
                                     {# Display last updated by if applicable #}
                                     {% if record.createdAt.long != record.updatedAtDisplay.long %}
-                                        last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                        last updated by
+                                        {% if record.modifiedByDisplay.deletedAt.isNull %}
+                                            <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                        {% else %}
+                                            {{ record.modifiedByDisplay.fullName }}
+                                        {% endif %}
                                         <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span><br>
                                     {% endif %}
 

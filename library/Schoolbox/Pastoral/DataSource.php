@@ -14,9 +14,9 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
+use PDO;
 
 /**
  * Data source for pastoral care records.
@@ -104,64 +104,88 @@ class DataSource
 
 
     /**
+     * Gets number of records for particular student visible to the given viewer
+     * @param User     $viewer
+     * @param User     $student
+     * @param int|null $typeId
+     * @param array    $pastoralGroupIds
+     * @return int
+     */
+    public function countRecords(User $viewer, User $student, ?int $typeId, array $pastoralGroupIds): int
+    {
+        $where = $this->getWhere($viewer, $student->getId(), $typeId, $pastoralGroupIds, null);
+        $sql   = "
+        SELECT count(*)
+                FROM pastoral p
+        WHERE {$where['sql']}
+        ";
+
+        $stmt = $this->mapper->getDatabase()->query($sql, $where['params']);
+
+        return (int)$stmt->fetchColumn();
+    }
+
+
+    /**
      * Gets records for particular student visible to the given viewer
      * @param User     $viewer
      * @param User     $student
      * @param int|null $typeId
      * @param array    $pastoralGroupIds
+     * @param int      $offset
+     * @param int      $limit
      * @return GenericCollection|Model[]
      */
-    public function findForStudent(User $viewer, User $student, ?int $typeId, array $pastoralGroupIds): GenericCollection
+    public function findRecords(User $viewer, User $student, ?int $typeId, array $pastoralGroupIds, int $offset, int $limit): GenericCollection
     {
-        $rows    = $this->findForList($viewer, $typeId, $pastoralGroupIds, null, $student->getId());
-        $records = Model::createCollection();
-        foreach ($rows as $row) {
-            if (empty($row['pastoral_access'])) {
+        $rawRecords = $this->findRawRecords($viewer, $typeId, $pastoralGroupIds, null, $student->getId(), $offset, $limit);
+        $userMapper = $this->mapper->getJoinMapper('owner');
+
+        // hydrate the parent records first
+        $parentRecords = Model::createCollection();
+        foreach ($rawRecords as $rawRecord) {
+            try {
+                $record = $this->mapper->hydrate($rawRecord);
+                /** @var User $owner */
+                $owner = $userMapper->hydrate($rawRecord, 'o');
+                $record->setOwner($owner);
+                /** @var User $modifiedBy */
+                $modifiedBy = $userMapper->hydrate($rawRecord, 'u');
+                $record->setModifiedBy($modifiedBy);
+            } catch (MapperException $e) {
+                // noop
                 continue;
             }
-            $record = new Model();
-            $record->setId($row['pastoral_id'])
-                   ->setOwner((new User())->setId($row['pastoral_owner_id']))
-                   ->setHeading($row['pastoral_heading'])
-                   ->setOwner((new User())->setId($row['pastoral_owner_id'])->setFirstname($row['user1_firstname'])->setLastname($row['user1_lastname']))
-                   ->setModifiedBy((new User())->setId($row['pastoral_modified_by_id'])->setFirstname($row['user2_firstname'])->setLastname($row['user2_lastname']))
-                   ->setCreatedAt((new Alaress_Date_Format($row['pastoral_created_at'], Alaress_Date_Format::DATABASE_FORMAT)))
-                   ->setUpdatedAt((new Alaress_Date_Format($row['pastoral_updated_at'], Alaress_Date_Format::DATABASE_FORMAT)));
+
             // keep key as record id
-            $records->offsetSet($record->getId(), $record);
+            $parentRecords->offsetSet($record->getId(), $record);
         }
 
-        return $records;
-    }
-
-
-    /**
-     * Adds related records to the given records
-     * @param GenericCollection $parentRecords
-     * @param User              $viewer
-     * @param int|null          $typeId
-     * @param array             $pastoralGroupIds
-     * @return GenericCollection
-     */
-    public function addLinkedInfo(GenericCollection $parentRecords, User $viewer, ?int $typeId, array $pastoralGroupIds): GenericCollection
-    {
+        // hydrate related records
         $parentIds        = $parentRecords->getPropertyValues('id');
-        $linkedRecordRows = $this->findForList($viewer, $typeId, $pastoralGroupIds, $parentIds, null);
+        $linkedRecordRows = $this->findRawRecords($viewer, $typeId, $pastoralGroupIds, $parentIds, null, null, null);
 
         foreach ($linkedRecordRows as $linkedRecordRow) {
-            if (empty($linkedRecordRow['pastoral_access'])) {
+            if (!$this->accessLevelCensor->isPastoralModerator($viewer)
+                && (int)$linkedRecordRow['owner_id'] !== $viewer->getId()
+                && empty($linkedRecordRow['pastoral_access'])) {
                 continue;
             }
-            $linkedRecord = new Model();
-            $linkedRecord->setId($linkedRecordRow['pastoral_id'])
-                         ->setHeading($linkedRecordRow['pastoral_heading'])
-                         ->setOwner((new User())->setId($linkedRecordRow['pastoral_owner_id'])->setFirstname($linkedRecordRow['user1_firstname'])->setLastname($linkedRecordRow['user1_lastname']))
-                         ->setStudent((new User())->setId($linkedRecordRow['student_id'])->setFirstname($linkedRecordRow['user2_firstname'])->setLastname($linkedRecordRow['user2_lastname']))
-                         ->setCreatedAt((new Alaress_Date_Format($linkedRecordRow['pastoral_created_at'], Alaress_Date_Format::DATABASE_FORMAT)))
-                         ->setUpdatedAt((new Alaress_Date_Format($linkedRecordRow['pastoral_updated_at'], Alaress_Date_Format::DATABASE_FORMAT)));
+            try {
+                $linkedRecord = $this->mapper->hydrate($linkedRecordRow);
+                /** @var User $owner */
+                $owner = $userMapper->hydrate($linkedRecordRow, 'o');
+                $linkedRecord->setOwner($owner);
+                /** @var User $student */
+                $student = $userMapper->hydrate($linkedRecordRow, 'u');
+                $linkedRecord->setStudent($student);
+            } catch (MapperException $e) {
+                // noop
+                continue;
+            }
 
             /** @var Model $parentRecord */
-            $parentRecord = $parentRecords->offsetGet($linkedRecordRow['parent_record_id']);
+            $parentRecord = $parentRecords->offsetGet($linkedRecordRow['parent_id']);
             $parentRecord->setRelatedRecords($parentRecord->getRelatedRecords()->add($linkedRecord));
             $linkedRecord->setParent($parentRecord);
         }
@@ -176,111 +200,152 @@ class DataSource
      * @param array      $pastoralGroupIds
      * @param array|null $parentRecordIds
      * @param int|null   $studentId
+     * @param int|null   $offset
+     * @param int|null   $limit
      * @return array
      */
-    private function findForList(User $viewer, ?int $typeId, array $pastoralGroupIds, ?array $parentRecordIds, ?int $studentId): array
+    private function findRawRecords(User $viewer, ?int $typeId, array $pastoralGroupIds, ?array $parentRecordIds, ?int $studentId, ?int $offset, ?int $limit): array
     {
-        // pastoral moderators
-        $pastoralService = $viewer->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
+        $where = $this->getWhere($viewer, $studentId, $typeId, $pastoralGroupIds, $parentRecordIds);
 
-        $outerPb = (new Builder($this->mapper->getDatabase(), ''));
-
-        $params = [];
-        if (!$pastoralService) {
-            $innerPb = (new Builder($this->mapper->getDatabase(), ''));
-            $innerPb->equals('p.owner_id', $viewer->getId());
-            $innerPb->equals('pa.user_id', $viewer->getId());
-            $innerPb->equals('pa.role_id', $viewer->getRole()->getId());
-            if (!empty($pastoralGroupIds)) {
-                $innerPb->in('pa.group_id', $pastoralGroupIds);
-            }
-            $outerPb->any($innerPb);
-            $params = $innerPb->getParams();
-        }
-
-        // This query expects either parent record ids or student id is set.
         if (!empty($parentRecordIds)) {
-            $outerPb->in('p.parent_id', $parentRecordIds);
-            $user2Column = 'p.student_id';
+            $userColumn = 'p.student_id';
         } else {
             if (null !== $studentId) {
-                $outerPb->equals('p.student_id', $studentId);
-                $user2Column = 'p.modified_by_user_id';
+                $userColumn = 'p.modified_by_user_id';
             } else {
                 return [];
             }
         }
 
-        $outerPb->isNull('p.deleted_at');
-        if (null !== $typeId) {
-            $outerPb->equals('p.type_id', $typeId);
-        }
-
-        $where = implode(' AND ', $outerPb->getWhere());
-
         $sql = "
-        SELECT p.id                  AS pastoral_id,
-               p.owner_id            AS pastoral_owner_id,
-               p.parent_id           AS parent_record_id,
-               p.heading             AS pastoral_heading,
-               p.modified_by_user_id AS pastoral_modified_by_id,
-               p.student_id          AS student_id,
-               p.created_at          AS pastoral_created_at,
-               p.updated_at          AS pastoral_updated_at,
-               min(pa.access)        AS pastoral_access,
-               u1.firstname          AS user1_firstname,
-               u1.lastname           AS user1_lastname,
-               u2.firstname          AS user2_firstname,
-               u2.lastname           AS user2_lastname
+        SELECT p.id,
+               p.owner_id,
+               p.parent_id,
+               p.heading,
+               p.modified_by_user_id,
+               p.student_id,
+               p.created_at,
+               p.updated_at,
+               o.id AS `o.id`,
+               o.firstname AS `o.firstname`,
+               o.lastname AS `o.lastname`,
+               o.deleted_at AS `o.deleted_at`,
+               u.id AS `u.id`,
+               u.firstname AS `u.firstname`,
+               u.lastname AS `u.lastname`,
+               u.deleted_at AS `u.deleted_at`
         FROM pastoral p
-        LEFT JOIN pastoral_access pa ON p.id = pa.pastoral_id
-        LEFT JOIN `user` u1 ON p.owner_id = u1.id
-        LEFT JOIN `user` u2 ON {$user2Column} = u2.id
-        WHERE {$where}
+        INNER JOIN `user` o ON p.owner_id = o.id
+        INNER JOIN `user` u ON {$userColumn} = u.id
+        WHERE {$where['sql']}
         GROUP BY p.id
         ORDER BY p.updated_at DESC
         ";
 
-        $stmt = $this->mapper->getDatabase()->query($sql, array_merge($params, $outerPb->getParams()));
-        return $stmt->fetchAll();
+        if ($limit) {
+            $sql .= " LIMIT {$limit}" . (empty($offset) ? '' : " OFFSET {$offset}");
+        }
+
+        $stmt = $this->mapper->getDatabase()->query($sql, $where['params']);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
     /**
-     * User-sensitive wrapper for `Mapper::findByColumn`.
-     *
-     * @param User   $currentUser
-     * @param string $columnName
-     * @param string $columnValue
-     * @param array  $options
-     *
-     * @return Collection
-     * @throws MapperException\InsufficientHydrationException
+     * Generates where clause with parameters to find visible pastoral records
+     * @param User       $viewer
+     * @param int|null   $studentId
+     * @param int|null   $typeId
+     * @param array      $pastoralGroupIds
+     * @param array|null $parentRecordIds
+     * @return array
      */
-    public function findByColumn(User $currentUser, $columnName, $columnValue, array $options = []): Collection
+    private function getWhere(User $viewer, ?int $studentId, ?int $typeId, array $pastoralGroupIds, ?array $parentRecordIds): array
     {
-        return $this->accessLevelCensor->filterRecordsForUser(
-            $this->mapper->findByColumn($columnName, $columnValue, $options),
-            $currentUser
-        );
-    }
+        // Pastoral records that we are interested in
+        $validPb = (new Builder($this->mapper->getDatabase(), 'p'))->setParamPrefix('pv');
 
+        // This query expects either parent record ids or student id is set.
+        if (!empty($parentRecordIds)) {
+            $validPb->in('p.parent_id', $parentRecordIds);
+        } else {
+            if (null !== $studentId) {
+                $validPb->equals('p.student_id', $studentId);
+            } else {
+                return [];
+            }
+        }
+        $validPb->isNull('p.deleted_at');
+        if (null !== $typeId) {
+            $validPb->equals('p.type_id', $typeId);
+        }
+        $where  = implode(' AND ', $validPb->getWhere());
+        $params = $validPb->getParams();
 
-    /**
-     * User-sensitive wrapper for `Mapper::findByColumnList`.
-     *
-     * @param User  $currentUser
-     * @param       $columnList
-     * @param array $options
-     *
-     * @return Collection
-     * @throws MapperException
-     * @throws MapperException\InsufficientHydrationException
-     */
-    public function findByColumnList(User $currentUser, $columnList, array $options = []): Collection
-    {
-        return $this->accessLevelCensor->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options),
-            $currentUser);
+        // Check access for the current user
+        if (!$this->accessLevelCensor->isPastoralModerator($viewer)) {
+            // owner
+            $ownerPb = (new Builder($this->mapper->getDatabase(), 'p'))
+                ->setParamPrefix('po')
+                ->equals('p.owner_id', $viewer->getId());
+
+            // allowed by pastoral_access
+            $paInnerPb1 = (new Builder($this->mapper->getDatabase(), 'pa1'))
+                ->setParamPrefix('pa1')
+                ->equals('user_id', $viewer->getId())
+                ->equals('role_id', $viewer->getRole()->getId());
+            if (!empty($pastoralGroupIds)) {
+                $paInnerPb1->in('group_id', $pastoralGroupIds);
+            }
+            $hasAccessPb    = (new Builder($this->mapper->getDatabase(), 'pa1'))
+                ->setParamPrefix('pa1')
+                ->any($paInnerPb1)
+                ->isNull('deleted_at')
+                ->greaterThan('access', 0);
+            $whereHasAccess = implode(' AND ', $hasAccessPb->getWhere());
+
+            // rejected by pastoral_access
+            $paInnerPb2 = (new Builder($this->mapper->getDatabase(), 'pa2'))
+                ->setParamPrefix('pa2')
+                ->equals('user_id', $viewer->getId())
+                ->equals('role_id', $viewer->getRole()->getId());
+            if (!empty($pastoralGroupIds)) {
+                $paInnerPb2->in('group_id', $pastoralGroupIds);
+            }
+            $noAccessPb    = (new Builder($this->mapper->getDatabase(), 'pa2'))
+                ->setParamPrefix('pa2')
+                ->any($paInnerPb2)
+                ->isNull('deleted_at')
+                ->equals('access', 0);
+            $whereNoAccess = implode(' AND ', $noAccessPb->getWhere());
+
+            // Generate where string using the results
+            $where  .= "
+                AND
+                (
+                    (
+                      p.id IN (SELECT pastoral_id FROM pastoral_access pa1 WHERE {$whereHasAccess})
+                      AND
+                      p.id NOT IN (SELECT pastoral_id FROM pastoral_access pa2 WHERE {$whereNoAccess})
+                    ) OR (
+                      {$ownerPb->getWhere()[0]}
+                    )
+                )
+            ";
+            $params = array_merge(
+                $ownerPb->getParams(),
+                $paInnerPb1->getParams(),
+                $hasAccessPb->getParams(),
+                $paInnerPb2->getParams(),
+                $noAccessPb->getParams(),
+                $params
+            );
+        }
+
+        return [
+            'sql'    => $where,
+            'params' => $params,
+        ];
     }
 
 
