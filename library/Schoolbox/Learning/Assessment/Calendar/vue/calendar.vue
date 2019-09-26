@@ -54,7 +54,6 @@
                 currentBatchCursor: null,
                 eventGroups: [],
                 defaultBgColour: '#0066b0',
-                contentHeight: 1,
                 maxDate: null,
                 minDate: null,
                 termDuration: 10,
@@ -90,6 +89,11 @@
                 // TODO this method should be unnecessary
                 // (for the same reason as `onLoading` in the main fullCalendar)
                 this.helper.onLoading(isLoading);
+            },
+
+
+            contentHeight() {
+                return this.helper.contentHeight();
             },
 
             /**
