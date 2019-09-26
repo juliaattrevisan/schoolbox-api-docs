@@ -122,7 +122,7 @@ class CourseCest
         $i->sendRequest($coursePayload);
 
         $course_spec = $i->grabFirstCourseSpecByTitle($title);
-        $unit_name   = $title . ' EmptyUnit';
+        $unit_name   = $title . ' With 1 project';
 
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
         $unitSpecPayload->setFormParam('name', $unit_name);
