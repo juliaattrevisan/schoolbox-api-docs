@@ -166,11 +166,6 @@ class DataSource
         $linkedRecordRows = $this->findRawRecords($viewer, $typeId, $pastoralGroupIds, $parentIds, null, null, null);
 
         foreach ($linkedRecordRows as $linkedRecordRow) {
-            if (!$this->accessLevelCensor->isPastoralModerator($viewer)
-                && (int)$linkedRecordRow['owner_id'] !== $viewer->getId()
-                && empty($linkedRecordRow['pastoral_access'])) {
-                continue;
-            }
             try {
                 $linkedRecord = $this->mapper->hydrate($linkedRecordRow);
                 /** @var User $owner */
