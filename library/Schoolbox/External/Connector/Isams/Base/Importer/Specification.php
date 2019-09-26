@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
  */
 class Specification
 {
+
     /**
      * Status text for existing nodes
      */

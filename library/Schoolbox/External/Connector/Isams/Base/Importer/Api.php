@@ -24,12 +24,14 @@ class Api implements IApi
      */
     private $host;
 
+
     /**
      * The API key for this call, provided by the school
      *
      * @var string
      */
     private $apiKey;
+
 
     /**
      * Constructor
