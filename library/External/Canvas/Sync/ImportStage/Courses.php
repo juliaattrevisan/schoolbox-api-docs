@@ -5,13 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace External\Canvas\Sync\Importer;
+namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
-use External\Canvas\Sync\Translator;
+use External\Canvas\Sync\Bridge;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -50,8 +51,17 @@ class Courses
     /** @var LoggerInterface */
     private $log;
 
-    /** @var Translator\Assignment */
-    private $assignmentTranslator;
+    /** @var Bridge\Account */
+    private $accountBridge;
+
+    /** @var Bridge\CourseGroup */
+    private $courseGroupBridge;
+
+    /** @var Bridge\Course */
+    private $courseBridge;
+
+    /** @var Bridge\Assignment */
+    private $assignmentBridge;
 
     /** @var SubmissionBoxMapper */
     private $submissionBoxMapper;
@@ -77,38 +87,47 @@ class Courses
     private $countCoursesDeleted;
 
     // Assignments => SubmissionBox
-    private $countBoxesSynchronised;
-    private $countBoxesCreated;
-    private $countBoxesUpdated;
-    private $countBoxesMoved;
-    private $countBoxesDeleted;
+    private $countAssignmentsSynchronised;
+    private $countSubmissionBoxCreated;
+    private $countSubmissionBoxUpdated;
+    private $countSubmissionBoxMoved;
+    private $countSubmissionBoxDeleted;
 
 
     /**
-     * @param IConnector            $canvasDb
-     * @param IConnector            $schoolboxDb
-     * @param LoggerInterface       $log
-     * @param Translator\Assignment $assignmentTranslator
-     * @param SubmissionBoxMapper   $submissionBoxMapper
-     * @param Assessment\Mapper     $assessmentMapper
-     * @param Folder\Mapper         $folderMapper
+     * @param IConnector          $canvasDb
+     * @param IConnector          $schoolboxDb
+     * @param Bridge\Assignment   $assignmentBridge
+     * @param SubmissionBoxMapper $submissionBoxMapper
+     * @param Assessment\Mapper   $assessmentMapper
+     * @param Folder\Mapper       $folderMapper
+     * @param LoggerInterface     $log
+     * @param Bridge\Account      $accountBridge
+     * @param Bridge\Course       $courseBridge
+     * @param Bridge\CourseGroup  $courseGroupBridge
      */
     public function __construct(
         IConnector $canvasDb,
         IConnector $schoolboxDb,
-        LoggerInterface $log,
-        Translator\Assignment $assignmentTranslator,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        LoggerInterface $log,
+        Bridge\Account $accountBridge,
+        Bridge\Assignment $assignmentBridge,
+        Bridge\Course $courseBridge,
+        Bridge\CourseGroup $courseGroupBridge
     ) {
-        $this->canvasDb             = $canvasDb;
-        $this->schoolboxDb          = $schoolboxDb;
-        $this->log                  = $log;
-        $this->assignmentTranslator = $assignmentTranslator;
-        $this->submissionBoxMapper  = $submissionBoxMapper;
-        $this->assessmentMapper     = $assessmentMapper;
-        $this->folderMapper         = $folderMapper;
+        $this->canvasDb            = $canvasDb;
+        $this->schoolboxDb         = $schoolboxDb;
+        $this->log                 = $log;
+        $this->assignmentBridge    = $assignmentBridge;
+        $this->submissionBoxMapper = $submissionBoxMapper;
+        $this->assessmentMapper    = $assessmentMapper;
+        $this->folderMapper        = $folderMapper;
+        $this->accountBridge       = $accountBridge;
+        $this->courseGroupBridge   = $courseGroupBridge;
+        $this->courseBridge        = $courseBridge;
     }
 
 
@@ -122,7 +141,7 @@ class Courses
      */
     public function synchronise(): void
     {
-        $this->log->info("Synchronising canvas courses + assignments...");
+        $this->log->info("Synchronising Canvas Courses + Assignments => Schoolbox CourseSpec, UnitSpec, SubmissionBoxSpec...");
         $this->resetCounts();
 
         // Fetch all relevant courses and their assignments
@@ -162,8 +181,6 @@ class Courses
             $accountCanvasId    = (int)$row['account.canvas_id'];
             $courseCode         = $row['course.code'];
             $courseCanvasId     = (int)$row['course.canvas_id'];
-            $courseName         = $row['course.name'];
-            $courseTermName     = $row['enrollment_term.name'];
             $assignmentCanvasId = $row['assignment.canvas_id'] === null ? null : (int)$row['assignment.canvas_id'];
 
             // First time we've seen this account?
@@ -181,8 +198,8 @@ class Courses
             // First time we've seen course?
             if (!array_key_exists($courseCanvasId, $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'])) {
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId] = [
-                    'name'        => $courseName,
-                    'termName'    => $courseTermName,
+                    'name'        => $row['course.name'],
+                    'termName'    => $row['enrollment_term.name'],
                     'assignments' => [],
                 ];
             }
@@ -220,7 +237,7 @@ class Courses
                 JOIN pseudonym_dim pseudonym ON pseudonym.user_id = enrollment.user_id
                 WHERE
                       course.name LIKE '%notif%' AND
-                      course.workflow_state != 'deleted' AND
+                      course.workflow_state = 'published' AND       -- We exclude 'unpublished' (aka draft), and 'deleted' assignments
                       enrollment.type = 'TeacherEnrollment' AND
                       pseudonym.sis_user_id IN ({$bindings->getPlaceholder()})
                 GROUP BY course.id
@@ -243,6 +260,9 @@ class Courses
         $synchronizedCourseFolderIds      = [];
         $synchronizedSubmissionBoxIds     = [];
 
+        // Fall back to setting SubmissionBoxSpec.owner to Schoolbox Admin if no course teacher found
+        $schoolboxAdminUserId = $this->getSchoolboxAdminUserId();
+
         foreach ($accountsData as $accountCanvasId => $accountData) {
             foreach ($accountData['courseGroups'] as $courseGroupCode => $courseGroupData) {
                 $mostRecentCourse                   = end($courseGroupData['courses']);
@@ -258,7 +278,7 @@ class Courses
                         $submissionBox                  = $this->processCanvasAssignment(
                             $unitSpecFolder,
                             $assignmentCanvasId,
-                            $courseData['teacherSchoolboxId'] ?? $this->getSchoolboxAdminUserId(),  // Fall back to Schoolbox Admin if no course teacher found
+                            $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
                             $assignmentData['title'],
                             $assignmentData['description'],
                             $assignmentData['points_possible'],
@@ -275,9 +295,9 @@ class Courses
             }
         }
 
-        $this->deleteUnSynchronizedCourseGroups($synchronizedCourseGroupFolderIds);
-        $this->deleteUnSynchronizedCourses($synchronizedCourseFolderIds);
         $this->deleteUnSynchronizedSubmissionBoxes($synchronizedSubmissionBoxIds);
+        $this->deleteUnSynchronizedCourses($synchronizedCourseFolderIds);
+        $this->deleteUnSynchronizedCourseGroups($synchronizedCourseGroupFolderIds);
 
         $this->printCounts();
     }
@@ -334,6 +354,8 @@ class Courses
      * @return Folder\Model
      * @throws Database\Exception
      * @throws UnexpectedValueException
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
      */
     private function processCanvasCourseGroup(
         int $accountCanvasId,
@@ -343,7 +365,7 @@ class Courses
         $this->countCourseGroupsSynchronised++;
 
         $accountFolder = $this->findAccountFolder($accountCanvasId);
-        $courseFolder  = $this->findCourseSpecFolder($accountCanvasId, $courseCode);
+        $courseFolder  = $this->courseGroupBridge->findCourseSpecFolder($this->folderMapper, $accountCanvasId, $courseCode);
 
         // Create update Schoolbox CourseSpec
         if (!$courseFolder) {
@@ -353,7 +375,7 @@ class Courses
             $updateRequired = false;
             if ($courseFolder->getParent()->getId() !== $accountFolder->getId()) {
                 $this->countCourseGroupsMoved++;
-                $this->log->debug("Folder '{$courseFolder->getName()}' moved from {$courseFolder->getParent()->getId()} to {$accountFolder->getId()}");
+                $this->log->debug("Folder '{$courseFolder->getName()}' moved from (folder.id: {$courseFolder->getParent()->getId()}) to (folder.id: {$accountFolder->getId()})");
                 $courseFolder->setParent($accountFolder);
                 $updateRequired = true;
             }
@@ -381,6 +403,7 @@ class Courses
      * @return Folder\Model
      * @throws Database\Exception
      * @throws UnexpectedValueException
+     * @throws InvalidColumnException
      */
     private function processCanvasCourse(
         Folder\Model $courseSpecFolder,
@@ -389,7 +412,7 @@ class Courses
     ): Folder\Model {
         $this->countCoursesSynchronised++;
 
-        $unitSpecFolder = $this->findUnitSpecFolder($courseCanvasId);
+        $unitSpecFolder = $this->courseBridge->findUnitSpecFolder($courseCanvasId);
         if (!$unitSpecFolder) {
             $unitSpecFolder = $this->createUnitSpecFolder($courseSpecFolder, $courseCanvasId, $termName);
             $this->countCoursesCreated++;
@@ -399,7 +422,7 @@ class Courses
             if ($unitSpecFolder->getParent()->getId() !== $courseSpecFolder->getId()) {
                 $updateRequired = true;
                 $this->countCoursesMoved++;
-                $this->log->debug("Folder '{$unitSpecFolder->getName()}' moved from {$unitSpecFolder->getParent()->getId()} to {$courseSpecFolder->getId()}");
+                $this->log->debug("Folder '{$unitSpecFolder->getName()}' moved from (folder.id: {$unitSpecFolder->getParent()->getId()}) to (folder.id: {$courseSpecFolder->getId()})");
                 $unitSpecFolder->setParent($courseSpecFolder);
             }
             if ($unitSpecFolder->getName() !== $unitSpecFolderName) {
@@ -451,22 +474,22 @@ class Courses
         bool $muted,
         int $position
     ): SubmissionBox {
-        $this->countBoxesSynchronised++;
+        $this->countAssignmentsSynchronised++;
         $submissionBox = $this->findSubmissionBoxSpec($canvasId);
 
         // Translate Canvas attributes to SB attributes if not a 1:1 between systems
-        $maxMark           = $this->assignmentTranslator->getMaxMark($pointsPossible);
-        $markType          = $this->assignmentTranslator->getMarkType($gradingType, $pointsPossible);
-        $acceptOnline      = $this->assignmentTranslator->getAcceptOnline($submissionTypes);
-        $acceptMultiple    = $this->assignmentTranslator->getAcceptMultiple($submissionTypes);
-        $markVisibility    = $this->assignmentTranslator->getMarkVisibility($muted);
-        $selfReviewability = $this->assignmentTranslator->getSelfReviewability();
+        $maxMark           = $this->assignmentBridge->getMaxMark($pointsPossible);
+        $markType          = $this->assignmentBridge->getMarkType($gradingType, $pointsPossible);
+        $acceptOnline      = $this->assignmentBridge->getAcceptOnline($submissionTypes);
+        $acceptMultiple    = $this->assignmentBridge->getAcceptMultiple($submissionTypes);
+        $markVisibility    = $this->assignmentBridge->getMarkVisibility($muted);
+        $selfReviewability = $this->assignmentBridge->getSelfReviewability();
 
         // Not found in SB?
         if (!$submissionBox) {
             // Create and return it.
-            $this->log->debug("Created new submission box for assignment '$title' ($canvasId)");
-            $this->countBoxesCreated++;
+            $this->log->debug("Created new SubmissionBox Spec for Canvas Assignment '$title' (canvasId: $canvasId)");
+            $this->countSubmissionBoxCreated++;
             return $this->createSubmissionBoxSpec(
                 $unitSpecFolder,
                 $canvasId,
@@ -485,14 +508,16 @@ class Courses
             );
         }
 
+        $this->log->debug("Synchronising Canvas Assignment(canvasId: $canvasId) with SubmissionBoxSpec (id: {$submissionBox->getId()})");
+
         // Already exists in SB. Do we need to update it?
         $assessmentModel = $submissionBox->getAssessmentModel();
         // Check if any updates are required (including moving to new context)
         if ($assessmentModel->getContextUnitSpecification()->getId() !== $unitSpecFolder->getUnitSpecification()->getId()) {
-            $this->countBoxesMoved++;
+            $this->countSubmissionBoxMoved++;
             $oldUnitSpecId = $assessmentModel->getContextUnitSpecification()->getId();
             $newUnitSpecId = $unitSpecFolder->getUnitSpecification()->getId();
-            $this->log->debug("SubmissionBox moved from $oldUnitSpecId to $newUnitSpecId");
+            $this->log->debug("SubmissionBox Spec moved from (unitSpecId: $oldUnitSpecId) to (unitSpecId: $newUnitSpecId)");
             $this->moveAssessmentSpec($assessmentModel->getId(), $unitSpecFolder->getUnitSpecification()->getId());
             $assessmentModel->setContextUnitSpecification($unitSpecFolder->getUnitSpecification());
         }
@@ -513,8 +538,8 @@ class Courses
             (int)$submissionBox->getMarkType()->getId() !== (int)$markType->getId()
         ) {
             // Update all attributes and update
-            $this->log->debug("SubmissionBox '$title' ($canvasId) updated");
-            $this->countBoxesUpdated++;
+            $this->log->debug("SubmissionBox '$title' (canvasId: $canvasId) updated");
+            $this->countSubmissionBoxUpdated++;
             $submissionBox->setCategory($unitSpecFolder);
             $assessmentModel->setTitle($title);
             $assessmentModel->setDescription($description);
@@ -654,6 +679,11 @@ class Courses
             ->setMarkVisibility($markVisibility)
             ->setSelfReviewability($selfReviewability);
 
+        /* Cannot use mappers here to save because:
+         * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
+         * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
+         */
+
         $sql = "
             INSERT INTO assessment (title, description, sequence, external_id, created_at, updated_at)
             VALUES (:title, :description, :sequence, :external_id, :created_at, :updated_at)
@@ -672,16 +702,19 @@ class Courses
         $this->schoolboxDb->executeQuery($sql, ['assessmentId' => $assessment->getId(), 'unitSpecId' => $unitSpecFolder->getUnitSpecification()->getId()]);
 
         $sql = "
-            INSERT INTO submission_box (assessment_id, category, owner, mark_type, max_mark, self_reviewability) 
-            VALUES (:assessment_id, :category, :owner, :mark_type, :max_mark, :self_reviewability)
+            INSERT INTO submission_box (assessment_id, category, owner, accept_submission, multi_submission, mark_type, max_mark, mark_visibility, self_reviewability) 
+            VALUES (:assessment_id, :category, :owner, :accept_submission, :multi_submission, :mark_type, :max_mark, :mark_visibility, :self_reviewability)
         ";
 
         $this->schoolboxDb->executeQuery($sql, [
             'assessment_id'      => $assessment->getId(),
             'category'           => $unitSpecFolder->getId(),
             'owner'              => $submissionBox->getOwner()->getId(),
+            'accept_submission'  => $submissionBox->getAcceptOnline(),
+            'multi_submission'   => $submissionBox->getAcceptMultiple(),
             'mark_type'          => $submissionBox->getMarkType()->getId(),
             'max_mark'           => $submissionBox->getMaxMark(),
+            'mark_visibility'    => $submissionBox->getMarkVisibility(),
             'self_reviewability' => $submissionBox->getSelfReviewability(),
         ]);
         $submissionBox->setId((int)$this->schoolboxDb->lastInsertId());
@@ -742,6 +775,7 @@ class Courses
             WHERE a.id = :assessmentId
         ";
 
+        // Use raw query to ensure create/update dateTimes align to Canvas
         $this->schoolboxDb->executeQuery($sql, [
             'title'             => $title,
             'description'       => $description,
@@ -784,101 +818,16 @@ class Courses
      * @param int $accountCanvasId
      * @return Folder\Model
      * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
      */
     private function findAccountFolder(int $accountCanvasId): Folder\Model
     {
-        $sql = "SELECT id, name FROM folder WHERE name REGEXP '\\\\(canvas-account-{$accountCanvasId}\\\\)' AND deleted_at IS NULL";
-        $row = $this->schoolboxDb->executeQuery($sql)->fetchAll()[0];
+        $accountFolderPb = $this->accountBridge->equalsAccountFolder($accountCanvasId, 'f');
+        $accountFolderWhere = $accountFolderPb->getWhere()[0];
+
+        $sql = "SELECT f.id, f.name FROM folder f WHERE {$accountFolderWhere} AND f.deleted_at IS NULL";
+        $row = $this->schoolboxDb->executeQuery($sql, $accountFolderPb->getParams())->fetchAll()[0];
         return (new Folder\Model())->setId((int)$row['id'])->setName($row['name']);
-    }
-
-
-    /**
-     * Returns the Schoolbox Course Folder+CourseSpec that aligns to a Canvas CourseGroup
-     *
-     * Note that the courseCode may be used by different canvas accounts, so we need to check parent too
-     *
-     * @param int    $accountCanvasId
-     * @param string $courseCode
-     * @return Folder\Model|null
-     * @throws Database\Exception
-     * @throws UnexpectedValueException
-     */
-    private function findCourseSpecFolder(int $accountCanvasId, string $courseCode): ?Folder\Model
-    {
-        $sql = "
-            SELECT 
-                   f.id     'f.id',
-                   f.name   'f.name',
-                   f.parent 'f.parent',
-                   cs.id    'cs.id'
-            FROM folder f 
-            JOIN folder p ON p.id = f.parent
-            JOIN course_specification cs on f.id = cs.folder_id
-            WHERE 
-                  p.name REGEXP '\\\\(canvas-account-{$accountCanvasId}\\\\)' AND
-                  f.name REGEXP '\\\\(canvas-course-group-{$courseCode}\\\\)' AND 
-                  f.deleted_at IS NULL AND 
-                  cs.deleted_at IS NULL
-        ";
-
-        $rows = $this->schoolboxDb->executeQuery($sql)->fetchAll();
-
-        if (!count($rows)) {
-            return null;
-        }
-        if (count($rows) > 1) {
-            throw new UnexpectedValueException("Multiple Schoolbox course folders found for canvas course code '$courseCode'");
-        }
-        $row = $rows[0];
-
-        return (new Folder\Model())
-            ->setId((int)$row['f.id'])
-            ->setName($row['f.name'])
-            ->setParent((new Folder\Model())->setId((int)$row['f.parent']))
-            ->setCourseSpecification((new CourseSpec\Model())->setId((int)$row['cs.id']));
-    }
-
-
-    /**
-     * Find the Schoolbox UnitSpec Folder that aligns to the specified canvas course
-     *
-     * @param int $courseCanvasId
-     * @return Folder\Model|null
-     * @throws Database\Exception
-     * @throws UnexpectedValueException
-     */
-    private function findUnitSpecFolder(int $courseCanvasId): ?Folder\Model
-    {
-        $sql = "
-            SELECT 
-                   f.id 'f.id', 
-                   f.name 'f.name', 
-                   f.parent 'f.parent',
-                   us.id 'us.id'
-            FROM folder f 
-            JOIN course_unit_specification us on f.id = us.folder_id
-            WHERE 
-                  f.name REGEXP '\\\\(canvas-course-{$courseCanvasId}\\\\)' AND 
-                  f.deleted_at IS NULL AND 
-                  us.deleted_at IS NULL
-        ";
-
-        $rows = $this->schoolboxDb->executeQuery($sql)->fetchAll();
-
-        if (!count($rows)) {
-            return null;
-        }
-        if (count($rows) > 1) {
-            throw new UnexpectedValueException("Multiple Schoolbox course folders found for canvas course canvasId '$courseCanvasId'");
-        }
-        $row = $rows[0];
-
-        return (new Folder\Model())
-            ->setId((int)$row['f.id'])
-            ->setName($row['f.name'])
-            ->setParent((new Folder\Model())->setId((int)$row['f.parent']))
-            ->setUnitSpecification((new UnitSpec\Model())->setId((int)$row['us.id']));
     }
 
 
@@ -901,7 +850,7 @@ class Courses
         $sql = "INSERT INTO course_specification(folder_id, created_at, updated_at) VALUES (:folder_id, NOW(), NOW())";
         $this->schoolboxDb->executeQuery($sql, ['folder_id' => $folder->getId()]);
 
-        $this->log->debug("Created Schoolbox CourseSpec+Folder '$folderName' for Canvas CourseGroup '$courseCode'");
+        $this->log->debug("Created Schoolbox CourseSpec+Folder '$folderName' for Canvas CourseGroup (courseCode: '$courseCode')");
 
         return $folder->setCourseSpecification((new CourseSpec\Model())->setId((int)$this->schoolboxDb->lastInsertId()));
     }
@@ -924,7 +873,7 @@ class Courses
         $sql = "INSERT INTO course_unit_specification(folder_id, course_specification_id, created_at, updated_at) VALUES (:folderId, :courseSpecId, NOW(), NOW())";
         $this->schoolboxDb->executeQuery($sql, ['folderId' => $folder->getId(), 'courseSpecId' => $courseSpecFolder->getCourseSpecification()->getId()]);
 
-        $this->log->debug("Created Schoolbox UnitSpec+Folder '$folderName' for Canvas Course '$courseCanvasId'");
+        $this->log->debug("Created Schoolbox UnitSpec+Folder '$folderName' for Canvas Course (canvasId: $courseCanvasId)");
 
         return $folder->setUnitSpecification((new UnitSpec\Model())->setId((int)$this->schoolboxDb->lastInsertId()));
     }
@@ -958,7 +907,7 @@ class Courses
      */
     private function getCourseSpecFolderName(string $courseName, string $courseCode): string
     {
-        return "$courseName (canvas-course-group-{$courseCode})";
+        return $this->courseGroupBridge->generateLinkedFolderName($courseName, $courseCode);
     }
 
 
@@ -971,7 +920,7 @@ class Courses
      */
     private function getUnitSpecFolderName(string $termName, int $courseCanvasId): string
     {
-        return "$termName (canvas-course-{$courseCanvasId})";
+        return $this->courseBridge->generateLinkedFolderName($termName, $courseCanvasId);
     }
 
 
@@ -1004,13 +953,13 @@ class Courses
      */
     private function deleteUnSynchronizedCourseGroups(array $synchronizedCourseGroupFolderIds): void
     {
-        $pb = $this->folderMapper->getPredicateBuilder()->regex('name', '.+\(canvas-course-group-\d+\)');
+        $pb = $this->courseGroupBridge->equalsAnyCourseGroupFolder();
         if (count($synchronizedCourseGroupFolderIds)) {
-            $pb->notIn('id', $synchronizedCourseGroupFolderIds);
+            $pb->notIn('folder.id', $synchronizedCourseGroupFolderIds);
         }
 
         foreach ($this->folderMapper->findByPredicates($pb) as $folder) {
-            $this->log->debug("Deleting un-synchronised course group folder '{$folder->getTitle()}' ({$folder->getId()})");
+            $this->log->debug("Deleting un-synchronised course group folder '{$folder->getTitle()}' (id: {$folder->getId()})");
             $this->folderMapper->delete($folder);
             $this->countCourseGroupsDeleted++;
         }
@@ -1027,13 +976,13 @@ class Courses
      */
     private function deleteUnSynchronizedCourses(array $synchronizedCourseFolderIds): void
     {
-        $pb = $this->folderMapper->getPredicateBuilder()->regex('name', '.+\(canvas-course-\d+\)');
+        $pb = $this->courseBridge->equalsAnyCanvasCourse();
         if (count($synchronizedCourseFolderIds)) {
             $pb->notIn('id', $synchronizedCourseFolderIds);
         }
 
         foreach ($this->folderMapper->findByPredicates($pb) as $folder) {
-            $this->log->debug("Deleting un-synchronised course folder '{$folder->getTitle()}' ({$folder->getId()})");
+            $this->log->debug("Deleting un-synchronised course folder '{$folder->getTitle()}' (id: {$folder->getId()})");
             $this->folderMapper->delete($folder);
             $this->countCoursesDeleted++;
         }
@@ -1056,9 +1005,9 @@ class Courses
         }
 
         foreach ($this->submissionBoxMapper->findByPredicates($pb) as $submissionBox) {
-            $this->log->debug("Deleting un-synchronised assignment '{$submissionBox->getAssessmentModel()->getTitle()}' ({$submissionBox->getId()})");
+            $this->log->debug("Deleting un-synchronised assignment '{$submissionBox->getAssessmentModel()->getTitle()}' (boxId: {$submissionBox->getId()})");
             $this->submissionBoxMapper->delete($submissionBox);
-            $this->countBoxesDeleted++;
+            $this->countSubmissionBoxDeleted++;
         }
     }
 
@@ -1080,11 +1029,11 @@ class Courses
         $this->countCoursesMoved        = 0;
         $this->countCoursesDeleted      = 0;
 
-        $this->countBoxesSynchronised = 0;
-        $this->countBoxesCreated      = 0;
-        $this->countBoxesUpdated      = 0;
-        $this->countBoxesMoved        = 0;
-        $this->countBoxesDeleted      = 0;
+        $this->countAssignmentsSynchronised = 0;
+        $this->countSubmissionBoxCreated    = 0;
+        $this->countSubmissionBoxUpdated    = 0;
+        $this->countSubmissionBoxMoved      = 0;
+        $this->countSubmissionBoxDeleted    = 0;
     }
 
 
@@ -1093,22 +1042,22 @@ class Courses
      */
     private function printCounts(): void
     {
-        $this->log->info($this->countCourseGroupsSynchronised . ' canvas course groups synchronised');
-        $this->log->info($this->countCourseGroupsCreated . ' canvas course groups created');
-        $this->log->info($this->countCourseGroupsUpdated . ' canvas course groups updated');
-        $this->log->info($this->countCourseGroupsMoved . ' canvas course groups moved');
-        $this->log->info($this->countCourseGroupsDeleted . ' canvas course groups deleted');
+        $this->log->info($this->countCourseGroupsSynchronised . ' Canvas CourseGroups synchronised');
+        $this->log->info($this->countCourseGroupsCreated . ' Schoolbox CourseSpecs created');
+        $this->log->info($this->countCourseGroupsUpdated . ' Schoolbox CourseSpecs updated');
+        $this->log->info($this->countCourseGroupsMoved . ' Schoolbox CourseSpecs moved');
+        $this->log->info($this->countCourseGroupsDeleted . ' Schoolbox CourseSpecs deleted');
 
-        $this->log->info($this->countCoursesSynchronised . ' canvas courses synchronised');
-        $this->log->info($this->countCoursesCreated . ' canvas courses created');
-        $this->log->info($this->countCoursesUpdated . ' canvas courses updated');
-        $this->log->info($this->countCoursesMoved . ' canvas courses moved');
-        $this->log->info($this->countCoursesDeleted . ' canvas courses deleted');
+        $this->log->info($this->countCoursesSynchronised . ' Canvas courses synchronised');
+        $this->log->info($this->countCoursesCreated . ' Schoolbox UnitSpecs created');
+        $this->log->info($this->countCoursesUpdated . ' Schoolbox UnitSpecs updated');
+        $this->log->info($this->countCoursesMoved . ' Schoolbox UnitSpecs moved');
+        $this->log->info($this->countCoursesDeleted . ' Schoolbox UnitSpecs deleted');
 
-        $this->log->info($this->countBoxesSynchronised . ' canvas assignments synchronised');
-        $this->log->info($this->countBoxesCreated . ' canvas assignments created');
-        $this->log->info($this->countBoxesUpdated . ' canvas assignments updated');
-        $this->log->info($this->countBoxesMoved . ' canvas assignments moved');
-        $this->log->info($this->countBoxesDeleted . ' canvas assignments deleted');
+        $this->log->info($this->countAssignmentsSynchronised . ' Canvas assignments synchronised');
+        $this->log->info($this->countSubmissionBoxCreated . ' Schoolbox SubmissionBox Specs created');
+        $this->log->info($this->countSubmissionBoxUpdated . ' Schoolbox SubmissionBox Specs updated');
+        $this->log->info($this->countSubmissionBoxMoved . ' Schoolbox SubmissionBox Specs moved');
+        $this->log->info($this->countSubmissionBoxDeleted . ' Schoolbox SubmissionBox Specs deleted');
     }
 }

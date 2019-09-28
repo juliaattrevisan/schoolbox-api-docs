@@ -10,32 +10,49 @@ namespace External\Canvas\Sync;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Aura\Di\Exception\ServiceNotFound;
+use DomainException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use RuntimeException;
 use Schoolbox\MapperFactory;
+use Schoolbox\UserMapper;
+use UnderflowException;
 use UnexpectedValueException;
 use function json_decode;
 
 /**
  * Command line application for syncing canvas-data
+ * fetch
+ * stage
+ * sync
  */
 class CliImporter extends CliTool\App
 {
+
     use CanvasDatabaseTrait;
 
-    private const OPT_SHORT_HELP       = 'h';           // print help
-    private const OPT_LONG_HELP        = 'help';        // print help
-    private const OPT_LONG_SKIP_FETCH  = 'skip-fetch';  // Don't re-fetch files from Canvas API, use previously downloaded
+    private const OPT_SHORT_HELP = 'h';           // print help
+    private const OPT_LONG_HELP = 'help';        // print help
+    private const OPT_LONG_SKIP_FETCH = 'skip-fetch';  // Don't re-fetch files from Canvas API, use previously downloaded
     private const OPT_LONG_SKIP_IMPORT = 'skip-import'; // Don't re-import files into staging DB
-    private const OPT_LONG_SKIP_SYNC   = 'skip-sync';   // Don't sync from staging DB to schoolbox DB
+    private const OPT_LONG_SKIP_SYNC = 'skip-sync';   // Don't sync from staging DB to schoolbox DB
+
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -44,6 +61,7 @@ class CliImporter extends CliTool\App
             self::OPT_SHORT_HELP,
         ];
     }
+
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -59,10 +77,16 @@ class CliImporter extends CliTool\App
 
     /**
      * @inheritDoc
-     * @throws UnexpectedValueException
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws Mapper\Exception
+     * @throws PDOException
      * @throws RuntimeException
      * @throws ServiceNotFound
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function run(): void
     {
@@ -225,6 +249,7 @@ class CliImporter extends CliTool\App
             $dataRestorer->restoreTableData($tableName, $tableFile);
             exec("gzip " . escapeshellarg($tableFile));
         }
+        $dataRestorer->addExtraIndexes();
     }
 
 
@@ -233,10 +258,14 @@ class CliImporter extends CliTool\App
      *
      * @param IConnector $canvasDb
      * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
      * @throws InvalidArgumentException
+     * @throws PDOException
      * @throws ServiceNotFound
      * @throws UnexpectedValueException
-     * @throws PDOException
+     * @throws Mapper\Exception
+     * @throws UnderflowException
+     * @throws DomainException
      */
     private function syncStagingDataWithSchoolbox(IConnector $canvasDb): void
     {
@@ -245,20 +274,45 @@ class CliImporter extends CliTool\App
             return;
         }
 
-        /** @var MapperFactory $mapperFactory */
+        /** @var MapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
-        /** @var Folder\Mapper $folderMapper */
+        $externalClass = $this->getDi()->get('externalClass');
+        $externalUser  = $this->getDi()->get('externalUser');
+        /** @var MarkTypeMapper */
+        $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
+        /** @var SubmissionBoxMapper */
+        $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
+        /** @var Assessment\Mapper */
+        $assessmentMapper = $mapperFactory->get(Assessment\Mapper::class);
+        $planMapper = $mapperFactory->get(Plan\Mapper::class);
+        /** @var Folder\Mapper */
         $folderMapper = $mapperFactory->get(Folder\Mapper::class);
-        /** @var ConfigMapper $configMapper */
+        /** @var UserMapper */
+        $userMapper = $mapperFactory->get(UserMapper::class);
+        /** @var CourseImpl\Mapper */
+        $courseImplMapper = $mapperFactory->get(CourseImpl\Mapper::class);
+        $courseSpecMapper = $mapperFactory->get(CourseSpec\Mapper::class);
+        /** @var UnitImpl\Mapper */
+        $unitImplMapper = $mapperFactory->get(UnitImpl\Mapper::class);
+        $unitSpecMapper = $mapperFactory->get(UnitSpec\Mapper::class);
+        /** @var ConfigMapper */
         $configMapper = $mapperFactory->get(ConfigMapper::class);
 
-        /** @var IConnector $externalDb */
-        $externalDb = $this->getDi()->get('databaseExternal');
-        $dataSync   = new DataSync(
+        $dataSync = new DataSync(
             $canvasDb,
             $this->getDatabaseInternal(),
-            $externalDb,
+            $externalClass,
+            $externalUser,
+            $markTypeMapper,
+            $submissionBoxMapper,
+            $assessmentMapper,
+            $planMapper,
             $folderMapper,
+            $userMapper,
+            $courseImplMapper,
+            $courseSpecMapper,
+            $unitImplMapper,
+            $unitSpecMapper,
             $configMapper,
             $this->perform(),
             $this->getLogger()
@@ -266,8 +320,10 @@ class CliImporter extends CliTool\App
         $dataSync->synchronise();
     }
 
+
     /**
      * Creates a temp directory to store files and return its name
+     *
      * @return string
      * @throws RuntimeException If unable to create the temp directory
      */
@@ -291,7 +347,7 @@ class CliImporter extends CliTool\App
     /**
      * Downloads data files
      *
-     * @param array $tableList
+     * @param array  $tableList
      * @param string $tempDir
      * @throws InvalidArgumentException If we attempt to create a Guzzle client with invalid handler/s
      */
@@ -302,7 +358,7 @@ class CliImporter extends CliTool\App
             if (!count($tableData['files'])) {
                 continue;
             }
-            $tableFile = $tableData['files'][0];
+            $tableFile     = $tableData['files'][0];
             $tableDataFile = fopen($this->perform() ? "$tempDir/$tableName.gz" : '/dev/null', 'wb');
             try {
                 $this->getLogger()->debug("Downloading $tableName to $tempDir/$tableName.gz.");
@@ -313,8 +369,10 @@ class CliImporter extends CliTool\App
         }
     }
 
+
     /**
      * Stores response to a file
+     *
      * @param string $response
      * @param string $path
      */
@@ -325,6 +383,7 @@ class CliImporter extends CliTool\App
         fclose($fp);
     }
 
+
     /**
      * Prints a help message, always to STDOUT, regardless of Kernel's output file option
      */
@@ -334,14 +393,14 @@ class CliImporter extends CliTool\App
 
         $options = [
             [self::OPT_SHORT_HELP, self::OPT_LONG_HELP, 'Print this help and exit'],
-            [CliTool\Kernel::OPT_SHORT_PERFORM, CliTool\Kernel::OPT_LONG_PERFORM, 'If not set, no changes to local files, staging db, or schoolbox db will be persisted.'],
+            [CliTool\Kernel::OPT_SHORT_PERFORM, CliTool\Kernel::OPT_LONG_PERFORM, 'Persist changes to local files, staging DB + Schoolbox DB'],
             [null, self::OPT_LONG_SKIP_FETCH, "If set, use most recently downloaded files, rather that fetching from API"],
             [null, self::OPT_LONG_SKIP_IMPORT, "If set, use most recent state of staging db, don't re-import files"],
             [null, self::OPT_LONG_SKIP_SYNC, "If set, don't sync staging data with schoolbox data"],
         ];
 
-        $green = self::COLOUR_GREEN;
-        $white = self::COLOUR_WHITE;
+        $green  = self::COLOUR_GREEN;
+        $white  = self::COLOUR_WHITE;
         $yellow = self::COLOUR_YELLOW;
 
         $help = "$white
@@ -355,11 +414,11 @@ SYNOPSIS:
     $green{$file} {$yellow}[OPTION]...$white
 
 OPTIONS:";
-        foreach($options as $option){
-            $short = $option[0] ? "-{$option[0]}" : '';
-            $long  = $option[1] ? "--{$option[1]}" : '';
-            $shortLong = implode(', ', array_filter([rtrim($short, ':') , rtrim($long, ':')]));
-            $help .= "
+        foreach ($options as $option) {
+            $short     = $option[0] ? "-{$option[0]}" : '';
+            $long      = $option[1] ? "--{$option[1]}" : '';
+            $shortLong = implode(', ', array_filter([rtrim($short, ':'), rtrim($long, ':')]));
+            $help      .= "
     $yellow{$shortLong}$white
         $option[2]
 

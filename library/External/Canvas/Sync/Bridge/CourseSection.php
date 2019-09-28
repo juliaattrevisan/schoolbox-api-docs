@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace External\Canvas\Sync;
+namespace External\Canvas\Sync\Bridge;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
@@ -29,8 +29,12 @@ use function preg_replace;
  * Responsible for the logical link between a Canvas CourseSection.SisSourceId and a Schoolbox Folder.FolderCode
  *
  * This encapsulates the link between a logical 'Class' in both systems.
+ *
+ * The StAlloy scheme appears to be course_section.sis_source_id = CONCAT($year, 'C', $subjectCode, 'NOT')
+ *
+ * @todo, snap the scheme into a stateless Bridge\CourseSection class, and the execution and logging into a utility class
  */
-class CourseSectionToFolderCodeMap
+class CourseSection
 {
 
     /** @var IConnector */
@@ -79,6 +83,18 @@ class CourseSectionToFolderCodeMap
      */
     private $yearAndFolderCodeToFolderMap = [];
 
+    /**
+     * Maps Schoolbox folder ids to SisSourceId
+     * [
+     *   1 => 'J/abc123',
+     *   2 => null,
+     *   ...
+     * ]
+     *
+     * @var string[]|null[]
+     */
+    private $folderIdToSisSourceIdMap = [];
+
 
     /**
      * Maps all Canvas CourseSections.SisSourceIds to a SB FolderCode (if a match is found)
@@ -113,6 +129,22 @@ class CourseSectionToFolderCodeMap
 
 
     /**
+     * Load data from databases and perform matching
+     *
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    public function execute(): void
+    {
+        $this->populateAllSchoolboxFolderCodes();
+        $this->populateAllCanvasSisSourceIds();
+    }
+
+
+    /**
      * Returns a Folder for a given year and folder code
      *
      * @param string $year
@@ -125,12 +157,18 @@ class CourseSectionToFolderCodeMap
     }
 
 
+    /**
+     * Returns the Schoolbox Folder for specified Canvas CourseSection.SisSourceId
+     *
+     * @param string $courseSectionSisSourceId
+     * @return Folder\Model|null
+     */
     public function getFolderByBySisSourceId(string $courseSectionSisSourceId): ?Folder\Model
     {
         $yearAndFolderCode = $this->getYearAndFolderCodeBySisSourceId($courseSectionSisSourceId);
 
         if ($yearAndFolderCode !== null) {
-            return $this->yearAndFolderCodeToFolderMap[$yearAndFolderCode[0]][$yearAndFolderCode[1]];
+            return $this->getFolderByYearAndFolderCode($yearAndFolderCode[0], $yearAndFolderCode[1]);
         }
         return null;
     }
@@ -140,7 +178,9 @@ class CourseSectionToFolderCodeMap
      * Returns a Year+FolderCode for the specified CourseSection.SisSourceId
      *
      * @param string $courseSectionSisSourceId
-     * @return array|null
+     * @return string[]|null
+     * @internal string return[0]
+     * @internal string return[1]
      */
     public function getYearAndFolderCodeBySisSourceId(string $courseSectionSisSourceId): ?array
     {
@@ -162,18 +202,31 @@ class CourseSectionToFolderCodeMap
 
 
     /**
-     * Load data from databases and perform matching
+     * Returns the Canvas CourseSection.SisSource id for specified folder id
      *
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws Mapper\Exception
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
+     * @param int $folderId
+     * @return string|null
      */
-    public function execute(): void
+    public function getSisSourceIdForFolderId(int $folderId): ?string
     {
-        $this->populateAllSchoolboxFolderCodes();
-        $this->populateAllCanvasSisSourceIds();
+        return $this->folderIdToSisSourceIdMap[$folderId] ?? null;
+    }
+
+
+    /**
+     * Returns all Canvas CourseSection.SisSourceIds that can be mapped to a Schoolbox folder
+     *
+     * @return string[]
+     */
+    public function getMappedSisSourceIds(): array
+    {
+        $mappedSisSourceIds = [];
+        foreach ($this->sisSourceIdToYearAndFolderCodeMap as $sisSourceId => $yearAndFolderCode) {
+            if ($yearAndFolderCode !== null) {
+                $mappedSisSourceIds[] = $sisSourceId;
+            }
+        }
+        return $mappedSisSourceIds;
     }
 
 
@@ -336,11 +389,9 @@ class CourseSectionToFolderCodeMap
         $regexMatchButNoFolderCodeMatch = [];
         $regexMatchAndFolderCodeMatch   = [];
 
-        $sisSourceIdParser = new CourseSectionSisCodeParser();
-
         foreach (array_keys($this->sisSourceIdToYearAndFolderCodeMap) as $sisSourceId) {
-            $year        = $sisSourceIdParser->parseYearFromSisSourceId($sisSourceId) ?? '';
-            $subjectCode = $sisSourceIdParser->parseSubjectCodeFromSisSourceId($sisSourceId);
+            $year        = $this->parseYearFromSisSourceId($sisSourceId) ?? '';
+            $subjectCode = $this->parseSubjectCodeFromSisSourceId($sisSourceId);
             if ($subjectCode === null) {
                 $regexNotMatch[] = $sisSourceId;
                 continue;
@@ -367,6 +418,7 @@ class CourseSectionToFolderCodeMap
 
             $this->yearAndFolderCodeToSisSourceIdMap[$year][$folderCode] = $sisSourceId;
             $this->sisSourceIdToYearAndFolderCodeMap[$sisSourceId]       = [$year, $folderCode];
+            $this->folderIdToSisSourceIdMap[$folder->getId()]            = $sisSourceId;
         }
 
         $this->log->info(count($this->sisSourceIdToYearAndFolderCodeMap) . ' distinct Canvas CourseSection.SisSourceId processed');
@@ -379,5 +431,50 @@ class CourseSectionToFolderCodeMap
             $this->log->debug($noFolderCodeMatch);
         }
         $this->log->info(count($regexMatchAndFolderCodeMatch) . ' Canvas CourseSection.SisSourceId were matched to a folderCode');
+    }
+
+
+    /**
+     * Attempt to parse a year from a sisSourceId, eg:
+     *
+     * 'Y2014C09DRA'    => '2014'
+     * 'xxxY2014C09DRA' => '2014'
+     * 'xxx'            => null
+     *
+     * @param string $sisSourceId
+     * @return string|null
+     */
+    private function parseYearFromSisSourceId(string $sisSourceId): ?string
+    {
+        if (preg_match("/^Y(\d{4})C.+$/", $sisSourceId, $canonicalYearMatch)) {
+            // This is the canonical form.
+            return $canonicalYearMatch[1];
+        }
+        if (preg_match("/(\d{4})/", $sisSourceId, $fuzzyYearMatch)) {
+            // Fall back to any four digits
+            return $fuzzyYearMatch[1];
+        }
+        return null;
+    }
+
+
+    /**
+     * Attempt to parse a Subject Code from a sisSourceId, eg:
+     *
+     * 'Y2014C09DRANOT' => '09DRA'
+     * 'Y2014C09DRA'    => '09DRA'
+     * 'C09DRA'         => null
+     *
+     * @param string $sisSourceId
+     * @return string|null
+     */
+    private function parseSubjectCodeFromSisSourceId(string $sisSourceId): ?string
+    {
+        // Parse subject code (exact match only, no fuzzy fall back for now)
+        if (preg_match("/^Y\d{4}C(.+)$/", $sisSourceId, $canonicalSubjectMatch)) {
+            // This is the canonical form.
+            return preg_replace("/NOT$/", '', $canonicalSubjectMatch[1]);
+        }
+        return null;
     }
 }

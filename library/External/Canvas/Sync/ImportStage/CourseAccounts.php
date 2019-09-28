@@ -5,17 +5,18 @@
  */
 declare(strict_types=1);
 
-namespace External\Canvas\Sync\Importer;
+namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\DataStructures\ObjectTree;
-use Schoolbox\Resource\Folder\TreeBuilder;
+use External\Canvas\Sync\Bridge;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\TreeBuilder;
 use SplQueue;
 use UnderflowException;
 use UnexpectedValueException;
@@ -23,7 +24,6 @@ use function array_key_exists;
 use function array_keys;
 use function count;
 use function is_array;
-use function preg_match;
 use function preg_replace;
 use function reset;
 
@@ -37,11 +37,10 @@ use function reset;
  * @todo  : For now, the link between a canvas account and schoolbox folder is via the canvas id
  *        being embedded in the folder name, eg 'History (canvas-account-123)' where '123' is the canvas account id.
  *        This needs to be moved to folder.externalId when it becomes available
- *
- * @todo  We probably should only import accounts that either have relevant courses, or are parents of such accounts.
  */
 class CourseAccounts
 {
+
     private const FACULTY_FOLDER_CANVAS_ID = -1;
 
     /** @var IConnector */
@@ -53,6 +52,9 @@ class CourseAccounts
     /** @var Folder\Mapper */
     private $folderMapper;
 
+    /** @var Bridge\Account */
+    private $accountBridge;
+
     /** @var LoggerInterface */
     private $log;
 
@@ -60,7 +62,8 @@ class CourseAccounts
     private $facultyFolderId;
 
     // Per-execution counts
-    private $countFoldersSynchronised;
+    private $countCanvasAccountsSynchronised;
+
     private $countFoldersCreated;
     private $countFoldersUpdated;  // if any non-parent-relationship attribute changes
     private $countFoldersMoved;    // if a folder's parent changes
@@ -73,6 +76,7 @@ class CourseAccounts
      * @param Folder\Mapper   $folderMapper
      * @param ConfigMapper    $configMapper
      * @param LoggerInterface $log
+     * @param Bridge\Account  $accountBridge
      * @throws UnexpectedValueException
      */
     public function __construct(
@@ -80,12 +84,14 @@ class CourseAccounts
         IConnector $schoolboxDb,
         Folder\Mapper $folderMapper,
         ConfigMapper $configMapper,
-        LoggerInterface $log
+        LoggerInterface $log,
+        Bridge\Account $accountBridge
     ) {
-        $this->canvasDb       = $canvasDb;
-        $this->schoolboxDb    = $schoolboxDb;
-        $this->folderMapper   = $folderMapper;
-        $this->log            = $log;
+        $this->canvasDb      = $canvasDb;
+        $this->schoolboxDb   = $schoolboxDb;
+        $this->folderMapper  = $folderMapper;
+        $this->accountBridge = $accountBridge;
+        $this->log           = $log;
 
         $facultyFolderId = preg_replace('/[\D]/', '', $configMapper->get('course_homepage'));
         if (!$facultyFolderId) {
@@ -125,11 +131,11 @@ class CourseAccounts
      */
     private function resetCounts(): void
     {
-        $this->countFoldersSynchronised = 0;
-        $this->countFoldersCreated      = 0;
-        $this->countFoldersUpdated      = 0;
-        $this->countFoldersMoved        = 0;
-        $this->countFoldersDeleted      = 0;
+        $this->countCanvasAccountsSynchronised = 0;
+        $this->countFoldersCreated             = 0;
+        $this->countFoldersUpdated             = 0;
+        $this->countFoldersMoved               = 0;
+        $this->countFoldersDeleted             = 0;
     }
 
 
@@ -150,13 +156,13 @@ class CourseAccounts
             if ($folder->getId() === $this->facultyFolderId) {
                 return self::FACULTY_FOLDER_CANVAS_ID;
             }
-            return $this->getCanvasIdFromFolderName($folder->getName());
+            return $this->accountBridge->getAccountCanvasIdFromFolder($folder);
         };
 
         $treeBuilder = new TreeBuilder($this->folderMapper);
 
         // We only want canvas account folders in our tree
-        $pb = $this->folderMapper->getPredicateBuilder()->regex('name', '.+\(canvas-account-\d+\)');
+        $pb = $this->accountBridge->equalsAnyAccountFolder();
 
         return $treeBuilder->buildTree($this->facultyFolderId, $hashFunction, $pb);
     }
@@ -218,7 +224,7 @@ class CourseAccounts
      */
     private function syncAccountsWithFolders(array $canvasAccount, ObjectTree $sbFolderTree): void
     {
-        $this->countFoldersSynchronised++;
+        $this->countCanvasAccountsSynchronised++;
 
         // Is this a root account?
         if (($canvasAccount['parent_canvas_id'] ?? null) === null) {
@@ -230,7 +236,7 @@ class CourseAccounts
         }
 
         $folder     = $sbFolderTree->getElementByHash($canvasAccount['canvas_id']);
-        $folderName = $this->generateLinkedFolderName($canvasAccount['name'], $canvasAccount['canvas_id']);
+        $folderName = $this->accountBridge->generateLinkedFolderName($canvasAccount['name'], $canvasAccount['canvas_id']);
 
         // Does folder not exist yet in SB?
         if (!$folder) {
@@ -304,40 +310,11 @@ class CourseAccounts
 
     private function outputResults(): void
     {
-        $this->log->info($this->countFoldersSynchronised . ' accounts/folders synchronised');
-        $this->log->info($this->countFoldersCreated . ' folders created');
-        $this->log->info($this->countFoldersUpdated . ' folders updated');
-        $this->log->info($this->countFoldersMoved . ' folders moved');
-        $this->log->info($this->countFoldersDeleted . ' folders deleted');
-    }
-
-
-    /**
-     * @param string $folderNamePrefix
-     * @param string $canvasId
-     * @return string
-     * @todo replace when folder.externalId becomes available
-     */
-    private function generateLinkedFolderName(string $folderNamePrefix, string $canvasId): string
-    {
-        return "$folderNamePrefix (canvas-account-{$canvasId})";
-    }
-
-
-    /**
-     * Returns the canvas-id from a folder name
-     *
-     * @param string $folderName
-     * @return string
-     * @throws UnexpectedValueException
-     * @todo replace when folder.externalId becomes available
-     */
-    private function getCanvasIdFromFolderName(string $folderName): string
-    {
-        if (preg_match('/\(canvas-account-(\d+)\)/', $folderName, $matches)) {
-            return $matches[1];
-        }
-        throw new UnexpectedValueException("Unable to determine canvas.id from folder name '$folderName'");
+        $this->log->info($this->countCanvasAccountsSynchronised . ' Canvas Accounts synchronised');
+        $this->log->info($this->countFoldersCreated . ' Schoolbox folders created');
+        $this->log->info($this->countFoldersUpdated . ' Schoolbox folders updated');
+        $this->log->info($this->countFoldersMoved . ' Schoolbox folders moved');
+        $this->log->info($this->countFoldersDeleted . ' Schoolbox folders deleted');
     }
 
 
@@ -366,7 +343,7 @@ class CourseAccounts
         /** @var Folder\Model $folder */
         foreach ($folderTree->toFlatArray() as $folder) {
             try {
-                $canvasId = $this->getCanvasIdFromFolderName($folder->getName());
+                $canvasId = $this->accountBridge->getAccountCanvasIdFromFolder($folder);
             } catch (UnexpectedValueException $e) {
                 // Not a canvas-synced folder, don't delete this!
                 continue;

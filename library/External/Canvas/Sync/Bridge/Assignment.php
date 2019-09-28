@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace External\Canvas\Sync\Translator;
+namespace External\Canvas\Sync\Bridge;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -15,14 +15,12 @@ use function array_map;
 use function explode;
 
 /**
- * Responsible for translating a Canvas Assignment to Schoolbox SubmissionBox
+ * Responsible for providing the link between a  Canvas Assignment to Schoolbox SubmissionBox Spec
  */
 class Assignment
 {
 
-    /**
-     * @var GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[]
-     */
+    /** @var GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[] */
     private $markTypes;
 
 
@@ -87,9 +85,11 @@ class Assignment
                 // TODO discuss with client.
                 return $pointsPossible
                     ? $this->markTypes[SubmissionBox\MarkType::SLUG_TOTAL]
-                    : $this->markTypes[SubmissionBox\MarkType::SLUG_NONE];
+                    : $this->markTypes[SubmissionBox\MarkType::SLUG_LETTER];
             case 'pass_fail':
-                return $this->markTypes[SubmissionBox\MarkType::SLUG_COMPLETION];
+                // TODO add support for completion to DueWork
+//                return $this->markTypes[SubmissionBox\MarkType::SLUG_COMPLETION];
+                return $this->markTypes[SubmissionBox\MarkType::SLUG_LETTER];
             case 'letter_grade':
                 return $this->markTypes[SubmissionBox\MarkType::SLUG_LETTER];
             case 'percent':
