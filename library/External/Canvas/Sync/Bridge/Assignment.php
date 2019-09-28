@@ -85,13 +85,14 @@ class Assignment
                 // TODO discuss with client.
                 return $pointsPossible
                     ? $this->markTypes[SubmissionBox\MarkType::SLUG_TOTAL]
-                    : $this->markTypes[SubmissionBox\MarkType::SLUG_LETTER];
+                    : $this->markTypes[SubmissionBox\MarkType::SLUG_NONE];
             case 'pass_fail':
                 // TODO add support for completion to DueWork
 //                return $this->markTypes[SubmissionBox\MarkType::SLUG_COMPLETION];
-                return $this->markTypes[SubmissionBox\MarkType::SLUG_LETTER];
+                return $this->markTypes[SubmissionBox\MarkType::SLUG_NONE];
             case 'letter_grade':
-                return $this->markTypes[SubmissionBox\MarkType::SLUG_LETTER];
+                // TODO add support for letter grades. (these require a grade group be be set)
+                return $this->markTypes[SubmissionBox\MarkType::SLUG_NONE];
             case 'percent':
                 return $this->markTypes[SubmissionBox\MarkType::SLUG_PERCENT];
             case 'not_graded':
