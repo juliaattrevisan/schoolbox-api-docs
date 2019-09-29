@@ -125,8 +125,9 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             } else {
                 $event->setColour($this->getEventColor($folder, $eventType));
             }
-            $event->setStartTime($dueDate);
-            $event->setEndTime($dueDate);
+            // Passing newly created date objects so that start and end date can be modified separately
+            $event->setStartTime(new Alaress_Date_Format($dueDate->getDatabase(), Alaress_Date_Format::DATABASE_FORMAT));
+            $event->setEndTime(new Alaress_Date_Format($dueDate->getDatabase(), Alaress_Date_Format::DATABASE_FORMAT));
 
             // Will only be all day if the event's date is one second before
             // midnight.
