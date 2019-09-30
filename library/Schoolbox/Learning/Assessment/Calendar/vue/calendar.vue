@@ -52,6 +52,8 @@
                 eventGroups: [],
                 defaultBgColour: '#0066b0',
                 contentHeight: 1,
+                maxDate: null,
+                minDate: null,
             }
         },
         computed: {
@@ -355,6 +357,8 @@
                     self.cleanupMonthHeaderInlineStyles();
                 }
 
+                self.maxDate = self.getMaxTermDate();
+                self.minDate = self.getMinTermDate();
                 self.contentHeight = self.getContentHeight();
             },
 
@@ -466,13 +470,12 @@
              * @see: https://fullcalendar.io/docs/validRange
              */
             getMaxTermDate() {
-                var self = this;
-
-                var termStartDates = Object.values(self.config.termDates).flat().map(function(row){
+                var self = this,
+                    termStartDates = Object.values(self.config.termDates).flat().map(function(row){
                     return new Date(row.end);
                 });
 
-                return moment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
+                return self.toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
             },
 
             /**
@@ -480,13 +483,12 @@
              * @see: https://fullcalendar.io/docs/validRange
              */
             getMinTermDate() {
-                var self = this;
-
-                var termStartDates = Object.values(self.config.termDates).flat().map(function(row){
+                var self = this,
+                    termStartDates = Object.values(self.config.termDates).flat().map(function(row){
                     return new Date(row.start);
                 });
 
-                return moment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+                return self.toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
             },
 
             /**
@@ -590,7 +592,7 @@
             :views="{
                 resourceTimelineSemester: {
                     type: 'resourceTimelineYear',
-                    duration: { days: getTermDateDurations() },
+                    duration: { days: this.getTermDateDurations() },
                     slotDuration: { weeks: 1 },
                     weekNumbers: true,
                     slotLabelFormat: [
@@ -600,8 +602,8 @@
                     resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
                     validRange: {
-                        start: this.getMinTermDate(),
-                        end: this.getMaxTermDate()
+                        start: this.minDate,
+                        end: this.maxDate,
                     },
                     resourceLabelText: 'Week'
                 },
