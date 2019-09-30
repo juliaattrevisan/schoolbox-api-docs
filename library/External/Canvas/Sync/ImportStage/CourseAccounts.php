@@ -41,8 +41,6 @@ use function reset;
 class CourseAccounts
 {
 
-    private const FACULTY_FOLDER_CANVAS_ID = -1;
-
     /** @var IConnector */
     private $canvasDb;
 
@@ -154,7 +152,12 @@ class CourseAccounts
         // Index folders by their Canvas id so we can process them purely in memory
         $hashFunction = function (Folder\Model $folder) {
             if ($folder->getId() === $this->facultyFolderId) {
-                return self::FACULTY_FOLDER_CANVAS_ID;
+                /* Real CanvasIds are > 0.
+                 * Let's give the faculty folder a fake CanvasId that falls outside the real range
+                 * so we can use this hash function to index the faculty folder, but not collide
+                 * with any real CanvasIds.
+                 */
+                return -1;
             }
             return $this->accountBridge->getAccountCanvasIdFromFolder($folder);
         };

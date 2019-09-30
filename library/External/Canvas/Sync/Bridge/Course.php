@@ -18,7 +18,7 @@ use function count;
 use function preg_match;
 
 /**
- * Responsible for providing the link between a Canvas Course and a Schoolbox Folder.
+ * Responsible for providing the link between a Canvas Course and a Schoolbox Folder+UnitSpec.
  */
 class Course
 {

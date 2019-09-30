@@ -19,7 +19,7 @@ use function count;
 use function preg_match;
 
 /**
- * Responsible for providing the link between set of Canvas Courses (aka CourseGroup) and a Schoolbox Folder.
+ * Responsible for providing the link between set of Canvas Courses (aka CourseGroup) and a Schoolbox Folder+CourseSpec.
  *
  * The set of Canvas Courses are those that:
  * * belong to the same canvas account, and
