@@ -42,6 +42,8 @@ export default class FullCalendarHelper {
             // this.$refs.toast.activate('Loading...');
             this.jQuery.magnificPopup.open({
                 showCloseBtn: false,
+                closeOnBgClick: false,
+                enableEscapeKey: false,
                 items: {
                     src: "<div class='preview loader'></div>",
                     type: 'inline'
