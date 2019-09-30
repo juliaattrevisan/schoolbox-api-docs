@@ -368,7 +368,6 @@
                 self.maxDate = self.getMaxTermDate();
                 self.minDate = self.getMinTermDate();
                 self.termDuration = self.getTermDateDurations();
-                self.contentHeight = self.getContentHeight();
             },
 
             /**
