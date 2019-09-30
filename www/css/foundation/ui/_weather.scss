@@ -43,6 +43,28 @@
 }
 
 
+.weather-list {
+  @include information-list;
+  .active {
+    background-color: $row-hover-background;
+  }
+
+  .current-value,
+  .hot,
+  .cold {
+    margin-top: 1.5rem;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+
+  .future-day {
+    background: #fafafa;
+  }
+}
+
+
 //
 //.weather-list {
 //  display: flex;
