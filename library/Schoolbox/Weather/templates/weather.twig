@@ -75,25 +75,25 @@ Weather details page (linked from dashboard component)
         <div class="small-12 island">
             <h2 class="subheader">Forecast</h2>
 
-            <section>
+            <section class="weather-forecast">
                 <div class="row collapse">
-                    <ul class="weather-list">
-                        {% for forecastDay in forecastDays %}
-                            <li class="weather-forecast">
-                                <div class="weather-card">
-                                    <h3>{{ forecastDay.day }}</h3>
-                                    <div class="weather-summary">
-                                        <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
-                                        <p>{{ forecastDay.weatherSummary }}</p>
-                                    </div>
-                                    <p class="temperature">
-                                        <span class="hot">Hi {{ forecastDay.highTemp }}&deg;C</span>
-                                        <span class="cold">Lo {{ forecastDay.lowTemp }}&deg;C</span>
-                                    </p>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% for forecastDay in forecastDays %}
+                    <div class="small-12 medium-3 columns">
+                        <div class="text-center content">
+                            <h3>{{ forecastDay.day }}</h3>
+
+                            <div class="weather-summary">
+                                <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
+                                <p>{{ forecastDay.weatherSummary }}</p>
+                            </div>
+
+                            <p class="temperature">
+                                <span class="hot">Hi {{ forecastDay.highTemp }}&deg;C</span>
+                                <span class="cold">Lo {{ forecastDay.lowTemp }}&deg;C</span>
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </section>
         </div>

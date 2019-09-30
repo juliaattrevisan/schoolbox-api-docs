@@ -1,12 +1,6 @@
-.weather-current {
-//  display: flex;
-//  align-items: center;
-//  justify-content: space-around;
-//  background: #fafafa;
-//  color: #555;
-//  padding: 0.75rem 0 0.75rem 0;
-//
-
+// Shared values between the currrent panels and forecast display on the detail screen
+// and the list view on the dashboard component itself
+.weather-current, .weather-forecast, .weather-list {
   .hot {
     color: $hot-color;
   }
@@ -18,6 +12,37 @@
     font-size: 1rem;
   }
 }
+
+.weather-current {
+//  display: flex;
+//  align-items: center;
+//  justify-content: space-around;
+//  background: #fafafa;
+//  color: #555;
+//  padding: 0.75rem 0 0.75rem 0;
+//
+
+
+}
+
+
+
+.weather-forecast {
+  @include information-list;
+  &.active {
+    background-color: $row-hover-background;
+  }
+
+  li {
+    text-align: center;
+  }
+
+  .weather-summary {
+    margin-bottom: 1rem;
+  }
+}
+
+
 //
 //.weather-list {
 //  display: flex;
@@ -29,10 +54,6 @@
 //    background: none;
 //  }
 //
-//  .weather-summary {
-//    margin-bottom: 1rem;
-//
-//  }
 //
 //  .temperature-forecast {
 //    .meta {
@@ -87,13 +108,3 @@
 //    color: $cold-color;
 //  }
 //}
-
-.weather-forecast {
-    @include information-list;
-    &.active {
-      background-color: $row-hover-background;
-    }
-    li {
-      text-align: center;
-    }
-}
