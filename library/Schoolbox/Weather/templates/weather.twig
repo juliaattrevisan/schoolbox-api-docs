@@ -24,14 +24,14 @@ Weather details page (linked from dashboard component)
             <section class="weather-current">
                 <div class="row">
                     <div class="small-12 medium-4 columns">
-                        <div class="text-center content">
+                        <div class="panel">
                             <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" title="{{ today.weatherSummary }}"/>
                             <p class="current-value">{{ today.weatherSummary }}</p>
                         </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <div class="text-center content">
-                            <p class="center">
+                        <div class="panel">
+                            <p class="center temperature">
                                 <span class="current-value">{{ today.currentTemp }}&deg;C</span>
                                 <br />
                                 Feels like {{ today.currentTemp}}&deg;C
@@ -39,10 +39,11 @@ Weather details page (linked from dashboard component)
                         </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <div class="text-center content">
-                            <p class="center">
-                                <span class="current-value hot">Hi {{ today.highTemp }}&deg;C</span><br />
-                                <span class="current-value cold">Lo {{ today.lowTemp }}&deg;C</span>
+                        <div class="panel">
+                            <p class="temperature">
+                                <span class="current-value cold">Min {{ today.lowTemp }}&deg;C</span>
+                                <br />
+                                <span class="current-value hot">Max {{ today.highTemp }}&deg;C</span>
                             </p>
                         </div>
                     </div>
@@ -55,13 +56,13 @@ Weather details page (linked from dashboard component)
                         </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <div class="text-center content">
+                        <div class="panel">
                             <p class="meta">Humidity</p>
                             <p class="current-value">{{ today.humidity }}%</p>
                         </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <div class="text-center content">
+                        <div class="panel">
                             <p class="meta">UV Index</p>
                             <p class="current-value">{{ today.uvIndex }}</p>
                         </div>
@@ -79,7 +80,7 @@ Weather details page (linked from dashboard component)
                 <div class="row collapse">
                     {% for forecastDay in forecastDays %}
                     <div class="small-12 medium-3 columns">
-                        <div class="text-center content">
+                        <div class="panel">
                             <h3>{{ forecastDay.day }}</h3>
 
                             <div class="weather-summary">
@@ -88,8 +89,8 @@ Weather details page (linked from dashboard component)
                             </div>
 
                             <p class="temperature">
-                                <span class="hot">Hi {{ forecastDay.highTemp }}&deg;C</span>
-                                <span class="cold">Lo {{ forecastDay.lowTemp }}&deg;C</span>
+                                <span class="cold">Min {{ forecastDay.lowTemp }}&deg;C</span>
+                                <span class="hot">Max {{ forecastDay.highTemp }}&deg;C</span>
                             </p>
                         </div>
                     </div>

@@ -11,9 +11,17 @@
   .current-value {
     font-size: 1rem;
   }
+
+  .panel {
+    margin-top: .5rem;
+    text-align: center;
+  }
 }
 
 .weather-current {
+  p.temperature {
+    margin-top: 1.5rem;
+  }
 //  display: flex;
 //  align-items: center;
 //  justify-content: space-around;

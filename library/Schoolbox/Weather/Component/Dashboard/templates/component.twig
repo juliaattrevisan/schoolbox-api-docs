@@ -14,7 +14,7 @@
 
                 <section>
                     <ul class="weather-list">
-                        <li data-equalizer>
+                        <li class="future-day" data-equalizer>
                             <div class="list-item">
                                 <div class="row">
                                     <div class="small-12 medium-3 columns">
@@ -36,7 +36,7 @@
                         </li>
 
                         {% for forecastDay in forecastDays %}
-                        <li class="future-day">
+                        <li>
                             <div class="list-item">
                                 <div class="row">
                                     <div class="small-12 medium-3 columns">
@@ -48,11 +48,10 @@
                                         </p>
                                     </div>
                                     <div class="small-12 medium-3 columns">
-                                        <p class="text-center hot">{{ forecastDay.highTemp }}&deg;C</p>
-
+                                        <p class="text-center cold">{{ forecastDay.lowTemp }}&deg;C</p>
                                     </div>
                                     <div class="small-12 medium-3 columns">
-                                        <p class="text-center cold">{{ forecastDay.lowTemp }}&deg;C</p>
+                                        <p class="text-center hot">{{ forecastDay.highTemp }}&deg;C</p>
                                     </div>
                                 </div>
                             </div>
