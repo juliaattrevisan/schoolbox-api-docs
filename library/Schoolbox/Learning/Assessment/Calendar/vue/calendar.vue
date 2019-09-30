@@ -4,7 +4,6 @@
     import interactionPlugin  from '@fullcalendar/interaction'
     import dayGridPlugin      from '@fullcalendar/daygrid'
     import timeGridPlugin     from '@fullcalendar/timegrid'
-    import listPlugin         from '@fullcalendar/list'
     import momentPlugin       from '@fullcalendar/moment'
     import RevealModal        from '@schoolbox/reveal-modal'
     import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
@@ -40,7 +39,7 @@
         },
         data() {
             return {
-                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, resourceTimelinePlugin, momentPlugin ],
+                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin ],
                 currentEvent: {},
                 newEvent: {},
                 selectedFilters: null,
