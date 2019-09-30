@@ -24,7 +24,6 @@ Weather details page (linked from dashboard component)
             <section>
                 <div class="row collapse">
                     <ul class="weather-list">
-
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <div class="weather-summary">
@@ -57,18 +56,24 @@ Weather details page (linked from dashboard component)
                                 </div>
                             </div>
                         </li>
-
+                    </ul>
+                    <ul class="weather-list">
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <p class="meta">Wind</p>
                                 <p class="temperature-forecast">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
                             </div>
                         </li>
-
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <p class="meta">Humidity</p>
                                 <p class="temperature-forecast">{{ today.humidity }}%</p>
+                            </div>
+                        </li>
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <p class="meta">UV Index</p>
+                                <p class="temperature-forecast">{{ today.uvIndex }}</p>
                             </div>
                         </li>
                     </ul>

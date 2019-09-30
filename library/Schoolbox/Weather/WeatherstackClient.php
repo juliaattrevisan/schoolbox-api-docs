@@ -163,6 +163,7 @@ class WeatherstackClient
              */
             'currentTemp' => $responseData['current']['temperature'],
             'feelsLike' => $responseData['current']['feelslike'],
+            'uvIndex' => $responseData['current']['uv_index'],
 
             /* Wind and precipitation (storms)
              */
