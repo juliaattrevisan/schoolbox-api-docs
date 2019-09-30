@@ -20,7 +20,9 @@
 
 .weather-current {
   p.temperature {
-    margin-top: 1.5rem;
+    @media #{$medium-up} {
+      margin-top: 1.5rem;
+    }
   }
 }
 
@@ -50,7 +52,9 @@
   .current-value,
   .hot,
   .cold {
-    margin-top: 1.5rem;
+    @media #{$medium-up} {
+      margin-top: 1.5rem;
+    }
   }
 
   p {
