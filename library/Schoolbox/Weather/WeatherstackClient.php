@@ -56,7 +56,7 @@ class WeatherstackClient
     public function getForecast(int $forecastLimit, string $location) : array
     {
         try {
-            $requestUrl = "forecast?query={$location}&forecast_days={$forecastLimit}&units=m&access_key={$this->apiKey}";
+            $requestUrl = "forecast?query={$location}&forecast_days={$forecastLimit}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             $twigData   = $this->parseWeatherData($response);
         } catch (\Exception $e) {
@@ -78,7 +78,7 @@ class WeatherstackClient
     public function getForecastByDate(Alaress_Date_Format $date, $latitude, $longitude)
     {
         try {
-            $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&access_key={$this->apiKey}";
+            $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             if (isset($response['forecast']['forecastday'][0]['day'])) {
                 return $response['forecast']['forecastday'][0]['day'];
@@ -149,7 +149,7 @@ class WeatherstackClient
                 'logo' => self::PROVIDER_LOGO
             ]
         ];
-
+//new \Alaress_Probe($responseData);
         $twigData['today'] = [
             'day' => $this->getDayOfWeek($responseData['location']['localtime_epoch']),
 
@@ -161,7 +161,7 @@ class WeatherstackClient
 
             /* Basic facts
              */
-            'currentTemp' => $responseData['current']['temp'],
+            'currentTemp' => $responseData['current']['temperature'],
             'humidity' => $responseData['current']['humidity'],
             'windSpeed' => $responseData['current']['wind_speed'],
             'windDirection' => $responseData['current']['wind_dir'],
@@ -183,8 +183,8 @@ class WeatherstackClient
                  * Just get the midnight value (first in the stack)
                  * and the usual first in the stack for description/icon
                  */
-                'weatherSummary' => $data['hourly'][0]['weather_descriptions'][0],
-                'weatherIcon' => $data['hourly'][0]['weather_icons'][0],
+                'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
+                'weatherIcon' => $data['hourly'][4]['weather_icons'][0],
 
                 /* Basic facts
                  */
