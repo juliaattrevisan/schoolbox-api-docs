@@ -114,6 +114,14 @@ class WeatherstackClient
             throw new \DomainException('Unable to read Weather API response', $response, $e);
         }
 
+        /* If the api wasn't correctly configured, $responseData returns an array
+         * containing an error message
+         */
+        if (isset($decodedResponse['error'])) {
+            throw new \DomainException("Weather API error: {$decodedResponse['error']['info']}");
+        }
+
+
         // If this is an array, we can assume we got some data back
         if (\is_array($decodedResponse)) {
             return $decodedResponse;
@@ -133,13 +141,6 @@ class WeatherstackClient
      */
     private function parseWeatherData(array $responseData) : array
     {
-        /* If the api wasn't correctly configured, $responseData returns an array
-         * containing an error message
-         */
-        if (isset($responseData['error'])) {
-            return [];
-        }
-
         $twigData = [
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
             'apiProvider' => [
