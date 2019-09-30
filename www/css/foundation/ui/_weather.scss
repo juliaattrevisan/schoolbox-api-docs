@@ -15,9 +15,14 @@
   .panel {
     margin-top: .5rem;
     text-align: center;
+
+    @media #{$small-only} {
+      border-bottom: 1px solid $body-bg;
+    }
   }
 }
 
+// Detail screen, today's details
 .weather-current {
   p.temperature {
     @media #{$medium-up} {
@@ -26,7 +31,7 @@
   }
 }
 
-
+// Detail screen, all the future days' details
 .weather-forecast {
   @include information-list;
   &.active {
@@ -40,9 +45,14 @@
   .weather-summary {
     margin-bottom: 1rem;
   }
+
+  @media #{$small-only} {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
-
+// Dashboard Component
 .weather-list {
   @include information-list;
   .active {
