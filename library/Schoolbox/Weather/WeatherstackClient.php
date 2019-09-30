@@ -157,7 +157,7 @@ class WeatherstackClient
         ];
 
         $twigData['today'] = [
-            'day' => $this->getDayOfWeek($responseData['location']['localtime_epoch']),
+            'day' => $this->getDayOfWeek(strtotime($responseData['location']['localtime'])),
 
             /* Weather descriptions and icons now come back as an array
              * But why would I get multiple of these? I just chose the first one anyway
@@ -176,7 +176,7 @@ class WeatherstackClient
             'humidity' => $responseData['current']['humidity'],
             'windSpeed' => $responseData['current']['wind_speed'],
             'windDirection' => $responseData['current']['wind_dir'],
-            'lastUpdated' => \Alaress_Date_Format::newFromTimestamp($responseData['location']['localtime_epoch'])->getRelativeTime()
+            'lastUpdated' => \Alaress_Date_Format::newFromTimestamp(strtotime($responseData['location']['localtime']))->getRelativeTime()
         ];
 
         foreach ($responseData['forecast'] as $date => $data) {
