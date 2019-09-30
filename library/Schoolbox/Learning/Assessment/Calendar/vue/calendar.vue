@@ -51,6 +51,7 @@
                 currentBatchCursor: null,
                 eventGroups: [],
                 defaultBgColour: '#0066b0',
+                contentHeight: 1,
             }
         },
         computed: {
@@ -191,20 +192,17 @@
                     self.eventGroups.push(eventGrouping);
                 }
 
-                if (self.currentViewIsSemester()) {
-                    if (eventRenderInfo.event.extendedProps.data.placeholder) {
-                        element.setAttribute('event-group-id-placeholder', eventGrouping);
-                        element.classList.add('placeholder');
-                        element.classList.add('fc-more');
-                    } else {
-                        element.setAttribute('event-group-id', eventGrouping);
-                        element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
-                        element.setAttribute('event-group-date', self.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
-                        element.style.width = '95%';
-                        element.classList.add('hide');
-                        element.style.backgroundColor = backgroundColour;
-                    }
+                if (eventRenderInfo.event.extendedProps.data.placeholder) {
+                    element.setAttribute('event-group-id-placeholder', eventGrouping);
+                    element.classList.add('placeholder');
+                    element.classList.add('fc-more');
                 } else {
+                    if (self.currentViewIsSemester()) {
+                        element.style.width = '95%';
+                    }
+                    element.setAttribute('event-group-id', eventGrouping);
+                    element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
+                    element.setAttribute('event-group-date', self.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
                     element.style.backgroundColor = backgroundColour;
                 }
             },
@@ -356,6 +354,8 @@
                     self.redrawWeekNumbers();
                     self.cleanupMonthHeaderInlineStyles();
                 }
+
+                self.contentHeight = self.getContentHeight();
             },
 
             /**
@@ -521,6 +521,8 @@
                     this.redrawWeekNumbers();
                     this.redrawEventRows();
                 }
+
+                self.contentHeight = self.getContentHeight();
             },
 
             cleanupMonthHeaderInlineStyles() {
@@ -548,6 +550,24 @@
              */
             currentViewIsSemester() {
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
+            },
+
+            /**
+             * Calculate a height for the calendar content
+             */
+            getContentHeight: function() {
+                var windowHeight = window.innerHeight,
+                    calendarOffset = document.querySelector('.fc-view-container').offsetTop, // The amount of space between the top of the window and the start of the calendar
+                    footerHeight = $('#footer').outerHeight(),
+                    otherPadding = 32, // <section> margin-bottom and #container padding-bottom
+                    contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
+
+                // Force a min height of 500px
+                if (contentHeight < 500) {
+                    return 500;
+                }
+
+                return contentHeight;
             }
         }
     }
@@ -641,7 +661,7 @@
             :default-date="this.termStartDate"
             :view-skeleton-render="viewSkeletonRender"
             :week-number-calculation="'ISO'"
-            :content-height="5"
+            :content-height="this.contentHeight"
             @loading="onLoading"
             @eventClick="onEventClick"
             @dateClick="onDateClick"
@@ -710,7 +730,8 @@
     }
 
     .fc-resourceTimelineSemester-view .fc-event-container .fc-timeline-event:not(.placeholder),
-    .fc-dayGridMonth-view .placeholder {
+    .fc-dayGridMonth-view .placeholder,
+    .fc-resourceTimelineWeek-view .placeholder {
         display: none;
     }
 
