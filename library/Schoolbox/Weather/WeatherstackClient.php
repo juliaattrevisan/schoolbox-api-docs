@@ -23,15 +23,18 @@ class WeatherstackClient
     private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
     private const NOW = 'Now';
 
+
     /**
      * @var string
      */
     private $apiKey;
 
+
     /**
      * @var string
      */
     private $apiUrl;
+
 
     /**
      * ApixuClient constructor.
@@ -44,6 +47,7 @@ class WeatherstackClient
         $this->apiKey = $apiKey;
         $this->apiUrl = $apiUrl;
     }
+
 
     /**
      * Get the data from the API in a JSON format usable by Twig
@@ -65,6 +69,7 @@ class WeatherstackClient
 
         return $twigData;
     }
+
 
     /**
      * Get weather for particular date and location
@@ -88,6 +93,7 @@ class WeatherstackClient
             return [];
         }
     }
+
 
     /**
      * Find $forecastLimit days worth of information about $location
@@ -185,7 +191,7 @@ class WeatherstackClient
                 'day' => $this->getDayOfWeek($data['date_epoch']),
 
                 /* Forecast is now broken down hourly
-                 * Just get the midnight value (first in the stack)
+                 * Just get the midday value (fifth in the stack)
                  * and the usual first in the stack for description/icon
                  */
                 'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
@@ -198,7 +204,6 @@ class WeatherstackClient
             ];
 
             $twigData['forecastDays'][] = $dayForecast;
-
         }
 
         // If we've reached this code path, we successfully retrieved the weather data.
