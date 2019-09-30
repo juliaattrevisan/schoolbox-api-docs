@@ -32,10 +32,13 @@
             FullCalendar,
             RevealModal,
         },
-        beforeMount() {
+        created() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
             this.termStartDate = this.config.termDates.current.start;
             this.termEndDate = this.config.termDates.current.end;
+        },
+        mounted() {
+            this.termDuration = this.getTermDateDurations();
         },
         data() {
             return {
@@ -54,6 +57,7 @@
                 contentHeight: 1,
                 maxDate: null,
                 minDate: null,
+                termDuration: 10,
             }
         },
         computed: {
@@ -359,6 +363,7 @@
 
                 self.maxDate = self.getMaxTermDate();
                 self.minDate = self.getMinTermDate();
+                self.termDuration = self.getTermDateDurations();
                 self.contentHeight = self.getContentHeight();
             },
 
@@ -513,7 +518,6 @@
                 document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach(function (element, index) {
                     element.innerHTML = index + 1;
                 });
-
             },
 
             redrawCalendar() {
@@ -592,7 +596,7 @@
             :views="{
                 resourceTimelineSemester: {
                     type: 'resourceTimelineYear',
-                    duration: { days: this.getTermDateDurations() },
+                    duration: { days: this.termDuration },
                     slotDuration: { weeks: 1 },
                     weekNumbers: true,
                     slotLabelFormat: [

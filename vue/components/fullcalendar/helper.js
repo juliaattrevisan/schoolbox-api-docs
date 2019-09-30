@@ -160,8 +160,8 @@ export default class FullCalendarHelper {
      * @returns {*}
      */
     dateDiff(start, end, type = 'days') {
-        var startDate = moment(start);
-        var endDate = moment(end);
+        var startDate = this.toMoment(start),
+            endDate = this.toMoment(end);
 
         return endDate.diff(startDate, type);
     }
