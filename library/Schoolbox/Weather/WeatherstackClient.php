@@ -149,7 +149,7 @@ class WeatherstackClient
                 'logo' => self::PROVIDER_LOGO
             ]
         ];
-//new \Alaress_Probe($responseData);
+
         $twigData['today'] = [
             'day' => $this->getDayOfWeek($responseData['location']['localtime_epoch']),
 
@@ -162,6 +162,10 @@ class WeatherstackClient
             /* Basic facts
              */
             'currentTemp' => $responseData['current']['temperature'],
+            'feelsLike' => $responseData['current']['feelslike'],
+
+            /* Wind and precipitation (storms)
+             */
             'humidity' => $responseData['current']['humidity'],
             'windSpeed' => $responseData['current']['wind_speed'],
             'windDirection' => $responseData['current']['wind_dir'],

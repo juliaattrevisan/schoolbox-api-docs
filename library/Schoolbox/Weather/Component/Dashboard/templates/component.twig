@@ -19,9 +19,11 @@
                                 <p class="day-heading">{{ today.day }}</p>
 
                                 <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}"/>
-                                <p style="width:50px"></p>
 
                                 <p>{{ today.currentTemp }}&deg;C</p>
+
+                                <p>Feels like {{ today.currentTemp}}&deg;C</p>
+
                             </div>
                         </li>
                         {% for forecastDay in forecastDays %}
