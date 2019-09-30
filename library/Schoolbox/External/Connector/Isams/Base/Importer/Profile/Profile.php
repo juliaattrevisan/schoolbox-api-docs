@@ -129,7 +129,7 @@ class Profile implements IStrategy
         /* Purge old relations before re-inserting them
          */
         if ($this->perform) {
-            $this->relationMapper->purge();
+            $this->relationMapper->truncate();
         }
 
         /* Import students' profile data
