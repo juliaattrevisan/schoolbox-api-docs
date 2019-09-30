@@ -614,17 +614,9 @@
                     ],
                     resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
-                    validRange: {
-                        start: this.getMinTermDate(),
-                        end: this.getMaxTermDate()
-                    },
                 },
                 dayGridMonth: {
                     eventLimit: config.eventLimit,
-                    validRange: {
-                        start: this.getMinTermDate(),
-                        end: this.getMaxTermDate()
-                    }
                 }
             }"
             :week-label="''"
