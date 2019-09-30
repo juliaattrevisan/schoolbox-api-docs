@@ -29,7 +29,7 @@ use \Schoolbox\Fixtures\Team\Model as Team;
 use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\Fixtures\Team\Metadata\Factory as TeamMetadataFactory;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
-use Schoolbox\Weather\ApixuClient;
+use Schoolbox\Weather\WeatherstackClient;
 
 
 class Controller extends AbstractController
@@ -301,8 +301,8 @@ class Controller extends AbstractController
         /** @var Match $match */
         $apiKey = $this->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigLoader()->get('weather_api_url');
-        $apixuClient = new ApixuClient($apiKey, $apiUrl);
-        $forecast = new MatchWeather($match, $apixuClient);
+        $weatherClient = new WeatherstackClient($apiKey, $apiUrl);
+        $forecast = new MatchWeather($match, $weatherClient);
         $forecast->loadForecast();
 
         /* Determine whether you've got write access or not

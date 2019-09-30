@@ -16,7 +16,7 @@ use Alaress_Date_Format;
  *
  * @package Schoolbox\Weather
  */
-class ApixuClient
+class WeatherstackClient
 {
     private const PROVIDER_NAME = 'Apixu';
     private const PROVIDER_URL = 'https://apixu.com';

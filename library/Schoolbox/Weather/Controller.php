@@ -30,9 +30,9 @@ class Controller extends Base
         $apiKey = $this->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigLoader()->get('weather_api_url');
 
-        $apixuClient = new ApixuClient($apiKey, $apiUrl);
+        $weatherClient = new WeatherstackClient($apiKey, $apiUrl);
 
-        $weatherPayload = $apixuClient->getForecast(self::DEFAULT_FORECAST_LIMIT, $location);
+        $weatherPayload = $weatherClient->getForecast(self::DEFAULT_FORECAST_LIMIT, $location);
 
         /* Overwrite the location for twig
          *

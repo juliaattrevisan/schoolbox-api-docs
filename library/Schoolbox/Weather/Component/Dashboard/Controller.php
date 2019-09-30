@@ -6,7 +6,7 @@
 namespace Schoolbox\Weather\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
-use Schoolbox\Weather\ApixuClient;
+use Schoolbox\Weather\WeatherstackClient;
 
 /**
  * Class Controller
@@ -50,7 +50,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
 
-        $this->weatherPayload = (new ApixuClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
+        $this->weatherPayload = (new WeatherstackClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
         $this->weatherPayload['weeklyForecastLocation'] = $location;
 
         $this->setComponentName("Weather in {$this->weatherPayload['weatherLocation']}");
