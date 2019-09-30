@@ -1,0 +1,33 @@
+{% extends '@core/user/staff.twig' %}
+                                {% block details %}
+                                    {% if externalUser.StaffDepartment %}
+                                        <dt class="small-12 medium-3">Department:</dt>
+                                        <dd class="small-12 medium-9">{{ externalUser.StaffDepartment }}</dd>
+                                    {% endif %}
+                                    {% if externalUser.SchoolStaffCode %}
+                                        <dt class="small-12 medium-3">Staff Code:</dt>
+                                        <dd class="small-12 medium-9">{{ externalUser.SchoolStaffCode }}</dd>
+                                    {% endif %}
+                                    {% if externalUser.StaffCategoryDescription %}
+                                        <dt class="small-12 medium-3">Type:</dt>
+                                        <dd class="small-12 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
+                                    {% endif %}
+                                    {% if externalUser.StaffBuilding %}
+                                        <dt class="small-12 medium-3">Building:</dt>
+                                        <dd class="small-12 medium-9">{{ externalUser.StaffBuilding }}</dd>
+                                    {% endif %}
+                                    {% if externalUser.StaffRoom %}
+                                        <dt class="small-12 medium-3">Room:</dt>
+                                        <dd class="small-12 medium-9">{{ externalUser.StaffRoom }}</dd>
+                                    {% endif %}
+                                    {% if externalUser.StaffExtension %}
+                                        <dt class="small-12 medium-3">Extension:</dt>
+                                        <dd class="small-12 medium-9">{{ externalUser.StaffExtension }}</dd>
+                                    {% endif %}
+                                    {% if externalUser.StaffCampusDescription %}
+                                        <dt class="small-12 medium-3">Campus:</dt>
+                                        <dd class="small-12 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
+                                    {% endif %}
+                                    {% block house %}
+                                    {% endblock %}
+                                {% endblock %}
