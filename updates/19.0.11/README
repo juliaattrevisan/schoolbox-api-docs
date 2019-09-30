@@ -1,0 +1,5 @@
+This release contains all of the update scripts from 19.0.10, updated so that
+they will only run if they haven't already.
+
+For some reason 19.0.10 didn't include all of the update scripts in the repo,
+despite them existing in the repo at the time of package.
