@@ -44,6 +44,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         // so we have to fall back to default
         $forecastLimit = (int)$this->getConfig('size') ?: self::DEFAULT_FORECAST_LIMIT;
 
+
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
         $forecastLimit++;
 

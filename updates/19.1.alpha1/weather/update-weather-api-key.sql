@@ -4,7 +4,7 @@ UPDATE `config` SET `value`='93cc4486b7ba4afdafe44837182011', `description`='A k
 # Add config for weather API endpoint - not editable because you can't just throw any API at the system and expect it to work
 INSERT INTO `config`(`name`, `value`, `title`, `description`, `field_id`, `editable`, `hidden`, `required`, `module`) VALUES (
   'weather_api_url',
-  'http://api.apixu.com/v1/',
+  'https://api.weatherstack.com',
   'Weather API URL',
   'Endpoint for weather API requests',
   '1',

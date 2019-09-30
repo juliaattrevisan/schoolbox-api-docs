@@ -19,7 +19,7 @@ use Alaress_Date_Format;
 class WeatherstackClient
 {
     private const PROVIDER_NAME = 'Apixu';
-    private const PROVIDER_URL = 'https://apixu.com';
+    private const PROVIDER_URL = 'https://api.weatherstack.com';
     private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
     private const NOW = 'Now';
 
@@ -56,7 +56,7 @@ class WeatherstackClient
     public function getForecast(int $forecastLimit, string $location) : array
     {
         try {
-            $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key={$this->apiKey}";
+            $requestUrl = "forecast?query={$location}&forecast_days={$forecastLimit}&units=m&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             $twigData   = $this->parseWeatherData($response);
         } catch (\Exception $e) {
@@ -78,7 +78,7 @@ class WeatherstackClient
     public function getForecastByDate(Alaress_Date_Format $date, $latitude, $longitude)
     {
         try {
-            $requestUrl = "forecast.json?date={$date->getDatabaseDate()}&q={$latitude},{$longitude}&key={$this->apiKey}";
+            $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             if (isset($response['forecast']['forecastday'][0]['day'])) {
                 return $response['forecast']['forecastday'][0]['day'];
@@ -101,7 +101,7 @@ class WeatherstackClient
         // Cache the request
         try {
             $cache = new \Alaress_Weather_Cache();
-            $cache->init($this->apiUrl . $requestUrl);
+            $cache->init("{$this->apiUrl}/{$requestUrl}");
             $response = $cache->getStreamContents();
         } catch (\InvalidArgumentException $e) {
             throw new \DomainException('Invalid Weather API endpoint');
@@ -149,33 +149,46 @@ class WeatherstackClient
             ]
         ];
 
-        $todayLastUpdated = \Alaress_Date_Format::newFromTimestamp($responseData['current']['last_updated_epoch'])->getRelativeTime();
-
         $twigData['today'] = [
-            'day' => $this->getDayOfWeek($responseData['current']['last_updated_epoch']),
-            'weatherSummary' => $responseData['current']['condition']['text'],
-            'weatherIcon' => $responseData['current']['condition']['icon'],
-            'currentTemp' => $responseData['current']['temp_c'],
+            'day' => $this->getDayOfWeek($responseData['location']['localtime_epoch']),
+
+            /* Weather descriptions and icons now come back as an array
+             * But why would I get multiple of these? I just chose the first one anyway
+             */
+            'weatherSummary' => $responseData['current']['weather_descriptions'][0],
+            'weatherIcon' => $responseData['current']['weather_icons'][0],
+
+            /* Basic facts
+             */
+            'currentTemp' => $responseData['current']['temp'],
             'humidity' => $responseData['current']['humidity'],
-            'windSpeed' => $responseData['current']['wind_kph'],
+            'windSpeed' => $responseData['current']['wind_speed'],
             'windDirection' => $responseData['current']['wind_dir'],
-            'lastUpdated' => $todayLastUpdated
+            'lastUpdated' => \Alaress_Date_Format::newFromTimestamp($responseData['location']['localtime_epoch'])->getRelativeTime()
         ];
 
-        foreach($responseData['forecast']['forecastday'] as $forecastDay) {
+        foreach ($responseData['forecast'] as $date => $data) {
             // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
-            if ($this->getDayOfWeek($forecastDay['date_epoch']) === self::NOW) {
-                $twigData['today']['lowTemp'] = $forecastDay['day']['mintemp_c'];
-                $twigData['today']['highTemp'] = $forecastDay['day']['maxtemp_c'];
+            if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
+                $twigData['today']['lowTemp'] = $data['mintemp'];
+                $twigData['today']['highTemp'] = $data['maxtemp'];
                 continue;
             }
 
             $dayForecast = [
-                'day' => $this->getDayOfWeek($forecastDay['date_epoch']),
-                'weatherSummary' => $forecastDay['day']['condition']['text'],
-                'weatherIcon' => $forecastDay['day']['condition']['icon'],
-                'lowTemp' => $forecastDay['day']['mintemp_c'],
-                'highTemp' => $forecastDay['day']['maxtemp_c']
+                'day' => $this->getDayOfWeek($data['date_epoch']),
+
+                /* Forecast is now broken down hourly
+                 * Just get the midnight value (first in the stack)
+                 * and the usual first in the stack for description/icon
+                 */
+                'weatherSummary' => $data['hourly'][0]['weather_descriptions'][0],
+                'weatherIcon' => $data['hourly'][0]['weather_icons'][0],
+
+                /* Basic facts
+                 */
+                'lowTemp' => $data['mintemp'],
+                'highTemp' => $data['maxtemp']
             ];
 
             $twigData['forecastDays'][] = $dayForecast;
