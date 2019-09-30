@@ -22,17 +22,7 @@
   p.temperature {
     margin-top: 1.5rem;
   }
-//  display: flex;
-//  align-items: center;
-//  justify-content: space-around;
-//  background: #fafafa;
-//  color: #555;
-//  padding: 0.75rem 0 0.75rem 0;
-//
-
-
 }
-
 
 
 .weather-forecast {
@@ -71,70 +61,3 @@
     background: #fafafa;
   }
 }
-
-
-//
-//.weather-list {
-//  display: flex;
-//  justify-content: space-around;
-//  background: white;
-//
-//  li, li:last-child {
-//    border: none;
-//    background: none;
-//  }
-//
-//
-//  .temperature-forecast {
-//    .meta {
-//      margin-right: 1rem;
-//    }
-//    font-size: 1rem;
-//  }
-//  @media #{$small-only} {
-//    display: block;
-//    li {
-//      border-bottom: 1px solid #ededed;
-//    }
-//  }
-//}
-//
-///* TODO: This already existed in _content.scss
-// * You probably weren't aware this existed lol
-// *
-// * I've moved it here for you to untangle, since it seems you've reimplemented it
-// * There's some kind of interplay between the two .weather-list implementations
-// */
-//
-///* Weekly Weather display
-// */
-//.weather-list {
-//  @include information-list;
-//  &.active {
-//    background-color: $row-hover-background;
-//  }
-//  li {
-//    text-align: center;
-//  }
-//}
-//
-//.weather-list-summary {
-//  @include information-list;
-//  .active {
-//    background-color: $row-hover-background;
-//  }
-//}
-//
-///* Separate for usage in component view
-// */
-//.temperature {
-//  text-align: center;
-//
-//  .hot {
-//    color: $hot-color;
-//    margin-right: 1rem;
-//  }
-//  .cold {
-//    color: $cold-color;
-//  }
-//}
