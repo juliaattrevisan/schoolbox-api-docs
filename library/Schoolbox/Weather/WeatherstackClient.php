@@ -18,9 +18,6 @@ use Alaress_Date_Format;
  */
 class WeatherstackClient
 {
-    private const PROVIDER_NAME = 'Apixu';
-    private const PROVIDER_URL = 'https://api.weatherstack.com';
-    private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
     private const NOW = 'Now';
 
 
@@ -149,11 +146,6 @@ class WeatherstackClient
     {
         $twigData = [
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
-            'apiProvider' => [
-                'url' => self::PROVIDER_URL,
-                'name' => self::PROVIDER_NAME,
-                'logo' => self::PROVIDER_LOGO
-            ]
         ];
 
         $twigData['today'] = [
