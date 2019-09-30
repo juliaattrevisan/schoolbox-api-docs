@@ -98,12 +98,6 @@ class Javascript extends Base
         $assessable = $event->getAssessment();
         $workType   = $assessable->getWorkType();
         $folderColour = $assessable->getContext()->getFolder()->getColour();
-        $eventColour = null;
-
-        if ($folderColour) {
-            $colour = new Color($folderColour->getRed(), $folderColour->getGreen(), $folderColour->getBlue(), $folderColour->getAlpha());
-            $eventColour = $colour->getAsRgba();
-        }
 
         return [
             'eventId'   => $event->getEventId(),
@@ -122,7 +116,7 @@ class Javascript extends Base
             'workTypeId'=> $workType ? $workType->getId() : null,
             'weighted'  => $assessable->getWeight() ? 1 : 0,
             'assessmentType' => $assessable->getFamilyName(),
-            'colour' => $eventColour,
+            'colour' => $folderColour ? $folderColour->getAsRgba() : null,
         ];
     }
 
