@@ -21,36 +21,50 @@ Weather details page (linked from dashboard component)
             <ul class="meta">
                 <li>Last updated: {{ today.lastUpdated }}</li>
             </ul>
-            <section>
+            <section class="weather-current">
                 <div class="row">
                     <div class="small-12 medium-4 columns">
-                        <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" title="{{ today.weatherSummary }}"/>
-                        <p>{{ today.weatherSummary }}</p>
+                        <div class="text-center content">
+                            <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" title="{{ today.weatherSummary }}"/>
+                            <p class="current-value">{{ today.weatherSummary }}</p>
+                        </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <p class="temperature-forecast">
-                            {{ today.currentTemp }}&deg;C
-                            <br />
-                            Feels like {{ today.currentTemp}}&deg;C
-                        </p>
+                        <div class="text-center content">
+                            <p class="center">
+                                <span class="current-value">{{ today.currentTemp }}&deg;C</span>
+                                <br />
+                                Feels like {{ today.currentTemp}}&deg;C
+                            </p>
+                        </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <p class="temperature-forecast">
-                            <span class="hot">Hi {{ today.highTemp }}&deg;C</span>
-                            <span class="cold">Lo {{ today.lowTemp }}&deg;C</span>
-                        </p>
+                        <div class="text-center content">
+                            <p class="center">
+                                <span class="current-value hot">Hi {{ today.highTemp }}&deg;C</span><br />
+                                <span class="current-value cold">Lo {{ today.lowTemp }}&deg;C</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 medium-4 columns">
+                        <div class="text-center content">
+                            <p class="meta">Wind</p>
+                            <p class="current-value">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
+                        </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <p class="meta">Wind</p>
-                        <p class="temperature-forecast">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
+                        <div class="text-center content">
+                            <p class="meta">Humidity</p>
+                            <p class="current-value">{{ today.humidity }}%</p>
+                        </div>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <p class="meta">Humidity</p>
-                        <p class="temperature-forecast">{{ today.humidity }}%</p>
-                    </div>
-                    <div class="small-12 medium-4 columns">
-                        <p class="meta">UV Index</p>
-                        <p class="temperature-forecast">{{ today.uvIndex }}</p>
+                        <div class="text-center content">
+                            <p class="meta">UV Index</p>
+                            <p class="current-value">{{ today.uvIndex }}</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -84,16 +98,6 @@ Weather details page (linked from dashboard component)
             </section>
         </div>
     </div>
-
-    {#<div class="row"></div>#}
-    {#<div class="small-12 medium-6 columns">#}
-    {#<h2 class="subheader">Weather supplied by</h2>#}
-    {#<section class="content">#}
-    {#<div class="content">#}
-    {#<a href="{{ apiProvider.url }}" target="_blank"><img alt="{{ apiProvider.name }}" src="{{ apiProvider.logo }}" />{{ apiProvider.name }}</a>#}
-    {#</div>#}
-    {#</div>#}
-    {#</div>#}
 
 {% else %}
 
