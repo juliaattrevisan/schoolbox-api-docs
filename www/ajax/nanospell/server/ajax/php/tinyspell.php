@@ -16,7 +16,7 @@ $broker = enchant_broker_init();
 
 // Dictionaries, in order of preference
 $dicts = [
-    enchant_broker_request_dict($broker, $config->get('spelling_checking_language')),
+    enchant_broker_request_dict($broker, $config->get('spellcheck_language')),
 ];
 
 if (!$post->id) {
