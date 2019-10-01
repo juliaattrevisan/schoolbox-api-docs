@@ -577,10 +577,16 @@
                         /* If valid, start processing data
                          */
                         if ($('#importFeedbackForm').valid()) {
+                            var rows = $('#importFeedbackInput').val().split("\n");
 
                             /* For every row, find the student id, mark and comments and
                              * assign them to #mark-12345 and #comment-12345 as required
                              */
+                            for (var i = 0; i < rows.length; i++) {
+                                var row = rows[i].split("\t");
+
+                                console.log(row);
+                            }
 
                             /* Trigger Quickmark validator for immediate feedback on your feedback
                              */
