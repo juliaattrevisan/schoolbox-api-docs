@@ -1,7 +1,5 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,22 +10,31 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Comms\News\Statistics
+ */
 class Controller extends Base
 {
+
     /**
      * @var IConnector
      */
     private $database;
+
 
     /**
      * @var Mapper
      */
     private $statisticsMapper;
 
+
     /**
      * @var Cumulative\Mapper
      */
     private $statisticsCumulativeMapper;
+
 
     /**
      * Controller constructor.
@@ -60,7 +67,6 @@ class Controller extends Base
     public function getOverview(News\Model $article)
     {
         $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
-        $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
@@ -84,7 +90,7 @@ class Controller extends Base
             /* Scale selector
              */
             'scaleOptions' => News\Statistics\Scale\Factory::SCALE_OPTIONS,
-            'scale' => $scale,
+            'scale' => News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']),
 
             /* Interaction Referrers This Period
              */
