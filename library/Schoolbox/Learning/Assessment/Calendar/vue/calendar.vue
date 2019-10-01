@@ -716,7 +716,7 @@
             @dateClick="onDateClick"
             @eventPositioned="redrawCalendar"
             @windowResize="redrawCalendar"
-            @datesRender="datesRender"
+            :dates-render="datesRender"
         />
     </div>
 </template>
