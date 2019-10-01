@@ -54,6 +54,33 @@ do
 
 	ls -l;
 
+  echo "Check we have the right commit in the artifacts for the package";
+
+  if [ -f .git/ref ];
+  then
+      buildcommit=`cat .git/ref`;
+  else
+      echo "Unable to determine build commit";
+      ls -1 .git/;
+  fi
+
+  echo "Build commit: $buildcommit";
+
+  if [ -f version.json ];
+  then
+    buildcommit_in_artifacts=`cat version.json | grep -oP '(?<="build_commit":")[^"]*'`;
+    echo "Artifacts commit: $buildcommit_in_artifacts"
+  else
+    echo "Unable to check commit in artifacts is valid, don't package";
+    exit 1;
+  fi
+
+  if [ ! "$buildcommit_in_artifacts" == "$buildcommit" ]
+  then
+    echo "Build commit in artifacts is not the same as commit in current build. Do not package."
+    exit 1;
+  fi
+
 	echo "[$i] Create package specfic directory sql";
 	tools/generate-dir-sql.sh /var/lib/$i /usr/share/$i > sql/$i-package-config.sql;
 	if [ $? -ne 0 ];
