@@ -1,12 +1,5 @@
 <?php
 /**
- * ImpressionsConversionsOpens
- *
- * Highcharts likes its dates represented as timestamps in milliseconds
- * so we take the UNIX_TIMESTAMP and smash it by 1000 and strip the microseconds bit away by casting as int
- *
- * For now, these queries also groups data according to the nearest minute
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -20,6 +13,16 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Scale\Factory;
 use Schoolbox\Role;
 
+/**
+ * Class ImpressionsConversionsOpens
+ *
+ * Highcharts likes its dates represented as timestamps in milliseconds
+ * so we take the UNIX_TIMESTAMP and smash it by 1000 and strip the microseconds bit away by casting as int
+ *
+ * For now, these queries also groups data according to the nearest minute
+ *
+ * @package Schoolbox\Comms\News\Statistics
+ */
 class ImpressionsConversionsOpens
 {
 
@@ -63,7 +66,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Record an impression for $articleId
+     * Record an open for $articleId
      * ie. $userId has witnessed $articleId
      *
      * $referrer indicates a link they clicked to initiate the open
