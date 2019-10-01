@@ -527,6 +527,18 @@
                 }
             },
 
+            datesRender(datesRenderInfo) {
+                let todayButton = this.$el.querySelector('button.fc-customToday-button'),
+                    nextButton  = this.$el.querySelector('button.fc-customNext-button'),
+                    prevButton  = this.$el.querySelector('button.fc-customPrev-button'),
+                    start       = datesRenderInfo.view.currentStart,
+                    end         = datesRenderInfo.view.currentEnd,
+                    now         = new Date();
+
+                // Should the Today button be enabled?
+                todayButton.disabled = (now >= start && now < end);
+            },
+
             cleanupMonthHeaderInlineStyles() {
                 document.querySelectorAll('.fc-time-area .fc-content tr')[0].querySelectorAll('div').forEach(function (element) {
                     element.removeAttribute('style');
@@ -660,6 +672,7 @@
             @dateClick="onDateClick"
             @eventPositioned="redrawCalendar"
             @windowResize="redrawCalendar"
+            @datesRender="datesRender"
         />
     </div>
 </template>
