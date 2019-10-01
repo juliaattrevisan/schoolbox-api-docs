@@ -583,12 +583,15 @@
                              */
                             var dataFormat = $('#importFeedbackForm input[name="importFeedbackType"]:checked').val();
 
+                            /* Ignore any rows without a student identifier
+                             * Trigger autosave upon change for instant feedback on your feedback
+                             */
                             if (dataFormat === 'mark-only') {
                                 var assign = function(input) {
                                     var id = $.trim(input[0]);
 
                                     if (id) {
-                                        $('#mark-' + id).val(input[1]);
+                                        $('#mark-' + id).val(input[1]).change();
                                     }
                                 }
                             } else if (dataFormat === 'comment-only') {
@@ -596,7 +599,7 @@
                                     var id = $.trim(input[0]);
 
                                     if (id) {
-                                        $('#comment-' + id).val(input[1]);
+                                        $('#comment-' + id).val(input[1]).change();
                                     }
                                 }
                             } else {
@@ -604,8 +607,8 @@
                                     var id = $.trim(input[0]);
 
                                     if (id) {
-                                        $('#mark-' + id).val(input[1]);
-                                        $('#comment-' + id).val(input[2]);
+                                        $('#mark-' + id).val(input[1]).change();
+                                        $('#comment-' + id).val(input[2]).change();
                                     }
                                 }
                             }
@@ -620,9 +623,6 @@
                             /* Close the modal
                              */
                             $('#importFeedbackModal').foundation('reveal', 'close');
-
-                            /* Trigger Quickmark validator for immediate feedback on your feedback
-                             */
                         }
                     });
 
