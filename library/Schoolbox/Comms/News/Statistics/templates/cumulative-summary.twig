@@ -1,24 +1,18 @@
 <div class="content">
     <div class="row">
-        <div class="small-12 medium-3 columns">
+        <div class="small-12 medium-4 columns">
             <p class="infographic">
                 <span class="title">{% block cumulativeDateHeading %}First Open <span class='hint has-tip tip-top' data-tooltip title="The date when the {{ locale.news }} was first opened">?</span>{% endblock %}</span>
                 <span class="value">{% if cumulative.date %}{{ cumulative.date|date('j M') }}{% else %}n/a{% endif %}</span>
             </p>
         </div>
-        <div class="small-12 medium-3 columns">
+        <div class="small-12 medium-4 columns">
             <p class="infographic">
                 <span class="title">Conversions <span class="hint has-tip tip-top" data-tooltip title="The number of people who saw a link with a referrer, and then clicked through to view the {{ locale.news }}">?</span></span>
                 <span class="value">{{ cumulative.numConversions }}</span>
             </p>
         </div>
-        <div class="small-12 medium-3 columns">
-            <p class="infographic">
-                <span class="title">Impressions <span class="hint has-tip tip-top" data-tooltip title="The number of times that links with a referrer value were presented to a user">?</span></span>
-                <span class="value">{{ cumulative.numImpressions }}</span>
-            </p>
-        </div>
-        <div class="small-12 medium-3 columns">
+        <div class="small-12 medium-4 columns">
             <p class="infographic">
                 <span class="title tip-top" data-tooltip title="The percentage of impressions that led to viewing of a {{ locale.news }} expressed as conversions/impressions">Conversion Ratio % <span class="hint has-tip">?</span></span>
                 <span class="value">{{ cumulative.conversionRatio }}</span>
@@ -32,7 +26,6 @@
     <tr>
         <th>Referrer</th>
         <th>Conversions</th>
-        <th>Impressions</th>
         <th>Conversion Ratio (%)</th>
     </tr>
     </thead>
@@ -40,31 +33,26 @@
     <tr>
         <td>Dashboard</td>
         <td>{{ cumulative.breakdown.grid.conversion.dashboard }}</td>
-        <td>{{ cumulative.breakdown.grid.impression.dashboard }}</td>
         <td>{{ cumulative.breakdown.ratio.dashboard }}</td>
     </tr>
     <tr>
         <td>Homepage</td>
         <td>{{ cumulative.breakdown.grid.conversion.homepage }}</td>
-        <td>{{ cumulative.breakdown.grid.impression.homepage }}</td>
         <td>{{ cumulative.breakdown.ratio.homepage }}</td>
     </tr>
     <tr>
         <td>Index</td>
         <td>{{ cumulative.breakdown.grid.conversion.index }}</td>
-        <td>{{ cumulative.breakdown.grid.impression.index }}</td>
         <td>{{ cumulative.breakdown.ratio.index }}</td>
     </tr>
     <tr>
         <td>Archive</td>
         <td>{{ cumulative.breakdown.grid.conversion.archive }}</td>
-        <td>{{ cumulative.breakdown.grid.impression.archive }}</td>
         <td>{{ cumulative.breakdown.ratio.archive }}</td>
     </tr>
     <tr>
         <td>Email</td>
         <td>{{ cumulative.breakdown.grid.conversion.email }}</td>
-        <td>{{ cumulative.breakdown.grid.impression.email }}</td>
         <td>{{ cumulative.breakdown.ratio.email }}</td>
     </tr>
     </tbody>
