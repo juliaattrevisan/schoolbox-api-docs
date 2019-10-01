@@ -49,12 +49,12 @@ class WeatherstackClient
     /**
      * Get the data from the API in a JSON format usable by Twig
      *
-     * @param int $forecastLimit   How many days to forecast - configurable in component settings
-     * @param string $location     City to get weather for - configurable in component settings
+     * @param int    $forecastLimit How many days to forecast - configurable in component settings
+     * @param string $location      City to get weather for - configurable in component settings
      *
      * @return array
      */
-    public function getForecast(int $forecastLimit, string $location) : array
+    public function getForecast(int $forecastLimit, string $location): array
     {
         try {
             $requestUrl = "forecast?query={$location}&forecast_days={$forecastLimit}&units=m&hourly=1&access_key={$this->apiKey}";
@@ -82,10 +82,7 @@ class WeatherstackClient
         try {
             $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
-            if (isset($response['forecast']['forecastday'][0]['day'])) {
-                return $response['forecast']['forecastday'][0]['day'];
-            }
-            return [];
+            return $response['forecast']['forecastday'][0]['day'] ?? [];
         } catch (\Exception $e) {
             return [];
         }
@@ -99,7 +96,7 @@ class WeatherstackClient
      * @return array
      * @throws \DomainException
      */
-    private function makeRequest(string $requestUrl) : array
+    private function makeRequest(string $requestUrl): array
     {
         // Cache the request
         try {
@@ -111,9 +108,9 @@ class WeatherstackClient
         }
 
         // Attempt to json decode the response body
-        try{
+        try {
             $decodedResponse = json_decode($response, true);
-        } catch (\RuntimeException $e){
+        } catch (\RuntimeException $e) {
             throw new \DomainException('Unable to read Weather API response', $response, $e);
         }
 
@@ -142,57 +139,57 @@ class WeatherstackClient
      * @param array $responseData
      * @return array
      */
-    private function parseWeatherData(array $responseData) : array
+    private function parseWeatherData(array $responseData): array
     {
         $twigData = [
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
         ];
 
         $twigData['today'] = [
-            'day' => $this->getDayOfWeek(strtotime($responseData['location']['localtime'])),
+            'day'            => $this->getDayOfWeek(strtotime($responseData['location']['localtime'])),
 
             /* Weather descriptions and icons now come back as an array
              * But why would I get multiple of these? I just chose the first one anyway
              */
             'weatherSummary' => $responseData['current']['weather_descriptions'][0],
-            'weatherIcon' => $responseData['current']['weather_icons'][0],
+            'weatherIcon'    => $responseData['current']['weather_icons'][0],
 
             /* Basic facts
              */
-            'currentTemp' => $responseData['current']['temperature'],
-            'feelsLike' => $responseData['current']['feelslike'],
-            'uvIndex' => $responseData['current']['uv_index'],
+            'currentTemp'    => $responseData['current']['temperature'],
+            'feelsLike'      => $responseData['current']['feelslike'],
+            'uvIndex'        => $responseData['current']['uv_index'],
 
             /* Wind and precipitation (storms)
              */
-            'humidity' => $responseData['current']['humidity'],
-            'windSpeed' => $responseData['current']['wind_speed'],
-            'windDirection' => $responseData['current']['wind_dir'],
-            'lastUpdated' => \Alaress_Date_Format::newFromTimestamp(strtotime($responseData['location']['localtime']))->getRelativeTime()
+            'humidity'       => $responseData['current']['humidity'],
+            'windSpeed'      => $responseData['current']['wind_speed'],
+            'windDirection'  => $responseData['current']['wind_dir'],
+            'lastUpdated'    => Alaress_Date_Format::newFromTimestamp(strtotime($responseData['location']['localtime']))->getRelativeTime(),
         ];
 
         foreach ($responseData['forecast'] as $date => $data) {
             // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
             if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
-                $twigData['today']['lowTemp'] = $data['mintemp'];
+                $twigData['today']['lowTemp']  = $data['mintemp'];
                 $twigData['today']['highTemp'] = $data['maxtemp'];
                 continue;
             }
 
             $dayForecast = [
-                'day' => $this->getDayOfWeek($data['date_epoch']),
+                'day'            => $this->getDayOfWeek($data['date_epoch']),
 
                 /* Forecast is now broken down hourly
                  * Just get the midday value (fifth in the stack)
                  * and the usual first in the stack for description/icon
                  */
                 'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
-                'weatherIcon' => $data['hourly'][4]['weather_icons'][0],
+                'weatherIcon'    => $data['hourly'][4]['weather_icons'][0],
 
                 /* Basic facts
                  */
-                'lowTemp' => $data['mintemp'],
-                'highTemp' => $data['maxtemp']
+                'lowTemp'        => $data['mintemp'],
+                'highTemp'       => $data['maxtemp'],
             ];
 
             $twigData['forecastDays'][] = $dayForecast;
@@ -212,10 +209,10 @@ class WeatherstackClient
      */
     private function getDayOfWeek(int $timestamp): string
     {
-        if (\Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(\Alaress_Date_Format::now())) {
+        if (Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(Alaress_Date_Format::now())) {
             return self::NOW;
         }
 
-        return \Alaress_Date_Format::newFromTimestamp($timestamp)->getUsingFormat('D');
+        return Alaress_Date_Format::newFromTimestamp($timestamp)->getUsingFormat('D');
     }
 }

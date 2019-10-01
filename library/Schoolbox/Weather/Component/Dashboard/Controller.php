@@ -3,9 +3,11 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Weather\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
+use Schoolbox\Weather\Location;
 use Schoolbox\Weather\WeatherstackClient;
 
 /**
@@ -37,7 +39,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        $location = (new \Schoolbox\Weather\Location())->detect($this->getConfig('url'), $this->getConfigMapper()->getConfigLoader()->get('weather_location'));
+        $location = (new Location())->detect($this->getConfig('url'), $this->getConfigMapper()->getConfigLoader()->get('weather_location'));
 
         // Number of days of forecast to show.
         // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option,
@@ -51,7 +53,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
 
-        $this->weatherPayload = (new WeatherstackClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
+        $this->weatherPayload                           = (new WeatherstackClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
         $this->weatherPayload['weeklyForecastLocation'] = $location;
 
         $this->setComponentName("Weather in {$this->weatherPayload['weatherLocation']}");
