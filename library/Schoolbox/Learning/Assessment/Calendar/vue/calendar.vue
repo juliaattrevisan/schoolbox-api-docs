@@ -621,7 +621,7 @@
             :week-label="''"
             :event-time-format="helper.eventTimeFormat"
             :header="{
-                left: 'today,prev,next',
+                left: 'customToday,customPrev,customNext',
                 center: 'title',
                 right: 'resourceTimelineSemester,dayGridMonth,resourceTimelineWeek'
             }"
@@ -632,13 +632,15 @@
                 resourceTimelineSemester:'Semester',
             }"
             :custom-buttons="{
-                next: {
+                customNext: {
+                    icon: 'chevron-right',
                     click: this.clickNext.bind(this),
                 },
-                prev: {
+                customPrev: {
+                    icon: 'chevron-left',
                     click: this.clickPrev.bind(this)
                 },
-                today: {
+                customToday: {
                     text: 'Today',
                     click: this.clickToday.bind(this)
                 }
