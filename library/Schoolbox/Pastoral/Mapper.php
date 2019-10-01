@@ -398,8 +398,7 @@ class Mapper extends BaseMapper
         $sql = $this->getSelectString() . "
         
             JOIN    `pastoral_tags` ON `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND 
-                    `pastoral_tags`.`tag_id` = :tagId AND
-                    `pastoral_tags`.`deleted_at` IS NULL
+                    `pastoral_tags`.`tag_id` = :tagId
         ";
 
         $statement = $this->database->prepare($sql);
