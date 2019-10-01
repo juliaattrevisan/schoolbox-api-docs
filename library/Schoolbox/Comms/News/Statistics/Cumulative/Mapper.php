@@ -47,19 +47,19 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Increment a counter
      *
-     * @param int         $articleId
-     * @param string      $type
-     * @param string      $roleType
-     * @param int         $roleId
-     * @param null|string $referrer
+     * @param int                  $articleId
+     * @param \Alaress_Date_Format $date
+     * @param string               $type
+     * @param string               $roleType
+     * @param int                  $roleId
+     * @param null|string          $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function increment(int $articleId, string $type, string $roleType, int $roleId, ?string $referrer)
+    private function increment(int $articleId, \Alaress_Date_Format $date, string $type, string $roleType, int $roleId, ?string $referrer)
     {
-        $now = \Alaress_Date_Format::now();
 
         /* TODO: Random bug in findOneByColumnList()?
          *
@@ -69,7 +69,7 @@ class Mapper extends \Schoolbox\Mapper
          * ['cache'=>false] but it didn't help. Resorting back to this for now
          */
         $model = $this->findByColumnList([
-            'date' => $now->getDatabaseDate(),
+            'date' => $date->getDatabaseDate(),
             'article_id' => $articleId,
             'type' => $type,
             'referrer' => $referrer,
@@ -80,7 +80,7 @@ class Mapper extends \Schoolbox\Mapper
             $model->setNum((int)$model->getNum() + 1);
         } else {
             $model = $this->createModel()
-                ->setDate($now)
+                ->setDate($date)
                 ->setArticleId($articleId)
                 ->setType($type)
                 ->setReferrer($referrer)
@@ -102,21 +102,22 @@ class Mapper extends \Schoolbox\Mapper
      * Conversions cannot have a null referrer (despite that being considered valid
      * for general usage, it's invalid for this particular usage)
      *
-     * @param int         $articleId
-     * @param string      $roleType
-     * @param int         $roleId
-     * @param string|null $referrer
+     * @param int                  $articleId
+     * @param \Alaress_Date_Format $date
+     * @param string               $roleType
+     * @param int                  $roleId
+     * @param string|null          $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function incrementOpen(int $articleId, string $roleType, int $roleId, ?string $referrer)
+    public function incrementOpen(int $articleId, \Alaress_Date_Format $date, string $roleType, int $roleId, ?string $referrer)
     {
         if (!(new Statistics\ValidOpenReferrer())->isSatisfiedBy($referrer)) {
             return false;
         }
 
-        return $this->increment($articleId, StatisticsMapper::TYPE_OPEN, $roleType, $roleId, $referrer);
+        return $this->increment($articleId, $date,StatisticsMapper::TYPE_OPEN, $roleType, $roleId, $referrer);
     }
 }

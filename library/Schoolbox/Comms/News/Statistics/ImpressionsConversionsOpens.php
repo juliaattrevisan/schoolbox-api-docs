@@ -76,17 +76,18 @@ class ImpressionsConversionsOpens
      * It can be null if someone directly typed in the url, or opened it from some random place
      * that we don't know about. Unknown referrers are disregarded
      *
-     * @param News\Model  $article
-     * @param int         $userId
-     * @param string      $roleType
-     * @param int         $roleId
-     * @param null|string $referrer
+     * @param News\Model           $article
+     * @param \Alaress_Date_Format $date
+     * @param int                  $userId
+     * @param string               $roleType
+     * @param int                  $roleId
+     * @param null|string          $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveOpen(News\Model $article, int $userId, string $roleType, int $roleId, ?string $referrer)
+    public function saveOpen(News\Model $article, \Alaress_Date_Format $date, int $userId, string $roleType, int $roleId, ?string $referrer)
     {
         /* Only record Opens for publicly-accessible articles
          */
@@ -111,7 +112,7 @@ class ImpressionsConversionsOpens
             ->setRoleType($roleType)
             ->setRoleId($roleId)
             ->setType(Mapper::TYPE_OPEN)
-            ->setOccursAt(\Alaress_Date_Format::now());
+            ->setOccursAt($date);
 
         /* Record uniques only
          * If the current (articleId, userId, referrer) tuple exists in the db
@@ -139,7 +140,7 @@ class ImpressionsConversionsOpens
         /* It's a valid referrer and $user hasn't Opened this period
          * so add an Open record and increment the cumulative total
          */
-        $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $roleType, $roleId, $referrer);
+        $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
 
         return $this->statisticsMapper->save($model);
     }

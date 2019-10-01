@@ -616,6 +616,7 @@ class Controller extends Base
         (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
             ->saveOpen(
                 $article,
+                \Alaress_Date_Format::now(),
                 $this->getUser()->getId(),
                 $this->getUser()->getRole()->getType(),
                 $this->getUser()->getRole()->getId(),

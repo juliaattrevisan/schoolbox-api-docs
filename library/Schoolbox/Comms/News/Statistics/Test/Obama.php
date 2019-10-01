@@ -514,7 +514,9 @@ class Obama
             if (\random_int(0, 100) < $directOpenLikelihood) {
                 $randomReferrer = $referrers[\rand(0, \count($referrers)-1)];
 
-                $r = $this->ico->saveOpen($model, $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $randomReferrer);
+                /* Jitter this around
+                 */
+                $r = $this->ico->saveOpen($model, $this->generateStatisticDate(50), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $randomReferrer);
 
                 if ($r !== false) {
                     $this->summary['role'][News\Statistics\Mapper::TYPE_OPEN][$currentUser->getRole()->getType()]++;
@@ -529,46 +531,26 @@ class Obama
     }
 
 
+
     /**
-     * Start a counter identical in value to $duration
-     * for every record,
-     *   subtract a random quantity of $duration hours
-     *   update created_at with this as the difference
+     * Change the date of a generated stat
      *
-     * @param News\Model $model
-     * @param int        $duration
-     * @param bool       $skewedStatistics
-     * @throws Exception
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @param int $duration
+     * @return \Alaress_Date_Format
+     * @throws \Exception
      */
-    private function resequenceStatistics(News\Model $model, int $duration, bool $skewedStatistics): void
+    private function generateStatisticDate(int $duration): \Alaress_Date_Format
     {
-        $records = $this->statisticsMapper->findByColumn('article_id', $model->getId(), ['cache' => false]);
+        $jitteryness = \random_int(1, 10)*60;
 
-        $counter = $duration;
+        $val = $this->getWeightedRandom(1, $duration, 0.5);
 
-        /** @var News\Statistics\Model $record */
-        foreach ($records as $record) {
-            $jitteryness = \random_int(1, 10)*60;
+        $difference = -1 * $val * 3600 - $jitteryness;
 
-            $val = \random_int(1, $duration);
+        $newTime = \Alaress_Date_Format::now();
+        $newTime->addSeconds($difference);
 
-            if ($skewedStatistics) {
-                $val = $this->getWeightedRandom(1, $duration, 0.5);
-            }
-
-            $difference = -1 * $val * 3600 - $jitteryness;
-
-            $newTime = new \Alaress_Date_Format($record->getCreatedAt()->getDatabase(), \Alaress_Date_Format::DATABASE_FORMAT);
-            $newTime->addSeconds($difference);
-
-            $record->setOccursAt($newTime);
-            $this->statisticsMapper->save($record);
-
-            $counter -= $difference;
-        }
+        return $newTime;
     }
 
 
@@ -607,11 +589,6 @@ class Obama
 
             $this->createStatistics($model, $directOpenLikelihood);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
-
-            /* Resequence statistics so they occur over a larger period of time
-             */
-            $this->resequenceStatistics($model, $duration, $skewedStatistics);
-            new \Alaress_Probe("Resequenced all statistics over {$duration} hours");
         }
 
         /* Statistical summary
