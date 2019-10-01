@@ -172,12 +172,7 @@ class ImpressionsConversionsOpens
 
             /* Total number of Comments
              */
-            'numComments' => $this->database->executeQuery('
-                SELECT COUNT(*) AS numComments
-                FROM comms_news_article cna
-                INNER JOIN discussion_thread_comment dtc ON cna.discussion_thread_id = dtc.discussion_thread_id
-                WHERE dtc.deleted_at IS NULL
-            ')->fetch(\PDO::FETCH_ASSOC)['numComments'],
+            'numComments' => $this->calculateNumComments($article)
         ];
 
         return $summary;
