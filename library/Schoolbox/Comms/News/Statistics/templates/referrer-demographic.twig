@@ -57,39 +57,38 @@
             series: [
                 {
                     color: '#82b5d8',
-                    name: 'Dashboard',
+                    name: 'Archive',
                     data: [
-                        {{ referrerDemographic['open']['dashboard'] }}
-
+                        {{ referrerDemographic['open']['archive'] }}
                     ]
+
                 },
                 {
                     color: '#1f78c1',
+                    name: 'Dashboard',
+                    data: [
+                        {{ referrerDemographic['open']['dashboard'] }}
+                    ]
+                },
+                {
+                    color: '#0a437c',
+                    name: 'Email',
+                    data: [
+                        {{ referrerDemographic['open']['email'] }}
+                    ]
+                },
+                {
+                    color: '#806eb7',
                     name: 'Homepage',
                     data: [
                         {{ referrerDemographic['open']['homepage'] }}
                     ]
                 },
                 {
-                    color: '#0a437c',
+                    color: '#ba43a9',
                     name: 'Index',
                     data: [
                         {{ referrerDemographic['open']['index'] }}
-
-                    ]
-                },
-                {
-                    color: '#806eb7',
-                    name: 'Archive',
-                    data: [
-                        {{ referrerDemographic['open']['archive'] }}
-                    ]
-                },
-                {
-                    color: '#ba43a9',
-                    name: 'Email',
-                    data: [
-                        {{ referrerDemographic['open']['email'] }}
                     ]
                 },
                 {
