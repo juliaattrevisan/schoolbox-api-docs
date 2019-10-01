@@ -515,22 +515,29 @@ class Obama
             if (\random_int(0, 100) < $directOpenLikelihood) {
                 $randomReferrer = $referrers[\rand(0, \count($referrers)-1)];
 
+                /* Pass an actual value if we chose an unknown referrer
+                 */
+                if ($randomReferrer === News\Statistics\Mapper::REFERRER_UNKNOWN) {
+                    $referrer = null;
+                } else {
+                    $referrer = $randomReferrer;
+                }
+
                 /* Jitter this around
                  */
-                $r = $this->ico->saveOpen($model, $this->generateStatisticDate(50), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $randomReferrer);
+                $r = $this->ico->saveOpen($model, $this->generateStatisticDate(50), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
 
                 if ($r !== false) {
                     $this->summary['role'][News\Statistics\Mapper::TYPE_OPEN][$currentUser->getRole()->getType()]++;
                     $this->summary['numOpens']++;
                 }
 
-                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened directly onto carpet using {$directOpenLikelihood}%");
+                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened directly onto carpet using {$directOpenLikelihood}% and referrer {$randomReferrer}");
             } else {
                 new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} didn't open the article");
             }
         }
     }
-
 
 
     /**
