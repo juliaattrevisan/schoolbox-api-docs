@@ -558,6 +558,8 @@
         {% if importFeedback %}
             <script>
                 $(function() {
+                    /* Validation
+                     */
                     $('#importFeedbackForm').alaressValidate({
                         rules: {
                             importFeedbackType: "required",
@@ -571,11 +573,26 @@
                         onkeyup: false
                     });
 
+                    /* Try to process data
+                     */
                     $('#importFeedbackForm [data-submit]').on('click', function(event) {
                         event.preventDefault();
-                        $('#importFeedbackForm').submit();
+
+                        /* If valid, start processing data
+                         */
+                        if ($('#importFeedbackForm').valid()) {
+
+                            /* For every row, find the student id, mark and comments and
+                             * assign them to #mark-12345 and #comment-12345 as required
+                             */
+
+                            /* Trigger Quickmark validator for immediate feedback on your feedback
+                             */
+                        }
                     });
 
+                    /* Close modal via Cancel button
+                     */
                     $('#importFeedbackForm [data-cancel]').on('click', function(event) {
                         event.preventDefault();
                         $('#importFeedbackModal').foundation('reveal', 'close');
