@@ -160,26 +160,29 @@ class ImpressionsConversionsOpens
             ]
         ]);
 
-        /* Aggregate from daily statistics
-         */
-        $summary = $this->summariseDailyStatistics($statistics);
+        $summary = [
 
-        /* First open (a specific alteration for this data set)
-         */
-        $summary['date'] = null;
+            /* First open (a specific alteration for this data set)
+             */
+            'date' => $statistics->count() ? $statistics->first()->getCreatedAt() : null,
 
-        if ($statistics->count()) {
-            $summary['date'] = $statistics->first()->getCreatedAt();
-        }
+            /* Total number of Opens across all time
+             */
+            'numOpens' => $this->calculateNumOpens($statistics),
 
-        /* Quantity of Comments
-         */
-        $summary['numComments'] = $this->database->executeQuery('
-            SELECT COUNT(*) AS numComments
-            FROM comms_news_article cna
-            INNER JOIN discussion_thread_comment dtc ON cna.discussion_thread_id = dtc.discussion_thread_id
-            WHERE dtc.deleted_at IS NULL
-        ')->fetch(\PDO::FETCH_ASSOC)['numComments'];
+            /* Total number of Comments
+             */
+            'numComments' => $this->database->executeQuery('
+                SELECT COUNT(*) AS numComments
+                FROM comms_news_article cna
+                INNER JOIN discussion_thread_comment dtc ON cna.discussion_thread_id = dtc.discussion_thread_id
+                WHERE dtc.deleted_at IS NULL
+            ')->fetch(\PDO::FETCH_ASSOC)['numComments'],
+
+            /* Grid of referrer values
+             */
+            'breakdown' => $this->summariseDailyStatistics($statistics)['breakdown']
+        ];
 
         return $summary;
     }
@@ -235,8 +238,6 @@ class ImpressionsConversionsOpens
     {
         $breakdown = $this->generateDefaultBreakdown(Mapper::REFERRERS);
 
-        $numOpens = 0;
-
         /** @var Cumulative\Model $statistic */
         foreach ($statistics as $statistic) {
             $referrer = $statistic->getReferrer();
@@ -246,8 +247,6 @@ class ImpressionsConversionsOpens
             }
 
             $breakdown[$statistic->getType()][$referrer] += $statistic->getNum();
-
-            $numOpens += $statistic->getNum();
         }
 
         return [
@@ -255,8 +254,26 @@ class ImpressionsConversionsOpens
             'breakdown' => [
                 'grid' => $breakdown,
             ],
-            'numOpens' => $numOpens
         ];
+    }
+
+
+    /**
+     * Aggregate the number of Opens from a collection of statistic records
+     *
+     * @param Collection $statistics
+     * @return int
+     */
+    private function calculateNumOpens(Collection $statistics): int
+    {
+        $numOpens = 0;
+
+        /** @var Cumulative\Model $statistic */
+        foreach ($statistics as $statistic) {
+            $numOpens += $statistic->getNum();
+        }
+
+        return $numOpens;
     }
 
 
