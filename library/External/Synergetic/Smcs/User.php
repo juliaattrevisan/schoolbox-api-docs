@@ -142,37 +142,6 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
         return $this->clearInvalidValues($student);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        $query =
-            "
-            SELECT      uvStudents.StudentID,
-                        NetworkLogin,
-                        uvStudents.StudentTitle,
-                        uvStudents.StudentPreferred,
-                        uvStudents.StudentSurname,
-                        StudentGender,
-                        StudentEmail,
-                        StudentOccupEmail,
-                        uvStudents.StudentYearLevel,
-                        uvStudents.StudentHouse,
-                        uvStudents.StudentBoarder,
-                        uvStudents.StudentBoardingHouse,
-                        StudentCampus
-            FROM        dbo.uvStudents uvStudents
-            JOIN        FileSemesters Semester ON
-                            Semester.FileSemester = uvStudents.FileSemester AND
-                            Semester.FileYear = uvStudents.FileYear AND
-                            Semester.SystemCurrentFlag = 1
-            LEFT JOIN   Community ON Community.ID = StudentID
-        ";
-
-        return $this->getConnector()->executeQuery($query)->fetchAll();
-    }
-
 
     /**
      * @inheritdoc
