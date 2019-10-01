@@ -83,21 +83,22 @@ class DueWork implements IAssessmentTypeTranslator
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
         // For brevity, these setters are only called if the corresponding getter() returns non-null
-        null === $domainObject->getTitle()             || $dataModel->setName($domainObject->getTitle());
-        null === $domainObject->getDescription()       || $dataModel->setDescription($domainObject->getDescription());
-        null === $domainObject->getPublishAt()         || $dataModel->setPublishDate($domainObject->getPublishAt());
-        null === $domainObject->getOpenAt()            || $dataModel->setOpenDate($domainObject->getOpenAt());
-        null === $domainObject->getDueAt()             || $dataModel->setDueDate($domainObject->getDueAt());
-        null === $domainObject->getCloseAt()           || $dataModel->setLateDate($domainObject->getCloseAt());
-        null === $domainObject->getWeight()            || $dataModel->setWeight($domainObject->getWeight());
-        null === $domainObject->getMarkVisibility()    || $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
-        null === $domainObject->getShowSubmittedOnly() || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
-        null === $domainObject->isAcceptMulti()        || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
-        null === $domainObject->getUseRubric()         || $dataModel->setUseRubric($domainObject->getUseRubric());
-        null === $domainObject->getMarkPerCapability() || $dataModel->setMarkedPerCapability($domainObject->getMarkPerCapability());
-        null === $domainObject->getUseMarkRange()      || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
-        null === $domainObject->getCreator()           || $dataModel->setOwner($domainObject->getCreator());
-        null === $domainObject->getSelfReviewability() || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
+        null === $domainObject->getTitle()                  || $dataModel->setName($domainObject->getTitle());
+        null === $domainObject->getDescription()            || $dataModel->setDescription($domainObject->getDescription());
+        null === $domainObject->getPublishAt()              || $dataModel->setPublishDate($domainObject->getPublishAt());
+        null === $domainObject->getOpenAt()                 || $dataModel->setOpenDate($domainObject->getOpenAt());
+        null === $domainObject->getDueAt()                  || $dataModel->setDueDate($domainObject->getDueAt());
+        null === $domainObject->getCloseAt()                || $dataModel->setLateDate($domainObject->getCloseAt());
+        null === $domainObject->getWeight()                 || $dataModel->setWeight($domainObject->getWeight());
+        null === $domainObject->getMarkVisibility()         || $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
+        null === $domainObject->getShowSubmittedOnly()      || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
+        null === $domainObject->isAcceptMulti()             || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
+        null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
+        null === $domainObject->getMarkPerCapability()      || $dataModel->setMarkedPerCapability($domainObject->getMarkPerCapability());
+        null === $domainObject->getUseMarkRange()           || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
+        null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
+        null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
+        null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
 
         if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
             $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
@@ -143,12 +144,13 @@ class DueWork implements IAssessmentTypeTranslator
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
         // Due work-specific fields
-        null === $dataModel->getSkipUnsubmitted() || $domainObject->setShowSubmittedOnly($dataModel->getSkipUnsubmitted());
-        null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
-        null === $dataModel->getMaxMark() || $domainObject->setMaxMark($dataModel->getMaxMark());
-        null === $dataModel->getGradeGroup() || $domainObject->setGradeGroup($dataModel->getGradeGroup());
-        null === $dataModel->getMarkVisibility() || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
-        null === $dataModel->getSelfReviewability() || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
+        null === $dataModel->getSkipUnsubmitted()        || $domainObject->setShowSubmittedOnly($dataModel->getSkipUnsubmitted());
+        null === $dataModel->getOwner()                  || $domainObject->setCreator($dataModel->getOwner());
+        null === $dataModel->getMaxMark()                || $domainObject->setMaxMark($dataModel->getMaxMark());
+        null === $dataModel->getGradeGroup()             || $domainObject->setGradeGroup($dataModel->getGradeGroup());
+        null === $dataModel->getMarkVisibility()         || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
+        null === $dataModel->getSelfReviewability()      || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
+        null === $dataModel->getSimilarityCheckEnabled() || $domainObject->setSimilarityCheckEnabled($dataModel->getSimilarityCheckEnabled());
 
         // Has Rubric? (actual rubric must be loaded outside of this method)
         if ($dataModel->getUseRubric()) {

@@ -72,6 +72,11 @@ trait DueWorkTrait
     private $maxMark;
 
     /**
+     * @var bool
+     */
+    private $similarityCheckEnabled = false;
+
+    /**
      * @return int
      */
     protected function getAcceptOnline()
@@ -247,6 +252,24 @@ trait DueWorkTrait
     public function setSelfReviewable(?string $selfReviewable): self
     {
         $this->selfReviewable = $selfReviewable;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSimilarityCheckEnabled(): bool
+    {
+        return $this->similarityCheckEnabled;
+    }
+
+    /**
+     * @param bool $similarityCheckEnabled
+     * @return $this
+     */
+    public function setSimilarityCheckEnabled(bool $similarityCheckEnabled): self
+    {
+        $this->similarityCheckEnabled = $similarityCheckEnabled;
         return $this;
     }
 }

@@ -156,6 +156,7 @@ class Factory
         $this->setMarkType($markType);
         $this->setGradingScheme(trim($post['gradingScheme']));
         $this->setUseRubric(trim($post['useRubric']));
+        $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled']) === 'on');
 
         $this->setMarkPerCapability(trim($post['markPerCapability']) === 'on');
         $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
@@ -293,7 +294,8 @@ class Factory
                 $this->getMaxMark(),
                 $this->getRubricData(),
                 $this->getAttachedFiles(),
-                $this->getSelfReviewable()
+                $this->getSelfReviewable(),
+                $this->getSimilarityCheckEnabled()
             );
 
         } elseif ($assessment instanceof Task) {

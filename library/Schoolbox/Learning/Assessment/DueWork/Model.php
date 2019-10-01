@@ -110,6 +110,12 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
 
     /**
+     * @var bool
+     */
+    protected $similarityCheckEnabled = false;
+
+
+    /**
      * @return string
      */
     public static function getDefaultTypeName(): string
@@ -781,6 +787,25 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->selfReviewability = $selfReviewability;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function getSimilarityCheckEnabled(): bool
+    {
+        return $this->similarityCheckEnabled;
+    }
+
+    /**
+     * @param bool $similarityCheckEnabled
+     * @return Model
+     */
+    public function setSimilarityCheckEnabled(bool $similarityCheckEnabled): self
+    {
+        $this->similarityCheckEnabled = $similarityCheckEnabled;
+        return $this;
+    }
+
 
     /**
      * Can learners give feedback on their own submissions?
