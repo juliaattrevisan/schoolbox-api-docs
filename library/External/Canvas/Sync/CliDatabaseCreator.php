@@ -112,7 +112,7 @@ class CliDatabaseCreator extends CliTool\App
             $allowedHosts = $rootDb->executeQuery(
                 "SELECT Host FROM mysql.user WHERE User = :user ORDER BY Host LIMIT 1",
                 ['user' => $dbSchoolboxUser]
-            )->fetch(PDO::FETCH_COLUMN);
+            )->fetchAll(PDO::FETCH_COLUMN);
             if (!$allowedHosts || !count($allowedHosts)) {
                 $this->getLogger()->warning("Error fetching allowed host for {$dbSchoolboxUser}.");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
@@ -135,7 +135,7 @@ class CliDatabaseCreator extends CliTool\App
                     "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* to {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHosts[0])}"
                 );
             } catch (Database\Exception $e) {
-                $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}: {$e->getMessage()}");
+                $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}@{$allowedHosts[0]}: {$e->getMessage()}");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
         } else {
