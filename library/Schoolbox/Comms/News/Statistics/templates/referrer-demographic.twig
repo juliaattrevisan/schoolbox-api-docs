@@ -43,7 +43,7 @@
             },
 
             xAxis: {
-                categories: ['Conversions', 'Impressions']
+                categories: ['Opens']
             },
 
             yAxis: {
@@ -59,7 +59,7 @@
                     color: '#82b5d8',
                     name: 'Dashboard',
                     data: [
-                        {{ referrerDemographic['conversion']['dashboard'] }}
+                        {{ referrerDemographic['open']['dashboard'] }}
 
                     ]
                 },
@@ -67,14 +67,14 @@
                     color: '#1f78c1',
                     name: 'Homepage',
                     data: [
-                        {{ referrerDemographic['conversion']['homepage'] }}
+                        {{ referrerDemographic['open']['homepage'] }}
                     ]
                 },
                 {
                     color: '#0a437c',
                     name: 'Index',
                     data: [
-                        {{ referrerDemographic['conversion']['index'] }}
+                        {{ referrerDemographic['open']['index'] }}
 
                     ]
                 },
@@ -82,21 +82,21 @@
                     color: '#806eb7',
                     name: 'Archive',
                     data: [
-                        {{ referrerDemographic['conversion']['archive'] }}
+                        {{ referrerDemographic['open']['archive'] }}
                     ]
                 },
                 {
                     color: '#ba43a9',
                     name: 'Email',
                     data: [
-                        {{ referrerDemographic['conversion']['email'] }}
+                        {{ referrerDemographic['open']['email'] }}
                     ]
                 },
                 {
                     color: '#888888',
-                    name: 'Non-referred Opens',
+                    name: 'None',
                     data: [
-                        {{ referrerDemographic['open'] }}
+                        {{ referrerDemographic['open']['unknown'] }}
                     ]
                 }
             ]
