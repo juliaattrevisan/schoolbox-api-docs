@@ -148,6 +148,7 @@ class ImpressionsConversionsOpens
      *
      * @param News\Model $article
      * @return array
+     * @throws \Alaress\Database\Exception
      */
     public function fetchCumulative(News\Model $article): array
     {
@@ -168,6 +169,15 @@ class ImpressionsConversionsOpens
         if ($statistics->count()) {
             $summary['date'] = $statistics->first()->getCreatedAt();
         }
+
+        /* Quantity of Comments
+         */
+        $summary['numComments'] = $this->database->executeQuery('
+            SELECT COUNT(*) AS numComments
+            FROM comms_news_article cna
+            INNER JOIN discussion_thread_comment dtc ON cna.discussion_thread_id = dtc.discussion_thread_id
+            WHERE dtc.deleted_at IS NULL
+        ')->fetch(\PDO::FETCH_ASSOC)['numComments'];
 
         return $summary;
     }
