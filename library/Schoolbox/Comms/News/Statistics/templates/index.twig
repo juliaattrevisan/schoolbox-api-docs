@@ -26,7 +26,7 @@
 <div class="row">
     <div class="small-12 island" id="cumulatives">
         <h2 class="subheader">Cumulative Summary</h2>
-        <p class="meta">Overall cumulative statistics from all time.</p>
+        <p class="meta">Overall cumulative statistics across all time.</p>
 
         {% include '@commsNewsStatistics/cumulative-summary.twig' with {
             cumulative: cumulative
@@ -79,7 +79,7 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Historic Dailies</h2>
-        <p class="meta">Daily cumulative statistics from all time.</p>
+        <p class="meta">Daily statistics from all time.</p>
 
         {% for daily in historic %}
         <section>
