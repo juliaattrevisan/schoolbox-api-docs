@@ -92,10 +92,6 @@ class Controller extends Base
             'scaleOptions' => News\Statistics\Scale\Factory::SCALE_OPTIONS,
             'scale' => News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']),
 
-            /* Interaction Referrers This Period
-             */
-            'referrersThisPeriod' => $impressionsConversionsOpens->fetchInteractionReferrers($article),
-
             /* Historical Dailies
              */
             'historic' => $impressionsConversionsOpens->fetchHistoric($article),
