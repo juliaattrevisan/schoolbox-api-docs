@@ -24,7 +24,17 @@
 
 {% set readonly = interactionLocked and not USER.superUser %}
 
+{# Importing Feedback only applies when Mark Type is something other than None
+ #}
+{% set importFeedback = not assessment.markType.isNone %}
+
 {% block headerOptions %}
+    {% if importFeedback %}
+        <li>
+            <a id="import-feedback" class="icon-upload">Import Feedback</a>
+        </li>
+    {% endif %}
+
     {% if download %}
         <li>
             <a class="icon-download"

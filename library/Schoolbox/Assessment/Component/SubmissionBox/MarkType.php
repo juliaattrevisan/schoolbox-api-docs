@@ -62,6 +62,16 @@ class MarkType
     private $enabled;
 
     /**
+     * This MarkType is "None"
+     *
+     * @return bool
+     */
+    public function isNone(): bool
+    {
+        return $this->slug === self::SLUG_NONE;
+    }
+
+    /**
      * @param string $comment
      * @return static
      */
