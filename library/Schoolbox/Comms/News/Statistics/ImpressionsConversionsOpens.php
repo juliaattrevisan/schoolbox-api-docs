@@ -330,12 +330,12 @@ class ImpressionsConversionsOpens
         $statement = $this->database->prepareQuery("
             SELECT
                 {$strat->getSql()}
-                `type`,
+                role_type,
                 COUNT(*) AS num
             FROM {$this->statisticsMapper->getTable()}
             WHERE article_id = :articleId
             AND deleted_at IS NULL
-            GROUP BY timestamp, `type`
+            GROUP BY timestamp, role_type
             ORDER BY timestamp
         ");
 
@@ -347,12 +347,15 @@ class ImpressionsConversionsOpens
          */
         $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
 
-        $data = [
-            Mapper::TYPE_OPEN => $range
-        ];
+        foreach (Role::getRoleTypes() as $roleType) {
+            $data[$roleType] = $range;
+        }
 
+        /* There's only one Type now (Open)
+         * so we can group by Role Type instead
+         */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][$row['datetime']] = [
+            $data[$row['role_type']][$row['datetime']] = [
                 (int)$row['timestamp'],
                 (int)$row['num'],
                 $row['datetime']
@@ -361,8 +364,8 @@ class ImpressionsConversionsOpens
 
         /* Format it for highcharts to understand
          */
-        foreach ([Mapper::TYPE_OPEN] as $type) {
-            $data[$type] = array_values($data[$type]);
+        foreach (Role::getRoleTypes() as $roleType) {
+            $data[$roleType] = array_values($data[$roleType]);
 
             /* Sort to eliminate anomolous ordering
              *
@@ -372,7 +375,7 @@ class ImpressionsConversionsOpens
              * First encountered setting the period to be longer than 30 days and using the Month scale
              * option but may occur if we misconfigured something
              */
-            usort($data[$type], function($a, $b) {
+            usort($data[$roleType], function($a, $b) {
                 return $a[0] < $b[0];
             });
         }
