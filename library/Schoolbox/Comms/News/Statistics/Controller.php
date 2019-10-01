@@ -114,7 +114,7 @@ class Controller extends Base
         $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
 
         $output = [
-            'interactions' => $impressionsConversionsOpens->fetchOpens($article, $scale),
+            'interactions' => $impressionsConversionsOpens->fetchOpensVsTime($article, $scale),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));

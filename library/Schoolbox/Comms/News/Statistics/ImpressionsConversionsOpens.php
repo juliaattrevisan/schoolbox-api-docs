@@ -276,7 +276,7 @@ class ImpressionsConversionsOpens
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetchOpens(News\Model $article, ?string $scale): array
+    public function fetchOpensVsTime(News\Model $article, ?string $scale): array
     {
 
         /* Determine a sane value
