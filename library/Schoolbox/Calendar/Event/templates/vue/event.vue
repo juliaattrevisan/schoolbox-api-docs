@@ -12,6 +12,7 @@
                 </div>
                 <div class="meta">
                     <span v-html="byLine"></span>
+                    <span v-if="audiencesMeta"> | {{ audiencesMeta }}</span>
                 </div>
                 <article v-html="data.detail"></article>
             </section>
@@ -19,6 +20,9 @@
 
         <div class="small-12 medium-4 island">
             <section class="detail content">
+                <a href="#" class="button icon-approve">RSVP</a>
+                <a href="#" class="button icon-calendar">Add to Calendar</a>
+
                 <h4>Date and Time</h4>
                 <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
 
@@ -42,7 +46,7 @@
         name: "event-details",
         data() {
             return {
-                campusCollection: this.data,
+                event: this.data,
             }
         },
         mounted() {
@@ -81,6 +85,24 @@
                 }
 
                 return ''
+            },
+
+            audiencesMeta: function() {
+                let result = [],
+                    campusCount = this.data.audiences.campus.length,
+                    rolesCount  = this.data.audiences.roles.length;
+
+                if (campusCount) {
+                    let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';
+                    result.push(campusCount + suffix);
+                }
+
+                if (rolesCount) {
+                    let suffix = (rolesCount > 1) ? ' Roles' : ' Role';
+                    result.push(rolesCount + suffix);
+                }
+
+                return result.join(' & ');
             }
         }
     }
