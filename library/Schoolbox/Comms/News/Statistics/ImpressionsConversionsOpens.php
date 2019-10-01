@@ -252,7 +252,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Aggregate values for conversions and impressions for the set of $statistics
+     * Aggregate values for conversions for the set of $statistics
      *
      * @param Collection|Cumulative\Model[] $statistics
      * @return array
@@ -262,7 +262,6 @@ class ImpressionsConversionsOpens
         $breakdown = $this->generateDefaultBreakdown(Mapper::REFERRERS);
 
         $numConversions = 0;
-        $numImpressions = 0;
 
         /** @var Cumulative\Model $statistic */
         foreach ($statistics as $statistic) {
@@ -274,9 +273,7 @@ class ImpressionsConversionsOpens
 
             $breakdown[$statistic->getType()][$referrer] += $statistic->getNum();
 
-            if ($statistic->getType() === Mapper::TYPE_IMPRESSION) {
-                $numImpressions += $statistic->getNum();
-            } elseif ($statistic->getType() === Mapper::TYPE_CONVERSION) {
+            if ($statistic->getType() === Mapper::TYPE_CONVERSION) {
                 $numConversions += $statistic->getNum();
             }
         }
@@ -287,7 +284,6 @@ class ImpressionsConversionsOpens
                 'grid' => $breakdown,
             ],
             'numConversions' => $numConversions,
-            'numImpressions' => $numImpressions,
         ];
     }
 
@@ -347,7 +343,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Get Conversion and Impressions vs Time
+     * Get Conversion  vs Time
      *
      * @param News\Model  $article
      * @param null|string $scale
@@ -383,7 +379,6 @@ class ImpressionsConversionsOpens
 
         $data = [
             Mapper::TYPE_CONVERSION => $range,
-            Mapper::TYPE_IMPRESSION => $range,
             Mapper::TYPE_OPEN => $range
         ];
 
@@ -397,7 +392,7 @@ class ImpressionsConversionsOpens
 
         /* Format it for highcharts to understand
          */
-        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
+        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_OPEN] as $type) {
             $data[$type] = array_values($data[$type]);
 
             /* Sort to eliminate anomolous ordering
@@ -418,7 +413,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Fetch the impressions/conversions for each referrer type for all the granular data in this period
+     * Fetch the conversions for each referrer type for all the granular data in this period
      *
      * @param News\Model  $article
      * @return array
@@ -493,7 +488,6 @@ class ImpressionsConversionsOpens
 
         return [
             Mapper::TYPE_CONVERSION => $defaultValues,
-            Mapper::TYPE_IMPRESSION => $defaultValues,
             Mapper::TYPE_OPEN => $defaultValues,
         ];
     }
