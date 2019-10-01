@@ -5,7 +5,6 @@
  #
  # @param News\Model $article
  # @param array series
- # @param array conversionRatio
  #}
 <script>
     $(function() {
@@ -26,7 +25,7 @@
             },
 
             title: {
-                text: 'Conversion, Impressions Referrers This Period'
+                text: 'Conversion Referrers This Period'
             },
 
             tooltip: {
@@ -50,12 +49,7 @@
                     color: '#82b5d8',
                     name: 'Conversions',
                     data: {{ referrersThisPeriod['conversion']|json_encode|raw }}
-                },
-                {
-                    color: '#f2c96d',
-                    name: 'Impressions',
-                    data: {{ referrersThisPeriod['impression']|json_encode|raw }}
-                },
+                }
                 {
                     color: '#888888',
                     name: 'Non-referred Opens',
