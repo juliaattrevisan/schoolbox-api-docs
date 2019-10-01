@@ -3,10 +3,12 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Weather\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
-use Schoolbox\Weather\ApixuClient;
+use Schoolbox\Weather\Location;
+use Schoolbox\Weather\WeatherstackClient;
 
 /**
  * Class Controller
@@ -37,12 +39,13 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        $location = (new \Schoolbox\Weather\Location())->detect($this->getConfig('url'), $this->getConfigMapper()->getConfigLoader()->get('weather_location'));
+        $location = (new Location())->detect($this->getConfig('url'), $this->getConfigMapper()->getConfigLoader()->get('weather_location'));
 
         // Number of days of forecast to show.
         // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option,
         // so we have to fall back to default
         $forecastLimit = (int)$this->getConfig('size') ?: self::DEFAULT_FORECAST_LIMIT;
+
 
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
         $forecastLimit++;
@@ -50,7 +53,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
 
-        $this->weatherPayload = (new ApixuClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
+        $this->weatherPayload                           = (new WeatherstackClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
         $this->weatherPayload['weeklyForecastLocation'] = $location;
 
         $this->setComponentName("Weather in {$this->weatherPayload['weatherLocation']}");

@@ -1,99 +1,77 @@
-.weather-forecast {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: #fafafa;
-  color: #555;
-  padding: 0.75rem 0 0.75rem 0;
-
-  &.current {
-    background: white;
-    color: black;
+// Shared values between the currrent panels and forecast display on the detail screen
+// and the list view on the dashboard component itself
+.weather-current, .weather-forecast, .weather-list {
+  .hot {
+    color: $hot-color;
+  }
+  .cold {
+    color: $cold-color;
   }
 
-  p {
-    margin: 0;
-    &.hot {
-      color: $hot-color;
-    }
-    &.cold {
-      color: $cold-color;
-    }
-    &.day-heading {
-      font-weight: bold;
-    }
-  }
-
-  img {
-    width: 3rem;
-  }
-}
-
-.weather-list {
-  display: flex;
-  justify-content: space-around;
-  background: white;
-
-  li, li:last-child {
-    border: none;
-    background: none;
-  }
-
-  .weather-summary {
-    margin-bottom: 1rem;
-
-  }
-
-  .temperature-forecast {
-    .meta {
-      margin-right: 1rem;
-    }
+  .current-value {
     font-size: 1rem;
   }
-  @media #{$small-only} {
-    display: block;
-    li {
-      border-bottom: 1px solid #ededed;
+
+  .panel {
+    margin-top: .5rem;
+    text-align: center;
+
+    @media #{$small-only} {
+      border-bottom: 1px solid $body-bg;
     }
   }
 }
 
-/* TODO: This already existed in _content.scss
- * You probably weren't aware this existed lol
- *
- * I've moved it here for you to untangle, since it seems you've reimplemented it
- * There's some kind of interplay between the two .weather-list implementations
- */
+// Detail screen, today's details
+.weather-current {
+  p.temperature {
+    @media #{$medium-up} {
+      margin-top: 1.5rem;
+    }
+  }
+}
 
-/* Weekly Weather display
- */
-.weather-list {
+// Detail screen, all the future days' details
+.weather-forecast {
   @include information-list;
   &.active {
     background-color: $row-hover-background;
   }
+
   li {
     text-align: center;
   }
+
+  .weather-summary {
+    margin-bottom: 1rem;
+  }
+
+  @media #{$small-only} {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
-.weather-list-summary {
+// Dashboard Component
+.weather-list {
   @include information-list;
   .active {
     background-color: $row-hover-background;
   }
-}
 
-/* Separate for usage in component view
- */
-.temperature {
-  text-align: center;
-
-  .hot {
-    color: $hot-color;
-    margin-right: 1rem;
-  }
+  .current-value,
+  .hot,
   .cold {
-    color: $cold-color;
+    @media #{$medium-up} {
+      margin-top: 1.5rem;
+    }
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+
+  .highlighted-day {
+    background: #fafafa;
   }
 }

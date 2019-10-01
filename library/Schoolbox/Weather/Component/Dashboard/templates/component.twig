@@ -13,28 +13,49 @@
             {% if weatherAvailable %}
 
                 <section>
-                    <ul class="weather-list-summary">
-                        <li data-equalizer>
-                            <div class="list-item weather-forecast current">
-                                <p class="day-heading">{{ today.day }}</p>
-
-                                <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}"/>
-                                <p style="width:50px"></p>
-
-                                <p>{{ today.currentTemp }}&deg;C</p>
+                    <ul class="weather-list">
+                        <li class="highlighted-day" data-equalizer>
+                            <div class="list-item">
+                                <div class="row">
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center current-value">Now</p>
+                                    </div>
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center">
+                                            <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}" />
+                                        </p>
+                                    </div>
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center current-value">{{ today.currentTemp }}&deg;C</p>
+                                    </div>
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center current-value">UV Index {{ today.uvIndex}}</p>
+                                    </div>
+                                </div>
                             </div>
                         </li>
+
                         {% for forecastDay in forecastDays %}
-                            <li data-equalizer>
-                                <div class="list-item weather-forecast">
-                                    <p class="day-heading">{{ forecastDay.day }}</p>
-
-                                    <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
-
-                                    <p class="hot">{{ forecastDay.highTemp }}&deg;C</p>
-                                    <p class="cold">{{ forecastDay.lowTemp }}&deg;C</p>
+                        <li>
+                            <div class="list-item">
+                                <div class="row">
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center current-value">{{ forecastDay.day }}</p>
+                                    </div>
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center">
+                                            <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
+                                        </p>
+                                    </div>
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center cold">{{ forecastDay.lowTemp }}&deg;C</p>
+                                    </div>
+                                    <div class="small-12 medium-3 columns">
+                                        <p class="text-center hot">{{ forecastDay.highTemp }}&deg;C</p>
+                                    </div>
                                 </div>
-                            </li>
+                            </div>
+                        </li>
                         {% endfor %}
                     </ul>
 

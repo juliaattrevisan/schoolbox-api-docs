@@ -10,7 +10,7 @@
 namespace Schoolbox\Fixtures\Match;
 
 use \Schoolbox\Fixtures\Match\Model as Match;
-use Schoolbox\Weather\ApixuClient;
+use Schoolbox\Weather\WeatherstackClient;
 
 class Weather
 {
@@ -59,17 +59,17 @@ class Weather
     /**
      * The weather API
      *
-     * @var ApixuClient
+     * @var WeatherstackClient
      */
     private $api;
 
     /**
      * Weather constructor.
      *
-     * @param Match       $match
-     * @param ApixuClient $api
+     * @param Match              $match
+     * @param WeatherstackClient $api
      */
-    public function __construct(Match $match, ApixuClient $api)
+    public function __construct(Match $match, WeatherstackClient $api)
     {
         $this->match = $match;
         $this->api   = $api;

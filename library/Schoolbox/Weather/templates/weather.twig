@@ -21,55 +21,52 @@ Weather details page (linked from dashboard component)
             <ul class="meta">
                 <li>Last updated: {{ today.lastUpdated }}</li>
             </ul>
-            <section>
-                <div class="row collapse">
-                    <ul class="weather-list">
-
-                        <li class="weather-forecast">
-                            <div class="weather-card">
-                                <div class="weather-summary">
-                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" title="{{ today.weatherSummary }}"/>
-                                    <p>{{ today.weatherSummary }}</p>
-                                </div>
-                            </div>
-                        </li>
-
-                        <li class="weather-forecast">
-                            <div class="weather-card">
-                                <p class="meta">Currently</p>
-                                <div class="temperature">
-                                    <p class="temperature-forecast">
-                                        {{ today.currentTemp }}&deg;C
-                                    </p>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="weather-forecast">
-                            <div class="weather-card">
-                                <p class="meta">Temperature</p>
-                                <div class="temperature">
-                                    <p class="temperature-forecast">
-                                        <span class="hot">Hi {{ today.highTemp }}&deg;C</span>
-                                        <span class="cold">Lo {{ today.lowTemp }}&deg;C</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </li>
-
-                        <li class="weather-forecast">
-                            <div class="weather-card">
-                                <p class="meta">Wind</p>
-                                <p class="temperature-forecast">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
-                            </div>
-                        </li>
-
-                        <li class="weather-forecast">
-                            <div class="weather-card">
-                                <p class="meta">Humidity</p>
-                                <p class="temperature-forecast">{{ today.humidity }}%</p>
-                            </div>
-                        </li>
-                    </ul>
+            <section class="weather-current">
+                <div class="row">
+                    <div class="small-12 medium-4 columns">
+                        <div class="panel">
+                            <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" title="{{ today.weatherSummary }}"/>
+                            <p class="current-value">{{ today.weatherSummary }}</p>
+                        </div>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <div class="panel">
+                            <p class="center temperature">
+                                <span class="current-value">{{ today.currentTemp }}&deg;C</span>
+                                <br />
+                                Feels like {{ today.currentTemp}}&deg;C
+                            </p>
+                        </div>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <div class="panel">
+                            <p class="temperature">
+                                <span class="current-value cold">Min {{ today.lowTemp }}&deg;C</span>
+                                <br />
+                                <span class="current-value hot">Max {{ today.highTemp }}&deg;C</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 medium-4 columns">
+                        <div class="panel">
+                            <p class="meta">Wind</p>
+                            <p class="current-value">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
+                        </div>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <div class="panel">
+                            <p class="meta">Humidity</p>
+                            <p class="current-value">{{ today.humidity }}%</p>
+                        </div>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <div class="panel">
+                            <p class="meta">UV Index</p>
+                            <p class="current-value">{{ today.uvIndex }}</p>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -79,39 +76,29 @@ Weather details page (linked from dashboard component)
         <div class="small-12 island">
             <h2 class="subheader">Forecast</h2>
 
-            <section>
-                <div class="row collapse">
-                    <ul class="weather-list">
-                        {% for forecastDay in forecastDays %}
-                            <li class="weather-forecast">
-                                <div class="weather-card">
-                                    <h3>{{ forecastDay.day }}</h3>
-                                    <div class="weather-summary">
-                                        <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
-                                        <p>{{ forecastDay.weatherSummary }}</p>
-                                    </div>
-                                    <p class="temperature">
-                                        <span class="hot">Hi {{ forecastDay.highTemp }}&deg;C</span>
-                                        <span class="cold">Lo {{ forecastDay.lowTemp }}&deg;C</span>
-                                    </p>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
+            <section class="weather-forecast">
+                <div class="row">
+                    {% for forecastDay in forecastDays %}
+                    <div class="small-12 medium-3 columns">
+                        <div class="panel">
+                            <h3>{{ forecastDay.day }}</h3>
+
+                            <div class="weather-summary">
+                                <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
+                                <p>{{ forecastDay.weatherSummary }}</p>
+                            </div>
+
+                            <p class="temperature">
+                                <span class="cold">Min {{ forecastDay.lowTemp }}&deg;C</span><br />
+                                <span class="hot">Max {{ forecastDay.highTemp }}&deg;C</span>
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </section>
         </div>
     </div>
-
-    {#<div class="row"></div>#}
-    {#<div class="small-12 medium-6 columns">#}
-    {#<h2 class="subheader">Weather supplied by</h2>#}
-    {#<section class="content">#}
-    {#<div class="content">#}
-    {#<a href="{{ apiProvider.url }}" target="_blank"><img alt="{{ apiProvider.name }}" src="{{ apiProvider.logo }}" />{{ apiProvider.name }}</a>#}
-    {#</div>#}
-    {#</div>#}
-    {#</div>#}
 
 {% else %}
 

@@ -16,22 +16,22 @@ use Alaress_Date_Format;
  *
  * @package Schoolbox\Weather
  */
-class ApixuClient
+class WeatherstackClient
 {
-    private const PROVIDER_NAME = 'Apixu';
-    private const PROVIDER_URL = 'https://apixu.com';
-    private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
     private const NOW = 'Now';
+
 
     /**
      * @var string
      */
     private $apiKey;
 
+
     /**
      * @var string
      */
     private $apiUrl;
+
 
     /**
      * ApixuClient constructor.
@@ -45,18 +45,19 @@ class ApixuClient
         $this->apiUrl = $apiUrl;
     }
 
+
     /**
      * Get the data from the API in a JSON format usable by Twig
      *
-     * @param int $forecastLimit   How many days to forecast - configurable in component settings
-     * @param string $location     City to get weather for - configurable in component settings
+     * @param int    $forecastLimit How many days to forecast - configurable in component settings
+     * @param string $location      City to get weather for - configurable in component settings
      *
      * @return array
      */
-    public function getForecast(int $forecastLimit, string $location) : array
+    public function getForecast(int $forecastLimit, string $location): array
     {
         try {
-            $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key={$this->apiKey}";
+            $requestUrl = "forecast?query={$location}&forecast_days={$forecastLimit}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             $twigData   = $this->parseWeatherData($response);
         } catch (\Exception $e) {
@@ -65,6 +66,7 @@ class ApixuClient
 
         return $twigData;
     }
+
 
     /**
      * Get weather for particular date and location
@@ -78,16 +80,14 @@ class ApixuClient
     public function getForecastByDate(Alaress_Date_Format $date, $latitude, $longitude)
     {
         try {
-            $requestUrl = "forecast.json?date={$date->getDatabaseDate()}&q={$latitude},{$longitude}&key={$this->apiKey}";
+            $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
-            if (isset($response['forecast']['forecastday'][0]['day'])) {
-                return $response['forecast']['forecastday'][0]['day'];
-            }
-            return [];
+            return $response['forecast']['forecastday'][0]['day'] ?? [];
         } catch (\Exception $e) {
             return [];
         }
     }
+
 
     /**
      * Find $forecastLimit days worth of information about $location
@@ -96,23 +96,31 @@ class ApixuClient
      * @return array
      * @throws \DomainException
      */
-    private function makeRequest(string $requestUrl) : array
+    private function makeRequest(string $requestUrl): array
     {
         // Cache the request
         try {
             $cache = new \Alaress_Weather_Cache();
-            $cache->init($this->apiUrl . $requestUrl);
+            $cache->init("{$this->apiUrl}/{$requestUrl}");
             $response = $cache->getStreamContents();
         } catch (\InvalidArgumentException $e) {
             throw new \DomainException('Invalid Weather API endpoint');
         }
 
         // Attempt to json decode the response body
-        try{
+        try {
             $decodedResponse = json_decode($response, true);
-        } catch (\RuntimeException $e){
+        } catch (\RuntimeException $e) {
             throw new \DomainException('Unable to read Weather API response', $response, $e);
         }
+
+        /* If the api wasn't correctly configured, $responseData returns an array
+         * containing an error message
+         */
+        if (isset($decodedResponse['error'])) {
+            throw new \DomainException("Weather API error: {$decodedResponse['error']['info']}");
+        }
+
 
         // If this is an array, we can assume we got some data back
         if (\is_array($decodedResponse)) {
@@ -131,55 +139,60 @@ class ApixuClient
      * @param array $responseData
      * @return array
      */
-    private function parseWeatherData(array $responseData) : array
+    private function parseWeatherData(array $responseData): array
     {
-        /* If the api wasn't correctly configured, $responseData returns an array
-         * containing an error message
-         */
-        if (isset($responseData['error'])) {
-            return [];
-        }
-
         $twigData = [
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
-            'apiProvider' => [
-                'url' => self::PROVIDER_URL,
-                'name' => self::PROVIDER_NAME,
-                'logo' => self::PROVIDER_LOGO
-            ]
         ];
-
-        $todayLastUpdated = \Alaress_Date_Format::newFromTimestamp($responseData['current']['last_updated_epoch'])->getRelativeTime();
 
         $twigData['today'] = [
-            'day' => $this->getDayOfWeek($responseData['current']['last_updated_epoch']),
-            'weatherSummary' => $responseData['current']['condition']['text'],
-            'weatherIcon' => $responseData['current']['condition']['icon'],
-            'currentTemp' => $responseData['current']['temp_c'],
-            'humidity' => $responseData['current']['humidity'],
-            'windSpeed' => $responseData['current']['wind_kph'],
-            'windDirection' => $responseData['current']['wind_dir'],
-            'lastUpdated' => $todayLastUpdated
+            'day'            => $this->getDayOfWeek(strtotime($responseData['location']['localtime'])),
+
+            /* Weather descriptions and icons now come back as an array
+             * But why would I get multiple of these? I just chose the first one anyway
+             */
+            'weatherSummary' => $responseData['current']['weather_descriptions'][0],
+            'weatherIcon'    => $responseData['current']['weather_icons'][0],
+
+            /* Basic facts
+             */
+            'currentTemp'    => $responseData['current']['temperature'],
+            'feelsLike'      => $responseData['current']['feelslike'],
+            'uvIndex'        => $responseData['current']['uv_index'],
+
+            /* Wind and precipitation (storms)
+             */
+            'humidity'       => $responseData['current']['humidity'],
+            'windSpeed'      => $responseData['current']['wind_speed'],
+            'windDirection'  => $responseData['current']['wind_dir'],
+            'lastUpdated'    => Alaress_Date_Format::newFromTimestamp(strtotime($responseData['location']['localtime']))->getRelativeTime(),
         ];
 
-        foreach($responseData['forecast']['forecastday'] as $forecastDay) {
+        foreach ($responseData['forecast'] as $date => $data) {
             // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
-            if ($this->getDayOfWeek($forecastDay['date_epoch']) === self::NOW) {
-                $twigData['today']['lowTemp'] = $forecastDay['day']['mintemp_c'];
-                $twigData['today']['highTemp'] = $forecastDay['day']['maxtemp_c'];
+            if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
+                $twigData['today']['lowTemp']  = $data['mintemp'];
+                $twigData['today']['highTemp'] = $data['maxtemp'];
                 continue;
             }
 
             $dayForecast = [
-                'day' => $this->getDayOfWeek($forecastDay['date_epoch']),
-                'weatherSummary' => $forecastDay['day']['condition']['text'],
-                'weatherIcon' => $forecastDay['day']['condition']['icon'],
-                'lowTemp' => $forecastDay['day']['mintemp_c'],
-                'highTemp' => $forecastDay['day']['maxtemp_c']
+                'day'            => $this->getDayOfWeek($data['date_epoch']),
+
+                /* Forecast is now broken down hourly
+                 * Just get the midday value (fifth in the stack)
+                 * and the usual first in the stack for description/icon
+                 */
+                'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
+                'weatherIcon'    => $data['hourly'][4]['weather_icons'][0],
+
+                /* Basic facts
+                 */
+                'lowTemp'        => $data['mintemp'],
+                'highTemp'       => $data['maxtemp'],
             ];
 
             $twigData['forecastDays'][] = $dayForecast;
-
         }
 
         // If we've reached this code path, we successfully retrieved the weather data.
@@ -196,10 +209,10 @@ class ApixuClient
      */
     private function getDayOfWeek(int $timestamp): string
     {
-        if (\Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(\Alaress_Date_Format::now())) {
+        if (Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(Alaress_Date_Format::now())) {
             return self::NOW;
         }
 
-        return \Alaress_Date_Format::newFromTimestamp($timestamp)->getUsingFormat('D');
+        return Alaress_Date_Format::newFromTimestamp($timestamp)->getUsingFormat('D');
     }
 }
