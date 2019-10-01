@@ -278,23 +278,13 @@ class ImpressionsConversionsOpens
             }
         }
 
-        /* Calculate overall conversion ratio
-         */
-        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
-
-        /* Calculate conversion ratios for each referrer type
-         */
-        $referrerRatio = $this->calculateReferrerRatios($breakdown);
-
         return [
             'date' => $statistics->count() ? $statistic->getDate() : null,
             'breakdown' => [
                 'grid' => $breakdown,
-                'ratio' => $referrerRatio
             ],
             'numConversions' => $numConversions,
             'numImpressions' => $numImpressions,
-            'conversionRatio' => $conversionRatio
         ];
     }
 
@@ -350,111 +340,6 @@ class ImpressionsConversionsOpens
         }
 
         return $breakdown;
-    }
-
-
-    /**
-     * The average conversion ratio over time
-     *
-     * Fetch data set separately from its previous home in fetchInteractionReferrers()
-     *
-     * @param News\Model  $article
-     * @param string $scale
-     * @return array
-     * @throws \Alaress\Database\Exception
-     */
-    public function fetchConversionRatio(News\Model $article, string $scale): array
-    {
-        /* Determine a sane value
-         */
-        $strat = (new Factory())->produce($scale);
-
-        /* Get all the timestamps that have content - because of the way highcharts stacks its data
-         * I need to initialise the container with all the possibilities and stack categorised data in-order
-         */
-        $statement = $this->database->prepareQuery("
-            SELECT
-                {$strat->getSql()}
-                COUNT(*) AS num,
-                `type`
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            AND deleted_at IS NULL
-            GROUP BY timestamp, `type`
-            ORDER BY timestamp
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $interactions = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $interactions[(int)$row['timestamp']][$row['type']] += $row['num'];
-        }
-
-        /* Figure out the average conversion ratio over time
-         *
-         * First, find out if there were any data points prior to this period
-         * If there were, average all those and use that as a starting point
-         * Otherwise just start at zero (coalesced in sql)
-         */
-        $periodLength = self::PERIOD_LENGTH;
-
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                SUM(num) AS num, 
-                `type`,
-                1000*UNIX_TIMESTAMP(CONCAT(MAX(`date`), ' 00:00:00')) AS start
-            FROM {$this->statisticsCumulativeMapper->getTable()}
-            WHERE article_id = :articleId
-            AND `date` <= CURRENT_DATE - INTERVAL {$periodLength} DAY
-            AND deleted_at IS NULL
-            GROUP BY `type`
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $initialConditions = [
-            Mapper::TYPE_CONVERSION => 0,
-            Mapper::TYPE_IMPRESSION => 0,
-            Mapper::TYPE_OPEN => 0,
-            'num' => 0,
-            'start' => null
-        ];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $initialConditions[$row['type']] = $row['num'];
-            $initialConditions['start'] = $row['start'];
-        }
-
-        $numerator = $initialConditions['conversion'];
-        $denominator = $initialConditions['impression'];
-
-        /* Aggregate by using science
-         * If initialConditions[start] doesn't exist, it's because there was no previous cumulative data
-         * from which to draw initial conditions so the series should just start at the first value of
-         * the current granular data set.
-         */
-        $data = [];
-
-        if ($initialConditions['start']) {
-            $data = [
-                [ (int)$initialConditions['start'], $this->percentage($numerator, $denominator) ]
-            ];
-        }
-
-        foreach ($interactions as $timestamp => $current) {
-            $numerator += $current['conversion'];
-            $denominator += $current['impression'];
-
-            $data[] = [$timestamp, $this->percentage($numerator, $denominator)];
-        }
-
-        return $data;
     }
 
 
@@ -589,64 +474,6 @@ class ImpressionsConversionsOpens
         $percentage = $denominator ? round(100*$numerator/$denominator, $precision) : 0;
 
         return $percentage > 100 ? 100 : $percentage;
-    }
-
-
-    /**
-     * Calculate overall conversion ratio
-     *
-     * @param int $numConversions
-     * @param int $numImpressions
-     * @return float
-     */
-    private function calculateConversionRatio(int $numConversions, int $numImpressions): float
-    {
-        $conversionRatio = 0.00;
-
-        if ($numConversions && $numImpressions) {
-            $conversionRatio = $this->percentage($numConversions, $numImpressions, 1);
-        }
-
-        return $conversionRatio;
-    }
-
-
-    /**
-     * Calculate Conversion ratios for each referrer type
-     *
-     * $breakdown = [
-     *     'conversion' => [
-     *         'dashboard' => 12,
-     *         'homepage' => 34,
-     *         ...
-     *     ],
-     *     'impression' => [
-     *         'dashboard' => 12,
-     *         'homepage' => 34,
-     *         ...
-     *     ],
-     *     'open' => [
-     *         'dashboard' => 12,
-     *         'homepage' => 34,
-     *         ...
-     *     ]
-     * ]
-     *
-     * @param array $breakdown
-     * @return array
-     */
-    private function calculateReferrerRatios(array $breakdown): array
-    {
-        $referrerRatio = [];
-
-        foreach (Mapper::REFERRERS as $referrer) {
-            $numConversions = $breakdown[Mapper::TYPE_CONVERSION][$referrer];
-            $numImpressions = $breakdown[Mapper::TYPE_IMPRESSION][$referrer];
-
-            $referrerRatio[$referrer] = $this->calculateConversionRatio($numConversions, $numImpressions);
-        }
-
-        return $referrerRatio;
     }
 
 
