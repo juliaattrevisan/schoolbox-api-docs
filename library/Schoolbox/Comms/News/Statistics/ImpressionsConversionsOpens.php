@@ -158,7 +158,7 @@ class ImpressionsConversionsOpens
     {
         $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
             ->equals('article_id', $article->getId())
-            ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
+            ->lessThanOrEqualTo('date', \Alaress_Date_Format::now()->getDatabaseDate());
 
         $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
             'order' => [
