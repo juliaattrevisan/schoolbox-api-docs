@@ -9,7 +9,7 @@
     [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
     ['Inline Grader', routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
-    ['Plagscan Report', null]
+    ['Similarity Report', null]
     ] %}
 {% else %}
     {% set nodes = [
@@ -17,7 +17,7 @@
     [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbookForClass', {folderId: assessment.context.folder.id})],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
     ['Inline Grader', routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
-    ['Plagscan Report', null]
+    ['Similarity Report', null]
     ] %}
 {% endif %}
 

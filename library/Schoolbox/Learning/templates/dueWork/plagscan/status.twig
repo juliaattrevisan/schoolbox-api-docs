@@ -19,19 +19,19 @@
             {% if plagscanReport %}
                 <a href="{{ plagscanReport }}">
                     <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
-                    <span title="Plagiarism check completed.">plagiarised</span>
+                    <span title="Similarity check completed.">similar content</span>
                 </a>
             {% else %}
                 <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
-                <span title="Plagiarism check completed.">plagiarised</span>
+                <span title="Similarity check completed.">similar content</span>
             {%  endif %}
         {% elseif currentFile.plagscan.isProcessing %}
-            <span title="Plagiarism check is currently processing - check back again soon.">Calculating plagiarism...</span>
+            <span title="Similarity check is currently processing - check back again soon.">Calculating similarity...</span>
         {% elseif currentFile.plagscan.isPending %}
-            <span title="Plagiarism check has been queued for processing and is pending being sent">Plagiarism check pending</span>
+            <span title="Similarity check has been queued for processing and is pending being sent">Similarity check pending</span>
         {% elseif currentFile.plagscan.isUnscannable %}
-            <span title="Plagiarism check is unavailable.">Plagiarism unavailable</span>
-            <span class='hint has-tip tip-top' title="Plagiarism check is unavailable. Most likely this type of file cannot be checked for plagiarism, or the system is not configured." data-tooltip="">?</span>
+            <span title="Similarity check is unavailable.">Similarity check unavailable</span>
+            <span class='hint has-tip tip-top' title="Similarity check is unavailable. Most likely this type of file cannot be checked for similarity, or the system is not configured." data-tooltip="">?</span>
         {% endif %}
     </p>
 {% endif %}
