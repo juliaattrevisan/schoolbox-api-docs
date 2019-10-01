@@ -162,7 +162,10 @@ class DataSync
      */
     public function synchronise(): void
     {
-        $this->schoolboxDb->beginTransaction();
+        // If not persisting changes, wrap everything in a transaction we will subsequently rollback.
+        if (!$this->persist) {
+            $this->schoolboxDb->beginTransaction();
+        }
 
         $this->log->info("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge     = new Bridge\Account($this->schoolboxDb);
@@ -226,9 +229,7 @@ class DataSync
             new Bridge\CourseSectionDates()
         ))->synchronise();
 
-        if ($this->persist) {
-            $this->schoolboxDb->commit();
-        } else {
+        if (!$this->persist) {
             $this->schoolboxDb->rollBack();
         }
     }
