@@ -172,7 +172,7 @@ class ImpressionsConversionsOpens
         if ($statistics->count()) {
             $summary['date'] = $statistics->first()->getCreatedAt();
         }
-
+new \Alaress_Probe($summary['breakdown']);
         return $summary;
     }
 
@@ -227,7 +227,7 @@ class ImpressionsConversionsOpens
     {
         $breakdown = $this->generateDefaultBreakdown(Mapper::REFERRERS);
 
-        $numConversions = 0;
+        $numOpens = 0;
 
         /** @var Cumulative\Model $statistic */
         foreach ($statistics as $statistic) {
@@ -239,9 +239,7 @@ class ImpressionsConversionsOpens
 
             $breakdown[$statistic->getType()][$referrer] += $statistic->getNum();
 
-            if ($statistic->getType() === Mapper::TYPE_CONVERSION) {
-                $numConversions += $statistic->getNum();
-            }
+            $numOpens += $statistic->getNum();
         }
 
         return [
@@ -249,7 +247,7 @@ class ImpressionsConversionsOpens
             'breakdown' => [
                 'grid' => $breakdown,
             ],
-            'numConversions' => $numConversions,
+            'numOpens' => $numOpens
         ];
     }
 
@@ -453,7 +451,6 @@ class ImpressionsConversionsOpens
         $defaultValues = array_fill_keys($keys, 0);
 
         return [
-            Mapper::TYPE_CONVERSION => $defaultValues,
             Mapper::TYPE_OPEN => $defaultValues,
         ];
     }

@@ -8,8 +8,8 @@
         </div>
         <div class="small-12 medium-4 columns">
             <p class="infographic">
-                <span class="title">Conversions <span class="hint has-tip tip-top" data-tooltip title="The number of people who saw a link with a referrer, and then clicked through to view the {{ locale.news }}">?</span></span>
-                <span class="value">{{ cumulative.numConversions }}</span>
+                <span class="title">Opens <span class="hint has-tip tip-top" data-tooltip title="The number of people who clicked through to view the {{ locale.news }}">?</span></span>
+                <span class="value">{{ cumulative.numOpens }}</span>
             </p>
         </div>
     </div>
@@ -17,41 +17,35 @@
 
 <table class="ico" data-cumulative>
     <thead>
-    <tr>
-        <th>Referrer</th>
-        <th>Conversions</th>
-    </tr>
+        <tr>
+            <th>Referrer</th>
+            <th>Opens</th>
+        </tr>
     </thead>
     <tbody>
-    <tr>
-        <td>Dashboard</td>
-        <td>{{ cumulative.breakdown.grid.conversion.dashboard }}</td>
-    </tr>
-    <tr>
-        <td>Homepage</td>
-        <td>{{ cumulative.breakdown.grid.conversion.homepage }}</td>
-    </tr>
-    <tr>
-        <td>Index</td>
-        <td>{{ cumulative.breakdown.grid.conversion.index }}</td>
-    </tr>
-    <tr>
-        <td>Archive</td>
-        <td>{{ cumulative.breakdown.grid.conversion.archive }}</td>
-    </tr>
-    <tr>
-        <td>Email</td>
-        <td>{{ cumulative.breakdown.grid.conversion.email }}</td>
-    </tr>
+        <tr>
+            <td>Dashboard</td>
+            <td>{{ cumulative.breakdown.grid.open.dashboard }}</td>
+        </tr>
+        <tr>
+            <td>Homepage</td>
+            <td>{{ cumulative.breakdown.grid.open.homepage }}</td>
+        </tr>
+        <tr>
+            <td>Index</td>
+            <td>{{ cumulative.breakdown.grid.open.index }}</td>
+        </tr>
+        <tr>
+            <td>Archive</td>
+            <td>{{ cumulative.breakdown.grid.open.archive }}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>{{ cumulative.breakdown.grid.open.email }}</td>
+        </tr>
+        <tr>
+            <td>None</td>
+            <td>{{ cumulative.breakdown.grid.open.unknown }}</td>
+        </tr>
     </tbody>
 </table>
-
-{% if cumulative.breakdown.grid.open.unknown %}
-<div class="content">
-    <div class="row">
-        <div class="small-12 columns">
-            <p>Additionally, people opened this article <strong>{{ cumulative.breakdown.grid.open.unknown }} times</strong> without a referrer.</p>
-        </div>
-    </div>
-</div>
-{% endif %}

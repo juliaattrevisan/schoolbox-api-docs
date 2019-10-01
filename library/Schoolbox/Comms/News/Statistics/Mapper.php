@@ -20,7 +20,6 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Consts to match schema enums
      */
-    public const TYPE_IMPRESSION = 'impression';
     public const TYPE_CONVERSION = 'conversion';
     public const TYPE_OPEN = 'open';
     public const REFERRER_DASHBOARD = 'dashboard';
@@ -30,6 +29,7 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_INDEX = 'index';
     public const REFERRER_SAVED = 'saved';
     public const REFERRER_SEARCH = 'search';
+    public const REFERRER_UNKNOWN = 'unknown';
 
 
     /**
@@ -49,6 +49,7 @@ class Mapper extends \Schoolbox\Mapper
         self::REFERRER_EMAIL,
         self::REFERRER_SAVED,
         self::REFERRER_SEARCH,
+        self::REFERRER_UNKNOWN
     ];
 
 
