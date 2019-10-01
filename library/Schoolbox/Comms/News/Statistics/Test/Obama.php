@@ -28,7 +28,6 @@ use Schoolbox\UserMapper;
  * Example usage is in www/test.php as follows:
     - Create 50 articles
     - 24*7*4 day duration (1 month)
-    - Don't skew stats to the left
     - 67% chance to open article
 
 
@@ -41,8 +40,7 @@ use Schoolbox\UserMapper;
         \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Cumulative\Mapper::getInstance()
-    ))->generate(50, 24*7*4, false, 67);
-
+    ))->generate(1, 24*7*4, 67);
 
  *
  * @package Schoolbox\Comms\News\Statistics\Test
@@ -568,14 +566,13 @@ class Obama
      *
      * @param int  $numArticles
      * @param int  $duration              Number of hours for which to populate data
-     * @param bool $skewedStatistics      True when emphasis is placed on leftmost values
      * @param int  $directOpenLikelihood
      * @throws Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function generate(int $numArticles, int $duration, bool $skewedStatistics, int $directOpenLikelihood): void
+    public function generate(int $numArticles, int $duration, int $directOpenLikelihood): void
     {
         new \Alaress_Probe("Creating {$numArticles} articles using {$directOpenLikelihood}% Open rate over {$duration} hours");
 
