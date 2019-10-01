@@ -7,7 +7,24 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event;
 
-class Controller
-{
+use Alaress\Database\Connector\IConnector;
+use Alaress\Web\Controller\Base;
 
+class Controller extends Base
+{
+    /**
+     * @var IConnector
+     */
+    private $databaseInternal;
+
+    public function __construct(IConnector $databaseInternal)
+    {
+        $this->databaseInternal           = $databaseInternal;
+    }
+
+    public function getEvent()
+    {
+        echo 'test';
+        die();
+    }
 }
