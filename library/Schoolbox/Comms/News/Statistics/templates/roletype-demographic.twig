@@ -43,7 +43,7 @@
             },
 
             xAxis: {
-                categories: ['Conversions', 'Impressions', 'Non-referred Opens']
+                categories: ['Conversions', 'Non-referred Opens']
             },
 
             yAxis: {
@@ -60,7 +60,6 @@
                     name: 'Staff',
                     data: [
                         {{ roleTypeDemographic['conversion']['staff'] }},
-                        {{ roleTypeDemographic['impression']['staff'] }},
                         {{ roleTypeDemographic['open']['staff'] }},
 
                     ]
@@ -70,7 +69,6 @@
                     name: 'Parent',
                     data: [
                         {{ roleTypeDemographic['conversion']['parent'] }},
-                        {{ roleTypeDemographic['impression']['parent'] }},
                         {{ roleTypeDemographic['open']['parent'] }}
                     ]
                 },
@@ -79,7 +77,6 @@
                     name: 'Student',
                     data: [
                         {{ roleTypeDemographic['conversion']['student'] }},
-                        {{ roleTypeDemographic['impression']['student'] }},
                         {{ roleTypeDemographic['open']['student'] }}
 
                     ]
@@ -89,7 +86,6 @@
                     name: 'Guest',
                     data: [
                         {{ roleTypeDemographic['conversion']['guest'] }},
-                        {{ roleTypeDemographic['impression']['guest'] }},
                         {{ roleTypeDemographic['open']['guest'] }}
                     ]
                 }
