@@ -86,7 +86,7 @@ class ImpressionsConversionsOpens
      */
     public function saveOpen(News\Model $article, int $userId, string $roleType, int $roleId, ?string $referrer)
     {
-        /* Only record Conversions for publicly-accessible articles
+        /* Only record Opens for publicly-accessible articles
          */
         if (!$article->isPublished() && !$article->isExpired()) {
             return false;
@@ -101,9 +101,6 @@ class ImpressionsConversionsOpens
         /* Opens come in two flavours:
          *  - with a null referrer (which means they accessed the url directly)
          *  - with a non-null referrer (which means they came from some other link we provided)
-         *
-         * Null referrers (direct opens) are recorded separately from Conversions which are
-         * opens that occur with a non-null referrer.
          */
         $model = $this->statisticsMapper->createModel()
             ->setArticleId($article->getId())
@@ -116,12 +113,12 @@ class ImpressionsConversionsOpens
 
         /* Record uniques only
          * If the current (articleId, userId, referrer) tuple exists in the db
-         * don't record a dupe Conversion, nor increment the cumulative tally
+         * don't record a dupe Open, nor increment the cumulative tally
          *
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
-         * increment cumulative total if (and only if) a unique Conversion was made
+         * increment cumulative total if (and only if) a unique Open was made
          */
-        $existingConversion = $this->statisticsMapper->countByColumnList([
+        $existingOpen = $this->statisticsMapper->countByColumnList([
             'article_id' => $article->getId(),
             'type' => Mapper::TYPE_OPEN,
             'user_id' => $userId,
@@ -131,10 +128,9 @@ class ImpressionsConversionsOpens
         ]);
 
         /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
-         * Otherwise, this (user, referrer) combination indicates a new conversion or a new open
-         * for this particular user
+         * Otherwise, this (user, referrer) combination indicates a new Open for this particular user
          */
-        if ($existingConversion) {
+        if ($existingOpen) {
             return false;
         }
 
@@ -172,7 +168,7 @@ class ImpressionsConversionsOpens
         if ($statistics->count()) {
             $summary['date'] = $statistics->first()->getCreatedAt();
         }
-new \Alaress_Probe($summary['breakdown']);
+
         return $summary;
     }
 
@@ -218,7 +214,7 @@ new \Alaress_Probe($summary['breakdown']);
 
 
     /**
-     * Aggregate values for conversions for the set of $statistics
+     * Aggregate values for Opens for the set of $statistics
      *
      * @param Collection|Cumulative\Model[] $statistics
      * @return array
@@ -307,7 +303,7 @@ new \Alaress_Probe($summary['breakdown']);
 
 
     /**
-     * Get Conversion  vs Time
+     * Get Opens vs Time
      *
      * @param News\Model  $article
      * @param null|string $scale
@@ -342,7 +338,6 @@ new \Alaress_Probe($summary['breakdown']);
         $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
 
         $data = [
-            Mapper::TYPE_CONVERSION => $range,
             Mapper::TYPE_OPEN => $range
         ];
 
@@ -356,7 +351,7 @@ new \Alaress_Probe($summary['breakdown']);
 
         /* Format it for highcharts to understand
          */
-        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_OPEN] as $type) {
+        foreach ([Mapper::TYPE_OPEN] as $type) {
             $data[$type] = array_values($data[$type]);
 
             /* Sort to eliminate anomolous ordering
@@ -377,7 +372,7 @@ new \Alaress_Probe($summary['breakdown']);
 
 
     /**
-     * Fetch the conversions for each referrer type for all the granular data in this period
+     * Fetch the Opens for each referrer type for all the granular data in this period
      *
      * @param News\Model  $article
      * @return array
