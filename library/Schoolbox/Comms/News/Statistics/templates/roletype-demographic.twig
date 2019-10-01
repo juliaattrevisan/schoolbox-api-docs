@@ -43,7 +43,7 @@
             },
 
             xAxis: {
-                categories: ['Conversions', 'Non-referred Opens']
+                categories: ['Opens']
             },
 
             yAxis: {
@@ -59,16 +59,13 @@
                     color: '#82b5d8',
                     name: 'Staff',
                     data: [
-                        {{ roleTypeDemographic['conversion']['staff'] }},
-                        {{ roleTypeDemographic['open']['staff'] }},
-
+                        {{ roleTypeDemographic['open']['staff'] }}
                     ]
                 },
                 {
                     color: '#1f78c1',
                     name: 'Parent',
                     data: [
-                        {{ roleTypeDemographic['conversion']['parent'] }},
                         {{ roleTypeDemographic['open']['parent'] }}
                     ]
                 },
@@ -76,7 +73,6 @@
                     color: '#0a437c',
                     name: 'Student',
                     data: [
-                        {{ roleTypeDemographic['conversion']['student'] }},
                         {{ roleTypeDemographic['open']['student'] }}
 
                     ]
@@ -85,7 +81,6 @@
                     color: '#806eb7',
                     name: 'Guest',
                     data: [
-                        {{ roleTypeDemographic['conversion']['guest'] }},
                         {{ roleTypeDemographic['open']['guest'] }}
                     ]
                 }
