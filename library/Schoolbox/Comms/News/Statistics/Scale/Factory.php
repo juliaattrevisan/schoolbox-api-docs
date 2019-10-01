@@ -26,8 +26,6 @@ class Factory
      * @var array
      */
     public const SCALE_OPTIONS = [
-        '10min'     => 10,
-        '30min'     => 30,
         'hour'      => 60,
         'day'       => 60*24,
         'month'     => 60*24*31,
