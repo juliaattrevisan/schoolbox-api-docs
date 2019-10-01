@@ -151,10 +151,15 @@ class ImpressionsConversionsOpens
      * @param News\Model $article
      * @return array
      * @throws \Alaress\Database\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function fetchCumulative(News\Model $article): array
     {
-        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+        $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
+            ->equals('article_id', $article->getId())
+            ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
+
+        $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
             'order' => [
                 'date' => 'asc'
             ]
