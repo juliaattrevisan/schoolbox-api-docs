@@ -4,7 +4,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
@@ -31,15 +30,18 @@ class ImpressionsConversionsOpens
      */
     public const PERIOD_LENGTH = 30;
 
+
     /**
      * @var IConnector
      */
     private $database;
 
+
     /**
      * @var Mapper
      */
     private $statisticsMapper;
+
 
     /**
      * @var Cumulative\Mapper
