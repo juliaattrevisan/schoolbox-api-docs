@@ -116,7 +116,6 @@ class Controller extends Base
          */
         $output = [
             'interactions' => $impressionsConversionsOpens->fetchConversions($article, $scale),
-            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $scale),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));
