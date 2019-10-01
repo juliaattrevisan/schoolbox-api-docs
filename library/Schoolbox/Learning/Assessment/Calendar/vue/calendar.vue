@@ -37,9 +37,6 @@
             this.termStartDate = this.config.termDates.current.start;
             this.termEndDate = this.config.termDates.current.end;
         },
-        mounted() {
-            this.termDuration = this.getTermDateDurations();
-        },
         data() {
             return {
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin ],
@@ -56,7 +53,6 @@
                 defaultBgColour: '#0066b0',
                 maxDate: null,
                 minDate: null,
-                termDuration: 10,
             }
         },
         computed: {
@@ -367,7 +363,6 @@
 
                 self.maxDate = self.getMaxTermDate();
                 self.minDate = self.getMinTermDate();
-                self.termDuration = self.getTermDateDurations();
             },
 
             /**
@@ -558,6 +553,16 @@
             currentViewIsSemester() {
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
             },
+            determineVisibleRange(currentDate) {
+                // Find the range in the list of terms
+                let dateString = this.toMoment(currentDate).format('YYYY-MM-DD'),
+                    allTerms   = this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future);
+                for (let term of allTerms) {
+                    if (dateString >= term.start && dateString <= term.end) {
+                        return term;
+                    }
+                }
+            },
         }
     }
 </script>
@@ -578,8 +583,8 @@
             :plugins="calendarPlugins"
             :views="{
                 resourceTimelineSemester: {
-                    type: 'resourceTimelineYear',
-                    duration: { days: this.termDuration },
+                    type: 'resourceTimeline',
+                    visibleRange: this.config.termDates.current,
                     slotDuration: { weeks: 1 },
                     weekNumbers: true,
                     slotLabelFormat: [
