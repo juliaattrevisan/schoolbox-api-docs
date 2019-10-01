@@ -3,7 +3,7 @@
         <div class="row">
             <div class="small-12 medium-4 columns">
                 <p class="infographic">
-                    <span class="title">{% block cumulativeDateHeading %}First Open <span class='hint has-tip tip-top' data-tooltip title="The date when the {{ locale.news }} was first opened">?</span>{% endblock %}</span>
+                    <span class="title">First Open <span class='hint has-tip tip-top' data-tooltip title="The date when the {{ locale.news }} was first opened">?</span></span>
                     <span class="value">{% if cumulative.date %}{{ cumulative.date|date('j M') }}{% else %}n/a{% endif %}</span>
                 </p>
             </div>

@@ -1,5 +1,18 @@
-{% extends '@commsNewsStatistics/cumulative-summary.twig' %}
-
-{% block cumulativeDateHeading %}
-Date
-{% endblock %}
+<table>
+    <thead>
+        <tr>
+            <th class="text-center">Date</th>
+            <th class="text-center">Opens</th>
+            <th class="text-center">Comments</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for daily in historic %}
+        <tr>
+            <td class="text-center">{% if daily.date %}{{ daily.date|date('j M') }}{% else %}n/a{% endif %}</td>
+            <td class="text-center">{{ daily.numOpens }}</td>
+            <td class="text-center">{{ daily.numComments }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
