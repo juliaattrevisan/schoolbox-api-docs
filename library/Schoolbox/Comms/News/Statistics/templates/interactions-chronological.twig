@@ -23,7 +23,7 @@
                         height: 500,
                         panning: true,
                         panKey: 'shift',
-                        renderTo: 'conversions-chronological',
+                        renderTo: 'opens-chronological',
                         spacingBottom: 64,
                         type: 'line',
                         zoomType: 'xy'
@@ -44,7 +44,7 @@
                     },
 
                     title: {
-                        text: 'Conversions vs Time'
+                        text: 'Opens vs Time'
                     },
 
                     tooltip: {
@@ -81,12 +81,7 @@
                     series: [
                         {
                             color: '#82b5d8',
-                            name: 'Conversions',
-                            data: data.interactions.conversion
-                        },
-                        {
-                            color: '#888888',
-                            name: 'Non-referred Opens',
+                            name: 'Opens',
                             data: data.interactions.open
                         }
                     ]
@@ -122,4 +117,4 @@
     </select>
 </section>
 
-<div id="conversions-chronological"></div>
+<div id="opens-chronological"></div>
