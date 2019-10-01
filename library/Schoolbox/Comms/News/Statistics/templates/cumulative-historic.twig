@@ -19,7 +19,7 @@
     <tbody>
         {% for daily in historic %}
         <tr>
-            <td class="text-center">{% if daily.date %}{{ daily.date|date('j M') }}{% else %}n/a{% endif %}</td>
+            <td class="text-center" data-order="{{ daily.date|date('U') }}">{% if daily.date %}{{ daily.date|date('j M') }}{% else %}n/a{% endif %}</td>
             <td class="text-center">{{ daily.numOpens }}</td>
             <td class="text-center">{{ daily.numComments }}</td>
         </tr>
