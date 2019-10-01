@@ -170,7 +170,7 @@ class ImpressionsConversionsOpens
 
             /* First open (a specific alteration for this data set)
              */
-            'date' => $statistics->count() ? $statistics->first()->getCreatedAt() : null,
+            'date' => $statistics->count() ? $statistics->first()->getDate() : null,
 
             /* Total number of Opens across all time
              */
