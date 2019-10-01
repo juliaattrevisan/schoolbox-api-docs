@@ -104,7 +104,7 @@ class Controller extends Base
 
 
     /**
-     * Get the json payload to populate "Conversions, Impressions vs Time" graph so that
+     * Get the json payload to populate "Opens vs Time" graph so that
      * when you change scale, only the graph updates, instead of the whole page kek
      *
      * @api GET /news/statistics/{articleId}/interactions
@@ -117,9 +117,6 @@ class Controller extends Base
         $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
         $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
 
-        /* Conversions and Impressions vs Time,
-         * Conversion Ratio vs Time
-         */
         $output = [
             'interactions' => $impressionsConversionsOpens->fetchOpens($article, $scale),
         ];
