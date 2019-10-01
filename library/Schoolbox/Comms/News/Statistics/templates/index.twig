@@ -75,20 +75,20 @@
  # continue to capture enough data points to show this kind of information
  # such that we can enable/re-present this later.
  #}
-{#{% if historic|length %}#}
-{#<div class="row">#}
-    {#<div class="small-12 island">#}
-        {#<h2 class="subheader">Historic Dailies</h2>#}
-        {#<p class="meta">Daily cumulative statistics from all time.</p>#}
+{% if historic|length %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Historic Dailies</h2>
+        <p class="meta">Daily cumulative statistics from all time.</p>
 
-        {#{% for daily in historic %}#}
-        {#<section>#}
-            {#{% include '@commsNewsStatistics/cumulative-historic.twig' with {#}
-                {#cumulative: daily#}
-            {#} %}#}
-        {#</section>#}
-        {#{% endfor %}#}
-    {#</div>#}
-{#</div>#}
-{#{% endif %}#}
+        {% for daily in historic %}
+        <section>
+            {% include '@commsNewsStatistics/cumulative-historic.twig' with {
+                cumulative: daily
+            } %}
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 

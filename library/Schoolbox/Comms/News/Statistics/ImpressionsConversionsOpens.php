@@ -190,6 +190,7 @@ class ImpressionsConversionsOpens
      * @param News\Model $article
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Alaress\Database\Exception
      */
     public function fetchHistoric(News\Model $article): array
     {
@@ -197,7 +198,7 @@ class ImpressionsConversionsOpens
             ->equals('article_id', $article->getId())
             ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
 
-        $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
+        $dailyStatistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
             'order' => [
                 'date' => 'asc'
             ]
@@ -205,22 +206,44 @@ class ImpressionsConversionsOpens
 
         /* Group by date
          */
-        $stack = [];
-
-        /** @var Cumulative\Model $statistic */
-        foreach ($statistics as $statistic) {
-            $stack[$statistic->getDate()->getDatabase()][] = $statistic;
-        }
-
-        /* Process each day's data
-         */
         $historic = [];
 
-        foreach ($stack as $date => $statistics) {
-            $historic[] = $this->summariseDailyStatistics(new Collection($statistics));
+        /** @var Cumulative\Model $statistic */
+        foreach ($dailyStatistics as $dailyStatistic) {
+            $node = [
+                'date' => $dailyStatistic->getDate()->getDatabase(),
+                'numOpens' => $this->calculateNumOpens((new Collection())->add($dailyStatistic)),
+                'numComments' => $this->calculateNumComments($article)
+            ];
+
+            $historic[] = $node;
         }
 
         return $historic;
+    }
+
+
+    /**
+     * Calculate number of comments for a given article
+     * @param News\Model $article
+     * @return int
+     * @throws \Alaress\Database\Exception
+     */
+    private function calculateNumComments(News\Model $article): int
+    {
+        $statement = $this->database->prepareQuery('
+            SELECT COUNT(*) AS numComments
+            FROM comms_news_article cna
+            INNER JOIN discussion_thread_comment dtc ON cna.discussion_thread_id = dtc.discussion_thread_id
+            WHERE dtc.deleted_at IS NULL
+            AND cna.id = :articleId
+        ');
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        return (int)$statement->fetch(\PDO::FETCH_ASSOC)['numComments'];
     }
 
 
