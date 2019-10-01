@@ -336,7 +336,7 @@ class ImpressionsConversionsOpens
             WHERE article_id = :articleId
             AND deleted_at IS NULL
             GROUP BY timestamp, role_type
-            ORDER BY timestamp
+            ORDER BY timestamp ASC
         ");
 
         $statement->execute([
@@ -376,7 +376,7 @@ class ImpressionsConversionsOpens
              * option but may occur if we misconfigured something
              */
             usort($data[$roleType], function($a, $b) {
-                return $a[0] < $b[0];
+                return $a[0] > $b[0];
             });
         }
 
