@@ -34,6 +34,7 @@ class MockApi implements IApi
         $this->file = $file;
     }
 
+
     /**
      * Retrieves a XML document representing the result from the API call.
      *

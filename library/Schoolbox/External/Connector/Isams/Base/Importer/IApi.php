@@ -7,6 +7,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+/**
+ * Interface IApi
+ *
+ * Api and MockApi must implement these methods
+ *
+ * @package Schoolbox\External\Connector\Isams\Base\Importer
+ */
 interface IApi
 {
 

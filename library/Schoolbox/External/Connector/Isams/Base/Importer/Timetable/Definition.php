@@ -36,6 +36,7 @@ class Definition implements IStrategy
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
 
+
     /**
      * @var LoggerInterface
      */

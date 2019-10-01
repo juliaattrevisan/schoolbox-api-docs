@@ -63,10 +63,28 @@ class Batchxml
      */
     public function fetchXml(string $path): array
     {
+        /* If you need to see the raw xml data from your chosen endpoint
+         * you can drop a printxml() here, which does some minor formatting to
+         * make it vaguely bearable to read
+         *
+         * $this->printXml();
+         */
         if (!$this->nodes) {
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }
 
         return $this->nodes->xpath($path);
+    }
+
+
+    /**
+     * Use this to print a vaguely-formatted version to a file for manual inspection
+     *
+     * e.g. php profileImporter.php > test.xml
+     */
+    private function printXml(): void
+    {
+        print_r(str_replace(['<', '/>'], ["\n<", "/>\n"], $this->api->retrieveDocument()));
+        die();
     }
 }

@@ -90,9 +90,6 @@ class Profile implements IStrategy
      * @param UserProfile\Parent\Mapper   $parentProfileMapper
      * @param UserProfile\Staff\Mapper    $staffProfileMapper
      * @param UserProfile\Relation\Mapper $relationMapper
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
     public function __construct(
         LoggerInterface $log,
@@ -132,9 +129,7 @@ class Profile implements IStrategy
         /* Purge old relations before re-inserting them
          */
         if ($this->perform) {
-            $this->relationMapper->getDatabase()->query("
-                DELETE FROM {$this->relationMapper->getTable()}
-            ");
+            $this->relationMapper->truncate();
         }
 
         /* Import students' profile data
@@ -197,6 +192,10 @@ class Profile implements IStrategy
             $username = trim((string)$student->SchoolCode);
             $firstname = trim((string)$student->Preferredname);
             $lastname = trim((string)$student->Surname);
+            $studentId = trim((string)$student->xpath('@Id')[0]);
+            $yearLevel = trim((string)$student->NCYear);
+            $form = trim((string)$student->Form);
+            $academicHouse = trim((string)$student->AcademicHouse);
 
             /* Students without usernames are skipped
              */
@@ -242,67 +241,73 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
 
-            /* Assign campuses if they exist in the mapping
-             * Otherwise quietly disregard bad data
-             */
-            $campusName = null;
-
-            if (isset($campusMapping[(int)$student->NCYear])) {
-                $campusName = $campusMapping[(int)$student->NCYear]->getName();
-            }
-
             /* Fish out a staff member via their user code
              */
             $tutor = $this->findTutor((string)$student->Tutor);
 
             /* Fish out a staff member via their user code
              */
-            $housemaster = $this->findHousemaster((string)$student->AcademicHouse);
+            $housemaster = $this->findHousemaster($academicHouse);
 
-            /* Find out enrolment date if it exists
+            /* Find out a staff member via their user code
              */
-            $enrolmentDate = null;
+            $formTeacher = $this->findFormTeacher($form);
 
-            if (trim((string)$student->EnrolmentDate)) {
-                $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->EnrolmentDate)));
-            }
+            /* Find out a staff member via their user code
+             */
+            $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
+
+            /* Add their parents' profile data
+             * Messages come from parents' nodes
+             */
+            $messages = $this->importParentsOfStudent($externalId, $studentBaseProfile);
 
             /* Smoosh it all together
              */
             $studentProfile
                 ->setUsername($username)
-                ->setAlertComment(null)
+                ->setAlertComment($this->findComments($studentId))
                 ->setAlertLegal(null)
-                ->setAlertMedical(null)
-                ->setAlertMessage(null)
-                ->setCampusName($campusName)
+                ->setAlertMedical($this->findMedicalAlert($studentId))
+                ->setAlertMessage($messages)
+                ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
                 ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
                 ->setEmail(trim((string)$student->EmailAddress))
-                ->setEnrolmentDate($enrolmentDate)
-                ->setFormName(trim((string)$student->Form))
-                ->setFormTeacherId(null)
-                ->setFormTeacherName(null)
+                ->setEnrolmentDate($this->findEnrolmentDate(trim((string)$student->EnrolmentDate)))
+                ->setFormName($form)
+                ->setFormTeacherId($formTeacher['id'])
+                ->setFormTeacherName($formTeacher['name'])
                 ->setGender(trim((string)$student->Gender))
-                ->setHeadOfHouseId($housemaster['housemasterId'])
-                ->setHeadOfHouseName($housemaster['housemasterName'])
-                ->setHouseName(trim((string)$student->AcademicHouse))
+                ->setHeadOfHouseId($housemaster['id'])
+                ->setHeadOfHouseName($housemaster['name'])
+                ->setHouseName($academicHouse)
                 ->setLeavingDate(null)
                 ->setMobile(trim((string)$student->MobileNumber))
-                ->setStudiesCode(null)
+                ->setStudiesCode(trim((string)$student->UPN))
                 ->setTutorGroup(null)
-                ->setTutorTeacherId($tutor['tutorId'])
-                ->setTutorTeacherName($tutor['tutorName'])
-                ->setYearLevel((string)$student->NCYear)
-                ->setYearLevelCoordinatorId(null)
-                ->setYearLevelCoordinatorName(null)
+                ->setTutorTeacherId($tutor['id'])
+                ->setTutorTeacherName($tutor['name'])
+                ->setYearLevel($yearLevel)
+                ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
+                ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
 
-                /* Flags
+                /**
+                 * Flags
+                 */
+
+                /* Boarding Status comes from ISAMS as a client-configurable value
+                 *
+                 * We can't check for this effectively unless we predetermine what these
+                 * statuses could contain and what those statuses mean
                  */
                 ->setBoardingStatus(false)
                 ->setEsl(null)
                 ->setIb(null)
                 ->setIndividualLearningPlans(null)
-                ->setSpecialNeeds(false);
+
+                /* SEN (Special Education Needs)
+                 */
+                ->setSpecialNeeds($this->findSpecialNeeds($studentId));
 
             /* Log it
              */
@@ -316,39 +321,87 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->studentProfileMapper->save($studentProfile);
             }
-
-            /* Add their parents' profile data
-             */
-            $this->importParentsOfStudent($externalId, $studentBaseProfile);
         }
+    }
+
+
+    /**
+     * Find campus name
+     *
+     * Assign campuses if they exist in the mapping
+     * Otherwise quietly disregard bad data
+     *
+     * @param array $campusMapping
+     * @param int   $yearLevel
+     * @return string|null
+     */
+    private function findCampusName(array $campusMapping, int $yearLevel): ?string
+    {
+        if (isset($campusMapping[$yearLevel])) {
+            return $campusMapping[$yearLevel]->getName();
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Find the enrolment date for student
+     *
+     * @param string $date
+     * @return \Alaress_Date_Format|null
+     */
+    private function findEnrolmentDate(string $date): ?\Alaress_Date_Format
+    {
+        $enrolmentDate = null;
+
+        if ($date) {
+            $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime($date));
+        }
+
+        return $enrolmentDate;
+    }
+
+
+    /**
+     * Find comments info for a given student
+     *
+     * @param string $studentId
+     * @return string
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findComments(string $studentId): string
+    {
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SENManager/Requirements/Type[@PupilId='{$studentId}']");
+
+        $comments = [];
+
+        if ($nodes) {
+            foreach($nodes as $node) {
+                $comments[] = trim((string)$node->Type);
+            }
+        }
+
+        /* Glue together
+         */
+        return implode("\n", $comments);
     }
 
 
     /**
      * Find a tutor from their id
      *
-     * @param string $tutorId
+     * @param string $id
      * @return array
      * @throws \RuntimeException
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function findTutor(string $tutorId): array
+    private function findTutor(string $id): array
     {
-        $tutorName = null;
-
-        $tutorId = trim($tutorId);
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$tutorId}')]");
-
-        if ($node) {
-            $tutor = $node[0];
-            $tutorName = trim((string)$tutor->FullName);
-        }
-
-        return [
-            'tutorId' => $tutorId,
-            'tutorName' => $tutorName,
-        ];
+        return $this->findStaffMemberById(trim($id));
     }
 
 
@@ -363,28 +416,141 @@ class Profile implements IStrategy
      */
     private function findHousemaster(string $houseName): array
     {
-        $housemasterId = null;
-        $housemasterName = null;
-
         $houseName = trim($houseName);
-        $node = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
 
-        if ($node) {
-            $house = $node[0];
-
-            $housemasterId = trim((string)$house->HouseMaster);
-            $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$housemasterId}')]");
-
-            if ($node) {
-                $housemaster = $node[0];
-                $housemasterName = trim((string)$housemaster->FullName);
-            }
+        if ($nodes) {
+            return $this->findStaffMemberById(trim((string)$nodes[0]->HouseMaster));
         }
 
         return [
-            'housemasterId' => $housemasterId,
-            'housemasterName' => $housemasterName
+            'id' => null,
+            'name' => null
         ];
+    }
+
+
+    /**
+     * Find a form teacher from their form code
+     *
+     * @param string $form
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findFormTeacher(string $form): array
+    {
+        $form = trim($form);
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Forms/Form[@Id='{$form}']");
+
+        if ($nodes) {
+            return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
+        }
+
+        return [
+            'id' => null,
+            'name' => null
+        ];
+    }
+
+
+    /**
+     * Find a year level coordinator from their year level
+     *
+     * @param string $year
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findYearLevelCoordinator(string $year): array
+    {
+        $year = trim($year);
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[contains(Code, '{$year}')]");
+
+        if ($nodes) {
+            return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
+        }
+
+        return [
+            'id' => null,
+            'name' => null
+        ];
+    }
+
+
+    /**
+     * Find a staff member's node based on identifier $id
+     *
+     * @param string $id
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findStaffMemberById(string $id): array
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
+
+        $name = '';
+
+        if ($node) {
+            $staffMember = $node[0];
+            $name = trim((string)$staffMember->FullName);
+        }
+
+        return [
+            'id' => $id,
+            'name' => $name
+        ];
+    }
+
+
+    /**
+     * Find medical data for student id $studentId
+     * This isn't their external id. It's their isams internal PupilId
+     *
+     * @param string $studentId
+     * @return string|null
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findMedicalAlert(string $studentId): ?string
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id='{$studentId}']");
+
+        /* TODO: HealthNotes DentalNotes HearingNotes OpthalmicNotes could denote Medical Alerts
+         * We keep it simple for now
+         */
+        if ($node && $node[0]->HealthNotes) {
+            return trim((string)$node[0]->HealthNotes);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Find out if $studentId is on the SEN (Special Education Needs) Registry
+     * and that their RegisterFlag > 0
+     *
+     * @param string $studentId
+     * @return bool
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findSpecialNeeds(string $studentId): bool
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/SENManager/SEN/Register[@PupilId='{$studentId}']/RegisterFlag[. > 0]");
+
+        if ($node) {
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -429,6 +595,7 @@ class Profile implements IStrategy
      *
      * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
+     * @return string
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws \PDOException
@@ -437,7 +604,7 @@ class Profile implements IStrategy
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): string
     {
         /* Find the parents/guardians of this student
          * To do it, we need a specific id value for $student
@@ -459,6 +626,11 @@ class Profile implements IStrategy
          */
         $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
         $parents = $this->batchxml->fetchXml($path);
+
+        /* As per Duane's conclusion:
+         * A contact's aggregated SOS field equates to Message Alerts for their student
+         */
+        $messages = [];
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
@@ -554,7 +726,13 @@ class Profile implements IStrategy
 
                 $this->relationMapper->save($relation);
             }
+
+            /* Accumulate messages
+             */
+            $messages[] = trim((string)$parent->SOS);
         }
+
+        return implode("\n", $messages);
     }
 
 
