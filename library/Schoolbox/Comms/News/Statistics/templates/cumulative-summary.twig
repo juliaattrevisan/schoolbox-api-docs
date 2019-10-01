@@ -12,12 +12,6 @@
                 <span class="value">{{ cumulative.numConversions }}</span>
             </p>
         </div>
-        <div class="small-12 medium-4 columns">
-            <p class="infographic">
-                <span class="title tip-top" data-tooltip title="The percentage of impressions that led to viewing of a {{ locale.news }} expressed as conversions/impressions">Conversion Ratio % <span class="hint has-tip">?</span></span>
-                <span class="value">{{ cumulative.conversionRatio }}</span>
-            </p>
-        </div>
     </div>
 </div>
 
@@ -26,34 +20,28 @@
     <tr>
         <th>Referrer</th>
         <th>Conversions</th>
-        <th>Conversion Ratio (%)</th>
     </tr>
     </thead>
     <tbody>
     <tr>
         <td>Dashboard</td>
         <td>{{ cumulative.breakdown.grid.conversion.dashboard }}</td>
-        <td>{{ cumulative.breakdown.ratio.dashboard }}</td>
     </tr>
     <tr>
         <td>Homepage</td>
         <td>{{ cumulative.breakdown.grid.conversion.homepage }}</td>
-        <td>{{ cumulative.breakdown.ratio.homepage }}</td>
     </tr>
     <tr>
         <td>Index</td>
         <td>{{ cumulative.breakdown.grid.conversion.index }}</td>
-        <td>{{ cumulative.breakdown.ratio.index }}</td>
     </tr>
     <tr>
         <td>Archive</td>
         <td>{{ cumulative.breakdown.grid.conversion.archive }}</td>
-        <td>{{ cumulative.breakdown.ratio.archive }}</td>
     </tr>
     <tr>
         <td>Email</td>
         <td>{{ cumulative.breakdown.grid.conversion.email }}</td>
-        <td>{{ cumulative.breakdown.ratio.email }}</td>
     </tr>
     </tbody>
 </table>
