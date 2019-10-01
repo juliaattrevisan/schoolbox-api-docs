@@ -614,7 +614,7 @@ class Controller extends Base
          * referrer value determines what kind it was
          */
         (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
-            ->saveConversionOpen(
+            ->saveOpen(
                 $article,
                 $this->getUser()->getId(),
                 $this->getUser()->getRole()->getType(),

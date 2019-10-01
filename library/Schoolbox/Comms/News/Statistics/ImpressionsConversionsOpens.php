@@ -84,7 +84,7 @@ class ImpressionsConversionsOpens
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveConversionOpen(News\Model $article, int $userId, string $roleType, int $roleId, ?string $referrer)
+    public function saveOpen(News\Model $article, int $userId, string $roleType, int $roleId, ?string $referrer)
     {
         /* Only record Conversions for publicly-accessible articles
          */
@@ -111,71 +111,37 @@ class ImpressionsConversionsOpens
             ->setReferrer($referrer)
             ->setRoleType($roleType)
             ->setRoleId($roleId)
+            ->setType(Mapper::TYPE_OPEN)
             ->setOccursAt(\Alaress_Date_Format::now());
 
-        if (null !== $referrer) {
+        /* Record uniques only
+         * If the current (articleId, userId, referrer) tuple exists in the db
+         * don't record a dupe Conversion, nor increment the cumulative tally
+         *
+         * We can't rely on the INSERT ON DUPLICATE idea because I also need to
+         * increment cumulative total if (and only if) a unique Conversion was made
+         */
+        $existingConversion = $this->statisticsMapper->countByColumnList([
+            'article_id' => $article->getId(),
+            'type' => Mapper::TYPE_OPEN,
+            'user_id' => $userId,
+            'referrer' => $referrer,
+            'role_type' => $roleType,
+            'role_id' => $roleId,
+        ]);
 
-            /* Record uniques only
-             * If the current (articleId, userId, referrer) tuple exists in the db
-             * don't record a dupe Conversion, nor increment the cumulative tally
-             *
-             * We can't rely on the INSERT ON DUPLICATE idea because I also need to
-             * increment cumulative total if (and only if) a unique Conversion was made
-             */
-            $existingConversion = $this->statisticsMapper->countByColumnList([
-                'article_id' => $article->getId(),
-                'type' => Mapper::TYPE_CONVERSION,
-                'user_id' => $userId,
-                'referrer' => $referrer,
-                'role_type' => $roleType,
-                'role_id' => $roleId,
-            ]);
-
-            /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
-             * Otherwise, this (user, referrer) combination indicates a new conversion or a new open
-             * for this particular user
-             */
-            if ($existingConversion) {
-                return false;
-            }
-
-            /* It's a valid referrer and $user hasn't been Converted this period
-             * so add a Conversion record and increment the cumulative total
-             */
-            $this->statisticsCumulativeMapper->incrementConversion($article->getId(), $roleType, $roleId, $referrer);
-
-            $model->setType(Mapper::TYPE_CONVERSION);
-        } else {
-
-            /* Record uniques only
-             * If the current (articleId, userId, referrer) tuple exists in the db
-             * don't record a dupe Conversion, nor increment the cumulative tally
-             *
-             * We can't rely on the INSERT ON DUPLICATE idea because I also need to
-             * increment cumulative total if (and only if) a unique Conversion was made
-             */
-            $existingOpen = $this->statisticsMapper->countByColumnList([
-                'article_id' => $article->getId(),
-                'type' => Mapper::TYPE_OPEN,
-                'user_id' => $userId,
-                'role_type' => $roleType,
-                'role_id' => $roleId,
-            ]);
-
-            /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
-             * Otherwise, this (user, referrer) combination indicates a new conversion or a new open
-             * for this particular user
-             */
-            if ($existingOpen) {
-                return false;
-            }
-
-            /* When referrer is empty, add an Open record and increment the cumulative total
-             */
-            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $roleType, $roleId);
-
-            $model->setType(Mapper::TYPE_OPEN);
+        /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
+         * Otherwise, this (user, referrer) combination indicates a new conversion or a new open
+         * for this particular user
+         */
+        if ($existingConversion) {
+            return false;
         }
+
+        /* It's a valid referrer and $user hasn't Opened this period
+         * so add an Open record and increment the cumulative total
+         */
+        $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $roleType, $roleId, $referrer);
 
         return $this->statisticsMapper->save($model);
     }
