@@ -27,6 +27,14 @@ else
 	exit 1;
 fi
 
+if [ -f .git/ref ];
+then
+    buildcommit=`cat .git/ref`;
+else
+    echo "Unable to determine build commit";
+    ls -1 .git/;
+fi
+
 if [ ! -f ../build-artifact/"$branch"-build.tar.gz ];
 then
 	echo "Unable to locate build artifact: ../build-artifact/"$branch"-build.tar.gz";
@@ -55,14 +63,6 @@ do
 	ls -l;
 
   echo "Check we have the right commit in the artifacts for the package";
-
-  if [ -f .git/ref ];
-  then
-      buildcommit=`cat .git/ref`;
-  else
-      echo "Unable to determine build commit";
-      ls -1 .git/;
-  fi
 
   echo "Build commit: $buildcommit";
 
