@@ -27,7 +27,7 @@ use Schoolbox\UserMapper;
  *
  * Example usage is in www/test.php as follows:
     - Create 50 articles
-    - 24*7*4 day duration (1 month)
+    - Distribute over (24 hours * 7 days * 4 weeks) duration which is 1 month
     - 67% chance to open article
 
 
@@ -481,6 +481,7 @@ class Obama
      *           increment overall time and continue
      *
      * @param News\Model $model
+     * @param int        $duration  Distribute stats over this duration
      * @param int        $directOpenLikelihood
      * @throws Exception
      * @throws \PDOException
@@ -488,6 +489,7 @@ class Obama
      */
     private function createStatistics(
         News\Model $model,
+        int $duration,
         int $directOpenLikelihood = 10
     ): void {
         /* At least half of your user population is involved
@@ -523,7 +525,7 @@ class Obama
 
                 /* Jitter this around
                  */
-                $r = $this->ico->saveOpen($model, $this->generateStatisticDate(50), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
+                $r = $this->ico->saveOpen($model, $this->generateStatisticDate($duration), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
 
                 if ($r !== false) {
                     $this->summary['role'][News\Statistics\Mapper::TYPE_OPEN][$currentUser->getRole()->getType()]++;
@@ -592,7 +594,7 @@ class Obama
             $this->createAudience($model);
             new \Alaress_Probe(str_pad(' ',4)."Added audience for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $this->createStatistics($model, $directOpenLikelihood);
+            $this->createStatistics($model, $duration, $directOpenLikelihood);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
