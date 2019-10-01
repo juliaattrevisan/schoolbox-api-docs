@@ -558,7 +558,7 @@
         {% if importFeedback %}
             <script>
                 $(function() {
-                    var importFeedbackValidation = {
+                    $('#importFeedbackForm').alaressValidate({
                         rules: {
                             importFeedbackType: "required",
                             importFeedbackInput: "required"
@@ -569,9 +569,7 @@
                         },
                         onfocusout: false,
                         onkeyup: false
-                    };
-
-                    $('#importFeedbackForm').alaressValidate(importFeedbackValidation);
+                    });
 
                     $('#importFeedbackForm [data-submit]').on('click', function(event) {
                         event.preventDefault();
