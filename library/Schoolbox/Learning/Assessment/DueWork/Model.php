@@ -116,6 +116,14 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
 
     /**
+     * External system identifier
+     *
+     * @var null|string
+     */
+    private $externalId;
+
+
+    /**
      * @return string
      */
     public static function getDefaultTypeName(): string
@@ -853,5 +861,25 @@ class Model extends AbstractAssessment implements ISelfAssessable
             throw new UnexpectedValueException('Property not set');
         }
         return $this->selfReviewability === SubmissionBox::SELF_REVIEWABILITY_FULL;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

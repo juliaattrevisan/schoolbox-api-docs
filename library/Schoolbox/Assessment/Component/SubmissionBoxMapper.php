@@ -40,6 +40,7 @@ use UnexpectedValueException;
  */
 class SubmissionBoxMapper extends Schoolbox\Mapper
 {
+    public const COL_EXTERNAL_ID = 'external_id';
 
     /**
      * @throws Schoolbox\Mapper\Exception
@@ -68,6 +69,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('self_reviewability', self::TYPE_STRING);
         $this->uses('similarity_check_enabled', self::TYPE_BOOLEAN);
+        $this->uses(self::COL_EXTERNAL_ID, self::TYPE_STRING);
+
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');

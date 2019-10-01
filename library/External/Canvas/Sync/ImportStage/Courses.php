@@ -592,7 +592,7 @@ class Courses
             FROM submission_box sb
             JOIN assessment a ON a.id = sb.assessment_id
             JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
-            WHERE a.deleted_at IS NULL AND a.external_id = :externalId
+            WHERE a.deleted_at IS NULL AND sb.external_id = :externalId
         ";
 
         $rows = $this->schoolboxDb->executeQuery($sql, ['externalId' => $canvasId])->fetchAll();
@@ -661,7 +661,6 @@ class Courses
     ): SubmissionBox {
         $assessment = (new Assessment\Model())
             ->setContextUnitSpecification($unitSpecFolder->getUnitSpecification())
-            ->setExternalId((string)$canvasId)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
@@ -677,7 +676,8 @@ class Courses
             ->setAcceptOnline($acceptOnline)
             ->setAcceptMultiple($acceptMultiple)
             ->setMarkVisibility($markVisibility)
-            ->setSelfReviewability($selfReviewability);
+            ->setSelfReviewability($selfReviewability)
+            ->setExternalId((string)$canvasId);
 
         /* Cannot use mappers here to save because:
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
@@ -685,14 +685,13 @@ class Courses
          */
 
         $sql = "
-            INSERT INTO assessment (title, description, sequence, external_id, created_at, updated_at)
-            VALUES (:title, :description, :sequence, :external_id, :created_at, :updated_at)
+            INSERT INTO assessment (title, description, sequence, created_at, updated_at)
+            VALUES (:title, :description, :sequence, :created_at, :updated_at)
         ";
         $this->schoolboxDb->executeQuery($sql, [
             'title'       => $assessment->getTitle(),
             'description' => $assessment->getDescription(),
             'sequence'    => $assessment->getSequence(),
-            'external_id' => $assessment->getExternalId(),
             'created_at'  => $assessment->getCreatedAt()->getDatabase(),
             'updated_at'  => $assessment->getUpdatedAt()->getDatabase(),
         ]);
@@ -702,8 +701,8 @@ class Courses
         $this->schoolboxDb->executeQuery($sql, ['assessmentId' => $assessment->getId(), 'unitSpecId' => $unitSpecFolder->getUnitSpecification()->getId()]);
 
         $sql = "
-            INSERT INTO submission_box (assessment_id, category, owner, accept_submission, multi_submission, mark_type, max_mark, mark_visibility, self_reviewability) 
-            VALUES (:assessment_id, :category, :owner, :accept_submission, :multi_submission, :mark_type, :max_mark, :mark_visibility, :self_reviewability)
+            INSERT INTO submission_box (assessment_id, category, owner, accept_submission, multi_submission, mark_type, max_mark, mark_visibility, self_reviewability, external_id) 
+            VALUES (:assessment_id, :category, :owner, :accept_submission, :multi_submission, :mark_type, :max_mark, :mark_visibility, :self_reviewability, :external_id)
         ";
 
         $this->schoolboxDb->executeQuery($sql, [
@@ -716,6 +715,7 @@ class Courses
             'max_mark'           => $submissionBox->getMaxMark(),
             'mark_visibility'    => $submissionBox->getMarkVisibility(),
             'self_reviewability' => $submissionBox->getSelfReviewability(),
+            'external_id'        => $submissionBox->getExternalId(),
         ]);
         $submissionBox->setId((int)$this->schoolboxDb->lastInsertId());
 
@@ -998,7 +998,7 @@ class Courses
     private function deleteUnSynchronizedSubmissionBoxes(array $synchronizedSubmissionBoxIds): void
     {
         $pb = $this->submissionBoxMapper->getPredicateBuilder()
-                                        ->notNull('am.external_id')
+                                        ->notNull('external_id')
                                         ->isNull('am.deleted_at');
         if (count($synchronizedSubmissionBoxIds)) {
             $pb->notIn('id', $synchronizedSubmissionBoxIds);

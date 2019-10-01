@@ -838,17 +838,4 @@ interface IAssessable extends ISoftDeletable
      * @return $this
      */
     public function setDeletedAt(\Alaress_Date_Format $deletedAt = null);
-
-
-    /**
-     * @return string|null
-     */
-    public function getExternalId(): ?string;
-
-
-    /**
-     * @param string|null $externalId
-     * @return $this
-     */
-    public function setExternalId(?string $externalId): IAssessable;
 }

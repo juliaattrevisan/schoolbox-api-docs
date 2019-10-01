@@ -211,7 +211,7 @@ class CourseSections
         $this->log->info("Synchronising Canvas CourseSections + Assignments => CourseImpl, UnitImpl, AssessmentImpl...");
         $this->resetCounts();
 
-        // all submissionBox.assessment.externalId
+        // all submissionBox.externalId
         $assignmentCanvasIds = $this->getAssignmentCanvasIds();
         // All sections.canvasId that match a SchoolboxId
         $sectionSisSourceIds = $this->courseSectionBridge->getMappedSisSourceIds();
@@ -348,7 +348,7 @@ class CourseSections
 
                         foreach ($section['assignments'] as $assignmentCanvasId => $assignment) {
                             $this->countCanvasAssignmentsSynchronised++;
-                            $this->log->debug("Processing Canvas Assignment (CanvasId: '$assignmentCanvasId')");
+                            $this->log->debug("Processing Canvas Assignment (CanvasId: $assignmentCanvasId)");
                             $submissionBoxImpl               = $this->syncAssignmentWithSubmissionBoxImpl(
                                 $assignmentCanvasId,
                                 $unitImpl,
@@ -659,9 +659,9 @@ class CourseSections
                     {$this->assessmentMapper->getColumnString('a')}
                 FROM submission_box sb
                 JOIN assessment a ON a.id = sb.assessment_id
-                WHERE a.external_id = :aExternalId AND a.deleted_at IS NULL
+                WHERE sb.external_id = :sbExternalId AND a.deleted_at IS NULL
             ";
-            $rows = $this->schoolboxDb->executeQuery($sql, ['aExternalId' => $assignmentCanvasId])->fetchAll();
+            $rows = $this->schoolboxDb->executeQuery($sql, ['sbExternalId' => $assignmentCanvasId])->fetchAll();
             if (!count($rows)) {
                 throw new UnexpectedValueException("Unable to find a submission box spec for Canvas assignment.canvas_id $assignmentCanvasId");
             }
@@ -928,7 +928,8 @@ class CourseSections
         $submissionBoxImpl
             ->setAssessmentModel($assessmentImpl)            // TODO This line compensates for a core bug. Fix this properly in develop.
             ->setCategory($unitImpl->getFolder())
-            ->setOwner($owner);
+            ->setOwner($owner)
+            ->setExternalId(null);
 
         $assessmentImpl
             ->setAssessmentContext($unitImpl)
@@ -936,8 +937,7 @@ class CourseSections
             ->setPublishDate(Alaress_Date_Format::newDatabaseDate($publishDate))
             ->setOpenDate(Alaress_Date_Format::newDatabaseDate($openDate))
             ->setDueDate(Alaress_Date_Format::newDatabaseDate($dueDate))
-            ->setCloseDate(Alaress_Date_Format::newDatabaseDate($closeDate))
-            ->setExternalId(null);
+            ->setCloseDate(Alaress_Date_Format::newDatabaseDate($closeDate));
 
         $this->assessmentMapper->save($assessmentImpl);          // TODO This will trigger the creation of a dynamic plan - fix this properly in develop.
         $this->submissionBoxMapper->save($submissionBoxImpl);
@@ -947,7 +947,7 @@ class CourseSections
 
 
     /**
-     * Returns all submissionBox.assessment.externalId
+     * Returns all submissionBox.externalId
      *
      * @return int[]
      * @throws Database\Exception
@@ -955,10 +955,10 @@ class CourseSections
     private function getAssignmentCanvasIds(): array
     {
         $sql      = "
-            SELECT a.external_id
+            SELECT sb.external_id
             FROM assessment a
             JOIN submission_box sb on a.id = sb.assessment_id
-            WHERE a.external_id IS NOT NULL AND a.deleted_at IS NULL;
+            WHERE sb.external_id IS NOT NULL AND a.deleted_at IS NULL;
         ";
         $callback = static function (string $externalId): int {
             return (int)$externalId;
@@ -1004,7 +1004,7 @@ class CourseSections
     private function deleteUnSynchronisedSubmissionBoxImpl(array $submissionBoxImplSynchronised): void
     {
         $pb = $this->assessmentMapper->getPredicateBuilder()
-                                     ->notNull('aSpec.external_id')
+                                     ->notNull('sbSpec.external_id')
                                      ->isNull('aImpl.deleted_at');
         if (count($submissionBoxImplSynchronised)) {
             $pb->notIn('sbImpl.id', $submissionBoxImplSynchronised);
@@ -1014,9 +1014,10 @@ class CourseSections
         $sql = "
             SELECT aImpl.id
             FROM assessment aImpl
-            JOIN submission_box sbImpl on aImpl.id = sbImpl.assessment_id
+            JOIN submission_box sbImpl ON aImpl.id = sbImpl.assessment_id
             JOIN assessment_specification_implementation asi ON aImpl.id = asi.implementation_assessment_id
             JOIN assessment aSpec ON aSpec.id = asi.specification_assessment_id
+            JOIN submission_box sbSpec ON sbSpec.assessment_id = aSpec.id
             WHERE {$whereClause}
         ";
 

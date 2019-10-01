@@ -171,6 +171,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     private $selfReviewability;
 
+    /** @var null|string */
+    private $externalId;
+
 
     /**
      * SubmissionBox constructor.
@@ -844,5 +847,25 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     {
         // Submission box takes this value from the assessment it is *composed* of
         return $this->assessmentModel->isDeleted();
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }
