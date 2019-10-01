@@ -579,14 +579,47 @@
                         if ($('#importFeedbackForm').valid()) {
                             var rows = $('#importFeedbackInput').val().split("\n");
 
+                            /* Find out which prototype to use
+                             */
+                            var dataFormat = $('#importFeedbackForm input[name="importFeedbackType"]:checked').val();
+
+                            if (dataFormat === 'mark-only') {
+                                var assign = function(input) {
+                                    var id = $.trim(input[0]);
+
+                                    if (id) {
+                                        $('#mark-' + id).val(input[1]);
+                                    }
+                                }
+                            } else if (dataFormat === 'comment-only') {
+                                var assign = function(input) {
+                                    var id = $.trim(input[0]);
+
+                                    if (id) {
+                                        $('#comment-' + id).val(input[1]);
+                                    }
+                                }
+                            } else {
+                                var assign = function(input) {
+                                    var id = $.trim(input[0]);
+
+                                    if (id) {
+                                        $('#mark-' + id).val(input[1]);
+                                        $('#comment-' + id).val(input[2]);
+                                    }
+                                }
+                            }
+
                             /* For every row, find the student id, mark and comments and
                              * assign them to #mark-12345 and #comment-12345 as required
                              */
                             for (var i = 0; i < rows.length; i++) {
-                                var row = rows[i].split("\t");
-
-                                console.log(row);
+                                assign(rows[i].split("\t"));
                             }
+
+                            /* Close the modal
+                             */
+                            $('#importFeedbackModal').foundation('reveal', 'close');
 
                             /* Trigger Quickmark validator for immediate feedback on your feedback
                              */
