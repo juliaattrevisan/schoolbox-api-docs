@@ -1,62 +1,25 @@
-<div class="content">
-    <div class="row">
-        <div class="small-12 medium-4 columns">
-            <p class="infographic">
-                <span class="title">{% block cumulativeDateHeading %}First Open <span class='hint has-tip tip-top' data-tooltip title="The date when the {{ locale.news }} was first opened">?</span>{% endblock %}</span>
-                <span class="value">{% if cumulative.date %}{{ cumulative.date|date('j M') }}{% else %}n/a{% endif %}</span>
-            </p>
-        </div>
-        <div class="small-12 medium-4 columns">
-            <p class="infographic">
-                <span class="title">Opens <span class="hint has-tip tip-top" data-tooltip title="The number of people who clicked through to view the {{ locale.news }}">?</span></span>
-                <span class="value">{{ cumulative.numOpens }}</span>
-            </p>
-        </div>
+<section>
+    <div class="content">
+        <div class="row">
+            <div class="small-12 medium-4 columns">
+                <p class="infographic">
+                    <span class="title">{% block cumulativeDateHeading %}First Open <span class='hint has-tip tip-top' data-tooltip title="The date when the {{ locale.news }} was first opened">?</span>{% endblock %}</span>
+                    <span class="value">{% if cumulative.date %}{{ cumulative.date|date('j M') }}{% else %}n/a{% endif %}</span>
+                </p>
+            </div>
+            <div class="small-12 medium-4 columns">
+                <p class="infographic">
+                    <span class="title">Opens <span class="hint has-tip tip-top" data-tooltip title="The number of people who clicked through to view the {{ locale.news }}">?</span></span>
+                    <span class="value">{{ cumulative.numOpens }}</span>
+                </p>
+            </div>
 
-        <div class="small-12 medium-4 columns">
-            <p class="infographic">
-                <span class="title">Comments <span class="hint has-tip tip-top" data-tooltip title="The current number of comments for this {{ locale.news }}">?</span></span>
-                <span class="value">{{ cumulative.numComments }}</span>
-            </p>
+            <div class="small-12 medium-4 columns">
+                <p class="infographic">
+                    <span class="title">Comments <span class="hint has-tip tip-top" data-tooltip title="The current number of comments for this {{ locale.news }}">?</span></span>
+                    <span class="value">{{ cumulative.numComments }}</span>
+                </p>
+            </div>
         </div>
     </div>
-</div>
-
-<table class="ico" data-cumulative>
-    <thead>
-        <tr>
-            <th>Referrer</th>
-            <th>Opens</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Archive</td>
-            <td>{{ cumulative.breakdown.grid.open.archive }}</td>
-        </tr>
-        <tr>
-            <td>Dashboard</td>
-            <td>{{ cumulative.breakdown.grid.open.dashboard }}</td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td>{{ cumulative.breakdown.grid.open.email }}</td>
-        </tr>
-        <tr>
-            <td>Homepage</td>
-            <td>{{ cumulative.breakdown.grid.open.homepage }}</td>
-        </tr>
-        <tr>
-            <td>Index</td>
-            <td>{{ cumulative.breakdown.grid.open.index }}</td>
-        </tr>
-        <tr>
-            <td>Search</td>
-            <td>{{ cumulative.breakdown.grid.open.search }}</td>
-        </tr>
-        <tr>
-            <td>None</td>
-            <td>{{ cumulative.breakdown.grid.open.unknown }}</td>
-        </tr>
-    </tbody>
-</table>
+</section>

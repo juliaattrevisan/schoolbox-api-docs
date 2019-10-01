@@ -109,4 +109,48 @@
         });
     });
 </script>
-<div id="referrerDemographic"></div>
+
+<section class="content">
+    <div id="referrerDemographic"></div>
+</section>
+
+<section>
+    <table class="ico" data-cumulative>
+        <thead>
+            <tr>
+                <th>Referrer</th>
+                <th>Opens</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Archive</td>
+                <td>{{ referrerDemographic.open.archive }}</td>
+            </tr>
+            <tr>
+                <td>Dashboard</td>
+                <td>{{ referrerDemographic.open.dashboard }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{ referrerDemographic.open.email }}</td>
+            </tr>
+            <tr>
+                <td>Homepage</td>
+                <td>{{ referrerDemographic.open.homepage }}</td>
+            </tr>
+            <tr>
+                <td>Index</td>
+                <td>{{ referrerDemographic.open.index }}</td>
+            </tr>
+            <tr>
+                <td>Search</td>
+                <td>{{ referrerDemographic.open.search }}</td>
+            </tr>
+            <tr>
+                <td>None</td>
+                <td>{{ referrerDemographic.open.unknown }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>

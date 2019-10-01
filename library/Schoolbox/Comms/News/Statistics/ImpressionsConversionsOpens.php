@@ -178,10 +178,6 @@ class ImpressionsConversionsOpens
                 INNER JOIN discussion_thread_comment dtc ON cna.discussion_thread_id = dtc.discussion_thread_id
                 WHERE dtc.deleted_at IS NULL
             ')->fetch(\PDO::FETCH_ASSOC)['numComments'],
-
-            /* Grid of referrer values
-             */
-            'breakdown' => $this->summariseDailyStatistics($statistics)['breakdown']
         ];
 
         return $summary;

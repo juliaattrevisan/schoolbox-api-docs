@@ -28,23 +28,17 @@
         <h2 class="subheader">Cumulative Summary</h2>
         <p class="meta">Overall cumulative statistics from all time.</p>
 
-        <section>
-            {% include '@commsNewsStatistics/cumulative-summary.twig' with {
-                cumulative: cumulative
-            } %}
-        </section>
+        {% include '@commsNewsStatistics/cumulative-summary.twig' with {
+            cumulative: cumulative
+        } %}
 
-        <section class="content">
-            {% include '@commsNewsStatistics/referrer-demographic.twig' with {
-                referrerDemographic: referrerDemographic
-            } %}
-        </section>
+        {% include '@commsNewsStatistics/referrer-demographic.twig' with {
+            referrerDemographic: referrerDemographic
+        } %}
 
-        <section class="content">
-            {% include '@commsNewsStatistics/roletype-demographic.twig' with {
-                roleTypeDemographic: roleTypeDemographic
-            } %}
-        </section>
+        {% include '@commsNewsStatistics/roletype-demographic.twig' with {
+            roleTypeDemographic: roleTypeDemographic
+        } %}
     </div>
 </div>
 
