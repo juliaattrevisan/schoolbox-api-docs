@@ -554,8 +554,13 @@
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
             },
             determineVisibleRange(currentDate) {
-                // Find the range in the list of terms
-                let dateString = this.toMoment(currentDate).format('YYYY-MM-DD'),
+                // Find the range in the list of terms.
+                // (Need to go to these lengths to create a date, as calendar
+                //  and thus moment isn't initialized yet.
+                //  Need to feed the date in as UTC because toISOString outputs
+                //  date in UTC)
+                let actualDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())),
+                    dateString = actualDate.toISOString().slice(0, 10),
                     allTerms   = this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future);
                 for (let term of allTerms) {
                     if (dateString >= term.start && dateString <= term.end) {
@@ -584,7 +589,7 @@
             :views="{
                 resourceTimelineSemester: {
                     type: 'resourceTimeline',
-                    visibleRange: this.config.termDates.current,
+                    visibleRange: this.determineVisibleRange,
                     slotDuration: { weeks: 1 },
                     weekNumbers: true,
                     slotLabelFormat: [
