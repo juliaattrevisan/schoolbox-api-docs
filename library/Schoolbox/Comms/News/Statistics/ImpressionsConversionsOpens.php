@@ -213,7 +213,7 @@ class ImpressionsConversionsOpens
             $node = [
                 'date' => $dailyStatistic->getDate()->getDatabase(),
                 'numOpens' => $this->calculateNumOpens((new Collection())->add($dailyStatistic)),
-                'numComments' => $this->calculateNumComments($article)
+                'numComments' => $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate())
             ];
 
             $historic[] = $node;
@@ -225,19 +225,28 @@ class ImpressionsConversionsOpens
 
     /**
      * Calculate number of comments for a given article
-     * @param News\Model $article
+     * @param News\Model  $article
+     * @param string|null $date
      * @return int
      * @throws \Alaress\Database\Exception
      */
-    private function calculateNumComments(News\Model $article): int
+    private function calculateNumComments(News\Model $article, string $date = null): int
     {
-        $statement = $this->database->prepareQuery('
+        $query = '
             SELECT COUNT(*) AS numComments
             FROM comms_news_article cna
             INNER JOIN discussion_thread_comment dtc ON cna.discussion_thread_id = dtc.discussion_thread_id
             WHERE dtc.deleted_at IS NULL
             AND cna.id = :articleId
-        ');
+        ';
+
+        /* Optional date filter
+         */
+        if ($date) {
+            $query .= " AND dtc.created_at LIKE '{$date}%'";
+        }
+
+        $statement = $this->database->prepareQuery($query);
 
         $statement->execute([
             'articleId' => $article->getId()
