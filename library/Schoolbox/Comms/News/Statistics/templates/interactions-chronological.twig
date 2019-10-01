@@ -44,7 +44,7 @@
                     },
 
                     title: {
-                        text: 'Conversions, Impressions vs Time'
+                        text: 'Conversions vs Time'
                     },
 
                     tooltip: {
@@ -75,26 +75,6 @@
                             title: {
                                 text: 'Quantity'
                             }
-                        },
-                        {
-                            labels: {
-                                style: {
-                                    color: '#629e51'
-                                }
-                            },
-                            lineColor: '#629e51',
-                            lineWidth: 1,
-                            max: 100,
-                            min: 0,
-                            tickInterval: 10,
-                            title: {
-                                allowDecimals: true,
-                                style: {
-                                    color: '#629e51'
-                                },
-                                text: 'Conversion Ratio This Period (%)'
-                            },
-                            opposite: true
                         }
                     ],
 
@@ -108,14 +88,6 @@
                             color: '#888888',
                             name: 'Non-referred Opens',
                             data: data.interactions.open
-                        },
-                        {
-                            color: '#629e51',
-                            lineWidth: 1,
-                            name: 'Conversion Ratio This Period (%)',
-                            type: 'spline',
-                            yAxis: 1,
-                            data: data.conversionRatio
                         }
                     ]
                 });
