@@ -537,6 +537,19 @@
 
                 // Should the Today button be enabled?
                 todayButton.disabled = (now >= start && now < end);
+
+                // What about next/prev?
+                if (this.currentViewIsSemester()) {
+                    // Next: disable if there is no next
+                    // Prev: disable if there is no prev
+                    let allTerms     = this.buildAllTermsList(),
+                        currentIndex = Number(this.findRangeIndex(this.toMoment(start).format('YYYY-MM-DD')));
+                    nextButton.disabled = (currentIndex === allTerms.length - 1);
+                    prevButton.disabled = (currentIndex === 0);
+                } else {
+                    nextButton.disabled = false;
+                    prevButton.disabled = false;
+                }
             },
 
             cleanupMonthHeaderInlineStyles() {
@@ -573,13 +586,44 @@
                 //  date in UTC)
                 let actualDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())),
                     dateString = actualDate.toISOString().slice(0, 10),
-                    allTerms   = this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future);
-                for (let term of allTerms) {
-                    if (dateString >= term.start && dateString <= term.end) {
-                        return term;
+                    allTerms   = this.buildAllTermsList();
+
+                // TODO check this in IE, or use filter
+                return allTerms[this.findRangeIndex(dateString)];
+            },
+
+            buildAllTermsList() {
+                return this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future)
+                    .sort(function (a, b) {
+                        if (a.start < b.start) {
+                            return -1;
+                        }
+                        if (a.start > b.start) {
+                            return 1;
+                        }
+                        if (a.end < b.end) {
+                            return -1;
+                        }
+                        if (a.end > b.end) {
+                            return 1;
+                        }
+                        return 0;
+                    });
+            },
+
+            findRangeIndex(date) {
+                let allTerms = this.buildAllTermsList();
+                for (let i in allTerms) {
+                    if (!allTerms.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    let term = allTerms[i];
+                    if (date >= term.start && date <= term.end) {
+                        return i;
                     }
                 }
-            },
+                return -1;
+            }
         }
     }
 </script>
