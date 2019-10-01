@@ -317,6 +317,8 @@ class ImpressionsConversionsOpens
                 (int)$row['num'],
                 $row['datetime']
             ];
+
+            $data['total'][(int)$row['timestamp']] += (int)$row['num'];
         }
 
         /* Format it for highcharts to understand
@@ -336,6 +338,23 @@ class ImpressionsConversionsOpens
                 return $a[0] > $b[0];
             });
         }
+
+        /* I guess we sort the Total dataset too
+         */
+        ksort($data['total']);
+
+        /* Restructure data for highcharts
+         */
+        $keys = array_keys($data['total']);
+        $values = array_values($data['total']);
+
+        $n = \count($keys);
+
+        for ($total = [], $i = 0; $i < $n; $i++) {
+            $total[] = [$keys[$i], $values[$i]];
+        }
+
+        $data['total'] = $total;
 
         return $data;
     }
