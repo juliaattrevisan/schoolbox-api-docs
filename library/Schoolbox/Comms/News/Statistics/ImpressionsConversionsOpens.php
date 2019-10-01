@@ -365,18 +365,23 @@ class ImpressionsConversionsOpens
          */
         $historic = [];
 
-        /** @var Cumulative\Model $statistic */
+        /** @var Cumulative\Model $dailyStatistic */
         foreach ($dailyStatistics as $dailyStatistic) {
-            $node = [
-                'date' => $dailyStatistic->getDate()->getDatabase(),
-                'numOpens' => $this->calculateNumOpens((new Collection())->add($dailyStatistic)),
-                'numComments' => $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate())
-            ];
+            $date = $dailyStatistic->getDate()->getDatabase();
 
-            $historic[] = $node;
+            if (!isset($historic[$date])) {
+                $historic[$date] = [
+                    'date' => $date,
+                    'numOpens' => 0,
+                    'numComments' => 0
+                ];
+            }
+
+            $historic[$date]['numOpens'] += $this->calculateNumOpens((new Collection())->add($dailyStatistic));
+            $historic[$date]['numOpens'] += $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate());
         }
 
-        return $historic;
+        return array_values($historic);
     }
 
 
