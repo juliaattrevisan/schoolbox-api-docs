@@ -556,6 +556,34 @@
         {% endautoescape %}
 
         {% if importFeedback %}
+            <script>
+                $(function() {
+                    var importFeedbackValidation = {
+                        rules: {
+                            importFeedbackType: "required",
+                            importFeedbackInput: "required"
+                        },
+                        messages: {
+                            name: "Please enter feedback data",
+                            parent: "Please select your feedback data format."
+                        },
+                        onfocusout: false,
+                        onkeyup: false
+                    };
+
+                    $('#importFeedbackForm').alaressValidate(importFeedbackValidation);
+
+                    $('#importFeedbackForm [data-submit]').on('click', function(event) {
+                        event.preventDefault();
+                        $('#importFeedbackForm').submit();
+                    });
+
+                    $('#importFeedbackForm [data-cancel]').on('click', function(event) {
+                        event.preventDefault();
+                        $('#importFeedbackModal').foundation('reveal', 'close');
+                    });
+                });
+            </script>
             <div id="importFeedbackModal" class="reveal-modal" data-reveal>
                 <form id="importFeedbackForm" action="#">
                     <section>
@@ -573,7 +601,7 @@
                                     <li>Comment (Optional)</li>
                                 </ol>
 
-                                <textarea id="importFeedbackInput" rows="10" class="full-width" placeholder="Paste content here"></textarea>
+                                <textarea id="importFeedbackInput" name="importFeedbackInput" rows="10" class="full-width" placeholder="Paste content here"></textarea>
                             </div>
                         </fieldset>
 
@@ -593,10 +621,10 @@
 
                             <ul class="flex-list buttons">
                                 <li>
-                                    <a href="#" class="submit">Import</a>
+                                    <a href="#" class="submit" data-submit>Import</a>
                                 </li>
                                 <li>
-                                    <a href="#" data-cancel="importFeedbackModal">Cancel</a>
+                                    <a href="#" data-cancel>Cancel</a>
                                 </li>
                             </ul>
                         </fieldset>
