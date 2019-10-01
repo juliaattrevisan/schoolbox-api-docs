@@ -13,6 +13,7 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -506,7 +507,7 @@ class Obama
 
         for ($i = 0; $i < $numUsers; $i++) {
 
-            /** @var \Schoolbox\User $currentUser */
+            /** @var User $currentUser */
             $currentUser = $this->getRandomUser();
 
             /* Decide whether this was person opened a thing
