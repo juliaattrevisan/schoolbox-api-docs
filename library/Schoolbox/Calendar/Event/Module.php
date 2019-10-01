@@ -12,8 +12,11 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
 {
@@ -21,7 +24,6 @@ class Module extends BaseModule
      * @inheritdoc
      */
     protected $basename = 'calendarEvent';
-
 
     /**
      * @inheritDoc
@@ -34,7 +36,11 @@ class Module extends BaseModule
             );
         });
 
-        $this->register('GET', '/{eventId:\d+}', 'getEvent', $perms);
+        $preloadEvent = function ($params) {
+            return $this->preloadEvent($params);
+        };
+
+        $this->register('GET', '/{eventId:\d+}', 'getEvent', $perms, $preloadEvent);
     }
 
     /**
@@ -54,13 +60,38 @@ class Module extends BaseModule
     }
 
     /**
+     * @param array $params
+     * @return array|null
+     * @throws NotFound
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function preloadEvent(array $params): ?array
+    {
+        try {
+            return ['event' => $this->getEventMapper()->findById($params['eventId']) ];
+        }
+        catch (MapperException $e) {
+            throw new NotFound(ErrorMapper::ERROR_EVENT_NOT_FOUND);
+        }
+    }
+
+    /**
+     * @return EventMapper
+     */
+    private function getEventMapper(): EventMapper
+    {
+        return $this->getMapperFactory()->get(EventMapper::class);
+    }
+
+    /**
      * @inheritDoc
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'databaseInternal' => $injector->lazyGet('databaseInternal'),
+            'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
         ];
     }
 }

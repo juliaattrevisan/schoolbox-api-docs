@@ -1,0 +1,30 @@
+<div class="row" id="event-details">
+    {% set data = {
+        "title"   : event.title,
+        "location": event.location,
+        "author"  : {
+            id      : event.author.id,
+            fullName: event.author.fullName,
+        },
+        "detail"  : event.detail,
+        "options" : {
+            "allDay": event.allDay,
+            "type"  : {
+                "name": event.type.type,
+                "color": event.type.color,
+            }
+        },
+        "dates"   : {
+            "start": event.startDateTime.getDatabase,
+            "end"  : event.endDateTime.getDatabase,
+        },
+        "audiences" : {
+            "campus" : campusCollection,
+            "roles": event.roleCollection,
+        }
+    } %}
+
+    <event-details :data="{{ data | json_encode }}"></event-details>
+</div>
+
+<script src="/javascript/components/eventDetails.bundle.js"></script>

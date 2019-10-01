@@ -7,24 +7,75 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Campus;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\RoleMapper;
 
 class Controller extends Base
 {
     /**
-     * @var IConnector
+     * @var RoleMapper
      */
-    private $databaseInternal;
+    protected $roleMapper;
 
-    public function __construct(IConnector $databaseInternal)
+    /**
+     * Controller constructor.
+     * @param RoleMapper $roleMapper
+     */
+    public function __construct(RoleMapper $roleMapper)
     {
-        $this->databaseInternal           = $databaseInternal;
+        $this->roleMapper = $roleMapper;
     }
 
-    public function getEvent()
+    public function getEvent(Event $event)
     {
-        echo 'test';
-        die();
+        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
+            'event' => $event,
+            'campusCollection' => $this->getCampusCollection($event),
+            'roleCollection' => $this->getRoleCollection($event),
+        ])->setTitle($event->getTitle()));
+    }
+
+    /**
+     * @param Event $event
+     * @return array
+     */
+    private function getCampusCollection(Event $event): array
+    {
+        $result = [];
+
+        /** @var Campus $campus */
+        foreach ($event->getCampusCollection()->getAll() as $campus) {
+            $result[] = [
+                'id' => $campus->getId(),
+                'name' => $campus->getName(),
+                'extTimetableCode' => $campus->getExtTimetableCode(),
+                'timetableDay' => $campus->getTimetableDay(),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Event $event
+     * @return array
+     */
+    private function getRoleCollection(Event $event): array
+    {
+        $result = [];
+
+        /** @var \Schoolbox\Calendar\Relation\Role $role */
+        foreach ($event->getRoleCollection()->getAll() as $role) {
+            try {
+                $result[] = $this->roleMapper->findById($role->getRoleId());
+            } catch (Exception $e) {
+                // noop
+            }
+        }
+
+        return $result;
     }
 }
