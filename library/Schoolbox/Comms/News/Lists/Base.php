@@ -232,13 +232,12 @@ abstract class Base
 
 
     /**
+     * Load a set of hydrated articles having known their ids
+     *
      * @param array       $articleIds
      * @param Querystring $params
      * @param User        $user
      * @return GenericCollection
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     protected function loadArticleByIds(array $articleIds, Querystring $params, User $user) : GenericCollection
     {
@@ -251,23 +250,6 @@ abstract class Base
 
             if (null !== $record) {
                 $articles->add($records->getOffset($articleId));
-
-                /* Statistics: save an impression record
-                 * Load the referrer value from $params
-                 * Also increment a tally elsewhere
-                 */
-
-                (new ImpressionsConversionsOpens(
-                    $this->databaseInternal,
-                    $this->statisticsMapper,
-                    $this->statisticsCumulativeMapper
-                ))->saveImpression(
-                    $record,
-                    $user->getId(),
-                    $user->getRole()->getType(),
-                    $user->getRole()->getId(),
-                    $params->getReferrer()
-                );
             }
         }
 

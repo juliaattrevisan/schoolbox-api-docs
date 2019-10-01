@@ -839,10 +839,6 @@ class Controller extends Base
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
-        /* TODO: Repair statistics logging here
-         * See usages of saveImpression()
-         */
-
         $map = [
             'id',
             'title',

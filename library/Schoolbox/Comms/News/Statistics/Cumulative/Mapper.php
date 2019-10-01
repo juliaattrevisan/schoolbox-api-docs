@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -92,29 +90,6 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $this->save($model);
-    }
-
-
-    /**
-     * Record an Impression for $articleId
-     * Only increment known referrers
-     *
-     * @param int         $articleId
-     * @param string      $roleType
-     * @param int         $roleId
-     * @param null|string $referrer
-     * @return bool|int[]
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    public function incrementImpression(int $articleId, string $roleType, int $roleId, ?string $referrer)
-    {
-        if (!(new Statistics\ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
-            return false;
-        }
-
-        return $this->increment($articleId, StatisticsMapper::TYPE_IMPRESSION, $roleType, $roleId, $referrer);
     }
 
 
