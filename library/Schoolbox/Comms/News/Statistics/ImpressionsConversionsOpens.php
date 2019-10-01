@@ -341,38 +341,6 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Calculate a integer percentage, but you can specify precision
-     *
-     * @param null|int $numerator
-     * @param null|int $denominator
-     * @param int      $precision
-     * @return float
-     */
-    private function percentage(?int $numerator, ?int $denominator, int $precision = 0): float
-    {
-        $percentage = $denominator ? round(100*$numerator/$denominator, $precision) : 0;
-
-        return $percentage > 100 ? 100 : $percentage;
-    }
-
-
-    /**
-     * Generate an initialised array for each of the interaction types
-     * Prefill array with default values so they don't render as empty strings
-     *
-     * @param array $keys
-     * @return array
-     */
-    public function generateDefaultBreakdown(array $keys): array
-    {
-        $defaultValues = array_fill_keys($keys, 0);
-
-        return [
-            Mapper::TYPE_OPEN => $defaultValues,
-        ];
-    }
-
-    /**
      * Fetch Cumulative data per day during the lifetime of an article
      *
      * @param News\Model $article
@@ -461,4 +429,38 @@ class ImpressionsConversionsOpens
 
         return (int)$statement->fetch(\PDO::FETCH_ASSOC)['numComments'];
     }
+
+
+    /**
+     * Calculate a integer percentage, but you can specify precision
+     *
+     * @param null|int $numerator
+     * @param null|int $denominator
+     * @param int      $precision
+     * @return float
+     */
+    private function percentage(?int $numerator, ?int $denominator, int $precision = 0): float
+    {
+        $percentage = $denominator ? round(100*$numerator/$denominator, $precision) : 0;
+
+        return $percentage > 100 ? 100 : $percentage;
+    }
+
+
+    /**
+     * Generate an initialised array for each of the interaction types
+     * Prefill array with default values so they don't render as empty strings
+     *
+     * @param array $keys
+     * @return array
+     */
+    public function generateDefaultBreakdown(array $keys): array
+    {
+        $defaultValues = array_fill_keys($keys, 0);
+
+        return [
+            Mapper::TYPE_OPEN => $defaultValues,
+        ];
+    }
+
 }
