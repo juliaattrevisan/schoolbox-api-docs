@@ -1,4 +1,14 @@
-<table>
+<script>
+    $(function() {
+        $('[data-historic]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+
+<table data-historic>
     <thead>
         <tr>
             <th class="text-center">Date</th>
