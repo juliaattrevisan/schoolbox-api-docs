@@ -216,6 +216,8 @@
                                 });
                             }
 
+                            eventGroupingCursor = element.data.meta.eventGrouping;
+
                             // Create the resource and push the element
                             if (!self.newResources.some(el => el.id === element.resourceId)) {
                                 self.newResources.push({'id': element.resourceId, 'title': element.resourceId});
