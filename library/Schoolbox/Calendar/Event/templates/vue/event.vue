@@ -12,7 +12,7 @@
                 </div>
                 <div class="meta">
                     <span v-html="byLine"></span>
-                    <span v-if="audiencesMeta"> | {{ audiencesMeta }}</span>
+                    <span v-if="audiencesMeta"> | <a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span>
                 </div>
                 <article v-html="data.detail"></article>
             </section>
@@ -30,11 +30,18 @@
                 <p v-html="this.data.location"></p>
             </section>
         </div>
+
+        <auidences-modal
+                ref="audiencesModal"
+                :campus-audiences="this.data.audiences.campus"
+                :role-audiences="this.data.audiences.roles"
+        ></auidences-modal>
     </div>
 </template>
 
 <script>
     import moment from 'moment';
+    import auidencesModal from './audiencesModal';
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
@@ -44,13 +51,20 @@
     export default {
         props: ['data'],
         name: "event-details",
+        components: {auidencesModal},
         data() {
             return {
                 event: this.data,
             }
         },
         mounted() {
-            console.log( this.data.audiences.campus );
+            // this.$refs.audiencesModal.open();
+            // console.log( this.data.audiences.campus );
+        },
+        methods: {
+            showAudiencesModal() {
+                this.$refs.audiencesModal.open();
+            }
         },
         computed: {
             dateTimeDisplay: function() {
