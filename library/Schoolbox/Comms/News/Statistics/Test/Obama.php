@@ -28,6 +28,7 @@ use Schoolbox\UserMapper;
  * Example usage is in www/test.php as follows:
     - Create 50 articles
     - Distribute over (24 hours * 7 days * 4 weeks) duration which is 1 month
+    - Democraticness 0.35 (the smaller the number, the more left-leaning obamastats becomes)
     - 67% chance to open article
 
 
@@ -40,7 +41,7 @@ use Schoolbox\UserMapper;
         \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Cumulative\Mapper::getInstance()
-    ))->generate(1, 24*7*4, 67);
+    ))->generate(1, 24*7*4*4, 0.35, 67);
 
  *
  * @package Schoolbox\Comms\News\Statistics\Test
@@ -369,7 +370,7 @@ class Obama
     private function getRandomReferrer(bool $skewedStatistics): string
     {
         if ($skewedStatistics) {
-            return $this->referrers[$this->getWeightedRandom(0, \count($this->referrers) - 1, 2)];
+            return $this->referrers[$this->getWeightedRandom(0, \count($this->referrers) - 1, 0.5)];
         }
 
         return $this->referrers[\random_int(0, \count($this->referrers)-1)];
@@ -481,7 +482,8 @@ class Obama
      *           increment overall time and continue
      *
      * @param News\Model $model
-     * @param int        $duration  Distribute stats over this duration
+     * @param int        $duration Distribute stats over this duration
+     * @param float      $democraticness
      * @param int        $directOpenLikelihood
      * @throws Exception
      * @throws \PDOException
@@ -490,6 +492,7 @@ class Obama
     private function createStatistics(
         News\Model $model,
         int $duration,
+        float $democraticness,
         int $directOpenLikelihood = 10
     ): void {
         /* At least half of your user population is involved
@@ -525,7 +528,7 @@ class Obama
 
                 /* Jitter this around
                  */
-                $r = $this->ico->saveOpen($model, $this->generateStatisticDate($duration), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
+                $r = $this->ico->saveOpen($model, $this->generateStatisticDate($duration, $democraticness), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
 
                 if ($r !== false) {
                     $this->summary['role'][News\Statistics\Mapper::TYPE_OPEN][$currentUser->getRole()->getType()]++;
@@ -543,17 +546,19 @@ class Obama
     /**
      * Change the date of a generated stat
      *
+     * Democraticness: the smaller the number, the more democratic Obama becomes
+     * 0.15 is very democratic
+     * 1 is not
+     *
      * @param int $duration
+     * @param     $democraticness
      * @return \Alaress_Date_Format
-     * @throws \Exception
      */
-    private function generateStatisticDate(int $duration): \Alaress_Date_Format
+    private function generateStatisticDate(int $duration, $democraticness): \Alaress_Date_Format
     {
-        $jitteryness = \random_int(1, 10)*60;
+        $val = $this->getWeightedRandom(1, $duration, $democraticness);
 
-        $val = $this->getWeightedRandom(1, $duration, 0.5);
-
-        $difference = -1 * $val * 3600 - $jitteryness;
+        $difference = -1 * $val * 3600;
 
         $newTime = \Alaress_Date_Format::now();
         $newTime->addSeconds($difference);
@@ -566,15 +571,15 @@ class Obama
      * Spawn this many random articles
      * Use a prime number for pagination and demonstration purposes
      *
-     * @param int  $numArticles
-     * @param int  $duration              Number of hours for which to populate data
-     * @param int  $directOpenLikelihood
+     * @param int   $numArticles
+     * @param int   $duration Number of hours for which to populate data
+     * @param float $democraticness
+     * @param int   $directOpenLikelihood
      * @throws Exception
-     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function generate(int $numArticles, int $duration, int $directOpenLikelihood): void
+    public function generate(int $numArticles, int $duration, float $democraticness, int $directOpenLikelihood): void
     {
         new \Alaress_Probe("Creating {$numArticles} articles using {$directOpenLikelihood}% Open rate over {$duration} hours");
 
@@ -594,7 +599,7 @@ class Obama
             $this->createAudience($model);
             new \Alaress_Probe(str_pad(' ',4)."Added audience for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $this->createStatistics($model, $duration, $directOpenLikelihood);
+            $this->createStatistics($model, $duration, $democraticness, $directOpenLikelihood);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
