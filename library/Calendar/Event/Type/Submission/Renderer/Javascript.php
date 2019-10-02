@@ -96,6 +96,7 @@ class Javascript extends Base
         $event      = $this->getEvent();
         $assessable = $event->getAssessment();
         $workType   = $assessable->getWorkType();
+        $folderColour = $assessable->getContext()->getFolder()->getColour();
 
         return [
             'eventId'   => $event->getEventId(),
@@ -114,6 +115,7 @@ class Javascript extends Base
             'workTypeId'=> $workType ? $workType->getId() : null,
             'weighted'  => $assessable->getWeight() ? 1 : 0,
             'assessmentType' => $assessable->getFamilyName(),
+            'colour' => $folderColour ? $folderColour->getAsRgba() : null,
         ];
     }
 

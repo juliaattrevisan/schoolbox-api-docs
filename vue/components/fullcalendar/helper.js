@@ -42,6 +42,8 @@ export default class FullCalendarHelper {
             // this.$refs.toast.activate('Loading...');
             this.jQuery.magnificPopup.open({
                 showCloseBtn: false,
+                closeOnBgClick: false,
+                enableEscapeKey: false,
                 items: {
                     src: "<div class='preview loader'></div>",
                     type: 'inline'
@@ -148,6 +150,20 @@ export default class FullCalendarHelper {
      */
     dayTitleFormat(dateObject) {
         return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
+    }
+
+    /**
+     * Helper function to get the difference between two dates.
+     * @param start
+     * @param end
+     * @param type
+     * @returns {*}
+     */
+    dateDiff(start, end, type = 'days') {
+        var startDate = this.toMoment(start),
+            endDate = this.toMoment(end);
+
+        return endDate.diff(startDate, type);
     }
 }
 

@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
@@ -84,6 +85,7 @@ class Module extends BaseModule
                 );
             }),
             'rosettaStone' => $injector->lazyGet('l10n'),
+            'termMapper'   => $this->getMapperFactory()->getLazy(TermMapper::class),
         ];
     }
 }
