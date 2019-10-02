@@ -20,11 +20,12 @@ Usage:
     });
 
     window.fullCalendarConfig = {
+        userId:              Number('{{ user.id }}'),
         eventLimit:          Boolean('{{ config.calendar_collapse_events }}'),
         firstDay:            Number('{{ config.calendar_start_day }}'),
         dateDisplayFormats:  dateDisplayFormats,
         schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
-        termDates:          {{ termDates|json_encode|raw }},
+        termDates:           {{ termDates|json_encode|raw }},
     };
 </script>
 {% endautoescape %}
