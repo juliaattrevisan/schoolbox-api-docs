@@ -587,32 +587,17 @@
                              * Trigger autosave upon change for instant feedback on your feedback
                              */
                             if (dataFormat === 'mark-only') {
-                                var assign = function(input) {
-                                    var id = $.trim(input[0]);
-                                    var form = $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]');
-
-                                    if (id) {
-                                        $(form).find('input[name="mark"]').val(input[1]).change();
-                                    }
+                                var assign = function(input, form) {
+                                    $(form).find('input[name="mark"]').val(input[1]).change();
                                 }
                             } else if (dataFormat === 'comment-only') {
-                                var assign = function(input) {
-                                    var id = $.trim(input[0]);
-                                    var form = $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]');
-
-                                    if (id) {
-                                        $(form).find('textarea[name="comment"]').val(input[1]).change();
-                                    }
+                                var assign = function(input, form) {
+                                    $(form).find('textarea[name="comment"]').val(input[1]).change();
                                 }
                             } else {
-                                var assign = function(input) {
-                                    var id = $.trim(input[0]);
-                                    var form = $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]');
-
-                                    if (id) {
-                                        $(form).find('input[name="mark"]').val(input[1]).change();
-                                        $(form).find('textarea[name="comment"]').val(input[2]).change();
-                                    }
+                                var assign = function(input, form) {
+                                    $(form).find('input[name="mark"]').val(input[1]).change();
+                                    $(form).find('textarea[name="comment"]').val(input[2]).change();
                                 }
                             }
 
@@ -625,9 +610,13 @@
                                  * Multiple tabs occurs when you split-select columns in excel
                                  * such as selecting column A and column D
                                  */
-                                var row = rows[i].replace(/\t\t+/g, "\t");
+                                var input = rows[i].replace(/\t\t+/g, "\t").split("\t");
 
-                                assign(row.split("\t"));
+                                var id = $.trim(input[0]);
+
+                                if (id) {
+                                    assign(input, $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]'));
+                                }
                             }
 
                             /* Close the modal
