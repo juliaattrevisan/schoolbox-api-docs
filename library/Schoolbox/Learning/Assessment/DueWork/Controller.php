@@ -881,7 +881,7 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set([
             'format' => 'noContent',
             'postOutput' => [
-                function() use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
+                function () use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
                     if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
                         foreach ($response->getAllFiles() as $currentFile) {
                             $filename = $plagscanMapper->plagscanFilename($currentFile);
