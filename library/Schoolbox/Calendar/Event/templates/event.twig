@@ -1,5 +1,5 @@
 <div class="row" id="event-details">
-    {% set data = {
+    {% set eventData = {
         "title"   : event.title,
         "location": event.location,
         "author"  : {
@@ -12,7 +12,8 @@
             "type"  : {
                 "name": event.type.type,
                 "color": event.type.color,
-            }
+            },
+            "isAttendable": event.attendance,
         },
         "dates"   : {
             "start": event.startDateTime.getDatabase,
@@ -24,7 +25,7 @@
         }
     } %}
 
-    <event-details :data="{{ data | json_encode }}"></event-details>
+    <event-details :event="{{ eventData | json_encode }}"></event-details>
 </div>
 
 <script src="/javascript/components/eventDetails.bundle.js"></script>
