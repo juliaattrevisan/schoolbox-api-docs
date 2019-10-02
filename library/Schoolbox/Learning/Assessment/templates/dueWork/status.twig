@@ -589,26 +589,29 @@
                             if (dataFormat === 'mark-only') {
                                 var assign = function(input) {
                                     var id = $.trim(input[0]);
+                                    var form = $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]');
 
                                     if (id) {
-                                        $('#mark-' + id).val(input[1]).change();
+                                        $(form).find('input[name="mark"]').val(input[1]).change();
                                     }
                                 }
                             } else if (dataFormat === 'comment-only') {
                                 var assign = function(input) {
                                     var id = $.trim(input[0]);
+                                    var form = $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]');
 
                                     if (id) {
-                                        $('#comment-' + id).val(input[1]).change();
+                                        $(form).find('textarea[name="comment"]').val(input[1]).change();
                                     }
                                 }
                             } else {
                                 var assign = function(input) {
                                     var id = $.trim(input[0]);
+                                    var form = $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]');
 
                                     if (id) {
-                                        $('#mark-' + id).val(input[1]).change();
-                                        $('#comment-' + id).val(input[2]).change();
+                                        $(form).find('input[name="mark"]').val(input[1]).change();
+                                        $(form).find('textarea[name="comment"]').val(input[2]).change();
                                     }
                                 }
                             }
