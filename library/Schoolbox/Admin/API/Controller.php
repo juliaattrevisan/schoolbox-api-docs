@@ -8,9 +8,11 @@
 
 namespace Schoolbox\Admin\API;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web;
 use InvalidArgumentException;
+use Schoolbox\Admin\Import\Profile\Processor;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
@@ -18,8 +20,14 @@ use Schoolbox\Mapper;
 
 class Controller extends Web\Controller\Base
 {
+    private const USER_PROFILE_CSVS = [
+        'student',
+        'parent',
+        'staff',
+        'relation',
+    ];
+
     private const REQUIRED_CSVS = [
-        'user'                  => ImporterFactory::IMPORT_USER,
         'timetable-structure'   => ImporterFactory::IMPORT_STRUCTURE,
         'timetable'             => ImporterFactory::IMPORT_TIMETABLE,
         'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
@@ -126,7 +134,7 @@ class Controller extends Web\Controller\Base
 
             $files = [];
 
-            foreach (array_keys(self::REQUIRED_CSVS) as $requiredCsv) {
+            foreach (array_merge(self::USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS)) as $requiredCsv) {
 
                 $hash = $post->get($requiredCsv);
 
@@ -136,14 +144,20 @@ class Controller extends Web\Controller\Base
                 }
 
                 try {
-                    // assign the given hash to its place in the files array
-                    $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
+                    if(!in_array($requiredCsv,self::USER_PROFILE_CSVS)){
+                        // assign the given hash to its place in the files array
+                        $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
+                    }else{
+                        $files[$requiredCsv] = $this->storageMapper->findByHash($hash);
+                    }
 
                 } catch (Mapper\Exception $e) {
                     $errors[] = "Invalid file hash given for '$requiredCsv'.";
                     continue;
                 }
             }
+            /** @var IConnector $db */
+            $db = $this->getDi()->get('databaseInternal');
 
             if (isset($errors)) {
                 $responseJson['error'] = $errors;
@@ -158,8 +172,14 @@ class Controller extends Web\Controller\Base
 
                 try {
                     foreach ($files as $keyspace => $file) {
-                        // this is where the action happens
-                        $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
+                        if (!in_array($keyspace,self::USER_PROFILE_CSVS)){
+                            // this is where the action happens
+                            $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
+                        }else{
+                            $processor = new Processor($keyspace, $file, $db);
+                            $processor->setPerform(true);
+                            $processor->process();
+                        }
                     }
 
                     $responseJson['success'] = true;
