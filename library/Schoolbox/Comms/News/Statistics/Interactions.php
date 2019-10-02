@@ -10,6 +10,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Scale\Factory;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 
 /**
@@ -130,14 +131,18 @@ class Interactions
          * increment cumulative total if (and only if) a unique Open was made
          */
         /** @var News\Statistics\Model $existingOpen */
-        $existingOpen = $this->statisticsMapper->findOneByColumnList([
-            'article_id' => $article->getId(),
-            'type' => Mapper::TYPE_OPEN,
-            'user_id' => $userId,
-            'referrer' => $referrer,
-            'role_type' => $roleType,
-            'role_id' => $roleId,
-        ]);
+        try {
+            $existingOpen = $this->statisticsMapper->findOneByColumnList([
+                'article_id' => $article->getId(),
+                'type'       => Mapper::TYPE_OPEN,
+                'user_id'    => $userId,
+                'referrer'   => $referrer,
+                'role_type'  => $roleType,
+                'role_id'    => $roleId,
+            ]);
+        } catch (NotFound $e) {
+            $existingOpen = false;
+        }
 
         /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
          * Otherwise, this (user, referrer) combination indicates a new Open for this particular user
