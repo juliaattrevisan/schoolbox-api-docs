@@ -13,7 +13,8 @@
     import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 
     // Various URLs that FullCalendar may make use of.
-    const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    const URL_CALENDAR_EVENT_SOURCE   = '/calendar/ajax/full';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -111,7 +112,7 @@
                     return;
                 }
                 axios.get(
-                    URL_EVENT_SOURCE,
+                    URL_ASSESSMENT_EVENT_SOURCE,
                     {
                         headers: {
                             'X-Requested-With' : 'XMLHttpRequest'
@@ -179,6 +180,27 @@
                     }
                 );
                 // Fail callback: consider a message saying something failed
+
+
+                // Another source of events: the standard calendar feed
+                axios.get(
+                    URL_CALENDAR_EVENT_SOURCE,
+                    {
+                        headers: {
+                            'X-Requested-With' : 'XMLHttpRequest'
+                        },
+                        params: {
+                            start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                            end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                            filters: self.selectedFilters,
+                        },
+                        paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                    }
+                ).then(function (response) {
+                    successCallback(response.filter(function (v) {
+                        return 'start' in v;
+                    }));
+                });
             },
 
             /**
