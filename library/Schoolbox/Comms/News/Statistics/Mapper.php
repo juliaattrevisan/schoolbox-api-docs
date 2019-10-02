@@ -20,10 +20,10 @@ class Mapper extends \Schoolbox\Mapper
      * Consts to match schema enums
      */
     public const TYPE_OPEN = 'open';
-    public const REFERRER_DASHBOARD = 'dashboard';
-    public const REFERRER_HOMEPAGE = 'homepage';
     public const REFERRER_ARCHIVE = 'archive';
+    public const REFERRER_DASHBOARD = 'dashboard';
     public const REFERRER_EMAIL = 'email';
+    public const REFERRER_HOMEPAGE = 'homepage';
     public const REFERRER_INDEX = 'index';
     public const REFERRER_SAVED = 'saved';
     public const REFERRER_SEARCH = 'search';
@@ -40,11 +40,11 @@ class Mapper extends \Schoolbox\Mapper
      * These are the referrers that we understand in the domain logic
      */
     public const REFERRERS = [
+        self::REFERRER_ARCHIVE,
         self::REFERRER_DASHBOARD,
         self::REFERRER_HOMEPAGE,
-        self::REFERRER_INDEX,
-        self::REFERRER_ARCHIVE,
         self::REFERRER_EMAIL,
+        self::REFERRER_INDEX,
         self::REFERRER_SAVED,
         self::REFERRER_SEARCH,
         self::REFERRER_EMPTY
