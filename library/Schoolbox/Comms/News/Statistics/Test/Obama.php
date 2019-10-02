@@ -568,6 +568,50 @@ class Obama
 
 
     /**
+     * Artificially reddit this article with an $articleNum incrementor that's used to
+     * create discussion_thread_ids because I didn't find a mapper/model anywhere obvious
+     *
+     * @param News\Model $model
+     * @return int
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createComments(News\Model $model): int
+    {
+        /* Create a thread
+         */
+        $threadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
+
+        $thread = $threadMapper->createModel()->setOpen(true);
+
+        $threadMapper->save($thread);
+
+        /* Make some commentary
+         */
+        $numComments = rand(1, 10);
+
+        $commentMapper = \Schoolbox\Discussion\Comment\Mapper::getInstance();
+
+        for ($i = 0; $i < $numComments; $i++) {
+            $comment = $commentMapper->createModel()
+                ->setContent($this->getRandomBody())
+                ->setAuthor($this->getRandomUser())
+                ->setThread($thread)
+                ->setCreatedAt(\Alaress_Date_Format::now()->addDays($this->getWeightedRandom(1,5, 1)));
+
+            $commentMapper->save($comment);
+        }
+
+        /* Associate thread
+         */
+        \Schoolbox\Comms\News\Mapper::getInstance()->save($model->setDiscussionThread($thread));
+
+        return $numComments;
+    }
+
+
+    /**
      * Spawn this many random articles
      * Use a prime number for pagination and demonstration purposes
      *
@@ -601,6 +645,9 @@ class Obama
 
             $this->createStatistics($model, $duration, $democraticness, $directOpenLikelihood);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
+
+            $numComments = $this->createComments($model);
+            new \Alaress_Probe(str_pad(' ', 4)."Commented {$numComments} random comments for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
         /* Statistical summary
