@@ -118,6 +118,6 @@ class Mapper extends \Schoolbox\Mapper
             return false;
         }
 
-        return $this->increment($articleId, $date,StatisticsMapper::TYPE_OPEN, $roleType, $roleId, $referrer);
+        return $this->increment($articleId, $date, StatisticsMapper::TYPE_OPEN, $roleType, $roleId, $referrer);
     }
 }

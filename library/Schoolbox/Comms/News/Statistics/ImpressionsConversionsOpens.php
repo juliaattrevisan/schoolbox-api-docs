@@ -334,7 +334,7 @@ class ImpressionsConversionsOpens
              * First encountered setting the period to be longer than 30 days and using the Month scale
              * option but may occur if we misconfigured something
              */
-            usort($data[$roleType], function($a, $b) {
+            usort($data[$roleType], function ($a, $b) {
                 return $a[0] > $b[0];
             });
         }
@@ -487,5 +487,4 @@ class ImpressionsConversionsOpens
             Mapper::TYPE_OPEN => $defaultValues,
         ];
     }
-
 }
