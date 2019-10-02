@@ -146,6 +146,10 @@ class TokenizerTest extends TestCase
                         'sfirst', 'ssecond', 'sthird', 'sfourth',
                         'tfirst', 'tsecond', 'tthird', 'tfourth',
                     ]],
+            'single-multi + single-multi'
+            => ['{:single.multi}+{:single.multi}', [
+                'first+first', 'second+second', 'third+third', 'fourth+fourth',
+            ]],
             'multi-multi mapped'
                 => [ new Map('{:multi.multi}', [
                         'first'  => 'ONE',

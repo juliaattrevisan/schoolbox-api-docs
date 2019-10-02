@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -29,6 +29,8 @@ abstract class Tokenizer
             )?                          # /$2
         }                               # token end
     `ix';
+
+    const TOKEN_AND = '+';
 
     /** @var Token[] */
     protected $tokens = [];
@@ -142,6 +144,16 @@ abstract class Tokenizer
         if (preg_match_all(self::TOKEN_REGEX, $fieldValue, $tokenMatches)) {
 
             $tokenCount = count($tokenMatches[0]);
+            $connector = $fieldValue;
+            $union = true;
+            if ($tokenCount > 1) {
+                // get connector between tokens
+                foreach ($tokenMatches[0] as $tokenMatch) {
+                    $connector = str_replace($tokenMatch, '', $connector);
+                }
+                // if connector is +, simply get values for each token for each key
+                $union = ($connector !== str_repeat(self::TOKEN_AND, $tokenCount - 1));
+            }
 
             $tokenMap = [];
 
@@ -173,8 +185,17 @@ abstract class Tokenizer
                 $tokenMap[$substitution] = $replacements;
             }
 
-            // this is where it gets fun. we're attempting a cartesian product of $tokenMap[*][1]
-            $cartesian = $this->cartesian($tokenMap);
+            if ($union) {
+                // this is where it gets fun. we're attempting a cartesian product of $tokenMap[*][1]
+                $cartesian = $this->cartesian($tokenMap);
+            } else {
+                $cartesian = [];
+                foreach ($tokenMap as $fieldKey => $array) {
+                    foreach ($array as $index => $value) {
+                        $cartesian[$index][$fieldKey] = $value;
+                    }
+                }
+            }
 
             // iterate that result and apply the replacements
             foreach ($cartesian as $permutation) {
