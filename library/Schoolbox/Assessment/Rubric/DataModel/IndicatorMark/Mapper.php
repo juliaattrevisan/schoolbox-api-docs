@@ -179,7 +179,7 @@ class Mapper extends BaseMapper
         $query = "
             SELECT sr.owner AS student_id
             FROM submission_return sr
-            JOIN submission_box sb on sr.box_id = sb.id
+            JOIN submission_box sb ON sr.box_id = sb.id
             JOIN (
                 -- find most recent feedback (including drafts)
                 SELECT sr.owner, MAX(sr.updated_at) AS max_updated_at
@@ -191,12 +191,12 @@ class Mapper extends BaseMapper
                       sr.deleted_at IS NULL
                 GROUP BY sr.owner
             ) t1 ON t1.owner = sr.owner AND t1.max_updated_at = sr.updated_at
-            JOIN rubric_group_mark rgm on sr.id = rgm.return_id
+            JOIN rubric_capability_mark rcm ON sr.id = rcm.return_id
             WHERE
                 sb.assessment_id = :assessment_id_2 AND
                 sr.review_route = :review_route_2 AND
                 sr.deleted_at IS NULL AND
-                rgm.valid = 1
+                rcm.valid = 1
             GROUP BY sr.owner
         ";
         $stmt  = $this->database->prepare($query);
