@@ -809,9 +809,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @return bool
+     * @return null|bool
      */
-    public function getSimilarityCheckEnabled(): bool
+    public function getSimilarityCheckEnabled(): ?bool
     {
         return $this->similarityCheckEnabled;
     }

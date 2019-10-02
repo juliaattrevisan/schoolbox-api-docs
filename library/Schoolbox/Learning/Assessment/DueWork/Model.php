@@ -789,9 +789,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return bool
+     * @return null|bool
      */
-    public function getSimilarityCheckEnabled(): bool
+    public function getSimilarityCheckEnabled(): ?bool
     {
         return $this->similarityCheckEnabled;
     }
