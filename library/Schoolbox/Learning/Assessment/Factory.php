@@ -125,7 +125,8 @@ class Factory
     /**
      * Factory constructor.
      * @param User $creator
-     * @param $post (an array of post vars from the create/update forms)
+     * @param      $post (an array of post vars from the create/update forms)
+     * @param      $assessmentType
      * @throws \UnexpectedValueException
      */
     public function __construct(User $creator, $post, $assessmentType) {
