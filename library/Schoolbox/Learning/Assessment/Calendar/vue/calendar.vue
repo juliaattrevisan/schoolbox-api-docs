@@ -377,15 +377,11 @@
                     if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length) ||
                         (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])) {
                         self.cursor++;
-                        var startDateByCursor = self.getStartDateByCursor(),
-                            endDateByCursor = self.getEndDateByCursor();
+                        var startDateByCursor = self.getStartDateByCursor();
 
                         if (startDateByCursor !== undefined) {
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
                         }
-
-                        self.termStartDate = startDateByCursor;
-                        self.termEndDate = endDateByCursor;
                     }
 
                     self.redrawWeekNumbers();
@@ -408,15 +404,11 @@
 
                         self.cursor--;
 
-                        var startDateByCursor = self.getStartDateByCursor(),
-                            endDateByCursor = self.getEndDateByCursor();
+                        var startDateByCursor = self.getStartDateByCursor();
 
                         if (startDateByCursor !== undefined) {
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
                         }
-
-                        self.termStartDate = startDateByCursor;
-                        self.termEndDate = endDateByCursor;
 
                         self.redrawWeekNumbers();
                         self.cleanupMonthHeaderInlineStyles();
@@ -451,21 +443,6 @@
                     return self.config.termDates.past[Math.abs(self.cursor) - 1]?.start;
                 } else {
                     return self.config.termDates.future[Math.abs(self.cursor) - 1]?.start;
-                }
-            },
-
-            /**
-             * Navigate through the dates via the cursor
-             */
-            getEndDateByCursor() {
-                var self = this;
-
-                if (self.cursor === 0) {
-                    return self.config.termDates.current?.end;
-                } else if (self.cursor < 0) {
-                    return self.config.termDates.past[Math.abs(self.cursor) - 1]?.end;
-                } else {
-                    return self.config.termDates.future[Math.abs(self.cursor) - 1]?.end;
                 }
             },
 
