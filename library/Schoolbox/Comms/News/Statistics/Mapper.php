@@ -20,7 +20,6 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Consts to match schema enums
      */
-    public const TYPE_CONVERSION = 'conversion';
     public const TYPE_OPEN = 'open';
     public const REFERRER_DASHBOARD = 'dashboard';
     public const REFERRER_HOMEPAGE = 'homepage';
