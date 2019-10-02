@@ -81,11 +81,12 @@ class Controller extends Base
 
             /* Overall Referrer Demographics
              */
-            'referrerDemographic' => $interactions->fetchReferrerDemographic($article),
+             'referrerDemographic' => $interactions->fetchReferrerDemographic($article),
 
             /* Overall RoleType Demographics
+             * Temporarily disabled
              */
-            'roleTypeDemographic' => $interactions->fetchRoleTypeDemographic($article),
+            // 'roleTypeDemographic' => $interactions->fetchRoleTypeDemographic($article),
 
             /* Scale selector
              */
@@ -93,8 +94,9 @@ class Controller extends Base
             'scale' => News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']),
 
             /* Historical Dailies
+             * Temporarily disabled
              */
-            'historic' => $interactions->fetchHistoric($article),
+            // 'historic' => $interactions->fetchHistoric($article),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 

@@ -27,9 +27,11 @@
             referrerDemographic: referrerDemographic
         } %}
 
+        {# Temporarily disabled
         {% include '@commsNewsStatistics/roletype-demographic.twig' with {
             roleTypeDemographic: roleTypeDemographic
         } %}
+        #}
     </div>
 </div>
 
@@ -56,6 +58,7 @@
  # continue to capture enough data points to show this kind of information
  # such that we can enable/re-present this later.
  #}
+{#
 {% if historic|length %}
 <div class="row">
     <div class="small-12 island">
@@ -68,4 +71,4 @@
     </div>
 </div>
 {% endif %}
-
+#}
