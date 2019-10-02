@@ -13,7 +13,7 @@ use Schoolbox\Comms\News\Statistics\Scale\Factory;
 use Schoolbox\Role;
 
 /**
- * Class ImpressionsConversionsOpens
+ * Class Interactions
  *
  * Highcharts likes its dates represented as timestamps in milliseconds
  * so we take the UNIX_TIMESTAMP and smash it by 1000 and strip the microseconds bit away by casting as int
@@ -22,7 +22,7 @@ use Schoolbox\Role;
  *
  * @package Schoolbox\Comms\News\Statistics
  */
-class ImpressionsConversionsOpens
+class Interactions
 {
 
     /**
@@ -50,7 +50,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Controller constructor.
+     * Interactions constructor.
      *
      * @param IConnector        $databaseInternal
      * @param Mapper            $statisticsMapper

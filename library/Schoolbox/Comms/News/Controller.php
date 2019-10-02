@@ -22,7 +22,7 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
-use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Comms\News\Statistics\Interactions;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
@@ -613,7 +613,7 @@ class Controller extends Base
         /* Record this Conversion/Open
          * referrer value determines what kind it was
          */
-        (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
+        (new Interactions($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
             ->saveOpen(
                 $article,
                 \Alaress_Date_Format::now(),

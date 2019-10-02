@@ -66,26 +66,26 @@ class Controller extends Base
      */
     public function getOverview(News\Model $article)
     {
-        $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+        $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
 
             /* Length of period to record granular data
              */
-            'period' => ImpressionsConversionsOpens::PERIOD_LENGTH,
+            'period' => Interactions::PERIOD_LENGTH,
 
             /* Overall Cumulative summary
              */
-            'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
+            'cumulative' => $interactions->fetchCumulative($article),
 
             /* Overall Referrer Demographics
              */
-            'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
+            'referrerDemographic' => $interactions->fetchReferrerDemographic($article),
 
             /* Overall RoleType Demographics
              */
-            'roleTypeDemographic' => $impressionsConversionsOpens->fetchRoleTypeDemographic($article),
+            'roleTypeDemographic' => $interactions->fetchRoleTypeDemographic($article),
 
             /* Scale selector
              */
@@ -94,7 +94,7 @@ class Controller extends Base
 
             /* Historical Dailies
              */
-            'historic' => $impressionsConversionsOpens->fetchHistoric($article),
+            'historic' => $interactions->fetchHistoric($article),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 
@@ -110,11 +110,11 @@ class Controller extends Base
      */
     public function getInteractionsVsTime(News\Model $article)
     {
-        $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+        $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
         $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
 
         $output = [
-            'interactions' => $impressionsConversionsOpens->fetchOpensVsTime($article, $scale),
+            'interactions' => $interactions->fetchOpensVsTime($article, $scale),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));

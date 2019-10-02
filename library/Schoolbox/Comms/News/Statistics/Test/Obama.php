@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Statistics\Test;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Comms\News\Statistics\Interactions;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -83,7 +83,7 @@ class Obama
     private $topics;
 
     /**
-     * @var ImpressionsConversionsOpens
+     * @var Interactions
      */
     private $ico;
 
@@ -161,7 +161,7 @@ class Obama
 
         /* Helper
          */
-        $this->ico = new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+        $this->ico = new Interactions($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper);
     }
 
 
