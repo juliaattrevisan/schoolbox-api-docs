@@ -55,15 +55,6 @@
         props: ['event'],
         name: "event-details",
         components: {auidencesModal},
-        data() {
-            return {
-                event: this.event,
-            }
-        },
-        mounted() {
-            // this.$refs.audiencesModal.open();
-            // console.log( this.data.audiences.campus );
-        },
         methods: {
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
