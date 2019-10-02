@@ -617,7 +617,14 @@
                              * assign them to #mark-12345 and #comment-12345 as required
                              */
                             for (var i = 0; i < rows.length; i++) {
-                                assign(rows[i].split("\t"));
+
+                                /* Condense multiple tabs into one tab
+                                 * Multiple tabs occurs when you split-select columns in excel
+                                 * such as selecting column A and column D
+                                 */
+                                var row = rows[i].replace(/\t\t+/g, "\t");
+
+                                assign(row.split("\t"));
                             }
 
                             /* Close the modal
