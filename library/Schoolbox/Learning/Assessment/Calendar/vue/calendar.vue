@@ -36,9 +36,7 @@
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
             this.termStartDate = this.config.termDates.current.start;
             this.termEndDate = this.config.termDates.current.end;
-        },
-        mounted() {
-            this.termDuration = this.getTermDateDurations();
+            this.allTerms = this.buildAllTermsList();
         },
         data() {
             return {
@@ -56,7 +54,6 @@
                 defaultBgColour: '#0066b0',
                 maxDate: null,
                 minDate: null,
-                termDuration: 10,
             }
         },
         computed: {
@@ -367,7 +364,6 @@
 
                 self.maxDate = self.getMaxTermDate();
                 self.minDate = self.getMinTermDate();
-                self.termDuration = self.getTermDateDurations();
             },
 
             /**
@@ -381,15 +377,11 @@
                     if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length) ||
                         (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])) {
                         self.cursor++;
-                        var startDateByCursor = self.getStartDateByCursor(),
-                            endDateByCursor = self.getEndDateByCursor();
+                        var startDateByCursor = self.getStartDateByCursor();
 
                         if (startDateByCursor !== undefined) {
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
                         }
-
-                        self.termStartDate = startDateByCursor;
-                        self.termEndDate = endDateByCursor;
                     }
 
                     self.redrawWeekNumbers();
@@ -412,15 +404,11 @@
 
                         self.cursor--;
 
-                        var startDateByCursor = self.getStartDateByCursor(),
-                            endDateByCursor = self.getEndDateByCursor();
+                        var startDateByCursor = self.getStartDateByCursor();
 
                         if (startDateByCursor !== undefined) {
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
                         }
-
-                        self.termStartDate = startDateByCursor;
-                        self.termEndDate = endDateByCursor;
 
                         self.redrawWeekNumbers();
                         self.cleanupMonthHeaderInlineStyles();
@@ -455,21 +443,6 @@
                     return self.config.termDates.past[Math.abs(self.cursor) - 1]?.start;
                 } else {
                     return self.config.termDates.future[Math.abs(self.cursor) - 1]?.start;
-                }
-            },
-
-            /**
-             * Navigate through the dates via the cursor
-             */
-            getEndDateByCursor() {
-                var self = this;
-
-                if (self.cursor === 0) {
-                    return self.config.termDates.current?.end;
-                } else if (self.cursor < 0) {
-                    return self.config.termDates.past[Math.abs(self.cursor) - 1]?.end;
-                } else {
-                    return self.config.termDates.future[Math.abs(self.cursor) - 1]?.end;
                 }
             },
 
@@ -532,6 +505,42 @@
                 }
             },
 
+            /**
+             * Callback when a date is rendered (i.e. the view or viewed date
+             * changes).
+             *
+             * This callback enables/disabled prev/next/today buttons based on
+             * whether they're available.
+             */
+            datesRender(datesRenderInfo) {
+                let todayButton = this.$el.querySelector('button.fc-customToday-button'),
+                    nextButton  = this.$el.querySelector('button.fc-customNext-button'),
+                    prevButton  = this.$el.querySelector('button.fc-customPrev-button'),
+                    start       = datesRenderInfo.view.currentStart,
+                    end         = datesRenderInfo.view.currentEnd,
+                    now         = new Date();
+
+                // Should the Today button be enabled?
+                todayButton.disabled = (now >= start && now < end);
+
+                // What about next/prev?
+                if (this.currentViewIsSemester()) {
+                    // Next:  disable if there is no next
+                    // Prev:  disable if there is no prev
+                    // Today: disable if today isn't within a term
+                    let currentIndex    = this.findTermIndex(this.toMoment(start).format('YYYY-MM-DD'));
+                    nextButton.disabled = (currentIndex === this.allTerms.length - 1);
+                    prevButton.disabled = (currentIndex === 0);
+                    if (!todayButton.disabled) {
+                        let todayIndex       = this.findTermIndex(this.toMoment(now).format('YYYY-MM-DD'));
+                        todayButton.disabled = (todayIndex === -1);
+                    }
+                } else {
+                    nextButton.disabled = false;
+                    prevButton.disabled = false;
+                }
+            },
+
             cleanupMonthHeaderInlineStyles() {
                 document.querySelectorAll('.fc-time-area .fc-content tr')[0].querySelectorAll('div').forEach(function (element) {
                     element.removeAttribute('style');
@@ -558,6 +567,73 @@
             currentViewIsSemester() {
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
             },
+
+            /**
+             * Determine which visible range is shown on the semester view.
+             *
+             * @param currentDate A Date object matching the date to show
+             * @return {*} An object which can be passed to FullCalendar's
+             *             `visibleRange`, or null if if found nothing.
+             */
+            determineVisibleRange(currentDate) {
+                // Find the range in the list of terms.
+                // (Need to go to these lengths to create a date, as calendar
+                //  and thus moment isn't initialized yet.
+                //  Need to feed the date in as UTC because toISOString outputs
+                //  date in UTC)
+                let actualDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())),
+                    dateString = actualDate.toISOString().slice(0, 10);
+
+                return this.allTerms[this.findTermIndex(dateString)] || null;
+            },
+
+            /**
+             * Builds the list of all terms passed into `this.config.termDates`
+             * into a single array, ordered by start then end date.
+             *
+             * @return {Array}
+             */
+            buildAllTermsList() {
+                return this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future)
+                    .sort(function (a, b) {
+                        if (a.start < b.start) {
+                            return -1;
+                        }
+                        if (a.start > b.start) {
+                            return 1;
+                        }
+                        if (a.end < b.end) {
+                            return -1;
+                        }
+                        if (a.end > b.end) {
+                            return 1;
+                        }
+                        return 0;
+                    });
+            },
+
+            /**
+             * Find the index of the term within `this.termDates` which contains
+             * `dateString`.
+             *
+             * @param dateString A date to find the index for, in "YYYY-MM-DD"
+             *                   format
+             * @return {Number} The index of the term within `this.termDates`,
+             *                  or -1 if not found.
+             */
+            findTermIndex(dateString) {
+                for (let i in this.allTerms) {
+                    if (!this.allTerms.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    let term = this.allTerms[i];
+                    // TODO end times are exclusive: account for that
+                    if (dateString >= term.start && dateString <= term.end) {
+                        return Number(i);
+                    }
+                }
+                return -1;
+            }
         }
     }
 </script>
@@ -578,8 +654,8 @@
             :plugins="calendarPlugins"
             :views="{
                 resourceTimelineSemester: {
-                    type: 'resourceTimelineYear',
-                    duration: { days: this.termDuration },
+                    type: 'resourceTimeline',
+                    visibleRange: this.determineVisibleRange,
                     slotDuration: { weeks: 1 },
                     weekNumbers: true,
                     slotLabelFormat: [
@@ -611,7 +687,7 @@
             :week-label="''"
             :event-time-format="helper.eventTimeFormat"
             :header="{
-                left: 'today,prev,next',
+                left: 'customToday,customPrev,customNext',
                 center: 'title',
                 right: 'resourceTimelineSemester,dayGridMonth,resourceTimelineWeek'
             }"
@@ -622,13 +698,15 @@
                 resourceTimelineSemester:'Semester',
             }"
             :custom-buttons="{
-                next: {
+                customNext: {
+                    icon: 'chevron-right',
                     click: this.clickNext.bind(this),
                 },
-                prev: {
+                customPrev: {
+                    icon: 'chevron-left',
                     click: this.clickPrev.bind(this)
                 },
-                today: {
+                customToday: {
                     text: 'Today',
                     click: this.clickToday.bind(this)
                 }
@@ -648,6 +726,7 @@
             @dateClick="onDateClick"
             @eventPositioned="redrawCalendar"
             @windowResize="redrawCalendar"
+            :dates-render="datesRender"
         />
     </div>
 </template>
