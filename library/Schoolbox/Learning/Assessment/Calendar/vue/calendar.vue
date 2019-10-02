@@ -36,6 +36,7 @@
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
             this.termStartDate = this.config.termDates.current.start;
             this.termEndDate = this.config.termDates.current.end;
+            this.allTerms = this.buildAllTermsList();
         },
         data() {
             return {
@@ -542,9 +543,8 @@
                 if (this.currentViewIsSemester()) {
                     // Next: disable if there is no next
                     // Prev: disable if there is no prev
-                    let allTerms     = this.buildAllTermsList(),
-                        currentIndex = Number(this.findRangeIndex(this.toMoment(start).format('YYYY-MM-DD')));
-                    nextButton.disabled = (currentIndex === allTerms.length - 1);
+                    let currentIndex    = Number(this.findRangeIndex(this.toMoment(start).format('YYYY-MM-DD')));
+                    nextButton.disabled = (currentIndex === this.allTerms.length - 1);
                     prevButton.disabled = (currentIndex === 0);
                 } else {
                     nextButton.disabled = false;
@@ -585,11 +585,9 @@
                 //  Need to feed the date in as UTC because toISOString outputs
                 //  date in UTC)
                 let actualDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())),
-                    dateString = actualDate.toISOString().slice(0, 10),
-                    allTerms   = this.buildAllTermsList();
+                    dateString = actualDate.toISOString().slice(0, 10);
 
-                // TODO check this in IE, or use filter
-                return allTerms[this.findRangeIndex(dateString)];
+                return this.allTerms[this.findRangeIndex(dateString)];
             },
 
             buildAllTermsList() {
@@ -612,12 +610,11 @@
             },
 
             findRangeIndex(date) {
-                let allTerms = this.buildAllTermsList();
-                for (let i in allTerms) {
-                    if (!allTerms.hasOwnProperty(i)) {
+                for (let i in this.allTerms) {
+                    if (!this.allTerms.hasOwnProperty(i)) {
                         continue;
                     }
-                    let term = allTerms[i];
+                    let term = this.allTerms[i];
                     if (date >= term.start && date <= term.end) {
                         return i;
                     }
