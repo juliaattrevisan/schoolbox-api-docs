@@ -137,7 +137,7 @@
 
                         // Assign event grouping and resourceIds into every event
                         assessmentResponse.data.map(function(element) {
-                            element.resourceId = element.data.meta.folderId;
+                            element.resourceId = 'folder-' + String(element.data.meta.folderId);
                             element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
 
@@ -170,21 +170,65 @@
                                 });
                             }
 
+                            // Add new resource here too
+                            if (!self.newResources.some(el => el.id === element.data.meta?.folderId)) {
+                                self.newResources.push({'id': element.resourceId, 'title': element.data.meta.folderName});
+                            }
+
                             eventGroupingCursor = element.data.meta.eventGrouping;
                             newResponse.push(element);
                         });
 
                         // Add calendar item responses
-                        newResponse = newResponse.concat(calendarResponse.data);
+                        // Must be a campus-level event
+                        calendarResponse.data = calendarResponse.data.filter(function (element) {
+                            return element.data.meta.level.match(/campus/);
+                        });
+                        calendarResponse.data.map(function(element) {
+                            element.resourceId = 'eventType-' + String(element.data.meta.eventTypeId);
+                            element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                        });
+                        calendarResponse.data.forEach(function (element) {
 
-                        successCallback(newResponse.filter(function (v) {
-                            // Check if resource is already added
-                            if (!self.newResources.some(el => el.id === v.data.meta?.folderId)) {
-                                self.newResources.push({'id': v.data.meta.folderId, 'title': v.data.meta.folderName});
+                            // Create a place holder
+                            if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
+
+                                let itemCountByGroup = assessmentResponse.data.filter(function(val) {
+                                    return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
+                                }).length;
+
+                                newResponse.push({
+                                    allDay: true,
+                                    backgroundColor: (element.data.meta.colour) ? element.data.meta.colour : self.defaultBgColour,
+                                    editable: false,
+                                    draggable: false,
+                                    resourceId: element.resourceId,
+                                    title: itemCountByGroup,
+                                    start: element.start,
+                                    end: null,
+                                    data: {
+                                        placeholder: true,
+                                        meta: {
+                                            eventGrouping: element.data.meta.eventGrouping,
+                                            weekNo: self.toMoment(element.start).isoWeek(),
+                                        }
+                                    },
+                                });
                             }
 
-                            return 'start' in v;
-                        }));
+                            // Create the resource and push the element
+                            if (!self.newResources.some(el => el.id === element.resourceId)) {
+                                self.newResources.push({'id': element.resourceId, 'title': element.resourceId});
+                            }
+
+                            newResponse.push(element);
+                        });
+
+
+                        newResponse = newResponse.concat();
+
+                        // Filter out events which don't start
+                        successCallback(newResponse.filter(v => 'start' in v));
                     }
                 );
                 // Fail callback: consider a message saying something failed
