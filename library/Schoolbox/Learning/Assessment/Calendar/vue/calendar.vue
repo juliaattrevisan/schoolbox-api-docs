@@ -505,6 +505,13 @@
                 }
             },
 
+            /**
+             * Callback when a date is rendered (i.e. the view or viewed date
+             * changes).
+             *
+             * This callback enables/disabled prev/next/today buttons based on
+             * whether they're available.
+             */
             datesRender(datesRenderInfo) {
                 let todayButton = this.$el.querySelector('button.fc-customToday-button'),
                     nextButton  = this.$el.querySelector('button.fc-customNext-button'),
