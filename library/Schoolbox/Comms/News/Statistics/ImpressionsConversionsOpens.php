@@ -69,7 +69,7 @@ class ImpressionsConversionsOpens
 
     /**
      * Record an open for $articleId
-     * ie. $userId has witnessed $articleId
+     * ie. $userId has loaded the detail screen for $articleId
      *
      * $referrer indicates a link they clicked to initiate the open
      *
