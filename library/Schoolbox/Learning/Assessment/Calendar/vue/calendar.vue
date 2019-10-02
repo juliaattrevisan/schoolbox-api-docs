@@ -102,7 +102,7 @@
              * @param successCallback A function to call with the list of events.
              */
             events(fetchInfo, successCallback) {
-                var self = this;
+                let self = this;
 
                 // No filters loaded yet? Render nothing.
                 // The selected filters get populated by `onFilterChange`:
@@ -111,36 +111,40 @@
                     successCallback([]);
                     return;
                 }
-                axios.get(
-                    URL_ASSESSMENT_EVENT_SOURCE,
-                    {
-                        headers: {
-                            'X-Requested-With' : 'XMLHttpRequest'
-                        },
-                        params: {
-                            start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                            end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            filters: self.selectedFilters,
-                        },
-                        paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
-                    }
-                ).then(
-                    function (response) {
+
+                // AJAX params: the same for all requests
+                let ajaxParams = {
+                    headers: {
+                        'X-Requested-With' : 'XMLHttpRequest'
+                    },
+                    params: {
+                        start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                        end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                        filters: self.selectedFilters,
+                    },
+                    paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                };
+
+                Promise.all([
+                    axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams),
+                    axios.get(URL_CALENDAR_EVENT_SOURCE, ajaxParams),
+                ]).then(
+                    function (assessmentResponse, calendarResponse) {
                         // Massage the data to inject placeholders
                         let newResponse = [],
                             eventGroupingCursor = '';
 
                         // Assign event grouping and resourceIds into every event
-                        response.data.map(function(element, index) {
+                        assessmentResponse.data.map(function(element, index) {
                             element.resourceId = element.data.meta.folderId;
                             element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
 
-                        response.data.forEach(function(element) {
+                        assessmentResponse.data.forEach(function(element) {
                             // Create a place holder
                             if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
 
-                                var itemCountByGroup = response.data.filter(function(val) {
+                                var itemCountByGroup = assessmentResponse.data.filter(function(val) {
                                     return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
                                 }).length;
 
@@ -169,6 +173,8 @@
                             newResponse.push(element);
                         });
 
+                        newResponse = newResponse.concat(calendarResponse.data);
+
                         successCallback(newResponse.filter(function (v) {
                             // Check if resource is already added
                             if (!self.newResources.some(el => el.id === v.data.meta?.folderId)) {
@@ -180,27 +186,6 @@
                     }
                 );
                 // Fail callback: consider a message saying something failed
-
-
-                // Another source of events: the standard calendar feed
-                axios.get(
-                    URL_CALENDAR_EVENT_SOURCE,
-                    {
-                        headers: {
-                            'X-Requested-With' : 'XMLHttpRequest'
-                        },
-                        params: {
-                            start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                            end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            filters: self.selectedFilters,
-                        },
-                        paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
-                    }
-                ).then(function (response) {
-                    successCallback(response.filter(function (v) {
-                        return 'start' in v;
-                    }));
-                });
             },
 
             /**
