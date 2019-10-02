@@ -54,7 +54,6 @@
                 currentBatchCursor: null,
                 eventGroups: [],
                 defaultBgColour: '#0066b0',
-                contentHeight: 1,
                 maxDate: null,
                 minDate: null,
                 termDuration: 10,
@@ -90,6 +89,11 @@
                 // TODO this method should be unnecessary
                 // (for the same reason as `onLoading` in the main fullCalendar)
                 this.helper.onLoading(isLoading);
+            },
+
+
+            contentHeight() {
+                return this.helper.contentHeight();
             },
 
             /**
@@ -364,7 +368,6 @@
                 self.maxDate = self.getMaxTermDate();
                 self.minDate = self.getMinTermDate();
                 self.termDuration = self.getTermDateDurations();
-                self.contentHeight = self.getContentHeight();
             },
 
             /**
@@ -527,8 +530,6 @@
                     this.redrawWeekNumbers();
                     this.redrawEventRows();
                 }
-
-                self.contentHeight = self.getContentHeight();
             },
 
             cleanupMonthHeaderInlineStyles() {
@@ -557,24 +558,6 @@
             currentViewIsSemester() {
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
             },
-
-            /**
-             * Calculate a height for the calendar content
-             */
-            getContentHeight: function() {
-                var windowHeight = window.innerHeight,
-                    calendarOffset = document.querySelector('.fc-view-container').offsetTop, // The amount of space between the top of the window and the start of the calendar
-                    footerHeight = $('#footer').outerHeight(),
-                    otherPadding = 32, // <section> margin-bottom and #container padding-bottom
-                    contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
-
-                // Force a min height of 500px
-                if (contentHeight < 500) {
-                    return 500;
-                }
-
-                return contentHeight;
-            }
         }
     }
 </script>
