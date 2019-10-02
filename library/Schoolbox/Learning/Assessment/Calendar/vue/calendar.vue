@@ -129,13 +129,14 @@
                     axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams),
                     axios.get(URL_CALENDAR_EVENT_SOURCE, ajaxParams),
                 ]).then(
-                    function (assessmentResponse, calendarResponse) {
+                    function (responses) {
                         // Massage the data to inject placeholders
                         let newResponse = [],
-                            eventGroupingCursor = '';
+                            eventGroupingCursor = '',
+                            [assessmentResponse, calendarResponse] = responses;
 
                         // Assign event grouping and resourceIds into every event
-                        assessmentResponse.data.map(function(element, index) {
+                        assessmentResponse.data.map(function(element) {
                             element.resourceId = element.data.meta.folderId;
                             element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
@@ -144,7 +145,7 @@
                             // Create a place holder
                             if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
 
-                                var itemCountByGroup = assessmentResponse.data.filter(function(val) {
+                                let itemCountByGroup = assessmentResponse.data.filter(function(val) {
                                     return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
                                 }).length;
 
@@ -173,6 +174,7 @@
                             newResponse.push(element);
                         });
 
+                        // Add calendar item responses
                         newResponse = newResponse.concat(calendarResponse.data);
 
                         successCallback(newResponse.filter(function (v) {
