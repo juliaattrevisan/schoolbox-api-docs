@@ -256,7 +256,7 @@ th, td{
 	label {
 		cursor: $cursor-default-value;
 	}
-	
+
 	span {
 		position: absolute;
 		top: 0.2rem;
@@ -920,7 +920,6 @@ section > fieldset {
 	}
 
 	fieldset, fieldset.collapsible {
-		float: left;
 		width: 100%;
 		border: none;
 		padding: 1rem 0;
