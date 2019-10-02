@@ -14,13 +14,17 @@ use Schoolbox\Pastoral\Model;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\GenericCollection;
 
 require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
 
-    private const NUM_RECORDS = 2000;
+    private const NUM_RECORDS = 500;
+
+    /** @var Schoolbox\Pastoral\Tag\Mapper */
+    private $pastoralTagMapper;
 
     /** @inheritDoc */
     public function run(): void
@@ -74,6 +78,10 @@ $app = new class extends CliTool\App
         $memberMapper = \Schoolbox\Pastoral\Group\Member\Mapper::getInstance();
         $memberMapper->save((new \Schoolbox\Pastoral\Group\Member\Model())->setGroup($pastoralGroup)->setUser($testStaffs->current())->setAuthor($moderator ?? $testStaffs->current()));
 
+        // pastoral tags
+        $this->pastoralTagMapper = Schoolbox\Pastoral\Tag\Mapper::getInstance();
+        $tags = $this->generateTags();
+
         for ($i = 0; $i < $this::NUM_RECORDS; $i++) {
             /** @var \Schoolbox\User $ownerStaff */
             $ownerStaff = $testStaffs->offsetGet(rand(0, 2));
@@ -90,6 +98,12 @@ $app = new class extends CliTool\App
                                            ->setType($currentType);
             $pastoralMapper = Mapper::getInstance();
             $pastoralMapper->save($pastoral);
+
+            $tagStart = rand(0, 2);
+            $tagEnd = rand($tagStart, 5);
+            for ($j = $tagStart; $j < $tagEnd; $j++) {
+                $this->pastoralTagMapper->assignToRecord($pastoral, $tags->getOffset($j));
+            }
 
             if ($i % 3 == 0) {
                 $access = (new PastoralAccess())->setUser($currentStudent->getParents()->first())->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
@@ -108,6 +122,37 @@ $app = new class extends CliTool\App
             // pastoral access
             $accessMapper->save($access);
         }
+    }
+
+    /**
+     * Generates pastoral tags
+     * @return GenericCollection
+     */
+    private function generateTags(): GenericCollection
+    {
+        $tagNames = ['AAA', 'BBB', 'CCC', 'DDD', 'EEE'];
+        $tags = $this->pastoralTagMapper->createCollection();
+        foreach ($tagNames as $tagName) {
+            /** @var Schoolbox\Pastoral\Tag\Model $tag */
+            try {
+                /* Assign an existing tag to this pastoral record
+                 */
+                $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagName, ['cache' => false]);
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                /* Restore this tag to active duty
+                 */
+                $tag = $e->getDeletedObject();
+
+                $tag->setDeletedAt(null);
+                $this->pastoralTagMapper->save($tag);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $tag = $this->pastoralTagMapper->createModel();
+                $tag->setName($tagName);
+            }
+            $this->pastoralTagMapper->save($tag);
+            $tags->add($tag);
+        }
+        return $tags;
     }
 };
 

@@ -43,7 +43,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
     public function assignToRecord(Pastoral $pastoral, PastoralTag $tag): void
     {
         $statement = $this->getDatabase()->prepare("
-            INSERT INTO pastoral_tags (pastoral_id, tag_id) VALUES (:pastoralId, :tagId)
+            INSERT IGNORE INTO pastoral_tags (pastoral_id, tag_id) VALUES (:pastoralId, :tagId)
         ");
 
         $statement->execute([
