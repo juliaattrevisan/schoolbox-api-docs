@@ -32,6 +32,14 @@ class Interactions
 
 
     /**
+     * This threshold indicates how long to wait before we can record more data for this open, in days
+     *
+     * Default: you have to wait one day between visits for it to start recording more data
+     */
+    private const UNIQUE_VISIT_THRESHOLD = 1;
+
+
+    /**
      * @var IConnector
      */
     private $database;
@@ -121,7 +129,8 @@ class Interactions
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
          * increment cumulative total if (and only if) a unique Open was made
          */
-        $existingOpen = $this->statisticsMapper->countByColumnList([
+        /** @var News\Statistics\Model $existingOpen */
+        $existingOpen = $this->statisticsMapper->findOneByColumnList([
             'article_id' => $article->getId(),
             'type' => Mapper::TYPE_OPEN,
             'user_id' => $userId,
@@ -133,7 +142,7 @@ class Interactions
         /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
          * Otherwise, this (user, referrer) combination indicates a new Open for this particular user
          */
-        if ($existingOpen) {
+        if ($existingOpen && $existingOpen->getOccursAt()->diffInDays($date) < self::UNIQUE_VISIT_THRESHOLD) {
             return false;
         }
 
