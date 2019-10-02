@@ -2,6 +2,9 @@
     <div>
         <div class="small-12 medium-8 island">
             <section class="detail content">
+                <div class="event-type">
+                    <span :style="{'background-color': this.event.options.type.color}">{{ this.event.options.type.name }}</span>
+                </div>
                 <div class="title-section">
                     <time datetime="2014-09-20" class="icon">
                         <strong :style="{'background-color': this.event.options.type.color}"> {{ monthDisplay }}</strong>
@@ -132,8 +135,8 @@
         font-size: 1rem;
         display: block;
         position: relative;
-        width: 4rem;
-        height: 4rem;
+        min-width: 4rem;
+        min-height: 4rem;
         background-color: #fff;
         border-radius: 0.1em;
         box-shadow: 0 1px 0 #bdbdbd, 0 2px 0 #fff, 0 3px 0 #bdbdbd, 0 4px 0 #fff, 0 5px 0 #bdbdbd, 0 0 0 1px #bdbdbd;
@@ -168,5 +171,18 @@
 
     time {
         margin-right: .5rem;
+    }
+
+    .event-type {
+        text-align: right;
+    }
+
+    .event-type span {
+        color: #fff;
+        padding: .5rem;
+        font-size: .8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: .5rem;
     }
 </style>
