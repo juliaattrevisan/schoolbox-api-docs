@@ -151,7 +151,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      *
      * @var bool
      */
-    protected $similarityCheckEnabled;
+    private $similarityCheckEnabled;
 
     /**
      * @var bool

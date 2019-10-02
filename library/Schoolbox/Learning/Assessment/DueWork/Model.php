@@ -112,7 +112,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @var bool
      */
-    protected $similarityCheckEnabled = false;
+    private $similarityCheckEnabled = false;
 
 
     /**
