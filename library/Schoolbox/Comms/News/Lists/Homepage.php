@@ -52,7 +52,7 @@ class Homepage extends Base
         $idProperty = $this->newsMapper->getIdentifierProperty();
 
         /** @var GenericCollection|Model[] $articles */
-        $articles = $this->loadArticleByIds($articleIds, $params, $user)->indexBy($idProperty);
+        $articles = $this->loadArticleByIds($articleIds)->indexBy($idProperty);
 
         foreach ($articles as $article) {
             $article->setAudience(new GenericCollection(Audience\Model::class));

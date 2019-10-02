@@ -125,7 +125,7 @@ class Archive extends Base
             $folderId
         );
 
-        $articles = $this->loadArticleByIds($articleIds, $params, $user);
+        $articles = $this->loadArticleByIds($articleIds);
 
         /* Get an accompanying paginator
          */

@@ -236,11 +236,9 @@ abstract class Base
      * Load a set of hydrated articles having known their ids
      *
      * @param array       $articleIds
-     * @param Querystring $params
-     * @param User        $user
      * @return GenericCollection
      */
-    protected function loadArticleByIds(array $articleIds, Querystring $params, User $user) : GenericCollection
+    protected function loadArticleByIds(array $articleIds) : GenericCollection
     {
         $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
 
