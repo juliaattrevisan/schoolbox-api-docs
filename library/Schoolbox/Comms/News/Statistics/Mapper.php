@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -10,6 +8,7 @@ namespace Schoolbox\Comms\News\Statistics;
 
 /**
  * Class Mapper
+ *
  * @package Schoolbox\Comms\News\Statistics
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
@@ -34,7 +33,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * This const represents a string value for an empty referrer so it can be meaningful to humans
      */
-    public const REFERRER_EMPTY = 'unknown';
+    public const REFERRER_EMPTY = 'none';
 
 
     /**
@@ -48,7 +47,7 @@ class Mapper extends \Schoolbox\Mapper
         self::REFERRER_EMAIL,
         self::REFERRER_SAVED,
         self::REFERRER_SEARCH,
-        self::REFERRER_UNKNOWN
+        self::REFERRER_EMPTY
     ];
 
 

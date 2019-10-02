@@ -326,7 +326,7 @@ class ImpressionsConversionsOpens
         foreach (Role::getRoleTypes() as $roleType) {
             $data[$roleType] = array_values($data[$roleType]);
 
-            /* Sort to eliminate anomolous ordering
+            /* Sort to eliminate anomalous ordering
              *
              * Sometimes data points are added that don't fall within the prescribed set of keys produced by
              * generateDateRange() and are added to the end of the stack, out of order with everything else

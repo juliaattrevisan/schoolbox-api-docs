@@ -4,7 +4,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Comms\News\Statistics\Cumulative;
 
 use Schoolbox\Collection;
@@ -13,6 +12,7 @@ use Schoolbox\Comms\News\Statistics\Mapper as StatisticsMapper;
 
 /**
  * Class Mapper
+ *
  * @package Schoolbox\Comms\News\Statistics
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
