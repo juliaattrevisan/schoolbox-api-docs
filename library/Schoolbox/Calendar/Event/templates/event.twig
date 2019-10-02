@@ -1,5 +1,6 @@
 <div class="row" id="event-details">
     {% set eventData = {
+        "id"      : event.id,
         "title"   : event.title,
         "location": event.location,
         "author"  : {
@@ -22,7 +23,8 @@
         "audiences" : {
             "campus" : campusCollection,
             "roles": roleCollection,
-        }
+        },
+        "attendance" : attendance
     } %}
 
     <event-details :event="{{ eventData | json_encode }}"></event-details>

@@ -35,10 +35,16 @@ class Controller extends Base
      */
     public function getEvent(Event $event)
     {
+        $attendanceStatus = (new \Calendar())->getAttendanceByEventAndUser($event->getId(), $this->getUser()->getId());
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event' => $event,
-            'campusCollection' => $this->getCampusCollection($event),
-            'roleCollection' => $this->getRoleCollection($event),
+            'campusCollection'  => $this->getCampusCollection($event),
+            'roleCollection'    => $this->getRoleCollection($event),
+            'attendance'        => [
+                'status'            => $attendanceStatus,
+                'nextAction'        => ($attendanceStatus) ? 'remove' : 'add',
+            ],
         ])->setTitle($event->getTitle()));
     }
 
