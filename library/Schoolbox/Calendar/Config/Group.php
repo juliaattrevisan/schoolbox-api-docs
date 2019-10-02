@@ -59,7 +59,7 @@ class Group extends Base
             function (\Schoolbox\Resource\Folder\Model $v) {
                 return [
                     'id'    => (int) $v->getId(),
-                    'name'  => $v->getName(),
+                    'name'  => $v->getNameWithCodes(),
                     'code'  => $v->getCodeString()
                 ];
             }
