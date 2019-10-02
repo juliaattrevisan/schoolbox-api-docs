@@ -517,7 +517,7 @@ class Obama
 
                 /* Pass an actual value if we chose an unknown referrer
                  */
-                if ($randomReferrer === News\Statistics\Mapper::REFERRER_UNKNOWN) {
+                if ($randomReferrer === News\Statistics\Mapper::REFERRER_EMPTY) {
                     $referrer = null;
                 } else {
                     $referrer = $randomReferrer;
