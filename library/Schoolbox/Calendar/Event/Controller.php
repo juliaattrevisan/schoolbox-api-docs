@@ -29,6 +29,10 @@ class Controller extends Base
         $this->roleMapper = $roleMapper;
     }
 
+    /**
+     * @param Event $event
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
     public function getEvent(Event $event)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
