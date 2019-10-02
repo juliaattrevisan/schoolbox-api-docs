@@ -28,7 +28,7 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Periodic Data</h2>
-        <p class="meta">Statistics from the last {{ period }} days. Click and drag graphs to zoom; click and drag while holding down <strong>Shift</strong> to pan while zoomed in.</strong></p>
+        <p class="meta">Unique daily visits over time. Click and drag graphs to zoom; click and drag while holding down <strong>Shift</strong> to pan while zoomed in.</p>
 
         {% include '@commsNewsStatistics/interactions-chronological.twig' with {
             article: article,
@@ -40,6 +40,9 @@
 
 <div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Referrers</h2>
+        <p class="meta">Referrers used to access this {{ locale.news }} across all time.</p>
+
         {% include '@commsNewsStatistics/referrer-demographic.twig' with {
             referrerDemographic: referrerDemographic
         } %}
@@ -51,7 +54,6 @@
         #}
     </div>
 </div>
-
 
 {# Historical Dailies: temporarily disabled
  #
