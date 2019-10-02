@@ -543,7 +543,7 @@
                 if (this.currentViewIsSemester()) {
                     // Next: disable if there is no next
                     // Prev: disable if there is no prev
-                    let currentIndex    = Number(this.findRangeIndex(this.toMoment(start).format('YYYY-MM-DD')));
+                    let currentIndex    = this.findTermIndex(this.toMoment(start).format('YYYY-MM-DD'));
                     nextButton.disabled = (currentIndex === this.allTerms.length - 1);
                     prevButton.disabled = (currentIndex === 0);
                 } else {
@@ -578,6 +578,14 @@
             currentViewIsSemester() {
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
             },
+
+            /**
+             * Determine which visible range is shown on the semester view.
+             *
+             * @param currentDate A Date object matching the date to show
+             * @return {*} An object which can be passed to FullCalendar's
+             *             `visibleRange`, or null if if found nothing.
+             */
             determineVisibleRange(currentDate) {
                 // Find the range in the list of terms.
                 // (Need to go to these lengths to create a date, as calendar
@@ -587,9 +595,15 @@
                 let actualDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())),
                     dateString = actualDate.toISOString().slice(0, 10);
 
-                return this.allTerms[this.findRangeIndex(dateString)];
+                return this.allTerms[this.findTermIndex(dateString)] || null;
             },
 
+            /**
+             * Builds the list of all terms passed into `this.config.termDates`
+             * into a single array, ordered by start then end date.
+             *
+             * @return {Array}
+             */
             buildAllTermsList() {
                 return this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future)
                     .sort(function (a, b) {
@@ -609,14 +623,24 @@
                     });
             },
 
-            findRangeIndex(date) {
+            /**
+             * Find the index of the term within `this.termDates` which contains
+             * `dateString`.
+             *
+             * @param dateString A date to find the index for, in "YYYY-MM-DD"
+             *                   format
+             * @return {Number} The index of the term within `this.termDates`,
+             *                  or -1 if not found.
+             */
+            findTermIndex(dateString) {
                 for (let i in this.allTerms) {
                     if (!this.allTerms.hasOwnProperty(i)) {
                         continue;
                     }
                     let term = this.allTerms[i];
-                    if (date >= term.start && date <= term.end) {
-                        return i;
+                    // TODO end times are exclusive: account for that
+                    if (dateString >= term.start && dateString <= term.end) {
+                        return Number(i);
                     }
                 }
                 return -1;
