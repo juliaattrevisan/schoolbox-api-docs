@@ -807,4 +807,12 @@
         color: #fff;
     }
 
+    .fc-resourceTimelineSemester-view span.fc-cell-text.fc-sticky {
+        left: 0 !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-widget-header .fc-cell-content {
+        text-align: center !important;
+    }
+
 </style>
