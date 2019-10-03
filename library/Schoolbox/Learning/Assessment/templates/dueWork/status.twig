@@ -588,7 +588,7 @@
                             }
                         } else if (dataFormat === 'comment-only') {
                             assign = function(input, form) {
-                                $(form).find('textarea[name="comment"], select[name="mark"]').val(input[1]).change();
+                                $(form).find('textarea[name="comment"]').val(input[1]).change();
                             }
                         } else {
                             assign = function(input, form) {
