@@ -329,7 +329,7 @@
                             {% endblock buttons_pastoralCare %}
 
                             {% block buttons_documents %}
-                                {% if config.external_document_report_enabled %}
+                                {% if config.external_document_report_enabled and config.external_document_button_enable %}
                                     {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
                                     {% if routeAcademicReports %}
                                         <li>
