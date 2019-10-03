@@ -323,10 +323,14 @@ class ListController extends Web\Controller\Base
      * @param User              $user
      * @param array|Traversable $postData
      * @param IAssessable       $assessment
-     * @throws DomainException
      * @return array
+     * @throws DomainException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws \LogicException
      */
-    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null)
+    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
