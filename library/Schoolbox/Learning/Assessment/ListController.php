@@ -150,28 +150,29 @@ class ListController extends Web\Controller\Base
      *
      * @param AssessmentContext $context
      * @throws Web\Controller\Exception
+     * @throws UnexpectedValueException
      */
     public function postCreateAssessment(AssessmentContext $context)
     {
         try {
             // we need to perform some surgery on our "post" data before we send it through
             $post = $this->getRequest()->post->getArrayCopy();
-            $post['context']   = $context;
+            $post['context'] = $context;
 
-            list ($assessment, $defaultReturnUrl) = array_values($this->persistAssessment($this->getUser(), $post));
+            [$assessment, $defaultReturnUrl] = array_values($this->persistAssessment($this->getUser(), $post));
 
-            $type          = AssessmentType::objectToString($assessment);
-            $controller    = $this->getDelegateController($type);
+            $type       = AssessmentType::objectToString($assessment);
+            $controller = $this->getDelegateController($type);
 
             $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
 
             $this->redirect($controller->determineRedirect($assessment, $explicitReturnUrl, $defaultReturnUrl));
-
         } catch (DomainException $e) {
-            $this->sendError("Could not save assessment. You need to " . $e->getMessage(), [], 400, $e->getCode());
+            $this->sendError('Could not save assessment.', ["You need to {$e->getMessage()}"], 400, $e->getCode());
             return;
         }
     }
+
 
     /**
      * POST action for reordering assessments.

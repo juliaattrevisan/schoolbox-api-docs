@@ -644,7 +644,7 @@ class Controller extends Base\Base
                 }
             }
         } else {
-            $this->sendError(new Base\Exception("Cannot create a Course without Units", ["create at least 1 unit"]));
+            $this->sendError(new Base\Exception('Cannot create a Course without Units.', ['You need to create at least 1 unit']));
             return;
         }
 
@@ -711,7 +711,7 @@ class Controller extends Base\Base
         $name = trim($post->get('name'));
 
         if (!$name) {
-            $this->sendError('Could not create unit', ['give the unit a name']);
+            $this->sendError('Could not create unit.', ['You need to give the unit a name']);
             return;
         }
 
