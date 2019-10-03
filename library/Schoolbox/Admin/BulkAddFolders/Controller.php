@@ -9,140 +9,118 @@
 
 namespace Schoolbox\Admin\BulkAddFolders;
 
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Bulk_Folder;
+use InvalidArgumentException;
+use PDOException;
+use Schoolbox\Application;
+use Schoolbox\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\RoleMapper;
-use Schoolbox\User;
-use Schoolbox\Resource\Storage;
+use Schoolbox\Resource;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Scrub;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
-    /**
-     * A RoleMapper instance
-     *
-     * @var RoleMapper
-     */
+    /** @var RoleMapper */
     private $roleMapper;
 
-    /**
-     * A HomepageTemplateMapper instance
-     *
-     * @var HomepageTemplateMapper
-     */
+    /** @var HomepageTemplateMapper */
     private $homepageTemplateMapper;
 
-    /**
-     * @var ErrorMapper
-     */
+    /** @var ErrorMapper */
     private $errorMapper;
 
     /**
-     * Get Role Mapper
-     *
-     * @return RoleMapper
+     * @param RoleMapper             $roleMapper
+     * @param ErrorMapper            $errorMapper
+     * @param HomepageTemplateMapper $homepageTemplateMapper
      */
-    private function getRoleMapper()
+    public function __construct(
+        RoleMapper $roleMapper,
+        ErrorMapper $errorMapper,
+        HomepageTemplateMapper $homepageTemplateMapper
+    )
     {
-        return $this->roleMapper;
-    }
-
-    /**
-     * Set Role Mapper
-     *
-     * @param RoleMapper $roleMapper
-     */
-    private function setRoleMapper($roleMapper)
-    {
-        $this->roleMapper = $roleMapper;
-    }
-
-    /**
-     * Get Error Mapper
-     *
-     * @return ErrorMapper
-     */
-    private function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * Set Error Mapper
-     *
-     * @param ErrorMapper $errorMapper
-     */
-    private function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-    }
-
-    /**
-     * Controller constructor.
-     */
-    public function __construct()
-    {
-        $this->setRoleMapper(RoleMapper::getInstance());
-        $this->setErrorMapper(ErrorMapper::getInstance());
-        $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
+        $this->roleMapper             = $roleMapper;
+        $this->errorMapper            = $errorMapper;
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
     }
 
     /**
      * Display bulk upload admin page
+     *
+     * @api   GET /adminv2/bulk-add-folders
+     * @since 16.0.0
+     * @throws UnexpectedValueException
      */
-    public function getIndex()
+    public function getIndex(): void
     {
         // Render this thing out
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminBulkAddFolders/index.twig',
                 'data'     => array(
                     'pageCurrent' => 'bulk-add-folders',
-                    'templates' => $this->getHomepageTemplateMapper()->findAll()->sortBy("name", "asc"),
-                    'roles' => $this->getRoleMapper()->findAll(),
+                    'templates' => $this->homepageTemplateMapper->findAll()->sortBy("name", "asc"),
+                    'roles' => $this->roleMapper->findAll(),
                     'attachzone' => $this->getAttachZone(),
                 ),
             )
         );
     }
 
+
+    /** @noinspection PhpUnused */
     /**
      * Create folders and render results
+     *
+     * @api   POST /adminv2/bulk-add-folders
+     * @since 16.0.0
+     * @throws Application\Exception\Exception
+     * @throws DefinitionException
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws Resource\Exception
+     * @throws UnexpectedValueException
      */
-    public function postImportResults()
+    public function postImportResults(): void
     {
         set_time_limit(600);
 
-        if (!$this->getUser()->isSuperuser()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
+        $post = $this->getRequest()->post;
 
-        $allFolders = null;
-        if (is_array($this->getRequest()->post['attachment'])) {
-            $factory = new CollectorFactory();
-            $csvFile = $factory->build($this->getRequest()->post['attachment'])->getFirst();
-
-            $bulkHandler = new Bulk_Folder($csvFile->readStream(), Scrub::text($this->getRequest()->post['template']));
-            $allFolders = $bulkHandler->addFolders();
-        } else {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        if (!is_array($post->get('attachment'))) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
+        $factory = new CollectorFactory();
+        $csvFile = $factory->build($post->get('attachment'))->getFirst();
+
+        $bulkHandler = new Bulk_Folder(
+            $csvFile->readStream(),
+            (int)$post->get('template'),
+            $post->get('groupPerm'),
+            (bool)$post->get('inherit')
+        );
+        $allFolders = $bulkHandler->addFolders();
 
         // Render this thing out
-
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@adminBulkAddFolders/importResults.twig',
-                'data'     => array(
+                'data'     => [
                     'pageCurrent' => 'bulk-add-folders',
-                    'folders' => $allFolders
-                ),
-            )
+                    'folders'     => $allFolders,
+                ],
+            ]
         );
     }
 
@@ -150,10 +128,10 @@ class Controller extends Base
     /**
      * Insert an attach zone into the template
      *
-     * @param Collection|PastoralAttachmentModel $attachments
      * @return array
+     * @throws UnexpectedValueException
      */
-    private function getAttachZone()
+    private function getAttachZone(): array
     {
         $zone = new Zone('attachment');
         $zone
@@ -167,25 +145,4 @@ class Controller extends Base
 
         return $zone->getTwigContext();
     }
-
-    /**
-     * Get homepage template mapper
-     *
-     * @return HomepageTemplateMapper
-     */
-    private function getHomepageTemplateMapper()
-    {
-        return $this->homepageTemplateMapper;
-    }
-
-    /**
-     * Set homepage template mapper
-     *
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     */
-    private function setHomepageTemplateMapper($homepageTemplateMapper)
-    {
-        $this->homepageTemplateMapper = $homepageTemplateMapper;
-    }
-
 }

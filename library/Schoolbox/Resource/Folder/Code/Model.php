@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -10,10 +10,16 @@ namespace Schoolbox\Resource\Folder\Code;
 
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Resource\Folder;
 
 class Model implements ISoftDeletable
 {
+    use CreateCollection;
+
+    // Maximum length allowed for folder codes
+    public const CODE_LENGTH_MAX = 20;
+
     /**
      * @var Folder\Model
      */

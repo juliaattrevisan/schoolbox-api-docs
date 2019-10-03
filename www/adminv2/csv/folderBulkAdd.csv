@@ -1,5 +1,7 @@
-Parent ID,Folder Name,Folder Code 1,Folder Code 2,Folder Code 3
-162,Folder A,1000CA1,1000CA2,1000CA3
-162,Folder B,1001CB,,
-141,Folder C,1001CC,,
-141,Folder D,1001CD,,
+Parent ID,Folder Name,Folder Code 1,Folder Code 2,Folder Code 3, YearLevel, YearLevel
+162,Folder A,1000CA1,1000CA2,1000CA3,,
+162,Folder B,1001CB,,,,
+141,Folder C,1001CC,,,8,
+141,Folder D,1001CD,,,,
+141,Year 7 Archery,,,,7,
+141,Year 9/10 Archery,,,,9,10

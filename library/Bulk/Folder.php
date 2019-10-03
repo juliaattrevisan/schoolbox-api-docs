@@ -1,24 +1,28 @@
 <?php
 /**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+use Alaress\Database\Predicate\InvalidColumnException;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\RoleAccess;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\HomepageConfig;
+use Schoolbox\Resource\HomepageTemplate;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\YearLevel;
+
+/**
  * Bulk_Folder
  *
  * Upload folder structures from a csv
- *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
  */
-
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Resource\HomepageConfigMapper;
-use Schoolbox\Role;
-use Schoolbox\RoleMapper;
-
-
 class Bulk_Folder
 {
 
@@ -27,248 +31,413 @@ class Bulk_Folder
      *
      * @var int
      */
-    private $templateID = 0;
+    private $templateID;
+
+    /**
+     * Maps role.id to accessLevel
+     * @var int[]
+     */
+    private $rolePerms;
+
+    /** @var bool */
+    private $inherit;
 
     /**
      * Storage object
      * @var resource
      */
-    protected $fp;
+    private $fp;
+
+    /** @var Folder\Mapper */
+    private $folderMapper;
+
+    /** @var RoleAccessMapper */
+    private $roleAccessMapper;
+
+    /** @var RoleMapper */
+    private $roleMapper;
+
+    /** @var HomepageConfigMapper */
+    private $homepageConfigMapper;
+
+    /** @var YearLevel\Mapper */
+    private $yearLevelMapper;
+
 
     /**
      * Constructor
      *
-     * @param $file
-     * @param $templateID
+     * @param resource $file
+     * @param int      $templateID
+     * @param array    $rolePerms
+     * @param bool     $inherit
      */
-    public function __construct($file, $templateID)
+    public function __construct($file, int $templateID, array $rolePerms, bool $inherit)
     {
-        $this->fp = $file;
-        $this->setTemplateID($templateID);
+        if (!is_resource($file)) {
+            throw new TypeError(sprintf('$file must be a resource, found: %s', gettype($file)));
+        }
+        $this->fp         = $file;
+        $this->templateID = $templateID;
+        $this->rolePerms  = array_map('\intval', $rolePerms);
+        $this->inherit    = $inherit;
+
+        // TODO inject dependencies
+        $this->folderMapper         = Folder\Mapper::getInstance();
+        $this->roleAccessMapper     = RoleAccessMapper::getInstance();
+        $this->roleMapper           = RoleMapper::getInstance();
+        $this->homepageConfigMapper = HomepageConfigMapper::getInstance();
+        $this->yearLevelMapper      = YearLevel\Mapper::getInstance();
     }
+
 
     /**
      * Adds folders via csv
      *
-     * CSV Fields:
-     * 0.	parent
-     * 1.	title
-     * 2-n. codes
-     *
      * @return array
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws InvalidColumnException
+     * @throws DefinitionException
+     * @throws InvalidArgumentException
      */
-    public function addFolders()
+    public function addFolders(): array
     {
-        $folderMapper = FolderMapper::getInstance();
-        $folderCodeMapper = FolderCodeMapper::getInstance();
-        $roleAccessMapper = RoleAccessMapper::getInstance();
-        $roleMapper = RoleMapper::getInstance();
-        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
-        $homepageConfigMapper = HomepageConfigMapper::getInstance();
+        $results = [];
 
-        /* List of outcomes
-		 */
-        $output = [];
+        // Parse Header Row
+        $headerRow = fgetcsv($this->fp, 1000, ",");
 
-        if (is_resource($this->fp)) {
-            $groups = array_map(['Scrub', 'text'], $_POST['groupPerm']);
+        // Determine column semantics from header values
+        $parentColumn      = $this->determineColumnIndex($headerRow, 'parent');
+        $folderNameColumn  = $this->determineColumnIndex($headerRow, 'name');
+        $folderCodeColumns = $this->determineColumnIndexes($headerRow, 'code');
+        $yearLevelColumns  = $this->determineColumnIndexes($headerRow, 'year');
 
-            /* Process rows
-			 */
-            $headerRow = fgetcsv($this->fp, 1000, ",");
+        // Check no overlapping matches
+        $this->assertColumnIndexesAreUnique([$parentColumn, $folderNameColumn], $folderCodeColumns, $yearLevelColumns);
 
-            while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
+        $yearLevels = $this->getAllYearLevels();
 
-                /* Parent folder and Import Folder name must exist
-                 */
-                if (($row[0] != '') && ($row[1] != '')) {
+        while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
+            $results[] = $this->processCsvRow(
+                $row,
+                $parentColumn,
+                $folderNameColumn,
+                $folderCodeColumns,
+                $yearLevelColumns,
+                $yearLevels
+            );
+        }
 
-                    /* Check parent exists
-					 */
-                    try {
-                        $folder = $folderMapper->findById($row[0]);
-                    }
-                    catch (MapperException $e) {
-                        $output[] = [
-                            'id' => '',
-                            'name' => $row[1],
-                            'status' => 'Not Added',
-                            'error' => "Could not find parent folder {$row[0]}",
-                        ];
-
-                        continue;
-                    }
-
-                    /* Check codes */
-
-                    $codes = [];
-                    $lowerCaseCodes = [];
-                    $skip = false;
-
-                    for ($i=2; $row[$i]; $i++) {
-                        $subjectCode = trim($row[$i]);
-                        $lowerCaseCode = strtolower($subjectCode);
-                        if (in_array($lowerCaseCode, $lowerCaseCodes, true) && !in_array($subjectCode, $codes, true)) {
-                            $skip     = true;
-                            $output[] = [
-                                'id'     => '',
-                                'name'   => $row[1],
-                                'status' => 'Skipped',
-                                'error'  => "Ambiguous subject code. Same characters but different capitalisation ({$subjectCode})",
-                            ];
-                            break;
-                        }
-
-                        /* Check if code too looong */
-                        if(strlen($subjectCode) > 20) {
-                            $skip = true;
-
-                            $output[] = [
-                                'id' => '',
-                                'name' => $row[1],
-                                'status' => 'Skipped',
-                                'error' => "Subject code exceeds 20 characters ({$subjectCode})",
-                            ];
-
-                            break;
-                        }
-
-                        /* Check if subject code already exists*/
-                        try {
-                            $folder = $folderMapper->findByCode($subjectCode);
-
-                            $skip = true;
-
-                            $output[] = [
-                                'id' => '',
-                                'name' => $row[1],
-                                'status' => 'Skipped',
-                                'error' => "Subject code already exists ({$subjectCode})",
-                            ];
-
-                            break;
-                        } catch (MapperException $e) {
-                            /* noop - folder doesn't exist
-                             */
-                            $codes[] = $subjectCode;
-                            $lowerCaseCodes[] = $lowerCaseCode;
-                        }
-                    }
-
-                    /*skip folder creation if above we found any of the folder subjectCodes exist already
-                    */
-                    if($skip) {
-                        continue;
-                    }
+        return $results;
+    }
 
 
-                    /* Parent folder
-                     */
-                    $parent = $folderMapper->createModel();
-                    $parent->setId($row[0]);
+    /**
+     * Process a single row from the CSV and returns an array describing the processing results.
+     *
+     * @param array                               $row
+     * @param int                                 $parentColumnIndex
+     * @param int                                 $folderNameColumnIndex
+     * @param int[]                               $folderCodeColumnIndexes
+     * @param int[]                               $yearLevelColumnIndexes
+     * @param GenericCollection|YearLevel\Model[] $yearLevels Indexed by yearLevel.name
+     * @return array
+     * @throws DefinitionException
+     * @throws InvalidColumnException
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function processCsvRow(
+        array $row,
+        int $parentColumnIndex,
+        int $folderNameColumnIndex,
+        array $folderCodeColumnIndexes,
+        array $yearLevelColumnIndexes,
+        GenericCollection $yearLevels
+    ): array {
 
-                    /* Homepage config template
-                     */
-                    $homepageTemplate = $homepageTemplateMapper->createModel();
-                    $homepageTemplate->setId($this->getTemplateID());
+        $parentId   = trim($row[$parentColumnIndex]);
+        $folderName = trim($row[$folderNameColumnIndex]);
 
-                    /* Homepage config
-                     */
-                    $homepageConfig = $homepageConfigMapper->createModel();
-                    $homepageConfig->setTemplate($homepageTemplate);
+        // Parent folder and Import Folder name must exist
+        if (($parentId === '') || ($folderName === '')) {
+            $error = "Parent id and folder name must be provided. Found: parent='$parentId', folderName='$folderName'";
+            return $this->buildRowResult('', '', 'Not Added', $error);
+        }
 
-                    /* Set up new folder
-                     */
-                    $newFolder = $folderMapper->createModel();
-                    $newFolder->setName(trim($row[1]));
-                    $newFolder->setParent($parent);
-                    $newFolder->setHomepage($homepageConfig);
+        // Check parent exists
+        try {
+            $parent = $this->folderMapper->findById($parentId);
+        } catch (MapperException $e) {
+            return $this->buildRowResult('', $folderName, 'Not Added', "Could not find parent folder {$parentId}");
+        }
 
-                    /* Accumulate all folder codes
-                     */
-                    foreach ($codes as $currentCode) {
+        $homepageConfig = (new HomepageConfig())->setTemplate((new HomepageTemplate())->setId($this->templateID));
 
-                        $folderCode = $folderCodeMapper->createModel();
-                        $folderCode->setCode($currentCode);
+        // Create new Folder
+        $newFolder = (new Folder\Model())
+            ->setName($folderName)
+            ->setParent($parent)
+            ->setHomepage($homepageConfig);
+        $homepageConfig->setCategory($newFolder);
 
-                        $newFolder->getCodes()->add($folderCode);
-                    }
+        // Folder Codes
+        $result = $this->processFolderCodes($row, $newFolder, $folderCodeColumnIndexes);
+        if ($result) {
+            return $result;
+        }
 
-                    /* Inherit perms
-                     */
-                    if (count($codes) == 0 && $_POST["inherit"]) {
-                        $newFolder->setInherit(true);
-                    }
+        // Year Levels
+        $result = $this->processYearLevels($row, $newFolder, $yearLevels, $yearLevelColumnIndexes);
+        if ($result) {
+            return $result;
+        }
 
-                    $folderMapper->save($newFolder);
+        // Persist models to DB.
+        $newFolder->setInherit($this->inherit && count($newFolder->getCodes()) === 0);
+        $this->folderMapper->save($newFolder);
+        $this->saveHomepageConfig($newFolder->getHomepage());
+        $this->saveRolePermissions($newFolder);
 
-                    // Save the homepage contents
-                    if ($this->getTemplateID()) {
-                        $homepageConfigMapper->save($homepageConfig);
-                        $homepageConfigMapper->resetToTemplate($homepageConfig);
-                    }
+        return $this->buildRowResult($newFolder->getId(), $newFolder->getNameWithCodes(), 'Added', 'OK');
+    }
 
-                    if (!$_POST["inherit"]) {
 
-                        /* Save roles
-                         */
-                        foreach ($groups as $id => $perm) {
-                            try {
-                                /** @var Role $role */
-                                $role = $roleMapper->findById($id);
+    /**
+     * Checks folder codes and adds them to folder.
+     *
+     * If an error is detected, returns an array describing the issue.
+     *
+     * @param array        $row
+     * @param Folder\Model $newFolder
+     * @param array        $folderCodeColumnIndexes
+     * @return array|null
+     * @throws InvalidColumnException
+     * @throws PDOException
+     */
+    private function processFolderCodes(array $row, Folder\Model $newFolder, array $folderCodeColumnIndexes): ?array
+    {
+        $codes = $lowerCaseCodes = [];
+        foreach ($folderCodeColumnIndexes as $i) {
+            $folderCode = trim($row[$i]);
+            if ($folderCode === '') {
+                continue;
+            }
+            $lowerCaseCode = strtolower($folderCode);
+            if (in_array($lowerCaseCode, $lowerCaseCodes, true) && !in_array($folderCode, $codes, true)) {
+                $error = "Ambiguous folder code. Same characters but different capitalisation ({$folderCode})";
+                return $this->buildRowResult('', $newFolder->getName(), 'Skipped', $error);
+            }
 
-                                $roleAccess = $roleAccessMapper->createModel();
-                                $roleAccess->setCategory($newFolder);
-                                $roleAccess->setRole($role);
-                                $roleAccess->setType($perm);
-                                $roleAccessMapper->save($roleAccess);
-                            } catch (MapperException $e) {
+            // Check if code too long
+            if (strlen($folderCode) > Folder\Code\Model::CODE_LENGTH_MAX) {
+                $error = sprintf("Folder code exceeds %d characters ({$folderCode})", Folder\Code\Model::CODE_LENGTH_MAX);
+                return $this->buildRowResult('', $newFolder->getName(), 'Skipped', $error);
+            }
 
-                                /* noop - role not found
-                                 */
-                            }
-                        }
-                    }
-
-                    /* Successfully created
-					 */
-                    if (is_numeric($newFolder->getId())) {
-                        $output[] = [
-                            'id' => $newFolder->getId(),
-                            'name' => $row[1],
-                            'status' => 'Added',
-                            'error' => 'OK',
-                        ];
-                    }
-                }
+            // Check if folder code already exists
+            try {
+                $this->folderMapper->findByCode($folderCode);
+                return $this->buildRowResult('', $folderCode, 'Skipped', "Folder code already exists ({$folderCode})");
+            } catch (MapperException $e) {
+                // noop - folder doesn't exist
+                $codes[]          = $folderCode;
+                $lowerCaseCodes[] = $lowerCaseCode;
             }
         }
 
-        return $output;
+        // Accumulate all folder codes
+        $folderCodeModels = Folder\Code\Model::createCollection();
+        foreach ($codes as $currentCode) {
+            $folderCode = (new Folder\Code\Model())
+                ->setFolder($newFolder)
+                ->setCode($currentCode);
+            $folderCodeModels->add($folderCode);
+        }
+        $newFolder->setCodes($folderCodeModels);
+        return null;
     }
 
-    /* Getters/Setters
-	 */
 
     /**
-    * Set template id
-    *
-    * @param $templateID
-    * @return $this
-    */
-    private function setTemplateID($templateID)
-    {
-        $this->templateID = $templateID;
-        return $this;
+     * Check yearLevels and add them to folder model.
+     *
+     * If an error is detected, returns an array describing the issue.
+     *
+     * @param array             $row
+     * @param Folder\Model      $newFolder
+     * @param GenericCollection $yearLevels
+     * @param array             $yearLevelColumnIndexes
+     * @return array|null
+     */
+    private function processYearLevels(
+        array $row,
+        Folder\Model $newFolder,
+        GenericCollection $yearLevels,
+        array $yearLevelColumnIndexes
+    ): ?array {
+        $folderYearLevels = Schoolbox\YearLevel\Model::createCollection();
+        foreach ($yearLevelColumnIndexes as $yearLevelColumnIndex) {
+            $yearLevelName = trim($row[$yearLevelColumnIndex]);
+            if (!$yearLevelName) {
+                continue;
+            }
+
+            $yearLevel = $yearLevels->getOffset($yearLevelName);
+            if (!$yearLevel) {
+                return $this->buildRowResult('', $newFolder->getName(), 'Skipped', "Year Level '$yearLevelName' not found");
+            }
+            $folderYearLevels->add($yearLevel);
+        }
+        $newFolder->setYearLevels($folderYearLevels);
+        return null;
     }
 
+
     /**
-    * Get template id
-    *
-    * @return int
-    */
-    private function getTemplateID()
+     * Saves the homepage config
+     *
+     * @param $homepageConfig
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function saveHomepageConfig($homepageConfig): void
     {
-        return $this->templateID;
+        if ($this->templateID) {
+            $this->homepageConfigMapper->save($homepageConfig);
+            $this->homepageConfigMapper->resetToTemplate($homepageConfig);
+        }
+    }
+
+
+    /**
+     * If folder does not inherit, save new Role Access permissions
+     *
+     * @param Folder\Model $newFolder
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function saveRolePermissions(Folder\Model $newFolder): void
+    {
+        if (!$newFolder->getInherit()) {
+            foreach ($this->rolePerms as $id => $perm) {
+                try {
+                    $role       = $this->roleMapper->findById($id);
+                    $roleAccess = (new RoleAccess())
+                        ->setCategory($newFolder)
+                        ->setRole($role)
+                        ->setType($perm);
+                    $this->roleAccessMapper->save($roleAccess);
+                } catch (MapperException $e) {
+                    // noop - role not found
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Consistently build an array that describes the result of a row's processing.
+     *
+     * @param string $id
+     * @param string $folderName
+     * @param string $status
+     * @param string $error
+     * @return array
+     */
+    private function buildRowResult(string $id, string $folderName, string $status, string $error): array
+    {
+        return [
+            'id'     => $id,
+            'name'   => $folderName,
+            'status' => $status,
+            'error'  => $error,
+        ];
+    }
+
+
+    /**
+     * Returns the 0-based index of the column that contains the specified search string.
+     *
+     * @param array  $headerRow
+     * @param string $search
+     * @return int
+     * @throws UnexpectedValueException
+     */
+    private function determineColumnIndex(array $headerRow, string $search): int
+    {
+        $parentIdColumns = [];
+        foreach ($headerRow as $idx => $value) {
+            if (stripos($value, $search) !== false) {
+                $parentIdColumns[] = $idx;
+            }
+        }
+        if (count($parentIdColumns) === 1) {
+            return reset($parentIdColumns);
+        }
+
+        $headerRowValues = implode(',', $headerRow);
+        throw new UnexpectedValueException("Unable to locate unique '$search' column from headers: '$headerRowValues'");
+    }
+
+
+    /**
+     * Returns the 0-based index of the columns that contains the specified search string.
+     *
+     * @param array  $headerRow
+     * @param string $search
+     * @return int[]
+     */
+    private function determineColumnIndexes(array $headerRow, string $search): array
+    {
+        $columnIndexes = [];
+        foreach ($headerRow as $idx => $value) {
+            if (stripos($value, $search) !== false) {
+                $columnIndexes[] = $idx;
+            }
+        }
+        return $columnIndexes;
+    }
+
+
+    /**
+     * Assert that there are no duplicate values across a set of arrays
+     *
+     * @param mixed $columnIndexes
+     * @throws UnexpectedValueException
+     */
+    private function assertColumnIndexesAreUnique(array ...$columnIndexes): void
+    {
+        $counts = [];
+        foreach (array_merge(...$columnIndexes) as $index) {
+            $counts[$index]++;
+        }
+        $duplicates = [];
+        foreach ($counts as $index => $count) {
+            if ($count > 1) {
+                $duplicates[] = $index;
+            }
+        }
+        if (count($duplicates)) {
+            throw new UnexpectedValueException("Ambiguous columns: " . implode(',', $duplicates));
+        }
+    }
+
+
+    /**
+     * Returns all year level names known to system, indexed by name
+     *
+     * @return GenericCollection|YearLevel\Model[]
+     * @throws InvalidArgumentException
+     */
+    private function getAllYearLevels(): GenericCollection
+    {
+        $nameProperty = $this->yearLevelMapper->getPropertyFromColumn($this->yearLevelMapper::COL_NAME);
+        return $this->yearLevelMapper->findAll()->indexBy($nameProperty);
     }
 }
