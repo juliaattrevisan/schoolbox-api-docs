@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="small-12 columns">
+        <div class="small-12 columns" v-if="this.event.canModify">
             <div class="actions-small-2 row">
                 <nav><a :href="modifyPath" class="icon-modify" title="Modify Event"></a></nav>
             </div>

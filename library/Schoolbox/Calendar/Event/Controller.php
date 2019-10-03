@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Campus;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 
 class Controller extends Base
@@ -35,7 +36,9 @@ class Controller extends Base
      */
     public function getEvent(Event $event)
     {
-        $attendanceStatus = (new \Calendar())->getAttendanceByEventAndUser($event->getId(), $this->getUser()->getId());
+        $calendar = new \Calendar();
+
+        $attendanceStatus = $calendar->getAttendanceByEventAndUser($event->getId(), $this->getUser()->getId());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event' => $event,
@@ -45,6 +48,7 @@ class Controller extends Base
                 'status'            => $attendanceStatus,
                 'nextAction'        => ($attendanceStatus) ? 'remove' : 'add',
             ],
+            'canModify'         => $calendar->getPerm($event->getId()) >= UserAccess::ACCESS_WRITE
         ])->setTitle($event->getTitle()));
     }
 
