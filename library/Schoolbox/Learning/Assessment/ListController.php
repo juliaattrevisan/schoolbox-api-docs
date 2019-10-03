@@ -168,7 +168,7 @@ class ListController extends Web\Controller\Base
 
             $this->redirect($controller->determineRedirect($assessment, $explicitReturnUrl, $defaultReturnUrl));
         } catch (DomainException $e) {
-            $this->sendError('Could not save assessment.', ["You need to {$e->getMessage()}"], 400, $e->getCode());
+            $this->sendError('Could not save assessment.', [$e->getMessage()], 400, $e->getCode());
             return;
         }
     }
