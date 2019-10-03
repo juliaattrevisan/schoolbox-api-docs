@@ -578,17 +578,20 @@
 
                         /* Ignore any rows without a student identifier
                          * Trigger autosave upon change for instant feedback on your feedback
+                         * Assign data in one of three slightly-different ways
                          */
+                        var assign;
+
                         if (dataFormat === 'mark-only') {
-                            var assign = function(input, form) {
+                            assign = function(input, form) {
                                 $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
                             }
                         } else if (dataFormat === 'comment-only') {
-                            var assign = function(input, form) {
+                            assign = function(input, form) {
                                 $(form).find('textarea[name="comment"], select[name="mark"]').val(input[1]).change();
                             }
                         } else {
-                            var assign = function(input, form) {
+                            assign = function(input, form) {
                                 $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
                                 $(form).find('textarea[name="comment"]').val(input[2]).change();
                             }
