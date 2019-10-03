@@ -144,10 +144,10 @@ class Controller extends Web\Controller\Base
                 }
 
                 try {
-                    if(!in_array($requiredCsv,self::USER_PROFILE_CSVS)){
+                    if (!in_array($requiredCsv, self::USER_PROFILE_CSVS)) {
                         // assign the given hash to its place in the files array
                         $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
-                    }else{
+                    } else {
                         $files[$requiredCsv] = $this->storageMapper->findByHash($hash);
                     }
 
@@ -172,10 +172,10 @@ class Controller extends Web\Controller\Base
 
                 try {
                     foreach ($files as $keyspace => $file) {
-                        if (!in_array($keyspace,self::USER_PROFILE_CSVS)){
+                        if (!in_array($keyspace, self::USER_PROFILE_CSVS)) {
                             // this is where the action happens
                             $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
-                        }else{
+                        } else {
                             $processor = new Processor($keyspace, $file, $db);
                             $processor->setPerform(true);
                             $processor->process();
