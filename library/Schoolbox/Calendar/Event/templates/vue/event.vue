@@ -2,7 +2,7 @@
     <div>
         <div class="small-12 columns">
             <div class="actions-small-2 row">
-                <nav><a href="#" class="icon-modify" title="Modify Event"></a></nav>
+                <nav><a :href="modifyPath" class="icon-modify" title="Modify Event"></a></nav>
             </div>
         </div>
         <div class="small-12 medium-8 island">
@@ -54,6 +54,7 @@
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
+    const URL_EVENT_MODIFY = '/calendar/modify.php?eventID=';
     const ATTENDANCE_APPROVE_ICON = 'icon-approve';
     const ATTENDANCE_CLOSE_ICON = 'icon-close';
     const ATTENDANCE_NEXT_ACTION_ADD = 'add';
@@ -155,6 +156,10 @@
                 }
 
                 return result.join(' & ');
+            },
+
+            modifyPath: function() {
+                return URL_EVENT_MODIFY + this.event.id + '&returnTo=' + window.location.pathname
             }
         }
     }
