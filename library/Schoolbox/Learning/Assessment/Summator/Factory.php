@@ -1,19 +1,16 @@
 <?php
 /**
- * Factory
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\Summator;
 
-use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
-use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
-use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
-
+/**
+ * Class Factory
+ *
+ * @package Schoolbox\Learning\Assessment\Summator
+ */
 class Factory
 {
     const WEIGHTED_AVERAGE = 'weighted';
@@ -21,20 +18,23 @@ class Factory
     const MAXIMUM = 'max';
     const MINIMUM = 'min';
 
+
     /**
      * @var string
      */
     protected $summator;
+
 
     /**
      * Factory constructor.
      *
      * @param string $summator
      */
-    public function __construct($summator)
+    public function __construct(string $summator)
     {
-        $this->setSummator($summator);
+        $this->summator = $summator;
     }
+
 
     /**
      * Bang out a Summation strategy
@@ -44,39 +44,20 @@ class Factory
      */
     public function produce(): ISummator
     {
-        switch ($this->getSummator()) {
+        switch ($this->summator) {
             case self::WEIGHTED_AVERAGE:
-                return new SummatorWeightedAverage();
+                return new WeightedAverage();
 
             case self::AVERAGE:
-                return new SummatorAverage();
+                return new Average;
 
             case self::MAXIMUM:
-                return new SummatorMaximum();
+                return new Maximum();
 
             case self::MINIMUM:
-                return new SummatorMinimum();
+                return new Minimum();
         }
 
         throw new \InvalidArgumentException('Please choose a valid summation option');
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return int
-     */
-    protected function getSummator()
-    {
-        return $this->summator;
-    }
-
-    /**
-     * @param int $summator
-     */
-    protected function setSummator($summator)
-    {
-        $this->summator = $summator;
     }
 }
