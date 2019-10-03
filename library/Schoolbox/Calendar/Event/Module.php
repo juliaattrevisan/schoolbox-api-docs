@@ -23,7 +23,6 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Relation\Campus;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\Role;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -64,7 +63,7 @@ class Module extends BaseModule
                         if ($event->isPersonalLevel()) {
                             $isStaff        = $loggedInUser->getRole()->isStaff();
                             $isOwner        = $event->getAuthor()->getId() === $loggedInUser->getId();
-                            $isParentOfUser = $loggedInUser->isParentOf( $event->getAuthor()->loadParents());
+                            $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor()->loadParents());
 
                             if ($isOwner || $isStaff || $isParentOfUser) {
                                 return true;
@@ -132,10 +131,9 @@ class Module extends BaseModule
     private function preloadEvent(array $params): ?array
     {
         try {
-            return ['event' => $this->getEventMapper()->findById($params['eventId']) ];
-        }
-        catch (MapperException $e) {
-            throw new NotFound(ErrorMapper::ERROR_EVENT_NOT_FOUND);
+            return ['event' => $this->getEventMapper()->findById($params['eventId'])];
+        } catch (MapperException $e) {
+            throw new NotFound('Event not found');
         }
     }
 

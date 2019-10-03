@@ -25,7 +25,13 @@
 
         <div class="small-12 medium-4 island">
             <section class="detail content">
-                <a href="#" class="button expand" :class="attendanceIcon" v-if="this.event.options.isAttendable" @click="toggleAttendance()" :disabled="this.attendanceButtonIsDisabled">{{ attendanceActionLabel }}</a>
+                <a href="#" class="button expand"
+                   :class="attendanceIcon"
+                   v-if="this.event.options.isAttendable"
+                   @click="toggleAttendance()"
+                   :disabled="this.attendanceButtonIsDisabled">
+                    {{ attendanceActionLabel }}
+                </a>
                 <a href="#" class="button icon-calendar expand">Add to Calendar</a>
 
                 <h2 class="subheader">Date and Time</h2>
@@ -107,19 +113,17 @@
         },
         computed: {
             dateTimeDisplay: function() {
-                if (this.event.options.allDay) {
-                    return moment(this.event.dates.start).format(FORMAT_LONG_DATE)
-                } else {
-                    let startDate = moment(this.event.dates.start),
-                        endDate = moment(this.event.dates.end);
+                if (this.event.options.allDay) return moment(this.event.dates.start).format(FORMAT_LONG_DATE);
 
-                    if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
-                        return startDate.format(FORMAT_LONG_DATE) +
-                                '<br />' + startDate.format(FORMAT_TIME_ONLY) + ' - ' + endDate.format(FORMAT_TIME_ONLY)
-                    } else {
-                        return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + ' - ' + endDate.format(FORMAT_LONG_DATE_WITH_TIME)
-                    }
+                let startDate = moment(this.event.dates.start),
+                    endDate = moment(this.event.dates.end);
+
+                if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
+                    return startDate.format(FORMAT_LONG_DATE) +
+                        '<br />' + startDate.format(FORMAT_TIME_ONLY) + ' - ' + endDate.format(FORMAT_TIME_ONLY)
                 }
+
+                return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + ' - ' + endDate.format(FORMAT_LONG_DATE_WITH_TIME)
             },
 
             monthDisplay: function() {
@@ -131,11 +135,8 @@
             },
 
             byLine: function() {
-                if (this.event.author.id && this.event.author.fullName) {
-                    return 'By ' + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + '</a>'
-                } else if (!this.event.author.id && this.data.author.fullName) {
-                    return 'By ' + this.event.author.fullName
-                }
+                if (this.event.author.id && this.event.author.fullName) return 'By ' + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + '</a>';
+                if (!this.event.author.id && this.data.author.fullName) return 'By ' + this.event.author.fullName;
 
                 return ''
             },
