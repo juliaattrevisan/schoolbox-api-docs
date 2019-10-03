@@ -149,8 +149,12 @@ class ListController extends Web\Controller\Base
      * @since 165
      *
      * @param AssessmentContext $context
-     * @throws Web\Controller\Exception
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
      * @throws UnexpectedValueException
+     * @throws Web\Controller\Exception
+     * @throws \LogicException
      */
     public function postCreateAssessment(AssessmentContext $context)
     {
@@ -168,7 +172,7 @@ class ListController extends Web\Controller\Base
 
             $this->redirect($controller->determineRedirect($assessment, $explicitReturnUrl, $defaultReturnUrl));
         } catch (DomainException $e) {
-            $this->sendError('Could not save assessment.', [$e->getMessage()], 400, $e->getCode());
+            $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
             return;
         }
     }
