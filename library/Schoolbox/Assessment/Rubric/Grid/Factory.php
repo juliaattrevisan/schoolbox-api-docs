@@ -91,9 +91,7 @@ class Factory
             if ($validate) {
                 $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
                 if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
-                    throw new \InvalidArgumentException(
-                        'provide capability maximum points that are numeric and equal to or greater than 0'
-                    );
+                    throw new \InvalidArgumentException('Please provide capability maximum points that are numeric and equal to or greater than 0');
                 }
             }
 
@@ -162,7 +160,7 @@ class Factory
                     if ($validate) {
                         $descriptorSpec = new ValidDescriptor($usesMarkRange);
                         if (! $descriptorSpec->isSatisfiedBy($descriptorValue) ) {
-                            throw new \InvalidArgumentException("use positive numbers only, and disable Mark Range to use decimal places in descriptor point values");
+                            throw new \InvalidArgumentException('Please use positive numbers only, and disable Mark Range to use decimal places in descriptor point values');
                         }
                     }
 
@@ -176,11 +174,11 @@ class Factory
             if ($validate) {
                 $notEmptySpec = new NotEmpty();
                 if (!$notEmptySpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
-                    throw new \InvalidArgumentException("have at least one non-empty descriptor in each selected indicator");
+                    throw new \InvalidArgumentException('You require at least one non-empty descriptor in each selected indicator');
                 }
                 $monotonicDescriptorRowSpec = new ValidMonotonicDescriptorRow($usesMarkRange);
                 if (!$monotonicDescriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
-                    throw new \InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
+                    throw new \InvalidArgumentException('Please only use descriptor values that form an ascending or descending sequence within a row');
                 }
             }
 
@@ -193,7 +191,7 @@ class Factory
         if ($validate) {
             $gridSpec = new ValidRubricGrid();
             if (!$gridSpec->isSatisfiedBy($grid)) {
-                throw new \InvalidArgumentException('have at least one selected indicator if using a rubric');
+                throw new \InvalidArgumentException('Please have at least one selected indicator if using a rubric');
             }
         }
 
