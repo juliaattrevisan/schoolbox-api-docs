@@ -40,8 +40,9 @@ class Factory
      * Bang out a Summation strategy
      *
      * @return ISummator
+     * @throws \InvalidArgumentException
      */
-    public function produce()
+    public function produce(): ISummator
     {
         switch ($this->getSummator()) {
             case self::WEIGHTED_AVERAGE:
@@ -57,7 +58,7 @@ class Factory
                 return new SummatorMinimum();
         }
 
-        throw new \InvalidArgumentException('choose a valid summation option');
+        throw new \InvalidArgumentException('Please choose a valid summation option');
     }
 
     /* Getters/Setters

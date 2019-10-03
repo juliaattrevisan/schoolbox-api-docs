@@ -633,7 +633,7 @@ abstract class AbstractAssessment implements IAssessable
      * @throws InvalidArgumentException if any value is absent, or values are out of order
      * @return void
      */
-    protected function assertDateSequence(array $dates)
+    protected function assertDateSequence(array $dates): void
     {
         /** @var Alaress_Date_Format $previousAdf */
         $previousAdf   = null;
@@ -641,11 +641,11 @@ abstract class AbstractAssessment implements IAssessable
 
         foreach ($dates as $label => $adf) {
             if ($adf->isNull()) {
-                throw new InvalidArgumentException("set a $label date");
+                throw new InvalidArgumentException("Please set a {$label} date");
             }
 
             if ($previousAdf && $previousAdf->gt($adf)) {
-                throw new InvalidArgumentException("set the $previousLabel date to be earlier than the $label date");
+                throw new InvalidArgumentException("Please set the {$previousLabel} date to be earlier than the $label date");
             }
 
             // cache the previous iteration

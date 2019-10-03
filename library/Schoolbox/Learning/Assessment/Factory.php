@@ -180,7 +180,7 @@ class Factory
 
             // We should never end up with a 0 max mark unless something goes very wrong, but if that does happen, we want to handle it nicely.
             if ($maxMark === 0.0) {
-                throw new \UnexpectedValueException('provide maximum available marks greater than 0');
+                throw new \UnexpectedValueException('Please provide maximum available marks greater than 0');
             }
             $this->setMaxMark($maxMark);
         }

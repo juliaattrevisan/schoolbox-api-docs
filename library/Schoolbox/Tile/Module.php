@@ -141,6 +141,7 @@ class Module extends BaseModule
      * * Any user who has write permission to that homepage
      * * Any user who is the teacher of a class connected to that page
      * @param Authorizer $authorizer
+     * @throws \InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -152,7 +153,7 @@ class Module extends BaseModule
         // Callback for extracting homepage from route params
         $getHomepageCallback = function ($params) {
             if ($params['component']->getModule() != 'homepage') {
-                throw new \Exception('homepage permission does not apply to dashboard tiles');
+                throw new \Exception('Homepage permission does not apply to dashboard tiles');
             }
             return $params['homepage'];
         };
