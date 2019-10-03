@@ -40,13 +40,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
         // Skip superuser field
     ];
 
-    private $userProfileFields = [
-        'profile_child_ids'    => 'Child External IDs',
-        'profile_dob'          => 'Date of Birth',
-        'profile_home_phone'   => 'Home Phone',
-        'profile_mobile_phone' => 'Mobile Phone',
-        'profile_work_phone'   => 'Work Phone',
-    ];
 
     // fields that we will permit sorting on
     private $sortable = ['firstname', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email'];
@@ -77,9 +70,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $this->getPage()->setVar(['group_block' => '']);
         $this->getPage()->setTitle('Group Report');
 
-        if (Config::get('external_type') === 'schoolbox') {
-            $this->fields += $this->userProfileFields;
-        }
 
         $this->emailObj = new Email();
     }
