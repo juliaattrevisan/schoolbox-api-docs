@@ -1,5 +1,10 @@
 <template>
     <div>
+        <div class="small-12 columns">
+            <div class="actions-small-2 row">
+                <nav><a href="#" class="icon-modify" title="Modify Event"></a></nav>
+            </div>
+        </div>
         <div class="small-12 medium-8 island">
             <section class="detail content">
                 <div class="title-section">
