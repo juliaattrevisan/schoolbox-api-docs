@@ -374,11 +374,13 @@ class ListController extends Web\Controller\Base
 
     /**
      * @param GenericCollection|ParticipantModels\Plan\Model[] $plans
-     * @param array             $inclusionFlags
-     * @param array             $userPlanIndices
+     * @param array                                            $inclusionFlags
+     * @param array                                            $userPlanIndices
      * @throws DomainException
-     * @throws UnexpectedValueException
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices)
     {
@@ -388,7 +390,6 @@ class ListController extends Web\Controller\Base
 
         // plans are saved; persistipation
         foreach ($inclusionFlags as $userId => $userIncluded) {
-
             $existingParticipation = $partMap->findByColumnList([
                 'participant_plan_id' => $planIds,
                 'user_id'             => $userId
@@ -424,8 +425,6 @@ class ListController extends Web\Controller\Base
                 $partMap->save($existingParticipation);
             }
         }
-
-
     }
 
 
