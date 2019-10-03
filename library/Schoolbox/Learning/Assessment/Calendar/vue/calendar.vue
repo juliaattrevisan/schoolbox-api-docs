@@ -803,4 +803,8 @@
         position: absolute !important;
     }
 
+    .fc-time {
+        color: #fff;
+    }
+
 </style>
