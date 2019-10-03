@@ -145,6 +145,7 @@ class Transactor
          * You only get contextId when you're Creating, not updating
          */
         $context   = $this->getFolderMapper()->findById($this->getContextId());
+
         $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         $returnUrl = "/homepage/{$context->getId()}";

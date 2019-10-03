@@ -865,8 +865,9 @@ class Controller extends Assessment\Controller
         /* Plagscans should only spawn upon saving a Submitted IResponse instance
          * This screen is shared between self-reflection and non-self-reflection steps
          * Self-reflection's plagscan stubs saving .......happens elsewhere
+         * Similarity Check must be enabled
          */
-        if ($isFinal && !$selfAssessable && $response->getId()) {
+        if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             foreach ($response->getAllFiles() as $currentFile) {
                 if (!$currentFile->getEditableInline()) {
                     $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -880,8 +881,8 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set([
             'format' => 'noContent',
             'postOutput' => [
-                function() use ($plagscanMapper, $isFinal, $selfAssessable, $response) {
-                    if ($isFinal && !$selfAssessable && $response->getId()) {
+                function () use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
+                    if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
                         foreach ($response->getAllFiles() as $currentFile) {
                             $filename = $plagscanMapper->plagscanFilename($currentFile);
 

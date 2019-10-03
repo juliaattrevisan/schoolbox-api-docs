@@ -65,7 +65,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('self_reviewability', self::TYPE_STRING);
-
+        $this->uses('similarity_check_enabled', self::TYPE_BOOLEAN);
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');

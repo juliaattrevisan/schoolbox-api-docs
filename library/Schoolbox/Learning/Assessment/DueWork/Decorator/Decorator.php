@@ -31,16 +31,17 @@ class Decorator implements DecoratorInterface
     /**
      * Decorator constructor.
      *
-     * @param $acceptOnline
-     * @param $markType
-     * @param $gradingScheme
-     * @param $useRubric
-     * @param $markPerCapability,
-     * @param $useMarkRange
-     * @param $maxMark
-     * @param $rubricData
-     * @param $attachedFiles
+     * @param        $acceptOnline
+     * @param        $markType
+     * @param        $gradingScheme
+     * @param        $useRubric
+     * @param        $markPerCapability ,
+     * @param        $useMarkRange
+     * @param        $maxMark
+     * @param        $rubricData
+     * @param        $attachedFiles
      * @param string $selfReviewable
+     * @param        $similarityCheckEnabled
      */
     public function __construct(
         $acceptOnline,
@@ -52,7 +53,8 @@ class Decorator implements DecoratorInterface
         $maxMark,
         $rubricData,
         $attachedFiles,
-        $selfReviewable
+        $selfReviewable,
+        bool $similarityCheckEnabled
     ) {
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setMarkType(trim($markType));
@@ -64,6 +66,7 @@ class Decorator implements DecoratorInterface
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);
+        $this->setSimilarityCheckEnabled($similarityCheckEnabled);
     }
 
     /**
@@ -174,5 +177,8 @@ class Decorator implements DecoratorInterface
 
         $assessment->setAttachedFiles($newList);
 
+        /* Similarity Check
+         */
+        $assessment->setSimilarityCheckEnabled($this->getSimilarityCheckEnabled());
     }
 }

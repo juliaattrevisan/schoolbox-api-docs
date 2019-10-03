@@ -147,6 +147,13 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $skipUnsubmitted = 0;
 
     /**
+     * Plagscan (or equivalent) is opt-in on a per-assessment basis
+     *
+     * @var bool
+     */
+    private $similarityCheckEnabled;
+
+    /**
      * @var bool
      */
     protected $deleted;
@@ -159,6 +166,10 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     private $selfReviewability;
 
+
+    /**
+     * SubmissionBox constructor.
+     */
     public function __construct()
     {
         $this->setCategory(new FolderModel());
@@ -793,6 +804,26 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function setSelfReviewability(string $selfReviewability): self
     {
         $this->selfReviewability = $selfReviewability;
+        return $this;
+    }
+
+
+    /**
+     * @return null|bool
+     */
+    public function getSimilarityCheckEnabled(): ?bool
+    {
+        return $this->similarityCheckEnabled;
+    }
+
+
+    /**
+     * @param bool|null $similarityCheckEnabled
+     * @return $this
+     */
+    public function setSimilarityCheckEnabled(?bool $similarityCheckEnabled): self
+    {
+        $this->similarityCheckEnabled = $similarityCheckEnabled;
         return $this;
     }
 

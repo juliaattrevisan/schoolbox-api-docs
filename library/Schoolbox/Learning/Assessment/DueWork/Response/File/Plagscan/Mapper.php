@@ -400,9 +400,9 @@ class Mapper extends \Schoolbox\Mapper
             $query = "
                 SELECT {$this->getColumnString()}
                 FROM {$this->getTable()}
-                INNER JOIN student_submission_file ON plagscan_document.`student_submission_file_id` = student_submission_file.`id`
+                INNER JOIN student_submission_file ON {$this->getTable()}.`student_submission_file_id` = student_submission_file.`id`
                 INNER JOIN student_submission ON student_submission.`id` = student_submission_file.`student_submission_id`
-                WHERE plagscan_document.`privatised_at` IS NULL
+                WHERE {$this->getTable()}.`privatised_at` IS NULL
                 AND student_submission.`owner` = :ownerId
                 AND student_submission.`box_id` = :boxId
                 AND student_submission.`id` < :submissionId
