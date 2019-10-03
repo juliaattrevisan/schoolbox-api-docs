@@ -503,7 +503,7 @@
         <template v-else>
             <div class="row">
                 <div class="small-12">
-                    <h2>{{ event.title }}</h2>
+                    <a :href="'/calendar/event/' + eventExtendedProps.eventId"><h2>{{ event.title }}</h2></a>
                     <meta-list>
                         <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
                             {{ eventExtendedProps.booking.status.name }}
