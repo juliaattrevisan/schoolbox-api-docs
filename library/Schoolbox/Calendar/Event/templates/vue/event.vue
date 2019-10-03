@@ -2,16 +2,13 @@
     <div>
         <div class="small-12 medium-8 island">
             <section class="detail content">
-                <div class="event-type">
-                    <span :style="{'background-color': this.event.options.type.color}">{{ this.event.options.type.name }}</span>
-                </div>
                 <div class="title-section">
                     <time datetime="2014-09-20" class="icon">
-                        <strong :style="{'background-color': this.event.options.type.color}"> {{ monthDisplay }}</strong>
+                        <strong> {{ monthDisplay }}</strong>
                         <span>{{ dateDisplay }}</span>
                     </time>
-
                     <h1>{{ this.event.title }}</h1>
+                    <div class="event-type label" :style="{'background-color': this.event.options.type.color}">{{ this.event.options.type.name }}</div>
                 </div>
                 <div class="meta">
                     <span v-html="byLine"></span>
@@ -23,17 +20,16 @@
 
         <div class="small-12 medium-4 island">
             <section class="detail content">
-                <a href="#" class="button" :class="attendanceIcon" v-if="this.event.options.isAttendable" @click="toggleAttendance()" :disabled="this.attendanceButtonIsDisabled">{{ attendanceActionLabel }}</a>
-                <a href="#" class="button icon-calendar">Add to Calendar</a>
+                <a href="#" class="button expand" :class="attendanceIcon" v-if="this.event.options.isAttendable" @click="toggleAttendance()" :disabled="this.attendanceButtonIsDisabled">{{ attendanceActionLabel }}</a>
+                <a href="#" class="button icon-calendar expand">Add to Calendar</a>
 
-                <h4>Date and Time</h4>
+                <h2 class="subheader">Date and Time</h2>
                 <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
 
-                <h4>Location</h4>
+                <h2 class="subheader">Location</h2>
                 <p v-html="this.event.location"></p>
             </section>
         </div>
-
         <auidences-modal
                 ref="audiencesModal"
                 :campus-audiences="this.event.audiences.campus"
@@ -158,65 +154,3 @@
         }
     }
 </script>
-
-<style scoped>
-    h1 {
-        margin-top: 1rem;
-    }
-
-    time.icon
-    {
-        font-size: 1rem;
-        display: block;
-        position: relative;
-        min-width: 4rem;
-        min-height: 4rem;
-        background-color: #fff;
-        border-radius: 0.1em;
-        box-shadow: 0 1px 0 #bdbdbd, 0 2px 0 #fff, 0 3px 0 #bdbdbd, 0 4px 0 #fff, 0 5px 0 #bdbdbd, 0 0 0 1px #bdbdbd;
-        overflow: hidden;
-    }
-
-    time.icon *
-    {
-        display: block;
-        width: 100%;
-        font-size: 1rem;
-        font-weight: bold;
-        font-style: normal;
-        text-align: center;
-    }
-
-    time.icon strong
-    {
-        position: absolute;
-        top: 0;
-        color: #fff;
-        text-transform: uppercase;
-    }
-
-    time.icon span
-    {
-        font-size: 2.3rem;
-        letter-spacing: -0.05rem;
-        padding-top: 1.1rem;
-        color: #2f2f2f;
-    }
-
-    time {
-        margin-right: .5rem;
-    }
-
-    .event-type {
-        text-align: right;
-    }
-
-    .event-type span {
-        color: #fff;
-        padding: .5rem;
-        font-size: .8rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        border-radius: .5rem;
-    }
-</style>
