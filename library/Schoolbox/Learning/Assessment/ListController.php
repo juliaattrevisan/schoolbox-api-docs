@@ -367,7 +367,7 @@ class ListController extends Web\Controller\Base
             // And send notifications
             $notifier->notify($assessment, $this->getUser(), $before);
         }
-        catch (RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
+        catch (Mapper\Exception|RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
