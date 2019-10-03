@@ -43,7 +43,7 @@ class Group extends Base
     public function generate(): self
     {
         $this->data = $this->format(
-            $this->folderMapper->findForUser($this->user)->sortBy('name', 'ASC')
+            $this->folderMapper->findForUser($this->user)->sortByMultiFields(['isClass' => 'DESC', 'name' => 'ASC'])
         );
 
         return $this;

@@ -8,6 +8,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use Schoolbox\Collection;
+use Schoolbox\Column\Boolean;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -640,5 +641,13 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         $yearLevels->assertCollectionOf(YearLevel\Model::class);
         $this->yearLevels = $yearLevels;
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsClass(): bool
+    {
+        return $this->isClass();
     }
 }
