@@ -588,15 +588,15 @@
                              */
                             if (dataFormat === 'mark-only') {
                                 var assign = function(input, form) {
-                                    $(form).find('input[name="mark"]').val(input[1]).change();
+                                    $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
                                 }
                             } else if (dataFormat === 'comment-only') {
                                 var assign = function(input, form) {
-                                    $(form).find('textarea[name="comment"]').val(input[1]).change();
+                                    $(form).find('textarea[name="comment"], select[name="mark"]').val(input[1]).change();
                                 }
                             } else {
                                 var assign = function(input, form) {
-                                    $(form).find('input[name="mark"]').val(input[1]).change();
+                                    $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
                                     $(form).find('textarea[name="comment"]').val(input[2]).change();
                                 }
                             }
