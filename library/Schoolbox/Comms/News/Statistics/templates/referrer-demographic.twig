@@ -34,16 +34,16 @@
             },
 
             title: {
-                text: 'Referrer Demographic'
+                text: ''
             },
 
             tooltip: {
-                pointFormat: '{point.y} {point.category} came<br />from the <span style="color:{series.color}">{series.name}</span> referrer',
+                pointFormat: '{point.y} - Accessed via <span style="color:{series.color}">{series.name}</span>',
                 useHTML: true
             },
 
             xAxis: {
-                categories: ['Opens']
+                categories: ['Origin']
             },
 
             yAxis: {
@@ -86,7 +86,7 @@
                 },
                 {
                     color: '#ba43a9',
-                    name: 'Index',
+                    name: 'Feed',
                     data: [
                         {{ referrerDemographic['open']['index'] }}
                     ]

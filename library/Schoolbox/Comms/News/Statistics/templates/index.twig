@@ -28,8 +28,7 @@
 
 <div class="row">
     <div class="small-12 island" id="cumulatives">
-        <h2 class="subheader">Cumulative Summary</h2>
-        <p class="meta">Overall cumulative statistics across all time.</p>
+        <h2 class="subheader">Summary</h2>
 
         {% include '@commsNewsStatistics/cumulative-summary.twig' with {
             cumulative: cumulative
@@ -40,7 +39,9 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Periodic Data</h2>
-        <p class="meta">Unique daily visits over time. Click and drag graphs to zoom; click and drag while holding down <strong>Shift</strong> to pan while zoomed in.</p>
+        <p class="meta">
+            Click and drag graphs to zoom; click and drag while holding down <strong>Shift</strong> to pan while zoomed in.
+        </p>
 
         {% include '@commsNewsStatistics/interactions-chronological.twig' with {
             article: article,
@@ -52,8 +53,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Referrers</h2>
-        <p class="meta">Referrers used to access this {{ locale.news }} across all time.</p>
+        <h2 class="subheader">Origin of {{ locale.news }} access</h2>
 
         {% include '@commsNewsStatistics/referrer-demographic.twig' with {
             referrerDemographic: referrerDemographic
