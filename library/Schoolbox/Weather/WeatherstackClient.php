@@ -134,6 +134,24 @@ class WeatherstackClient
 
 
     /**
+     * Updated time is localtime - UTC Offset + your local utc offset
+     * (or they could give me a complete datetime for observation_time, but ok...)
+     *
+     * @param string $localtime
+     * @param string $utcOffset
+     * @return int
+     */
+    private function calculateLastUpdated(string $localtime, string $utcOffset): int
+    {
+        $locationTimestamp = strtotime($localtime);
+        $locationUTCOffset = $utcOffset*3600;
+        $localUTCOffset = date('Z');
+
+        return (int)($locationTimestamp - $locationUTCOffset + $localUTCOffset);
+    }
+
+
+    /**
      * Given a raw JSON response from the API, turn it into a data structure we can use
      *
      * @param array $responseData
@@ -141,40 +159,32 @@ class WeatherstackClient
      */
     private function parseWeatherData(array $responseData): array
     {
+        $lastUpdatedTimestamp = $this->calculateLastUpdated($responseData['location']['localtime'], $responseData['location']['utc_offset']);
+
         $twigData = [
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
-        ];
+            'today' => [
+                'day'            => $this->getDayOfWeek($lastUpdatedTimestamp),
 
-        /* Updated time is localtime - UTC Offset + your local utc offset
-         * (or they could give me a complete datetime for observation_time, but ok...)
-         */
-        $locationTimestamp = strtotime($responseData['location']['localtime']);
-        $locationUTCOffset = $responseData['location']['utc_offset']*3600;
-        $localUTCOffset = date('Z');
+                /* Weather descriptions and icons now come back as an array
+                 * But why would I get multiple of these? I just chose the first one anyway
+                 */
+                'weatherSummary' => $responseData['current']['weather_descriptions'][0],
+                'weatherIcon'    => $responseData['current']['weather_icons'][0],
 
-        $lastUpdatedTimestamp = (int)($locationTimestamp - $locationUTCOffset + $localUTCOffset);
+                /* Basic facts
+                 */
+                'currentTemp'    => $responseData['current']['temperature'],
+                'feelsLike'      => $responseData['current']['feelslike'],
+                'uvIndex'        => $responseData['current']['uv_index'],
 
-        $twigData['today'] = [
-            'day'            => $this->getDayOfWeek($lastUpdatedTimestamp),
-
-            /* Weather descriptions and icons now come back as an array
-             * But why would I get multiple of these? I just chose the first one anyway
-             */
-            'weatherSummary' => $responseData['current']['weather_descriptions'][0],
-            'weatherIcon'    => $responseData['current']['weather_icons'][0],
-
-            /* Basic facts
-             */
-            'currentTemp'    => $responseData['current']['temperature'],
-            'feelsLike'      => $responseData['current']['feelslike'],
-            'uvIndex'        => $responseData['current']['uv_index'],
-
-            /* Wind and precipitation (storms)
-             */
-            'humidity'       => $responseData['current']['humidity'],
-            'windSpeed'      => $responseData['current']['wind_speed'],
-            'windDirection'  => $responseData['current']['wind_dir'],
-            'lastUpdated'    => Alaress_Date_Format::newFromTimestamp($lastUpdatedTimestamp)->getRelativeTime(),
+                /* Wind and precipitation (storms)
+                 */
+                'humidity'       => $responseData['current']['humidity'],
+                'windSpeed'      => $responseData['current']['wind_speed'],
+                'windDirection'  => $responseData['current']['wind_dir'],
+                'lastUpdated'    => Alaress_Date_Format::newFromTimestamp($lastUpdatedTimestamp)->getRelativeTime(),
+            ]
         ];
 
         foreach ($responseData['forecast'] as $date => $data) {
