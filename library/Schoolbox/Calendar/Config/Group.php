@@ -29,7 +29,8 @@ class Group extends Base
 
     /**
      * Group constructor.
-     * @param User $user
+     * @param User   $user
+     * @param Mapper $folderMapper
      */
     public function __construct(User $user, Mapper $folderMapper)
     {
@@ -42,8 +43,21 @@ class Group extends Base
      */
     public function generate(): self
     {
+        $classes = new Collection();
+        $groups = new Collection();
+
+        $folders = $this->folderMapper
+            ->findForUser($this->user)
+            ->sortByCallback(function (\Schoolbox\Resource\Folder\Model $a, \Schoolbox\Resource\Folder\Model $b) {
+                return strnatcasecmp($a->getName(), $b->getName());
+            });
+
+        foreach ($folders as $folder) {
+            $folder->isClass() ? $classes->add($folder) : $groups->add($folder);
+        }
+
         $this->data = $this->format(
-            $this->folderMapper->findForUser($this->user)->sortBy('name', 'ASC')
+            $classes->merge($groups)
         );
 
         return $this;
@@ -59,7 +73,7 @@ class Group extends Base
             function (\Schoolbox\Resource\Folder\Model $v) {
                 return [
                     'id'    => (int) $v->getId(),
-                    'name'  => $v->getName(),
+                    'name'  => $v->getNameWithCodes(),
                     'code'  => $v->getCodeString()
                 ];
             }
