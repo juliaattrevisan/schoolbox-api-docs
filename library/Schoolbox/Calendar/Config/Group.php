@@ -29,7 +29,8 @@ class Group extends Base
 
     /**
      * Group constructor.
-     * @param User $user
+     * @param User   $user
+     * @param Mapper $folderMapper
      */
     public function __construct(User $user, Mapper $folderMapper)
     {
@@ -48,7 +49,7 @@ class Group extends Base
         $folders = $this->folderMapper
             ->findForUser($this->user)
             ->sortByCallback(function (\Schoolbox\Resource\Folder\Model $a, \Schoolbox\Resource\Folder\Model $b) {
-                return strnatcmp($a->getName(), $b->getName());
+                return strnatcasecmp($a->getName(), $b->getName());
             });
 
         foreach ($folders as $folder) {
