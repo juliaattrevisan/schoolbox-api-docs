@@ -152,7 +152,8 @@ class Profile implements IStrategy
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
-                $this->staffProfileMapper
+                $this->staffProfileMapper,
+                $this->relationMapper
             ))->remove();
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
