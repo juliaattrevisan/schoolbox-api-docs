@@ -82,10 +82,11 @@ class Weather
     public function loadForecast(): void
     {
         $forecast = $this->findWeather($this->match);
+
         if (!empty($forecast)) {
-            $this->icon      = $forecast['condition']['icon'];
-            $this->condition = $forecast['condition']['text'];
-            $this->temp      = $forecast['avgtemp_c'];
+            $this->icon      = $forecast['hourly'][4]['weather_icons'][0];
+            $this->condition = $forecast['hourly'][4]['weather_descriptions'][0];
+            $this->temp      = $forecast['avgtemp'];
         }
     }
 

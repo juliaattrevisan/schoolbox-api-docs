@@ -82,7 +82,8 @@ class WeatherstackClient
         try {
             $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
-            return $response['forecast']['forecastday'][0]['day'] ?? [];
+
+            return $response['forecast'][$date->getDatabaseDate()] ?? [];
         } catch (\Exception $e) {
             return [];
         }
