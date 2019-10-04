@@ -26,7 +26,7 @@ class Weather
      *
      * @var int
      */
-    private $forecastLength = 10;
+    private $forecastLength = 7;
 
     /**
      * The icon to display
@@ -103,7 +103,7 @@ class Weather
 
         /* Only return data if the match hasn't already occurred
          */
-        if ($matchDayDiff > 0) {
+        if ($matchDayDiff >= 0) {
 
             /* Extract all the datums
              * Don't bother if the match day is too far into the future (10 days)
