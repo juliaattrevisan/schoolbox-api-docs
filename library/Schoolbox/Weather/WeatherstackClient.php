@@ -145,8 +145,17 @@ class WeatherstackClient
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
         ];
 
+        /* Updated time is localtime - UTC Offset + your local utc offset
+         * (or they could give me a complete datetime for observation_time, but ok...)
+         */
+        $locationTimestamp = strtotime($responseData['location']['localtime']);
+        $locationUTCOffset = $responseData['location']['utc_offset']*3600;
+        $localUTCOffset = date('Z');
+
+        $lastUpdatedTimestamp = (int)($locationTimestamp - $locationUTCOffset + $localUTCOffset);
+
         $twigData['today'] = [
-            'day'            => $this->getDayOfWeek(strtotime($responseData['location']['localtime'])),
+            'day'            => $this->getDayOfWeek($lastUpdatedTimestamp),
 
             /* Weather descriptions and icons now come back as an array
              * But why would I get multiple of these? I just chose the first one anyway
@@ -165,7 +174,7 @@ class WeatherstackClient
             'humidity'       => $responseData['current']['humidity'],
             'windSpeed'      => $responseData['current']['wind_speed'],
             'windDirection'  => $responseData['current']['wind_dir'],
-            'lastUpdated'    => Alaress_Date_Format::newFromTimestamp(strtotime($responseData['location']['localtime']))->getRelativeTime(),
+            'lastUpdated'    => Alaress_Date_Format::newFromTimestamp($lastUpdatedTimestamp)->getRelativeTime(),
         ];
 
         foreach ($responseData['forecast'] as $date => $data) {
