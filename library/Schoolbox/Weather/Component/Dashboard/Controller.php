@@ -56,7 +56,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $this->weatherPayload                           = (new WeatherstackClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
         $this->weatherPayload['weeklyForecastLocation'] = $location;
 
-        $this->setComponentName("Weather in {$this->weatherPayload['weatherLocation']}");
+        /* If the api couldn't understand your location, set the component name to some default
+         * otherwise it says "Weather In" and that's it
+         */
+        $componentName = $this->weatherPayload['weatherLocation'] ?: 'Unknown Location';
+
+        $this->setComponentName("Weather in {$componentName}");
 
         return true;
     }

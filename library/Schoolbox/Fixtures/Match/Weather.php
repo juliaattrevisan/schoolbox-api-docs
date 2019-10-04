@@ -26,7 +26,7 @@ class Weather
      *
      * @var int
      */
-    private $forecastLength = 10;
+    private $forecastLength = 7;
 
     /**
      * The icon to display
@@ -82,10 +82,11 @@ class Weather
     public function loadForecast(): void
     {
         $forecast = $this->findWeather($this->match);
+
         if (!empty($forecast)) {
-            $this->icon      = $forecast['condition']['icon'];
-            $this->condition = $forecast['condition']['text'];
-            $this->temp      = $forecast['avgtemp_c'];
+            $this->icon      = $forecast['hourly'][4]['weather_icons'][0];
+            $this->condition = $forecast['hourly'][4]['weather_descriptions'][0];
+            $this->temp      = $forecast['avgtemp'];
         }
     }
 
@@ -102,7 +103,7 @@ class Weather
 
         /* Only return data if the match hasn't already occurred
          */
-        if ($matchDayDiff > 0) {
+        if ($matchDayDiff >= 0) {
 
             /* Extract all the datums
              * Don't bother if the match day is too far into the future (10 days)
