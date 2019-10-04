@@ -815,4 +815,7 @@
         text-align: center !important;
     }
 
+    a.fc-timeline-event.fc-h-event.fc-event.fc-start.fc-end.source.personal.fc-draggable.fc-resizable {
+        width: auto !important;
+    }
 </style>
