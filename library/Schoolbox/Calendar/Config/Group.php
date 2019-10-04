@@ -42,8 +42,21 @@ class Group extends Base
      */
     public function generate(): self
     {
+        $classes = new Collection();
+        $groups = new Collection();
+
+        $folders = $this->folderMapper
+            ->findForUser($this->user)
+            ->sortByCallback(function (\Schoolbox\Resource\Folder\Model $a, \Schoolbox\Resource\Folder\Model $b) {
+                return strnatcmp($a->getName(), $b->getName());
+            });
+
+        foreach ($folders as $folder) {
+            $folder->isClass() ? $classes->add($folder) : $groups->add($folder);
+        }
+
         $this->data = $this->format(
-            $this->folderMapper->findForUser($this->user)->sortByMultiFields(['isClass' => 'DESC', 'name' => 'ASC'])
+            $classes->merge($groups)
         );
 
         return $this;
