@@ -37,8 +37,10 @@
                 <h2 class="subheader">Date and Time</h2>
                 <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
 
-                <h2 class="subheader">Location</h2>
-                <p v-html="this.event.location"></p>
+                <div v-if="this.event.location">
+                    <h2 class="subheader">Location</h2>
+                    <p v-html="this.event.location"></p>
+                </div>
             </section>
         </div>
         <auidences-modal
