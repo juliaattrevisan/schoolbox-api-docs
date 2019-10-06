@@ -42,6 +42,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event' => $event,
+            'level' => $this->getEventLevel($event),
             'campusCollection'  => $this->getCampusCollection($event),
             'roleCollection'    => $this->getRoleCollection($event),
             'attendance'        => [
@@ -91,5 +92,24 @@ class Controller extends Base
         }
 
         return $result;
+    }
+
+    /**
+     * @param Event $event
+     * @return string
+     */
+    private function getEventLevel(Event $event): ?string
+    {
+        if ($event->isCampusLevel()) {
+            return 'campus';
+        }
+
+        if ($event->isPersonalLevel()) {
+            return 'personal';
+        }
+
+        if ($event->isGroupLevel()) {
+            return 'group';
+        }
     }
 }
