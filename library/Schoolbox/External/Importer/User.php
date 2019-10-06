@@ -14,8 +14,6 @@ use HouseMapper;
 use HouseResidential as HouseResidentialModel;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
-use Schoolbox\External\UserRelation as UserRelationModel;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
 use Schoolbox\User as UserModel;
@@ -83,19 +81,6 @@ class User extends AbstractImporter
      * @var array|User\Hydrator\HydratorInterface[]
      */
     protected $userHydrators = [];
-
-    /**
-     * Does this Schoolbox have an external database?
-     *
-     * (The Schoolbox "external" connector is the only one that does not.)
-     *
-     * @return bool
-     */
-    public static function hasExternalDb()
-    {
-        // Sigh
-        return \Config::get('external_type') !== 'schoolbox';
-    }
 
     /**
      * Documentation function for expected format
@@ -250,30 +235,6 @@ class User extends AbstractImporter
             $user = $hydrator->hydrate($row, $user);
         }
         return $user;
-    }
-
-    /**
-     * Retrieves users of whom this user is a guardian.
-     *
-     * @param  UserModel $user
-     * @return Collection|UserModel[]
-     */
-    protected function retrieveUserChildren(UserModel $user)
-    {
-        $userId   = $user->getId();
-        $childIds = [];
-        if ($userId) {
-            foreach ($this->userRelationMapper->findByColumn('user_id', $userId) as $userRelation) {
-                /** @var UserRelationModel $userRelation */
-                // Fully populate the user fields
-                $childIds[] = $userRelation->getRelation()->getId();
-            }
-            if (empty($childIds)) {
-                return new Collection();
-            }
-            return $this->userMapper->findByColumn('id', $childIds);
-        }
-        return new Collection();
     }
 
     /**
