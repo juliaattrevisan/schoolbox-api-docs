@@ -71,4 +71,20 @@
     margin: 0 0 1rem;
     padding-bottom: .5rem;
   }
+
+  .action-links {
+    background-color: rgba(0,0,0,0.02) !important;
+    border: 1px solid #ededed;
+    margin: 1rem 0 0;
+    text-align: right;
+    min-height: 2.5rem;
+
+    a {
+        font-weight: bold;
+        background-color: transparent;
+        margin: 0;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+  }
 }
