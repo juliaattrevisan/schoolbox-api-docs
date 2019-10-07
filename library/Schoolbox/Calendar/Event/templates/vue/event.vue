@@ -39,7 +39,7 @@
                    :disabled="this.attendanceButtonIsDisabled">
                     {{ attendanceActionLabel }}
                 </a>
-                <a href="#" class="button icon-calendar expand">Add to Calendar</a>
+                <a v-if="showAddToCalendar" href="#" class="button icon-calendar expand">Add to Calendar</a>
 
                 <h2 class="subheader">Date and Time</h2>
                 <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
@@ -91,7 +91,8 @@
                 attendanceButtonIsDisabled: false,
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
-                isCampusEvent: this.event.level === 'campus'
+                isCampusEvent: this.event.level === 'campus',
+                showAddToCalendar: false, // Disabled for now...
             }
         },
         methods: {
