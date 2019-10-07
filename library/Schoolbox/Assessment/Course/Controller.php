@@ -1283,29 +1283,6 @@ class Controller extends Base\Base
     /**
      * @param int $folderId
      * @return FolderInterface
-     * @throws BaseMapper\DefinitionException
-     * @throws MapperException
-     */
-    protected function findFolder($folderId)
-    {
-        try {
-            return $this->getFolder($folderId);
-
-        } catch (MapperExceptionDeleted $e) {
-            // Deleted: load the parent (recursively)
-            /** @var Folder $folder */
-            $folder = $e->getDeletedObject();
-            return $this->findFolder($folder->getId());
-
-        } catch (MapperException $e) {
-            return $this->folderMapper->createModel()->setId(0);
-        }
-    }
-
-
-    /**
-     * @param int $folderId
-     * @return FolderInterface
      * @throws MapperException
      * @throws BaseMapper\DefinitionException
      */
