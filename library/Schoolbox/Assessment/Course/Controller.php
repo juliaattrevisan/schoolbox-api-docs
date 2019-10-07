@@ -14,12 +14,17 @@ use Component_InstanceMapper;
 use InvalidArgumentException;
 use PDOException;
 use RangeException;
+use UnexpectedValueException;
 use Schoolbox\Application;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -30,12 +35,10 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted as MapperExceptionDeleted;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -43,14 +46,14 @@ use Schoolbox\Resource\Folder\Controller as FolderController;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\YearLevel;
-use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Curriculum\Node;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use UnexpectedValueException;
 
+
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Assessment\Course
+ */
 class Controller extends Base\Base
 {
     /** @var FolderMapper */
