@@ -1258,20 +1258,6 @@ class Controller extends Base\Base
 
 
     /**
-     * Returns a HTTP 500 error with a specific text message
-     *
-     * @param $message
-     */
-    protected function throwError($message)
-    {
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data' => $message
-        ]);
-    }
-
-
-    /**
      * @return Ancestry
      */
     public function getAncestry()
