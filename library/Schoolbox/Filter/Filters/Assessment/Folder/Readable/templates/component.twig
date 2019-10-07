@@ -43,6 +43,8 @@
                 multiple
                 placeholder="Enter one or more folder names or class codes"
                 data-selectize
+                data-value-original="{{ userSelectionIds | json_encode | e('html_attr') }}"
+                data-value-default="{{ roleSelectionIds | json_encode | e('html_attr') }}"
         >
             {# For this filter, folders are just all the URL override folders #}
             <optgroup label="My Classes">

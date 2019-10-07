@@ -44,6 +44,8 @@
                 multiple
                 placeholder="Enter one or more course names"
                 data-selectize
+                data-value-original="{{ userSelectionIds | json_encode | e('html_attr') }}"
+                data-value-default="{{ roleSelectionIds | json_encode | e('html_attr') }}"
         >
             {# show NONE selector #}
             {% include '@filters/_option.twig' with {
