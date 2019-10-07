@@ -524,7 +524,7 @@ class Controller extends Base\Base
 
         // if there were any validation problems, throw that back
         if ($errors || !$parentFolder instanceof Folder) {
-            throw new Base\Exception('Could not save', $errors);
+            throw new Base\Exception('Could not save.', $errors);
         }
 
         // Explicitly set to root (as opposed to not set)
