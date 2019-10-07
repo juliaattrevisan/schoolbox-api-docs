@@ -577,13 +577,7 @@
              */
             determineVisibleRange(currentDate) {
                 // Find the range in the list of terms.
-                // (Need to go to these lengths to create a date, as calendar
-                //  and thus moment isn't initialized yet.
-                //  Need to feed the date in as UTC because toISOString outputs
-                //  date in UTC)
-                let actualDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())),
-                    dateString = actualDate.toISOString().slice(0, 10);
-
+                let dateString = this.convertDateToDateString(currentDate);
                 return this.allTerms[this.findTermIndex(dateString)] || null;
             },
 
@@ -594,6 +588,7 @@
              * @return {Array}
              */
             buildAllTermsList() {
+                let self = this;
                 return this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future)
                     .sort(function (a, b) {
                         if (a.start < b.start) {
@@ -609,8 +604,34 @@
                             return 1;
                         }
                         return 0;
+                    })
+                    .map(function (term) {
+                        let end = new Date(term.end);
+                        end.setDate(end.getDate() + 1);
+                        term.end = self.convertDateToDateString(end);
+                        return term;
                     });
             },
+
+
+            /**
+             * Convert a Date object to a `YYYY-MM-DD` format string without
+             * MomentJS.
+             *
+             * Required because in this component's  `create` method, the
+             * calendar and thus MomentJS won't yet be initialized.
+             *
+             * @param {Date} date
+             *
+             * @return {string}
+             */
+            convertDateToDateString(date) {
+                // Need to feed the date in as UTC because toISOString outputs
+                // date in UTC.
+                let actualDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+                return actualDate.toISOString().slice(0, 10);
+            },
+
 
             /**
              * Find the index of the term within `this.termDates` which contains
