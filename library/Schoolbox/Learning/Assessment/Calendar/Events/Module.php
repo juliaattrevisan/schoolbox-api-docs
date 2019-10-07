@@ -12,6 +12,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Calendar_Api_Config_Mapper;
+use Calendar_Api_EventType_Event_Schoolbox_Campus;
 use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\FactoryFactory as FilterFactoryFactory;
@@ -84,6 +86,10 @@ class Module extends BaseModule
                 );
             }),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+            'calendarConfig'        => $injector->lazy(function () {
+                return $this->getMapperFactory()->get(Calendar_Api_Config_Mapper::class)
+                                                ->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Campus::class);
+            }),
         ];
     }
 }

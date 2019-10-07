@@ -10,6 +10,9 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
+use Calendar_Api_Composite;
+use Calendar_Api_Config_Record;
+use Calendar_Api_EventType_Event_Schoolbox_Campus;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
@@ -55,6 +58,12 @@ class Controller extends Base
 
 
     /**
+     * @var Calendar_Api_Config_Record
+     */
+    private $calendarConfig;
+
+
+    /**
      * Constructor
      *
      * @param AssessmentDataSource             $assessmentDataSource
@@ -62,19 +71,22 @@ class Controller extends Base
      * @param AssessmentFilters\IdFinder       $assessmentIdFinder
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @param FilterSelection\Mapper           $filterSelectionMapper
+     * @param Calendar_Api_Config_Record       $calendarConfig
      */
     public function __construct(
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         AssessmentFilters\IdFinder $assessmentIdFinder,
         AssessmentFilters\FactoryFactory $filterFactoryFactory,
-        FilterSelection\Mapper $filterSelectionMapper
+        FilterSelection\Mapper $filterSelectionMapper,
+        Calendar_Api_Config_Record $calendarConfig
     ) {
         $this->assessmentDataSource  = $assessmentDataSource;
         $this->visibility            = $visibility;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterSelectionMapper = $filterSelectionMapper;
+        $this->calendarConfig        = $calendarConfig;
     }
 
 
@@ -110,7 +122,7 @@ class Controller extends Base
 
 
         // Query the API for the events in this time span
-        $api = new \Calendar_Api_Composite();
+        $api = new Calendar_Api_Composite();
         $api->add(
             new Api(
                 $this->getUser(),
@@ -121,8 +133,8 @@ class Controller extends Base
             )
         );
         $api->add(
-            new \Calendar_Api_EventType_Event_Schoolbox_Campus(
-                \Calendar_Api_Config_Mapper::getInstance()->findOneForClass(\Calendar_Api_EventType_Event_Schoolbox_Campus::class)->getId(),
+            new Calendar_Api_EventType_Event_Schoolbox_Campus(
+                $this->calendarConfig->getId(),
                 $this->getUser(),
                 $this->getUser()
             )
