@@ -188,12 +188,12 @@
                             element.resourceId = 'eventType-' + String(element.data.meta.eventTypeId);
                             element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
-                        calendarResponse.data.forEach(function (element) {
 
+                        calendarResponse.data.forEach(function (element) {
                             // Create a place holder
                             if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
 
-                                let itemCountByGroup = assessmentResponse.data.filter(function(val) {
+                                let itemCountByGroup = calendarResponse.data.filter(function(val) {
                                     return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
                                 }).length;
 
