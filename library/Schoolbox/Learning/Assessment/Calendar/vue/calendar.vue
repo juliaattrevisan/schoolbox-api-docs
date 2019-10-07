@@ -371,13 +371,15 @@
              * navigate into the next available semester
              */
             clickNext() {
-                var self = this;
+                let self = this;
 
                 if (self.currentViewIsSemester()) {
-                    if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length) ||
-                        (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])) {
+                    if (self.cursor < 0
+                        || (self.cursor === 0 && self.config.termDates.future.length)
+                        || (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])
+                    ) {
                         self.cursor++;
-                        var startDateByCursor = self.getStartDateByCursor();
+                        let startDateByCursor = self.getStartDateByCursor();
 
                         if (startDateByCursor !== undefined) {
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
@@ -396,15 +398,15 @@
              * navigate into the previous available semester
              */
             clickPrev() {
-                var self = this;
+                let self = this;
 
                 if (self.currentViewIsSemester()) {
-                    if ((self.cursor > 0) || (self.cursor === 0 && self.config.termDates.past.length) ||
-                        (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)) {
-
+                    if (self.cursor > 0
+                        || (self.cursor === 0 && self.config.termDates.past.length)
+                        || (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)
+                    ) {
                         self.cursor--;
-
-                        var startDateByCursor = self.getStartDateByCursor();
+                        let startDateByCursor = self.getStartDateByCursor();
 
                         if (startDateByCursor !== undefined) {
                             self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
