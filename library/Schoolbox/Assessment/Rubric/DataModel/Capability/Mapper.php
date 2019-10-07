@@ -108,9 +108,11 @@ class Mapper extends BaseMapper
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
      * characters.
      *
-     * @param  Model $object
+     * @param Model $object
      * @return bool  Always true
+     * @throws \Schoolbox\Mapper\Exception
      * @throws MapperException if the name isn't unique
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function verifyUniqueness(Model $object): bool
     {

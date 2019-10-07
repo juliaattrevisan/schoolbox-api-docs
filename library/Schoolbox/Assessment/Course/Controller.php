@@ -8,18 +8,19 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
 use Aura\Di\Exception\ServiceNotFound;
-use Component_DefinitionMapper;
-use Component_Instance;
-use Component_InstanceMapper;
 use InvalidArgumentException;
 use PDOException;
 use RangeException;
+use UnexpectedValueException;
 use Schoolbox\Application;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -30,27 +31,23 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted as MapperExceptionDeleted;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
-use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\YearLevel;
-use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Curriculum\Node;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use UnexpectedValueException;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Assessment\Course
+ */
 class Controller extends Base\Base
 {
     /** @var FolderMapper */
@@ -67,15 +64,6 @@ class Controller extends Base\Base
 
     /** @var UnitImplementationMapper */
     private $unitImplementationMapper;
-
-    /** @var Component_DefinitionMapper */
-    private $componentDefinitionMapper;
-
-    /** @var Component_InstanceMapper */
-    private $componentInstanceMapper;
-
-    /** @var HomepageConfigMapper */
-    private $homepageConfigMapper;
 
     /** @var  HomepageTemplateMapper */
     private $homepageTemplateMapper;
@@ -102,9 +90,6 @@ class Controller extends Base\Base
      * @param UnitSpecificationMapper    $unitSpecificationMapper
      * @param UnitImplementationMapper   $unitImplementationMapper
      * @param FolderMapper               $folderMapper
-     * @param Component_DefinitionMapper $componentDefinitionMapper
-     * @param Component_InstanceMapper   $componentInstanceMapper
-     * @param HomepageConfigMapper       $homepageConfigMapper
      * @param HomepageTemplateMapper     $homepageTemplateMapper
      * @param Access                     $access
      * @param CourseConfigMapper         $courseConfigMapper
@@ -118,9 +103,6 @@ class Controller extends Base\Base
         UnitSpecificationMapper $unitSpecificationMapper,
         UnitImplementationMapper $unitImplementationMapper,
         FolderMapper $folderMapper,
-        Component_DefinitionMapper $componentDefinitionMapper,
-        Component_InstanceMapper $componentInstanceMapper,
-        HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
         Access $access,
         CourseConfigMapper $courseConfigMapper,
@@ -133,9 +115,6 @@ class Controller extends Base\Base
         $this->unitSpecificationMapper    = $unitSpecificationMapper;
         $this->unitImplementationMapper   = $unitImplementationMapper;
         $this->folderMapper               = $folderMapper;
-        $this->componentDefinitionMapper  = $componentDefinitionMapper;
-        $this->componentInstanceMapper    = $componentInstanceMapper;
-        $this->homepageConfigMapper       = $homepageConfigMapper;
         $this->homepageTemplateMapper     = $homepageTemplateMapper;
         $this->access                     = $access;
         $this->courseConfigMapper         = $courseConfigMapper;
@@ -170,7 +149,7 @@ class Controller extends Base\Base
         $errors = [];
 
         // Is the course folder not the parent of the unit folder?
-        if($unitFolder->getParent()->getId() != $courseFolder->getId()){
+        if ($unitFolder->getParent()->getId() != $courseFolder->getId()) {
             $errors[] = "Course folder (id: {$courseFolder->getId()}) is not the parent of Unit folder (id: {$unitFolder->getId()})";
             $this->returnJson($errors, 400);
             return;
@@ -183,55 +162,59 @@ class Controller extends Base\Base
         $unitExists = $unit instanceof UnitSpecification && $unit->getId();
 
         // Do the folders already have a Unit and Course attached ?
-        if($courseExists && $unitExists){
+        if ($courseExists && $unitExists) {
             $errors[] = "Course (id: {$course->getId()}) and Unit (id: {$unit->getId()}) already linked.";
             $this->returnJson($errors, 400);
             return;
         }
 
         // Does Unit already exist and belong to different Course?
-        if($unitExists && !$courseExists){
+        if ($unitExists && !$courseExists) {
             $errors[] = "Unit (id: {$unit->getId()}) already exists in Course (id: {$unit->getCourse()->getId()})";
             $this->returnJson($errors, 400);
             return;
         }
 
         // Is the proposed unit folder the same as the course folder?
-        if($unitFolder->getId() == $courseFolder->getId()){
+        if ($unitFolder->getId() == $courseFolder->getId()) {
             $errors[] = 'Cannot convert the same folder into both a Unit and a Course. FolderId: ' . $courseFolder->getId();
         }
 
         // Check proposed Course
-        if(!$courseExists){
+        if (!$courseExists) {
             // Does user have WRITE+ access to Course Folder?
             $courseFolderAccess = $this->access->getFolderAccess($this->getUser(), $courseFolder->getId());
-            if($courseFolderAccess < UserAccess::ACCESS_WRITE){
+
+            if ($courseFolderAccess < UserAccess::ACCESS_WRITE) {
                 $errors[] = 'Course Folder permission error: '.$courseFolder->getId();
             }
 
             // Does the proposed Course Folder already have a Unit
             $courseFolderUnit = $courseFolder->getUnitSpecification();
-            if($courseFolderUnit instanceof UnitSpecification && $courseFolderUnit->getId()){
+
+            if ($courseFolderUnit instanceof UnitSpecification && $courseFolderUnit->getId()){
                 $errors[] = 'Proposed Course folder already has a Unit: ' . $courseFolderUnit->getId();
             }
         }
 
         // Check the proposed Unit
-        if(!$unitExists){
+        if (!$unitExists) {
             // Does user have WRITE+ access to the Unit folder?
             $unitFolderAccess = $this->access->getFolderAccess($this->getUser(), $unitFolder->getId());
-            if($unitFolderAccess < UserAccess::ACCESS_WRITE){
+
+            if ($unitFolderAccess < UserAccess::ACCESS_WRITE) {
                 $errors[] = 'Unit Folder permission error: '.$unitFolder->getId();
             }
 
             // Does the proposed Unit Folder already have a Course ?
             $unitFolderCourse = $unitFolder->getCourseSpecification();
-            if($unitFolderCourse instanceof CourseSpecification && $unitFolderCourse->getId()){
+
+            if ($unitFolderCourse instanceof CourseSpecification && $unitFolderCourse->getId()) {
                 $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
             }
         }
 
-        if(count($errors)){
+        if (\count($errors)) {
             $this->returnJson($errors, 400);
             return;
         }
@@ -239,13 +222,13 @@ class Controller extends Base\Base
         // No errors. Proceed.
 
         // Create Course if required
-        if(!$courseExists){
+        if (!$courseExists) {
             $course = $this->courseSpecificationMapper->createModel();
             $course->setFolder($courseFolder);
         }
 
         // Create Unit if required
-        if(!$unitExists){
+        if (!$unitExists) {
             $unit = $this->unitSpecificationMapper->createModel();
             $unit->setFolder($unitFolder);
         }
@@ -256,19 +239,21 @@ class Controller extends Base\Base
 
         // And save
         $response = [];
-        if(!$courseExists){
+
+        if (!$courseExists) {
             $this->courseSpecificationMapper->save($course);
             $response['course'] = $course->getId();
         }
 
         // Create Unit if required
-        if(!$unitExists){
+        if (!$unitExists) {
             $this->unitSpecificationMapper->save($unit);
             $response['unit'] = $unit->getId();
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
+
 
     /**
      * Convenience method for returning JSON output
@@ -279,12 +264,14 @@ class Controller extends Base\Base
     protected function returnJson($message, $code = 200)
     {
         $this->getResponse()->status->set($code);
-        if($this->getRequest()->isXhr()){
+
+        if ($this->getRequest()->isXhr()){
             $this->getResponse()->content->set($this->buildJsonOutput($message));
         } else {
             die(json_encode($message));
         }
     }
+
 
     /**
      * Saves the sequence of Assessments in specified UnitSpecification
@@ -307,61 +294,9 @@ class Controller extends Base\Base
      * @param string $template
      * @param array $data
      */
-    protected function courseTpl($template, $data = [])
+    protected function courseTpl($template, array $data = [])
     {
         $this->tpl('course', $template, $data, 'course');
-    }
-
-    /**
-     * Retrieve the Course Builder component instance. If it doesn't exist, create it, then return that
-     *
-     * @param Folder $unitFolder
-     * @return Component_Instance
-     */
-    protected function getCourseBuilderInstance(Folder $unitFolder)
-    {
-        // confirm that there's a Course Builder component
-        $folderId = $unitFolder->getId();
-        $componentClass = CourseBuilderController::class;
-        $instances = $this->componentInstanceMapper->findByContextAndClass('homepage', $folderId, $componentClass);
-
-        if (count($instances) == 0) {
-            // no instance found - give me a new one
-            return $this->injectNewComponent($unitFolder);
-        }
-
-        // instance found - use that
-        return $instances->first();
-    }
-
-
-    /**
-     * @param Folder $folder
-     * @param string $controllerClass
-     * @return Component_Instance
-     * @throws MapperException
-     */
-    protected function injectNewComponent(Folder $folder, $controllerClass = CourseBuilderController::class)
-    {
-        // Doesn't exist. We need that to exist. Make it exist.
-        $definition = $this->componentDefinitionMapper->findOneByColumn('class', $controllerClass);
-
-        // invent a new component
-        $newInstance = $this->componentInstanceMapper
-            ->createModel()
-            ->setModule('homepage')
-            ->setIdentifier($folder->getId())
-            ->setDefinitionId($definition->getId())
-            ->setSequence(0)
-            ->setPosition('top');
-
-        // save it
-        $this->componentInstanceMapper->save($newInstance);
-
-        // reapply the sequencing so the homepage doesn't break
-        $this->componentInstanceMapper->cascadeSequence($folder->getId(), 'top');
-
-        return $newInstance;
     }
 
 
@@ -374,20 +309,27 @@ class Controller extends Base\Base
      * @since 160
      *
      * @param CourseSpecification $courseSpec The course being created/modified
+     * @throws BaseMapper\DefinitionException
      * @throws Deleted
+     * @throws MapperException
+     * @throws NotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \LogicException
      */
     public function modifyCourse(CourseSpecification $courseSpec)
     {
         // Is course deleted ?
         // TODO move this to module's route auth rule
-        if($courseSpec->isDeleted()){
+        if ($courseSpec->isDeleted()) {
             throw new NotFound();
         }
 
         $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
 
         // Is this an UPDATE ?
-        if($courseSpec->getId()){
+        if ($courseSpec->getId()) {
             // Rehydrate course folder so that curriculum codes exist
             $courseSpec->setFolder($this->folderMapper->findById($courseSpec->getFolder()->getId()));
 
@@ -412,7 +354,7 @@ class Controller extends Base\Base
 
         $folderAccess[$courseSpec->getFolder()->getId()] = $this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId());
 
-        foreach($courseSpec->getUnits() as $unitSpec){
+        foreach ($courseSpec->getUnits() as $unitSpec) {
             $unitSpecId = $unitSpec->getId();
             $folderId = $unitSpec->getFolder()->getId();
             $options = ['order' => ['sequence' => 'ASC']];
@@ -437,10 +379,18 @@ class Controller extends Base\Base
      *
      * @api   GET /course/new{/:name}
      * @since 160
+     *
      * @param string|null $name
+     * @throws BaseMapper\DefinitionException
+     * @throws Deleted
      * @throws MapperException
+     * @throws NotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \LogicException
      */
-    public function newCourse($name = null)
+    public function newCourse(string $name = null)
     {
         $course = $this->courseSpecificationMapper->createModel();
         $folder = $this->folderMapper->createModel();
@@ -449,6 +399,7 @@ class Controller extends Base\Base
         $folder->setName($name);
         $this->modifyCourse($course);
     }
+
 
     /**
      * Accept the create formdata
@@ -459,6 +410,18 @@ class Controller extends Base\Base
      * @var string   $_POST['name']             name to give to new course's folder
      * @var int      $_POST['parent']           id of the folder to create the new course's folder under
      * @var string[] $_POST['curriculumCodes']  1st item is comma-separated integers. Saves to 'curriculum_node_for_category' table
+     *
+     * @throws Application\Exception\Exception
+     * @throws BaseMapper\DefinitionException
+     * @throws Base\Exception
+     * @throws Deleted
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws PDOException
+     * @throws RangeException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function createCourse()
     {
@@ -472,7 +435,7 @@ class Controller extends Base\Base
         }
 
         try {
-            $this->validateCourseData(null, trim($post['name']), trim($post['parent']));
+            $this->validateCourseData(trim($post['name']), trim($post['parent']), null);
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
@@ -526,78 +489,80 @@ class Controller extends Base\Base
      * * course not being created, or moved to, outside faculty root
      * * no loops in folder ancestry
      *
-     * @param int|null $folderId
      * @param string   $folderName
+     * @param int|null $folderId
      * @param int      $parentFolderId
      * @throws Base\Exception
      * @todo move route perm logic from controller to module (eg course parent folder access)
      */
-    protected function validateCourseData($folderId = null, $folderName, $parentFolderId)
+    protected function validateCourseData($folderName, $parentFolderId, $folderId = null)
     {
         $errors = [];
         $parentFolder = null;
 
         if (!$folderName) {
-            $errors[] = 'give the course a name';
+            $errors[] = 'You need to give the course a name';
             $folderName = 'this course';
         }
 
         // Was no parent indicated? (as opposed to explicitly setting to root)
-        if(!$parentFolderId && "0" !== $parentFolderId){
-            $errors[] = "select a faculty or class for $folderName to live in";
+        if (!$parentFolderId && '0' !== $parentFolderId) {
+            $errors[] = "You need to select a faculty or class for {$folderName} to live in";
         } else {
             $access = $this->access->getFolderAccess($user = $this->getUser(), $parentFolderId);
+
             if ($access < UserAccess::ACCESS_WRITE) {
-                $errors[] = "select a Faculty / Subject for which you have write access";
+                $errors[] = 'You need to select a Faculty / Subject for which you have write access';
             } else {
-                try{
+                try {
                     $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
                 } catch (MapperException $e){
-                    $errors[] = "select an existing faculty or class for $folderName to live in";
+                    $errors[] = "You need to select an existing faculty or class for {$folderName} to live in";
                 }
             }
         }
 
         // if there were any validation problems, throw that back
         if ($errors || !$parentFolder instanceof Folder) {
-            throw new Base\Exception("Could not save", $errors);
+            throw new Base\Exception('Could not save.', $errors);
         }
 
         // Explicitly set to root (as opposed to not set)
         if ('0' === $parentFolderId && 0 !== $this->courseSpecificationMapper->getFacultyRootFolder()->getId()) {
-            throw new Base\Exception("Courses may not be created in the root folder");
+            throw new Base\Exception('Courses may not be created in the root folder');
         }
 
 
         // Deeper logic tests
-        try{
+        try {
             // Does the folder already exist? If so, retrieve it.
             $folder = null;
-            if($folderId){
+
+            if ($folderId) {
                 $folder = $this->folderMapper->findCheaplyById($folderId);
             }
 
             // Is this a create, or are we moving an existing course?
-            if(!$folderId || $folder->getParent()->getId() != $parentFolderId ){
-
-                if(!$this->courseSpecificationMapper->isFolderValid($parentFolder)){
-                    if($folderId){
-                        throw new Base\Exception("Courses may not be moved outside the faculty folder");
+            if (!$folderId || $folder->getParent()->getId() != $parentFolderId) {
+                if (!$this->courseSpecificationMapper->isFolderValid($parentFolder)) {
+                    if ($folderId) {
+                        throw new Base\Exception('Courses may not be moved outside the faculty folder');
                     } else {
-                        throw new Base\Exception("Courses may not be created outside the faculty folder");
+                        throw new Base\Exception('Courses may not be created outside the faculty folder');
                     }
                 }
             }
 
             // Check we are not moving a folder to be its own parent
-            if($folder){
+            if ($folder) {
                 $folder->setParent($parentFolder);
-                if(!$this->folderMapper->checkParentage($folder)) {
-                    throw new Base\Exception("Courses may not be moved inside themselves");
+
+                if (!$this->folderMapper->checkParentage($folder)) {
+                    throw new Base\Exception('Courses may not be moved inside themselves');
                 }
             }
         } catch (BaseMapper\Exception $e) {
-            throw new Base\Exception("Could not save because " . $e->getMessage());
+            throw new Base\Exception("Could not save because {$e->getMessage()}");
         }
     }
 
@@ -612,17 +577,26 @@ class Controller extends Base\Base
      * @var string[] $_POST['curriculumCodes']  1st item is comma-separated integers. Saves to 'curriculum_node_for_category' table
      * @var array[]  $_POST['unit'] indexed by unitSpec.id
      * @var string   $_POST[unitSpecId]['name']
+     * @throws BaseMapper\DefinitionException
+     * @throws Base\Exception
+     * @throws Deleted
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
      */
     public function updateCourse(CourseSpecification $courseSpec)
     {
         $post = $this->getRequest()->post;
         $courseSpec->getFolder()->setName(trim($post['name']));
-        $parentFolderId = trim($post['parent']);
+        $parentFolderId = (int)trim($post['parent']);
         $curriculumCodes = $post['curriculumCodes'];
 
-        try{
-            $this->validateCourseData($courseSpec->getFolder()->getId(), $courseSpec->getFolder()->getName(), $parentFolderId);
-            if($courseSpec->getFolder()->getParent()->getId() != $parentFolderId){
+        try {
+            $this->validateCourseData($courseSpec->getFolder()->getName(), $parentFolderId, $courseSpec->getFolder()->getId());
+
+            if ($courseSpec->getFolder()->getParent()->getId() != $parentFolderId) {
                 $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
                 $courseSpec->getFolder()->setParent($parentFolder);
             }
@@ -632,11 +606,13 @@ class Controller extends Base\Base
         }
 
         // Save each Unit's name
-        if (is_array($post['unit'])) {
+        if (\is_array($post['unit'])) {
             $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
+
             // save unit name changes
             foreach ($courseSpec->getUnits() as $unitSpec) {
                 $unitName = $post['unit'][$unitSpec->getId()]['name'];
+
                 if (isset($unitName)) {
                     // Re-hydrate unit folder to ensure curriculum codes etc are hydrated.
                     $unitFolder = $this->folderMapper->findById($unitSpec->getFolder()->getId());
@@ -644,7 +620,7 @@ class Controller extends Base\Base
                 }
             }
         } else {
-            $this->sendError(new Base\Exception("Cannot create a Course without Units", ["create at least 1 unit"]));
+            $this->sendError(new Base\Exception('Cannot create a Course without Units.', ['You need to create at least 1 unit']));
             return;
         }
 
@@ -653,15 +629,17 @@ class Controller extends Base\Base
 
         // Save the folder
         $folder = $courseSpec->getFolder();
-        if(count($curriculumCodes)){
+
+        if (\count($curriculumCodes)) {
             $folder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $curriculumCodes));
         }
+
         $this->folderMapper->save($folder);
 
         if ($this->getRequest()->isXhr()) {
             // respond to XHR with JSON
             $this->getResponse()->content->set($this->buildJsonOutput([
-                'id'              => $courseSpec->getId(),
+                'id' => $courseSpec->getId(),
             ]));
         } else {
             // respond to synchronous POST with redirect
@@ -669,19 +647,21 @@ class Controller extends Base\Base
         }
     }
 
+
     /**
      * Give the encoded return URL for the given course ID
      *
      * @param int $courseId
      * @param int $unitId
      * @return string
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    protected function getReturnUrl($courseId, $unitId = null)
+    protected function getReturnUrl($courseId, $unitId = null): string
     {
         $path = $this->getRouteIfAuthorized('course.modifyCourse', ['id' => $courseId]);
 
         if ($unitId) {
-            $path .= "#$unitId";
+            $path .= "#{$unitId}";
         }
 
         return Redirect::encode($path);
@@ -698,20 +678,23 @@ class Controller extends Base\Base
      *
      * @api   POST /course/{courseSpecId}/units/new
      * @since 160
+     *
      * @param CourseSpecification $courseSpec
      * @var string $_POST['name'] What to name the new unit
+     * @throws Base\Exception
      */
     public function newUnit(CourseSpecification $courseSpec)
     {
-        if(!$courseSpec->getId()){
-            $this->sendError("Could not save. Course not found.");
+        if (!$courseSpec->getId()) {
+            $this->sendError('Could not save. Course not found.');
             return;
         }
+
         $post = $this->getRequest()->post;
         $name = trim($post->get('name'));
 
         if (!$name) {
-            $this->sendError('Could not create unit', ['give the unit a name']);
+            $this->sendError('Could not create unit.', ['You need to give the unit a name']);
             return;
         }
 
@@ -720,11 +703,13 @@ class Controller extends Base\Base
             // base config
             // course config
             $rolePermissions = [];
+
             foreach ($this->courseConfigMapper->findByColumn('page', 'unit') as $courseConfig) {
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
+
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
                 $templateID = HomepageTemplate::HOMEPAGE_NONE;
             } else {
@@ -760,11 +745,11 @@ class Controller extends Base\Base
 
         } catch (ServiceNotFound $e) {
             // quite simple not able to find things we need. bye bye.
-            $this->sendError("Could not save because of an internal error.", [], 500);
+            $this->sendError('Could not save because of an internal error.', [], 500);
 
         } catch (\Exception $e) {
             // whatever the exception, recover from it as best you can
-            $this->sendError("Could not save because " . $e->getMessage());
+            $this->sendError("Could not save because {$e->getMessage()}");
         }
     }
 
@@ -842,6 +827,7 @@ class Controller extends Base\Base
         return $folder;
     }
 
+
     /**
      * Generate a list of CourseSpecs
      *
@@ -852,6 +838,13 @@ class Controller extends Base\Base
      * @var string   $_GET['encodedReturnUrl']   For URL generation
      * @var int      $_GET['folder']             Folder.id for URL generation
      * @var int      $_GET['component']          ComponentInstance.id for URL generation
+     *
+     * @throws BaseMapper\DefinitionException
+     * @throws Deleted
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \OverflowException
      */
     public function courseList(): void
     {
@@ -885,6 +878,7 @@ class Controller extends Base\Base
                 'encodedReturnUrl' => Redirect::encode($this->getRouter()->generate('course.courseList')),
             ];
         }
+
         $this->courseTpl('courseList', array_merge($data, $options));
     }
 
@@ -904,6 +898,11 @@ class Controller extends Base\Base
      * @var bool     $_GET['linkToUnits']
      * @var int      $_GET['folder']
      * @var int      $_GET['component']
+     * @throws BaseMapper\DefinitionException
+     * @throws Deleted
+     * @throws MapperException
+     * @throws \DomainException
+     * @throws \OverflowException
      */
     public function courseListAjax()
     {
@@ -922,8 +921,8 @@ class Controller extends Base\Base
 
         $options = [
             'search'           => $search,
-            'folder'           => [ 'id' => $folder ],
-            'component'        => [ 'id' => $query->get('component') ],
+            'folder'           => ['id' => $folder],
+            'component'        => ['id' => $query->get('component')],
             'hasAdd'           => $query->get('hasAdd', 0),
             'hasTot'           => $query->get('hasTot', 0),
             'linkToUnits'      => $query->get('linkToUnits', 0),
@@ -934,26 +933,30 @@ class Controller extends Base\Base
         $this->courseTpl('courseListResults', array_merge($data, $options));
     }
 
+
     /**
      * @param int $folderId
      * @param int $min
      * @return bool
      */
-    protected function confirmAccess($folderId, $min = UserAccess::ACCESS_READ)
+    protected function confirmAccess($folderId, $min = UserAccess::ACCESS_READ): bool
     {
         return $this->access->getFolderAccess($this->getUser(), $folderId) >= $min;
     }
+
 
     /**
      * List the courses. Returns a combined array of Folder instances
      * and information about any found Units and their task counts
      *
-     * @param string|null $searchParam   If null, filter out courses residing outside Faculty root
-     * @return array $data
+     * @param string|null $searchParam  If null, filter out courses residing outside Faculty root
+     * @return array
      * @var Folder[] $data['lineage']
      * @var CourseSpecification[] $data['courses']
+     * @throws \DomainException
+     * @throws \OverflowException
      */
-    protected function getCourseData($searchParam = null)
+    protected function getCourseData(string $searchParam = null): array
     {
         // Use the new mapper to get the list of courses
         $allCourses = $this->courseSpecificationMapper->findAllByName($searchParam, ['order' => ['f.name' => 'asc']]);
@@ -965,7 +968,7 @@ class Controller extends Base\Base
             // general search ignores Courses outside Faculty
             if (null === $searchParam) {
                 try {
-                    if (!($this->folderMapper->isDescendant($currentCourse->getFolder(), $this->courseSpecificationMapper->getFacultyRootFolder()))) {
+                    if (!$this->folderMapper->isDescendant($currentCourse->getFolder(), $this->courseSpecificationMapper->getFacultyRootFolder())) {
                         continue;
                     }
                 } catch (MapperException $e) {
@@ -990,6 +993,7 @@ class Controller extends Base\Base
 
             // Get units for a course
             $units = $this->unitSpecificationMapper->findAllByCourseId($currentCourse->getId());
+
             // Remove units whose folders aren't accessible by this user
             $currentCourse->setUnits($units->filter(function ($unit) {
                 /** @var UnitSpecification $unit */
@@ -1009,11 +1013,12 @@ class Controller extends Base\Base
      *
      * @param Folder $course
      * @throws MapperException if one of the ancestors is deleted or missing somehow
+     * @throws \OverflowException
      * @return Collection
      */
-    protected function getLineage(Folder $course)
+    protected function getLineage(Folder $course): Collection
     {
-        return $this->getAncestry()->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
+        return $this->folderMapper->getAncestry()->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
     }
 
 
@@ -1022,8 +1027,9 @@ class Controller extends Base\Base
      *
      * @param Folder $folder
      * @return Collection
+     * @throws MapperException
      */
-    protected function getLinkSuggestions(Folder $folder)
+    protected function getLinkSuggestions(Folder $folder): Collection
     {
         // obtain curriculum codes...
         $codes = $folder->getCurriculumNodes()->getColumnValues('code');
@@ -1086,13 +1092,16 @@ class Controller extends Base\Base
      * @since 160
      *
      * @param CourseSpecification $courseSpec The course to delete
-     * @param bool $deleteFolder
+     * @param bool                $deleteFolder
+     * @throws Application\Exception\Exception
+     * @throws MapperException
+     * @throws ServiceNotFound
      */
     public function deleteCourseSpecification(CourseSpecification $courseSpec, $deleteFolder = false)
     {
         // TODO: make delete of folder and course atomic
 
-        if($courseSpec->isDeleted()){
+        if ($courseSpec->isDeleted()){
             $this->getResponse()->status->set(410);
         }
 
@@ -1100,7 +1109,7 @@ class Controller extends Base\Base
         // (this also cascades the deletions to constituent units and assessments)
         $this->courseSpecificationMapper->delete($courseSpec);
 
-        if($deleteFolder){
+        if ($deleteFolder) {
             /** @var FolderController $folderController */
             $folderController = $this->getController('folder');
             $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
@@ -1123,23 +1132,29 @@ class Controller extends Base\Base
      * @since 160
      *
      * @param UnitSpecification $unitSpec The unit spec to delete
+     * @throws Base\Exception
+     * @throws MapperException
      */
     public function deleteUnitSpecification(UnitSpecification $unitSpec)
     {
         // Does this Course exist ?
-        if(!$unitSpec->getId()){
+        if (!$unitSpec->getId()){
             $this->sendError('Unit not found');
             return;
         }
-        if($unitSpec->isDeleted()){
+
+        if ($unitSpec->isDeleted()){
             $this->getResponse()->status->set(410);
         }
+
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitSpecificationMapper->delete($unitSpec);
+
         $this->getResponse()->content->set($this->buildJsonOutput([
             'id' => $unitSpec->getId(),
         ]));
     }
+
 
     /**
      * Delete a unit implementation.
@@ -1151,19 +1166,24 @@ class Controller extends Base\Base
      * @since 160
      *
      * @param UnitImplementation $unitImpl The unit implementation to delete
+     * @throws Base\Exception
+     * @throws MapperException
      */
     public function deleteUnitImplementation(UnitImplementation $unitImpl)
     {
         // Does this Course exist ?
-        if(!$unitImpl->getId()){
+        if (!$unitImpl->getId()){
             $this->sendError('Unit not found');
             return;
         }
-        if($unitImpl->isDeleted()){
+
+        if ($unitImpl->isDeleted()){
             $this->getResponse()->status->set(410);
         }
+
         // Call delete(), even if already deleted, to enable mapper hooks to fire
         $this->unitImplementationMapper->delete($unitImpl);
+
         $this->getResponse()->content->set($this->buildJsonOutput([
             'id' => $unitImpl->getId(),
         ]));
@@ -1171,69 +1191,20 @@ class Controller extends Base\Base
 
 
     /**
-     * Returns a HTTP 500 error with a specific text message
-     *
-     * @param $message
-     */
-    protected function throwError($message)
-    {
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data' => $message
-        ]);
-    }
-
-    /**
-     * @return Ancestry
-     */
-    public function getAncestry()
-    {
-        return $this->folderMapper->getAncestry();
-    }
-
-    /**
-     * @param int $folderId
-     * @return FolderInterface
-     */
-    protected function findFolder($folderId)
-    {
-        try {
-            return $this->getFolder($folderId);
-
-        } catch (MapperExceptionDeleted $e) {
-            // Deleted: load the parent (recursively)
-            /** @var Folder $folder */
-            $folder = $e->getDeletedObject();
-            return $this->findFolder($folder->getId());
-
-        } catch (MapperException $e) {
-            return $this->folderMapper->createModel()->setId(0);
-        }
-    }
-
-    /**
-     * @param int $folderId
-     * @return FolderInterface
-     * @throws MapperException
-     */
-    protected function getFolder($folderId)
-    {
-        return $this->folderMapper->findById($folderId);
-    }
-
-
-    /**
-     * @api GET /course/:folderId/nodes
+     * @api   GET /course/:folderId/nodes
      * @since 155
      *
      * @param int $folderId
+     * @throws BaseMapper\DefinitionException
+     * @throws Deleted
+     * @throws MapperException
      */
     public function listNodes($folderId)
     {
-        $mime = $this->getRequest()->query["mime"];
+        $mime = $this->getRequest()->query['mime'];
 
         if (empty($mime)) {
-            $mime = "*/*";
+            $mime = '*/*';
         }
 
         // hydrate so children can detect parent folder type

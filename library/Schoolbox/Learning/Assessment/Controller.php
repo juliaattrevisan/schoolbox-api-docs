@@ -160,6 +160,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
+
     /**
      * Save the data when creating a specific kind of Assessment
      *
@@ -170,17 +171,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      *
      * @param IAssessable $assessment
+     * @throws \Alaress\Web\Controller\Exception
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postUpdateAssessment(IAssessable $assessment)
     {
         /* Modify particular fields
+         * This is accessed when you tick Skip Unsubmitted in the Inline Grader
          */
         if ($this->getRequest()->server['HTTP_X_HTTP_METHOD_OVERRIDE']) {
             $this->patchUpdateAssessment($assessment);
             return;
         }
 
-        /* Regular update
+        /* Regular update while you're creating the assessment, otherwise
          */
         try {
             $assessmentInfo = $this->persistAssessment(
@@ -191,7 +195,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $internalReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
         }
         catch (DomainException $e) {
-            $this->sendError('Could not save assessment', [ $e->getMessage() ]);
+            $this->sendError('Could not save assessment. ', [ $e->getMessage() ]);
 
             /* Return Early to let mage deal with error messages
              */
@@ -209,6 +213,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // we're done here
         $this->redirect($returnUrl);
     }
+
 
     /**
      * Get an overview of rubric marks

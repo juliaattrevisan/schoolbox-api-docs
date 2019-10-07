@@ -56,7 +56,7 @@ class TotalMarkFractional extends TotalMarkAbstract
             // I'm also using the term "maximum available marks" to be consistent with the field this corresponds to on due work creation.
             // (The reason this will only be seen on due work creation is because other assessment types have a null total mark,
             // so wouldn't even execute this code path)
-            throw new \RangeException("have maximum available marks greater than 0");
+            throw new \RangeException('You must have maximum available marks greater than 0');
         }
     }
 

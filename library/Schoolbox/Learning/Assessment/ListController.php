@@ -149,29 +149,34 @@ class ListController extends Web\Controller\Base
      * @since 165
      *
      * @param AssessmentContext $context
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws UnexpectedValueException
      * @throws Web\Controller\Exception
+     * @throws \LogicException
      */
     public function postCreateAssessment(AssessmentContext $context)
     {
         try {
             // we need to perform some surgery on our "post" data before we send it through
             $post = $this->getRequest()->post->getArrayCopy();
-            $post['context']   = $context;
+            $post['context'] = $context;
 
-            list ($assessment, $defaultReturnUrl) = array_values($this->persistAssessment($this->getUser(), $post));
+            [$assessment, $defaultReturnUrl] = array_values($this->persistAssessment($this->getUser(), $post));
 
-            $type          = AssessmentType::objectToString($assessment);
-            $controller    = $this->getDelegateController($type);
+            $type       = AssessmentType::objectToString($assessment);
+            $controller = $this->getDelegateController($type);
 
             $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
 
             $this->redirect($controller->determineRedirect($assessment, $explicitReturnUrl, $defaultReturnUrl));
-
         } catch (DomainException $e) {
-            $this->sendError("Could not save assessment. You need to " . $e->getMessage(), [], 400, $e->getCode());
+            $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
             return;
         }
     }
+
 
     /**
      * POST action for reordering assessments.
@@ -322,10 +327,14 @@ class ListController extends Web\Controller\Base
      * @param User              $user
      * @param array|Traversable $postData
      * @param IAssessable       $assessment
-     * @throws DomainException
      * @return array
+     * @throws DomainException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws \LogicException
      */
-    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null)
+    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
@@ -362,7 +371,7 @@ class ListController extends Web\Controller\Base
             // And send notifications
             $notifier->notify($assessment, $this->getUser(), $before);
         }
-        catch (RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
+        catch (Mapper\Exception|RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
@@ -373,11 +382,13 @@ class ListController extends Web\Controller\Base
 
     /**
      * @param GenericCollection|ParticipantModels\Plan\Model[] $plans
-     * @param array             $inclusionFlags
-     * @param array             $userPlanIndices
+     * @param array                                            $inclusionFlags
+     * @param array                                            $userPlanIndices
      * @throws DomainException
-     * @throws UnexpectedValueException
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices)
     {
@@ -387,7 +398,6 @@ class ListController extends Web\Controller\Base
 
         // plans are saved; persistipation
         foreach ($inclusionFlags as $userId => $userIncluded) {
-
             $existingParticipation = $partMap->findByColumnList([
                 'participant_plan_id' => $planIds,
                 'user_id'             => $userId
@@ -423,8 +433,6 @@ class ListController extends Web\Controller\Base
                 $partMap->save($existingParticipation);
             }
         }
-
-
     }
 
 
@@ -454,10 +462,10 @@ class ListController extends Web\Controller\Base
      * @throws UnexpectedValueException
      * @throws PDOException
      * @throws Mapper\Exception
+     * @throws InvalidArgumentException
      */
     private function savePlanData(IAssessable $assessment, array $postPlans = [])
     {
-
         $assessmentId = $assessment->getId();
         $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];
 
@@ -472,10 +480,8 @@ class ListController extends Web\Controller\Base
         foreach ($postPlans as $planId => $planData) {
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
 
-
             //Handle assessments that do no accept submissions:
-            if (($assessment instanceof DueWork\Model && $assessment->getAcceptOnline() == 0) ||
-                $assessment instanceof Task\Model ) {
+            if (($assessment instanceof DueWork\Model && $assessment->getAcceptOnline() == 0) || $assessment instanceof Task\Model) {
                 $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }

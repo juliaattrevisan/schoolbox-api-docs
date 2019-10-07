@@ -49,7 +49,7 @@ class Mapping
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function decompose(ISummator $summator = null)
+    public function decompose(ISummator $summator = null): string
     {
         if ($summator instanceof WeightedAverage) {
             return SummatorFactory::WEIGHTED_AVERAGE;
@@ -64,7 +64,7 @@ class Mapping
             return SummatorFactory::MINIMUM;
         }
 
-        throw new \InvalidArgumentException('choose a valid summation option');
+        throw new \InvalidArgumentException('Please choose a valid summation option');
     }
 
     /* Getters/Setters

@@ -475,10 +475,6 @@ abstract class Base {
             $problem = $problem->getMessage();
         }
 
-        if (count($resolutions)) {
-            $problem .= ". You need to";
-        }
-
         $this->getResponse()->status->set($statusCode);
 
         // if this isn't XHR, let the kernel and SitePage take care of
