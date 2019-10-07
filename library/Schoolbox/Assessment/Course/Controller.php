@@ -8,9 +8,6 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
 use Aura\Di\Exception\ServiceNotFound;
-use Component_DefinitionMapper;
-use Component_Instance;
-use Component_InstanceMapper;
 use InvalidArgumentException;
 use PDOException;
 use RangeException;
@@ -23,7 +20,6 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -43,11 +39,9 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
-use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\YearLevel;
-
 
 /**
  * Class Controller
@@ -70,12 +64,6 @@ class Controller extends Base\Base
 
     /** @var UnitImplementationMapper */
     private $unitImplementationMapper;
-
-    /** @var Component_DefinitionMapper */
-    private $componentDefinitionMapper;
-
-    /** @var Component_InstanceMapper */
-    private $componentInstanceMapper;
 
     /** @var  HomepageTemplateMapper */
     private $homepageTemplateMapper;
@@ -102,8 +90,6 @@ class Controller extends Base\Base
      * @param UnitSpecificationMapper    $unitSpecificationMapper
      * @param UnitImplementationMapper   $unitImplementationMapper
      * @param FolderMapper               $folderMapper
-     * @param Component_DefinitionMapper $componentDefinitionMapper
-     * @param Component_InstanceMapper   $componentInstanceMapper
      * @param HomepageTemplateMapper     $homepageTemplateMapper
      * @param Access                     $access
      * @param CourseConfigMapper         $courseConfigMapper
@@ -117,8 +103,6 @@ class Controller extends Base\Base
         UnitSpecificationMapper $unitSpecificationMapper,
         UnitImplementationMapper $unitImplementationMapper,
         FolderMapper $folderMapper,
-        Component_DefinitionMapper $componentDefinitionMapper,
-        Component_InstanceMapper $componentInstanceMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
         Access $access,
         CourseConfigMapper $courseConfigMapper,
@@ -131,8 +115,6 @@ class Controller extends Base\Base
         $this->unitSpecificationMapper    = $unitSpecificationMapper;
         $this->unitImplementationMapper   = $unitImplementationMapper;
         $this->folderMapper               = $folderMapper;
-        $this->componentDefinitionMapper  = $componentDefinitionMapper;
-        $this->componentInstanceMapper    = $componentInstanceMapper;
         $this->homepageTemplateMapper     = $homepageTemplateMapper;
         $this->access                     = $access;
         $this->courseConfigMapper         = $courseConfigMapper;
