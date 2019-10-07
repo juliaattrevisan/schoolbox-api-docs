@@ -11,7 +11,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\All;
 use Alaress\Authorizer\Rule\Any;
 use Alaress\Authorizer\Rule\Callback;
-use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Authorizer\Rule\LazyCallback;
@@ -50,7 +49,6 @@ class Module extends BaseModule
                 new IsLoggedIn(),
                 new Any(
                     new IsSuperuser(),
-                    new HasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL),
                     new Callback(function (array $params) {
                         /** @var Event $event */
                         $event = $params['event'];
@@ -79,6 +77,17 @@ class Module extends BaseModule
                         } elseif ($event->isCampusLevel()) {
                             $inRole = false;
                             $inCampus = false;
+
+                            foreach ($loggedInUser->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR) as $access) {
+                                if ($access->getAccessLevel() >= UserAccess::ACCESS_READ) {
+                                    /** @var \Schoolbox\Campus $campus */
+                                    foreach ($event->getCampusCollection()->getAll() as $campus) {
+                                        if ($campus->getId() === $access->getServiceIdentifier()) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
 
                             /** @var Campus $campus */
                             foreach ($event->getCampusCollection() as $campus) {
