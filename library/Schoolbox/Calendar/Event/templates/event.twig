@@ -21,11 +21,13 @@
             "end"  : event.endDateTime.getDatabase,
         },
         "audiences" : {
-            "campus" : campusCollection,
-            "roles": roleCollection,
+            "campus"    : campusCollection,
+            "roles"     : roleCollection,
+            "groups"    : groupCollection
         },
         "attendance" : attendance,
-        "canModify" : canModify,
+        "canModify"  : canModify,
+        "level"      : level,
     } %}
 
     <event-details :event="{{ eventData | json_encode }}"></event-details>

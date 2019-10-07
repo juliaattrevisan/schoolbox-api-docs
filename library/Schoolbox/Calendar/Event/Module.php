@@ -26,6 +26,7 @@ use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
@@ -153,6 +154,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
+            'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
         ];
     }
 }

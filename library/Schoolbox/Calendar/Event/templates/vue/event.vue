@@ -8,7 +8,7 @@
         <div class="small-12 medium-8 island">
             <section class="detail content">
                 <div class="title-section">
-                    <time datetime="2014-09-20" class="icon">
+                    <time class="icon">
                         <strong> {{ monthDisplay }}</strong>
                         <span>{{ dateDisplay }}</span>
                     </time>
@@ -17,7 +17,14 @@
                 </div>
                 <div class="meta">
                     <span v-html="byLine"></span>
-                    <span v-if="audiencesMeta"> | <a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span>
+                    <template v-if="audiencesMeta"> |
+                        <span v-if="this.isCampusEvent"><a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span>
+                        <span v-else-if="this.isPersonalEvent">{{ audiencesMeta }}</span>
+                        <span v-else-if="this.isGroupEvent">
+                            <span v-html="audiencesMeta"></span>
+                            <span v-if="this.event.audiences.groups.length > 1"> and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span>
+                        </span>
+                    </template>
                 </div>
                 <article v-html="this.event.detail"></article>
             </section>
@@ -47,6 +54,8 @@
                 ref="audiencesModal"
                 :campus-audiences="this.event.audiences.campus"
                 :role-audiences="this.event.audiences.roles"
+                :group-audiences="this.event.audiences.groups"
+                :is-group="this.isGroupEvent"
         ></auidences-modal>
 
     </div>
@@ -79,7 +88,10 @@
                 attendanceNextAction: this.event.attendance.nextAction,
                 attendanceActionLabel: (this.event.attendance.nextAction === ATTENDANCE_NEXT_ACTION_ADD) ? ATTENDANCE_NEXT_ACTION_ADD_LABEL : ATTENDANCE_NEXT_ACTION_REMOVE_LABEL,
                 attendanceIcon: (this.event.attendance.nextAction === ATTENDANCE_NEXT_ACTION_ADD) ? ATTENDANCE_APPROVE_ICON : ATTENDANCE_CLOSE_ICON,
-                attendanceButtonIsDisabled: false
+                attendanceButtonIsDisabled: false,
+                isPersonalEvent: this.event.level === 'personal',
+                isGroupEvent: this.event.level === 'group',
+                isCampusEvent: this.event.level === 'campus'
             }
         },
         methods: {
@@ -125,28 +137,32 @@
                         '<br />' + startDate.format(FORMAT_TIME_ONLY) + ' - ' + endDate.format(FORMAT_TIME_ONLY)
                 }
 
-                return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + ' - ' + endDate.format(FORMAT_LONG_DATE_WITH_TIME)
+                return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + ' - ' + endDate.format(FORMAT_LONG_DATE_WITH_TIME);
             },
 
             monthDisplay: function() {
-                return moment(this.event.dates.start).format('MMM')
+                return moment(this.event.dates.start).format('MMM');
             },
 
             dateDisplay: function() {
-                return moment(this.event.dates.start).format('DD')
+                return moment(this.event.dates.start).format('DD');
             },
 
             byLine: function() {
                 if (this.event.author.id && this.event.author.fullName) return 'By ' + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + '</a>';
                 if (!this.event.author.id && this.data.author.fullName) return 'By ' + this.event.author.fullName;
 
-                return ''
+                return '';
             },
 
             audiencesMeta: function() {
                 let result = [],
                     campusCount = this.event.audiences.campus.length,
                     rolesCount  = this.event.audiences.roles.length;
+
+                if (this.isPersonalEvent) return 'Personal';
+                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.groups[0].id +'">' + this.event.audiences.groups[0].name  + '</a>';
+
 
                 if (campusCount) {
                     let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';
@@ -159,6 +175,12 @@
                 }
 
                 return result.join(' & ');
+            },
+
+            showMoreGroups: function() {
+                let suffix = (this.event.audiences.groups.length > 2) ? 'groups' : 'group';
+
+                return (this.event.audiences.groups.length - 1) + ' more ' + suffix;
             },
 
             modifyPath: function() {

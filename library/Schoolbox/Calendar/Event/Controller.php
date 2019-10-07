@@ -9,9 +9,8 @@ namespace Schoolbox\Calendar\Event;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Calendar\Event;
-use Schoolbox\Campus;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
 
 class Controller extends Base
@@ -22,12 +21,19 @@ class Controller extends Base
     protected $roleMapper;
 
     /**
-     * Controller constructor.
-     * @param RoleMapper $roleMapper
+     * @var FolderMapper
      */
-    public function __construct(RoleMapper $roleMapper)
+    protected $folderMapper;
+
+    /**
+     * Controller constructor.
+     * @param RoleMapper   $roleMapper
+     * @param FolderMapper $folderMapper
+     */
+    public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper)
     {
-        $this->roleMapper = $roleMapper;
+        $this->roleMapper   = $roleMapper;
+        $this->folderMapper = $folderMapper;
     }
 
     /**
@@ -37,79 +43,21 @@ class Controller extends Base
     public function getEvent(Event $event)
     {
         $calendar = new \Calendar();
+        $helper = new Helper($this->roleMapper, $this->folderMapper);
 
         $attendanceStatus = $calendar->getAttendanceByEventAndUser($event->getId(), $this->getUser()->getId());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event' => $event,
-            'level' => $this->getEventLevel($event),
-            'campusCollection'  => $this->getCampusCollection($event),
-            'roleCollection'    => $this->getRoleCollection($event),
+            'level' => $helper->getEventLevel($event),
+            'campusCollection'  => $helper->getCampusCollection($event),
+            'roleCollection'    => $helper->getRoleCollection($event),
+            'groupCollection'   => $helper->getGroupCollection($event),
             'attendance'        => [
                 'status'            => $attendanceStatus,
                 'nextAction'        => ($attendanceStatus) ? 'remove' : 'add',
             ],
             'canModify'         => $calendar->getPerm($event->getId()) >= UserAccess::ACCESS_WRITE
         ])->setTitle($event->getTitle()));
-    }
-
-    /**
-     * @param Event $event
-     * @return array
-     */
-    private function getCampusCollection(Event $event): array
-    {
-        $result = [];
-
-        /** @var Campus $campus */
-        foreach ($event->getCampusCollection()->getAll() as $campus) {
-            $result[] = [
-                'id' => $campus->getId(),
-                'name' => $campus->getName(),
-                'extTimetableCode' => $campus->getExtTimetableCode(),
-                'timetableDay' => $campus->getTimetableDay(),
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param Event $event
-     * @return array
-     */
-    private function getRoleCollection(Event $event): array
-    {
-        $result = [];
-
-        /** @var \Schoolbox\Calendar\Relation\Role $role */
-        foreach ($event->getRoleCollection()->getAll() as $role) {
-            try {
-                $result[] = $this->roleMapper->findById($role->getRoleId());
-            } catch (Exception $e) {
-                // noop
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param Event $event
-     * @return string
-     */
-    private function getEventLevel(Event $event): ?string
-    {
-        if ($event->isCampusLevel()) {
-            return 'campus';
-        }
-
-        if ($event->isPersonalLevel()) {
-            return 'personal';
-        }
-
-        if ($event->isGroupLevel()) {
-            return 'group';
-        }
     }
 }
