@@ -96,7 +96,7 @@ class Controller extends ConfigController
                 if (\in_array($name, $reRouterSettings, true)) {
                     $reloadReRouter = true;
                 }
-                $existingConfig->setValue($newValue);
+                $existingConfig->setValue(trim($newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
