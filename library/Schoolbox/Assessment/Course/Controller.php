@@ -206,7 +206,7 @@ class Controller extends Base\Base
             // Does user have WRITE+ access to Course Folder?
             $courseFolderAccess = $this->access->getFolderAccess($this->getUser(), $courseFolder->getId());
 
-            if ($courseFolderAccess < UserAccess::ACCESS_WRITE){
+            if ($courseFolderAccess < UserAccess::ACCESS_WRITE) {
                 $errors[] = 'Course Folder permission error: '.$courseFolder->getId();
             }
 
@@ -260,6 +260,7 @@ class Controller extends Base\Base
 
         // And save
         $response = [];
+
         if (!$courseExists) {
             $this->courseSpecificationMapper->save($course);
             $response['course'] = $course->getId();
@@ -292,6 +293,7 @@ class Controller extends Base\Base
         }
     }
 
+
     /**
      * Saves the sequence of Assessments in specified UnitSpecification
      *
@@ -313,7 +315,7 @@ class Controller extends Base\Base
      * @param string $template
      * @param array $data
      */
-    protected function courseTpl($template, $data = [])
+    protected function courseTpl($template, array $data = [])
     {
         $this->tpl('course', $template, $data, 'course');
     }
@@ -401,7 +403,7 @@ class Controller extends Base\Base
     {
         // Is course deleted ?
         // TODO move this to module's route auth rule
-        if($courseSpec->isDeleted()){
+        if ($courseSpec->isDeleted()) {
             throw new NotFound();
         }
 
@@ -433,7 +435,7 @@ class Controller extends Base\Base
 
         $folderAccess[$courseSpec->getFolder()->getId()] = $this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId());
 
-        foreach($courseSpec->getUnits() as $unitSpec) {
+        foreach ($courseSpec->getUnits() as $unitSpec) {
             $unitSpecId = $unitSpec->getId();
             $folderId = $unitSpec->getFolder()->getId();
             $options = ['order' => ['sequence' => 'ASC']];
@@ -458,10 +460,18 @@ class Controller extends Base\Base
      *
      * @api   GET /course/new{/:name}
      * @since 160
+     *
      * @param string|null $name
+     * @throws BaseMapper\DefinitionException
+     * @throws Deleted
      * @throws MapperException
+     * @throws NotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \LogicException
      */
-    public function newCourse($name = null)
+    public function newCourse(string $name = null)
     {
         $course = $this->courseSpecificationMapper->createModel();
         $folder = $this->folderMapper->createModel();
@@ -756,10 +766,11 @@ class Controller extends Base\Base
      */
     public function newUnit(CourseSpecification $courseSpec)
     {
-        if(!$courseSpec->getId()){
+        if (!$courseSpec->getId()) {
             $this->sendError('Could not save. Course not found.');
             return;
         }
+
         $post = $this->getRequest()->post;
         $name = trim($post->get('name'));
 
@@ -773,11 +784,13 @@ class Controller extends Base\Base
             // base config
             // course config
             $rolePermissions = [];
+
             foreach ($this->courseConfigMapper->findByColumn('page', 'unit') as $courseConfig) {
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
+
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
                 $templateID = HomepageTemplate::HOMEPAGE_NONE;
             } else {
@@ -946,6 +959,7 @@ class Controller extends Base\Base
                 'encodedReturnUrl' => Redirect::encode($this->getRouter()->generate('course.courseList')),
             ];
         }
+
         $this->courseTpl('courseList', array_merge($data, $options));
     }
 
@@ -1006,7 +1020,7 @@ class Controller extends Base\Base
      * @param int $min
      * @return bool
      */
-    protected function confirmAccess($folderId, $min = UserAccess::ACCESS_READ)
+    protected function confirmAccess($folderId, $min = UserAccess::ACCESS_READ): bool
     {
         return $this->access->getFolderAccess($this->getUser(), $folderId) >= $min;
     }
@@ -1176,7 +1190,7 @@ class Controller extends Base\Base
         // (this also cascades the deletions to constituent units and assessments)
         $this->courseSpecificationMapper->delete($courseSpec);
 
-        if ($deleteFolder){
+        if ($deleteFolder) {
             /** @var FolderController $folderController */
             $folderController = $this->getController('folder');
             $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
