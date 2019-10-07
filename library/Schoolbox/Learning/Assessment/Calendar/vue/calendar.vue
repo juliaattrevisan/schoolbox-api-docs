@@ -305,10 +305,10 @@
                     popOverContent = '',
                     popOverHeader = '',
                     dateGroup = '',
+                    resourceId = eventInfo.event.getResources()[0].id,
                     eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
-                    folderId = eventInfo.event.extendedProps.data.meta.folderId,
                     eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
-                    resourceCol = document.querySelectorAll("[data-resource-id='"+ folderId +"']"),
+                    resourceCol = document.querySelectorAll("[data-resource-id='"+ resourceId +"']"),
                     popOverPlaceholder = document.querySelector('.fc-body .fc-time-area .fc-rows'),
                     tmpEvent = [];
 
