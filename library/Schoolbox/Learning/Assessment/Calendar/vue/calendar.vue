@@ -371,19 +371,17 @@
              * navigate into the next available semester
              */
             clickNext() {
-                let self = this;
-
-                if (self.currentViewIsSemester()) {
-
+                let api = this.$refs.fullCalendar.getApi();
+                if (this.currentViewIsSemester()) {
                     // Figure out which term I'm in: go to the next one
-                    let termIndex = self.findTermIndex(self.convertDateToDateString(self.$refs.fullCalendar.getApi().getDate()));
-                    if (self.allTerms[termIndex+1]) {
-                        self.$refs.fullCalendar.getApi().gotoDate(self.allTerms[termIndex+1].start);
-                        self.redrawWeekNumbers();
-                        self.cleanupMonthHeaderInlineStyles();
+                    let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
+                    if (this.allTerms[termIndex+1]) {
+                        api.gotoDate(this.allTerms[termIndex+1].start);
+                        this.redrawWeekNumbers();
+                        this.cleanupMonthHeaderInlineStyles();
                     }
                 } else {
-                    self.$refs.fullCalendar.getApi().next();
+                    api.next();
                 }
             },
 
@@ -392,19 +390,17 @@
              * navigate into the previous available semester
              */
             clickPrev() {
-                let self = this;
-
-                if (self.currentViewIsSemester()) {
-
+                let api = this.$refs.fullCalendar.getApi();
+                if (this.currentViewIsSemester()) {
                     // Figure out which term I'm in: go to the previous one
-                    let termIndex = self.findTermIndex(self.convertDateToDateString(self.$refs.fullCalendar.getApi().getDate()));
-                    if (self.allTerms[termIndex-1]) {
-                        self.$refs.fullCalendar.getApi().gotoDate(self.allTerms[termIndex-1].start);
-                        self.redrawWeekNumbers();
-                        self.cleanupMonthHeaderInlineStyles();
+                    let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
+                    if (this.allTerms[termIndex-1]) {
+                        api.gotoDate(this.allTerms[termIndex-1].start);
+                        this.redrawWeekNumbers();
+                        this.cleanupMonthHeaderInlineStyles();
                     }
                 } else {
-                    self.$refs.fullCalendar.getApi().prev();
+                    api.prev();
                 }
             },
 
