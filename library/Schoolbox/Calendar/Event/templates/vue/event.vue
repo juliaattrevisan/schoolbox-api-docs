@@ -39,7 +39,8 @@
                     <h2 class="subheader">Location</h2>
                     <p v-html="this.event.location"></p>
                 </div>
-
+            </section>
+            <section>
                 <div class="action-links" v-if="this.event.options.isAttendable || showAddToCalendar">
                     <a href="#"
                        class="button"
@@ -48,12 +49,12 @@
                        :disabled="this.attendanceButtonIsDisabled">
                         {{ attendanceActionLabel }}
                     </a>
-                    <a class="button" :href="attendanceLink">Attendees</a>
+                    <a v-if="this.event.canModify" class="button" :href="attendanceLink">Attendees</a>
                     <a v-if="showAddToCalendar" href="#" class="button">Add to Calendar</a>
                 </div>
-
             </section>
         </div>
+
         <auidences-modal
                 ref="audiencesModal"
                 :campus-audiences="this.event.audiences.campus"
@@ -164,7 +165,6 @@
 
                 if (this.isPersonalEvent) return 'Personal';
                 if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.groups[0].id +'">' + this.event.audiences.groups[0].name  + '</a>';
-
 
                 if (campusCount) {
                     let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';
