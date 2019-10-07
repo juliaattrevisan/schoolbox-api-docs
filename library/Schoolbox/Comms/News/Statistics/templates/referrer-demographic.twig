@@ -7,8 +7,9 @@
  #}
 <script>
     $(function() {
-        $('#referrerDemographic').highcharts({
+        var chart = new Highcharts.Chart({
             chart: {
+                renderTo: 'referrerDemographic',
                 spacingRight: 48,
                 type: 'column',
                 zoomType: 'xy'
@@ -114,6 +115,11 @@
                 }
             ]
         });
+
+        {# Because Foundation... #}
+        setTimeout(function() {
+            chart.reflow();
+        }, 250)
     });
 </script>
 

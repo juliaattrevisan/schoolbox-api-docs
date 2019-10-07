@@ -23,6 +23,7 @@
                         height: 500,
                         panning: true,
                         panKey: 'shift',
+                        reflow: true,
                         renderTo: 'opens-chronological',
                         spacingBottom: 64,
                         type: 'line',
@@ -111,6 +112,9 @@
                 {#var d = new Date();#}
                 {#chart.xAxis[0].setExtremes(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() - 7), Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));#}
                 {#chart.showResetZoom();#}
+
+                {# Because Foundation... #}
+                chart.reflow();
             });
         }
 
