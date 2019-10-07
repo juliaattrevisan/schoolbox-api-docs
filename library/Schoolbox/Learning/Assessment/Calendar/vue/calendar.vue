@@ -38,6 +38,7 @@
             this.termStartDate = this.config.termDates.current.start;
             this.termEndDate = this.config.termDates.current.end;
             this.allTerms = this.buildAllTermsList();
+            this.eventTypeResources = this.buildEventTypeResourcesList();
         },
         data() {
             return {
@@ -45,6 +46,7 @@
                 currentEvent: {},
                 newEvent: {},
                 selectedFilters: null,
+                eventTypeResources: [],
                 folderResources: [],
                 currentView: null,
                 termStartDate: null,
@@ -247,14 +249,18 @@
              *                        resources.
              */
             resources(fetchInfo, successCallback) {
-                let resources = this.config.eventTypes.map(function (a) {
-                    return {
-                        id: 'eventType-' + String(a.id),
-                        title: a.type,
-                        eventColor: a.color,
+                successCallback([
+                    {
+                        id: 'eventType',
+                        title: 'Events',
+                        children: this.eventTypeResources
+                    },
+                    {
+                        id: 'folder',
+                        title: 'Assessments',
+                        children: this.folderResources
                     }
-                });
-                successCallback(resources.concat(this.folderResources));
+                ]);
             },
 
             /**
@@ -708,6 +714,22 @@
                 return actualDate.toISOString().slice(0, 10);
             },
 
+
+            /**
+             * Builds the list of all event type resources, based on
+             * `this.config.eventTypes`.
+             *
+             * @return {Array}
+             */
+            buildEventTypeResourcesList() {
+                return this.config.eventTypes.map(function (a) {
+                    return {
+                        id:         'eventType-' + String(a.id),
+                        title:      a.type,
+                        eventColor: a.color,
+                    }
+                });
+            },
 
             /**
              * Find the index of the term within `this.termDates` which contains
