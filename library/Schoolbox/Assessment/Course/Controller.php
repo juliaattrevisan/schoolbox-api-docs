@@ -538,66 +538,68 @@ class Controller extends Base\Base
         $parentFolder = null;
 
         if (!$folderName) {
-            $errors[] = 'give the course a name';
+            $errors[] = 'You need to give the course a name';
             $folderName = 'this course';
         }
 
         // Was no parent indicated? (as opposed to explicitly setting to root)
-        if(!$parentFolderId && "0" !== $parentFolderId){
-            $errors[] = "select a faculty or class for $folderName to live in";
+        if (!$parentFolderId && '0' !== $parentFolderId){
+            $errors[] = "You need to select a faculty or class for {$folderName} to live in";
         } else {
             $access = $this->access->getFolderAccess($user = $this->getUser(), $parentFolderId);
+
             if ($access < UserAccess::ACCESS_WRITE) {
-                $errors[] = "select a Faculty / Subject for which you have write access";
+                $errors[] = 'You need to select a Faculty / Subject for which you have write access';
             } else {
-                try{
+                try {
                     $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
                 } catch (MapperException $e){
-                    $errors[] = "select an existing faculty or class for $folderName to live in";
+                    $errors[] = "You need to select an existing faculty or class for {$folderName} to live in";
                 }
             }
         }
 
         // if there were any validation problems, throw that back
         if ($errors || !$parentFolder instanceof Folder) {
-            throw new Base\Exception("Could not save", $errors);
+            throw new Base\Exception('Could not save', $errors);
         }
 
         // Explicitly set to root (as opposed to not set)
         if ('0' === $parentFolderId && 0 !== $this->courseSpecificationMapper->getFacultyRootFolder()->getId()) {
-            throw new Base\Exception("Courses may not be created in the root folder");
+            throw new Base\Exception('Courses may not be created in the root folder');
         }
 
 
         // Deeper logic tests
-        try{
+        try {
             // Does the folder already exist? If so, retrieve it.
             $folder = null;
-            if($folderId){
+
+            if ($folderId){
                 $folder = $this->folderMapper->findCheaplyById($folderId);
             }
 
             // Is this a create, or are we moving an existing course?
-            if(!$folderId || $folder->getParent()->getId() != $parentFolderId ){
-
-                if(!$this->courseSpecificationMapper->isFolderValid($parentFolder)){
-                    if($folderId){
-                        throw new Base\Exception("Courses may not be moved outside the faculty folder");
+            if (!$folderId || $folder->getParent()->getId() != $parentFolderId ) {
+                if (!$this->courseSpecificationMapper->isFolderValid($parentFolder)) {
+                    if ($folderId) {
+                        throw new Base\Exception('Courses may not be moved outside the faculty folder');
                     } else {
-                        throw new Base\Exception("Courses may not be created outside the faculty folder");
+                        throw new Base\Exception('Courses may not be created outside the faculty folder');
                     }
                 }
             }
 
             // Check we are not moving a folder to be its own parent
-            if($folder){
+            if ($folder) {
                 $folder->setParent($parentFolder);
-                if(!$this->folderMapper->checkParentage($folder)) {
-                    throw new Base\Exception("Courses may not be moved inside themselves");
+
+                if (!$this->folderMapper->checkParentage($folder)) {
+                    throw new Base\Exception('Courses may not be moved inside themselves');
                 }
             }
         } catch (BaseMapper\Exception $e) {
-            throw new Base\Exception("Could not save because " . $e->getMessage());
+            throw new Base\Exception("Could not save because {$e->getMessage()}");
         }
     }
 
