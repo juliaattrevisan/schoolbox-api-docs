@@ -31,26 +31,28 @@
         </div>
 
         <div class="small-12 medium-4 island">
-            <section class="detail content">
-                <h2 class="subheader">Date and Time</h2>
-                <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
+            <section class="detail">
+                <div class="content">
+                    <h2 class="subheader">Date and Time</h2>
+                    <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
 
-                <div v-if="this.event.location">
-                    <h2 class="subheader">Location</h2>
-                    <p v-html="this.event.location"></p>
+                    <div v-if="this.event.location">
+                        <h2 class="subheader">Location</h2>
+                        <p v-html="this.event.location"></p>
+                    </div>
                 </div>
-            </section>
-            <section>
-                <div class="action-links" v-if="this.event.options.isAttendable || showAddToCalendar">
-                    <a href="#"
-                       class="button"
-                       v-if="this.event.options.isAttendable"
-                       @click="toggleAttendance()"
-                       :disabled="this.attendanceButtonIsDisabled">
-                        {{ attendanceActionLabel }}
-                    </a>
-                    <a v-if="this.event.canModify" class="button" :href="attendanceLink">Attendees</a>
-                    <a v-if="showAddToCalendar" href="#" class="button">Add to Calendar</a>
+                <div class="component-action" v-if="this.event.options.isAttendable || showAddToCalendar">
+                    <section>
+                        <a href="#"
+                           class="button"
+                           v-if="this.event.options.isAttendable"
+                           @click="toggleAttendance()"
+                           :disabled="this.attendanceButtonIsDisabled">
+                            {{ attendanceActionLabel }}
+                        </a>
+                        <a v-if="this.event.canModify" class="button" :href="attendanceLink">Attendees</a>
+                        <a v-if="showAddToCalendar" href="#" class="button">Add to Calendar</a>
+                    </section>
                 </div>
             </section>
         </div>
