@@ -45,7 +45,7 @@
                 currentEvent: {},
                 newEvent: {},
                 selectedFilters: null,
-                newResources: [],
+                folderResources: [],
                 currentView: null,
                 termStartDate: null,
                 termEndDate: null,
@@ -171,13 +171,18 @@
                             }
 
                             // Add new resource here too
-                            if (!self.newResources.some(el => el.id === element.data.meta?.folderId)) {
-                                self.newResources.push({'id': element.resourceId, 'title': element.data.meta.folderName});
+                            if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                                self.folderResources.push({'id': element.resourceId, 'title': element.data.meta.folderName});
                             }
 
                             eventGroupingCursor = element.data.meta.eventGrouping;
                             newResponse.push(element);
                         });
+
+
+                        // Reload resources here too
+                        self.$refs.fullCalendar.getApi().refetchResources();
+
 
                         // Add calendar item responses
                         // Must be a campus-level event
@@ -218,22 +223,38 @@
 
                             eventGroupingCursor = element.data.meta.eventGrouping;
 
-                            // Create the resource and push the element
-                            if (!self.newResources.some(el => el.id === element.resourceId)) {
-                                self.newResources.push({'id': element.resourceId, 'title': element.resourceId});
-                            }
-
                             newResponse.push(element);
                         });
 
 
-                        newResponse = newResponse.concat();
+                        // newResponse = newResponse.concat();
+
 
                         // Filter out events which don't start
                         successCallback(newResponse.filter(v => 'start' in v));
                     }
                 );
                 // Fail callback: consider a message saying something failed
+            },
+
+            /**
+             * Resource source.
+             * @see https://fullcalendar.io/docs/resources-function
+             *
+             * @param fetchInfo       Unused, but contains start/end of period
+             *                        to fetch resources for.
+             * @param successCallback A callback that is called with the list of
+             *                        resources.
+             */
+            resources(fetchInfo, successCallback) {
+                let resources = this.config.eventTypes.map(function (a) {
+                    return {
+                        id: 'eventType-' + String(a.id),
+                        title: a.type,
+                        eventColor: a.color,
+                    }
+                });
+                successCallback(resources.concat(this.folderResources));
             },
 
             /**
@@ -789,7 +810,7 @@
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-render="eventRender"
             :events="events"
-            :resources="this.newResources"
+            :resources="resources"
             :scheduler-license-key="config.schedulerLicenseKey"
             :first-day="1"
             :default-date="this.termStartDate"
