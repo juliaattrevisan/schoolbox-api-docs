@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -235,10 +236,10 @@ elseif (is_numeric($_GET['delete'])) {
 
     if (isset($_REQUEST['ajax'])) {
         die(json_encode(['result' => 'success']));
-    } elseif ($_GET['redirect'] == '') {
+    } elseif ($_GET[Redirect::RETURN_URL] == '') {
         $page->backToTheFuture(1);
     } else {
-        SitePage::localRedir($_GET['redirect']);
+        SitePage::localRedir($_GET[Redirect::RETURN_URL]);
     }
 } /* Delete a list of files */
 elseif (is_numeric($_GET['deleteList'])) {

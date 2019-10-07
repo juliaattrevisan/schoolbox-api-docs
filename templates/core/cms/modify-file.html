@@ -8,7 +8,7 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this file?',
                 confirmEvent: function () {
-                    window.location = '/cms/fileForm.php?delete={FILE_ID}&redirect=/homepage/{CATEGORY_ID}';
+                    window.location = '/cms/fileForm.php?delete={FILE_ID}&returnUrl={RETURN_URL}';
                 }
             });
         });

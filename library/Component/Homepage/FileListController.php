@@ -185,6 +185,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
                             'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                             'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
+                            'RETURN_URL'           => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
                         ]);
 
                         if ($this->getConfig('compactMode')) {

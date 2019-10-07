@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\GenericZone;
 use \Schoolbox\Resource\File\Mapper as FileMapper;
@@ -53,6 +54,7 @@ if (is_numeric($this->arg[0])) {
         'DUE_DAY'          => '',
         'DUE_MONTH'        => '',
         'DUE_YEAR'         => '',
+        'RETURN_URL'       => $_GET[Redirect::RETURN_URL],
     );
 
     $this->setVar($output);
