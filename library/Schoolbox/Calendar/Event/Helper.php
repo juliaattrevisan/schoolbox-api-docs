@@ -78,7 +78,7 @@ class Helper
 
     /**
      * @param Event $event
-     * @return string
+     * @return string|null
      */
     public function getEventLevel(Event $event): ?string
     {
