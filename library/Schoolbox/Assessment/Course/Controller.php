@@ -472,7 +472,7 @@ class Controller extends Base\Base
         }
 
         try {
-            $this->validateCourseData(null, trim($post['name']), trim($post['parent']));
+            $this->validateCourseData(trim($post['name']), trim($post['parent']), null);
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
@@ -532,7 +532,7 @@ class Controller extends Base\Base
      * @throws Base\Exception
      * @todo move route perm logic from controller to module (eg course parent folder access)
      */
-    protected function validateCourseData($folderId = null, $folderName, $parentFolderId)
+    protected function validateCourseData($folderName, $parentFolderId, $folderId = null)
     {
         $errors = [];
         $parentFolder = null;
@@ -623,7 +623,7 @@ class Controller extends Base\Base
         $curriculumCodes = $post['curriculumCodes'];
 
         try{
-            $this->validateCourseData($courseSpec->getFolder()->getId(), $courseSpec->getFolder()->getName(), $parentFolderId);
+            $this->validateCourseData($courseSpec->getFolder()->getName(), $parentFolderId, $courseSpec->getFolder()->getId());
             if($courseSpec->getFolder()->getParent()->getId() != $parentFolderId){
                 $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
                 $courseSpec->getFolder()->setParent($parentFolder);
