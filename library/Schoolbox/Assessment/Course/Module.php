@@ -1,11 +1,9 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Authorizer\Authorizer;
@@ -13,25 +11,27 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\HomepageConfigMapper;
-use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Role;
 use Twig_Error_Loader;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use \Component_InstanceMapper;
-use \Component_DefinitionMapper;
-use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Role;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Assessment\Course
+ */
 class Module extends BaseModule
 {
     /** @var string */
