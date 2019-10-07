@@ -9,8 +9,9 @@
 
 namespace Schoolbox\Calendar;
 
+use JsonSerializable;
 
-class EventType
+class EventType implements JsonSerializable
 {
 
     /**
@@ -121,5 +122,17 @@ class EventType
     public function isTaskType()
     {
         return $this->getType() == 'Task';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'    => $this->id,
+            'name'  => $this->type,
+            'color' => $this->color,
+        ];
     }
 }

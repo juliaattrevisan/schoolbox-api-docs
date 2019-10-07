@@ -26,6 +26,7 @@ Usage:
         dateDisplayFormats:  dateDisplayFormats,
         schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
         termDates:           {{ termDates|json_encode|raw }},
+        eventTypes:          {{ eventTypes|json_encode|raw }}
     };
 </script>
 {% endautoescape %}
