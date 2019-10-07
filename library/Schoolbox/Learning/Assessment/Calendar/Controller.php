@@ -103,7 +103,7 @@ class Controller extends Base
                 [
                     'filterPanel' => $filterPanel,
                     'termDates'   => $this->getAvailableTermDates(),
-                    'eventTypes'  => $this->eventTypeMapper->findAll(),
+                    'eventTypes'  => $this->eventTypeMapper->findAll()->indexBy('id'),
                 ],
                 'Assessment Calendar',
                 $pageTitle
