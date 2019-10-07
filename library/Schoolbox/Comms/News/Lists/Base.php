@@ -13,7 +13,6 @@ use Schoolbox\Comms\News\Audience\IArticleResolver;
 use Schoolbox\Comms\News\Helper;
 use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Model;
-use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Discussion\Comment;
