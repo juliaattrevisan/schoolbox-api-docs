@@ -12,9 +12,7 @@
     import {stringify}        from 'qs';
     import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 
-    // Various URLs that FullCalendar may make use of.
     const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
-    const URL_CALENDAR_EVENT_SOURCE   = '/calendar/ajax/full';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -130,28 +128,31 @@
                     paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
                 };
 
-                Promise.all([
-                    axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams),
-                    // axios.get(URL_CALENDAR_EVENT_SOURCE, ajaxParams),
-                ]).then(
-                    function (responses) {
+                axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams).then(
+                    function (response) {
                         // Massage the data to inject placeholders
                         let newResponse = [],
-                            eventGroupingCursor = '',
-                            [assessmentResponse, calendarResponse] = responses;
+                            eventGroupingCursor = ''
 
                         // Assign event grouping and resourceIds into every event
-                        assessmentResponse.data = assessmentResponse.data.map(function(element) {
-                            element.resourceId = RESOURCE_FOLDER_PREFIX + String(element.data.meta.folderId);
-                            element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                        response.data = response.data.map(function(element) {
+                            // What is the resource ID?
+                            // It depends on whether the event has a folder.
+                            element.resourceId = self.buildResourceIdFromEvent(element);
+                            if (element.resourceId) {
+                                element.data.meta.eventGrouping =
+                                    self.toMoment(element.start).format('YYYY')
+                                    + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
+                                    + element.resourceId;
+                            }
                             return element;
                         });
 
-                        assessmentResponse.data.forEach(function(element) {
+                        response.data.forEach(function(element) {
                             // Create a place holder
                             if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
 
-                                let itemCountByGroup = assessmentResponse.data.filter(function(val) {
+                                let itemCountByGroup = response.data.filter(function(val) {
                                     return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
                                 }).length;
 
@@ -188,55 +189,8 @@
                             newResponse.push(element);
                         });
 
-
                         // Reload resources here too
                         self.$refs.fullCalendar.getApi().refetchResources();
-
-
-                        // // Add calendar item responses
-                        // // Must be a campus-level event
-                        // calendarResponse.data = calendarResponse.data
-                        //     .filter(function (element) {
-                        //         return element.data.meta.level.match(/campus/);
-                        //     })
-                        //     .map(function(element) {
-                        //         delete element.color;
-                        //         element.resourceId = RESOURCE_EVENT_TYPE_PREFIX + String(element.data.meta.eventTypeId);
-                        //         element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
-                        //         return element;
-                        //     });
-                        //
-                        // calendarResponse.data.forEach(function (element) {
-                        //     // Create a place holder
-                        //     if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
-                        //
-                        //         let itemCountByGroup = calendarResponse.data.filter(function(val) {
-                        //             return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
-                        //         }).length;
-                        //
-                        //         newResponse.push({
-                        //             allDay: true,
-                        //             editable: false,
-                        //             draggable: false,
-                        //             resourceId: element.resourceId,
-                        //             title: itemCountByGroup,
-                        //             start: element.start,
-                        //             end: null,
-                        //             data: {
-                        //                 placeholder: true,
-                        //                 meta: {
-                        //                     eventGrouping: element.data.meta.eventGrouping,
-                        //                     weekNo: self.toMoment(element.start).isoWeek(),
-                        //                 }
-                        //             },
-                        //         });
-                        //     }
-                        //
-                        //     eventGroupingCursor = element.data.meta.eventGrouping;
-                        //
-                        //     newResponse.push(element);
-                        // });
-
 
                         // Filter out events which don't start
                         successCallback(newResponse.filter(v => 'start' in v));
@@ -733,6 +687,23 @@
                         eventBackgroundColor: a.color,
                     }
                 });
+            },
+
+            /**
+             * Build a resource ID out of the event.
+             *
+             * @param {object} event The event to be rendered
+             *
+             * @return {string|null} The resource ID, or null if it has none
+             */
+            buildResourceIdFromEvent(event) {
+                if (event?.data?.meta?.folderId) {
+                    return RESOURCE_FOLDER_PREFIX + String(event.data.meta.folderId);
+                }
+                if (event?.data?.meta?.eventTypeId) {
+                    return RESOURCE_EVENT_TYPE_PREFIX + String(event.data.meta.eventTypeId);
+                }
+                return null;
             },
 
             /**
