@@ -1267,18 +1267,6 @@ class Controller extends Base\Base
 
 
     /**
-     * @param int $folderId
-     * @return FolderInterface
-     * @throws MapperException
-     * @throws BaseMapper\DefinitionException
-     */
-    protected function getFolder($folderId)
-    {
-        return $this->folderMapper->findById($folderId);
-    }
-
-
-    /**
      * @api   GET /course/:folderId/nodes
      * @since 155
      *
