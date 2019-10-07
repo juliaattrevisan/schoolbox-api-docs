@@ -77,9 +77,6 @@ class Controller extends Base\Base
     /** @var Component_InstanceMapper */
     private $componentInstanceMapper;
 
-    /** @var HomepageConfigMapper */
-    private $homepageConfigMapper;
-
     /** @var  HomepageTemplateMapper */
     private $homepageTemplateMapper;
 
@@ -107,7 +104,6 @@ class Controller extends Base\Base
      * @param FolderMapper               $folderMapper
      * @param Component_DefinitionMapper $componentDefinitionMapper
      * @param Component_InstanceMapper   $componentInstanceMapper
-     * @param HomepageConfigMapper       $homepageConfigMapper
      * @param HomepageTemplateMapper     $homepageTemplateMapper
      * @param Access                     $access
      * @param CourseConfigMapper         $courseConfigMapper
@@ -123,7 +119,6 @@ class Controller extends Base\Base
         FolderMapper $folderMapper,
         Component_DefinitionMapper $componentDefinitionMapper,
         Component_InstanceMapper $componentInstanceMapper,
-        HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
         Access $access,
         CourseConfigMapper $courseConfigMapper,
@@ -138,7 +133,6 @@ class Controller extends Base\Base
         $this->folderMapper               = $folderMapper;
         $this->componentDefinitionMapper  = $componentDefinitionMapper;
         $this->componentInstanceMapper    = $componentInstanceMapper;
-        $this->homepageConfigMapper       = $homepageConfigMapper;
         $this->homepageTemplateMapper     = $homepageTemplateMapper;
         $this->access                     = $access;
         $this->courseConfigMapper         = $courseConfigMapper;

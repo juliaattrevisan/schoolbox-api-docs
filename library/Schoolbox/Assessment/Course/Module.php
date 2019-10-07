@@ -170,7 +170,6 @@ class Module extends BaseModule
                 'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'componentDefinitionMapper'  => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
                 'componentInstanceMapper'    => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
-                'homepageConfigMapper'       => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
                 'homepageTemplateMapper'     => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class),
                 'courseConfigMapper'         => $this->getMapperFactory()->getLazy(CourseConfigMapper::class),
