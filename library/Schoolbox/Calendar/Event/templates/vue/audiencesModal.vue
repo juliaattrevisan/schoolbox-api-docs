@@ -5,7 +5,7 @@
                 <div class="small-12 medium-6 columns no-pad" v-if="groups.length">
                     <p><strong>Groups</strong></p>
                     <ul>
-                        <li v-for="(group, index) in groups" v-if="index > 0">
+                        <li v-for="group in groups">
                             <a :href="/homepage/ + group.id">{{ group.name }}</a>
                         </li>
                     </ul>
