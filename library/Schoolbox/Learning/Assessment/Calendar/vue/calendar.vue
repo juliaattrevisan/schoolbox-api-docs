@@ -301,11 +301,17 @@
             renderPopOver(eventInfo) {
                 this.destroyPopOver();
 
-                var popOver = document.getElementById('popOver'),
+                let popOver = document.getElementById('popOver'),
                     popOverContent = '',
                     popOverHeader = '',
                     dateGroup = '',
-                    resourceId = eventInfo.event.getResources()[0].id,
+                    resources = eventInfo.event.getResources();
+
+                if (resources.length === 0) {
+                    return;
+                }
+
+                let resourceId = resources[0].id,
                     eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
                     eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
                     resourceCol = document.querySelectorAll("[data-resource-id='"+ resourceId +"']"),
