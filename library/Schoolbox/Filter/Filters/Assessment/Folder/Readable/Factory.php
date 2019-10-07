@@ -65,22 +65,30 @@ class Factory extends FolderFilter\Factory
         $getOtherClasses = $options[Definition::KEY_OTHER_CLASSES]->getAvailable();
         $getOtherGroups  = $options[Definition::KEY_OTHER_GROUPS]->getAvailable();
         $folderMapper    = $this->getFolderMapper();
-        $myFolders       = $folderMapper->createCollection();
-        $otherFolders    = $folderMapper->createCollection();
+        $myClasses       = $folderMapper->createCollection();
+        $myGroups        = $folderMapper->createCollection();
+        $otherClasses    = $folderMapper->createCollection();
+        $otherGroups     = $folderMapper->createCollection();
         $folderIdColumn  = 'id';
 
-        if ($getMyClasses || $getMyGroups) {
-            // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
-            $groupAccessLevel = $getMyGroups ? UserAccess::ACCESS_READ : UserAccess::ACCESS_FULL + 1;
-            $myFolders        = $folderMapper->findForUser(
+        // Ensure my classes and groups are separate from one another
+        if ($getMyClasses) {
+            // Note: UserAccess::ACCESS_FULL is a hack to mean 'INVALID',
+            // to force no group folders to be matched.
+            $myClasses = $folderMapper->findForUser(
                 $viewee,
-                $getMyClasses,
-                $groupAccessLevel
+                true,
+                UserAccess::ACCESS_FULL + 1
             )->indexBy($folderIdColumn);
         }
 
+        if ($getMyGroups) {
+            $myGroups = $folderMapper->findForUser($viewee, false)->indexBy($folderIdColumn);
+        }
+
+        // Ensure other folders don't intersect with my folders
         if ($getOtherClasses) {
-            $otherFolders = $folderMapper->findByPredicates(
+            $otherClasses = $folderMapper->findByPredicates(
                 $folderMapper->getPredicateBuilder()
                              ->notNull('cc.code')
                              ->isNull('cc.deleted_at')
@@ -88,13 +96,11 @@ class Factory extends FolderFilter\Factory
         }
 
         if ($getOtherGroups) {
-            $otherFolders = $otherFolders->mergeUnique(
-                $folderMapper->findByPredicates(
-                    $folderMapper->getPredicateBuilder()
-                                 ->notNull('ug.cid')
-                )->indexBy($folderIdColumn),
-                $folderIdColumn
-            );
+            $otherGroups = $folderMapper->findByPredicates(
+                $folderMapper->getPredicateBuilder()
+                             ->notNull('cc.code')
+                             ->isNull('cc.deleted_at')
+            )->indexBy($folderIdColumn);
         }
 
         // Ensure other folders don't intersect with my folders
@@ -106,8 +112,10 @@ class Factory extends FolderFilter\Factory
             $overrides[$pageFilter->getFilter()->getId()] ?? null,
             $this->getSelectionMapper(),
             $folderMapper->createCollection(),
-            $myFolders,
-            $otherFolders->diffBy($myFolders, 'id')
+            $myClasses,
+            $myGroups,
+            $otherClasses->diffBy($myClasses, $folderIdColumn)->diffBy($myGroups, $folderIdColumn),
+            $otherGroups->diffBy($myClasses, $folderIdColumn)->diffBy($myGroups, $folderIdColumn)
         );
     }
 
@@ -118,9 +126,17 @@ class Factory extends FolderFilter\Factory
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
+            ->filter(function ($folderId) use ($user) {
+                // Too heavy to filter by folder access
+                // Filter instead by whether the folder fits in the selections
+                return true;
+//                return $this->getAccess()->getFolderAccess($user, $folderId) >= UserAccess::ACCESS_WRITE;
+            })
             ->indexByCallback(static function ($folderId) {
                 return $folderId;
             });
-        return new KeyConverter($filter, $folderIds, $this->getAccess());
+
+        // Inject the folder mapper in here
+        return new KeyConverter($filter, $folderIds, $this->getAccess(), $this->getFolderMapper());
     }
 }

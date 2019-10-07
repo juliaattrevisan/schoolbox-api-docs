@@ -17,21 +17,38 @@ use Schoolbox\User;
 class Component extends BaseComponent
 {
     /**
-     * A list of folders that are eligible for selection, that the current user
-     * IS directly involved in.
+     * A list of the current user's classes that are eligible for selection.
      *
      * @var GenericCollection|Model[]
      */
-    private $myFolders;
+    private $myClasses;
 
 
     /**
-     * A list of folders that are eligible for selection, that the current user
-     * IS NOT directly involved in.
+     * A list of the current user's groups that are eligible for selection.
      *
      * @var GenericCollection|Model[]
      */
-    private $otherFolders;
+    private $myGroups;
+
+
+    /**
+     * A list of classes that the current user is not involved in, and that are
+     * eligible for selection.
+     *
+     * @var GenericCollection|Model[]
+     */
+    private $otherClasses;
+
+
+    /**
+     * A list of groups that the current user is not involved in, and that are
+     * eligible for selection.
+     *
+     * @var GenericCollection|Model[]
+     */
+    private $otherGroups;
+
 
     /**
      * Constructor
@@ -44,8 +61,10 @@ class Component extends BaseComponent
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param GenericCollection       $folders      Empty and unused in this context:
      *                                              split into `$myFolders` and `$otherFolders`
-     * @param GenericCollection       $myFolders
-     * @param GenericCollection       $otherFolders
+     * @param GenericCollection       $myClasses
+     * @param GenericCollection       $myGroups
+     * @param GenericCollection       $otherClasses
+     * @param GenericCollection       $otherGroups
      */
     public function __construct(
         Filter\IDefinition $definition,
@@ -55,8 +74,10 @@ class Component extends BaseComponent
         ?GenericCollection $urlOverrides,
         Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $folders,
-        GenericCollection $myFolders,
-        GenericCollection $otherFolders
+        GenericCollection $myClasses,
+        GenericCollection $myGroups,
+        GenericCollection $otherClasses,
+        GenericCollection $otherGroups
     ) {
         parent::__construct(
             $definition,
@@ -67,8 +88,10 @@ class Component extends BaseComponent
             $filterSelectionMapper,
             $folders
         );
-        $this->myFolders    = $myFolders;
-        $this->otherFolders = $otherFolders;
+        $this->myClasses    = $myClasses;
+        $this->myGroups     = $myGroups;
+        $this->otherClasses = $otherClasses;
+        $this->otherGroups  = $otherGroups;
     }
 
 
@@ -90,22 +113,24 @@ class Component extends BaseComponent
         $selectOtherGroups  = $abstractOptions[Definition::KEY_OTHER_GROUPS]->getDefaults()[$roleType]->getSelected();
         $selectOtherClasses = $abstractOptions[Definition::KEY_OTHER_CLASSES]->getDefaults()[$roleType]->getSelected();
 
-        foreach ($this->myFolders as $folder) {
-            $key                       = (string)$folder->getId();
-            $availableSelections[$key] = $this->convertFolderToSelection(
-                $folder,
-                $selectMyGroups,
-                $selectMyClasses
-            );
+        foreach ($this->myClasses as $folder) {
+            $availableSelections[(string)$folder->getId()]
+                = $this->convertFolderToSelection($folder, $selectMyClasses);
         }
 
-        foreach ($this->otherFolders as $folder) {
-            $key                       = (string)$folder->getId();
-            $availableSelections[$key] = $this->convertFolderToSelection(
-                $folder,
-                $selectOtherGroups,
-                $selectOtherClasses
-            );
+        foreach ($this->myGroups as $folder) {
+            $availableSelections[(string)$folder->getId()]
+                = $this->convertFolderToSelection($folder, $selectMyGroups);
+        }
+
+        foreach ($this->otherClasses as $folder) {
+            $availableSelections[(string)$folder->getId()]
+                = $this->convertFolderToSelection($folder, $selectOtherClasses);
+        }
+
+        foreach ($this->otherGroups as $folder) {
+            $availableSelections[(string)$folder->getId()]
+                = $this->convertFolderToSelection($folder, $selectOtherGroups);
         }
 
         return $availableSelections;
@@ -117,33 +142,13 @@ class Component extends BaseComponent
      */
     public function toContext()
     {
-        $myClasses    = $this->myFolders->emptyClone();
-        $myGroups     = $this->myFolders->emptyClone();
-        $otherClasses = $this->otherFolders->emptyClone();
-        $otherGroups  = $this->otherFolders->emptyClone();
-        foreach ($this->myFolders as $folder) {
-            $folderId = $folder->getId();
-            if ($folder->isClass()) {
-                $myClasses[$folderId] = $folder;
-            } else {
-                $myGroups[$folderId] = $folder;
-            }
-        }
-        foreach ($this->otherFolders as $folder) {
-            $folderId = $folder->getId();
-            if ($folder->isClass()) {
-                $otherClasses[$folderId] = $folder;
-            } else {
-                $otherGroups[$folderId] = $folder;
-            }
-        }
         return array_merge(
             parent::toContext(),
             [
-                'myClasses'    => $myClasses,
-                'myGroups'     => $myGroups,
-                'otherClasses' => $otherClasses,
-                'otherGroups'  => $otherGroups,
+                'myClasses'    => $this->myClasses,
+                'myGroups'     => $this->myGroups,
+                'otherClasses' => $this->otherClasses,
+                'otherGroups'  => $this->otherGroups,
             ]
         );
     }
@@ -153,30 +158,14 @@ class Component extends BaseComponent
      * Converts a folder to a selection object.
      *
      * @param Model $folder
-     * @param bool  $selectGroups  Are group folders selected by default?
-     * @param bool  $selectClasses Are class folders selected by default?
+     * @param bool  $select Is this type of folder selected by default?
      * @return Filter\Selection\Model
      */
-    protected function convertFolderToSelection(
-        Model $folder,
-        bool $selectGroups,
-        bool $selectClasses
-    ): Filter\Selection\Model {
-        // TODO Should this filter fetch folders that were classes?
+    protected function convertFolderToSelection(Model $folder, bool $select): Filter\Selection\Model
+    {
         $key          = (string)$folder->getId();
-        $isClass      = $folder->isClass();
         $urlOverrides = $this->getUrlOverrides();
         $isInjected   = $urlOverrides && $urlOverrides->offsetExists($key);
-        $isGroup      = !$isClass && !$isInjected;
-
-        /* Should folder be selected?
-         * - if injected via URL override
-         * - is group and roleDefault for group is true
-         * - is/was class and roleDefault for class is true
-         */
-        $selected = $isInjected
-            || ($selectGroups && $isGroup)
-            || ($selectClasses && $isClass);
-        return $this->createSelection($key, $selected);
+        return $this->createSelection($key, $isInjected || $select);
     }
 }
