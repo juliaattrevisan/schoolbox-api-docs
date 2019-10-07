@@ -27,7 +27,6 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_INDEX = 'index';
     public const REFERRER_SAVED = 'saved';
     public const REFERRER_SEARCH = 'search';
-    public const REFERRER_UNKNOWN = 'unknown';
 
 
     /**
