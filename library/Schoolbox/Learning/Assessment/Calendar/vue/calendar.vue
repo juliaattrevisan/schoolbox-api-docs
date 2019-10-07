@@ -141,9 +141,10 @@
                             [assessmentResponse, calendarResponse] = responses;
 
                         // Assign event grouping and resourceIds into every event
-                        assessmentResponse.data.map(function(element) {
+                        assessmentResponse.data = assessmentResponse.data.map(function(element) {
                             element.resourceId = RESOURCE_FOLDER_PREFIX + String(element.data.meta.folderId);
                             element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                            return element;
                         });
 
                         assessmentResponse.data.forEach(function(element) {
@@ -156,7 +157,6 @@
 
                                 newResponse.push({
                                     allDay: true,
-                                    backgroundColor: (element.data.meta.colour) ? element.data.meta.colour : self.defaultBgColour,
                                     editable: false,
                                     draggable: false,
                                     resourceId: element.resourceId,
@@ -177,7 +177,11 @@
 
                             // Add new resource here too
                             if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
-                                self.folderResources.push({'id': element.resourceId, 'title': element.data.meta.folderName});
+                                self.folderResources.push({
+                                    id:                   element.resourceId,
+                                    title:                element.data.meta.folderName,
+                                    eventBackgroundColor: element.data.meta.colour || self.defaultBgColour,
+                                });
                             }
 
                             eventGroupingCursor = element.data.meta.eventGrouping;
@@ -191,13 +195,16 @@
 
                         // Add calendar item responses
                         // Must be a campus-level event
-                        calendarResponse.data = calendarResponse.data.filter(function (element) {
-                            return element.data.meta.level.match(/campus/);
-                        });
-                        calendarResponse.data.map(function(element) {
-                            element.resourceId = RESOURCE_EVENT_TYPE_PREFIX + String(element.data.meta.eventTypeId);
-                            element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
-                        });
+                        calendarResponse.data = calendarResponse.data
+                            .filter(function (element) {
+                                return element.data.meta.level.match(/campus/);
+                            })
+                            .map(function(element) {
+                                delete element.color;
+                                element.resourceId = RESOURCE_EVENT_TYPE_PREFIX + String(element.data.meta.eventTypeId);
+                                element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                                return element;
+                            });
 
                         calendarResponse.data.forEach(function (element) {
                             // Create a place holder
@@ -229,9 +236,6 @@
 
                             newResponse.push(element);
                         });
-
-
-                        // newResponse = newResponse.concat();
 
 
                         // Filter out events which don't start
@@ -276,7 +280,6 @@
             eventRender(eventRenderInfo) {
                 var self = this,
                     eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping,
-                    backgroundColour = (eventRenderInfo.event.extendedProps.data.meta.colour) ? eventRenderInfo.event.extendedProps.data.meta.colour : self.defaultBgColour,
                     element = eventRenderInfo.el;
 
                 if (!self.eventGroups.includes(eventGrouping)) {
@@ -294,7 +297,6 @@
                     element.setAttribute('event-group-id', eventGrouping);
                     element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
                     element.setAttribute('event-group-date', self.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
-                    element.style.backgroundColor = backgroundColour;
                 }
             },
 
@@ -726,9 +728,9 @@
             buildEventTypeResourcesList() {
                 return this.config.eventTypes.map(function (a) {
                     return {
-                        id:         RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
-                        title:      a.type,
-                        eventColor: a.color,
+                        id:                   RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
+                        title:                a.type,
+                        eventBackgroundColor: a.color,
                     }
                 });
             },
