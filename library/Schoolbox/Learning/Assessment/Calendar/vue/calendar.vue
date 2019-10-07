@@ -27,6 +27,9 @@
 
     const VIEW_RESOURCE_TIMELINE_SEMESTER = 'resourceTimelineSemester';
 
+    const RESOURCE_FOLDER_PREFIX = 'folder-';
+    const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
+
     export default {
         components: {
             ViewEventModal,
@@ -139,7 +142,7 @@
 
                         // Assign event grouping and resourceIds into every event
                         assessmentResponse.data.map(function(element) {
-                            element.resourceId = 'folder-' + String(element.data.meta.folderId);
+                            element.resourceId = RESOURCE_FOLDER_PREFIX + String(element.data.meta.folderId);
                             element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
 
@@ -192,7 +195,7 @@
                             return element.data.meta.level.match(/campus/);
                         });
                         calendarResponse.data.map(function(element) {
-                            element.resourceId = 'eventType-' + String(element.data.meta.eventTypeId);
+                            element.resourceId = RESOURCE_EVENT_TYPE_PREFIX + String(element.data.meta.eventTypeId);
                             element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
                         });
 
@@ -251,15 +254,15 @@
             resources(fetchInfo, successCallback) {
                 successCallback([
                     {
-                        id: 'eventType',
                         title: 'Events',
-                        children: this.eventTypeResources
+                        children: this.eventTypeResources,
+                        eventAllow: false,
                     },
                     {
-                        id: 'folder',
                         title: 'Assessments',
-                        children: this.folderResources
-                    }
+                        children: this.folderResources,
+                        eventAllow: false,
+                    },
                 ]);
             },
 
@@ -724,7 +727,7 @@
             buildEventTypeResourcesList() {
                 return this.config.eventTypes.map(function (a) {
                     return {
-                        id:         'eventType-' + String(a.id),
+                        id:         RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
                         title:      a.type,
                         eventColor: a.color,
                     }
