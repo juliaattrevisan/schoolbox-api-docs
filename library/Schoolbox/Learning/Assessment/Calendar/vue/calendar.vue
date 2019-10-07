@@ -803,4 +803,19 @@
         position: absolute !important;
     }
 
+    .fc-time {
+        color: #fff;
+    }
+
+    .fc-resourceTimelineSemester-view span.fc-cell-text.fc-sticky {
+        left: 0 !important;
+    }
+
+    .fc-resourceTimelineSemester-view .fc-widget-header .fc-cell-content {
+        text-align: center !important;
+    }
+
+    a.fc-timeline-event.fc-h-event.fc-event.fc-start.fc-end.source.personal.fc-draggable.fc-resizable {
+        width: auto !important;
+    }
 </style>
