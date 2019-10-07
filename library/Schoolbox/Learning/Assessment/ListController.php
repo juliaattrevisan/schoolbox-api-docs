@@ -481,7 +481,7 @@ class ListController extends Web\Controller\Base
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
 
             //Handle assessments that do no accept submissions:
-            if (($assessment instanceof DueWork\Model && $assessment->getAcceptOnline() == 0) || $assessment instanceof Task\Model ) {
+            if (($assessment instanceof DueWork\Model && $assessment->getAcceptOnline() == 0) || $assessment instanceof Task\Model) {
                 $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }

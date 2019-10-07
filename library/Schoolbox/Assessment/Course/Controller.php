@@ -489,8 +489,8 @@ class Controller extends Base\Base
      * * course not being created, or moved to, outside faculty root
      * * no loops in folder ancestry
      *
-     * @param int|null $folderId
      * @param string   $folderName
+     * @param int|null $folderId
      * @param int      $parentFolderId
      * @throws Base\Exception
      * @todo move route perm logic from controller to module (eg course parent folder access)
@@ -506,7 +506,7 @@ class Controller extends Base\Base
         }
 
         // Was no parent indicated? (as opposed to explicitly setting to root)
-        if (!$parentFolderId && '0' !== $parentFolderId){
+        if (!$parentFolderId && '0' !== $parentFolderId) {
             $errors[] = "You need to select a faculty or class for {$folderName} to live in";
         } else {
             $access = $this->access->getFolderAccess($user = $this->getUser(), $parentFolderId);
@@ -538,12 +538,12 @@ class Controller extends Base\Base
             // Does the folder already exist? If so, retrieve it.
             $folder = null;
 
-            if ($folderId){
+            if ($folderId) {
                 $folder = $this->folderMapper->findCheaplyById($folderId);
             }
 
             // Is this a create, or are we moving an existing course?
-            if (!$folderId || $folder->getParent()->getId() != $parentFolderId ) {
+            if (!$folderId || $folder->getParent()->getId() != $parentFolderId) {
                 if (!$this->courseSpecificationMapper->isFolderValid($parentFolder)) {
                     if ($folderId) {
                         throw new Base\Exception('Courses may not be moved outside the faculty folder');
@@ -590,7 +590,7 @@ class Controller extends Base\Base
     {
         $post = $this->getRequest()->post;
         $courseSpec->getFolder()->setName(trim($post['name']));
-        $parentFolderId = trim($post['parent']);
+        $parentFolderId = (int)trim($post['parent']);
         $curriculumCodes = $post['curriculumCodes'];
 
         try {
@@ -630,7 +630,7 @@ class Controller extends Base\Base
         // Save the folder
         $folder = $courseSpec->getFolder();
 
-        if (\count($curriculumCodes)){
+        if (\count($curriculumCodes)) {
             $folder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $curriculumCodes));
         }
 
