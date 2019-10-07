@@ -11,8 +11,12 @@
 {% block filterName %}Classes and Groups{% endblock %}
 
 {% block userOptions %}
-    {# Selectize is only created if the item is user-configurable #}
+    {# Empty input is required so that filter works if not user-configurable, or
+       nothing is selected #}
+    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+
     {% if isUserConfigurable %}
+        {# Selectize is only created if the item is user-configurable #}
         <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
         <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 
@@ -33,8 +37,6 @@
                 });
             </script>
         {% endautoescape %}
-
-        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
 
         <select id="filter-selector-readable"
                 name="filter_selection[{{ definition.filter.id }}][]"
