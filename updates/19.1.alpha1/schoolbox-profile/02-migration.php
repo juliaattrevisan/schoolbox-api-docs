@@ -18,10 +18,11 @@ $app = new class extends CliTool\App
     /** Hands off execution over to the App */
     public function run(): void
     {
+        // This can't be done inside the transaction because it does an ALTER TABLE
+        $this->changeCollation();
+
         $this->getDatabaseInternal()->beginTransaction();
         try {
-            $this->changeCollation();
-
             // sis_* tables are only used if using the schoolbox connector; don't bother migrating otherwise
             if ('schoolbox' === ConfigMapper::getInstance()->get('external_type')) {
                 $this->migrate();
