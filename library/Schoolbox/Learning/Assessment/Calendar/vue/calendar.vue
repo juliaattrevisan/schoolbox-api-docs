@@ -404,16 +404,24 @@
                 }
             },
 
+            /**
+             * Customise today button behaviour for semester view.
+             *
+             * Clicking today button while on semester view will navigate to
+             * today, only if today is in a semester.
+             */
             clickToday() {
-                var self = this;
-
-                if (self.currentViewIsSemester()) {
-                    self.$refs.fullCalendar.getApi().gotoDate(self.config.termDates.current.start);
-
-                    self.redrawWeekNumbers();
-                    self.cleanupMonthHeaderInlineStyles();
+                let api = this.$refs.fullCalendar.getApi();
+                if (this.currentViewIsSemester()) {
+                    // Figure out if today is in a term before going to it
+                    let termIndex = this.findTermIndex(this.convertDateToDateString(new Date()));
+                    if (this.allTerms[termIndex]) {
+                        api.today();
+                        this.redrawWeekNumbers();
+                        this.cleanupMonthHeaderInlineStyles();
+                    }
                 } else {
-                    self.$refs.fullCalendar.getApi().gotoDate(self.toMoment().format('YYYY-MM-DD'));
+                    api.today();
                 }
             },
 
