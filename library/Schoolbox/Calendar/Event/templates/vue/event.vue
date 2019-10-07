@@ -48,6 +48,7 @@
                        :disabled="this.attendanceButtonIsDisabled">
                         {{ attendanceActionLabel }}
                     </a>
+                    <a class="button" :href="attendanceLink">Attendees</a>
                     <a v-if="showAddToCalendar" href="#" class="button">Add to Calendar</a>
                 </div>
 
@@ -75,6 +76,7 @@
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
     const URL_EVENT_MODIFY = '/calendar/modify.php?eventID=';
+    const URL_ATTENDEES = '/calendar/attendance/list/';
     const ATTENDANCE_NEXT_ACTION_ADD = 'add';
     const ATTENDANCE_NEXT_ACTION_REMOVE = 'remove';
     const ATTENDANCE_NEXT_ACTION_ADD_LABEL = 'RSVP';
@@ -92,6 +94,7 @@
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
                 isCampusEvent: this.event.level === 'campus',
+                attendanceLink: URL_ATTENDEES + this.event.id,
                 showAddToCalendar: false, // Disabled for now...
             }
         },
