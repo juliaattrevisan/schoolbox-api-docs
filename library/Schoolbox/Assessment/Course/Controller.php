@@ -319,39 +319,6 @@ class Controller extends Base\Base
 
 
     /**
-     * @param Folder $folder
-     * @param string $controllerClass
-     * @return Component_Instance
-     * @throws Deleted
-     * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
-     */
-    protected function injectNewComponent(Folder $folder, $controllerClass = CourseBuilderController::class): \Component_Instance
-    {
-        // Doesn't exist. We need that to exist. Make it exist.
-        $definition = $this->componentDefinitionMapper->findOneByColumn('class', $controllerClass);
-
-        // invent a new component
-        $newInstance = $this->componentInstanceMapper
-            ->createModel()
-            ->setModule('homepage')
-            ->setIdentifier($folder->getId())
-            ->setDefinitionId($definition->getId())
-            ->setSequence(0)
-            ->setPosition('top');
-
-        // save it
-        $this->componentInstanceMapper->save($newInstance);
-
-        // reapply the sequencing so the homepage doesn't break
-        $this->componentInstanceMapper->cascadeSequence($folder->getId(), 'top');
-
-        return $newInstance;
-    }
-
-
-    /**
      * Form to create/modify a course specification
      *
      * Course.id will be null if it is a create.
