@@ -473,6 +473,9 @@ class Interactions
     /**
      * Calculate a integer percentage, but you can specify precision
      *
+     * I think this will end up being used to calculate percentage of
+     * audience that read the article so don't worry about codeclimax
+     *
      * @param null|int $numerator
      * @param null|int $denominator
      * @param int      $precision
