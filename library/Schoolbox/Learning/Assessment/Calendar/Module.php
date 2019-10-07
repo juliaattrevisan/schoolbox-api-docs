@@ -15,6 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
@@ -76,7 +77,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
+            'filterFactoryFactory' => $injector->lazy(function () use ($injector) {
                 /** @var RosettaStone $rosettaStone */
                 $rosettaStone = $injector->get('l10n');
                 return new Filter\Filters\Assessment\FactoryFactory(
@@ -84,8 +85,9 @@ class Module extends BaseModule
                     $rosettaStone
                 );
             }),
-            'rosettaStone' => $injector->lazyGet('l10n'),
-            'termMapper'   => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'rosettaStone'         => $injector->lazyGet('l10n'),
+            'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'eventTypeMapper'      => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
         ];
     }
 }
