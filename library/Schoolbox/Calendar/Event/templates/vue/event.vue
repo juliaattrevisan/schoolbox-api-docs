@@ -40,7 +40,7 @@
                     <p v-html="this.event.location"></p>
                 </div>
 
-                <div class="action-links">
+                <div class="action-links" v-if="this.event.options.isAttendable || showAddToCalendar">
                     <a href="#"
                        class="button"
                        v-if="this.event.options.isAttendable"
