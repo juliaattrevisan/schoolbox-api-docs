@@ -970,9 +970,9 @@ class Controller extends Base
             $details = $this->folderMapper->findCheaplyById((int)$params->getFolderId())->findValueLabelPair();
 
             $metaDetails = [
-                'folderId'      => $details['value'],
-                'folderName'    => $details['label'],
-                'componentId'   => $params->getComponentId(),
+                'folderId'    => $details['value'],
+                'folderName'  => $details['label'],
+                'componentId' => $params->getComponentId(),
             ];
 
             $data = array_merge($data, $metaDetails);
@@ -1044,7 +1044,7 @@ class Controller extends Base
          */
         $partialData = array_merge($topicData, [
             'hidePaginator' => $hidePaginator,
-            'compactMode' => $params->getCompactMode(),
+            'compactMode' => true,
             'pageNum' => $params->getPageNum(),
             'referrer' => $params->getReferrer()
         ]);
