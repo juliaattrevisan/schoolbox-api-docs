@@ -23,7 +23,7 @@
     <div id="modal{{ event.getEventId() }}{{ augmentedId }}" class="reveal-modal" data-reveal>
         {% block eventBubble %}
             {% block eventBubbleSummary %}
-            <h3>{{ event.title }}</h3>
+                <h3><a href="{{ routeLookup('calendarEvent.getEvent', {eventId: event.eventId}) }}">{{ event.title }}</a></h3>
 
             <ul class="meta">
                 <li class="icon-calendar" title="Date"><time>{{ event.getFullDate() | raw }}</time></li>
