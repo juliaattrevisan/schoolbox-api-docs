@@ -16,6 +16,7 @@
     min-width: 3.5rem;
     min-height: 4rem;
     background-color: #fff;
+    margin-top: .58rem;
   }
 
   time.icon * {
@@ -55,6 +56,7 @@
     }
     @media #{$medium-up} {
       flex: 0 auto;
+      margin-top: 0.5rem;
     }
   }
 
