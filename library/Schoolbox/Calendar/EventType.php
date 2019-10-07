@@ -131,7 +131,7 @@ class EventType implements JsonSerializable
     {
         return [
             'id'    => $this->id,
-            'name'  => $this->type,
+            'type'  => $this->type,
             'color' => $this->color,
         ];
     }
