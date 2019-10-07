@@ -110,14 +110,25 @@ class Controller extends Base
 
 
         // Query the API for the events in this time span
-        $calendar = new Renderer(
+        $api = new \Calendar_Api_Composite();
+        $api->add(
             new Api(
                 $this->getUser(),
                 $this->assessmentDataSource,
                 $this->visibility,
                 $this->assessmentIdFinder,
                 $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page)
-            ),
+            )
+        );
+        $api->add(
+            new \Calendar_Api_EventType_Event_Schoolbox_Campus(
+                \Calendar_Api_Config_Mapper::getInstance()->findOneForClass(\Calendar_Api_EventType_Event_Schoolbox_Campus::class)->getId(),
+                $this->getUser(),
+                $this->getUser()
+            )
+        );
+        $calendar = new Renderer(
+            $api,
             $start,
             $end,
             $this->getUser(),
