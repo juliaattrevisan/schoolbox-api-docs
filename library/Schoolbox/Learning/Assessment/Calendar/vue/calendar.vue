@@ -374,20 +374,14 @@
                 let self = this;
 
                 if (self.currentViewIsSemester()) {
-                    if (self.cursor < 0
-                        || (self.cursor === 0 && self.config.termDates.future.length)
-                        || (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])
-                    ) {
-                        self.cursor++;
-                        let startDateByCursor = self.getStartDateByCursor();
 
-                        if (startDateByCursor !== undefined) {
-                            self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
-                        }
+                    // Figure out which term I'm in: go to the next one
+                    let termIndex = self.findTermIndex(self.convertDateToDateString(self.$refs.fullCalendar.getApi().getDate()));
+                    if (self.allTerms[termIndex+1]) {
+                        self.$refs.fullCalendar.getApi().gotoDate(self.allTerms[termIndex+1].start);
+                        self.redrawWeekNumbers();
+                        self.cleanupMonthHeaderInlineStyles();
                     }
-
-                    self.redrawWeekNumbers();
-                    self.cleanupMonthHeaderInlineStyles();
                 } else {
                     self.$refs.fullCalendar.getApi().next();
                 }
@@ -401,17 +395,11 @@
                 let self = this;
 
                 if (self.currentViewIsSemester()) {
-                    if (self.cursor > 0
-                        || (self.cursor === 0 && self.config.termDates.past.length)
-                        || (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)
-                    ) {
-                        self.cursor--;
-                        let startDateByCursor = self.getStartDateByCursor();
 
-                        if (startDateByCursor !== undefined) {
-                            self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
-                        }
-
+                    // Figure out which term I'm in: go to the previous one
+                    let termIndex = self.findTermIndex(self.convertDateToDateString(self.$refs.fullCalendar.getApi().getDate()));
+                    if (self.allTerms[termIndex-1]) {
+                        self.$refs.fullCalendar.getApi().gotoDate(self.allTerms[termIndex-1].start);
                         self.redrawWeekNumbers();
                         self.cleanupMonthHeaderInlineStyles();
                     }
@@ -650,8 +638,7 @@
                         continue;
                     }
                     let term = this.allTerms[i];
-                    // TODO end times are exclusive: account for that
-                    if (dateString >= term.start && dateString <= term.end) {
+                    if (dateString >= term.start && dateString < term.end) {
                         return Number(i);
                     }
                 }
