@@ -209,7 +209,6 @@
 
                                 newResponse.push({
                                     allDay: true,
-                                    backgroundColor: (element.data.meta.colour) ? element.data.meta.colour : self.defaultBgColour,
                                     editable: false,
                                     draggable: false,
                                     resourceId: element.resourceId,
