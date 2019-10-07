@@ -319,33 +319,6 @@ class Controller extends Base\Base
 
 
     /**
-     * Retrieve the Course Builder component instance. If it doesn't exist, create it, then return that
-     *
-     * @param Folder $unitFolder
-     * @return Component_Instance
-     * @throws Deleted
-     * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
-     */
-    protected function getCourseBuilderInstance(Folder $unitFolder): \Component_Instance
-    {
-        // confirm that there's a Course Builder component
-        $folderId = $unitFolder->getId();
-        $componentClass = CourseBuilderController::class;
-        $instances = $this->componentInstanceMapper->findByContextAndClass('homepage', $folderId, $componentClass);
-
-        if (\count($instances) == 0) {
-            // no instance found - give me a new one
-            return $this->injectNewComponent($unitFolder);
-        }
-
-        // instance found - use that
-        return $instances->first();
-    }
-
-
-    /**
      * @param Folder $folder
      * @param string $controllerClass
      * @return Component_Instance
