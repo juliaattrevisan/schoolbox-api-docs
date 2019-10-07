@@ -14,6 +14,8 @@ use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
+use Schoolbox\Comms\News\Statistics\Interactions;
+use Schoolbox\Comms\News\Statistics\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -56,6 +58,26 @@ class Homepage extends Base
 
         foreach ($articles as $article) {
             $article->setAudience(new GenericCollection(Audience\Model::class));
+        }
+
+        /* Tremendous Assumption
+         *
+         * If Compact Mode is off, then someone read all these articles currently displaying
+         * Record an Open for each of them
+         */
+        if (!(bool)$params->getCompactMode()) {
+            $interactions = new Interactions($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+
+            foreach ($articles as $article) {
+                $interactions->saveOpen(
+                    $article,
+                    \Alaress_Date_Format::now(),
+                    $user->getId(),
+                    $user->getRole()->getType(),
+                    $user->getRole()->getId(),
+                    Mapper::REFERRER_HOMEPAGE
+                );
+            }
         }
 
         // Load audiences so module auth rules work in rendered templates
