@@ -1083,9 +1083,9 @@ class Controller extends Base\Base
      * @throws \OverflowException
      * @return Collection
      */
-    protected function getLineage(Folder $course)
+    protected function getLineage(Folder $course): Collection
     {
-        return $this->getAncestry()->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
+        return $this->folderMapper->getAncestry()->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
     }
 
 
@@ -1254,15 +1254,6 @@ class Controller extends Base\Base
         $this->getResponse()->content->set($this->buildJsonOutput([
             'id' => $unitImpl->getId(),
         ]));
-    }
-
-
-    /**
-     * @return Ancestry
-     */
-    public function getAncestry()
-    {
-        return $this->folderMapper->getAncestry();
     }
 
 
