@@ -1,6 +1,13 @@
 <?php
 /**
- * Querystring
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+namespace Schoolbox\Comms\News;
+
+/**
+ * Class Querystring
  *
  * Rebuild a querystring or find out the particular pieces
  *  - compact mode
@@ -10,15 +17,8 @@
  * Encapsulate in a stringable class
  * Encapsulate helpers
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @package Schoolbox\Comms\News
  */
-
-namespace Schoolbox\Comms\News;
-
-use Schoolbox\Mapper\Exception as MapperException;
-
 class Querystring
 {
 
@@ -117,6 +117,7 @@ class Querystring
         return $this->querystring[self::COMPACT_MODE];
     }
 
+
     /**
      * Currently-chosen topic slug
      *
@@ -171,6 +172,7 @@ class Querystring
         return $this->querystring[self::FOLDER];
     }
 
+
     /**
      * Get the status
      *
@@ -192,6 +194,7 @@ class Querystring
         return $this->querystring[self::REFERRER];
     }
 
+
     /**
      * Get the entity type
      *
@@ -201,6 +204,7 @@ class Querystring
     {
         return $this->querystring[self::ENTITY_TYPE];
     }
+
 
     /**
      * Get the return url
@@ -212,6 +216,7 @@ class Querystring
         return $this->querystring[self::RETURN_URL];
     }
 
+
     /**
      * @return string|null
      */
@@ -219,6 +224,7 @@ class Querystring
     {
         return $this->querystring[self::COMPONENT_ID];
     }
+
 
     /**
      * @param null|string $referrer
@@ -230,6 +236,7 @@ class Querystring
         return $this;
     }
 
+
     /**
      * Set entity type
      *
@@ -239,6 +246,7 @@ class Querystring
     {
         $this->querystring[self::ENTITY_TYPE] = $entityType;
     }
+
 
     /**
      * Set the folder id if one was specified
@@ -251,6 +259,7 @@ class Querystring
         $this->querystring[self::FOLDER] = (string)$folderId;
     }
 
+
     /**
      * Set the return url
      * @param null|string $returnUrl
@@ -260,6 +269,7 @@ class Querystring
         $this->querystring[self::RETURN_URL] = $returnUrl;
     }
 
+
     /**
      * @param string|null $componentId
      */
@@ -267,6 +277,7 @@ class Querystring
     {
         $this->querystring[self::COMPONENT_ID] = $componentId;
     }
+
 
     /**
      * Array representation of the params
@@ -305,6 +316,7 @@ class Querystring
         return (int)$param ?: 1;
     }
 
+
     /**
      * Encode a url
      * TODO: merging library/Schoolbox/Learning/Assessment/Redirect.php ?
@@ -320,6 +332,7 @@ class Querystring
         return urlencode(base64_encode($url));
     }
 
+
     /**
      * Decode an encoded redirect url
      *
@@ -331,7 +344,7 @@ class Querystring
         if ($encoded === null) {
             return null;
         }
+
         return base64_decode(urldecode($encoded));
     }
-
 }
