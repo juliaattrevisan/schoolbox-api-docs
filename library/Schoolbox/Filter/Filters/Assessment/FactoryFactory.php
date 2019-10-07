@@ -201,7 +201,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $this->getCourseSpecMapper()
+                    $this->getCourseSpecMapper(),
+                    $this->getAccess()
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);

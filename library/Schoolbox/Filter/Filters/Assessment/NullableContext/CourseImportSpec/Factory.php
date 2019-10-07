@@ -10,6 +10,8 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\CourseImportSpec;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
@@ -25,19 +27,30 @@ class Factory extends NullableContext\Factory
 
 
     /**
+     * @var Access
+     */
+    private $access;
+
+
+    /**
+     * Constructor
+     *
      * @param Filter\Page\Option\Mapper          $optionMapper
      * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
      * @param Filter\Selection\Mapper            $selectionMapper
      * @param CourseSpec\Mapper                  $courseSpecMapper
+     * @param Access                             $access
      */
     public function __construct(
         Filter\Page\Option\Mapper $optionMapper,
         Filter\Page\Option\Defaults\Mapper $defaultMapper,
         Filter\Selection\Mapper $selectionMapper,
-        CourseSpec\Mapper $courseSpecMapper
+        CourseSpec\Mapper $courseSpecMapper,
+        Access $access
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->courseSpecMapper = $courseSpecMapper;
+        $this->access           = $access;
     }
 
 
@@ -77,12 +90,17 @@ class Factory extends NullableContext\Factory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
-            $this->courseSpecMapper->findAll()->sortByCallback(
-                static function (CourseSpec\Model $a, CourseSpec\Model $b) {
-                    return strnatcasecmp($a->getTitle(), $b->getTitle());
-                },
-                true
-            )
+            $this->courseSpecMapper
+                ->findAll()
+                ->filter(function (CourseSpec\Model $courseSpec) use ($viewee) {
+                    return $this->access->getFolderAccess($viewee, $courseSpec->getFolder()->getId()) >= UserAccess::ACCESS_READ;
+                })
+                ->sortByCallback(
+                    static function (CourseSpec\Model $a, CourseSpec\Model $b) {
+                        return strnatcasecmp($a->getTitle(), $b->getTitle());
+                    },
+                    true
+                )
         );
     }
 
