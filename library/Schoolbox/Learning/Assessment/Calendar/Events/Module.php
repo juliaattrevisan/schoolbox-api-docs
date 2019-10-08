@@ -15,6 +15,7 @@ use Aura\Di\ContainerInterface;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_EventType_Event_Schoolbox_Campus;
 use InvalidArgumentException;
+use Schoolbox\CampusMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\FactoryFactory as FilterFactoryFactory;
 use Schoolbox\L10n\RosettaStone;
@@ -86,6 +87,7 @@ class Module extends BaseModule
                 );
             }),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+            'campusMapper'          => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'calendarConfig'        => $injector->lazy(function () {
                 return $this->getMapperFactory()->get(Calendar_Api_Config_Mapper::class)
                                                 ->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Campus::class);
