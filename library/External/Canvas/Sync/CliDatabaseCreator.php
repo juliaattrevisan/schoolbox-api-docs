@@ -117,6 +117,7 @@ class CliDatabaseCreator extends CliTool\App
                 $this->getLogger()->warning("Error fetching allowed host for {$dbSchoolboxUser}.");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
+            $allowedHost = $allowedHosts[0];
 
             // Create database.
             try {
@@ -132,10 +133,14 @@ class CliDatabaseCreator extends CliTool\App
             // Grant permissions to schoolbox user to new database
             try {
                 $rootDb->execute(
-                    "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* to {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHosts[0])}"
+                    "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
+                );
+                // GRANT file ON *.* to `schoolboxdev`@`localhost`
+                $rootDb->execute(
+                    "GRANT file ON *.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
                 );
             } catch (Database\Exception $e) {
-                $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}@{$allowedHosts[0]}: {$e->getMessage()}");
+                $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}@{$allowedHost}: {$e->getMessage()}");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
         } else {
