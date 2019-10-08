@@ -16,11 +16,13 @@
         <li>
             <a class="icon-search" data-reveal-id="search-modal" title="Search Resources">Search Resources</a>
         </li>
+        {% if isRouteAuthorized('resourceBookingReport.index') %}
+            <li>
+                <a class="icon-report" href="{{  routeLookup('resourceBookingReport.index') }}" title="Booking Report">Booking Report</a>
+            </li>
+        {% endif %}
         <li>
-            <a class="icon-report" href="{{  routeLookup('resourceBookingReport.index', {id: categoryId}) }}" title="Booking Report">Booking Report</a>
-        </li>
-        <li>
-            <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar">Availability Calendar</a>
+            <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read') }}" title="Availability Calendar">Availability Calendar</a>
         </li>
         {% if isRouteAuthorized('resourceItem.add') %}
             <li class="separator">Admin Actions</li>
