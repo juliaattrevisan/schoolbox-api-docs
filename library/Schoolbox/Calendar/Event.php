@@ -338,6 +338,8 @@ class Event implements ISoftDeletable
             return '/calendar/attendance/upcomingEvents/';
         } else if ($returnView === 'homepage') {
             return '/homepage/' . $groupId;
+        } else if ($returnView === 'assessmentCalendar') {
+            return '/learning/assessment/calendar/';
         } else {
             if ($returnView === 'calendar') {
                 $return = "/calendar/$returnDate";

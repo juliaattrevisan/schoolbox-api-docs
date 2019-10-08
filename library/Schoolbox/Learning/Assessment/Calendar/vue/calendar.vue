@@ -12,8 +12,13 @@
     import {stringify}        from 'qs';
     import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 
-    // Various URLs that FullCalendar may make use of.
-    const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    // Various URLs this calendar can make use of
+    const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    const URL_EVENT_UPDATE = '/calendar/ajax/update';
+    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+    const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
+    const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
+    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -26,6 +31,9 @@
 
     const VIEW_RESOURCE_TIMELINE_SEMESTER = 'resourceTimelineSemester';
 
+    const RESOURCE_FOLDER_PREFIX = 'folder-';
+    const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
+
     export default {
         components: {
             ViewEventModal,
@@ -37,6 +45,7 @@
             this.termStartDate = this.config.termDates.current.start;
             this.termEndDate = this.config.termDates.current.end;
             this.allTerms = this.buildAllTermsList();
+            this.eventTypeResources = this.buildEventTypeResourcesList();
         },
         data() {
             return {
@@ -44,7 +53,8 @@
                 currentEvent: {},
                 newEvent: {},
                 selectedFilters: null,
-                newResources: [],
+                eventTypeResources: [],
+                folderResources: [],
                 currentView: null,
                 termStartDate: null,
                 termEndDate: null,
@@ -59,6 +69,15 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
+            urls() {
+                return {
+                    modifyForm: URL_EVENT_MODIFY_FORM,
+                    modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
+                    update: URL_EVENT_UPDATE,
+                    attendanceList: URL_ATTENDANCE_LIST,
+                    attendanceToggle: URL_ATTENDANCE_TOGGLE,
+                };
+            },
             formats() {
                 return {
                     formDate: FORMAT_FORM_DATE,
@@ -101,7 +120,7 @@
              * @param successCallback A function to call with the list of events.
              */
             events(fetchInfo, successCallback) {
-                var self = this;
+                let self = this;
 
                 // No filters loaded yet? Render nothing.
                 // The selected filters get populated by `onFilterChange`:
@@ -110,42 +129,53 @@
                     successCallback([]);
                     return;
                 }
-                axios.get(
-                    URL_EVENT_SOURCE,
-                    {
-                        headers: {
-                            'X-Requested-With' : 'XMLHttpRequest'
-                        },
-                        params: {
-                            start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                            end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            filters: self.selectedFilters,
-                        },
-                        paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
-                    }
-                ).then(
+
+                // AJAX params: the same for all requests
+                let ajaxParams = {
+                    headers: {
+                        'X-Requested-With' : 'XMLHttpRequest'
+                    },
+                    params: {
+                        start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                        end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                        filters: self.selectedFilters,
+                    },
+                    paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                };
+
+                axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams).then(
                     function (response) {
                         // Massage the data to inject placeholders
                         let newResponse = [],
-                            eventGroupingCursor = '';
+                            eventGroupingCursor = ''
 
                         // Assign event grouping and resourceIds into every event
-                        response.data.map(function(element, index) {
-                            element.resourceId = element.data.meta.folderId;
-                            element.data.meta.eventGrouping = self.toMoment(element.start).format('YYYY') + String(self.toMoment(element.start).isoWeek()).padStart(2,0) + element.resourceId;
+                        response.data = response.data.map(function(element) {
+                            // Consider not allowing events to be editable on this calendar?
+                            // element.editable = false;
+                            // element.data.meta.editable = false;
+                            // What is the resource ID?
+                            // It depends on whether the event has a folder.
+                            element.resourceId = self.buildResourceIdFromEvent(element);
+                            if (element.resourceId) {
+                                element.data.meta.eventGrouping =
+                                    self.toMoment(element.start).format('YYYY')
+                                    + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
+                                    + element.resourceId;
+                            }
+                            return element;
                         });
 
                         response.data.forEach(function(element) {
                             // Create a place holder
                             if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
 
-                                var itemCountByGroup = response.data.filter(function(val) {
+                                let itemCountByGroup = response.data.filter(function(val) {
                                     return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
                                 }).length;
 
                                 newResponse.push({
                                     allDay: true,
-                                    backgroundColor: (element.data.meta.colour) ? element.data.meta.colour : self.defaultBgColour,
                                     editable: false,
                                     draggable: false,
                                     resourceId: element.resourceId,
@@ -164,21 +194,51 @@
                                 });
                             }
 
+                            // Add new resource here too
+                            if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                                self.folderResources.push({
+                                    id:                   element.resourceId,
+                                    title:                element.data.meta.folderName,
+                                    eventBackgroundColor: element.data.meta.colour || self.defaultBgColour,
+                                });
+                            }
+
                             eventGroupingCursor = element.data.meta.eventGrouping;
                             newResponse.push(element);
                         });
 
-                        successCallback(newResponse.filter(function (v) {
-                            // Check if resource is already added
-                            if (!self.newResources.some(el => el.id === v.data.meta?.folderId)) {
-                                self.newResources.push({'id': v.data.meta.folderId, 'title': v.data.meta.folderName});
-                            }
+                        // Reload resources here too
+                        self.$refs.fullCalendar.getApi().refetchResources();
 
-                            return 'start' in v;
-                        }));
+                        // Filter out events which don't start
+                        successCallback(newResponse.filter(v => 'start' in v));
                     }
                 );
                 // Fail callback: consider a message saying something failed
+            },
+
+            /**
+             * Resource source.
+             * @see https://fullcalendar.io/docs/resources-function
+             *
+             * @param fetchInfo       Unused, but contains start/end of period
+             *                        to fetch resources for.
+             * @param successCallback A callback that is called with the list of
+             *                        resources.
+             */
+            resources(fetchInfo, successCallback) {
+                successCallback([
+                    {
+                        title: 'Events',
+                        children: this.eventTypeResources,
+                        eventAllow: false,
+                    },
+                    {
+                        title: 'Assessments',
+                        children: this.folderResources,
+                        eventAllow: false,
+                    },
+                ]);
             },
 
             /**
@@ -192,7 +252,6 @@
             eventRender(eventRenderInfo) {
                 var self = this,
                     eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping,
-                    backgroundColour = (eventRenderInfo.event.extendedProps.data.meta.colour) ? eventRenderInfo.event.extendedProps.data.meta.colour : self.defaultBgColour,
                     element = eventRenderInfo.el;
 
                 if (!self.eventGroups.includes(eventGrouping)) {
@@ -210,7 +269,6 @@
                     element.setAttribute('event-group-id', eventGrouping);
                     element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
                     element.setAttribute('event-group-date', self.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
-                    element.style.backgroundColor = backgroundColour;
                 }
             },
 
@@ -246,14 +304,20 @@
             renderPopOver(eventInfo) {
                 this.destroyPopOver();
 
-                var popOver = document.getElementById('popOver'),
+                let popOver = document.getElementById('popOver'),
                     popOverContent = '',
                     popOverHeader = '',
                     dateGroup = '',
+                    resources = eventInfo.event.getResources();
+
+                if (resources.length === 0) {
+                    return;
+                }
+
+                let resourceId = resources[0].id,
                     eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
-                    folderId = eventInfo.event.extendedProps.data.meta.folderId,
                     eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
-                    resourceCol = document.querySelectorAll("[data-resource-id='"+ folderId +"']"),
+                    resourceCol = document.querySelectorAll("[data-resource-id='"+ resourceId +"']"),
                     popOverPlaceholder = document.querySelector('.fc-body .fc-time-area .fc-rows'),
                     tmpEvent = [];
 
@@ -628,6 +692,39 @@
 
 
             /**
+             * Builds the list of all event type resources, based on
+             * `this.config.eventTypes`.
+             *
+             * @return {Array}
+             */
+            buildEventTypeResourcesList() {
+                return this.config.eventTypes.map(function (a) {
+                    return {
+                        id:                   RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
+                        title:                a.type,
+                        eventBackgroundColor: a.color,
+                    }
+                });
+            },
+
+            /**
+             * Build a resource ID out of the event.
+             *
+             * @param {object} event The event to be rendered
+             *
+             * @return {string|null} The resource ID, or null if it has none
+             */
+            buildResourceIdFromEvent(event) {
+                if (event?.data?.meta?.folderId) {
+                    return RESOURCE_FOLDER_PREFIX + String(event.data.meta.folderId);
+                }
+                if (event?.data?.meta?.eventTypeId) {
+                    return RESOURCE_EVENT_TYPE_PREFIX + String(event.data.meta.eventTypeId);
+                }
+                return null;
+            },
+
+            /**
              * Find the index of the term within `this.termDates` which contains
              * `dateString`.
              *
@@ -647,7 +744,17 @@
                     }
                 }
                 return -1;
-            }
+            },
+
+            /**
+             * Callback for reloading the calendar's events. May be used when
+             * a series of events is deleted, as the calendar no longer knows
+             * whether an event should be rendered even if it wasn't deleted.
+             * @see https://fullcalendar.io/docs/Calendar-refetchEvents
+             */
+            reloadEvents() {
+                this.$refs.fullCalendar.getApi().refetchEvents();
+            },
         }
     }
 </script>
@@ -655,11 +762,19 @@
 <template>
     <div>
         <view-event-modal ref="event"
+                          return-to="assessmentCalendar"
                           :event="currentEvent"
                           :to-moment="toMoment"
+                          :event-modify-form-url="urls.modifyForm"
+                          :event-modify-form-action-url="urls.modifyFormAction"
+                          :event-update-url="urls.update"
+                          :attendance-list-url="urls.attendanceList"
+                          :attendance-toggle-url="urls.attendanceToggle"
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
                           :format-display-datetime="formats.displayDatetime"
+                          @eventModified="reloadEvents"
+                          @eventDeleted="reloadEvents"
         />
 
         <full-calendar
@@ -728,7 +843,7 @@
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-render="eventRender"
             :events="events"
-            :resources="this.newResources"
+            :resources="resources"
             :scheduler-license-key="config.schedulerLicenseKey"
             :first-day="1"
             :default-date="this.termStartDate"

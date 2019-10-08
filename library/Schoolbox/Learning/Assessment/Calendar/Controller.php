@@ -14,6 +14,8 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
@@ -37,20 +39,28 @@ class Controller extends Base
     private $termMapper;
 
     /**
+     * @var EventTypeMapper
+     */
+    private $eventTypeMapper;
+
+    /**
      * Controller constructor.
      *
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      * @param RosettaStone                             $rosettaStone
      * @param TermMapper                               $termMapper
+     * @param EventTypeMapper                          $eventTypeMapper
      */
     public function __construct(
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
         RosettaStone $rosettaStone,
-        TermMapper $termMapper
+        TermMapper $termMapper,
+        EventTypeMapper $eventTypeMapper
     ) {
         $this->filterFactoryFactory = $filterFactoryFactory;
         $this->rosettaStone         = $rosettaStone;
         $this->termMapper           = $termMapper;
+        $this->eventTypeMapper      = $eventTypeMapper;
     }
 
     /**
@@ -93,6 +103,7 @@ class Controller extends Base
                 [
                     'filterPanel' => $filterPanel,
                     'termDates'   => $this->getAvailableTermDates(),
+                    'eventTypes'  => $this->eventTypeMapper->findAll(),
                 ],
                 'Assessment Calendar',
                 $pageTitle
