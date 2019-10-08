@@ -52,10 +52,19 @@
 </script>
 {% endautoescape %}
 
-<div class="row">
+<div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>{{ locale.calendar.proper ~ " for " ~ user.fullName}}</h1>
     </div>
+    {% set assessmentCalendar = routeLookupIfAuthorized('learningAssessmentCalendar.getReport')  %}
+    {% if assessmentCalendar %}
+    <nav>
+        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions" aria-expanded="false"></a>
+    </nav>
+    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+        <li><a class="icon-calendar" href="{{assessmentCalendar}}">Assessment Calendar</a></li>
+    </ul>
+    {% endif %}
 </div>
 
 <div class="row">
