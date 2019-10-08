@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 declare(strict_types=1);
 
@@ -10,30 +10,28 @@ namespace Schoolbox\Filter\Filters\Event\EventType;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
+use Schoolbox\User;
 
 
 /**
- * Converts between AssessmentType concrete keys and AssessmentType strings
+ * Converter between event type concrete keys and strings.
  */
 class KeyConverter extends AbstractKeyConverter
 {
-
     /**
-     * All AssessmentTypes known to the system (regardless of whether they are available)
-     *
      * @var Collection|string[]
      */
-    private $assessmentTypes;
+    private $eventTypeIds;
 
 
     /**
      * @param Filter\Model        $filter
-     * @param Collection|string[] $assessmentTypes
+     * @param Collection|string[] $eventTypeIds
      */
-    public function __construct(Filter\Model $filter, Collection $assessmentTypes)
+    public function __construct(Filter\Model $filter, Collection $eventTypeIds)
     {
         parent::__construct($filter);
-        $this->assessmentTypes = $assessmentTypes;
+        $this->eventTypeIds = $eventTypeIds;
     }
 
 
@@ -41,7 +39,7 @@ class KeyConverter extends AbstractKeyConverter
      * @inheritdoc
      * @return string
      */
-    protected function getItem(string $key, \Schoolbox\User $user, string $page): string
+    protected function getItem(string $key, User $user, string $page): string
     {
         $this->assertValidKey($key, $user, $page);
         return $key;
@@ -53,18 +51,17 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getAllPossibleItems(): Collection
     {
-        return $this->assessmentTypes->shallowClone();
+        return $this->eventTypeIds->shallowClone();
     }
 
 
     /**
      * @inheritdoc
      */
-    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
+    protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if (!in_array($key, $this->assessmentTypes->getAll(), true)) {
-            throw new \InvalidArgumentException('AssessmentType Key is invalid: ' . $key);
+        if (!in_array($key, $this->eventTypeIds->getAll(), true)) {
+            throw new \InvalidArgumentException('EventType Key is invalid: ' . $key);
         }
     }
-
 }
