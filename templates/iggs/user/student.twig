@@ -5,3 +5,10 @@
 
 {% block details_tutorGroup %}
 {% endblock details_tutorGroup %}
+
+{% block details_studiesCode %}
+    {% if externalUser.StudentStudiesCode %}
+        <dt class="no-margin small-6 medium-3">Studies Code:</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
+    {% endif %}
+{% endblock details_studiesCode %}
