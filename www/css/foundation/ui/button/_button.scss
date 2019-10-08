@@ -166,6 +166,7 @@ button.submit {
 			@include flex;
 			@extend .button;
 			justify-content: center;
+            margin-bottom: 0;
 			&.submit {
 				@extend input[type="submit"];
 			}
