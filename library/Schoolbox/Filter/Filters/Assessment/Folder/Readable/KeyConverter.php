@@ -78,6 +78,7 @@ class KeyConverter extends BaseKeyConverter
             // Start building the list of selected items
             // Only select folders which are available for this user's role type
             $selectedItems    = $this->getAllPossibleItems()->emptyClone();
+            $anySelected      = false;
             $pageModel        = $this->getFilter()->getPages()[$page];
             $availableOptions = [
                 Definition::KEY_MY_CLASSES,
@@ -86,8 +87,21 @@ class KeyConverter extends BaseKeyConverter
                 Definition::KEY_OTHER_GROUPS,
             ];
             foreach ($availableOptions as $availableOption) {
+                // Account for if no page option at all exists:
+                // assume that it is not selected in this case.
+                // (This happens if the settings for this filter have never been
+                //  changed, because no options at all exist for this filter.)
+                // Later on, select all if no items at all were selected.
                 $pageOption = $pageModel->getOptions()[$availableOption] ?? null;
-                if ($pageOption && $pageOption->getAvailable()) {
+                $selected   = false;
+                if ($pageOption) {
+                    $default  = $pageOption->getDefaults()[$user->getRole()->getType()] ?? null;
+                    $selected = $default ? $default->getSelected() : false;
+                }
+                if ($selected) {
+                    $anySelected = true;
+                }
+                if ($selected) {
                     switch ($availableOption) {
                         case Definition::KEY_MY_CLASSES:
                             $selectedItems = $selectedItems->mergeUnique(new Collection($userClasses));
@@ -104,6 +118,17 @@ class KeyConverter extends BaseKeyConverter
                     }
                 }
             }
+
+            // If none at all are selected: assume all are selected
+            if (!$anySelected) {
+                $selectedItems = $selectedItems
+                    ->mergeUnique(new Collection($userClasses))
+                    ->mergeUnique(new Collection($userGroups))
+                    ->mergeUnique(new Collection($otherClasses))
+                    ->mergeUnique(new Collection($otherGroups))
+                ;
+            }
+
             return $selectedItems->indexByCallback(static function ($v) { return $v; });
         }
         return parent::getSelectedItems($availableSelections, $user, $page);
