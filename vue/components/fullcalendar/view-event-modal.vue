@@ -115,6 +115,7 @@
                         view: data?.custom?.moreDetailsLink,
                         modify: modifyLink,
                         delete: deleteLink,
+                        path: data?.links?.path
                     },
                 };
             }
@@ -503,7 +504,12 @@
         <template v-else>
             <div class="row">
                 <div class="small-12">
-                    <a :href="'/calendar/event/' + eventExtendedProps.eventId" title="Go to event page"><h2>{{ event.title }}</h2></a>
+                    <template v-if="eventExtendedProps.links.path">
+                        <a :href="'/calendar/event/' + eventExtendedProps.eventId" title="Go to event page"><h2>{{ event.title }}</h2></a>
+                    </template>
+                    <template v-else>
+                        <h2>{{ event.title }}</h2>
+                    </template>
                     <meta-list>
                         <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
                             {{ eventExtendedProps.booking.status.name }}
