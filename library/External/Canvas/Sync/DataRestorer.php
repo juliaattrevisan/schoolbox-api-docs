@@ -82,12 +82,23 @@ class DataRestorer
                 $columnsSqlArray[] = "`{$column['name']}` $type COMMENT \"{$comment}\"";
             }
 
+            // What do we want to put indexes on?
+            $indexes = [];
+            foreach ($columns as $column) {
+                if ($this->requiresIndex($column['type'])) {
+                    $indexes[] = $column['name'];
+                }
+            }
+
             $columnSql = implode(",\n", $columnsSqlArray);
             $createSql = "CREATE TABLE IF NOT EXISTS `{$this->canvasDbName}`.`{$tableName}` (\n$columnSql\n) COMMENT \"{$description}\";";
             $this->log->debug("Creating table `{$this->canvasDbName}`.`{$tableName}`");
 
             try {
                 $this->executeIfPersisting($createSql);
+                foreach ($indexes as $columnName) {
+                    $this->addIndex($tableName, $columnName);
+                }
             } catch (Database\Exception $e) {
                 $errors = true;
                 $this->log->error($e->getMessage());
@@ -124,41 +135,6 @@ class DataRestorer
             foreach ($warnings as $warning) {
                 $this->log->warning(implode(': ', $warning));
             }
-        }
-    }
-
-
-    /**
-     * Adds indexes to all columns of specific data types
-     *
-     * @param array $schema
-     * @throws UnexpectedValueException
-     */
-    public function addStandardIndexes(array $schema): void
-    {
-        $this->log->info("Adding standard indexes...");
-        $errors = false;
-        foreach ($schema as $tableIndex => $tableData) {
-            $tableName = $tableData['tableName'];
-            $indexes   = [];
-            foreach ($tableData['columns'] as $column) {
-                // What do we want to put indexes on?
-                if ($this->requiresIndex($column['type'])) {
-                    $indexes[] = $column['name'];
-                }
-            }
-
-            foreach ($indexes as $columnName) {
-                try {
-                    $this->addIndex($tableName, $columnName);
-                } catch (Database\Exception $e) {
-                    $errors = true;
-                    $this->log->error($e->getMessage());
-                }
-            }
-        }
-        if ($errors) {
-            throw new UnexpectedValueException("Errors were encountered parsing json schema file");
         }
     }
 

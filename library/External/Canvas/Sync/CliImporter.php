@@ -252,7 +252,6 @@ class CliImporter extends CliTool\App
             $dataRestorer->restoreTableData($tableName, $tableFile);
             exec("gzip " . escapeshellarg($tableFile));
         }
-        $dataRestorer->addStandardIndexes($schema);
         $dataRestorer->addExtraIndexes();
     }
 
