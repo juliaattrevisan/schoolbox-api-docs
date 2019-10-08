@@ -18,6 +18,11 @@ use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Comms\News\Statistics
+ */
 class Module extends BaseModule
 {
     /**
@@ -32,6 +37,8 @@ class Module extends BaseModule
     {
         /* Only comms officers and authors can view statistics and obtain their data
          * Supers, Comms Officers, Article Moderators
+         *
+         * Anyone with write access to the folder should be able to view the article's stats too
          */
         $viewStats = new Rule\LazyCallback(function () {
             return new Rule\All(
@@ -39,13 +46,17 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory())
+                    new Authorizer\Rule\IsArticleAuthor(),
+                    new Rule\All(
+                        new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig()),
+                        new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory())
+                    )
                 )
             );
         });
 
         $preloadArticle = function ($params) {
-            return $this->preloadArticle($params);
+            return $this->preloadArticleWithAudience($params);
         };
 
         /* Json payload for the "Conversions, Impressions vs Time" graph
@@ -102,13 +113,14 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadArticle(array $params): array
+    private function preloadArticleWithAudience(array $params): array
     {
         if (\array_key_exists('article', $params)) {
             $article = $params['article'];
         } else {
             try {
                 $article = $this->getArticleMapper()->findById($params['articleId']);
+                $article->setAudience($this->getAudienceMapper()->findForArticles([$article->getId()]));
             } catch (MapperException $e) {
                 throw new NotFound("No article found for 'articleId' {$params['articleId']}", 0, $e);
             }
@@ -137,5 +149,15 @@ class Module extends BaseModule
     private function getStrategyFactory(): News\Audience\Segment\StrategyFactory
     {
         return $this->injector->get('commsNewsAudienceStrategyFactory');
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|News\Audience\Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getAudienceMapper(): News\Audience\Mapper
+    {
+        return $this->getMapperFactory()->get(News\Audience\Mapper::class);
     }
 }

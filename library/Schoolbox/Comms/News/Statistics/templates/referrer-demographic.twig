@@ -7,8 +7,9 @@
  #}
 <script>
     $(function() {
-        $('#referrerDemographic').highcharts({
+        var chart = new Highcharts.Chart({
             chart: {
+                renderTo: 'referrerDemographic',
                 spacingRight: 48,
                 type: 'column',
                 zoomType: 'xy'
@@ -34,16 +35,16 @@
             },
 
             title: {
-                text: 'Referrer'
+                text: ''
             },
 
             tooltip: {
-                pointFormat: '{point.y} {point.category} came<br />from the <span style="color:{series.color}">{series.name}</span> referrer',
+                pointFormat: '{point.y} - Accessed via <span style="color:{series.color}">{series.name}</span>',
                 useHTML: true
             },
 
             xAxis: {
-                categories: ['Conversions', 'Impressions']
+                categories: ['Origin']
             },
 
             yAxis: {
@@ -57,55 +58,124 @@
             series: [
                 {
                     color: '#82b5d8',
-                    name: 'Dashboard',
+                    name: 'Archive',
                     data: [
-                        {{ referrerDemographic['conversion']['dashboard'] }},
-                        {{ referrerDemographic['impression']['dashboard'] }}
-
+                        {{ referrerDemographic['open']['archive'] }}
                     ]
+
                 },
                 {
                     color: '#1f78c1',
-                    name: 'Homepage',
+                    name: 'Dashboard',
                     data: [
-                        {{ referrerDemographic['conversion']['homepage'] }},
-                        {{ referrerDemographic['impression']['homepage'] }}
+                        {{ referrerDemographic['open']['dashboard'] }}
                     ]
                 },
                 {
                     color: '#0a437c',
-                    name: 'Index',
+                    name: 'Email',
                     data: [
-                        {{ referrerDemographic['conversion']['index'] }},
-                        {{ referrerDemographic['impression']['index'] }}
-
+                        {{ referrerDemographic['open']['email'] }}
                     ]
                 },
                 {
                     color: '#806eb7',
-                    name: 'Archive',
+                    name: 'Homepage',
                     data: [
-                        {{ referrerDemographic['conversion']['archive'] }},
-                        {{ referrerDemographic['impression']['archive'] }}
+                        {{ referrerDemographic['open']['homepage'] }}
                     ]
                 },
                 {
                     color: '#ba43a9',
-                    name: 'Email',
+                    name: 'Feed',
                     data: [
-                        {{ referrerDemographic['conversion']['email'] }},
-                        {{ referrerDemographic['impression']['email'] }}
+                        {{ referrerDemographic['open']['index'] }}
+                    ]
+                },
+                {
+                    color: '#c1263c',
+                    name: 'Saved',
+                    data: [
+                        {{ referrerDemographic['open']['saved'] }}
+                    ]
+                },
+                {
+                    color: '#f86727',
+                    name: 'Search',
+                    data: [
+                        {{ referrerDemographic['open']['search'] }}
                     ]
                 },
                 {
                     color: '#888888',
-                    name: 'Non-referred Opens',
+                    name: 'None',
                     data: [
-                        {{ referrerDemographic['open'] }}
+                        {{ referrerDemographic['open']['none'] }}
                     ]
                 }
             ]
         });
+
+        {# Because Foundation... #}
+        setTimeout(function() {
+            chart.reflow();
+        }, 250)
     });
 </script>
-<div id="referrerDemographic"></div>
+
+<section class="content">
+    <div id="referrerDemographic"></div>
+</section>
+
+<script>
+    $(function() {
+        $('[data-cumulative]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+
+{# Temporarily disabled
+<section>
+    <table class="ico" data-cumulative>
+        <thead>
+            <tr>
+                <th>Referrer</th>
+                <th>Opens</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Archive</td>
+                <td>{{ referrerDemographic.open.archive }}</td>
+            </tr>
+            <tr>
+                <td>Dashboard</td>
+                <td>{{ referrerDemographic.open.dashboard }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{ referrerDemographic.open.email }}</td>
+            </tr>
+            <tr>
+                <td>Homepage</td>
+                <td>{{ referrerDemographic.open.homepage }}</td>
+            </tr>
+            <tr>
+                <td>Index</td>
+                <td>{{ referrerDemographic.open.index }}</td>
+            </tr>
+            <tr>
+                <td>Search</td>
+                <td>{{ referrerDemographic.open.search }}</td>
+            </tr>
+            <tr>
+                <td>None</td>
+                <td>{{ referrerDemographic.open.none }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+#}

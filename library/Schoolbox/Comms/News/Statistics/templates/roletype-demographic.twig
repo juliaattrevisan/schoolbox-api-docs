@@ -43,7 +43,7 @@
             },
 
             xAxis: {
-                categories: ['Conversions', 'Impressions', 'Non-referred Opens']
+                categories: ['Opens']
             },
 
             yAxis: {
@@ -59,18 +59,13 @@
                     color: '#82b5d8',
                     name: 'Staff',
                     data: [
-                        {{ roleTypeDemographic['conversion']['staff'] }},
-                        {{ roleTypeDemographic['impression']['staff'] }},
-                        {{ roleTypeDemographic['open']['staff'] }},
-
+                        {{ roleTypeDemographic['open']['staff'] }}
                     ]
                 },
                 {
                     color: '#1f78c1',
                     name: 'Parent',
                     data: [
-                        {{ roleTypeDemographic['conversion']['parent'] }},
-                        {{ roleTypeDemographic['impression']['parent'] }},
                         {{ roleTypeDemographic['open']['parent'] }}
                     ]
                 },
@@ -78,8 +73,6 @@
                     color: '#0a437c',
                     name: 'Student',
                     data: [
-                        {{ roleTypeDemographic['conversion']['student'] }},
-                        {{ roleTypeDemographic['impression']['student'] }},
                         {{ roleTypeDemographic['open']['student'] }}
 
                     ]
@@ -88,8 +81,6 @@
                     color: '#806eb7',
                     name: 'Guest',
                     data: [
-                        {{ roleTypeDemographic['conversion']['guest'] }},
-                        {{ roleTypeDemographic['impression']['guest'] }},
                         {{ roleTypeDemographic['open']['guest'] }}
                     ]
                 }
@@ -97,4 +88,6 @@
         });
     });
 </script>
-<div id="roleTypeDemographic"></div>
+<section class="content">
+    <div id="roleTypeDemographic"></div>
+</section>

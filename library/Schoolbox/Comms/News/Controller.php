@@ -22,7 +22,7 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
-use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Comms\News\Statistics\Interactions;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
@@ -613,9 +613,10 @@ class Controller extends Base
         /* Record this Conversion/Open
          * referrer value determines what kind it was
          */
-        (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
-            ->saveConversionOpen(
+        (new Interactions($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
+            ->saveOpen(
                 $article,
+                \Alaress_Date_Format::now(),
                 $this->getUser()->getId(),
                 $this->getUser()->getRole()->getType(),
                 $this->getUser()->getRole()->getId(),
@@ -839,10 +840,6 @@ class Controller extends Base
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
-        /* TODO: Repair statistics logging here
-         * See usages of saveImpression()
-         */
-
         $map = [
             'id',
             'title',
@@ -973,9 +970,9 @@ class Controller extends Base
             $details = $this->folderMapper->findCheaplyById((int)$params->getFolderId())->findValueLabelPair();
 
             $metaDetails = [
-                'folderId'      => $details['value'],
-                'folderName'    => $details['label'],
-                'componentId'   => $params->getComponentId(),
+                'folderId'    => $details['value'],
+                'folderName'  => $details['label'],
+                'componentId' => $params->getComponentId(),
             ];
 
             $data = array_merge($data, $metaDetails);
@@ -1047,7 +1044,7 @@ class Controller extends Base
          */
         $partialData = array_merge($topicData, [
             'hidePaginator' => $hidePaginator,
-            'compactMode' => $params->getCompactMode(),
+            'compactMode' => true,
             'pageNum' => $params->getPageNum(),
             'referrer' => $params->getReferrer()
         ]);

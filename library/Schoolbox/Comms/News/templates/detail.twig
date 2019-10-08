@@ -100,10 +100,10 @@ Data:
     {% endif %}
 
     {# Statistics link: must be author or comms officer and article must be published #}
-    {#{% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}#}
+    {% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}
 
-    {#{% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute or statisticsRoute %}#}
-    {% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute %}
+    {# Decide whether the tot shows #}
+    {% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute or statisticsRoute %}
 
     <nav>
         {# Save For Later #}
@@ -148,9 +148,9 @@ Data:
             <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}{{ returnUrlQueryString }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
         {% endif %}
 
-        {#{% if statisticsRoute %}#}
-            {#<li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>#}
-        {#{% endif %}#}
+        {% if statisticsRoute %}
+            <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
+        {% endif %}
     </ul>
     {% endif %}
 </div>

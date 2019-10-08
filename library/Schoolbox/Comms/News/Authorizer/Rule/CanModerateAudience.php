@@ -52,7 +52,7 @@ class CanModerateAudience extends ArticleAttribute
         $article = $this->findArticleInParams($params);
 
         // Articles that don't have audiences can only be moderated by Comms Officers and SUs
-        if (0 === $article->getAudience()->count()) {
+        if (null === $article->getAudience() || 0 === $article->getAudience()->count()) {
             throw new Unauthorized('Only CommsOfficers and SUs can moderate an article without an audience');
         }
 

@@ -40,6 +40,7 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
@@ -221,6 +222,7 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -286,6 +288,7 @@ class Module extends BaseModule
         ];
     }
 
+
     /**
      * Preload the news article with audience hydrated
      *
@@ -304,6 +307,7 @@ class Module extends BaseModule
         $article->setAudience($this->getAudienceMapper()->findForArticles([$article->getId()]));
         return $args;
     }
+
 
     /**
      * @return \Schoolbox\Mapper|Mapper

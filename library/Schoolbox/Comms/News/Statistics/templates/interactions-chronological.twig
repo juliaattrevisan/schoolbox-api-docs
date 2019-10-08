@@ -1,11 +1,11 @@
 {##
  # Conversions, Impressions vs Time
  #
- # @param News\Model $article
- # @param array scaleOptions
- # @param string scale
- # @param array interactions
- # @param array conversionRatio
+ # @param News\Model article
+ # @param array      scaleOptions
+ # @param string     scale
+ # @param array      interactions
+ # @param array      conversionRatio
  #}
 <script>
     $(function() {
@@ -23,7 +23,8 @@
                         height: 500,
                         panning: true,
                         panKey: 'shift',
-                        renderTo: 'conversions-chronological',
+                        reflow: true,
+                        renderTo: 'opens-chronological',
                         spacingBottom: 64,
                         type: 'line',
                         zoomType: 'xy'
@@ -44,7 +45,7 @@
                     },
 
                     title: {
-                        text: 'Conversions, Impressions vs Time'
+                        text: ''
                     },
 
                     tooltip: {
@@ -73,54 +74,36 @@
                             allowDecimals: false,
                             min: 0,
                             title: {
-                                text: 'Quantity'
+                                text: 'People'
                             }
-                        },
-                        {
-                            labels: {
-                                style: {
-                                    color: '#629e51'
-                                }
-                            },
-                            lineColor: '#629e51',
-                            lineWidth: 1,
-                            max: 100,
-                            min: 0,
-                            tickInterval: 10,
-                            title: {
-                                allowDecimals: true,
-                                style: {
-                                    color: '#629e51'
-                                },
-                                text: 'Conversion Ratio This Period (%)'
-                            },
-                            opposite: true
                         }
                     ],
 
                     series: [
                         {
                             color: '#82b5d8',
-                            name: 'Conversions',
-                            data: data.interactions.conversion
+                            name: 'Staff',
+                            data: data.interactions.staff
                         },
                         {
-                            color: '#f2c96d',
-                            name: 'Impressions',
-                            data: data.interactions.impression
+                            color: '#1f78c1',
+                            name: 'Parent',
+                            data: data.interactions.parent
                         },
                         {
-                            color: '#888888',
-                            name: 'Non-referred Opens',
-                            data: data.interactions.open
+                            color: '#0a437c',
+                            name: 'Student',
+                            data: data.interactions.student
                         },
                         {
-                            color: '#629e51',
-                            lineWidth: 1,
-                            name: 'Conversion Ratio This Period (%)',
-                            type: 'spline',
-                            yAxis: 1,
-                            data: data.conversionRatio
+                            color: '#806eb7',
+                            name: 'Guest',
+                            data: data.interactions.guest
+                        },
+                        {
+                            color: '#99D68E',
+                            name: 'Total',
+                            data: data.interactions.total
                         }
                     ]
                 });
@@ -129,6 +112,9 @@
                 {#var d = new Date();#}
                 {#chart.xAxis[0].setExtremes(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() - 7), Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));#}
                 {#chart.showResetZoom();#}
+
+                {# Because Foundation... #}
+                chart.reflow();
             });
         }
 
@@ -146,13 +132,13 @@
 
 <section class="content">
     <label for="scale">Scale</label>
-    <p class="meta">Change the way the graph condenses data.</p>
+    <p class="meta">Change the way the graph aggregates data.</p>
 
     <select id="scale">
         {% for value, label in scaleOptions %}
             <option value="{{ value }}" {% if value == scale %}selected="selected"{% endif %}>{{ value }}</option>
         {% endfor %}
     </select>
-</section>
 
-<div id="conversions-chronological"></div>
+    <div id="opens-chronological"></div>
+</section>

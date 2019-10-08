@@ -1,15 +1,9 @@
 <?php
 /**
- * Lists
- *
- * Generates a set of articles for a particular topic
- * Also figures out whether the viewing user has saved any of those articles for later
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Database\Connector\IConnector;
@@ -19,15 +13,21 @@ use Schoolbox\Comms\News\Audience\IArticleResolver;
 use Schoolbox\Comms\News\Helper;
 use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Model;
-use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics;
-use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\User;
 
+/**
+ * Class Base
+ *
+ * Generates a set of articles for a particular topic
+ * Also figures out whether the viewing user has saved any of those articles for later
+ *
+ * @package Schoolbox\Comms\News\Lists
+ */
 abstract class Base
 {
 
@@ -232,15 +232,12 @@ abstract class Base
 
 
     /**
+     * Load a set of hydrated articles having known their ids
+     *
      * @param array       $articleIds
-     * @param Querystring $params
-     * @param User        $user
      * @return GenericCollection
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
-    protected function loadArticleByIds(array $articleIds, Querystring $params, User $user) : GenericCollection
+    protected function loadArticleByIds(array $articleIds) : GenericCollection
     {
         $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
 
@@ -251,23 +248,6 @@ abstract class Base
 
             if (null !== $record) {
                 $articles->add($records->getOffset($articleId));
-
-                /* Statistics: save an impression record
-                 * Load the referrer value from $params
-                 * Also increment a tally elsewhere
-                 */
-
-                (new ImpressionsConversionsOpens(
-                    $this->databaseInternal,
-                    $this->statisticsMapper,
-                    $this->statisticsCumulativeMapper
-                ))->saveImpression(
-                    $record,
-                    $user->getId(),
-                    $user->getRole()->getType(),
-                    $user->getRole()->getId(),
-                    $params->getReferrer()
-                );
             }
         }
 

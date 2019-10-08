@@ -1,7 +1,5 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,22 +10,31 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Comms\News\Statistics
+ */
 class Controller extends Base
 {
+
     /**
      * @var IConnector
      */
     private $database;
+
 
     /**
      * @var Mapper
      */
     private $statisticsMapper;
 
+
     /**
      * @var Cumulative\Mapper
      */
     private $statisticsCumulativeMapper;
+
 
     /**
      * Controller constructor.
@@ -59,46 +66,43 @@ class Controller extends Base
      */
     public function getOverview(News\Model $article)
     {
-        $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
-        $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
+        $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
 
             /* Length of period to record granular data
              */
-            'period' => ImpressionsConversionsOpens::PERIOD_LENGTH,
+            'period' => Interactions::PERIOD_LENGTH,
 
             /* Overall Cumulative summary
              */
-            'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
+            'cumulative' => $interactions->fetchCumulative($article),
 
             /* Overall Referrer Demographics
              */
-            'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
+             'referrerDemographic' => $interactions->fetchReferrerDemographic($article),
 
             /* Overall RoleType Demographics
+             * Temporarily disabled
              */
-            'roleTypeDemographic' => $impressionsConversionsOpens->fetchRoleTypeDemographic($article),
+            // 'roleTypeDemographic' => $interactions->fetchRoleTypeDemographic($article),
 
             /* Scale selector
              */
             'scaleOptions' => News\Statistics\Scale\Factory::SCALE_OPTIONS,
-            'scale' => $scale,
-
-            /* Interaction Referrers This Period
-             */
-            'referrersThisPeriod' => $impressionsConversionsOpens->fetchInteractionReferrers($article),
+            'scale' => News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']),
 
             /* Historical Dailies
+             * Temporarily disabled
              */
-            'historic' => $impressionsConversionsOpens->fetchHistoric($article),
+            // 'historic' => $interactions->fetchHistoric($article),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 
 
     /**
-     * Get the json payload to populate "Conversions, Impressions vs Time" graph so that
+     * Get the json payload to populate "Opens vs Time" graph so that
      * when you change scale, only the graph updates, instead of the whole page kek
      *
      * @api GET /news/statistics/{articleId}/interactions
@@ -108,15 +112,11 @@ class Controller extends Base
      */
     public function getInteractionsVsTime(News\Model $article)
     {
-        $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+        $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
         $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
 
-        /* Conversions and Impressions vs Time,
-         * Conversion Ratio vs Time
-         */
         $output = [
-            'interactions' => $impressionsConversionsOpens->fetchConversions($article, $scale),
-            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $scale),
+            'interactions' => $interactions->fetchOpensVsTime($article, $scale),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));
