@@ -16,19 +16,22 @@
 
     export default {
         name: "view-event-modal",
-        props: [
-            'event',
-            'toMoment',
-            'taskTypeId',
-            'eventModifyFormUrl',
-            'eventModifyFormActionUrl',
-            'eventUpdateUrl',
-            'attendanceListUrl',
-            'attendanceToggleUrl',
-            'formatDisplayDate',
-            'formatDisplayTime',
-            'formatDisplayDatetime',
-        ],
+        props: {
+            event: {},
+            toMoment: {},
+            taskTypeId: {},
+            eventModifyFormUrl: {},
+            eventModifyFormActionUrl: {},
+            eventUpdateUrl: {},
+            attendanceListUrl: {},
+            attendanceToggleUrl: {},
+            formatDisplayDate: {},
+            formatDisplayTime: {},
+            formatDisplayDatetime: {},
+            returnTo: {
+                default: 'calendar',
+            }
+        },
         components: {
             MetaItem,
             MetaList,
@@ -59,8 +62,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=calendar';
-                        deleteLink = this.eventModifyFormActionUrl + '?action=Delete&id=' + metadata?.eventId + '&returnTo=calendar';
+                        modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=' + this.returnTo;
+                        deleteLink = this.eventModifyFormActionUrl + '?action=Delete&id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
                     }
                 }
 

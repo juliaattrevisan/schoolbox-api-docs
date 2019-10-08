@@ -762,6 +762,7 @@
 <template>
     <div>
         <view-event-modal ref="event"
+                          return-to="assessmentCalendar"
                           :event="currentEvent"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
