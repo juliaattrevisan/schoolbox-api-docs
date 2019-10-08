@@ -381,6 +381,7 @@ class CliImporter extends CliTool\App
      */
     public function storeTempFile(string $response, string $path): void
     {
+        $this->getLogger()->debug("Saving temp file to path '$path'");
         $fp = fopen($path, 'wb');
         fwrite($fp, $response);
         fclose($fp);
