@@ -14,6 +14,7 @@ use Calendar_Api_Composite;
 use Calendar_Api_Config_Record;
 use Calendar_Api_EventType_Event_Schoolbox_Campus;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Filter\Page as FilterPage;
@@ -104,11 +105,12 @@ class Controller extends Base
         $qsFilters      = $this->request->query->get('filters', []);
         $page           = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
         $codec          = $this->filterFactoryFactory->buildCodec();
-        $userSelections = $codec->convertRequestToSelections($this->getUser(), $page, $qsFilters);
+        $user           = $this->getUser();
+        $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
 
 
         // Store the filters this user selected
-        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $userSelections);
+        $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
 
 
         // User must have provided a start and end date: error out otherwise
@@ -123,29 +125,38 @@ class Controller extends Base
 
         // Query the API for the events in this time span
         $api = new Calendar_Api_Composite();
+
+
+        // Assessments
         $api->add(
             new Api(
-                $this->getUser(),
+                $user,
                 $this->assessmentDataSource,
                 $this->visibility,
                 $this->assessmentIdFinder,
-                $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page)
+                $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page)
             )
         );
+
+
+        // Calendar events: need events from all campuses (not just the
+        // logged-in user's), so create a clone who belongs to all campuses
+        $dummyUser = clone $user;
+        $dummyUser->setCampusCollection(CampusMapper::getInstance()->findAll());
         $api->add(
             new Calendar_Api_EventType_Event_Schoolbox_Campus(
                 $this->calendarConfig->getId(),
-                $this->getUser(),
-                $this->getUser()
+                $dummyUser,
+                $user
             )
         );
         $calendar = new Renderer(
             $api,
             $start,
             $end,
-            $this->getUser(),
+            $user,
             $this->getDi(),
-            $this->getUser()
+            $user
         );
 
 
