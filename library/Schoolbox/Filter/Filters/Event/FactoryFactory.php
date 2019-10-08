@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Event;
 
 use InvalidArgumentException;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Filter\IFactory;
@@ -34,6 +35,15 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
         }
 
         // Registry of filters definitions, and their extra dependencies
+        if ($filterDefinitionClass === EventType\Definition::class) {
+            return new EventType\Factory(
+                $this->getOptionMapper(),
+                $this->getDefaultsMapper(),
+                $this->getSelectionMapper(),
+                $this->getMapperFactory()->get(EventTypeMapper::class)
+            );
+        }
+
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
 }
