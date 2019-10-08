@@ -585,14 +585,14 @@
                                     <a class="button"
                                        :href="eventExtendedProps.links.view">View More Details</a>
                                 </span>
-                                <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
-                                    <a class="button"
-                                       :href="attendanceListUrl + String(eventExtendedProps.eventId)">View Attendees</a>
-                                </span>
                                 <span v-if="eventExtendedProps.attendance.actions.toggle.isAvailable">
                                     <a class="button"
                                        @click.prevent="toggleAttendance"
                                        href="#">{{ eventExtendedProps.attendance.actions.toggle.text }}</a>
+                                </span>
+                                <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
+                                    <a class="button"
+                                       :href="attendanceListUrl + String(eventExtendedProps.eventId)">View Attendees</a>
                                 </span>
                                 <span v-if="eventExtendedProps.classAttendance.url">
                                     <a class="button"
