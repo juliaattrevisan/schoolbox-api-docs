@@ -112,8 +112,6 @@ class AssessmentFeedbackImporter extends CliTool\App
 
         // Import csv
         $reader = new Reader($this->file, true, true);
-
-        // Class Code, Student ID (external), Staff ID (external), assessment ID, comment
         $reader->setExpectedColumns([
             self::COL_ASSESSMENT_ID,
             self::COL_STAFF_SYNERGETIC_ID,
