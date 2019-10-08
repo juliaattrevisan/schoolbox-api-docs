@@ -17,8 +17,9 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Alaress\Csv\Reader;
+use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Factory;
 
 /**
@@ -29,13 +30,13 @@ class AssessmentFeedbackImporter extends CliTool\App
     // This tools CLI options
     private const OPT_SHORT_HELP  = 'h';                 // print help
     private const OPT_LONG_HELP   = 'help';              // print help
-    private const OPT_LONG_FILE   = 'file:';             // session hash
-    private const OPT_LONG_FOLDER = 'folder:';         // username
+    private const OPT_LONG_FILE   = 'file:';             // csv file
+    private const OPT_LONG_FOLDER = 'folder:';           // attachment folder
 
     // Columns of csv file
     private const         COL_STUDENT_SYNERGETIC_ID = 'Student Synergetic ID';
     private const         COL_STAFF_SYNERGETIC_ID   = 'Marker Synergetic ID';
-    private const         COL_COMMENT               = 'comment';
+    private const         COL_COMMENT               = 'Comment';
     private const         COL_ASSESSMENT_ID         = 'Assessment Id';
 
     /** @var string|null */
@@ -43,6 +44,9 @@ class AssessmentFeedbackImporter extends CliTool\App
 
     /** @var string|null */
     private $folder;
+
+    /** @var int */
+    private $count = 0;
 
     /** @var UserMapper */
     private $userMapper;
@@ -107,23 +111,30 @@ class AssessmentFeedbackImporter extends CliTool\App
         $this->feedbackDataSource    = $di->get('feedbackDataSource');
 
         // Import csv
-        $reader = new Reader($this->file);
-        $reader->setLoadFromFirst(true);
-        $reader->rewind();
+        $reader = new Reader($this->file, true, true);
 
-        //Class Code, Student ID (external), Staff ID (external), assessment ID, comment
+        // Class Code, Student ID (external), Staff ID (external), assessment ID, comment
+        $reader->setExpectedColumns([
+            self::COL_ASSESSMENT_ID,
+            self::COL_STAFF_SYNERGETIC_ID,
+            self::COL_STUDENT_SYNERGETIC_ID,
+            self::COL_COMMENT,
+        ]);
+        $reader->next(); // header
+
         $currentFeedbackRows = [];
-        $row                 = $reader->current();
-        if (empty($row)) {
-            $this->getLogger()->notice('Nothing to process.');
-            return;
-        }
-        $currentAssessmentId   = (int)$row[self::COL_ASSESSMENT_ID];
-        $currentFeedbackRows[] = $row;
+        $currentAssessmentId = 0;
+
+        $reader->next();
         while ($reader->valid()) {
-            $reader->next();
-            $row              = $reader->current();
-            $nextAssessmentId = (int)$row[self::COL_ASSESSMENT_ID];
+            try {
+                $row              = $reader->current();
+                $nextAssessmentId = (int)$row[self::COL_ASSESSMENT_ID];
+            } catch (\InvalidArgumentException $e) {
+                // noop
+                $reader->next();
+                continue;
+            }
             if ($currentAssessmentId !== $nextAssessmentId) {
                 $this->process($currentAssessmentId, $currentFeedbackRows);
                 // reset
@@ -132,6 +143,16 @@ class AssessmentFeedbackImporter extends CliTool\App
             } else {
                 $currentFeedbackRows[] = $row;
             }
+            $reader->next();
+        }
+
+        // Process remaining feedback
+        $this->process($currentAssessmentId, $currentFeedbackRows);
+
+        if ($this->perform()) {
+            $this->getLogger()->info("Processed {$this->count} feedback.");
+        } else {
+            $this->getLogger()->info("{$this->count} feedback will be processed.");
         }
     }
 
@@ -148,7 +169,7 @@ class AssessmentFeedbackImporter extends CliTool\App
 
         try {
             $assessment = $this->assessmentDataSource->findById($assessmentId);
-            $this->getLogger()->debug("Assessment:{$assessment->getTitle()}");
+            $this->getLogger()->info("Assessment:{$assessment->getTitle()}");
             $this->participantDataSource->loadParticipationIntoAssessment($assessment);
         } catch (MapperException $e) {
             $this->getLogger()->warning("Unable to find assessment with id {$assessmentId}");
@@ -156,13 +177,12 @@ class AssessmentFeedbackImporter extends CliTool\App
         }
 
         foreach ($feedbackRows as $row) {
-//            $classCode = $row['Class Code'];
             $studentExternalId = $row[self::COL_STUDENT_SYNERGETIC_ID];
             $staffExternalId   = $row[self::COL_STAFF_SYNERGETIC_ID];
             $comment           = $row[self::COL_COMMENT];
 
             try {
-                $staff = $this->userMapper->findByExternalId($staffExternalId);
+                $staff = $this->userMapper->findByExternalId($staffExternalId, Role::STAFF);
             } catch (MapperException $e) {
                 $this->getLogger()->warning("Unable to find staff with external ID: {$staffExternalId}");
                 continue;
@@ -175,7 +195,7 @@ class AssessmentFeedbackImporter extends CliTool\App
             }
             $participant = $assessment->getParticipantIfExtant($student);
             if (!$participant) {
-                $this->getLogger()->warning("{$student->getFullName()}{$studentExternalId} is not a participant of this assessment");
+                $this->getLogger()->warning("{$student->getFullName()} {$studentExternalId} is not a participant of this assessment");
                 continue;
             }
 
@@ -192,12 +212,13 @@ class AssessmentFeedbackImporter extends CliTool\App
                             $attachments = [NodeFactory::STORE . ':' . $attachment->getHash()];
                         } catch (MapperException $e) {
                             $attachmentMessage = " (failed to attach {$attachmentFilename})";
+                            $this->getLogger()->debug($e->getMessage());
                         }
                     }
                 }
             }
 
-            $this->getLogger()->debug("Feedback for {$student->getFullName()} by {$staff->getFullName()}{$attachmentMessage}");
+            $this->getLogger()->info("Feedback for {$student->getFullName()} by {$staff->getFullName()}{$attachmentMessage}");
             if ($this->perform()) {
                 $dueWorkFeedbackFactory = new Factory(
                     $this->feedbackDataSource,
@@ -216,9 +237,12 @@ class AssessmentFeedbackImporter extends CliTool\App
                 try {
                     $feedbackRows = $dueWorkFeedbackFactory->produce();
                     $this->feedbackDataSource->save($feedbackRows);
+                    $this->count++;
                 } catch (MapperException $e) {
                     $this->getLogger()->warning('Failed to save feedback');
                 }
+            } else {
+                $this->count++;
             }
         }
     }
@@ -287,7 +311,7 @@ DESCRIPTION
     
     $yellow--file=FILE$white (required)
         Path to a spreadsheet file which contains the following data:
-        Class Code, Student ID (external), Staff ID (external), assessment ID, comment
+        Assessment ID, Student ID (external), Staff ID (external), Assessment ID, Comment
         
     $yellow--folder=FOLDER$white
         Path of a folder which has files to be attached to feedback.
@@ -296,6 +320,4 @@ DESCRIPTION
 ";
         \fwrite(STDOUT, $help);
     }
-
-
 }
