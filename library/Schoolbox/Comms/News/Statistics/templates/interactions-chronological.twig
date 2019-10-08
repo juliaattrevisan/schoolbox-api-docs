@@ -136,7 +136,7 @@
 
     <select id="scale">
         {% for value, label in scaleOptions %}
-            <option value="{{ value }}" {% if value == scale %}selected="selected"{% endif %}>{{ value }}</option>
+            <option value="{{ value }}" {% if value == scale %}selected="selected"{% endif %}>{{ value|capitalize }}s</option>
         {% endfor %}
     </select>
 

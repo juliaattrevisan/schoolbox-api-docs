@@ -192,7 +192,11 @@ class Interactions
 
             /* Total number of Comments
              */
-            'numComments' => $this->calculateNumComments($article)
+            'numComments' => $this->calculateNumComments($article),
+
+            /* Total number of times this article got Saved For Later
+             */
+            'numSaved' => $this->calculateNumSaved($article)
         ];
 
         return $summary;
@@ -467,6 +471,32 @@ class Interactions
         ]);
 
         return (int)$statement->fetch(\PDO::FETCH_ASSOC)['numComments'];
+    }
+
+
+    /**
+     * Calculate the absolute number of times this article has been saved across all time
+     * (Includes records that were soft deleted)
+     *
+     * @param News\Model $article
+     * @return int
+     * @throws \Alaress\Database\Exception
+     */
+    private function calculateNumSaved(News\Model $article): int
+    {
+        $query = '
+            SELECT COUNT(*) AS numSaved
+            FROM comms_news_saveforlater cns
+            WHERE cns.article_id = :articleId
+        ';
+
+        $statement = $this->database->prepareQuery($query);
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        return (int)$statement->fetch(\PDO::FETCH_ASSOC)['numSaved'];
     }
 
 

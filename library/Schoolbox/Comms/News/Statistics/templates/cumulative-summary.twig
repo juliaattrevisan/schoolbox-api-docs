@@ -6,23 +6,30 @@
 <section>
     <div class="content">
         <div class="row">
-            <div class="small-12 medium-4 columns">
+            <div class="small-12 medium-3 columns">
                 <p class="infographic">
                     <span class="title">First Open <span class='hint has-tip tip-top' data-tooltip title="The date when the {{ locale.news }} was first opened">?</span></span>
                     <span class="value">{% if cumulative.date %}{{ cumulative.date|date('j M') }}{% else %}n/a{% endif %}</span>
                 </p>
             </div>
-            <div class="small-12 medium-4 columns">
+            <div class="small-12 medium-3 columns">
                 <p class="infographic">
                     <span class="title">Opens <span class="hint has-tip tip-top" data-tooltip title="The number of people who clicked through to view the {{ locale.news }}">?</span></span>
                     <span class="value">{{ cumulative.numOpens }}</span>
                 </p>
             </div>
 
-            <div class="small-12 medium-4 columns">
+            <div class="small-12 medium-3 columns">
                 <p class="infographic">
                     <span class="title">Comments <span class="hint has-tip tip-top" data-tooltip title="The current number of comments for this {{ locale.news }}">?</span></span>
                     <span class="value">{{ cumulative.numComments }}</span>
+                </p>
+            </div>
+
+            <div class="small-12 medium-3 columns">
+                <p class="infographic">
+                    <span class="title">Saved <span class="hint has-tip tip-top" data-tooltip title="The total number of times this {{ locale.news }} was saved for later">?</span></span>
+                    <span class="value">{{ cumulative.numSaved }}</span>
                 </p>
             </div>
         </div>
