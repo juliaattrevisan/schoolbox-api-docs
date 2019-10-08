@@ -371,23 +371,17 @@
              * navigate into the next available semester
              */
             clickNext() {
-                var self = this;
-
-                if (self.currentViewIsSemester()) {
-                    if ((self.cursor < 0) || (self.cursor === 0 && self.config.termDates.future.length) ||
-                        (self.cursor > 0 && self.config.termDates.future[Math.abs(self.cursor)])) {
-                        self.cursor++;
-                        var startDateByCursor = self.getStartDateByCursor();
-
-                        if (startDateByCursor !== undefined) {
-                            self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
-                        }
+                let api = this.$refs.fullCalendar.getApi();
+                if (this.currentViewIsSemester()) {
+                    // Figure out which term I'm in: go to the next one
+                    let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
+                    if (this.allTerms[termIndex+1]) {
+                        api.gotoDate(this.allTerms[termIndex+1].start);
+                        this.redrawWeekNumbers();
+                        this.cleanupMonthHeaderInlineStyles();
                     }
-
-                    self.redrawWeekNumbers();
-                    self.cleanupMonthHeaderInlineStyles();
                 } else {
-                    self.$refs.fullCalendar.getApi().next();
+                    api.next();
                 }
             },
 
@@ -396,38 +390,38 @@
              * navigate into the previous available semester
              */
             clickPrev() {
-                var self = this;
-
-                if (self.currentViewIsSemester()) {
-                    if ((self.cursor > 0) || (self.cursor === 0 && self.config.termDates.past.length) ||
-                        (self.cursor < 0 && self.config.termDates.past.length >= Math.abs(self.cursor) + 1)) {
-
-                        self.cursor--;
-
-                        var startDateByCursor = self.getStartDateByCursor();
-
-                        if (startDateByCursor !== undefined) {
-                            self.$refs.fullCalendar.getApi().gotoDate(startDateByCursor);
-                        }
-
-                        self.redrawWeekNumbers();
-                        self.cleanupMonthHeaderInlineStyles();
+                let api = this.$refs.fullCalendar.getApi();
+                if (this.currentViewIsSemester()) {
+                    // Figure out which term I'm in: go to the previous one
+                    let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
+                    if (this.allTerms[termIndex-1]) {
+                        api.gotoDate(this.allTerms[termIndex-1].start);
+                        this.redrawWeekNumbers();
+                        this.cleanupMonthHeaderInlineStyles();
                     }
                 } else {
-                    self.$refs.fullCalendar.getApi().prev();
+                    api.prev();
                 }
             },
 
+            /**
+             * Customise today button behaviour for semester view.
+             *
+             * Clicking today button while on semester view will navigate to
+             * today, only if today is in a semester.
+             */
             clickToday() {
-                var self = this;
-
-                if (self.currentViewIsSemester()) {
-                    self.$refs.fullCalendar.getApi().gotoDate(self.config.termDates.current.start);
-
-                    self.redrawWeekNumbers();
-                    self.cleanupMonthHeaderInlineStyles();
+                let api = this.$refs.fullCalendar.getApi();
+                if (this.currentViewIsSemester()) {
+                    // Figure out if today is in a term before going to it
+                    let termIndex = this.findTermIndex(this.convertDateToDateString(new Date()));
+                    if (this.allTerms[termIndex]) {
+                        api.today();
+                        this.redrawWeekNumbers();
+                        this.cleanupMonthHeaderInlineStyles();
+                    }
                 } else {
-                    self.$refs.fullCalendar.getApi().gotoDate(self.toMoment().format('YYYY-MM-DD'));
+                    api.today();
                 }
             },
 
@@ -577,13 +571,7 @@
              */
             determineVisibleRange(currentDate) {
                 // Find the range in the list of terms.
-                // (Need to go to these lengths to create a date, as calendar
-                //  and thus moment isn't initialized yet.
-                //  Need to feed the date in as UTC because toISOString outputs
-                //  date in UTC)
-                let actualDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())),
-                    dateString = actualDate.toISOString().slice(0, 10);
-
+                let dateString = this.convertDateToDateString(currentDate);
                 return this.allTerms[this.findTermIndex(dateString)] || null;
             },
 
@@ -594,6 +582,7 @@
              * @return {Array}
              */
             buildAllTermsList() {
+                let self = this;
                 return this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future)
                     .sort(function (a, b) {
                         if (a.start < b.start) {
@@ -609,8 +598,34 @@
                             return 1;
                         }
                         return 0;
+                    })
+                    .map(function (term) {
+                        let end = new Date(term.end);
+                        end.setDate(end.getDate() + 1);
+                        term.end = self.convertDateToDateString(end);
+                        return term;
                     });
             },
+
+
+            /**
+             * Convert a Date object to a `YYYY-MM-DD` format string without
+             * MomentJS.
+             *
+             * Required because in this component's  `create` method, the
+             * calendar and thus MomentJS won't yet be initialized.
+             *
+             * @param {Date} date
+             *
+             * @return {string}
+             */
+            convertDateToDateString(date) {
+                // Need to feed the date in as UTC because toISOString outputs
+                // date in UTC.
+                let actualDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+                return actualDate.toISOString().slice(0, 10);
+            },
+
 
             /**
              * Find the index of the term within `this.termDates` which contains
@@ -627,8 +642,7 @@
                         continue;
                     }
                     let term = this.allTerms[i];
-                    // TODO end times are exclusive: account for that
-                    if (dateString >= term.start && dateString <= term.end) {
+                    if (dateString >= term.start && dateString < term.end) {
                         return Number(i);
                     }
                 }
