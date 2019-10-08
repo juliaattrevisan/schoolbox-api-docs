@@ -1,58 +1,46 @@
 <?php
 /**
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Event\EventType;
 
 use InvalidArgumentException;
-use Schoolbox\Collection;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\AssessmentType;
 
 
 /**
- * Available options:
- * □ Project
- * □ Quiz
- * □ DueWork
- * □ Task
- *
- * Defaults to full set, but run-time options will enable controller to exclude individual items
- *
+ * Definition for the event type filter.
  */
 class Definition extends Filter\AbstractDefinition
 {
-
     // The name to expose in the UI
-    protected const NAME = 'Activity Type';
+    protected const NAME = 'Event Type';
 
-    public const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
-    public const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
-    public const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
-    public const KEY_TASK = AssessmentType::TYPE_TASK;
-
-    /** @var Collection|string[] */
-    private $assessmentTypes;
+    /**
+     * @var GenericCollection|EventType[]
+     */
+    private $eventTypes;
 
 
     /**
      * @param Filter\Model                       $filter
      * @param Filter\Page\Option\Mapper          $filterOptionMapper
      * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
-     * @param Collection                         $assessmentTypes
+     * @param GenericCollection                  $eventTypes
      */
     public function __construct(
         Filter\Model $filter,
         Filter\Page\Option\Mapper $filterOptionMapper,
         Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
-        Collection $assessmentTypes
+        GenericCollection $eventTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->assessmentTypes = $assessmentTypes->shallowClone();
+        $this->eventTypes = $eventTypes->shallowClone();
     }
 
 
@@ -62,11 +50,6 @@ class Definition extends Filter\AbstractDefinition
     public static function getPages(): array
     {
         return [
-            Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
-            Filter\Page\Model::PAGE_GRADES,
-            Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
-            Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
-            Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
             Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
         ];
     }
@@ -77,44 +60,41 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        if (self::KEY_PROJECT === $key) {
-            return 'Project';
+        $eventType = $this->eventTypes[$key] ?? null;
+        if ($eventType) {
+            return $eventType->getType();
         }
-        if (self::KEY_QUIZ === $key) {
-            return 'Quiz';
-        }
-        if (self::KEY_DUE_WORK === $key) {
-            return 'Due Work';
-        }
-        if (self::KEY_TASK) {
-            return 'Task';
-        }
-        throw new InvalidArgumentException("Unknown AssessmentType key: $key");
+        throw new InvalidArgumentException("Unknown EventType key: $key");
     }
 
+
     /**
-     * @inheritdoc
+     * This filter has no custom keys.
+     *
+     * @return array
      */
     protected function getCustomKeys(): array
     {
-        return $this->assessmentTypes->getAll();
+        return [];
     }
 
 
     /**
-     * @inheritdoc
+     * This filter's abstract keys are the set of all event types.
+     *
+     * @return string[]
      */
-    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter): GenericCollection
+    public function getAbstractKeys(): array
     {
-        $cleanPageOptions = parent::unsetInvalidOptions($pageFilter);
-
-        foreach ($cleanPageOptions as $idx => $option) {
-            // Do not permit 'projects' on the 'pendingAssessments' page
-            if (self::KEY_PROJECT === $option->getKey() && Filter\Page\Model::PAGE_PENDING_ASSESSMENTS === $pageFilter->getPage()) {
-                $cleanPageOptions->offsetUnset($idx);
-            }
-        }
-        return $cleanPageOptions;
+        return array_merge(
+            $this->getCustomKeys(),
+            array_map(
+                static function (int $workTypeId) {
+                    return (string)$workTypeId;
+                },
+                $this->eventTypes->keys()
+            )
+        );
     }
 
     /**
@@ -122,6 +102,6 @@ class Definition extends Filter\AbstractDefinition
      */
     protected static function getTemplatesDir(): string
     {
-        return '@filterDefinitions/Assessment/AssessmentType/templates';
+        return '@filterDefinitions/Event/EventType/templates';
     }
 }
