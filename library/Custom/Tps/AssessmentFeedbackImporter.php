@@ -23,7 +23,7 @@ use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Factory;
 
 /**
- * A CLI App for batch printing PDFs to an archive
+ * A CLI App for batch saving feedback for assessments
  */
 class AssessmentFeedbackImporter extends CliTool\App
 {
