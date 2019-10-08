@@ -77,7 +77,7 @@ class DataRestorer
             $columnsSqlArray = [];
             $type            = null;
             foreach ($columns as $column) {
-                $type              = $this->getColumnMySqlDataType($column['type'], $column['length']);
+                $type              = $this->getColumnMySqlDataType($column['type'], $column['length'] ?? null);
                 $comment           = str_replace('"', '\"', $column['description'] ?? '');
                 $columnsSqlArray[] = "`{$column['name']}` $type COMMENT \"{$comment}\"";
             }
@@ -189,11 +189,11 @@ class DataRestorer
     /**
      * Convert a logical data type to a concrete MySQL data type
      *
-     * @param string $columnType
-     * @param        $columnLength    // TODO what data type is this?
+     * @param string      $columnType
+     * @param null|int $columnLength
      * @return string
      */
-    private function getColumnMySqlDataType(string $columnType, $columnLength): string
+    private function getColumnMySqlDataType(string $columnType, ?int $columnLength): string
     {
         switch ($columnType) {
             case 'bigint':
@@ -232,7 +232,7 @@ class DataRestorer
                 break;
             case 'varchar':
                 // There found a case where storing 330 chars when length is 256. Doubling it for now.
-                $length = (int)$columnLength * 2;
+                $length    = $columnLength * 2;
                 $mySqlType = "VARCHAR({$length})";
                 break;
             default:
@@ -314,7 +314,7 @@ class DataRestorer
         if (strlen($indexName) > 64) {
             $indexName = 'idx_' . md5($tableName) . '_' . substr(md5($columnName), 0, 27); // 4 + 32 + 1 + 27 = 64
         }
-        $this->log->debug("    Creating index '$indexName' ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
+        $this->log->debug("Creating index '$indexName' ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
         $this->executeIfPersisting("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
     }
 
