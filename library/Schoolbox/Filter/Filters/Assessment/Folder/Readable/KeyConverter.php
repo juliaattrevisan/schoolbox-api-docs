@@ -86,8 +86,12 @@ class KeyConverter extends BaseKeyConverter
                 Definition::KEY_OTHER_GROUPS,
             ];
             foreach ($availableOptions as $availableOption) {
+                // Account for if no page option at all exists:
+                // assume that it is available in this case.
+                // (This happens if the settings for this filter have never been
+                //  changed, because no options at all exist for this filter.)
                 $pageOption = $pageModel->getOptions()[$availableOption] ?? null;
-                if ($pageOption && $pageOption->getAvailable()) {
+                if (!$pageOption || $pageOption->getAvailable()) {
                     switch ($availableOption) {
                         case Definition::KEY_MY_CLASSES:
                             $selectedItems = $selectedItems->mergeUnique(new Collection($userClasses));
