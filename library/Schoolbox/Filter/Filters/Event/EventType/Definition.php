@@ -9,9 +9,8 @@ namespace Schoolbox\Filter\Filters\Event\EventType;
 
 use InvalidArgumentException;
 use Schoolbox\Calendar\EventType;
+use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\GenericCollection;
-
 
 /**
  * Definition for the event type filter.
@@ -22,7 +21,7 @@ class Definition extends Filter\AbstractDefinition
     protected const NAME = 'Event Type';
 
     /**
-     * @var GenericCollection|EventType[]
+     * @var Collection|EventType[]
      */
     private $eventTypes;
 
@@ -31,13 +30,13 @@ class Definition extends Filter\AbstractDefinition
      * @param Filter\Model                       $filter
      * @param Filter\Page\Option\Mapper          $filterOptionMapper
      * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
-     * @param GenericCollection                  $eventTypes
+     * @param Collection|EventType[]             $eventTypes
      */
     public function __construct(
         Filter\Model $filter,
         Filter\Page\Option\Mapper $filterOptionMapper,
         Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
-        GenericCollection $eventTypes
+        Collection $eventTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->eventTypes = $eventTypes->shallowClone();

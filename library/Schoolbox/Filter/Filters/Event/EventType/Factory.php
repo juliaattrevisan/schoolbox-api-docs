@@ -1,20 +1,48 @@
 <?php
 /**
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Event\EventType;
 
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Page;
+use Schoolbox\Filter\Selection;
 
 /**
- * A factory for building 'AssessmentType' filter objects
+ * A factory for building event type filter objects.
  */
 class Factory extends Filter\AbstractFactory
 {
+    /**
+     * @var EventTypeMapper
+     */
+    private $eventTypeMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param Page\Option\Mapper          $optionMapper
+     * @param Page\Option\Defaults\Mapper $defaultMapper
+     * @param Selection\Mapper            $selectionMapper
+     * @param EventTypeMapper             $eventTypeMapper
+     */
+    public function __construct(
+        Page\Option\Mapper $optionMapper,
+        Page\Option\Defaults\Mapper $defaultMapper,
+        Selection\Mapper $selectionMapper,
+        EventTypeMapper $eventTypeMapper
+    ) {
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
+        $this->eventTypeMapper = $eventTypeMapper;
+    }
+
 
     /**
      * @inheritdoc
@@ -27,7 +55,7 @@ class Factory extends Filter\AbstractFactory
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
-            $this->getAssessmentTypes()
+            $this->getEventTypes()
         );
     }
 
@@ -39,20 +67,15 @@ class Factory extends Filter\AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, $this->getAssessmentTypes());
+        return new KeyConverter($filter, $this->getEventTypes()->getPropertyValues('id'));
     }
 
 
     /**
-     * @return Collection|string[]
+     * @return Collection|EventType[]
      */
-    private function getAssessmentTypes()
+    private function getEventTypes()
     {
-        return new Collection([
-            Definition::KEY_PROJECT,
-            Definition::KEY_QUIZ,
-            Definition::KEY_DUE_WORK,
-            Definition::KEY_TASK,
-        ]);
+        return $this->eventTypeMapper->findAll();
     }
 }
