@@ -151,6 +151,9 @@
 
                         // Assign event grouping and resourceIds into every event
                         response.data = response.data.map(function(element) {
+                            // Consider not allowing events to be editable on this calendar?
+                            // element.editable = false;
+                            // element.data.meta.editable = false;
                             // What is the resource ID?
                             // It depends on whether the event has a folder.
                             element.resourceId = self.buildResourceIdFromEvent(element);
