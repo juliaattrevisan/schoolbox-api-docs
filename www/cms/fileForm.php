@@ -239,7 +239,7 @@ elseif (is_numeric($_GET['delete'])) {
     } elseif ($_GET[Redirect::RETURN_URL] == '') {
         $page->backToTheFuture(1);
     } else {
-        SitePage::localRedir($_GET[Redirect::RETURN_URL]);
+        SitePage::localRedir(Redirect::decode($_GET[Redirect::RETURN_URL]));
     }
 } /* Delete a list of files */
 elseif (is_numeric($_GET['deleteList'])) {

@@ -85,7 +85,7 @@ These are its args, which is given for you
             <li><a class="icon-document" data-action="open" {% if type == 'sbfs' %} data-plugin="preview" {%  endif %} href="{{ send ~ file.id }}" target="_blank">Open</a></li>
             <li><a class="icon-download" data-action="download" href="{{ send ~ file.id }}&save=1">Download</a></li>
             {% if access >= 2 %}
-                <li><a class="icon-modify"   data-action="modify"   href="{{ modify ~ file.id }}&returnUrl=/resources/">Modify</a></li>
+                <li><a class="icon-modify"   data-action="modify"   href="{{ modify ~ file.id }}{{RETURN_URL}}">Modify</a></li>
                 <li><a class="icon-delete"   data-action="delete"   href="{{ delete ~ file.id }}">Delete</a></li>
             {% endif %}
 

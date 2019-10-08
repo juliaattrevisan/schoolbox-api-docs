@@ -13,6 +13,7 @@ use Alaress\Web\Output\ThemedHtml;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\IFile as FileInterface;
@@ -24,6 +25,8 @@ use Schoolbox\UserMapper;
 
 abstract class AbstractController extends BaseController
 {
+    // return url
+    private const RETURN_URL = '/resources';
 
     /** @var AbstractTreeBuilder */
     protected $treeBuilder;
@@ -370,7 +373,8 @@ abstract class AbstractController extends BaseController
             'tree'   => $this->getBreadcrumbs($file->getFolder()),
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
             'access' => $this->getAccess($folderId),
-            'namespace' => $this->namespace
+            'namespace' => $this->namespace,
+            'RETURN_URL'=> '?' . Redirect::RETURN_URL . '=' . Redirect::encode(self::RETURN_URL),
         ];
 
         $this->getResponse()->content->set([
