@@ -22,5 +22,6 @@ class Calendar extends ModuleLoader
     public function configure($kernel): void
     {
         $this->loadModule($kernel, Module::class, "/calendar");
+        $this->loadModule($kernel, \Schoolbox\Calendar\Event\Module::class, "/calendar/event");
     }
 }
