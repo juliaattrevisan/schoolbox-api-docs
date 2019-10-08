@@ -12,7 +12,13 @@
     import {stringify}        from 'qs';
     import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 
+    // Various URLs this calendar can make use of
     const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    const URL_EVENT_UPDATE = '/calendar/ajax/update';
+    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+    const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
+    const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
+    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -63,6 +69,15 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
+            urls() {
+                return {
+                    modifyForm: URL_EVENT_MODIFY_FORM,
+                    modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
+                    update: URL_EVENT_UPDATE,
+                    attendanceList: URL_ATTENDANCE_LIST,
+                    attendanceToggle: URL_ATTENDANCE_TOGGLE,
+                };
+            },
             formats() {
                 return {
                     formDate: FORMAT_FORM_DATE,
@@ -726,7 +741,17 @@
                     }
                 }
                 return -1;
-            }
+            },
+
+            /**
+             * Callback for reloading the calendar's events. May be used when
+             * a series of events is deleted, as the calendar no longer knows
+             * whether an event should be rendered even if it wasn't deleted.
+             * @see https://fullcalendar.io/docs/Calendar-refetchEvents
+             */
+            reloadEvents() {
+                this.$refs.fullCalendar.getApi().refetchEvents();
+            },
         }
     }
 </script>
@@ -736,9 +761,16 @@
         <view-event-modal ref="event"
                           :event="currentEvent"
                           :to-moment="toMoment"
+                          :event-modify-form-url="urls.modifyForm"
+                          :event-modify-form-action-url="urls.modifyFormAction"
+                          :event-update-url="urls.update"
+                          :attendance-list-url="urls.attendanceList"
+                          :attendance-toggle-url="urls.attendanceToggle"
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
                           :format-display-datetime="formats.displayDatetime"
+                          @eventModified="reloadEvents"
+                          @eventDeleted="reloadEvents"
         />
 
         <full-calendar
