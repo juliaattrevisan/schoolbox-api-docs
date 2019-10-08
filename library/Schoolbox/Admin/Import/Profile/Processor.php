@@ -519,7 +519,7 @@ class Processor
          */
         $orphans = $this->removeOrphanedProfiles();
 
-        $this->log("Removed {$orphans} orphaned profiles", self::LOG_OK);
+        $this->log("Removed {$orphans} orphaned profiles and their associated relations", self::LOG_OK);
     }
 
 
@@ -535,7 +535,8 @@ class Processor
             $this->baseProfileMapper,
             $this->studentProfileMapper,
             $this->parentProfileMapper,
-            $this->staffProfileMapper
+            $this->staffProfileMapper,
+            $this->relationMapper
         ))->remove();
     }
 

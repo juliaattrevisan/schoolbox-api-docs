@@ -47,8 +47,6 @@
 
                         </div>
                         <div class="small-12 medium-6 columns">
-
-
                             <form method="post" action="/adminv2/import/profile/upload">
                                 <input type="hidden" name="file" value="staff" />
                                 {% include 'sub/attachzone.twig' with {attachzone: attachzone.staff} %}
@@ -131,7 +129,7 @@
                         </div>
                         <div class="small-12 medium-6 columns">
                             <form method="post" action="/adminv2/import/profile/upload">
-                                <input type="hidden" name="file" value="student" />
+                                <input type="hidden" name="file" value="parent" />
                                 {% include 'sub/attachzone.twig' with {attachzone: attachzone.parent} %}
 
                                 <ul class="flex-list buttons">
@@ -170,7 +168,7 @@
                         </div>
                         <div class="small-12 medium-6 columns">
                             <form method="post" action="/adminv2/import/profile/upload">
-                                <input type="hidden" name="file" value="student" />
+                                <input type="hidden" name="file" value="relation" />
                                 {% include 'sub/attachzone.twig' with {attachzone: attachzone.relation} %}
 
                                 <ul class="flex-list buttons">
