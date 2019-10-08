@@ -113,7 +113,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws DomainException                       If attempting to fetch the entity from an abstract factoryFactory
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    public function buildCurrentState($page, $enabledOnly)
+    public function buildCurrentState($page, $enabledOnly): GenericCollection
     {
         /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
         $savedPageFilters = $this->getPageMapper()->findForPage($page)->indexByCallback(function (Page\Model $pageFilter) {
@@ -245,7 +245,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws InvalidColumnException                If unable to parse a PB's column
      * @throws \UnderflowException                   If we generate an empty PB IN query
      */
-    private function findUserSelections(Collection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page)
+    private function findUserSelections(Collection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page): Collection
     {
         /** @var int[] $visibleFilterIds */
         $visibleFilterIds = $visiblePageFilters->map(function (Page\Model $pageFilter) {
@@ -292,7 +292,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      * @throws DomainException If attempting to fetch the entity for an abstract factory factory
      */
-    private function buildPageFilters($page, $enabledOnly, $userConfigurableOnly)
+    private function buildPageFilters($page, $enabledOnly, $userConfigurableOnly): GenericCollection
     {
         // What pageFilters could appear on this page ?
         /** @var GenericCollection|Model[] $availableFilters */
@@ -349,7 +349,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return GenericCollection|IDefinition[]
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    private function createDefinitionCollection(array $contents = [])
+    private function createDefinitionCollection(array $contents = []): GenericCollection
     {
         return new GenericCollection(IDefinition::class, $contents);
     }
@@ -360,7 +360,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return GenericCollection|IKeyConverter[]
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    private function createKeyConverterCollection(array $contents = [])
+    private function createKeyConverterCollection(array $contents = []): GenericCollection
     {
         return new GenericCollection(IKeyConverter::class, $contents);
     }
@@ -371,7 +371,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return GenericCollection|IComponent[]
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    private function createComponentCollection(array $contents = [])
+    private function createComponentCollection(array $contents = []): GenericCollection
     {
         return new GenericCollection(IComponent::class, $contents);
     }

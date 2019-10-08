@@ -45,12 +45,12 @@ class CompositeFactoryFactory implements IFactoryFactory
         // TODO: Implement buildFilterFactoryForFilter() method.
     }
 
-    public function buildCodec()
+    public function buildCodec(): Codec
     {
         // TODO: Implement buildCodec() method.
     }
 
-    public function buildEnabledKeyConverters($page)
+    public function buildEnabledKeyConverters($page): GenericCollection
     {
         // TODO: Implement buildEnabledKeyConverters() method.
     }
@@ -60,7 +60,7 @@ class CompositeFactoryFactory implements IFactoryFactory
         // TODO: Implement convertSelectionsToFilters() method.
     }
 
-    public function buildCurrentState($page, $enabledOnly)
+    public function buildCurrentState($page, $enabledOnly): GenericCollection
     {
         // TODO: Implement buildCurrentState() method.
     }

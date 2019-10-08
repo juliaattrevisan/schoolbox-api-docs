@@ -44,7 +44,7 @@ interface IFactoryFactory
     /**
      * @return Codec
      */
-    public function buildCodec();
+    public function buildCodec(): Codec;
 
     /**
      * Build a set of key converters for filters configured as enabled for the specified page
@@ -54,7 +54,7 @@ interface IFactoryFactory
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      */
-    public function buildEnabledKeyConverters($page);
+    public function buildEnabledKeyConverters($page): GenericCollection;
 
 
     /**
@@ -77,7 +77,7 @@ interface IFactoryFactory
      * @param bool   $enabledOnly
      * @return GenericCollection|IDefinition[]  Indexed by filter.class
      */
-    public function buildCurrentState($page, $enabledOnly);
+    public function buildCurrentState($page, $enabledOnly): GenericCollection;
 
 
     /**
