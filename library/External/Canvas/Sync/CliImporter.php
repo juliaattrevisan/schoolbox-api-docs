@@ -35,6 +35,8 @@ use Schoolbox\UserMapper;
 use UnderflowException;
 use UnexpectedValueException;
 use function json_decode;
+use function memory_get_peak_usage;
+use function microtime;
 
 /**
  * Command line application for syncing canvas-data
@@ -113,6 +115,7 @@ class CliImporter extends CliTool\App
         $this->fetchCanvasDataFilesFromApi($canvasApi, $tempDir, $schemaFile);
         $this->loadCanvasDataFilesToStagingDatabase($canvasDb, $tempDir, $schemaFile);
         $this->syncStagingDataWithSchoolbox($canvasDb);
+        $this->logStats();
     }
 
 
@@ -426,5 +429,20 @@ OPTIONS:";
 ";
         }
         \fwrite(STDOUT, $help);
+    }
+
+
+    /**
+     * Log some stats about the script execution
+     */
+    private function logStats(): void
+    {
+        $start = $_SERVER['REQUEST_TIME_FLOAT'] ?? $_SERVER['REQUEST_TIME'] ?? null;
+        if ($start === null) {
+            $this->getLogger()->warning('Unable to determine script start time');
+        } else {
+            $this->getLogger()->info("Script duration (s): " . (microtime(true) - $start));
+        }
+        $this->getLogger()->info("Script mem usage (B): " . memory_get_peak_usage(true));
     }
 }
