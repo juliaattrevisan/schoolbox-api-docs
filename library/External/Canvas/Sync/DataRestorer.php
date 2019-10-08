@@ -66,6 +66,7 @@ class DataRestorer
 
         $errors = false;
 
+        $this->log->info("Re-creating DB schema...");
         foreach ($schema as $tableIndex => $tableData) {
             $columns = $tableData['columns'];
             $tableName = $tableData['tableName'];
@@ -146,6 +147,7 @@ class DataRestorer
 
             $columnSql = implode(",\n", $columnsSqlArray);
             $createSql = "CREATE TABLE IF NOT EXISTS `{$this->canvasDbName}`.`{$tableName}` (\n$columnSql\n) COMMENT \"{$description}\";";
+            $this->log->debug("Creating table `{$this->canvasDbName}`.`{$tableName}`");
 
             try {
                 $this->executeIfPersisting($createSql);
@@ -229,8 +231,11 @@ class DataRestorer
             'SELECT table_name FROM information_schema.tables WHERE table_schema = :db_name',
             ['db_name' => $this->canvasDbName]
         )->fetchAll(PDO::FETCH_COLUMN);
-        foreach ($tables as $table) {
-            $this->log->debug("Dropping table $table");
+        $countTables = count($tables);
+        $this->log->debug(sprintf("%d tables found", $countTables));
+        foreach ($tables as $idx => $table) {
+            $idx++;
+            $this->log->debug("Dropping table $idx/$countTables '$table'");
             $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->quoteIdentifier($table)}");
         }
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 1');
@@ -251,6 +256,7 @@ class DataRestorer
         if (strlen($indexName) > 64) {
             $indexName = 'idx_' . md5($tableName) . '_' . substr(md5($columnName), 0, 27); // 4 + 32 + 1 + 27 = 64
         }
+        $this->log->debug("    Creating index '$indexName' ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
         $this->executeIfPersisting("CREATE INDEX {$indexName} ON `{$this->canvasDbName}`.`{$tableName}`(`{$columnName}`)");
     }
 
