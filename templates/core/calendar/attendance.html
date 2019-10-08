@@ -1,7 +1,12 @@
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Attendance for {EVENT_NAME}</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Attendance for {EVENT_NAME}</h1>
+        </div>
     </div>
+    <nav>
+        <a class="icon-export" title="Export To CSV" href="/calendar/attendance/exportPending/{EVENT_ID}"></a>
+    </nav>
 </div>
 
 <!-- BEGIN no_attendees -->
@@ -17,19 +22,13 @@
 
 <!-- BEGIN pending_attendee_list -->
 <div class="row">
-    <div class="small-12 island">
-        <form action="/calendar/attendance/processModifyAttendanceList" method="post" class="top">
-            <input type="hidden" name="event[id]" value="{EVENT_ID}">
-
-            <div class="actions-small-1 row">
-                <div class="list-item">
-                    <div class="small-12 columns">
-                        <h2 class="subheader">Pending Attendees</h2>
-                    </div>
+    <form action="/calendar/attendance/processModifyAttendanceList" method="post" class="top">
+    <input type="hidden" name="event[id]" value="{EVENT_ID}">
+        <div class="small-12 island">
+            <div class="row">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Pending Attendees</h2>
                 </div>
-                <nav>
-                    <a class="icon-export" title="Export To CSV" href="/calendar/attendance/exportPending/{EVENT_ID}"></a>
-                </nav>
             </div>
 
             <div class="row">
@@ -40,7 +39,7 @@
                                 <th></th>
                                 <th>Name</th>
                                 <th>Role</th>
-                                <th>Remove</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,8 +55,10 @@
                                 <td>
                                     {USER_ROLE}
                                 </td>
-                                <td>
-                                    <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
+                                <td class="actions-small-1">
+                                    <nav>
+                                        <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
+                                    <nav>
                                 </td>
                             </tr>
                             <!-- END pending_attendee -->
@@ -65,16 +66,14 @@
                     </table>
                 </div>
             </div>
-            <div class="row collapse">
-                <div class="small-6 columns">
-                    <input type="submit" name="approve" value="Approve Selected">
-                </div>
-                <div class="small-6 columns">
-                    <input type="submit" name="reject" value="Reject Selected">
-                </div>
-            </div>
-        </form>
-    </div>
+        </div>
+        <div class="small-12 medium-6 columns right">
+            <ul class="flex-list">
+                <li><input type="submit" name="approve" value="Approve Selected"></li>
+                <li><input type="submit" name="reject" value="Reject Selected"></li>
+            </ul>
+        </div>
+    </form>
 </div>
 <!-- END pending_attendee_list -->
 
@@ -101,7 +100,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Role</th>
-                            <th>Remove</th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -113,8 +112,10 @@
                             <td>
                                 {USER_ROLE}
                             </td>
-                            <td>
-                                <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
+                            <td class="actions-small-1">
+                                <nav>
+                                    <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
+                                </nav>
                             </td>
                         </tr>
                         <!-- END approved_attendee -->
@@ -148,7 +149,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Role</th>
-                            <th>Remove</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,8 +161,10 @@
                             <td>
                                 {USER_ROLE}
                             </td>
-                            <td>
-                                <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
+                            <td class="actions-small-1">
+                                <nav>
+                                    <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
+                                </nav>
                             </td>
                         </tr>
                         <!-- END rejected_attendee -->

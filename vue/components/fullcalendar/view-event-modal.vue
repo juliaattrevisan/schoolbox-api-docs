@@ -587,7 +587,7 @@
                                 </span>
                                 <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
                                     <a class="button"
-                                       :href="attendanceListUrl + String(eventExtendedProps.eventId)">Attendees</a>
+                                       :href="attendanceListUrl + String(eventExtendedProps.eventId)">View Attendees</a>
                                 </span>
                                 <span v-if="eventExtendedProps.attendance.actions.toggle.isAvailable">
                                     <a class="button"

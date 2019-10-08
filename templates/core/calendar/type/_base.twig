@@ -23,7 +23,9 @@
     <div id="modal{{ event.getEventId() }}{{ augmentedId }}" class="reveal-modal" data-reveal>
         {% block eventBubble %}
             {% block eventBubbleSummary %}
-                <h3><a href="{{ routeLookup('calendarEvent.getEvent', {eventId: event.eventId}) }}">{{ event.title }}</a></h3>
+            <h2>
+                <a href="{{ routeLookup('calendarEvent.getEvent', {eventId: event.eventId}) }}" title="Go to event page">{{ event.title }}</a>
+            </h2>
 
             <ul class="meta">
                 <li class="icon-calendar" title="Date"><time>{{ event.getFullDate() | raw }}</time></li>
@@ -57,30 +59,32 @@
             {% endblock eventBubbleSummary %}
 
             {% block eventBubbleButtons %}
-            <div>
+            <div class="component-action">
+                <section>
                 {% if event.attendance %}
                     <form method="post" data-rsvp-form>
                         <input name="eventId" type="hidden" value="{{ event.eventId }}">
                         {% if renderer.attendanceStatus() %}
-                        <a class="button icon-undo" data-attendance-request href="#">Unattend</a>
+                        <a class="button" data-attendance-request href="#">Unattend</a>
                         {% else %}
-                        <a class="button icon-reply" data-attendance-request href="#">RSVP</a>
+                        <a class="button" data-attendance-request href="#">RSVP</a>
                         {% endif %}
                     </form>
 
                     {%if event.isEditable %}
-                    <a class="button icon-group" href="/calendar/attendance/list/{{ event.eventId }}">Attendees</a>
+                    <a class="button" href="/calendar/attendance/list/{{ event.eventId }}">View Attendees</a>
                     {% endif %}
                 {% endif %}
                 {% if event.isEditable %}
                     {% block modifyLink %}
-                    <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
+                    <a class="button" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
                     {% endblock %}
                     {% block deleteButton %}
-                    <a class="button icon-delete" {{ event.seriesId() ? 'data-delete-series' : 'data-delete-single' }} id="delete-event-{{ event.eventId }}"
+                    <a class="button" {{ event.seriesId() ? 'data-delete-series' : 'data-delete-single' }} id="delete-event-{{ event.eventId }}"
                         data-event-id="{{ event.eventId }}" data-event-type="event">Delete</a>
                     {% endblock %}
                 {% endif %}
+                </section>
             </div>
             {% endblock eventBubbleButtons %}
         {% endblock eventBubble %}
