@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 
 /**
  * Definition for the event type filter.
@@ -88,13 +89,38 @@ class Definition extends Filter\AbstractDefinition
         return array_merge(
             $this->getCustomKeys(),
             array_map(
-                static function (int $workTypeId) {
-                    return (string)$workTypeId;
+                static function (EventType $eventType) {
+                    return (string)$eventType->getId();
                 },
-                $this->eventTypes->keys()
+                $this->eventTypes->getAll()
             )
         );
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function insertDynamicOptions(Filter\Page\Model $pageFilter): GenericCollection
+    {
+        $options = $pageFilter->getOptions();
+
+        // Ensure it contains all WorkTypes
+        foreach ($this->eventTypes as $eventType) {
+            $abstractKey = (string)$eventType->getId();
+            if (!$options->offsetExists($abstractKey)) {
+                $option = new Filter\Page\Option\Model();
+                $option
+                    ->setFilterPage($pageFilter)
+                    ->setKey($abstractKey)
+                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                    ->setDefaults(new GenericCollection(Filter\Page\Option\Defaults\Model::class));
+                $options->setOffset($option->getKey(), $option);
+            }
+        }
+        return $options;
+    }
+
 
     /**
      * @inheritdoc

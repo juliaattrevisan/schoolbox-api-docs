@@ -55,7 +55,7 @@ class Factory extends Filter\AbstractFactory
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
-            $this->eventTypeMapper->findAll()
+            $this->eventTypeMapper->findAll()->indexBy('id')
         );
     }
 
