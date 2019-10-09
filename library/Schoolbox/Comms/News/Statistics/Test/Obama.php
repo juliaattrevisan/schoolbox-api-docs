@@ -30,6 +30,7 @@ use Schoolbox\UserMapper;
     - Distribute over (24 hours * 7 days * 4 weeks) duration which is 1 month
     - Democraticness 0.35 (the smaller the number, the more left-leaning obamastats becomes)
     - 67% chance to open article
+    - 33% chance that it got saved for later
 
 
     (new \Schoolbox\Comms\News\Statistics\Test\Obama(
@@ -41,7 +42,7 @@ use Schoolbox\UserMapper;
         \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Cumulative\Mapper::getInstance()
-    ))->generate(1, 24*7*4*4, 0.35, 67);
+    ))->generate(1, 24*7*4*4, 0.35, 67, 33);
 
  *
  * @package Schoolbox\Comms\News\Statistics\Test
@@ -550,11 +551,11 @@ class Obama
      * 0.15 is very democratic
      * 1 is not
      *
-     * @param int $duration
-     * @param     $democraticness
+     * @param int   $duration
+     * @param float $democraticness
      * @return \Alaress_Date_Format
      */
-    private function generateStatisticDate(int $duration, $democraticness): \Alaress_Date_Format
+    private function generateStatisticDate(int $duration, float $democraticness): \Alaress_Date_Format
     {
         $val = $this->getWeightedRandom(1, $duration, $democraticness);
 
@@ -612,6 +613,47 @@ class Obama
 
 
     /**
+     * Arbitrarily save this for later for multiple users
+     * 33% chance of being saved for later, by default
+     *
+     * @param News\Model $model
+     * @param float      $savedForLaterLikelihood
+     * @return int
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createSavedForLater(News\Model $model, float $savedForLaterLikelihood = 33.0): int
+    {
+        /* At least half of your user population is involved
+         */
+        $minBias = 0.75;
+
+        $indexablePopulation = \count($this->users)-1;
+
+        $numUsers = \random_int((int)floor($indexablePopulation*$minBias), $indexablePopulation);
+
+        $numSaved = 0;
+
+        for ($i = 0; $i < $numUsers; $i++) {
+            if (rand(0, 100) < $savedForLaterLikelihood) {
+                $mapper = News\SaveForLater\Mapper::getInstance();
+
+                $savedForLater = $mapper->createModel()
+                                        ->setArticle($model)
+                                        ->setUser($this->getRandomUser());
+
+                $mapper->save($savedForLater);
+
+                $numSaved++;
+            }
+        }
+
+        return $numSaved;
+    }
+
+
+    /**
      * Spawn this many random articles
      * Use a prime number for pagination and demonstration purposes
      *
@@ -619,11 +661,12 @@ class Obama
      * @param int   $duration Number of hours for which to populate data
      * @param float $democraticness
      * @param int   $directOpenLikelihood
+     * @param int   $savedForLaterLikelihood
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function generate(int $numArticles, int $duration, float $democraticness, int $directOpenLikelihood): void
+    public function generate(int $numArticles, int $duration, float $democraticness, int $directOpenLikelihood, int $savedForLaterLikelihood): void
     {
         new \Alaress_Probe("Creating {$numArticles} articles using {$directOpenLikelihood}% Open rate over {$duration} hours");
 
@@ -648,6 +691,9 @@ class Obama
 
             $numComments = $this->createComments($model);
             new \Alaress_Probe(str_pad(' ', 4)."Commented {$numComments} random comments for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
+
+            $numSavedForLater = $this->createSavedForLater($model, $savedForLaterLikelihood);
+            new \Alaress_Probe(str_pad(' ', 4)."Saved {$numSavedForLater} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
         /* Statistical summary
