@@ -147,6 +147,8 @@ class Courses
         // Fetch all relevant courses and their assignments
         // If multiple courses with same code over multiple years, split into timeless courseSpec + per-time unitSpec
 
+        $courseFilterPb    = $this->courseBridge->courseFilterPredicate();
+        $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql       = "
         SELECT 
                account.canvas_id           'account.canvas_id',
@@ -168,14 +170,10 @@ class Courses
         JOIN enrollment_term_dim enrollment_term ON enrollment_term.id = course.enrollment_term_id
         JOIN account_dim account ON course.account_id = account.id
         LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state != 'deleted'
-        WHERE
-              -- TODO We could alternatively use `course.code LIKE '%NOT'` but there are ~27 rows where this is inconsistent with the `name` test.
-              -- TODO need to confirm with client the test by which we filter courses, either by `name`, `code`, both?
-              course.name LIKE '%notif%' AND
-              course.workflow_state != 'deleted'
+        WHERE $courseFilterWhere
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment.id DESC
         ";
-        $statement = $this->canvasDb->executeQuery($sql);
+        $statement = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
 
         // Parse results into hierarchical structure
         $accountsData = [];
@@ -237,14 +235,12 @@ class Courses
                 JOIN account_dim account ON course.account_id = account.id
                 JOIN enrollment_dim enrollment ON enrollment.course_id = course.id
                 JOIN pseudonym_dim pseudonym ON pseudonym.user_id = enrollment.user_id
-                WHERE
-                      course.name LIKE '%notif%' AND
-                      course.workflow_state = 'published' AND       -- We exclude 'unpublished' (aka draft), and 'deleted' assignments
+                WHERE $courseFilterWhere
                       enrollment.type = 'TeacherEnrollment' AND
                       pseudonym.sis_user_id IN ({$bindings->getPlaceholder()})
                 GROUP BY course.id
             ";
-            $statement = $this->canvasDb->executeQuery($sql, $bindings->getParams());
+            $statement = $this->canvasDb->executeQuery($sql, array_merge($bindings->getParams(), $courseFilterPb->getParams()));
             while ($row = $statement->fetch()) {
                 $accountCanvasId                                                                                               = (int)$row['account.canvas_id'];
                 $courseCode                                                                                                    = $row['course.code'];

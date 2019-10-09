@@ -13,6 +13,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
+use UnderflowException;
 use UnexpectedValueException;
 use function count;
 use function preg_match;
@@ -151,5 +152,25 @@ class Course
             ->setId((int)$row['us.id'])
             ->setFolder($folder);
         return $folder->setUnitSpecification($unitSpec);
+    }
+
+    /**
+     * Return a predicate that will filter the Canvas courses that should be synchronised
+     *
+     * @todo We could alternatively use `course.code LIKE '%NOT'` but there are ~27 rows where this is inconsistent with the `name` test.
+     *       Need to confirm with client the test by which we filter courses, either by `name`, `code`, both?
+     *
+     * @param string $courseTable
+     * @return Builder
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    public function courseFilterPredicate(string $courseTable = 'course'): Builder
+    {
+        return (new Builder($this->schoolboxDb, $courseTable))
+            ->all((new Builder($this->schoolboxDb, $courseTable))
+                ->like('name', '%notif%')
+                ->in('workflow_state', ['available', 'completed'])
+            );
     }
 }
