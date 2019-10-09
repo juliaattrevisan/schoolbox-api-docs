@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -47,7 +48,7 @@ class Controller extends Base
 
 
     /**
-     * @var AssessmentFilters\FactoryFactory
+     * @var IFactoryFactory
      */
     private $filterFactoryFactory;
 
@@ -73,19 +74,19 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param AssessmentDataSource             $assessmentDataSource
-     * @param Visibility                       $visibility
-     * @param AssessmentFilters\IdFinder       $assessmentIdFinder
-     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
-     * @param FilterSelection\Mapper           $filterSelectionMapper
+     * @param AssessmentDataSource       $assessmentDataSource
+     * @param Visibility                 $visibility
+     * @param AssessmentFilters\IdFinder $assessmentIdFinder
+     * @param IFactoryFactory            $filterFactoryFactory
+     * @param FilterSelection\Mapper     $filterSelectionMapper
      * @param CampusMapper                     $campusMapper
-     * @param Calendar_Api_Config_Record       $calendarConfig
+     * @param Calendar_Api_Config_Record $calendarConfig
      */
     public function __construct(
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         AssessmentFilters\IdFinder $assessmentIdFinder,
-        AssessmentFilters\FactoryFactory $filterFactoryFactory,
+        IFactoryFactory $filterFactoryFactory,
         FilterSelection\Mapper $filterSelectionMapper,
         CampusMapper $campusMapper,
         Calendar_Api_Config_Record $calendarConfig

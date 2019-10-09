@@ -70,14 +70,7 @@ class Module extends BaseModule
             'visibility'            => $injector->lazy(static function () {
                 return new Visibility(Access::getInstance());
             }),
-            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
-                /** @var RosettaStone $rosettaStone */
-                $rosettaStone = $injector->get('l10n');
-                return new FilterFactoryFactory(
-                    $this->getMapperFactory(),
-                    $rosettaStone
-                );
-            }),
+            'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
             'assessmentIdFinder'    => $injector->lazy(function () {
                 /** @var Filter\Mapper $filterMapper */
                 $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
