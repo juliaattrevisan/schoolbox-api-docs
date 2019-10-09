@@ -170,11 +170,11 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 /** @var Schoolbox\Resource\File\Model[] $fileList */
                 if (count($fileList)) {
+                    $folderId =$this->getContext()->getId();
                     foreach ($fileList as $file) {
                         if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                             continue;
                         }
-
                         $this->setVar([
                             'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
                             'FILE_ID'              => $file->getId(),
@@ -187,7 +187,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
                             'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                             'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
-                            'RETURN_URL'           => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
+                            'RETURN_URL'           => Redirect::RETURN_URL . '=' . Redirect::encode("/homepage/$folderId"),
                         ]);
 
                         if ($this->getConfig('compactMode')) {

@@ -25,8 +25,6 @@ use Schoolbox\UserMapper;
 
 abstract class AbstractController extends BaseController
 {
-    // return url
-    private const RETURN_URL = '/resources';
 
     /** @var AbstractTreeBuilder */
     protected $treeBuilder;
@@ -374,7 +372,7 @@ abstract class AbstractController extends BaseController
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
-            'RETURN_URL'=> '?' . Redirect::RETURN_URL . '=' . Redirect::encode(self::RETURN_URL),
+            'RETURN_URL'=> Redirect::RETURN_URL . '=' . Redirect::encode("/resources/$folderId"),
         ];
 
         $this->getResponse()->content->set([
