@@ -55,7 +55,7 @@ class Factory extends Filter\AbstractFactory
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
-            $this->getEventTypes()
+            $this->eventTypeMapper->findAll()
         );
     }
 
@@ -67,21 +67,6 @@ class Factory extends Filter\AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter(
-            $filter,
-            $this->getEventTypes()->map(
-                static function (EventType $eventType) {
-                    return (string)$eventType->getId();
-                }
-            ));
-    }
-
-
-    /**
-     * @return Collection|EventType[]
-     */
-    private function getEventTypes()
-    {
-        return $this->eventTypeMapper->findAll();
+        return new KeyConverter($filter, $this->eventTypeMapper->findAllIds());
     }
 }
