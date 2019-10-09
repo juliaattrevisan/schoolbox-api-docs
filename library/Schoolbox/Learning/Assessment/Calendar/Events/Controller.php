@@ -179,6 +179,7 @@ class Controller extends Base
             $this->getDi(),
             $user
         );
+        $calendar->getAllEvents()->filter(new EventFilters\Matcher($filters));
 
 
         // The API's renderAll returns a list of json-encoded events.
