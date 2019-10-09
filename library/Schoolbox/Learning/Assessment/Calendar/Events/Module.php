@@ -72,6 +72,7 @@ class Module extends BaseModule
             }),
             'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
             'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
+            'eventIdFinder'         => $injector->lazyGet('filters.eventIdFinder'),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
             'campusMapper'          => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'calendarConfig'        => $injector->lazy(function () {
