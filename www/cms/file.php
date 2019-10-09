@@ -54,7 +54,7 @@ if (is_numeric($this->arg[0])) {
         'DUE_DAY'          => '',
         'DUE_MONTH'        => '',
         'DUE_YEAR'         => '',
-        'RETURN_URL'       => $_GET[Redirect::RETURN_URL] ?? '',
+        'RETURN_URL'       => Redirect::RETURN_URL . '=' . ($_GET[Redirect::RETURN_URL] ?? ''),
     );
 
     $this->setVar($output);
