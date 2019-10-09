@@ -91,12 +91,12 @@ class Interactions
      * @param string               $roleType
      * @param int                  $roleId
      * @param null|string          $referrer
-     * @return bool|int[]
+     * @return Model
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveOpen(News\Model $article, \Alaress_Date_Format $date, int $userId, string $roleType, int $roleId, ?string $referrer)
+    public function saveOpen(News\Model $article, \Alaress_Date_Format $date, int $userId, string $roleType, int $roleId, ?string $referrer): Model
     {
         /* Only record Opens for publicly-accessible articles
          */
@@ -156,7 +156,9 @@ class Interactions
          */
         $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
 
-        return $this->statisticsMapper->save($model);
+        $this->statisticsMapper->save($model);
+
+        return $model;
     }
 
 
@@ -410,12 +412,11 @@ class Interactions
                 $historic[$date] = [
                     'date' => $date,
                     'numOpens' => 0,
-                    'numComments' => 0
+                    'numComments' => $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate())
                 ];
             }
 
             $historic[$date]['numOpens'] += $this->calculateNumOpens((new Collection())->add($dailyStatistic));
-            $historic[$date]['numOpens'] += $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate());
         }
 
         return array_values($historic);
@@ -443,6 +444,7 @@ class Interactions
 
     /**
      * Calculate number of comments for a given article
+     *
      * @param News\Model  $article
      * @param string|null $date
      * @return int

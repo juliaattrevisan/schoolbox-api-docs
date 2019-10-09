@@ -183,7 +183,8 @@ class Obama
                 'guest' => 0
             ],
         ],
-        'numOpens' => 0
+        'numOpens' => 0,
+        'numComments' => 0,
     ];
 
 
@@ -603,6 +604,7 @@ class Obama
      * @param int        $duration Distribute stats over this duration
      * @param float      $democraticness
      * @param int        $chanceToOpen
+     * @param int        $chanceToComment
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
@@ -611,14 +613,27 @@ class Obama
         News\Model $model,
         int $duration,
         float $democraticness,
-        int $chanceToOpen = 10
+        int $chanceToOpen,
+        int $chanceToComment
     ): void {
         $numUsers = $this->generateIndexablePopulation();
 
         new \Alaress_Probe(str_pad(' ',8)."{$numUsers} users were randomly selected for interaction generation");
 
-        $referrers = News\Statistics\Mapper::REFERRERS;
+        /* Create a thread
+         */
+        $threadMapper = Discussion\Thread\Mapper::getInstance();
 
+        $thread = $threadMapper->createModel()->setOpen(true);
+
+        $threadMapper->save($thread);
+
+        /* Associate thread
+         */
+        News\Mapper::getInstance()->save($model->setDiscussionThread($thread));
+
+        /* Statisfy everyone
+         */
         for ($i = 0; $i < $numUsers; $i++) {
 
             /** @var User $currentUser */
@@ -637,14 +652,34 @@ class Obama
 
                 /* Jitter this around
                  */
-                $r = $this->ico->saveOpen($model, $this->generateStatisticDate($duration, $democraticness), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
+                $date = $this->generateStatisticDate($duration, $democraticness);
+                $open = $this->ico->saveOpen($model, $date, $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
 
-                if ($r !== false) {
+                if ($open) {
                     $this->summary['role'][News\Statistics\Mapper::TYPE_OPEN][$currentUser->getRole()->getType()]++;
                     $this->summary['numOpens']++;
+
+                    /* Determine whether this open also resulted in a comment being spawned
+                     */
+                    if ($this->chance($chanceToComment)) {
+                        $commentMapper = Discussion\Comment\Mapper::getInstance();
+
+                        $comment = $commentMapper->createModel()
+                                                 ->setContent($this->getRandomBody())
+                                                 ->setAuthor($this->getRandomUser())
+                                                 ->setThread($thread)
+                                                 ->setCreatedAt($date)
+                                                 ->setUpdatedAt($date);
+
+                        $commentMapper->save($comment);
+
+                        $this->summary['numComments']++;
+
+                        new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} commented using {$chanceToComment}% chance to comment");
+                    }
                 }
 
-                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened using {$chanceToOpen}% and referrer {$randomReferrer}");
+                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened using {$chanceToOpen}% chance to open and referrer {$randomReferrer}");
             } else {
                 new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} didn't open the article");
             }
@@ -673,57 +708,6 @@ class Obama
         $newTime->addSeconds($difference);
 
         return $newTime;
-    }
-
-
-    /**
-     * Artificially reddit this article with an $articleNum incrementor that's used to
-     * create discussion_thread_ids because I didn't find a mapper/model anywhere obvious
-     *
-     * @param News\Model $model
-     * @param int        $chanceToComment
-     * @return int
-     * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     */
-    private function createComments(News\Model $model, int $chanceToComment): int
-    {
-        /* Create a thread
-         */
-        $threadMapper = Discussion\Thread\Mapper::getInstance();
-
-        $thread = $threadMapper->createModel()->setOpen(true);
-
-        $threadMapper->save($thread);
-
-        /* Associate thread
-         */
-        News\Mapper::getInstance()->save($model->setDiscussionThread($thread));
-
-        /* Make some commentary
-         */
-        $commentMapper = Discussion\Comment\Mapper::getInstance();
-
-        $numComments = 0;
-
-        $numUsers = $this->generateIndexablePopulation();
-
-        for ($i = 0; $i < $numUsers; $i++) {
-            if ($this->chance($chanceToComment)) {
-                $comment = $commentMapper->createModel()
-                                         ->setContent($this->getRandomBody())
-                                         ->setAuthor($this->getRandomUser())
-                                         ->setThread($thread)
-                                         ->setCreatedAt(\Alaress_Date_Format::now()->addDays($this->getWeightedRandom(1, 5, 1)));
-
-                $commentMapper->save($comment);
-
-                $numComments++;
-            }
-        }
-
-        return $numComments;
     }
 
 
@@ -810,11 +794,8 @@ class Obama
             $this->createAudience($model);
             new \Alaress_Probe(str_pad(' ',4)."Added audience for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $this->createStatistics($model, $duration, $democraticness, $chanceToOpen);
+            $this->createStatistics($model, $duration, $democraticness, $chanceToOpen, $chanceToComment);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
-
-            $numComments = $this->createComments($model, $chanceToComment);
-            new \Alaress_Probe(str_pad(' ', 4)."Commented {$numComments} random comments for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
             $numSavedForLater = $this->createSavedForLater($model, $chanceToSaveForLater);
             new \Alaress_Probe(str_pad(' ', 4)."Saved {$numSavedForLater} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
