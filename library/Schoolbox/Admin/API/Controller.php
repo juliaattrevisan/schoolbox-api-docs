@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,16 +16,27 @@ use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
 
-
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Admin\API
+ */
 class Controller extends Web\Controller\Base
 {
+    /**
+     * Profile CSVs
+     * Processor consts for declaring which file is being supplied
+     */
     private const REQUIRED_USER_PROFILE_CSVS = [
-        'student',
-        'parent',
-        'staff',
-        'relation',
+        Processor::CSV_STUDENT,
+        Processor::CSV_PARENT,
+        Processor::CSV_STAFF,
+        Processor::CSV_RELATION
     ];
 
+    /**
+     * Timetable and Enrolment CSVs
+     */
     private const REQUIRED_CSVS = [
         'timetable-structure'   => ImporterFactory::IMPORT_STRUCTURE,
         'timetable'             => ImporterFactory::IMPORT_TIMETABLE,
