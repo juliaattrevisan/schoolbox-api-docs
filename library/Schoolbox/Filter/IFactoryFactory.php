@@ -32,9 +32,9 @@ interface IFactoryFactory
 
 
     /**
-     * @return Codec
+     * @return ICodec
      */
-    public function buildCodec(): Codec;
+    public function buildCodec(): ICodec;
 
     /**
      * Build a set of key converters for filters configured as enabled for the specified page

@@ -39,10 +39,9 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @inheritdoc
-     * @throws \InvalidArgumentException If unable to locate the specified Mapper's class
+     * @return CompositeCodec
      */
-    public function buildCodec(): Codec
+    public function buildCodec(): ICodec
     {
         return new Codec($this->getFilterMapper(), $this->getSelectionMapper());
     }

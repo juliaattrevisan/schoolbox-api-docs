@@ -14,7 +14,11 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 /**
- * Class CompositeFactoryFactory
+ * Composite factory factory: can contain multiple factory factories.
+ * * `buildFilterFactoryForFilter` tries to use each factory factory to build
+ *   the requested class
+ * * other implemented methods aggregate the results from each factory factory
+ *   into a single result
  */
 class CompositeFactoryFactory implements IFactoryFactory
 {
@@ -60,12 +64,15 @@ class CompositeFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @return Codec
+     * @return CompositeCodec
      */
-    public function buildCodec(): Codec
+    public function buildCodec(): ICodec
     {
-        // Do I need a composite codec?
-        // TODO: Implement buildCodec() method.
+        $codecs = [];
+        foreach ($this->factoryFactories as $factoryFactory) {
+            $codecs[] = $factoryFactory->buildCodec();
+        }
+        return new CompositeCodec(...$codecs);
     }
 
 
