@@ -20,6 +20,10 @@ namespace Calendar\Event;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
 
+
+/**
+ * @deprecated Use a standard collection instead
+ */
 class Collection implements \Iterator, \Countable {
 
 	/**
@@ -182,7 +186,7 @@ class Collection implements \Iterator, \Countable {
 	 */
 	public function filter($callback) {
 		if (is_callable($callback)) {
-			$this->setStack(array_filter($this->getStack(), $callback));
+			$this->setStack(array_values(array_filter($this->getStack(), $callback)));
 		}
 	}
 
