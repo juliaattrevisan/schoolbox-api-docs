@@ -52,31 +52,102 @@ class Obama
     private const NUM_WORDS_PER_TITLE = 5;
     private const NUM_PARAGRAPHS_PER_BODY = 4;
 
-    /* Switch for changing between datasets
+    /**
+     * Switch for changing between datasets
+     *
+     * @var bool
      */
     private $legacy = true;
 
     /* Mappers
      */
+
+    /**
+     * @var IConnector
+     */
     private $databaseInternal;
+
+    /**
+     * @var UserMapper
+     */
     private $userMapper;
+
+    /**
+     * @var Storage\Mapper
+     */
     private $storageMapper;
+
+    /**
+     * @var News\Topic\Mapper
+     */
     private $topicMapper;
+
+    /**
+     * @var News\Mapper
+     */
     private $newsMapper;
+
+    /**
+     * @var News\Audience\Mapper
+     */
     private $audienceMapper;
+
+    /**
+     * @var News\Statistics\Mapper
+     */
     private $statisticsMapper;
+
+    /**
+     * @var News\Statistics\Cumulative\Mapper
+     */
     private $statisticsCumulativeMapper;
 
     /* Properties
      */
+
+    /**
+     * @var array
+     */
     private $users;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
     private $acceptedAt;
+
+    /**
+     * @var User
+     */
     private $acceptedBy;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
     private $submittedAt;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
     private $expiresAt;
+
+    /**
+     * @var array
+     */
     private $titleSource;
+
+    /**
+     * @var array
+     */
     private $titles;
+
+    /**
+     * @var array
+     */
     private $words;
+
+    /**
+     * @var Collection
+     */
     private $hashes;
 
     /**
@@ -89,7 +160,10 @@ class Obama
      */
     private $ico;
 
-    /* All the referrers that currently exist
+    /**
+     * All the referrers that currently exist
+     *
+     * @var array
      */
     private $referrers = [
         News\Statistics\Mapper::REFERRER_DASHBOARD,
@@ -99,7 +173,10 @@ class Obama
         News\Statistics\Mapper::REFERRER_EMAIL
     ];
 
-    /* Statistical summary
+    /**
+     * Statistical summary
+     *
+     * @var array
      */
     private $summary = [
         'role' => [
@@ -258,6 +335,19 @@ class Obama
 
 
     /**
+     * Pick a random element of $set
+     *
+     * @param array $set
+     * @return mixed
+     * @throws \Exception
+     */
+    private function random(array $set)
+    {
+        return $set[random_int(0, \count($set)-1)];
+    }
+
+
+    /**
      * Manufacture random user
      *
      * @return mixed
@@ -265,7 +355,7 @@ class Obama
      */
     private function getRandomUser()
     {
-        return $this->users[random_int(0, \count($this->users) - 1)];
+        return $this->random($this->users);
     }
 
 
@@ -280,7 +370,7 @@ class Obama
         $title = [];
 
         for ($k = 0; $k < self::NUM_WORDS_PER_TITLE; $k++) {
-            $title[] = $this->titles[random_int(0, \count($this->titles)-1)];
+            $title[] = $this->random($this->titles);
         }
 
         return implode(' ', $title);
@@ -298,7 +388,7 @@ class Obama
         $body = [];
 
         for ($k = 0; $k < self::NUM_PARAGRAPHS_PER_BODY; $k++) {
-            $body[] = "<p>{$this->words[random_int(0, \count($this->words)-1)]}</p>";
+            $body[] = "<p>{$this->random($this->words)}</p>";
         }
 
         return implode("\n", $body);
@@ -313,7 +403,7 @@ class Obama
      */
     private function getRandomBlurb(): string
     {
-        return "<p>{$this->words[random_int(0, \count($this->words)-1)]}</p>";
+        return "<p>{$this->random($this->words)}</p>";
     }
 
 
@@ -325,7 +415,7 @@ class Obama
      */
     private function getRandomImage(): ?Storage\Model
     {
-        return $this->hashes[random_int(0, \count($this->hashes) - 1)];
+        return $this->random($this->hashes->getAll());
     }
 
 
@@ -357,7 +447,7 @@ class Obama
      */
     private function getRandomTopic(): News\Topic\Model
     {
-        return $this->topics->getOffset(\random_int(0, $this->topics->count()-1));
+        return $this->random($this->topics->getAll());
     }
 
 
@@ -368,13 +458,13 @@ class Obama
      * @return string
      * @throws \Exception
      */
-    private function getRandomReferrer(bool $skewedStatistics): string
+    private function getRandomReferrer(bool $skewedStatistics = false): string
     {
         if ($skewedStatistics) {
             return $this->referrers[$this->getWeightedRandom(0, \count($this->referrers) - 1, 0.5)];
         }
 
-        return $this->referrers[\random_int(0, \count($this->referrers)-1)];
+        return $this->random($this->referrers);
     }
 
 
