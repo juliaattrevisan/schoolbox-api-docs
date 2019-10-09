@@ -243,8 +243,8 @@ class AssessmentFeedbackImporter extends CliTool\App
                 );
 
                 try {
-                    $feedbackRows = $dueWorkFeedbackFactory->produce();
-                    $this->feedbackDataSource->save($feedbackRows);
+                    $feedback = $dueWorkFeedbackFactory->produce();
+                    $this->feedbackDataSource->save($feedback);
                 } catch (MapperException $e) {
                     $this->getLogger()->warning('Failed to save feedback');
                     continue;
