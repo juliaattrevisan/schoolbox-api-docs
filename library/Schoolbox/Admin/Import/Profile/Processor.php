@@ -283,7 +283,7 @@ class Processor
 
             $n = $this->processOne(new Reader($this->file->readStream(), true));
 
-            $this->log("Processing {$this->file->getBasename()} complete", "{$n} rows");
+            $this->log("Processing {$this->file->getBasename()} containing {$n} rows complete", self::LOG_OK);
         } catch (\InvalidArgumentException $e) {
             $this->log($e->getMessage(), self::LOG_ERROR);
         }
