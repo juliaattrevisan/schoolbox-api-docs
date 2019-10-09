@@ -43,10 +43,6 @@ use Alaress\Database\Predicate\InvalidColumnException;
  */
 class Mapper extends BaseMapper
 {
-
-
-
-
     /**
      * @inheritdoc
      * @throws BaseMapper\Exception If unable to derive an ID for mapped joins
