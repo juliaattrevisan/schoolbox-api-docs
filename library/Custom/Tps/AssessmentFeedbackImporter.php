@@ -167,10 +167,10 @@ class AssessmentFeedbackImporter extends CliTool\App
 
         try {
             $assessment = $this->assessmentDataSource->findById($assessmentId);
-            $this->getLogger()->info("Assessment:{$assessment->getTitle()}");
+            $this->getLogger()->info("Assessment: {$assessment->getTitle()}");
             $this->participantDataSource->loadParticipationIntoAssessment($assessment);
         } catch (MapperException $e) {
-            $this->getLogger()->warning("Unable to find assessment with id {$assessmentId}");
+            $this->getLogger()->warning("Unable to find assessment with id: {$assessmentId}");
             return;
         }
 
@@ -240,13 +240,12 @@ class AssessmentFeedbackImporter extends CliTool\App
                 try {
                     $feedbackRows = $dueWorkFeedbackFactory->produce();
                     $this->feedbackDataSource->save($feedbackRows);
-                    $this->count++;
                 } catch (MapperException $e) {
                     $this->getLogger()->warning('Failed to save feedback');
+                    continue;
                 }
-            } else {
-                $this->count++;
             }
+            $this->count++;
         }
     }
 
@@ -314,7 +313,7 @@ DESCRIPTION
     
     $yellow--file=FILE$white (required)
         Path to a spreadsheet file which contains the following data:
-        Assessment ID, Student ID (external), Staff ID (external), Assessment ID, Comment
+        Assessment ID, Student ID (external), Staff ID (external), Comment
         
     $yellow--folder=FOLDER$white
         Path of a folder which has files to be attached to feedback.
