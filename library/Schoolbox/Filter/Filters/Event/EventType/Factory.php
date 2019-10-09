@@ -67,7 +67,13 @@ class Factory extends Filter\AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, $this->getEventTypes()->getPropertyValues('id'));
+        return new KeyConverter(
+            $filter,
+            $this->getEventTypes()->map(
+                static function (EventType $eventType) {
+                    return (string)$eventType->getId();
+                }
+            ));
     }
 
 
