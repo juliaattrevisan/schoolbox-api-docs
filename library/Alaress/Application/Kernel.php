@@ -11,9 +11,7 @@ namespace Alaress\Application;
 use Aura\Di;
 use Config\Modules\ModuleConfigInterface;
 use Predis;
-use Schoolbox\Filter\CompositeFactoryFactory;
-use Schoolbox\Filter\Filters\Assessment\FactoryFactory as AssessmentFactoryFactory;
-use Schoolbox\Filter\Filters\Event\FactoryFactory as EventFactoryFactory;
+use Schoolbox\Filter;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Throwable;
@@ -1353,15 +1351,26 @@ abstract class Kernel
             'filters.factoryFactory',
             $di->lazy(
                 static function () use ($di, $mapperFactory) {
-                    return new CompositeFactoryFactory(
-                        new AssessmentFactoryFactory(
+                    return new Filter\CompositeFactoryFactory(
+                        new Filter\Filters\Assessment\FactoryFactory(
                             $mapperFactory,
                             $di->get('l10n')
                         ),
-                        new EventFactoryFactory($mapperFactory)
+                        new Filter\Filters\Event\FactoryFactory($mapperFactory)
                     );
                 }
             )
+        );
+        $di->set(
+            'filters.assessmentIdFinder',
+            static function () use ($mapperFactory) {
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $mapperFactory->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper,
+                    $mapperFactory->get(AssessmentMapper::class)
+                );
+            }
         );
 
 
