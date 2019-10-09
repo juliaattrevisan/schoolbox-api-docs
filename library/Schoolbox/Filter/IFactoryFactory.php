@@ -85,4 +85,18 @@ interface IFactoryFactory
      */
     public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;
 
+
+    /**
+     * An assessment-specific function to ensure that if the admin disables the
+     * teacher-folder filter, then we fall back to the viewee's involved classes
+     * and groups.
+     *
+     * TODO this shouldn't be here: it's only added so the composite may use it
+     *
+     * @param null[]|Collection[] $filters
+     * @param User                $viewee
+     * @return null[]|Collection[]
+     * @throws InvalidArgumentException    If unable to find specified Mapper class
+     */
+    public function checkTeacherFolders(array $filters, User $viewee): array;
 }

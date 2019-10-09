@@ -145,4 +145,20 @@ class CompositeFactoryFactory implements IFactoryFactory
         }
         return new Panel($page, $route, $components);
     }
+
+
+    /**
+     * The composite factory teacher folder check checks all of the factory
+     * factories to see if they care about teacher folders?
+     *
+     * @inheritDoc
+     */
+    public function checkTeacherFolders(array $filters, User $viewee): array
+    {
+        foreach ($this->factoryFactories as $factoryFactory) {
+            /** @noinspection SlowArrayOperationsInLoopInspection */
+            $filters = array_replace($filters, $factoryFactory->checkTeacherFolders($filters, $viewee));
+        }
+        return $filters;
+    }
 }

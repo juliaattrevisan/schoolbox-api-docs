@@ -13,6 +13,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Filter\IFactory;
+use Schoolbox\User;
 
 /**
  * Factory class responsible for creating factory classes for event filters.
@@ -45,5 +46,16 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
         }
 
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+    }
+
+
+    /**
+     * This filter factory factory doesn't care about teacher folders.
+     *
+     * @inheritDoc
+     */
+    public function checkTeacherFolders(array $filters, User $viewee): array
+    {
+        return $filters;
     }
 }
