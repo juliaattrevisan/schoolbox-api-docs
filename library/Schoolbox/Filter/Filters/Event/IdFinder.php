@@ -9,9 +9,12 @@ namespace Schoolbox\Filter\Filters\Event;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\IMapper;
 
 /**
  * ID finder implementation for event filters.
+ *
+ * @method static IdFinder getInstance(Filter\Mapper $filterMapper, IMapper $mapper)
  */
 class IdFinder extends Filter\AbstractIdFinder
 {
