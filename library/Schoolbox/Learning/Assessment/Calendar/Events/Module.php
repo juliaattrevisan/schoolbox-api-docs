@@ -17,9 +17,6 @@ use Calendar_Api_EventType_Event_Schoolbox_Campus;
 use InvalidArgumentException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Filters\Assessment\FactoryFactory as FilterFactoryFactory;
-use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -72,7 +69,6 @@ class Module extends BaseModule
             }),
             'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
             'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
-            'eventIdFinder'         => $injector->lazyGet('filters.eventIdFinder'),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
             'campusMapper'          => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'calendarConfig'        => $injector->lazy(function () {

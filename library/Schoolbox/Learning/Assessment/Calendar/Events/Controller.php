@@ -49,12 +49,6 @@ class Controller extends Base
 
 
     /**
-     * @var EventFilters\IdFinder
-     */
-    private $eventIdFinder;
-
-
-    /**
      * @var IFactoryFactory
      */
     private $filterFactoryFactory;
@@ -84,7 +78,6 @@ class Controller extends Base
      * @param AssessmentDataSource       $assessmentDataSource
      * @param Visibility                 $visibility
      * @param AssessmentFilters\IdFinder $assessmentIdFinder
-     * @param EventFilters\IdFinder      $eventIdFinder
      * @param IFactoryFactory            $filterFactoryFactory
      * @param FilterSelection\Mapper     $filterSelectionMapper
      * @param CampusMapper                     $campusMapper
@@ -94,7 +87,6 @@ class Controller extends Base
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         AssessmentFilters\IdFinder $assessmentIdFinder,
-        EventFilters\IdFinder $eventIdFinder,
         IFactoryFactory $filterFactoryFactory,
         FilterSelection\Mapper $filterSelectionMapper,
         CampusMapper $campusMapper,
@@ -103,7 +95,6 @@ class Controller extends Base
         $this->assessmentDataSource  = $assessmentDataSource;
         $this->visibility            = $visibility;
         $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->eventIdFinder         = $eventIdFinder;
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->campusMapper          = $campusMapper;

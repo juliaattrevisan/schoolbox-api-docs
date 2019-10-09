@@ -1373,17 +1373,6 @@ abstract class Kernel
                 );
             }
         );
-        $di->set(
-            'filters.eventIdFinder',
-            static function () use ($mapperFactory) {
-                /** @var Filter\Mapper $filterMapper */
-                $filterMapper = $mapperFactory->get(Filter\Mapper::class);
-                return Filter\Filters\Event\IdFinder::getInstance(
-                    $filterMapper,
-                    $mapperFactory->get(EventMapper::class)
-                );
-            }
-        );
 
 
         // load dependencies into the kernel itself
