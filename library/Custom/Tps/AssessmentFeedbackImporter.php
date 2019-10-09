@@ -186,6 +186,7 @@ class AssessmentFeedbackImporter extends CliTool\App
                 continue;
             }
             try {
+                // not limiting to the student role for now, to allow non-student participants.
                 $student = $this->userMapper->findByExternalId($studentExternalId);
             } catch (MapperException $e) {
                 $this->getLogger()->warning("Unable to find student with external ID: {$studentExternalId}");
