@@ -132,9 +132,9 @@ class TreeBuilder
         /* This has the potential to have very large optimisations.
          * On vagrant, to build 30,000 folders:
          *  Using Mapper::getColumnString() + Mapper::hydrate()
-         *      xdebug off: 5.5x, xdebug ON: 55s
+         *      xdebug off: 5.5s, xdebug ON: 55s
          *  Using raw query to select id,parent,name + explicit id/parent hydration
-         *      xdebug off: 1.5x, xdebug ON: 8s
+         *      xdebug off: 1.5s, xdebug ON: 8s
          */
         $folders = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
