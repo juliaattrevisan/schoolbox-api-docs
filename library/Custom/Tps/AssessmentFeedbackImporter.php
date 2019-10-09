@@ -112,6 +112,10 @@ class AssessmentFeedbackImporter extends CliTool\App
 
         // Import csv
         $reader = new Reader($this->file, true, true);
+        if (!$reader->readHeaderRow()) {
+            $this->getLogger()->warning("Unable to read header from the file: {$this->file}");
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
         $reader->setExpectedColumns([
             self::COL_ASSESSMENT_ID,
             self::COL_STAFF_SYNERGETIC_ID,
