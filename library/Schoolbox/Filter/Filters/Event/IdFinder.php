@@ -14,9 +14,15 @@ use Schoolbox\Filter;
  */
 class IdFinder extends Filter\AbstractIdFinder
 {
-    protected function doFiltersGuaranteeEmptySet(array $completeFilters)
+    /**
+     * I don't yet know whether event filters can ever guarantee an empty set:
+     * return false for now.
+     *
+     * @inheritDoc
+     */
+    protected function doFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
-        // TODO: Implement doFiltersGuaranteeEmptySet() method.
+        return false;
     }
 
     protected function simplifyFilters(array $completeFilters): array
@@ -24,7 +30,7 @@ class IdFinder extends Filter\AbstractIdFinder
         // TODO: Implement simplifyFilters() method.
     }
 
-    protected function buildQuery(array $completeFilters, $deleted)
+    protected function buildQuery(array $completeFilters, $deleted): array
     {
         // TODO: Implement buildQuery() method.
     }

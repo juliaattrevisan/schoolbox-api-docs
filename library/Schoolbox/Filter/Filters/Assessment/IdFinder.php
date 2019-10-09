@@ -1142,7 +1142,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @inheritdoc
      */
-    protected function doFiltersGuaranteeEmptySet(array $completeFilters)
+    protected function doFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         // Examine the context-filters
         if ($this->doContextFiltersGuaranteeEmptySet($completeFilters)) {
