@@ -193,7 +193,7 @@ abstract class AbstractIdFinder implements IdFinder
      *
      * @param Collection[]|null[]|mixed[][] $completeFilters
      * @param bool                          $deleted Whether to include soft-deleted entities
-     * @return mixed[]
+     * @return mixed[]                      [$query, $params]
      * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
     abstract protected function buildQuery(array $completeFilters, bool $deleted): array;
