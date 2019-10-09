@@ -14,6 +14,7 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
@@ -104,7 +105,11 @@ class Controller extends Base
                 [
                     'filterPanel' => $filterPanel,
                     'termDates'   => $this->getAvailableTermDates(),
-                    'eventTypes'  => $this->eventTypeMapper->findAll(),
+                    'eventTypes'  => $this->eventTypeMapper
+                        ->findAll()
+                        ->sortByCallback(static function (EventType $a, EventType $b) {
+                            return strnatcasecmp($a->getType(), $b->getType());
+                        }),
                 ],
                 'Assessment Calendar',
                 $pageTitle
