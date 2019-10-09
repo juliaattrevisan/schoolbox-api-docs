@@ -427,6 +427,19 @@ class Obama
     }
 
 
+    /**
+     * Percentage chance that something occurred
+     *
+     * @param int $percentage
+     * @return bool
+     * @throws \Exception
+     */
+    private function chance(int $percentage): bool
+    {
+        return \random_int(0, 100) < $percentage;
+    }
+
+
     /* Creationals
      */
 
@@ -527,15 +540,14 @@ class Obama
 
             /* Decide whether this was person opened a thing
              */
-            if (\random_int(0, 100) < $directOpenLikelihood) {
+            if ($this->chance($directOpenLikelihood)) {
                 $randomReferrer = $referrers[\rand(0, \count($referrers)-1)];
+                $referrer = $randomReferrer;
 
                 /* Pass an actual value if we chose an unknown referrer
                  */
                 if ($randomReferrer === News\Statistics\Mapper::REFERRER_EMPTY) {
                     $referrer = null;
-                } else {
-                    $referrer = $randomReferrer;
                 }
 
                 /* Jitter this around
@@ -628,20 +640,20 @@ class Obama
      * 33% chance of being saved for later, by default
      *
      * @param News\Model $model
-     * @param float      $savedForLaterLikelihood
+     * @param int        $savedForLaterLikelihood
      * @return int
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createSavedForLater(News\Model $model, float $savedForLaterLikelihood = 33.0): int
+    private function createSavedForLater(News\Model $model, int $savedForLaterLikelihood = 33): int
     {
         $numSaved = 0;
 
         $numUsers = $this->generateIndexablePopulation();
 
         for ($i = 0; $i < $numUsers; $i++) {
-            if (rand(0, 100) < $savedForLaterLikelihood) {
+            if ($this->chance($savedForLaterLikelihood)) {
                 $mapper = News\SaveForLater\Mapper::getInstance();
 
                 $savedForLater = $mapper->createModel()
@@ -673,7 +685,7 @@ class Obama
      */
     public function generate(int $numArticles, int $duration, float $democraticness, int $directOpenLikelihood, int $savedForLaterLikelihood): void
     {
-        new \Alaress_Probe("Creating {$numArticles} articles using {$directOpenLikelihood}% Open rate over {$duration} hours");
+        new \Alaress_Probe("Creating {$numArticles} articles using {$directOpenLikelihood}% Open rate and {$savedForLaterLikelihood}% chance to save for later, over {$duration} hours");
 
         /* First article instance to go in, is the oldest
          */
