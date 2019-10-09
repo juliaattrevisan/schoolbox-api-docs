@@ -29,6 +29,7 @@ use Schoolbox\UserMapper;
     - Create 50 articles
     - Distribute over (24 hours * 7 days * 4 weeks) duration which is 1 month
     - Democraticness 0.35 (the smaller the number, the more left-leaning obamastats becomes)
+    - 50% chance for a comment
     - 67% chance to open article
     - 33% chance that it got saved for later
 
@@ -679,12 +680,13 @@ class Obama
      * create discussion_thread_ids because I didn't find a mapper/model anywhere obvious
      *
      * @param News\Model $model
+     * @param int        $commentLikelihood
      * @return int
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createComments(News\Model $model): int
+    private function createComments(News\Model $model, int $commentLikelihood): int
     {
         /* Create a thread
          */
@@ -694,25 +696,31 @@ class Obama
 
         $threadMapper->save($thread);
 
-        /* Make some commentary
-         */
-        $numComments = rand(1, 10);
-
-        $commentMapper = \Schoolbox\Discussion\Comment\Mapper::getInstance();
-
-        for ($i = 0; $i < $numComments; $i++) {
-            $comment = $commentMapper->createModel()
-                ->setContent($this->getRandomBody())
-                ->setAuthor($this->getRandomUser())
-                ->setThread($thread)
-                ->setCreatedAt(\Alaress_Date_Format::now()->addDays($this->getWeightedRandom(1,5, 1)));
-
-            $commentMapper->save($comment);
-        }
-
         /* Associate thread
          */
-        \Schoolbox\Comms\News\Mapper::getInstance()->save($model->setDiscussionThread($thread));
+        News\Mapper::getInstance()->save($model->setDiscussionThread($thread));
+
+        /* Make some commentary
+         */
+        $commentMapper = \Schoolbox\Discussion\Comment\Mapper::getInstance();
+
+        $numComments = 0;
+
+        $numUsers = $this->generateIndexablePopulation();
+
+        for ($i = 0; $i < $numUsers; $i++) {
+            if ($this->chance($commentLikelihood)) {
+                $comment = $commentMapper->createModel()
+                                         ->setContent($this->getRandomBody())
+                                         ->setAuthor($this->getRandomUser())
+                                         ->setThread($thread)
+                                         ->setCreatedAt(\Alaress_Date_Format::now()->addDays($this->getWeightedRandom(1, 5, 1)));
+
+                $commentMapper->save($comment);
+
+                $numComments++;
+            }
+        }
 
         return $numComments;
     }
@@ -760,15 +768,26 @@ class Obama
      * @param int   $numArticles
      * @param int   $duration Number of hours for which to populate data
      * @param float $democraticness
+     * @param int   $commentLikelihood
      * @param int   $directOpenLikelihood
      * @param int   $savedForLaterLikelihood
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function generate(int $numArticles, int $duration, float $democraticness, int $directOpenLikelihood, int $savedForLaterLikelihood): void
+    public function generate(
+        int $numArticles,
+        int $duration,
+        float $democraticness,
+        int $commentLikelihood,
+        int $directOpenLikelihood,
+        int $savedForLaterLikelihood
+    ): void
     {
-        new \Alaress_Probe("Creating {$numArticles} articles using {$directOpenLikelihood}% Open rate and {$savedForLaterLikelihood}% chance to save for later, over {$duration} hours");
+        new \Alaress_Probe("Creating {$numArticles} articles. Over {$duration} hours, the following events may occur:");
+        new \Alaress_Probe("  - {$commentLikelihood}% chance to comment");
+        new \Alaress_Probe("  - {$directOpenLikelihood}% Open rate");
+        new \Alaress_Probe("  - {$savedForLaterLikelihood}% chance to save for later");
 
         /* First article instance to go in, is the oldest
          */
@@ -789,7 +808,7 @@ class Obama
             $this->createStatistics($model, $duration, $democraticness, $directOpenLikelihood);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $numComments = $this->createComments($model);
+            $numComments = $this->createComments($model, $commentLikelihood);
             new \Alaress_Probe(str_pad(' ', 4)."Commented {$numComments} random comments for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
             $numSavedForLater = $this->createSavedForLater($model, $savedForLaterLikelihood);
