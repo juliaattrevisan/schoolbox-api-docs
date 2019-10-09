@@ -35,14 +35,6 @@ class CompositeFactoryFactory implements IFactoryFactory
     }
 
 
-    public static function getEntity(): string
-    {
-        // TODO this will need to become getEntities
-        // Composites are designed to contain multiple factory factories, each of which may filter a different entity
-        // TODO: Implement getEntity() method.
-    }
-
-
     /**
      * The composite's filter factory attempts to use each contained factory
      * factory to create the filter factory: one of the contained items should
