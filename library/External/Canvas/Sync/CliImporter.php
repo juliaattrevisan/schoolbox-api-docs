@@ -9,6 +9,7 @@ namespace External\Canvas\Sync;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
+use Alaress_Byte_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use GuzzleHttp\Client;
@@ -34,9 +35,11 @@ use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
 use UnderflowException;
 use UnexpectedValueException;
+use function floor;
 use function json_decode;
 use function memory_get_peak_usage;
 use function microtime;
+use function sprintf;
 
 /**
  * Command line application for syncing canvas-data
@@ -441,8 +444,12 @@ OPTIONS:";
         if ($start === null) {
             $this->getLogger()->warning('Unable to determine script start time');
         } else {
-            $this->getLogger()->info("Script duration (s): " . (microtime(true) - $start));
+            $duration = (microtime(true) - $start);
+            $hours    = floor($duration / 3600);
+            $minutes  = floor(($duration - $hours * 3600) / 60);
+            $seconds  = $duration - $hours * 3600 - $minutes * 60;
+            $this->getLogger()->info(sprintf("Script duration: %02d:%02d:%02d", $hours, $minutes, $seconds));
         }
-        $this->getLogger()->info("Script mem usage (B): " . memory_get_peak_usage(true));
+        $this->getLogger()->info("Script mem usage: " . Alaress_Byte_Format::bytesToString(memory_get_peak_usage(true)));
     }
 }
