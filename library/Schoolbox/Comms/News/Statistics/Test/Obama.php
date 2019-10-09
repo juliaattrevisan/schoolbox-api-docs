@@ -602,7 +602,7 @@ class Obama
      * @param News\Model $model
      * @param int        $duration Distribute stats over this duration
      * @param float      $democraticness
-     * @param int        $directOpenLikelihood
+     * @param int        $chanceToOpen
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
@@ -611,7 +611,7 @@ class Obama
         News\Model $model,
         int $duration,
         float $democraticness,
-        int $directOpenLikelihood = 10
+        int $chanceToOpen = 10
     ): void {
         $numUsers = $this->generateIndexablePopulation();
 
@@ -626,7 +626,7 @@ class Obama
 
             /* Decide whether this was person opened a thing
              */
-            if ($this->chance($directOpenLikelihood)) {
+            if ($this->chance($chanceToOpen)) {
                 $referrer = $randomReferrer = $this->getRandomReferrer();
 
                 /* Pass an actual value if we chose an unknown referrer
@@ -644,7 +644,7 @@ class Obama
                     $this->summary['numOpens']++;
                 }
 
-                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened directly onto carpet using {$directOpenLikelihood}% and referrer {$randomReferrer}");
+                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened using {$chanceToOpen}% and referrer {$randomReferrer}");
             } else {
                 new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} didn't open the article");
             }
@@ -681,13 +681,13 @@ class Obama
      * create discussion_thread_ids because I didn't find a mapper/model anywhere obvious
      *
      * @param News\Model $model
-     * @param int        $commentLikelihood
+     * @param int        $chanceToComment
      * @return int
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createComments(News\Model $model, int $commentLikelihood): int
+    private function createComments(News\Model $model, int $chanceToComment): int
     {
         /* Create a thread
          */
@@ -710,7 +710,7 @@ class Obama
         $numUsers = $this->generateIndexablePopulation();
 
         for ($i = 0; $i < $numUsers; $i++) {
-            if ($this->chance($commentLikelihood)) {
+            if ($this->chance($chanceToComment)) {
                 $comment = $commentMapper->createModel()
                                          ->setContent($this->getRandomBody())
                                          ->setAuthor($this->getRandomUser())
@@ -732,20 +732,20 @@ class Obama
      * 33% chance of being saved for later, by default
      *
      * @param News\Model $model
-     * @param int        $savedForLaterLikelihood
+     * @param int        $chanceToSaveForLater
      * @return int
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createSavedForLater(News\Model $model, int $savedForLaterLikelihood = 33): int
+    private function createSavedForLater(News\Model $model, int $chanceToSaveForLater = 33): int
     {
         $numSaved = 0;
 
         $numUsers = $this->generateIndexablePopulation();
 
         for ($i = 0; $i < $numUsers; $i++) {
-            if ($this->chance($savedForLaterLikelihood)) {
+            if ($this->chance($chanceToSaveForLater)) {
                 $mapper = News\SaveForLater\Mapper::getInstance();
 
                 $savedForLater = $mapper->createModel()
@@ -769,9 +769,9 @@ class Obama
      * @param int   $numArticles
      * @param int   $duration Number of hours for which to populate data
      * @param float $democraticness
-     * @param int   $commentLikelihood
-     * @param int   $directOpenLikelihood
-     * @param int   $savedForLaterLikelihood
+     * @param int   $chanceToComment
+     * @param int   $chanceToOpen
+     * @param int   $chanceToSaveForLater
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
@@ -780,17 +780,17 @@ class Obama
         int $numArticles,
         int $duration,
         float $democraticness,
-        int $commentLikelihood,
-        int $directOpenLikelihood,
-        int $savedForLaterLikelihood
+        int $chanceToComment,
+        int $chanceToOpen,
+        int $chanceToSaveForLater
     ): void
     {
         new \Alaress_Probe("Creating {$numArticles} articles. Over {$duration} hours, the following events may occur over a randomly chosen population of users:");
         new \Alaress_Probe(
             "{$democraticness} democratic-ness",
-            "{$commentLikelihood}% chance to Comment",
-            "{$directOpenLikelihood}% chance to Open",
-            "{$savedForLaterLikelihood}% chance to Save For Later"
+            "{$chanceToComment}% chance to Comment",
+            "{$chanceToOpen}% chance to Open",
+            "{$chanceToSaveForLater}% chance to Save For Later"
         );
         new \Alaress_Probe('<hr />');
 
@@ -810,13 +810,13 @@ class Obama
             $this->createAudience($model);
             new \Alaress_Probe(str_pad(' ',4)."Added audience for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $this->createStatistics($model, $duration, $democraticness, $directOpenLikelihood);
+            $this->createStatistics($model, $duration, $democraticness, $chanceToOpen);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $numComments = $this->createComments($model, $commentLikelihood);
+            $numComments = $this->createComments($model, $chanceToComment);
             new \Alaress_Probe(str_pad(' ', 4)."Commented {$numComments} random comments for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $numSavedForLater = $this->createSavedForLater($model, $savedForLaterLikelihood);
+            $numSavedForLater = $this->createSavedForLater($model, $chanceToSaveForLater);
             new \Alaress_Probe(str_pad(' ', 4)."Saved {$numSavedForLater} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
