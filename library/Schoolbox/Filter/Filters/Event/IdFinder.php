@@ -25,12 +25,25 @@ class IdFinder extends Filter\AbstractIdFinder
         return false;
     }
 
+
+    /**
+     * I don't yet know whether event filters can be simplified: return what was
+     * passed in for now.
+     *
+     * @inheritDoc
+     */
     protected function simplifyFilters(array $completeFilters): array
     {
-        // TODO: Implement simplifyFilters() method.
+        return $completeFilters;
     }
 
-    protected function buildQuery(array $completeFilters, $deleted): array
+
+    /**
+     * @param array $completeFilters
+     * @param bool  $deleted
+     * @return array
+     */
+    protected function buildQuery(array $completeFilters, bool $deleted): array
     {
         // TODO: Implement buildQuery() method.
     }

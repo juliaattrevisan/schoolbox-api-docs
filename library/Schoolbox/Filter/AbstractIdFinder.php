@@ -66,7 +66,7 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * @inheritdoc
      */
-    public function findIdsByFilters(array $filters = [], $deleted = false)
+    public function findIdsByFilters(array $filters = [], bool $deleted = false): array
     {
         // No filters ?
         if (0 === count($filters)) {
@@ -196,7 +196,7 @@ abstract class AbstractIdFinder implements IdFinder
      * @return mixed[]
      * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
-    abstract protected function buildQuery(array $completeFilters, $deleted): array;
+    abstract protected function buildQuery(array $completeFilters, bool $deleted): array;
 
 
     /* Getters
