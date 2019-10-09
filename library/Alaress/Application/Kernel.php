@@ -11,6 +11,7 @@ namespace Alaress\Application;
 use Aura\Di;
 use Config\Modules\ModuleConfigInterface;
 use Predis;
+use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Filter;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -1369,6 +1370,17 @@ abstract class Kernel
                 return Filter\Filters\Assessment\IdFinder::getInstance(
                     $filterMapper,
                     $mapperFactory->get(AssessmentMapper::class)
+                );
+            }
+        );
+        $di->set(
+            'filters.eventIdFinder',
+            static function () use ($mapperFactory) {
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $mapperFactory->get(Filter\Mapper::class);
+                return Filter\Filters\Event\IdFinder::getInstance(
+                    $filterMapper,
+                    $mapperFactory->get(EventMapper::class)
                 );
             }
         );
