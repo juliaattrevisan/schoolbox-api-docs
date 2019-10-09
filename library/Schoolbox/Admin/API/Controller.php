@@ -20,7 +20,7 @@ use Schoolbox\Mapper;
 
 class Controller extends Web\Controller\Base
 {
-    private const USER_PROFILE_CSVS = [
+    private const REQUIRED_USER_PROFILE_CSVS = [
         'student',
         'parent',
         'staff',
@@ -103,7 +103,11 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * @api POST /api/post/process
+     *
+     * @api POST /api/admin/process
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function postProcess()
     {
@@ -134,7 +138,7 @@ class Controller extends Web\Controller\Base
 
             $files = [];
 
-            foreach (array_merge(self::USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS)) as $requiredCsv) {
+            foreach (array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS)) as $requiredCsv) {
 
                 $hash = $post->get($requiredCsv);
 
@@ -144,7 +148,7 @@ class Controller extends Web\Controller\Base
                 }
 
                 try {
-                    if (!in_array($requiredCsv, self::USER_PROFILE_CSVS)) {
+                    if (!in_array($requiredCsv, self::REQUIRED_USER_PROFILE_CSVS)) {
                         // assign the given hash to its place in the files array
                         $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
                     } else {
@@ -156,8 +160,6 @@ class Controller extends Web\Controller\Base
                     continue;
                 }
             }
-            /** @var IConnector $db */
-            $db = $this->getDi()->get('databaseInternal');
 
             if (isset($errors)) {
                 $responseJson['error'] = $errors;
@@ -166,19 +168,20 @@ class Controller extends Web\Controller\Base
             } else {
                 // valid files found and loaded, we're good to attempt processing
 
+                /** @var IConnector $db */
+                $db = $this->getDi()->get('databaseInternal');
+
                 $write = fopen('php://memory', 'rb+');
 
                 $log = new Logger($write, $write, \Monolog\Logger::WARNING, [], true);
 
                 try {
                     foreach ($files as $keyspace => $file) {
-                        if (!in_array($keyspace, self::USER_PROFILE_CSVS)) {
+                        if (!in_array($keyspace, self::REQUIRED_USER_PROFILE_CSVS)) {
                             // this is where the action happens
                             $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
                         } else {
-                            $processor = new Processor($keyspace, $file, $db);
-                            $processor->setPerform(true);
-                            $processor->process();
+                            (new Processor($keyspace, $file, $db, $log))->setPerform(true)->process();
                         }
                     }
 

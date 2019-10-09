@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Profile;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -218,6 +219,12 @@ class Processor
      */
     private $perform = false;
 
+    /**
+     * The log object to which log entries are written
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * Processor constructor.
@@ -225,9 +232,10 @@ class Processor
      * @param string     $type
      * @param IStorage   $file
      * @param IConnector $database
+     * @param LoggerInterface|null $logger
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $type, IStorage $file, IConnector $database)
+    public function __construct(string $type, IStorage $file, IConnector $database, LoggerInterface $logger = null)
     {
         if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATION], true)) {
             throw new \InvalidArgumentException('Unknown csv type.');
@@ -239,6 +247,7 @@ class Processor
         $this->staffProfileMapper = new Profile\Staff\Mapper();
         $this->relationMapper = new Profile\Relation\Mapper();
         $this->database = $database;
+        $this->logger = $logger;
 
         $this->type = $type;
         $this->file = $file;
@@ -891,6 +900,9 @@ class Processor
             'message' => $message,
             'status' => $status
         ];
+        if ($status !== self::LOG_OK) {
+            $this->logger->warning($message);
+        }
     }
 
 
