@@ -409,6 +409,24 @@ class Obama
     }
 
 
+    /**
+     * A random quantity of random users upon which to iterate
+     *
+     * @return int
+     * @throws \Exception
+     */
+    private function generateIndexablePopulation(): int
+    {
+        /* At least half of your user population is involved
+         */
+        $minBias = 0.75;
+
+        $indexablePopulation = \count($this->users)-1;
+
+        return \random_int((int)floor($indexablePopulation*$minBias), $indexablePopulation);
+    }
+
+
     /* Creationals
      */
 
@@ -496,15 +514,8 @@ class Obama
         float $democraticness,
         int $directOpenLikelihood = 10
     ): void {
-        /* At least half of your user population is involved
-         */
-        $minBias = 0.75;
+        $numUsers = $this->generateIndexablePopulation();
 
-        /* zero-indexed count
-         */
-        $indexablePopulation = \count($this->users)-1;
-
-        $numUsers = \random_int((int)floor($indexablePopulation*$minBias), $indexablePopulation);
         new \Alaress_Probe(str_pad(' ',8)."{$numUsers} users were randomly selected for interaction generation");
 
         $referrers = News\Statistics\Mapper::REFERRERS;
@@ -625,15 +636,9 @@ class Obama
      */
     private function createSavedForLater(News\Model $model, float $savedForLaterLikelihood = 33.0): int
     {
-        /* At least half of your user population is involved
-         */
-        $minBias = 0.75;
-
-        $indexablePopulation = \count($this->users)-1;
-
-        $numUsers = \random_int((int)floor($indexablePopulation*$minBias), $indexablePopulation);
-
         $numSaved = 0;
+
+        $numUsers = $this->generateIndexablePopulation();
 
         for ($i = 0; $i < $numUsers; $i++) {
             if (rand(0, 100) < $savedForLaterLikelihood) {
