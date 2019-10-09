@@ -169,6 +169,8 @@ class Courses
         JOIN account_dim account ON course.account_id = account.id
         LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state != 'deleted'
         WHERE
+              -- TODO We could alternatively use `course.code LIKE '%NOT'` but there are ~27 rows where this is inconsistent with the `name` test.
+              -- TODO need to confirm with client the test by which we filter courses, either by `name`, `code`, both?
               course.name LIKE '%notif%' AND
               course.workflow_state != 'deleted'
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment.id DESC
