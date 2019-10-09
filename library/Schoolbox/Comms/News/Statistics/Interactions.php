@@ -91,12 +91,12 @@ class Interactions
      * @param string               $roleType
      * @param int                  $roleId
      * @param null|string          $referrer
-     * @return Model
+     * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveOpen(News\Model $article, \Alaress_Date_Format $date, int $userId, string $roleType, int $roleId, ?string $referrer): Model
+    public function saveOpen(News\Model $article, \Alaress_Date_Format $date, int $userId, string $roleType, int $roleId, ?string $referrer)
     {
         /* Only record Opens for publicly-accessible articles
          */
@@ -156,9 +156,7 @@ class Interactions
          */
         $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
 
-        $this->statisticsMapper->save($model);
-
-        return $model;
+        return $this->statisticsMapper->save($model);
     }
 
 

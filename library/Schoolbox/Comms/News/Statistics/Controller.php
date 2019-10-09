@@ -86,7 +86,7 @@ class Controller extends Base
             /* Overall RoleType Demographics
              * Temporarily disabled
              */
-             // 'roleTypeDemographic' => $interactions->fetchRoleTypeDemographic($article),
+            // 'roleTypeDemographic' => $interactions->fetchRoleTypeDemographic($article),
 
             /* Scale selector
              */
@@ -96,7 +96,7 @@ class Controller extends Base
             /* Historical Dailies
              * Temporarily disabled
              */
-             // 'historic' => $interactions->fetchHistoric($article),
+            // 'historic' => $interactions->fetchHistoric($article),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 

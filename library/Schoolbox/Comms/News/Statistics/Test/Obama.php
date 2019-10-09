@@ -653,9 +653,9 @@ class Obama
                 /* Jitter this around
                  */
                 $date = $this->generateStatisticDate($duration, $democraticness);
-                $open = $this->ico->saveOpen($model, $date, $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
+                $r = $this->ico->saveOpen($model, $date, $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
 
-                if ($open) {
+                if ($r !== false) {
                     $this->summary['role'][News\Statistics\Mapper::TYPE_OPEN][$currentUser->getRole()->getType()]++;
                     $this->summary['numOpens']++;
 
