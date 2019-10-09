@@ -44,8 +44,11 @@ class CompositeFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param string $filterDefinitionClass
-     * @return IFactory
+     * The composite's filter factory attempts to use each contained factory
+     * factory to create the filter factory: one of the contained items should
+     * be able to create what is requested.
+     *
+     * @inheritDoc
      */
     public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory
     {
@@ -75,8 +78,10 @@ class CompositeFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param string $page
-     * @return GenericCollection
+     * The composite's key converters are a union of the converters for all of
+     * its contained factory factories.
+     *
+     * @inheritDoc
      */
     public function buildEnabledKeyConverters($page): GenericCollection
     {
@@ -89,10 +94,10 @@ class CompositeFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param Collection $selectionsPerFilter
-     * @param User       $user
-     * @param string     $page
-     * @return array
+     * The composite's filters are a union of the filters for all of its
+     * contained factory factories.
+     *
+     * @inheritDoc
      */
     public function convertSelectionsToFilters(Collection $selectionsPerFilter, User $user, string $page): array
     {
@@ -109,9 +114,10 @@ class CompositeFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param string $page
-     * @param bool   $enabledOnly
-     * @return GenericCollection
+     * The composite's current state is a union of the state of all of its
+     * contained factory factories.
+     *
+     * @inheritDoc
      */
     public function buildCurrentState($page, $enabledOnly): GenericCollection
     {
@@ -124,17 +130,21 @@ class CompositeFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param User      $user
-     * @param string    $page
-     * @param string    $route
-     * @param User|null $viewee
-     * @param array     $routeArgs
-     * @param array     $request
-     * @return Panel
+     * The composite factory panel simply contains a list of all components that
+     * any of its contained factory factories would contain.
+     *
+     * @inheritDoc
      */
     public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel
     {
-        // Do I need a composite panel?
-        // TODO: Implement buildPanel() method.
+        // I can just piece together a panel from all of the components in each
+        // key converter's panels.
+        $components = [];
+        foreach ($this->factoryFactories as $factoryFactory) {
+            $panel = $factoryFactory->buildPanel($user, $page, $route, $viewee, $routeArgs, $request);
+            /** @noinspection SlowArrayOperationsInLoopInspection */
+            $components = array_replace($components, $panel->getComponents());
+        }
+        return new Panel($page, $route, $components);
     }
 }
