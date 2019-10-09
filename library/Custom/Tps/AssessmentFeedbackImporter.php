@@ -202,16 +202,21 @@ class AssessmentFeedbackImporter extends CliTool\App
             if ($this->folder) {
                 $attachmentFilename = "{$studentExternalId}-{$assessmentId}.pdf";
                 $path               = "{$this->folder}/{$attachmentFilename}";
-                if (is_file($path) && is_readable($path)) {
-                    $attachmentMessage = " with attachment {$attachmentFilename}";
-                    if ($this->perform()) {
-                        try {
-                            $attachment  = $this->storageMapper->acceptStream($attachmentFilename, file_get_contents($path));
-                            $attachments = [NodeFactory::STORE . ':' . $attachment->getHash()];
-                        } catch (MapperException $e) {
-                            $attachmentMessage = " (failed to attach {$attachmentFilename})";
-                            $this->getLogger()->debug($e->getMessage());
+                if (file_exists($path)) {
+                    if (is_file($path) && is_readable($path)) {
+                        $attachmentMessage = " with attachment {$attachmentFilename}";
+                        if ($this->perform()) {
+                            try {
+                                $attachment  = $this->storageMapper->acceptStream($attachmentFilename, file_get_contents($path));
+                                $attachments = [NodeFactory::STORE . ':' . $attachment->getHash()];
+                            } catch (MapperException $e) {
+                                $attachmentMessage = " (failed to attach {$attachmentFilename})";
+                                $this->getLogger()->debug($e->getMessage());
+                            }
                         }
+                    } else {
+                        $attachmentMessage = " (unable to attach {$attachmentFilename})";
+                        $this->getLogger()->warning("Unable to read {$path}");
                     }
                 }
             }
