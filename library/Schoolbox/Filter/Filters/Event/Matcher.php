@@ -49,20 +49,24 @@ class Matcher
     {
         // The only thing I know how to check yet is the event type.
         foreach ($this->filters as $filterClass => $filter) {
+
+            // Event type check
             if ($filterClass === EventType\Definition::class) {
                 // No items selected: filter in
                 if ($filter === null || count($filter) === 0) {
-                    return true;
+                    continue;
                 }
 
                 // Check this event's type, and compare it to what is selected
                 $type = (int)$event->getType();
                 if ($type <= 0) {
                     // No type? This filter doesn't apply to this event
-                    return true;
+                    continue;
                 }
 
-                return $filter->contains($type);
+                if (!$filter->contains($type)) {
+                    return false;
+                }
             }
         }
         return true;
