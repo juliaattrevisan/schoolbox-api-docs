@@ -900,7 +900,7 @@ class Processor
             'message' => $message,
             'status' => $status
         ];
-        if ($status !== self::LOG_OK) {
+        if ($status !== self::LOG_OK && $this->logger !== null) {
             $this->logger->warning($message);
         }
     }
