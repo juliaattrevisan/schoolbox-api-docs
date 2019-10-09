@@ -53,14 +53,10 @@ HELP;
         }
 
         /**
-         * @var Assessment\MapperProxy $assessmentDataSource
-         * @var MapperFactory          $mapperFactory
-         * @var Filter\Mapper          $filterMapper
+         * @var Filter\Filters\Assessment\IdFinder $idFinder
+         * @var Assessment\MapperProxy             $assessmentDataSource
          */
-        $mapperFactory        = $this->getDi()->get('mapperFactory');
-        $filterMapper         = $mapperFactory->get(Filter\Mapper::class);
-        $assessmentMapper     = $mapperFactory->get(Assessment\Mapper::class);
-        $idFinder             = Filter\Filters\Assessment\IdFinder::getInstance($filterMapper, $assessmentMapper);
+        $idFinder             = $this->getDi()->get('filters.assessmentIdFinder');
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
         $exporter = new Exporter($idFinder, $assessmentDataSource);

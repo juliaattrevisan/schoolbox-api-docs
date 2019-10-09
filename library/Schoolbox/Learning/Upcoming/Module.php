@@ -128,13 +128,7 @@ class Module extends BaseModule
             'participantDataSource' => $injector->lazyGet('participantDataSource'),
             'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
             'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
-            'assessmentIdFinder'    => $injector->lazy(function () {
-                /** @var Filter\Mapper $filterMapper */
-                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                return Filter\Filters\Assessment\IdFinder::getInstance(
-                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
-                );
-            }),
+            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
             'access'                => $this->getMapperFactory()->getLazy(Access::class),
         ];

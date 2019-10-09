@@ -114,21 +114,14 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'access'                   => Access::getInstance(),
-                    'assessmentDataSource'     => $this->getAssessmentMapperProxy(),
-                    'unitImplementationMapper' => $this->getUnitImplementationMapper(),
-                    'replicator'               => $injector->lazyNew(Replicator::class, [
+                    'access'                    => Access::getInstance(),
+                    'assessmentDataSource'      => $this->getAssessmentMapperProxy(),
+                    'unitImplementationMapper'  => $this->getUnitImplementationMapper(),
+                    'replicator'                => $injector->lazyNew(Replicator::class, [
                         'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                         'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
                     ]),
-                    'assessmentIdFinder'       => $injector->lazy(function () {
-                        /** @var Filter\Mapper $filterMapper */
-                        $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                        return Filter\Filters\Assessment\IdFinder::getInstance(
-                            $filterMapper,
-                            $this->getMapperFactory()->get(Assessment\Mapper::class)
-                        );
-                    }),
+                    'assessmentIdFinder'        => $injector->lazyGet('filters.assessmentIdFinder'),
                 ]
             )
         );

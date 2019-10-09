@@ -96,13 +96,7 @@ class Module extends \Alaress\Module\Module
                 'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
                 'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
                 'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
-                'assessmentIdFinder'    => $injector->lazy(function(){
-                    /** @var Filter\Mapper $filterMapper */
-                    $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                    return Filter\Filters\Assessment\IdFinder::getInstance(
-                        $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
-                    );
-                }),
+                'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                 'courseImplMapper' => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
                 'unitImplMapper' => $this->getMapperFactory()->getLazy(UnitImpl\Mapper::class),

@@ -215,13 +215,7 @@ class Module extends BaseModule
             'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
             'logMapper'                  => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
             'rosettaStone'               => $injector->lazyGet('l10n'),
-            'assessmentIdFinder'         => $injector->lazy(function(){
-                /** @var Filter\Mapper $filterMapper */
-                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                return Filter\Filters\Assessment\IdFinder::getInstance(
-                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
-                );
-            }),
+            'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
             'classListFactory' => $injector->lazy(function () {
                 /** @var IConnector $database */
                 $database = $this->getInjector()->get('databaseInternal');

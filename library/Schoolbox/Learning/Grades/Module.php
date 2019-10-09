@@ -135,13 +135,7 @@ class Module extends BaseModule
             'access'                     => $this->getMapperFactory()->getLazy(Access::class),
             'filterFactoryFactory'       => $injector->lazyGet('filters.factoryFactory'),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'assessmentIdFinder'         => $injector->lazy(function(){
-                /** @var Filter\Mapper $filterMapper */
-                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                return Filter\Filters\Assessment\IdFinder::getInstance(
-                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
-                );
-            }),
+            'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
         ];
     }
 
