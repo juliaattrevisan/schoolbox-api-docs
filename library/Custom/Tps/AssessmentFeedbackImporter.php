@@ -238,7 +238,7 @@ class AssessmentFeedbackImporter extends CliTool\App
                     $attachments,
                     true,
                     ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
-                    null,
+                    $participant->findMostRecentInstructorGivenFeedback(),
                     null
                 );
 
