@@ -251,9 +251,9 @@ class CliImporter extends CliTool\App
             $tableFile = "$tempDir/$tableName";
             $this->getLogger()->debug("Loading $tableFile.");
 
-            exec("gunzip " . escapeshellarg("$tempDir/$tableGzFile"));
+            exec("gunzip -f -k " . escapeshellarg("$tempDir/$tableGzFile")); // force overwrite of existing files, keep original
             $dataRestorer->restoreTableData($tableName, $tableFile);
-            exec("gzip " . escapeshellarg($tableFile));
+            unlink($tableFile);
         }
         $dataRestorer->addExtraIndexes();
     }
