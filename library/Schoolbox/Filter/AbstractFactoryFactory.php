@@ -37,20 +37,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     }
 
 
-    /**
-     * Return the mapper class of the entity being filtered by this FactoryFactory
-     *
-     * @return string
-     * @throws DomainException If called on abstract, or concrete class that does not override
-     */
-    public static function getEntity(): string
-    {
-        if ('' === static::ENTITY) {
-            throw new DomainException('Concrete classes must define this constant');
-        }
-        return static::ENTITY;
-    }
-
 
     /**
      * @inheritdoc
@@ -232,6 +218,21 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             );
         }
         return new Panel($page, $route, $filterComponents);
+    }
+
+
+    /**
+     * Return the mapper class of the entity being filtered by this FactoryFactory
+     *
+     * @return string
+     * @throws DomainException If called on abstract, or concrete class that does not override
+     */
+    private static function getEntity(): string
+    {
+        if ('' === static::ENTITY) {
+            throw new DomainException('Concrete classes must define this constant');
+        }
+        return static::ENTITY;
     }
 
 
