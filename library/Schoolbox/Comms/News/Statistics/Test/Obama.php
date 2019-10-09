@@ -30,9 +30,9 @@ use Schoolbox\UserMapper;
     - Create 50 articles
     - Distribute over (24 hours * 7 days * 4 weeks) duration which is 1 month
     - Democraticness 0.35 (the smaller the number, the more left-leaning obamastats becomes)
-    - 50% chance for a comment
+    - 5% chance for a comment
     - 67% chance to open article
-    - 33% chance that it got saved for later
+    - 25% chance that it got saved for later
 
 
     (new \Schoolbox\Comms\News\Statistics\Test\Obama(
@@ -44,7 +44,7 @@ use Schoolbox\UserMapper;
         \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Cumulative\Mapper::getInstance()
-    ))->generate(1, 24*7*4*4, 0.35, 67, 33);
+    ))->generate(1, 24*7*4*4, 0.35, 5, 67, 25);
 
  *
  * @package Schoolbox\Comms\News\Statistics\Test
@@ -785,10 +785,14 @@ class Obama
         int $savedForLaterLikelihood
     ): void
     {
-        new \Alaress_Probe("Creating {$numArticles} articles. Over {$duration} hours, the following events may occur:");
-        new \Alaress_Probe("  - {$commentLikelihood}% chance to comment");
-        new \Alaress_Probe("  - {$directOpenLikelihood}% Open rate");
-        new \Alaress_Probe("  - {$savedForLaterLikelihood}% chance to save for later");
+        new \Alaress_Probe("Creating {$numArticles} articles. Over {$duration} hours, the following events may occur over a randomly chosen population of users:");
+        new \Alaress_Probe(
+            "{$democraticness} democratic-ness",
+            "{$commentLikelihood}% chance to Comment",
+            "{$directOpenLikelihood}% chance to Open",
+            "{$savedForLaterLikelihood}% chance to Save For Later"
+        );
+        new \Alaress_Probe('<hr />');
 
         /* First article instance to go in, is the oldest
          */
