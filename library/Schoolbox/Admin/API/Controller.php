@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,18 +7,37 @@
 
 namespace Schoolbox\Admin\API;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web;
 use InvalidArgumentException;
+use Schoolbox\Admin\Import\Profile\Processor;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
 
-
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Admin\API
+ */
 class Controller extends Web\Controller\Base
 {
+    /**
+     * Profile CSVs
+     * Processor consts for declaring which file is being supplied
+     */
+    private const REQUIRED_USER_PROFILE_CSVS = [
+        Processor::CSV_STUDENT,
+        Processor::CSV_PARENT,
+        Processor::CSV_STAFF,
+        Processor::CSV_RELATION
+    ];
+
+    /**
+     * Timetable and Enrolment CSVs
+     */
     private const REQUIRED_CSVS = [
-        'user'                  => ImporterFactory::IMPORT_USER,
         'timetable-structure'   => ImporterFactory::IMPORT_STRUCTURE,
         'timetable'             => ImporterFactory::IMPORT_TIMETABLE,
         'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
@@ -95,7 +113,11 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * @api POST /api/post/process
+     *
+     * @api POST /api/admin/process
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function postProcess()
     {
@@ -126,7 +148,7 @@ class Controller extends Web\Controller\Base
 
             $files = [];
 
-            foreach (array_keys(self::REQUIRED_CSVS) as $requiredCsv) {
+            foreach (array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS)) as $requiredCsv) {
 
                 $hash = $post->get($requiredCsv);
 
@@ -136,8 +158,12 @@ class Controller extends Web\Controller\Base
                 }
 
                 try {
-                    // assign the given hash to its place in the files array
-                    $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
+                    if (!in_array($requiredCsv, self::REQUIRED_USER_PROFILE_CSVS)) {
+                        // assign the given hash to its place in the files array
+                        $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
+                    } else {
+                        $files[$requiredCsv] = $this->storageMapper->findByHash($hash);
+                    }
 
                 } catch (Mapper\Exception $e) {
                     $errors[] = "Invalid file hash given for '$requiredCsv'.";
@@ -152,14 +178,21 @@ class Controller extends Web\Controller\Base
             } else {
                 // valid files found and loaded, we're good to attempt processing
 
+                /** @var IConnector $db */
+                $db = $this->getDi()->get('databaseInternal');
+
                 $write = fopen('php://memory', 'rb+');
 
                 $log = new Logger($write, $write, \Monolog\Logger::WARNING, [], true);
 
                 try {
                     foreach ($files as $keyspace => $file) {
-                        // this is where the action happens
-                        $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
+                        if (!in_array($keyspace, self::REQUIRED_USER_PROFILE_CSVS)) {
+                            // this is where the action happens
+                            $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
+                        } else {
+                            (new Processor($keyspace, $file, $db, $log))->setPerform(true)->process();
+                        }
                     }
 
                     $responseJson['success'] = true;
