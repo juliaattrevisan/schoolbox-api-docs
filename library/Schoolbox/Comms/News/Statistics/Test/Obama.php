@@ -11,6 +11,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Interactions;
+use Schoolbox\Discussion;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -690,7 +691,7 @@ class Obama
     {
         /* Create a thread
          */
-        $threadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
+        $threadMapper = Discussion\Thread\Mapper::getInstance();
 
         $thread = $threadMapper->createModel()->setOpen(true);
 
@@ -702,7 +703,7 @@ class Obama
 
         /* Make some commentary
          */
-        $commentMapper = \Schoolbox\Discussion\Comment\Mapper::getInstance();
+        $commentMapper = Discussion\Comment\Mapper::getInstance();
 
         $numComments = 0;
 
