@@ -91,14 +91,7 @@ class Module extends BaseModule
             'internalDb'            => $injector->lazyGet('databaseInternal'),
             'gradeGroupMapper'      => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
             'userAccessMapper'      => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
-                /** @var RosettaStone $rosettaStone */
-                $rosettaStone = $injector->get('l10n');
-                return new Filter\Filters\Assessment\FactoryFactory(
-                    $this->getMapperFactory(),
-                    $rosettaStone
-                );
-            }),
+            'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
             'assessmentIdFinder'    => $injector->lazy(function () {
                 /** @var Filter\Mapper $filterMapper */

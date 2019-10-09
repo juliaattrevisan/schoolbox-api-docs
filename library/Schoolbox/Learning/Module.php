@@ -140,10 +140,8 @@ class Module extends BaseModule
             $matcher,
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
             function () {
-                /** @var RosettaStone $rosettaStone */
-                $rosettaStone = $this->getInjector()->get('l10n');
                 return [
-                    'filterFactoryFactory' => new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory(), $rosettaStone),
+                    'filterFactoryFactory' => $this->getInjector()->get('filters.factoryFactory'),
                 ];
             }
         );

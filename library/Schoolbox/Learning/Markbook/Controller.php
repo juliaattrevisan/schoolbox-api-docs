@@ -44,18 +44,18 @@ class Controller extends Base
     /** @var Filter\Filters\Assessment\IdFinder */
     private $assessmentIdFinder;
 
-    /** @var Filter\Filters\Assessment\FactoryFactory */
+    /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
 
     /**
-     * @param AssessmentMapperProxy                    $assessmentMapperProxy
-     * @param GradeGroup\Model                         $defaultGradeGroup
-     * @param Term\Mapper                              $termMapper
-     * @param DueWork_ErrorMapper                      $dueWorkErrorMapper
-     * @param Access                                   $access
-     * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
-     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+     * @param AssessmentMapperProxy              $assessmentMapperProxy
+     * @param GradeGroup\Model                   $defaultGradeGroup
+     * @param Term\Mapper                        $termMapper
+     * @param DueWork_ErrorMapper                $dueWorkErrorMapper
+     * @param Access                             $access
+     * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
+     * @param Filter\IFactoryFactory             $filterFactoryFactory
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -64,7 +64,7 @@ class Controller extends Base
         DueWork_ErrorMapper $dueWorkErrorMapper,
         Access $access,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+        Filter\IFactoryFactory $filterFactoryFactory
     ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->defaultGradeGroup     = $defaultGradeGroup;
@@ -278,6 +278,7 @@ class Controller extends Base
 
         $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
+        // Only one filter factory factory has this method: which one?
         $filters = $this->filterFactoryFactory->checkTeacherFolders($filters, $viewee);
 
         // Ensure that assessments are not Assessment Specs

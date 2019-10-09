@@ -119,14 +119,7 @@ class Module extends BaseModule
                         $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
                     );
                 }),
-                'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
-                    /** @var RosettaStone $rosettaStone */
-                    $rosettaStone = $injector->get('l10n');
-                    return new Filter\Filters\Assessment\FactoryFactory(
-                        $this->getMapperFactory(),
-                        $rosettaStone
-                    );
-                }),
+                'filterFactoryFactory'       => $injector->lazyGet('filters.factoryFactory'),
             ])
         );
     }

@@ -150,8 +150,8 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @since 165
-     * @param User                             $viewee The user whose pending assessments we are viewing.
-     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @param User                   $viewee The user whose pending assessments we are viewing.
+     * @param Filter\IFactoryFactory $filterFactoryFactory
      * @var mixed[][] $_GET. Comma-separated keys, indexed by filter.id. Eg '1=&2=weighted&3=1,2,3' (1 => [], 2 => [weighted], 3 => [1,2,3])
      * @throws RouteNotFound
      * @throws ServiceNotFound
@@ -161,7 +161,7 @@ class Controller extends Base
      * @throws \DomainException     If filter factoryFactory has not defined the entity it is filtering
      * @throws NotFound             If $viewee is not staff
      */
-    public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory): void
+    public function getPendingAssessmentsForUser(User $viewee, Filter\IFactoryFactory $filterFactoryFactory): void
     {
         if(!$viewee->getRole()->isStaff()){
             throw new NotFound('Only staff have pending assessments. Found: ' . $viewee->getRole()->getType());
@@ -192,9 +192,9 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @since 165
-     * @param User                             $viewee The user whose pending assessments we are viewing.
-     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
-     * @var  string[][]                        $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
+     * @param User                   $viewee The user whose pending assessments we are viewing.
+     * @param Filter\IFactoryFactory $filterFactoryFactory
+     * @var  string[][]              $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
      * @throws \LogicException
      * @throws \DomainException
      * @throws \OutOfRangeException
@@ -202,7 +202,7 @@ class Controller extends Base
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
-    public function postPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory): void
+    public function postPendingAssessmentsForUser(User $viewee, Filter\IFactoryFactory $filterFactoryFactory): void
     {
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
@@ -226,7 +226,7 @@ class Controller extends Base
     /**
      * Generate a pending assessment report as HTML string
      *
-     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @param Filter\IFactoryFactory $filterFactoryFactory
      * @param User                             $viewee
      * @param string[][]                       $request - Indexed by filter.id, then concrete key
      * @return string
@@ -238,7 +238,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    protected function generatePendingAssessmentReport(AssessmentFilters\FactoryFactory $filterFactoryFactory, User $viewee, array $request)
+    protected function generatePendingAssessmentReport(Filter\IFactoryFactory $filterFactoryFactory, User $viewee, array $request)
     {
         $page                = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
 

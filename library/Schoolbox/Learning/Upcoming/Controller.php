@@ -92,7 +92,7 @@ class Controller extends Base
      */
     protected $defaultGradeGroup;
 
-    /** @var Filter\Filters\Assessment\FactoryFactory */
+    /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
     /** @var Filter\Filters\Assessment\IdFinder */
@@ -108,17 +108,17 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param External_ClassInterface                  $externalClass
-     * @param FolderMapper                             $folderMapper
-     * @param UserMapper                               $userMapper
-     * @param TermMapper                               $termMapper
-     * @param AssessmentMapperProxy                    $assessmentDataSource
-     * @param ParticipantDataSource                    $participantDataSource
-     * @param GradeGroup\Model                         $defaultGradeGroup
-     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
-     * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
-     * @param Filter\Selection\Mapper                  $filterSelectionMapper
-     * @param Access                                   $access
+     * @param External_ClassInterface            $externalClass
+     * @param FolderMapper                       $folderMapper
+     * @param UserMapper                         $userMapper
+     * @param TermMapper                         $termMapper
+     * @param AssessmentMapperProxy              $assessmentDataSource
+     * @param ParticipantDataSource              $participantDataSource
+     * @param GradeGroup\Model                   $defaultGradeGroup
+     * @param Filter\IFactoryFactory             $filterFactoryFactory
+     * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
+     * @param Filter\Selection\Mapper            $filterSelectionMapper
+     * @param Access                             $access
      */
     public function __construct(
         External_ClassInterface $externalClass,
@@ -128,7 +128,7 @@ class Controller extends Base
         AssessmentMapperProxy $assessmentDataSource,
         ParticipantDataSource $participantDataSource,
         GradeGroup\Model $defaultGradeGroup,
-        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
+        Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Filter\Selection\Mapper $filterSelectionMapper,
         Access $access

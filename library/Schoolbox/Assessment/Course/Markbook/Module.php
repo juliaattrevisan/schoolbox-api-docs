@@ -93,14 +93,7 @@ class Module extends \Alaress\Module\Module
             'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
                 'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
-                'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
-                    /** @var RosettaStone $rosettaStone */
-                    $rosettaStone = $injector->get('l10n');
-                    return new Filter\Filters\Assessment\FactoryFactory(
-                        $this->getMapperFactory(),
-                        $rosettaStone
-                    );
-                }),
+                'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
                 'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
                 'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
                 'assessmentIdFinder'    => $injector->lazy(function(){

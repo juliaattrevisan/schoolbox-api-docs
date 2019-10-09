@@ -26,7 +26,7 @@ use Throwable;
 class Controller extends WebController\Base
 {
 
-    /** @var Filter\Filters\Assessment\FactoryFactory */
+    /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
     /** @var Filter\Mapper */
@@ -52,17 +52,17 @@ class Controller extends WebController\Base
 
 
     /**
-     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
-     * @param Filter\Mapper                            $filterMapper
-     * @param Filter\Selection\Mapper                  $filterSelectionMapper
-     * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
-     * @param Assessment\MapperProxy                   $assessmentMapperProxy
-     * @param GradeGroup\Model                         $defaultGradeGroup
-     * @param CourseImpl\Mapper                        $courseImplMapper
-     * @param UnitImpl\Mapper                          $unitImplMapper
+     * @param Filter\IFactoryFactory             $filterFactoryFactory
+     * @param Filter\Mapper                      $filterMapper
+     * @param Filter\Selection\Mapper            $filterSelectionMapper
+     * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
+     * @param Assessment\MapperProxy             $assessmentMapperProxy
+     * @param GradeGroup\Model                   $defaultGradeGroup
+     * @param CourseImpl\Mapper                  $courseImplMapper
+     * @param UnitImpl\Mapper                    $unitImplMapper
      */
     public function __construct(
-        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
+        Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Mapper $filterMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
