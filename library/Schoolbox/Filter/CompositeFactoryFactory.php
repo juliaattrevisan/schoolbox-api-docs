@@ -138,11 +138,10 @@ class CompositeFactoryFactory implements IFactoryFactory
     {
         // I can just piece together a panel from all of the components in each
         // key converter's panels.
-        $components = [];
+        $components = new GenericCollection(IComponent::class);
         foreach ($this->factoryFactories as $factoryFactory) {
-            $panel = $factoryFactory->buildPanel($user, $page, $route, $viewee, $routeArgs, $request);
-            /** @noinspection SlowArrayOperationsInLoopInspection */
-            $components = array_replace($components, $panel->getComponents());
+            $panel      = $factoryFactory->buildPanel($user, $page, $route, $viewee, $routeArgs, $request);
+            $components = $components->union($panel->getComponents());
         }
         return new Panel($page, $route, $components);
     }
