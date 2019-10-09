@@ -135,7 +135,6 @@ class CliDatabaseCreator extends CliTool\App
                 $rootDb->execute(
                     "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
                 );
-                // GRANT file ON *.* to `schoolboxdev`@`localhost`
                 $rootDb->execute(
                     "GRANT file ON *.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
                 );
