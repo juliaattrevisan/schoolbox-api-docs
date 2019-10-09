@@ -31,18 +31,17 @@ class KeyConverter extends AbstractKeyConverter
     public function __construct(Filter\Model $filter, Collection $eventTypeIds)
     {
         parent::__construct($filter);
-        $this->eventTypeIds = $eventTypeIds;
+        $this->eventTypeIds = $eventTypeIds->shallowClone();
     }
 
 
     /**
      * @inheritdoc
-     * @return string
      */
-    protected function getItem(string $key, User $user, string $page): string
+    protected function getItem(string $key, User $user, string $page): int
     {
         $this->assertValidKey($key, $user, $page);
-        return $key;
+        return (int)$key;
     }
 
 
@@ -60,7 +59,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if (!in_array($key, $this->eventTypeIds->getAll(), true)) {
+        if (!$this->eventTypeIds->offsetExists($key)) {
             throw new \InvalidArgumentException('EventType Key is invalid: ' . $key);
         }
     }

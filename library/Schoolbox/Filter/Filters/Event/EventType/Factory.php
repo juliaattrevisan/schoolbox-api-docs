@@ -67,6 +67,12 @@ class Factory extends Filter\AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, $this->eventTypeMapper->findAllIds());
+        return new KeyConverter(
+            $filter,
+            (new Collection($this->eventTypeMapper->findAllIds()))
+                ->indexByCallback(static function ($folderId) {
+                    return $folderId;
+                })
+        );
     }
 }
