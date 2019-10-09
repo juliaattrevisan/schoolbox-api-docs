@@ -165,13 +165,7 @@ class Obama
      *
      * @var array
      */
-    private $referrers = [
-        News\Statistics\Mapper::REFERRER_DASHBOARD,
-        News\Statistics\Mapper::REFERRER_HOMEPAGE,
-        News\Statistics\Mapper::REFERRER_INDEX,
-        News\Statistics\Mapper::REFERRER_ARCHIVE,
-        News\Statistics\Mapper::REFERRER_EMAIL
-    ];
+    private $referrers = News\Statistics\Mapper::REFERRERS;
 
     /**
      * Statistical summary
@@ -631,8 +625,7 @@ class Obama
             /* Decide whether this was person opened a thing
              */
             if ($this->chance($directOpenLikelihood)) {
-                $randomReferrer = $referrers[\rand(0, \count($referrers)-1)];
-                $referrer = $randomReferrer;
+                $referrer = $randomReferrer = $this->getRandomReferrer();
 
                 /* Pass an actual value if we chose an unknown referrer
                  */
