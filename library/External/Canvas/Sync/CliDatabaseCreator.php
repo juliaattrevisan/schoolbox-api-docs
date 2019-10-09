@@ -205,8 +205,6 @@ class CliDatabaseCreator extends CliTool\App
      */
     private function printHelp(): void
     {
-        $file = __FILE__;
-
         $green = self::COLOUR_GREEN;
         $white = self::COLOUR_WHITE;
         $yellow = self::COLOUR_YELLOW;
@@ -217,7 +215,7 @@ WHAT THIS DOES:
     Creates a local canvas staging database named canvas_data_[INSTANCE_ID].
 
 SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
+    $green{$this->getToolFilename()} {$yellow}[OPTION]...$white
 
 OPTIONS:
     $yellow-h, --help$white

@@ -396,8 +396,6 @@ class CliImporter extends CliTool\App
      */
     private function printHelp(): void
     {
-        $file = __FILE__;
-
         $options = [
             [self::OPT_SHORT_HELP, self::OPT_LONG_HELP, 'Print this help and exit'],
             [CliTool\Kernel::OPT_SHORT_PERFORM, CliTool\Kernel::OPT_LONG_PERFORM, 'Persist changes to local files, staging DB + Schoolbox DB'],
@@ -418,7 +416,7 @@ WHAT THIS DOES:
     To create the database, use tools/canvas/create_database.php.
 
 SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
+    $green{$this->getToolFilename()} {$yellow}[OPTION]...$white
 
 OPTIONS:";
         foreach ($options as $option) {
