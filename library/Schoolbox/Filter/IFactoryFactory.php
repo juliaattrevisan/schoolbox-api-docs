@@ -73,16 +73,16 @@ interface IFactoryFactory
     /**
      * Builds a filter panel for the specified user and page, which submits selections to the specified route
      *
-     * @param User      $user
-     * @param string    $page
-     * @param string    $route
-     * @param null|User $viewee
-     * @param array     $routeArgs  Any route params, as received by the controller method
-     * @param array     $request
+     * @param User        $user
+     * @param string      $page
+     * @param null|string $route
+     * @param null|User   $viewee
+     * @param array       $routeArgs  Any route params, as received by the controller method
+     * @param array       $request
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \DomainException If this class has not defined the entity it is filtering
      */
-    public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;
+    public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;
 
 }
