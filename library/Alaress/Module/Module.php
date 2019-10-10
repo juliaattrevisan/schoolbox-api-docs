@@ -111,6 +111,9 @@ class Module {
     /**
      * Shorthand for all the things you can configure on a route
      *
+     * @todo does not yet support repetition quantifiers in route, eg 'year:\d{4}'
+     * @see \Alaress\Module\Test\RouterParserTest
+     *
      * @param string             $httpMethod            typically one of 'GET' or 'POST', but any HTTP method is okay here
      * @param string             $path                  parameterised form of the URL that accepts tokens in-line
      *                                                   - the notation for setting a token is {param:regex}
