@@ -120,6 +120,8 @@ class TokenizerTest extends TestCase
                     ]],
             'nested multi-value x empty'
                 => ['{:single.multi}-{:empty}', ['first-', 'second-', 'third-', 'fourth-']],
+            'nested multi-value x empty (non-cartesian)'
+                => ['{:single.multi}-{:empty}', ['first-', 'second-', 'third-', 'fourth-'], false],
             'nested mutli-value extract'
                 => ['{:single.multi[1]}', 'second'],
             'nested multi-value extract dot-notation'
@@ -150,6 +152,10 @@ class TokenizerTest extends TestCase
                 => ['{:single.multi}{:single.multi}', [
                         'firstfirst', 'secondsecond', 'thirdthird', 'fourthfourth',
                     ], false],
+            'nested-multi - single-multi (non-cartesian)'
+                => ['{:alpha.id}-{:single.multi}', [
+                        'bravo-first', 'charlie-second', 'delta-third', 'echo-fourth', 'foxtrot-'
+                   ], false],
             'multi-multi mapped'
                 => [ new Map('{:multi.multi}', [
                         'first'  => 'ONE',

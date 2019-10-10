@@ -175,20 +175,10 @@ abstract class Tokenizer
                 $tokenMap[$substitution] = $replacements;
             }
 
-            if ($useCartesian) {
-                // this is where it gets fun. we're attempting a cartesian product of $tokenMap[*][1]
-                $cartesian = $this->cartesian($tokenMap);
-            } else {
-                $cartesian = [];
-                foreach ($tokenMap as $fieldKey => $array) {
-                    foreach ($array as $index => $value) {
-                        $cartesian[$index][$fieldKey] = $value;
-                    }
-                }
-            }
+            $indexedReplacements = $this->indexReplacements($tokenMap, $useCartesian);
 
             // iterate that result and apply the replacements
-            foreach ($cartesian as $permutation) {
+            foreach ($indexedReplacements as $permutation) {
                 $settings[$field][] = str_replace(
                     array_keys($permutation),
                     array_values($permutation),
@@ -216,32 +206,45 @@ abstract class Tokenizer
 
 
     /**
-     * Return a cartesian product of the given array
+     * Return a cartesian product of the given array, if useCartesian is true
      *
      * @see http://stackoverflow.com/a/15973172
      * @param array $input
+     * @param bool  $useCartesian
      * @return array
      */
-    protected function cartesian(array $input)
+    private function indexReplacements(array $input, bool $useCartesian): array
     {
         // filter out empty values
-        $input = array_filter($input);
-
+        $input  = array_filter($input);
         $result = [[]];
-
-        foreach ($input as $key => $values) {
-            $append = [];
-
-            foreach($result as $product) {
-                foreach($values as $item) {
-                    $product[$key] = $item;
-                    $append[] = $product;
+        // cartesian
+        if ($useCartesian) {
+            foreach ($input as $key => $values) {
+                $append = [];
+                foreach ($result as $product) {
+                    foreach ($values as $item) {
+                        $product[$key] = $item;
+                        $append[]      = $product;
+                    }
                 }
+                $result = $append;
             }
-
-            $result = $append;
+            return $result;
         }
-
+        // non-cartesian
+        foreach ($input as $key => $values) {
+            foreach ($values as $index => $value) {
+                $result[$index][$key] = $value;
+            }
+        }
+        // fill missing keys
+        foreach ($result as $index => $fields) {
+            $missingKeys = array_diff(array_keys($input), array_keys($fields));
+            foreach ($missingKeys as $missing) {
+                $result[$index][$missing] = '';
+            }
+        }
         return $result;
     }
 
