@@ -31,10 +31,6 @@ use Schoolbox\UserMapper;
  */
 class User extends AbstractImporter
 {
-    /**
-     * @var Reader
-     */
-    protected $csvReader;
 
     /**
      * @var Service
@@ -184,24 +180,6 @@ class User extends AbstractImporter
     }
 
     /**
-     * Performs a sanity check on this user
-     *
-     * Throws validation exceptions if it isn't.
-     *
-     * @param User\Result $userResult
-     * @throws \UnexpectedValueException if a value isn't what it should be
-     */
-    protected function sanityCheck(User\Result $userResult)
-    {
-        $userId = $userResult->getUser()->getExternalId();
-        foreach ($userResult->getChildren() as $child) {
-            if ($userId === $child->getExternalId()) {
-                throw new \UnexpectedValueException("A child cannot be their own parent. External ID: $userId");
-            }
-        }
-    }
-
-    /**
      * Retrieves a user to create or update.
      *
      * @param  array $row A row from the CSV import.
@@ -262,15 +240,8 @@ class User extends AbstractImporter
             // Step 3: update user based on fields
             $userResult->setUser($this->hydrateUser($row, $user));
 
-            // Step 4: sanity check - is data logically valid?
-            try{
-                $this->sanityCheck($userResult);
-            } catch (\UnexpectedValueException $e){
-                $this->log->warning(sprintf("%s - skipping",$e->getMessage()),['row' => $row]);
-                continue;
-            }
 
-            // Step 5: save user
+            // Step 4: save user
             if ($userResult->isUserDeleted()) {
                 $this->deleteUser($userResult);
             } else {
