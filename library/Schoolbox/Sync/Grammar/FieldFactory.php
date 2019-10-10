@@ -57,7 +57,7 @@ class FieldFactory
                     'phoneWork.silent'          => 'Work Phone Silent Status',
                     'meta.department'           => 'Department',
                     'meta.position'             => 'Position(s)',
-                    'meta.position.description' => 'Position(s)',
+                    'meta.position.description' => 'Position Description(s)',
                     'meta.positionName'         => 'Position Names',
                     'meta.category.code'        => 'Category Code',
                     'meta.category.type'        => 'Category Type',
@@ -77,9 +77,9 @@ class FieldFactory
                     'phoneWork.silent'         => 'Work Phone Silent Status',
                     'type'                     => 'Contact Type',
                     'role'                     => 'Guardian Role',
-                    'students[].campus[].code' => 'Student Campus(es) Code(s)',
+                    'students[].campus.code'   => 'Student Campus Code',
                     'students[].year.level'    => 'Student Year',
-                    'students[].house.code'    => 'Student House Code(s)',
+                    'students[].house.code'    => 'Student House Code',
                     'students[].gender'        => 'Student Gender',
                 ];
                 break;

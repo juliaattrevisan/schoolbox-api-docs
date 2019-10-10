@@ -30,8 +30,6 @@ abstract class Tokenizer
         }                               # token end
     `ix';
 
-    const TOKEN_AND = '+';
-
     /** @var Token[] */
     protected $tokens = [];
 
@@ -97,11 +95,12 @@ abstract class Tokenizer
      * @param mixed                  $dataSet   This is the dataset from which values will be taken and jammed into the tokenized string.
      *                                          Typically an array- or object-based hierarchy.
      * @param string|array|Construct $token     A string or Construct that will determine how to render the output. Typically looks like "{:this}".
+     * @param bool                   $useCartesian  Whether to use cartesian when there are two or more tokens in the field
      * @return array|string                     The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
-    public function parseToken($dataSet, $token)
+    public function parseToken($dataSet, $token, $useCartesian = true)
     {
-        return $this->parseTokens([], '_', $token, $dataSet);
+        return $this->parseTokens([], '_', $token, $dataSet, $useCartesian);
     }
 
 
@@ -112,15 +111,16 @@ abstract class Tokenizer
      *                                              Typically looks "something{:like|this}".
      * @param mixed                  $dataset       This is the dataset from which values will be taken and jammed into the tokenized string.
      *                                              Typically an array- or object-based hierarchy.
+     * @param bool                   $useCartesian  Whether to use cartesian when there are two or more tokens in the field
      * @return string|array                         The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
-    protected function parseTokens($settings, $field, $fieldValue, $dataset)
+    protected function parseTokens($settings, $field, $fieldValue, $dataset, $useCartesian = true)
     {
         // if field value is an array, dig into it and recursively parse
         if (is_array($fieldValue)) {
             // recurse
             foreach ($fieldValue as $subField => $subFieldValue) {
-                $settings[$field][$subField] = $this->parseTokens($settings, $subField, $subFieldValue, $dataset);
+                $settings[$field][$subField] = $this->parseTokens($settings, $subField, $subFieldValue, $dataset, $useCartesian);
             }
             return $settings[$field];
         }
@@ -144,16 +144,6 @@ abstract class Tokenizer
         if (preg_match_all(self::TOKEN_REGEX, $fieldValue, $tokenMatches)) {
 
             $tokenCount = count($tokenMatches[0]);
-            $connector = $fieldValue;
-            $union = true;
-            if ($tokenCount > 1) {
-                // get connector between tokens
-                foreach ($tokenMatches[0] as $tokenMatch) {
-                    $connector = str_replace($tokenMatch, '', $connector);
-                }
-                // if connector is +, simply get values for each token for each key
-                $union = ($connector !== str_repeat(self::TOKEN_AND, $tokenCount - 1));
-            }
 
             $tokenMap = [];
 
@@ -185,7 +175,7 @@ abstract class Tokenizer
                 $tokenMap[$substitution] = $replacements;
             }
 
-            if ($union) {
+            if ($useCartesian) {
                 // this is where it gets fun. we're attempting a cartesian product of $tokenMap[*][1]
                 $cartesian = $this->cartesian($tokenMap);
             } else {
