@@ -40,13 +40,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
         // Skip superuser field
     ];
 
-    private $userProfileFields = [
-        'profile_child_ids'    => 'Child External IDs',
-        'profile_dob'          => 'Date of Birth',
-        'profile_home_phone'   => 'Home Phone',
-        'profile_mobile_phone' => 'Mobile Phone',
-        'profile_work_phone'   => 'Work Phone',
-    ];
 
     // fields that we will permit sorting on
     private $sortable = ['firstname', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email'];
@@ -77,9 +70,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $this->getPage()->setVar(['group_block' => '']);
         $this->getPage()->setTitle('Group Report');
 
-        if (Config::get('external_type') === 'schoolbox') {
-            $this->fields += $this->userProfileFields;
-        }
 
         $this->emailObj = new Email();
     }
@@ -150,21 +140,13 @@ class Report_Group extends Report_Abstract implements Report_IReport
             GROUP_CONCAT(DISTINCT `c`.`name` ORDER BY `c`.`name` ASC SEPARATOR ', ') AS `campus`,
             `r`.`name` AS `role`,
             `h`.`house` AS `house`,
-            `rh`.`name` AS `res_house`,
-            GROUP_CONCAT(DISTINCT `child`.`synergy_id` ORDER BY `child`.`synergy_id` ASC SEPARATOR ', ') AS `profile_child_ids`,
-            p.dob AS profile_dob,
-            p.guardian1HomePhone AS profile_home_phone,
-            p.guardian1MobilePhone AS profile_mobile_phone,
-            p.guardian1WorkPhone profile_work_phone
+            `rh`.`name` AS `res_house`
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
             LEFT JOIN `groups` `r` ON `u`.`group_id`=`r`.`id`
             LEFT JOIN `house` `h` ON `u`.`house`=`h`.`id`
             LEFT JOIN `luResidentialHouse` `rh` ON `u`.`residential_house_id`=`rh`.`id`
-            LEFT JOIN `user_profile` `p` ON `u`.`id`=`p`.`user_id`
-            LEFT JOIN `user_relation` `ur` ON `u`.`id`=`ur`.`user_id`
-            LEFT JOIN `user` `child` ON `ur`.`relation_id`=`child`.`id`
             WHERE `u`.`group_id` = '$filterString'
             AND   `u`.`deleted_at` IS NULL
             GROUP BY `u`.`id`
