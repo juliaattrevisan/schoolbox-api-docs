@@ -288,6 +288,58 @@ class Interactions
 
 
     /**
+     * Generate placeholder timestamps, superimpose actual data on top of placeholders
+     * Find the earliest and latest data points and generate a range between them
+     *
+     * @param Scale\IScale $strat
+     * @param News\Model   $article
+     * @return mixed
+     * @throws \Alaress\Database\Exception
+     */
+    private function generatePlaceholders(News\Statistics\Scale\IScale $strat, News\Model $article)
+    {
+        $statement = $this->database->prepareQuery("
+            SELECT
+                ROUND(MIN(nodes.timestamp))/1000 AS min_timestamp,
+                ROUND(MAX(nodes.timestamp))/1000 AS max_timestamp
+            FROM (
+                SELECT
+                    {$strat->getSql()}
+                    role_type,
+                    COUNT(*) AS num
+                FROM {$this->statisticsMapper->getTable()}
+                WHERE article_id = :articleId
+                AND deleted_at IS NULL
+                GROUP BY timestamp, role_type
+                ORDER BY timestamp ASC
+            ) nodes
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        $range = $strat->generateDateRange(
+            \Alaress_Date_Format::newFromTimestamp((int)$row['min_timestamp']),
+            \Alaress_Date_Format::newFromTimestamp((int)$row['max_timestamp'])
+        );
+
+        /* Also set this up for the Total series which is the cumulative effect
+         * of all role types
+         */
+        $data = [];
+
+        foreach (Role::getRoleTypes() as $roleType) {
+            $data[$roleType] = $range;
+        }
+
+        return $data;
+    }
+
+
+    /**
      * Get Opens vs Time
      *
      * @param News\Model  $article
@@ -318,16 +370,11 @@ class Interactions
             'articleId' => $article->getId()
         ]);
 
-        /* Generate placeholder timestamps, superimpose actual data on top of placeholders
+        /* Data container containing placeholder elements
          */
-        $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
+        $data = $this->generatePlaceholders($strat, $article);
 
-        foreach (Role::getRoleTypes() as $roleType) {
-            $data[$roleType] = $range;
-        }
-
-        /* There's only one Type now (Open)
-         * so we can group by Role Type instead
+        /* There's only one Type now (Open) so we can group by Role Type instead
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $data[$row['role_type']][$row['datetime']] = [
