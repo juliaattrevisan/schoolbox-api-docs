@@ -80,6 +80,9 @@ class Matcher
                     $campusList = explode(',', $event->getCampusList());
 
                     // Campus must match at least one in the filter
+                    if (!array_intersect($filter->getAll(), $campusList)) {
+                        return false;
+                    }
                 }
             }
         }
