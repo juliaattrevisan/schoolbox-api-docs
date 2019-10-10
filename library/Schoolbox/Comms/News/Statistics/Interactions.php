@@ -410,12 +410,11 @@ class Interactions
                 $historic[$date] = [
                     'date' => $date,
                     'numOpens' => 0,
-                    'numComments' => 0
+                    'numComments' => $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate())
                 ];
             }
 
             $historic[$date]['numOpens'] += $this->calculateNumOpens((new Collection())->add($dailyStatistic));
-            $historic[$date]['numOpens'] += $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate());
         }
 
         return array_values($historic);
@@ -443,6 +442,7 @@ class Interactions
 
     /**
      * Calculate number of comments for a given article
+     *
      * @param News\Model  $article
      * @param string|null $date
      * @return int

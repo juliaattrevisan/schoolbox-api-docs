@@ -11,6 +11,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Interactions;
+use Schoolbox\Discussion;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -29,7 +30,9 @@ use Schoolbox\UserMapper;
     - Create 50 articles
     - Distribute over (24 hours * 7 days * 4 weeks) duration which is 1 month
     - Democraticness 0.35 (the smaller the number, the more left-leaning obamastats becomes)
+    - 5% chance for a comment
     - 67% chance to open article
+    - 25% chance that it got saved for later
 
 
     (new \Schoolbox\Comms\News\Statistics\Test\Obama(
@@ -41,7 +44,7 @@ use Schoolbox\UserMapper;
         \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Cumulative\Mapper::getInstance()
-    ))->generate(1, 24*7*4*4, 0.35, 67);
+    ))->generate(1, 24*7*4*4, 0.35, 5, 67, 25);
 
  *
  * @package Schoolbox\Comms\News\Statistics\Test
@@ -51,31 +54,102 @@ class Obama
     private const NUM_WORDS_PER_TITLE = 5;
     private const NUM_PARAGRAPHS_PER_BODY = 4;
 
-    /* Switch for changing between datasets
+    /**
+     * Switch for changing between datasets
+     *
+     * @var bool
      */
     private $legacy = true;
 
     /* Mappers
      */
+
+    /**
+     * @var IConnector
+     */
     private $databaseInternal;
+
+    /**
+     * @var UserMapper
+     */
     private $userMapper;
+
+    /**
+     * @var Storage\Mapper
+     */
     private $storageMapper;
+
+    /**
+     * @var News\Topic\Mapper
+     */
     private $topicMapper;
+
+    /**
+     * @var News\Mapper
+     */
     private $newsMapper;
+
+    /**
+     * @var News\Audience\Mapper
+     */
     private $audienceMapper;
+
+    /**
+     * @var News\Statistics\Mapper
+     */
     private $statisticsMapper;
+
+    /**
+     * @var News\Statistics\Cumulative\Mapper
+     */
     private $statisticsCumulativeMapper;
 
     /* Properties
      */
+
+    /**
+     * @var array
+     */
     private $users;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
     private $acceptedAt;
+
+    /**
+     * @var User
+     */
     private $acceptedBy;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
     private $submittedAt;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
     private $expiresAt;
+
+    /**
+     * @var array
+     */
     private $titleSource;
+
+    /**
+     * @var array
+     */
     private $titles;
+
+    /**
+     * @var array
+     */
     private $words;
+
+    /**
+     * @var Collection
+     */
     private $hashes;
 
     /**
@@ -88,17 +162,17 @@ class Obama
      */
     private $ico;
 
-    /* All the referrers that currently exist
+    /**
+     * All the referrers that currently exist
+     *
+     * @var array
      */
-    private $referrers = [
-        News\Statistics\Mapper::REFERRER_DASHBOARD,
-        News\Statistics\Mapper::REFERRER_HOMEPAGE,
-        News\Statistics\Mapper::REFERRER_INDEX,
-        News\Statistics\Mapper::REFERRER_ARCHIVE,
-        News\Statistics\Mapper::REFERRER_EMAIL
-    ];
+    private $referrers = News\Statistics\Mapper::REFERRERS;
 
-    /* Statistical summary
+    /**
+     * Statistical summary
+     *
+     * @var array
      */
     private $summary = [
         'role' => [
@@ -109,7 +183,8 @@ class Obama
                 'guest' => 0
             ],
         ],
-        'numOpens' => 0
+        'numOpens' => 0,
+        'numComments' => 0,
     ];
 
 
@@ -257,6 +332,19 @@ class Obama
 
 
     /**
+     * Pick a random element of $set
+     *
+     * @param array $set
+     * @return mixed
+     * @throws \Exception
+     */
+    private function random(array $set)
+    {
+        return $set[random_int(0, \count($set)-1)];
+    }
+
+
+    /**
      * Manufacture random user
      *
      * @return mixed
@@ -264,7 +352,7 @@ class Obama
      */
     private function getRandomUser()
     {
-        return $this->users[random_int(0, \count($this->users) - 1)];
+        return $this->random($this->users);
     }
 
 
@@ -279,7 +367,7 @@ class Obama
         $title = [];
 
         for ($k = 0; $k < self::NUM_WORDS_PER_TITLE; $k++) {
-            $title[] = $this->titles[random_int(0, \count($this->titles)-1)];
+            $title[] = $this->random($this->titles);
         }
 
         return implode(' ', $title);
@@ -297,7 +385,7 @@ class Obama
         $body = [];
 
         for ($k = 0; $k < self::NUM_PARAGRAPHS_PER_BODY; $k++) {
-            $body[] = "<p>{$this->words[random_int(0, \count($this->words)-1)]}</p>";
+            $body[] = "<p>{$this->random($this->words)}</p>";
         }
 
         return implode("\n", $body);
@@ -312,7 +400,7 @@ class Obama
      */
     private function getRandomBlurb(): string
     {
-        return "<p>{$this->words[random_int(0, \count($this->words)-1)]}</p>";
+        return "<p>{$this->random($this->words)}</p>";
     }
 
 
@@ -324,7 +412,7 @@ class Obama
      */
     private function getRandomImage(): ?Storage\Model
     {
-        return $this->hashes[random_int(0, \count($this->hashes) - 1)];
+        return $this->random($this->hashes->getAll());
     }
 
 
@@ -356,7 +444,7 @@ class Obama
      */
     private function getRandomTopic(): News\Topic\Model
     {
-        return $this->topics->getOffset(\random_int(0, $this->topics->count()-1));
+        return $this->random($this->topics->getAll());
     }
 
 
@@ -367,13 +455,13 @@ class Obama
      * @return string
      * @throws \Exception
      */
-    private function getRandomReferrer(bool $skewedStatistics): string
+    private function getRandomReferrer(bool $skewedStatistics = false): string
     {
         if ($skewedStatistics) {
             return $this->referrers[$this->getWeightedRandom(0, \count($this->referrers) - 1, 0.5)];
         }
 
-        return $this->referrers[\random_int(0, \count($this->referrers)-1)];
+        return $this->random($this->referrers);
     }
 
 
@@ -405,6 +493,37 @@ class Obama
         $offset= $max-$min+1;
 
         return (int)floor($min+ (lcg_value() ** $gamma) * $offset);
+    }
+
+
+    /**
+     * A random quantity of random users upon which to iterate
+     *
+     * @return int
+     * @throws \Exception
+     */
+    private function generateIndexablePopulation(): int
+    {
+        /* At least half of your user population is involved
+         */
+        $minBias = 0.75;
+
+        $indexablePopulation = \count($this->users)-1;
+
+        return \random_int((int)floor($indexablePopulation*$minBias), $indexablePopulation);
+    }
+
+
+    /**
+     * Percentage chance that something occurred
+     *
+     * @param int $percentage
+     * @return bool
+     * @throws \Exception
+     */
+    private function chance(int $percentage): bool
+    {
+        return \random_int(0, 100) < $percentage;
     }
 
 
@@ -484,7 +603,8 @@ class Obama
      * @param News\Model $model
      * @param int        $duration Distribute stats over this duration
      * @param float      $democraticness
-     * @param int        $directOpenLikelihood
+     * @param int        $chanceToOpen
+     * @param int        $chanceToComment
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
@@ -493,21 +613,27 @@ class Obama
         News\Model $model,
         int $duration,
         float $democraticness,
-        int $directOpenLikelihood = 10
+        int $chanceToOpen,
+        int $chanceToComment
     ): void {
-        /* At least half of your user population is involved
-         */
-        $minBias = 0.75;
+        $numUsers = $this->generateIndexablePopulation();
 
-        /* zero-indexed count
-         */
-        $indexablePopulation = \count($this->users)-1;
-
-        $numUsers = \random_int((int)floor($indexablePopulation*$minBias), $indexablePopulation);
         new \Alaress_Probe(str_pad(' ',8)."{$numUsers} users were randomly selected for interaction generation");
 
-        $referrers = News\Statistics\Mapper::REFERRERS;
+        /* Create a thread
+         */
+        $threadMapper = Discussion\Thread\Mapper::getInstance();
 
+        $thread = $threadMapper->createModel()->setOpen(true);
+
+        $threadMapper->save($thread);
+
+        /* Associate thread
+         */
+        News\Mapper::getInstance()->save($model->setDiscussionThread($thread));
+
+        /* Statisfy everyone
+         */
         for ($i = 0; $i < $numUsers; $i++) {
 
             /** @var User $currentUser */
@@ -515,27 +641,45 @@ class Obama
 
             /* Decide whether this was person opened a thing
              */
-            if (\random_int(0, 100) < $directOpenLikelihood) {
-                $randomReferrer = $referrers[\rand(0, \count($referrers)-1)];
+            if ($this->chance($chanceToOpen)) {
+                $referrer = $randomReferrer = $this->getRandomReferrer();
 
                 /* Pass an actual value if we chose an unknown referrer
                  */
                 if ($randomReferrer === News\Statistics\Mapper::REFERRER_EMPTY) {
                     $referrer = null;
-                } else {
-                    $referrer = $randomReferrer;
                 }
 
                 /* Jitter this around
                  */
-                $r = $this->ico->saveOpen($model, $this->generateStatisticDate($duration, $democraticness), $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
+                $date = $this->generateStatisticDate($duration, $democraticness);
+                $r = $this->ico->saveOpen($model, $date, $currentUser->getId(), $currentUser->getRole()->getType(), $currentUser->getRole()->getId(), $referrer);
 
                 if ($r !== false) {
                     $this->summary['role'][News\Statistics\Mapper::TYPE_OPEN][$currentUser->getRole()->getType()]++;
                     $this->summary['numOpens']++;
+
+                    /* Determine whether this open also resulted in a comment being spawned
+                     */
+                    if ($this->chance($chanceToComment)) {
+                        $commentMapper = Discussion\Comment\Mapper::getInstance();
+
+                        $comment = $commentMapper->createModel()
+                                                 ->setContent($this->getRandomBody())
+                                                 ->setAuthor($this->getRandomUser())
+                                                 ->setThread($thread)
+                                                 ->setCreatedAt($date)
+                                                 ->setUpdatedAt($date);
+
+                        $commentMapper->save($comment);
+
+                        $this->summary['numComments']++;
+
+                        new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} commented using {$chanceToComment}% chance to comment");
+                    }
                 }
 
-                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened directly onto carpet using {$directOpenLikelihood}% and referrer {$randomReferrer}");
+                new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} opened using {$chanceToOpen}% chance to open and referrer {$randomReferrer}");
             } else {
                 new \Alaress_Probe(str_pad(' ', 12) . "{$currentUser->getFullName()} didn't open the article");
             }
@@ -550,11 +694,11 @@ class Obama
      * 0.15 is very democratic
      * 1 is not
      *
-     * @param int $duration
-     * @param     $democraticness
+     * @param int   $duration
+     * @param float $democraticness
      * @return \Alaress_Date_Format
      */
-    private function generateStatisticDate(int $duration, $democraticness): \Alaress_Date_Format
+    private function generateStatisticDate(int $duration, float $democraticness): \Alaress_Date_Format
     {
         $val = $this->getWeightedRandom(1, $duration, $democraticness);
 
@@ -568,46 +712,37 @@ class Obama
 
 
     /**
-     * Artificially reddit this article with an $articleNum incrementor that's used to
-     * create discussion_thread_ids because I didn't find a mapper/model anywhere obvious
+     * Arbitrarily save this for later for multiple users
+     * 33% chance of being saved for later, by default
      *
      * @param News\Model $model
+     * @param int        $chanceToSaveForLater
      * @return int
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createComments(News\Model $model): int
+    private function createSavedForLater(News\Model $model, int $chanceToSaveForLater = 33): int
     {
-        /* Create a thread
-         */
-        $threadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
+        $numSaved = 0;
 
-        $thread = $threadMapper->createModel()->setOpen(true);
+        $numUsers = $this->generateIndexablePopulation();
 
-        $threadMapper->save($thread);
+        for ($i = 0; $i < $numUsers; $i++) {
+            if ($this->chance($chanceToSaveForLater)) {
+                $mapper = News\SaveForLater\Mapper::getInstance();
 
-        /* Make some commentary
-         */
-        $numComments = rand(1, 10);
+                $savedForLater = $mapper->createModel()
+                                        ->setArticle($model)
+                                        ->setUser($this->getRandomUser());
 
-        $commentMapper = \Schoolbox\Discussion\Comment\Mapper::getInstance();
+                $mapper->save($savedForLater);
 
-        for ($i = 0; $i < $numComments; $i++) {
-            $comment = $commentMapper->createModel()
-                ->setContent($this->getRandomBody())
-                ->setAuthor($this->getRandomUser())
-                ->setThread($thread)
-                ->setCreatedAt(\Alaress_Date_Format::now()->addDays($this->getWeightedRandom(1,5, 1)));
-
-            $commentMapper->save($comment);
+                $numSaved++;
+            }
         }
 
-        /* Associate thread
-         */
-        \Schoolbox\Comms\News\Mapper::getInstance()->save($model->setDiscussionThread($thread));
-
-        return $numComments;
+        return $numSaved;
     }
 
 
@@ -618,14 +753,30 @@ class Obama
      * @param int   $numArticles
      * @param int   $duration Number of hours for which to populate data
      * @param float $democraticness
-     * @param int   $directOpenLikelihood
+     * @param int   $chanceToComment
+     * @param int   $chanceToOpen
+     * @param int   $chanceToSaveForLater
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function generate(int $numArticles, int $duration, float $democraticness, int $directOpenLikelihood): void
+    public function generate(
+        int $numArticles,
+        int $duration,
+        float $democraticness,
+        int $chanceToComment,
+        int $chanceToOpen,
+        int $chanceToSaveForLater
+    ): void
     {
-        new \Alaress_Probe("Creating {$numArticles} articles using {$directOpenLikelihood}% Open rate over {$duration} hours");
+        new \Alaress_Probe("Creating {$numArticles} articles. Over {$duration} hours, the following events may occur over a randomly chosen population of users:");
+        new \Alaress_Probe(
+            "{$democraticness} democratic-ness",
+            "{$chanceToComment}% chance to Comment",
+            "{$chanceToOpen}% chance to Open",
+            "{$chanceToSaveForLater}% chance to Save For Later"
+        );
+        new \Alaress_Probe('<hr />');
 
         /* First article instance to go in, is the oldest
          */
@@ -643,11 +794,11 @@ class Obama
             $this->createAudience($model);
             new \Alaress_Probe(str_pad(' ',4)."Added audience for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $this->createStatistics($model, $duration, $democraticness, $directOpenLikelihood);
+            $this->createStatistics($model, $duration, $democraticness, $chanceToOpen, $chanceToComment);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $numComments = $this->createComments($model);
-            new \Alaress_Probe(str_pad(' ', 4)."Commented {$numComments} random comments for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
+            $numSavedForLater = $this->createSavedForLater($model, $chanceToSaveForLater);
+            new \Alaress_Probe(str_pad(' ', 4)."Saved {$numSavedForLater} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
         /* Statistical summary
