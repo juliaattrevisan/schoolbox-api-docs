@@ -72,6 +72,9 @@ class RouterParserTest extends TestCase
             ['/path/{token}/path',                    '/path/{token}/path',              []],
             ['/path/{token}/path{/a:X,b,c:X}',        '/path/{token}/path{/a,b,c}',      ['a' => 'X', 'c' => 'X']],
             ['/path/{token:X}/path{/a:X,b,c:X}',      '/path/{token}/path{/a,b,c}',      ['token' => 'X', 'a' => 'X', 'c' => 'X']],
+
+            // TODO cases, we should probably support, but currently don't
+//            ['/path/{token:\d{4}}',                   '/path/{token}',                   ['token' => '\d{4}']],
         ];
     }
 }

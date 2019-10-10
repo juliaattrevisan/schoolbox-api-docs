@@ -198,7 +198,7 @@ class Module extends BaseModule
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article
         $this->register('GET', '/list{/year:\d+,month:\d+}', 'getListByTopic', $loggedIn);                               // (async) Get a list of articles audienced to me, by topic
-        $this->register('GET', '/archive{/year:\d+,month:\d+}', 'getArchive', $loggedIn);                                // News Archive
+        $this->register('GET', '/archive{/year:\d{4},month:\d+}', 'getArchive', $loggedIn);                                // News Archive
         $this->register('GET', '', 'getIndex', $loggedIn);                                                       // Index of articles audienced to you
         $this->register('GET', '/lists/folder/{folderId:\d+}', 'getListForHomepage', $hasHomePageAccess);
 
