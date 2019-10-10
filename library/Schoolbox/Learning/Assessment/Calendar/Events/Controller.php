@@ -80,7 +80,7 @@ class Controller extends Base
      * @param AssessmentFilters\IdFinder $assessmentIdFinder
      * @param IFactoryFactory            $filterFactoryFactory
      * @param FilterSelection\Mapper     $filterSelectionMapper
-     * @param CampusMapper                     $campusMapper
+     * @param CampusMapper               $campusMapper
      * @param Calendar_Api_Config_Record $calendarConfig
      */
     public function __construct(
