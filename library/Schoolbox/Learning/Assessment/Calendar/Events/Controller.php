@@ -65,6 +65,12 @@ class Controller extends Base
 
 
     /**
+     * @var CampusMapper
+     */
+    private $campusMapper;
+
+
+    /**
      * Constructor
      *
      * @param AssessmentDataSource             $assessmentDataSource
@@ -72,6 +78,7 @@ class Controller extends Base
      * @param AssessmentFilters\IdFinder       $assessmentIdFinder
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @param FilterSelection\Mapper           $filterSelectionMapper
+     * @param CampusMapper                     $campusMapper
      * @param Calendar_Api_Config_Record       $calendarConfig
      */
     public function __construct(
@@ -80,6 +87,7 @@ class Controller extends Base
         AssessmentFilters\IdFinder $assessmentIdFinder,
         AssessmentFilters\FactoryFactory $filterFactoryFactory,
         FilterSelection\Mapper $filterSelectionMapper,
+        CampusMapper $campusMapper,
         Calendar_Api_Config_Record $calendarConfig
     ) {
         $this->assessmentDataSource  = $assessmentDataSource;
@@ -87,6 +95,7 @@ class Controller extends Base
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterSelectionMapper = $filterSelectionMapper;
+        $this->campusMapper          = $campusMapper;
         $this->calendarConfig        = $calendarConfig;
     }
 
@@ -142,7 +151,7 @@ class Controller extends Base
         // Calendar events: need events from all campuses (not just the
         // logged-in user's), so create a clone who belongs to all campuses
         $dummyUser = clone $user;
-        $dummyUser->setCampusCollection(CampusMapper::getInstance()->findAll());
+        $dummyUser->setCampusCollection($this->campusMapper->findAll());
         $api->add(
             new Calendar_Api_EventType_Event_Schoolbox_Campus(
                 $this->calendarConfig->getId(),
