@@ -185,6 +185,7 @@ class Obama
         ],
         'numOpens' => 0,
         'numComments' => 0,
+        'numSavedForLater' => 0
     ];
 
 
@@ -717,15 +718,13 @@ class Obama
      *
      * @param News\Model $model
      * @param int        $chanceToSaveForLater
-     * @return int
+     * @return void
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createSavedForLater(News\Model $model, int $chanceToSaveForLater = 33): int
+    private function createSavedForLater(News\Model $model, int $chanceToSaveForLater = 33): void
     {
-        $numSaved = 0;
-
         $numUsers = $this->generateIndexablePopulation();
 
         for ($i = 0; $i < $numUsers; $i++) {
@@ -738,11 +737,9 @@ class Obama
 
                 $mapper->save($savedForLater);
 
-                $numSaved++;
+                $this->summary['numSavedForLater']++;
             }
         }
-
-        return $numSaved;
     }
 
 
@@ -808,8 +805,8 @@ class Obama
             $this->createStatistics($model, $duration, $democraticness, $chanceToOpen, $chanceToComment);
             new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
-            $numSavedForLater = $this->createSavedForLater($model, $chanceToSaveForLater);
-            new \Alaress_Probe(str_pad(' ', 4)."Saved {$numSavedForLater} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
+            $this->createSavedForLater($model, $chanceToSaveForLater);
+            new \Alaress_Probe(str_pad(' ', 4)."Saved {$this->summary['numSavedForLater']} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
         /* Statistical summary
