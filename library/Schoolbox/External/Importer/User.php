@@ -7,7 +7,6 @@
 
 namespace Schoolbox\External\Importer;
 
-use Alaress\Csv\Reader;
 use Alaress\Password\Service;
 use House as HouseModel;
 use HouseMapper;
