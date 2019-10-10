@@ -328,14 +328,8 @@ class Interactions
 
         $data = [];
 
-        foreach (Role::getRoleTypes() as $roleType) {
+        foreach (array_merge(Role::getRoleTypes(), ['total']) as $roleType) {
             $data[$roleType] = $range;
-        }
-
-        /* Also set this up for the Total series which is the cumulative effect of all role types
-         */
-        foreach ($range as $key => $values) {
-            $data['total'][$values[0]] = 0;
         }
 
         return $data;
@@ -386,12 +380,15 @@ class Interactions
                 $row['datetime']
             ];
 
-            $data['total'][(int)$row['timestamp']] += (int)$row['num'];
+            /* Have Total series data in the same format
+             */
+            $data['total'][$row['datetime']][0] = (int)$row['timestamp'];
+            $data['total'][$row['datetime']][1] += (int)$row['num'];
         }
 
         /* Format it for highcharts to understand
          */
-        foreach (Role::getRoleTypes() as $roleType) {
+        foreach (array_merge(Role::getRoleTypes(), ['total']) as $roleType) {
             $data[$roleType] = array_values($data[$roleType]);
 
             /* Sort to eliminate anomalous ordering
@@ -406,23 +403,6 @@ class Interactions
                 return $a[0] > $b[0];
             });
         }
-
-        /* I guess we sort the Total dataset too
-         */
-        ksort($data['total']);
-
-        /* Restructure data for highcharts
-         */
-        $keys = array_keys($data['total']);
-        $values = array_values($data['total']);
-
-        $n = \count($keys);
-
-        for ($total = [], $i = 0; $i < $n; $i++) {
-            $total[] = [$keys[$i], $values[$i]];
-        }
-
-        $data['total'] = $total;
 
         return $data;
     }
