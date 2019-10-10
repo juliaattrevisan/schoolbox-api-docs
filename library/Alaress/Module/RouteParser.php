@@ -18,8 +18,12 @@ use function str_replace;
 class RouteParser
 {
     /**
+     * Parse a route with optional embedded regex tokens into a clean aura-friendly route + regex token array
+     *
      * @param string $path
      * @return array
+     * @internal string   return[0] The cleaned path
+     * @internal string[] return[1] Token regex array
      */
     public function parse(string $path): array
     {
