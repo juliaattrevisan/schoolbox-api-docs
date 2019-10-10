@@ -77,9 +77,9 @@ class FieldFactory
                     'phoneWork.silent'         => 'Work Phone Silent Status',
                     'type'                     => 'Contact Type',
                     'role'                     => 'Guardian Role',
-                    'students[].campus.code'   => 'Student Campus Code',
+                    'students[].campus[].code' => 'Student Campus(es) Code(s)',
                     'students[].year.level'    => 'Student Year',
-                    'students[].house.code'    => 'Student House Code',
+                    'students[].house.code'    => 'Student House Code(s)',
                     'students[].gender'        => 'Student Gender',
                 ];
                 break;
