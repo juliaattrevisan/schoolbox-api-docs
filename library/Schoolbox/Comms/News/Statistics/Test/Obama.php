@@ -750,12 +750,13 @@ class Obama
      * Spawn this many random articles
      * Use a prime number for pagination and demonstration purposes
      *
-     * @param int   $numArticles
-     * @param int   $duration Number of hours for which to populate data
-     * @param float $democraticness
-     * @param int   $chanceToComment
-     * @param int   $chanceToOpen
-     * @param int   $chanceToSaveForLater
+     * @param int      $numArticles
+     * @param int      $duration
+     * @param float    $democraticness
+     * @param int      $chanceToComment
+     * @param int      $chanceToOpen
+     * @param int      $chanceToSaveForLater
+     * @param int|null $help
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
@@ -766,9 +767,19 @@ class Obama
         float $democraticness,
         int $chanceToComment,
         int $chanceToOpen,
-        int $chanceToSaveForLater
+        int $chanceToSaveForLater,
+        ?int $help = 0
     ): void
     {
+        /* Help text for quick reference
+         */
+        if ($help) {
+            new \Alaress_Probe('Querystring Parameters:');
+            new \Alaress_Probe('?numArticles=1&duration=672&democraticness=0.15&chanceToComment=5&chanceToOpen=67&chanceToSaveForLater=25');
+            new \Alaress_Probe('Duration expressed in hours. 672 = 1 month.');
+            die();
+        }
+
         new \Alaress_Probe("Creating {$numArticles} articles. Over {$duration} hours, the following events may occur over a randomly chosen population of users:");
         new \Alaress_Probe(
             "{$democraticness} democratic-ness",
