@@ -72,6 +72,7 @@ interface IConnector extends IQuoter
      *
      * @param string $sql
      * @return bool
+     * @throws \Alaress\Database\Exception
      */
     public function execute($sql);
 

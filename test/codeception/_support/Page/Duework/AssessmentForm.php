@@ -10,6 +10,7 @@ namespace Page\Duework;
 
 use AcceptanceTester;
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\SubmissionBox;
 
 /**
  * Duework form page object
@@ -37,9 +38,9 @@ class AssessmentForm
     public const WORKTYPE_HOMEWORK = 3;
 
     // Visibility
-    public const VISIBILITY_STAFF_ONLY = 0;
-    public const VISIBILITY_STAFF_AND_STUDENT = 1;
-    public const VISIBILITY_ALL = 2;
+    public const VISIBILITY_STAFF_ONLY = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
+    public const VISIBILITY_STAFF_AND_STUDENT = SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
+    public const VISIBILITY_ALL = SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
 
     // Accepts Online Submission
     public const ACCEPT_SUBMISSION_NONE = 0;

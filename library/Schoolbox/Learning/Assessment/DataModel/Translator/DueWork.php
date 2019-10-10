@@ -132,6 +132,7 @@ class DueWork implements IAssessmentTypeTranslator
                 );
             }
         }
+        $dataModel->setExternalId($domainObject->getExternalId());
     }
 
 
@@ -201,5 +202,7 @@ class DueWork implements IAssessmentTypeTranslator
         if (null !== $dataModel->getMarkType()) {
             $domainObject->setMarkType($dataModel->getMarkType());
         }
+
+        $domainObject->setExternalId($dataModel->getExternalId());
     }
 }

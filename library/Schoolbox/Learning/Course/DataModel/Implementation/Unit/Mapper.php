@@ -26,6 +26,7 @@ use Schoolbox\Resource\HomepageConfig;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  * @method GenericCollection|Model[] createCollection($contents = [])
  */

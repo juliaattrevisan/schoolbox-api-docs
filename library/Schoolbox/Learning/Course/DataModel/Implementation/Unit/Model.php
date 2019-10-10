@@ -38,6 +38,7 @@ class Model extends AbstractUnit
     private $unitSpecification;
 
     /**
+     * This will be equal to the value of the unitSpec's folder.title at time of import create/modify
      * @var string
      */
     private $title;

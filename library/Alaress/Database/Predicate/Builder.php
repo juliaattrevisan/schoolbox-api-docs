@@ -20,6 +20,8 @@ class Builder implements IBuilder
     private const OPERATOR_NOT_EQUALS = '<>';
     private const OPERATOR_LIKE       = 'LIKE';
     private const OPERATOR_NOT_LIKE   = 'NOT LIKE';
+    private const OPERATOR_REGEX      = 'REGEXP';
+    private const OPERATOR_NOT_REGEX  = 'NOT REGEXP';
     private const OPERATOR_LT         = '<';
     private const OPERATOR_LTE        = '<=';
     private const OPERATOR_GT         = '>';
@@ -253,6 +255,31 @@ class Builder implements IBuilder
     {
         return $this->addScalarPredicate($columnName, $columnValue, self::OPERATOR_EQUALS);
     }
+
+
+    /**
+     * @param string $columnName
+     * @param string $regex
+     * @return $this
+     * @throws InvalidColumnException
+     */
+    public function regex(string $columnName, string $regex): self
+    {
+        return $this->addScalarPredicate($columnName, $regex, self::OPERATOR_REGEX);
+    }
+
+
+    /**
+     * @param string $columnName
+     * @param string $regex
+     * @return $this
+     * @throws InvalidColumnException
+     */
+    public function notRegex(string $columnName, string $regex): self
+    {
+        return $this->addScalarPredicate($columnName, $regex, self::OPERATOR_NOT_REGEX);
+    }
+
 
     /**
      * @param string|ISqlFunc $columnName

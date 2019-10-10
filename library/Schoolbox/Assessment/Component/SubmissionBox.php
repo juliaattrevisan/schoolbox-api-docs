@@ -26,6 +26,7 @@ use Schoolbox\Permission\Access\Access;
 
 class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 {
+
     use HasCurriculumNodes;
     use AssessmentModelTrait;
 
@@ -33,6 +34,10 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public const SELF_REVIEWABILITY_NONE         = 'none';         // only instructors can review
     public const SELF_REVIEWABILITY_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work, but not give grades
     public const SELF_REVIEWABILITY_FULL         = 'full';         // learner can give reflect and give grades
+
+    public const MARK_VISIBILITY_STAFF_ONLY           = 0;
+    public const MARK_VISIBILITY_STAFF_AND_STUDENT    = 1;
+    public const MARK_VISIBILITY_STAFF_STUDENT_PARENT = 2;
 
     /**
      * @var int
@@ -115,7 +120,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $weight = 0;
 
     /**
-     * @var int
+     * @var float
      */
     protected $max_mark;
 
@@ -165,6 +170,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * @var string
      */
     private $selfReviewability;
+
+    /** @var null|string */
+    private $externalId;
 
 
     /**
@@ -294,8 +302,10 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /**
      * @param  string $description
      * @return $this
+     * @deprecated
+     * @see \Schoolbox\Learning\Assessment\DataModel\Model::$description
      */
-    public function setDescription(string $description)
+    public function setDescription(?string $description)
     {
         $this->description = $description;
         return $this;
@@ -467,7 +477,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param  int $max_mark
+     * @param  float $max_mark
      * @return $this
      */
     public function setMaxMark($max_mark)
@@ -477,7 +487,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getMaxMark()
     {
@@ -837,5 +847,25 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     {
         // Submission box takes this value from the assessment it is *composed* of
         return $this->assessmentModel->isDeleted();
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

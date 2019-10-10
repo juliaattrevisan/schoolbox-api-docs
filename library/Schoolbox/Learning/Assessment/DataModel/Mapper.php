@@ -1106,7 +1106,7 @@ class Mapper extends BaseMapper
     protected function setSequence(Model $assessment)
     {
         // Ignore if this Assessment already had a sequence explicitly set
-        if($assessment->getSequence()) {
+        if($assessment->getSequence() !== null) {
             return;
         }
 

@@ -801,7 +801,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     private function getAllowedFileTypes(): ?string
     {
-        $allowedFileTypes = trim($this->config->get('external_synergetic_allowed_file_types'));
+        $allowedFileTypes = trim($this->config->get('external_synergetic_allowed_file_types') ?? '');
 
         if (!$allowedFileTypes) {
             return null;

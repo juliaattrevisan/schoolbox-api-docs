@@ -29,7 +29,7 @@ class Kernel extends CliKernelAbstract
     // Command line short options recognised by this kernel
     private const OPT_SHORT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
     private const OPT_SHORT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
-    private const OPT_SHORT_PERFORM    = 'p';  // CLI option to indicate the App short be run in 'perform' mode
+    public const OPT_SHORT_PERFORM    = 'p';  // CLI option to indicate the App short be run in 'perform' mode
 
     // By default, all apps run in 'dry-run' mode, unless either:
     // 1. this option is supplied on the command line, or
