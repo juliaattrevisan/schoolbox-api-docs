@@ -326,13 +326,16 @@ class Interactions
             \Alaress_Date_Format::newFromTimestamp((int)$row['max_timestamp'])
         );
 
-        /* Also set this up for the Total series which is the cumulative effect
-         * of all role types
-         */
         $data = [];
 
         foreach (Role::getRoleTypes() as $roleType) {
             $data[$roleType] = $range;
+        }
+
+        /* Also set this up for the Total series which is the cumulative effect of all role types
+         */
+        foreach ($range as $key => $values) {
+            $data['total'][$values[0]] = 0;
         }
 
         return $data;
