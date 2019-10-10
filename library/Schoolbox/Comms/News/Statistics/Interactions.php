@@ -288,6 +288,55 @@ class Interactions
 
 
     /**
+     * Generate placeholder timestamps, superimpose actual data on top of placeholders
+     * Find the earliest and latest data points and generate a range between them
+     *
+     * @param Scale\IScale $strat
+     * @param News\Model   $article
+     * @return mixed
+     * @throws \Alaress\Database\Exception
+     */
+    private function generatePlaceholders(News\Statistics\Scale\IScale $strat, News\Model $article)
+    {
+        $statement = $this->database->prepareQuery("
+            SELECT
+                ROUND(MIN(nodes.timestamp))/1000 AS min_timestamp,
+                ROUND(MAX(nodes.timestamp))/1000 AS max_timestamp
+            FROM (
+                SELECT
+                    {$strat->getSql()}
+                    role_type,
+                    COUNT(*) AS num
+                FROM {$this->statisticsMapper->getTable()}
+                WHERE article_id = :articleId
+                AND deleted_at IS NULL
+                GROUP BY timestamp, role_type
+                ORDER BY timestamp ASC
+            ) nodes
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        $range = $strat->generateDateRange(
+            \Alaress_Date_Format::newFromTimestamp((int)$row['min_timestamp']),
+            \Alaress_Date_Format::newFromTimestamp((int)$row['max_timestamp'])
+        );
+
+        $data = [];
+
+        foreach (array_merge(Role::getRoleTypes(), ['total']) as $roleType) {
+            $data[$roleType] = $range;
+        }
+
+        return $data;
+    }
+
+
+    /**
      * Get Opens vs Time
      *
      * @param News\Model  $article
@@ -311,23 +360,18 @@ class Interactions
             WHERE article_id = :articleId
             AND deleted_at IS NULL
             GROUP BY timestamp, role_type
-            ORDER BY timestamp ASC
+            ORDER BY role_type, timestamp ASC
         ");
 
         $statement->execute([
             'articleId' => $article->getId()
         ]);
 
-        /* Generate placeholder timestamps, superimpose actual data on top of placeholders
+        /* Data container containing placeholder elements
          */
-        $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
+        $data = $this->generatePlaceholders($strat, $article);
 
-        foreach (Role::getRoleTypes() as $roleType) {
-            $data[$roleType] = $range;
-        }
-
-        /* There's only one Type now (Open)
-         * so we can group by Role Type instead
+        /* There's only one Type now (Open) so we can group by Role Type instead
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $data[$row['role_type']][$row['datetime']] = [
@@ -336,12 +380,15 @@ class Interactions
                 $row['datetime']
             ];
 
-            $data['total'][(int)$row['timestamp']] += (int)$row['num'];
+            /* Have Total series data in the same format
+             */
+            $data['total'][$row['datetime']][0] = (int)$row['timestamp'];
+            $data['total'][$row['datetime']][1] += (int)$row['num'];
         }
 
         /* Format it for highcharts to understand
          */
-        foreach (Role::getRoleTypes() as $roleType) {
+        foreach (array_merge(Role::getRoleTypes(), ['total']) as $roleType) {
             $data[$roleType] = array_values($data[$roleType]);
 
             /* Sort to eliminate anomalous ordering
@@ -356,23 +403,6 @@ class Interactions
                 return $a[0] > $b[0];
             });
         }
-
-        /* I guess we sort the Total dataset too
-         */
-        ksort($data['total']);
-
-        /* Restructure data for highcharts
-         */
-        $keys = array_keys($data['total']);
-        $values = array_values($data['total']);
-
-        $n = \count($keys);
-
-        for ($total = [], $i = 0; $i < $n; $i++) {
-            $total[] = [$keys[$i], $values[$i]];
-        }
-
-        $data['total'] = $total;
 
         return $data;
     }
