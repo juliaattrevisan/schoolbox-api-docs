@@ -28,13 +28,9 @@ abstract class Base implements IScale
         $range = [];
 
         /* Multiply by 1000 to get milliseconds conversion, because highcharts
-         *
-         * We don't need to placehold the last element in the range, which is the most recent interval
-         * It should only show when there's data there, rather than assumed to be zero, because its
-         * state is currently volatile and inconclusive unlike its historical brethren.
          */
-        while ($start->getUnixTimeStamp() < ($endTimestamp-(60*$this->getInterval()))) {
-            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0];
+        while ($start->getUnixTimeStamp() <= $endTimestamp) {
+            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0, null];
 
             $start->addMinutes($this->getInterval());
         }

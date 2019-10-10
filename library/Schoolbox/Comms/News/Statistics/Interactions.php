@@ -360,7 +360,7 @@ class Interactions
             WHERE article_id = :articleId
             AND deleted_at IS NULL
             GROUP BY timestamp, role_type
-            ORDER BY timestamp ASC
+            ORDER BY role_type, timestamp ASC
         ");
 
         $statement->execute([
@@ -390,18 +390,6 @@ class Interactions
          */
         foreach (array_merge(Role::getRoleTypes(), ['total']) as $roleType) {
             $data[$roleType] = array_values($data[$roleType]);
-
-            /* Sort to eliminate anomalous ordering
-             *
-             * Sometimes data points are added that don't fall within the prescribed set of keys produced by
-             * generateDateRange() and are added to the end of the stack, out of order with everything else
-             *
-             * First encountered setting the period to be longer than 30 days and using the Month scale
-             * option but may occur if we misconfigured something
-             */
-            usort($data[$roleType], function ($a, $b) {
-                return $a[0] > $b[0];
-            });
         }
 
         return $data;
