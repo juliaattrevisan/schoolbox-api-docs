@@ -235,7 +235,7 @@ class Courses
                 JOIN account_dim account ON course.account_id = account.id
                 JOIN enrollment_dim enrollment ON enrollment.course_id = course.id
                 JOIN pseudonym_dim pseudonym ON pseudonym.user_id = enrollment.user_id
-                WHERE $courseFilterWhere
+                WHERE $courseFilterWhere AND
                       enrollment.type = 'TeacherEnrollment' AND
                       pseudonym.sis_user_id IN ({$bindings->getPlaceholder()})
                 GROUP BY course.id
