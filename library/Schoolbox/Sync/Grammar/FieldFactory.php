@@ -57,7 +57,7 @@ class FieldFactory
                     'phoneWork.silent'          => 'Work Phone Silent Status',
                     'meta.department'           => 'Department',
                     'meta.position'             => 'Position(s)',
-                    'meta.position.description' => 'Position(s)',
+                    'meta.position.description' => 'Position Description(s)',
                     'meta.positionName'         => 'Position Names',
                     'meta.category.code'        => 'Category Code',
                     'meta.category.type'        => 'Category Type',

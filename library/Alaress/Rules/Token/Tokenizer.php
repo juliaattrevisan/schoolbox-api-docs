@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -95,11 +95,12 @@ abstract class Tokenizer
      * @param mixed                  $dataSet   This is the dataset from which values will be taken and jammed into the tokenized string.
      *                                          Typically an array- or object-based hierarchy.
      * @param string|array|Construct $token     A string or Construct that will determine how to render the output. Typically looks like "{:this}".
+     * @param bool                   $useCartesian  Whether to use cartesian when there are two or more tokens in the field
      * @return array|string                     The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
-    public function parseToken($dataSet, $token)
+    public function parseToken($dataSet, $token, $useCartesian = true)
     {
-        return $this->parseTokens([], '_', $token, $dataSet);
+        return $this->parseTokens([], '_', $token, $dataSet, $useCartesian);
     }
 
 
@@ -110,15 +111,16 @@ abstract class Tokenizer
      *                                              Typically looks "something{:like|this}".
      * @param mixed                  $dataset       This is the dataset from which values will be taken and jammed into the tokenized string.
      *                                              Typically an array- or object-based hierarchy.
+     * @param bool                   $useCartesian  Whether to use cartesian when there are two or more tokens in the field
      * @return string|array                         The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
-    protected function parseTokens($settings, $field, $fieldValue, $dataset)
+    protected function parseTokens($settings, $field, $fieldValue, $dataset, $useCartesian = true)
     {
         // if field value is an array, dig into it and recursively parse
         if (is_array($fieldValue)) {
             // recurse
             foreach ($fieldValue as $subField => $subFieldValue) {
-                $settings[$field][$subField] = $this->parseTokens($settings, $subField, $subFieldValue, $dataset);
+                $settings[$field][$subField] = $this->parseTokens($settings, $subField, $subFieldValue, $dataset, $useCartesian);
             }
             return $settings[$field];
         }
@@ -173,11 +175,10 @@ abstract class Tokenizer
                 $tokenMap[$substitution] = $replacements;
             }
 
-            // this is where it gets fun. we're attempting a cartesian product of $tokenMap[*][1]
-            $cartesian = $this->cartesian($tokenMap);
+            $indexedReplacements = $this->indexReplacements($tokenMap, $useCartesian);
 
             // iterate that result and apply the replacements
-            foreach ($cartesian as $permutation) {
+            foreach ($indexedReplacements as $permutation) {
                 $settings[$field][] = str_replace(
                     array_keys($permutation),
                     array_values($permutation),
@@ -205,32 +206,45 @@ abstract class Tokenizer
 
 
     /**
-     * Return a cartesian product of the given array
+     * Return a cartesian product of the given array, if useCartesian is true
      *
      * @see http://stackoverflow.com/a/15973172
      * @param array $input
+     * @param bool  $useCartesian
      * @return array
      */
-    protected function cartesian(array $input)
+    private function indexReplacements(array $input, bool $useCartesian): array
     {
         // filter out empty values
-        $input = array_filter($input);
-
+        $input  = array_filter($input);
         $result = [[]];
-
-        foreach ($input as $key => $values) {
-            $append = [];
-
-            foreach($result as $product) {
-                foreach($values as $item) {
-                    $product[$key] = $item;
-                    $append[] = $product;
+        // cartesian
+        if ($useCartesian) {
+            foreach ($input as $key => $values) {
+                $append = [];
+                foreach ($result as $product) {
+                    foreach ($values as $item) {
+                        $product[$key] = $item;
+                        $append[]      = $product;
+                    }
                 }
+                $result = $append;
             }
-
-            $result = $append;
+            return $result;
         }
-
+        // non-cartesian
+        foreach ($input as $key => $values) {
+            foreach ($values as $index => $value) {
+                $result[$index][$key] = $value;
+            }
+        }
+        // fill missing keys
+        foreach ($result as $index => $fields) {
+            $missingKeys = array_diff(array_keys($input), array_keys($fields));
+            foreach ($missingKeys as $missing) {
+                $result[$index][$missing] = '';
+            }
+        }
         return $result;
     }
 

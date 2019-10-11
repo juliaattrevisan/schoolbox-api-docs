@@ -131,7 +131,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                 foreach ($data as $property => $token) {
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
-                    $value   = $this->tokenizer->parseToken($input, $token);
+                    $value   = $this->tokenizer->parseToken($input, $token, false);
 
                     // treat collections special-like
                     if ($this->isCollection($property)) {

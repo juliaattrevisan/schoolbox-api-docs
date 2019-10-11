@@ -120,6 +120,8 @@ class TokenizerTest extends TestCase
                     ]],
             'nested multi-value x empty'
                 => ['{:single.multi}-{:empty}', ['first-', 'second-', 'third-', 'fourth-']],
+            'nested multi-value x empty (non-cartesian)'
+                => ['{:single.multi}-{:empty}', ['first-', 'second-', 'third-', 'fourth-'], false],
             'nested mutli-value extract'
                 => ['{:single.multi[1]}', 'second'],
             'nested multi-value extract dot-notation'
@@ -146,6 +148,14 @@ class TokenizerTest extends TestCase
                         'sfirst', 'ssecond', 'sthird', 'sfourth',
                         'tfirst', 'tsecond', 'tthird', 'tfourth',
                     ]],
+            'single-multi - single-multi (non-cartesian)'
+                => ['{:single.multi}{:single.multi}', [
+                        'firstfirst', 'secondsecond', 'thirdthird', 'fourthfourth',
+                    ], false],
+            'nested-multi - single-multi (non-cartesian)'
+                => ['{:alpha.id}-{:single.multi}', [
+                        'bravo-first', 'charlie-second', 'delta-third', 'echo-fourth', 'foxtrot-'
+                   ], false],
             'multi-multi mapped'
                 => [ new Map('{:multi.multi}', [
                         'first'  => 'ONE',
@@ -168,10 +178,11 @@ class TokenizerTest extends TestCase
      * @dataProvider tokenParsingData
      * @param string $token
      * @param mixed $expected
+     * @param bool $useCartesian
      */
-    public function testTokenParsing($token, $expected)
+    public function testTokenParsing($token, $expected, $useCartesian = true)
     {
-        $actual = $this->tokenizer->parseToken($this->tree, $token);
+        $actual = $this->tokenizer->parseToken($this->tree, $token, $useCartesian);
 
         $this->assertEquals($expected, $actual);
     }
