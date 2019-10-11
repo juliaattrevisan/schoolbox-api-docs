@@ -24,9 +24,7 @@ class Month extends Base
 
 
     /**
-     * Not presently used in this strat; we can shortcut it with a simpler interpretation
-     * Classically you could use getInterval() and return PERIOD_LENGTH etc. but we can hardcode
-     * an intended result instead for now
+     * Not used for months; they don't increment uniformly, they have different numbers of days per month
      *
      * @return int
      */
@@ -35,9 +33,11 @@ class Month extends Base
         return 0;
     }
 
-
     /**
-     * @inheritdoc
+     * Generate a range of datetime values, starting at midnight of $start,
+     * ending at midnight of $end, at intervals (a value in minutes)
+     *
+     * Month requires some extra trickery because not all months are the same length
      *
      * @param \Alaress_Date_Format $start
      * @param \Alaress_Date_Format $end
@@ -45,15 +45,21 @@ class Month extends Base
      */
     public function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end): array
     {
-        $start->startOfMonth()->startOfDay();
-        $endTimestamp = $end->startOfMonth()->startOfDay()->getUnixTimeStamp();
+        $start->startOfDay();
+        $endTimestamp = $end->getUnixTimeStamp();
 
-        /* Special format for month; there are only ever two data points because of our crontab deletion
+        $range = [];
+
+        /* Multiply by 1000 to get milliseconds conversion, because highcharts
          */
-        $range = [
-            $start->getDatabase() => [$start->getUnixTimeStamp()*1000, 0],
-            $end->getDatabase() => [$endTimestamp*1000, 0]
-        ];
+        while ($start->getUnixTimeStamp() <= $endTimestamp) {
+            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0, null];
+
+            /* Arbitrarily add one month per iteration, rather than calculate based on seconds
+             * Months aren't the same length and cannot be incremented uniformly, except like this
+             */
+            $start->addMonths(1);
+        }
 
         return $range;
     }

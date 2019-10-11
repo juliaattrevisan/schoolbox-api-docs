@@ -346,7 +346,6 @@ class Interactions
      */
     public function fetchOpensVsTime(News\Model $article, ?string $scale): array
     {
-
         /* Determine a sane value
          */
         $strat = (new Factory())->produce($scale);
@@ -377,7 +376,8 @@ class Interactions
             $data[$row['role_type']][$row['datetime']] = [
                 (int)$row['timestamp'],
                 (int)$row['num'],
-                $row['datetime']
+                $row['datetime'],
+                date('Y-m-d H:i:s', (int)$row['timestamp']/1000)
             ];
 
             /* Have Total series data in the same format
