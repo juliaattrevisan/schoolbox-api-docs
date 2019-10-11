@@ -77,14 +77,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'filterFactoryFactory' => $injector->lazy(function () use ($injector) {
-                /** @var RosettaStone $rosettaStone */
-                $rosettaStone = $injector->get('l10n');
-                return new Filter\Filters\Assessment\FactoryFactory(
-                    $this->getMapperFactory(),
-                    $rosettaStone
-                );
-            }),
+            'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
             'rosettaStone'         => $injector->lazyGet('l10n'),
             'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
             'eventTypeMapper'      => $this->getMapperFactory()->getLazy(EventTypeMapper::class),

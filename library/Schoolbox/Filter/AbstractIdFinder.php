@@ -66,15 +66,12 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * @inheritdoc
      */
-    public function findIdsByFilters(array $filters = [], $deleted = false)
+    public function findIdsByFilters(array $filters = [], bool $deleted = false): array
     {
         // No filters ?
         if (0 === count($filters)) {
             return $this->getMapper()->findAllIds(['deleted' => $deleted]);
         }
-
-        // Filters supplied. Ensure they are recognisable.
-        $this->checkValidFilterKeys($filters);
 
         // Ensure all filter keys so we don't need to perform repeated isset() checks
         $completeFilters = $this->normaliseFilters($filters);
@@ -121,22 +118,6 @@ abstract class AbstractIdFinder implements IdFinder
 
 
     /**
-     * Ensures that any filters passed in are known to this class
-     *
-     * @param Collection[]|null[]|mixed[][] $filters
-     * @throws InvalidArgumentException If filter definition class not recognised
-     */
-    protected function checkValidFilterKeys(array $filters)
-    {
-        foreach ($filters as $filterClass => $val) {
-            if (!array_key_exists($filterClass, $this->registry)) {
-                throw new InvalidArgumentException("Unknown filter: $filterClass");
-            }
-        }
-    }
-
-
-    /**
      * Inserts null values for missing filters and ensures any scalars are wrapped in Collections
      *
      * This enables us to rely on filters being present, even if set explicitly to NULL
@@ -148,6 +129,17 @@ abstract class AbstractIdFinder implements IdFinder
     protected function normaliseFilters(array $sparseFilters)
     {
         $completeFilters = [];
+
+        // Filter out any passed-in filters this ID finder deals not with
+        // (Previously this errored out if unrecognized filters were found.
+        //  Now that multiple ID finders may operate on the same query string,
+        //  just skip)
+        foreach ($sparseFilters as $filterClass => $val) {
+            if (array_key_exists($filterClass, $this->registry)) {
+                $completeFilters[$filterClass] = $val;
+            }
+        }
+
         foreach ($this->registry as $filterClass) {
             // Not in the passed filters? Set it explicitly to null.
             if (!array_key_exists($filterClass, $sparseFilters)) {
@@ -179,7 +171,7 @@ abstract class AbstractIdFinder implements IdFinder
      * @param Collection[]|null[]|mixed[][] $completeFilters
      * @return bool
      */
-    abstract protected function doFiltersGuaranteeEmptySet(array $completeFilters);
+    abstract protected function doFiltersGuaranteeEmptySet(array $completeFilters): bool;
 
 
     /**
@@ -201,10 +193,10 @@ abstract class AbstractIdFinder implements IdFinder
      *
      * @param Collection[]|null[]|mixed[][] $completeFilters
      * @param bool                          $deleted Whether to include soft-deleted entities
-     * @return mixed[]
+     * @return mixed[]                      [$query, $params]
      * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
-    abstract protected function buildQuery(array $completeFilters, $deleted);
+    abstract protected function buildQuery(array $completeFilters, bool $deleted): array;
 
 
     /* Getters

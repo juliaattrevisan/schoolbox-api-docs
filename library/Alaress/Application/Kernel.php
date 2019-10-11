@@ -11,6 +11,8 @@ namespace Alaress\Application;
 use Aura\Di;
 use Config\Modules\ModuleConfigInterface;
 use Predis;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Filter;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Throwable;
@@ -1343,6 +1345,35 @@ abstract class Kernel
             // add sentry to the DI
             $di->set('sentry', $sentryClient);
         }
+
+
+        // Filter factory factory
+        $di->set(
+            'filters.factoryFactory',
+            $di->lazy(
+                static function () use ($di, $mapperFactory) {
+                    return new Filter\CompositeFactoryFactory(
+                        new Filter\Filters\Assessment\FactoryFactory(
+                            $mapperFactory,
+                            $di->get('l10n')
+                        ),
+                        new Filter\Filters\Event\FactoryFactory($mapperFactory)
+                    );
+                }
+            )
+        );
+        $di->set(
+            'filters.assessmentIdFinder',
+            static function () use ($mapperFactory) {
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $mapperFactory->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper,
+                    $mapperFactory->get(AssessmentMapper::class)
+                );
+            }
+        );
+
 
         // load dependencies into the kernel itself
         $this->setDependencyInjector($di);

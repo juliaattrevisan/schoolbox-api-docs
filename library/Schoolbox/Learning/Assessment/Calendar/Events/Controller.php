@@ -17,6 +17,8 @@ use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Filters\Event as EventFilters;
+use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -47,7 +49,7 @@ class Controller extends Base
 
 
     /**
-     * @var AssessmentFilters\FactoryFactory
+     * @var IFactoryFactory
      */
     private $filterFactoryFactory;
 
@@ -73,19 +75,19 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param AssessmentDataSource             $assessmentDataSource
-     * @param Visibility                       $visibility
-     * @param AssessmentFilters\IdFinder       $assessmentIdFinder
-     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
-     * @param FilterSelection\Mapper           $filterSelectionMapper
-     * @param CampusMapper                     $campusMapper
-     * @param Calendar_Api_Config_Record       $calendarConfig
+     * @param AssessmentDataSource       $assessmentDataSource
+     * @param Visibility                 $visibility
+     * @param AssessmentFilters\IdFinder $assessmentIdFinder
+     * @param IFactoryFactory            $filterFactoryFactory
+     * @param FilterSelection\Mapper     $filterSelectionMapper
+     * @param CampusMapper               $campusMapper
+     * @param Calendar_Api_Config_Record $calendarConfig
      */
     public function __construct(
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         AssessmentFilters\IdFinder $assessmentIdFinder,
-        AssessmentFilters\FactoryFactory $filterFactoryFactory,
+        IFactoryFactory $filterFactoryFactory,
         FilterSelection\Mapper $filterSelectionMapper,
         CampusMapper $campusMapper,
         Calendar_Api_Config_Record $calendarConfig
@@ -116,6 +118,7 @@ class Controller extends Base
         $codec          = $this->filterFactoryFactory->buildCodec();
         $user           = $this->getUser();
         $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
+        $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
 
 
         // Store the filters this user selected
@@ -143,13 +146,13 @@ class Controller extends Base
                 $this->assessmentDataSource,
                 $this->visibility,
                 $this->assessmentIdFinder,
-                $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page)
+                $filters
             )
         );
 
 
-        // Calendar events: need events from all campuses (not just the
-        // logged-in user's), so create a clone who belongs to all campuses
+        // Calendar events: need events from all campuses
+        // (not just the logged-in user's), so create a clone in all campuses
         $dummyUser = clone $user;
         $dummyUser->setCampusCollection($this->campusMapper->findAll());
         $api->add(
@@ -167,6 +170,7 @@ class Controller extends Base
             $this->getDi(),
             $user
         );
+        $calendar->getAllEvents()->filter(new EventFilters\Matcher($filters));
 
 
         // The API's renderAll returns a list of json-encoded events.

@@ -43,5 +43,5 @@ interface IdFinder
      * @throws \InvalidArgumentException If any filter keys not recognised
      * @throws BrokenFilterException If a injected filter is unable to be processed
      */
-    public function findIdsByFilters(array $filters = [], $deleted = false);
+    public function findIdsByFilters(array $filters = [], bool $deleted = false): array;
 }

@@ -67,7 +67,7 @@ class Controller extends Base
      */
     private $userAccessMapper;
 
-    /** @var Filter\Filters\Assessment\FactoryFactory */
+    /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
     /** @var Filter\Selection\Mapper */
@@ -83,19 +83,19 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param IConnector                               $internalDb
-     * @param GradeGroup\Mapper                        $gradeGroupMapper
-     * @param UserAccessMapper                         $userAccessMapper
-     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
-     * @param Filter\Selection\Mapper                  $filterSelectionMapper
-     * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
-     * @param Filter\Mapper                            $filterMapper
+     * @param IConnector                         $internalDb
+     * @param GradeGroup\Mapper                  $gradeGroupMapper
+     * @param UserAccessMapper                   $userAccessMapper
+     * @param Filter\IFactoryFactory             $filterFactoryFactory
+     * @param Filter\Selection\Mapper            $filterSelectionMapper
+     * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
+     * @param Filter\Mapper                      $filterMapper
      */
     public function __construct(
         IConnector $internalDb,
         GradeGroup\Mapper $gradeGroupMapper,
         UserAccessMapper $userAccessMapper,
-        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
+        Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Selection\Mapper $filterSelectionMapper,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Filter\Mapper $filterMapper

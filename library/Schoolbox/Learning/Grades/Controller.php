@@ -82,21 +82,21 @@ class Controller extends Base
     private $assessmentIdFinder;
 
     /**
-     * @var AssessmentFilters\FactoryFactory
+     * @var Filter\IFactoryFactory
      */
     private $filterFactoryFactory;
 
 
     /**
-     * @param AssessmentMapperProxy            $assessmentMapperProxy
-     * @param Folder\Mapper                    $folderMapper
-     * @param Term\Mapper                      $termMapper
-     * @param GradeGroup\Model                 $defaultGradeGroup
-     * @param RubricDataSource                 $rubricMapper
-     * @param FilterSelection\Mapper           $filterSelectionMapper
-     * @param Access                           $access
-     * @param AssessmentFilters\IdFinder       $assessmentIdFinder
-     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @param AssessmentMapperProxy      $assessmentMapperProxy
+     * @param Folder\Mapper              $folderMapper
+     * @param Term\Mapper                $termMapper
+     * @param GradeGroup\Model           $defaultGradeGroup
+     * @param RubricDataSource           $rubricMapper
+     * @param FilterSelection\Mapper     $filterSelectionMapper
+     * @param Access                     $access
+     * @param AssessmentFilters\IdFinder $assessmentIdFinder
+     * @param Filter\IFactoryFactory     $filterFactoryFactory
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -107,7 +107,7 @@ class Controller extends Base
         FilterSelection\Mapper $filterSelectionMapper,
         Access $access,
         AssessmentFilters\IdFinder $assessmentIdFinder,
-        AssessmentFilters\FactoryFactory $filterFactoryFactory
+        Filter\IFactoryFactory $filterFactoryFactory
     )
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
@@ -262,7 +262,7 @@ class Controller extends Base
                     if (!isset($assessmentTasks[$folder->getId()])) {
                         $assessmentTasks[$folder->getId()] = new GenericCollection(IAssessable::class);
                     }
-                    
+
                     $assessmentTasks[$folder->getId()]->add($assessment);
                 }
 

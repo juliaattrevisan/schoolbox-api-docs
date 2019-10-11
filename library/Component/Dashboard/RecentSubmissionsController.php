@@ -55,12 +55,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
     {
         parent::__construct($instance, $user, $sitepage);
 
-        /** @var Filter\Mapper $filterMapper */
-        $filterMapper                = $this->getMapperFactory()->get(Filter\Mapper::class);
-        $this->idFinder = Filters\Assessment\IdFinder::getInstance(
-            $filterMapper,
-            $this->getMapperFactory()->get(Assessment\Mapper::class)
-        );
+        $this->idFinder              = $this->getSitePage()->getDi()->get('filters.assessmentIdFinder');
         $this->attemptDataSource     = $this->getSitePage()->getDi()->get('attemptDataSource');
         $this->submissionDataSource  = $this->getSitePage()->getDi()->get('submissionDataSource');
         $this->assessmentMapperProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');

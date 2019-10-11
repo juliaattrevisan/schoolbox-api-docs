@@ -127,21 +127,8 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'participantDataSource' => $injector->lazyGet('participantDataSource'),
             'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
-            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
-                /** @var RosettaStone $rosettaStone */
-                $rosettaStone = $injector->get('l10n');
-                return new Filter\Filters\Assessment\FactoryFactory(
-                    $this->getMapperFactory(),
-                    $rosettaStone
-                );
-            }),
-            'assessmentIdFinder'    => $injector->lazy(function () {
-                /** @var Filter\Mapper $filterMapper */
-                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                return Filter\Filters\Assessment\IdFinder::getInstance(
-                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
-                );
-            }),
+            'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
+            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
             'access'                => $this->getMapperFactory()->getLazy(Access::class),
         ];

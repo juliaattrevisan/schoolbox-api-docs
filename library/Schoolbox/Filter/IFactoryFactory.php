@@ -19,16 +19,6 @@ use Schoolbox\User;
  */
 interface IFactoryFactory
 {
-
-    /**
-     * Return a constant that represents the entity that is being filtered,
-     * eg 1 => 'assessments'
-     *
-     * @return string
-     */
-    public static function getEntity(): string;
-
-
     /**
      * A registry of assessment-filter factories, along with their construction dependencies.
      *
@@ -42,9 +32,9 @@ interface IFactoryFactory
 
 
     /**
-     * @return Codec
+     * @return ICodec
      */
-    public function buildCodec();
+    public function buildCodec(): ICodec;
 
     /**
      * Build a set of key converters for filters configured as enabled for the specified page
@@ -54,7 +44,7 @@ interface IFactoryFactory
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      */
-    public function buildEnabledKeyConverters($page);
+    public function buildEnabledKeyConverters($page): GenericCollection;
 
 
     /**
@@ -77,22 +67,36 @@ interface IFactoryFactory
      * @param bool   $enabledOnly
      * @return GenericCollection|IDefinition[]  Indexed by filter.class
      */
-    public function buildCurrentState($page, $enabledOnly);
+    public function buildCurrentState($page, $enabledOnly): GenericCollection;
 
 
     /**
      * Builds a filter panel for the specified user and page, which submits selections to the specified route
      *
-     * @param User      $user
-     * @param string    $page
-     * @param string    $route
-     * @param null|User $viewee
-     * @param array     $routeArgs  Any route params, as received by the controller method
-     * @param array     $request
+     * @param User        $user
+     * @param string      $page
+     * @param null|string $route
+     * @param null|User   $viewee
+     * @param array       $routeArgs  Any route params, as received by the controller method
+     * @param array       $request
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \DomainException If this class has not defined the entity it is filtering
      */
-    public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;
+    public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;
 
+
+    /**
+     * An assessment-specific function to ensure that if the admin disables the
+     * teacher-folder filter, then we fall back to the viewee's involved classes
+     * and groups.
+     *
+     * TODO this shouldn't be here: it's only added so the composite may use it
+     *
+     * @param null[]|Collection[] $filters
+     * @param User                $viewee
+     * @return null[]|Collection[]
+     * @throws InvalidArgumentException    If unable to find specified Mapper class
+     */
+    public function checkTeacherFolders(array $filters, User $viewee): array;
 }

@@ -140,10 +140,8 @@ class Module extends BaseModule
             $matcher,
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
             function () {
-                /** @var RosettaStone $rosettaStone */
-                $rosettaStone = $this->getInjector()->get('l10n');
                 return [
-                    'filterFactoryFactory' => new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory(), $rosettaStone),
+                    'filterFactoryFactory' => $this->getInjector()->get('filters.factoryFactory'),
                 ];
             }
         );
@@ -217,13 +215,7 @@ class Module extends BaseModule
             'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
             'logMapper'                  => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
             'rosettaStone'               => $injector->lazyGet('l10n'),
-            'assessmentIdFinder'         => $injector->lazy(function(){
-                /** @var Filter\Mapper $filterMapper */
-                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                return Filter\Filters\Assessment\IdFinder::getInstance(
-                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
-                );
-            }),
+            'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
             'classListFactory' => $injector->lazy(function () {
                 /** @var IConnector $database */
                 $database = $this->getInjector()->get('databaseInternal');

@@ -93,23 +93,10 @@ class Module extends \Alaress\Module\Module
             'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
                 'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
-                'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
-                    /** @var RosettaStone $rosettaStone */
-                    $rosettaStone = $injector->get('l10n');
-                    return new Filter\Filters\Assessment\FactoryFactory(
-                        $this->getMapperFactory(),
-                        $rosettaStone
-                    );
-                }),
+                'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
                 'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
                 'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
-                'assessmentIdFinder'    => $injector->lazy(function(){
-                    /** @var Filter\Mapper $filterMapper */
-                    $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
-                    return Filter\Filters\Assessment\IdFinder::getInstance(
-                        $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
-                    );
-                }),
+                'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                 'courseImplMapper' => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
                 'unitImplMapper' => $this->getMapperFactory()->getLazy(UnitImpl\Mapper::class),

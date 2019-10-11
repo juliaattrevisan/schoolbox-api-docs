@@ -49,11 +49,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
                 case Page\Model::PAGE_ASSESSMENT_CALENDAR:
                     /** @var RosettaStone $rosettaStone */
-                    $rosettaStone = $this->getInjector()->get('l10n');
-                    return ['factoryFactory' => new Filters\Assessment\FactoryFactory(
-                        $this->getMapperFactory(),
-                        $rosettaStone
-                    )];
+                    return ['factoryFactory' => $this->getInjector()->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }
             return [];

@@ -70,7 +70,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    protected function buildQuery(array $completeFilters, $deleted): array
+    protected function buildQuery(array $completeFilters, bool $deleted): array
     {
         // Filters which effect which sub-queries are required
         $teacherFolderIds      = $completeFilters[Folder\TeacherInvolved\Definition::class];
@@ -1142,7 +1142,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @inheritdoc
      */
-    protected function doFiltersGuaranteeEmptySet(array $completeFilters)
+    protected function doFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         // Examine the context-filters
         if ($this->doContextFiltersGuaranteeEmptySet($completeFilters)) {

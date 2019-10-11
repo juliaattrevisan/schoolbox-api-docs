@@ -25,7 +25,9 @@ use UnexpectedValueException;
 
 class Controller extends Base
 {
-    /** @var Filter\Filters\Assessment\FactoryFactory */
+    /**
+     * @var Filter\IFactoryFactory
+     */
     private $filterFactoryFactory;
 
     /**
@@ -46,13 +48,13 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
-     * @param RosettaStone                             $rosettaStone
-     * @param TermMapper                               $termMapper
-     * @param EventTypeMapper                          $eventTypeMapper
+     * @param Filter\IFactoryFactory $filterFactoryFactory
+     * @param RosettaStone           $rosettaStone
+     * @param TermMapper             $termMapper
+     * @param EventTypeMapper        $eventTypeMapper
      */
     public function __construct(
-        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
+        Filter\IFactoryFactory $filterFactoryFactory,
         RosettaStone $rosettaStone,
         TermMapper $termMapper,
         EventTypeMapper $eventTypeMapper
@@ -103,7 +105,11 @@ class Controller extends Base
                 [
                     'filterPanel' => $filterPanel,
                     'termDates'   => $this->getAvailableTermDates(),
-                    'eventTypes'  => $this->eventTypeMapper->findAll(),
+                    'eventTypes'  => $this->eventTypeMapper
+                        ->findAll()
+                        ->sortByCallback(static function (EventType $a, EventType $b) {
+                            return strnatcasecmp($a->getType(), $b->getType());
+                        }),
                 ],
                 'Assessment Calendar',
                 $pageTitle
