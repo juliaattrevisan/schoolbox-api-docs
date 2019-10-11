@@ -33,6 +33,7 @@ class Month extends Base
         return 0;
     }
 
+
     /**
      * Generate a range of datetime values, starting at midnight of $start,
      * ending at midnight of $end, at intervals (a value in minutes)
@@ -46,6 +47,11 @@ class Month extends Base
     public function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end): array
     {
         $start->startOfDay();
+
+        if (!$start->getUnixTimeStamp() || !$end->getUnixTimeStamp()) {
+            return $this->generateMinimumRange();
+        }
+
         $endTimestamp = $end->getUnixTimeStamp();
 
         $range = [];

@@ -13,6 +13,23 @@ abstract class Base implements IScale
 {
 
     /**
+     * Generates a one-node range containing only today's date
+     *
+     * @return array
+     */
+    protected function generateMinimumRange(): array
+    {
+        $range = [];
+
+        $now = \Alaress_Date_Format::now();
+
+        $range[$now->getDatabase()] = [1000*$now->getUnixTimeStamp(), 0, null];
+
+        return $range;
+    }
+
+
+    /**
      * Generate a range of datetime values, starting at midnight of $start,
      * ending at midnight of $end, at intervals (a value in minutes)
      *
@@ -23,6 +40,11 @@ abstract class Base implements IScale
     public function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end): array
     {
         $start->startOfDay();
+
+        if (!$start->getUnixTimeStamp() || !$end->getUnixTimeStamp()) {
+            return $this->generateMinimumRange();
+        }
+
         $endTimestamp = $end->getUnixTimeStamp();
 
         $range = [];

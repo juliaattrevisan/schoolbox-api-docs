@@ -37,6 +37,7 @@ class Factory
      */
     private const DEFAULT_SCALE = 'day';
 
+
     /**
      * Enforce a default value
      *
