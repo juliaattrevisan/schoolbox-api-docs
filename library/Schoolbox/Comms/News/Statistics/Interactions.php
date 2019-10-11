@@ -376,8 +376,7 @@ class Interactions
             $data[$row['role_type']][$row['datetime']] = [
                 (int)$row['timestamp'],
                 (int)$row['num'],
-                $row['datetime'],
-                date('Y-m-d H:i:s', (int)$row['timestamp']/1000)
+                $row['datetime']
             ];
 
             /* Have Total series data in the same format
