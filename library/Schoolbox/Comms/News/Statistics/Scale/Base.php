@@ -40,6 +40,7 @@ abstract class Base implements IScale
     public function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end): array
     {
         $start->startOfDay();
+        $end->endOfDay();
 
         if (!$start->getUnixTimeStamp() || !$end->getUnixTimeStamp()) {
             return $this->generateMinimumRange();
