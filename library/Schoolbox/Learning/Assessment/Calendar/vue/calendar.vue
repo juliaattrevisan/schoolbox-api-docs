@@ -788,7 +788,7 @@
                     slotDuration: { weeks: 1 },
                     weekNumbers: true,
                     slotLabelFormat: [
-                        'MMMM',
+                        'MMM',
                         'w'
                     ],
                     resourceAreaWidth: '15%',
@@ -797,7 +797,8 @@
                         start: this.minDate,
                         end: this.maxDate,
                     },
-                    resourceLabelText: 'Week'
+                    resourceLabelText: 'Week',
+                    slotWidth: '50'
                 },
                 resourceTimelineWeek: {
                     columnHeaderFormat: formats.displayWeekDay,
