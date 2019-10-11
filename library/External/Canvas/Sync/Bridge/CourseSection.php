@@ -15,10 +15,10 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\TreeBuilder;
 use UnderflowException;
 use UnexpectedValueException;
+use function array_column;
 use function array_keys;
 use function implode;
 use function preg_match;
@@ -31,6 +31,9 @@ use function preg_replace;
  * This encapsulates the link between a logical 'Class' in both systems.
  *
  * The StAlloy scheme appears to be course_section.sis_source_id = CONCAT($year, 'C', $subjectCode, 'NOT')
+ *
+ * Note that we need to build a tree that contains the 'Calendar Year' folder ancestor of a class, because we need
+ * both the class's folderCode, and ancestral year, to match against the SIS Source Id.
  *
  * @todo, snap the scheme into a stateless Bridge\CourseSection class, and the execution and logging into a utility class
  */
@@ -45,6 +48,9 @@ class CourseSection
 
     /** @var Folder\Mapper */
     private $folderMapper;
+
+    /** @var Course */
+    private $courseBridge;
 
     private $folderTree;
 
@@ -113,17 +119,20 @@ class CourseSection
      * @param IConnector      $canvasDb
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
+     * @param Course          $courseBridge
      * @param LoggerInterface $log
      */
     public function __construct(
         IConnector $canvasDb,
         IConnector $schoolboxDb,
         Folder\Mapper $folderMapper,
+        Course $courseBridge,
         LoggerInterface $log
     ) {
         $this->canvasDb     = $canvasDb;
         $this->schoolboxDb  = $schoolboxDb;
         $this->folderMapper = $folderMapper;
+        $this->courseBridge = $courseBridge;
         $this->log          = $log;
     }
 
@@ -246,9 +255,8 @@ class CourseSection
         };
         $treeBuilder  = new TreeBuilder($this->folderMapper);
 
-        // The class structure is by far the largest, so not much saving to root in the 'Classes' top-level folder
-        $this->log->info(sprintf('Building folder tree from root %d', IFolder::ROOT_ID));
-        $this->folderTree = $treeBuilder->buildTree(IFolder::ROOT_ID, $hashFunction);
+        $this->log->info(sprintf('Building folder tree from root %d', $this->getClassFolder()->getId()));
+        $this->folderTree = $treeBuilder->buildTree($this->getClassFolder()->getId(), $hashFunction);
 
         // Get all folders that ARE or WERE classes
         $innerPb = $this->folderMapper->getPredicateBuilder()
@@ -298,6 +306,33 @@ class CourseSection
 
 
     /**
+     * Returns the root of the class folder tree
+     *
+     * @return Folder\Model
+     * @throws Database\Exception
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     */
+    private function getClassFolder(): Folder\Model
+    {
+        $sql = "
+            SELECT *
+            FROM folder
+            WHERE parent = 0 AND deleted_at IS NULL AND name = 'Classes'
+        ";
+
+        $rows = $this->schoolboxDb->executeQuery($sql)->fetchAll();
+        if(!count($rows)){
+            throw new UnexpectedValueException("Unable to locate class root folder");
+        }
+        if(count($rows) > 1){
+            throw new UnexpectedValueException("Ambiguous class root folders:" . implode(',', array_column($rows, 'id')));
+        }
+        return $this->folderMapper->hydrate($rows[0]);
+    }
+
+
+    /**
      * Returns a folder code that was rolled over and embedded in folder name
      *
      * @param string $folderName
@@ -340,6 +375,8 @@ class CourseSection
      * Fetch Canvas SisSourceIds and match up to Schoolbox folder codes
      *
      * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
      * @throws UnexpectedValueException
      */
     private function populateAllCanvasSisSourceIds(): void
@@ -358,7 +395,7 @@ class CourseSection
             foreach ($unPrefixedToOriginalMap as $unPrefixed => $originalCodes) {
                 if (count($originalCodes) > 1) {
                     $ambiguousFolderCodes = implode(', ', $originalCodes);
-                    $this->log->debug("Ignoring ambiguous codes '$ambiguousFolderCodes' for year '$year'");
+                    $this->log->debug("Ignoring ambiguous folder codes '$ambiguousFolderCodes' for year '$year'");
                     foreach ($originalCodes as $originalCode) {
                         unset($yearAndFolderCodeToFolderMap[$year][$originalCode]);
                     }
@@ -375,12 +412,10 @@ class CourseSection
             }
         }
 
-        // Fetch all Canvas SisSourceIds
-        $sql = "SELECT DISTINCT sis_source_id FROM course_section_dim WHERE sis_source_id IS NOT NULL";
-
+        // Fetch all relevant Canvas CourseSection SisSourceIds
         // Initially set mapping to NULL
         $this->sisSourceIdToYearAndFolderCodeMap = [];
-        foreach ($this->canvasDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN) as $sisSourceId) {
+        foreach ($this->getSectionSisSourceIds() as $sisSourceId) {
             $this->sisSourceIdToYearAndFolderCodeMap[$sisSourceId] = null;
         }
 
@@ -431,6 +466,28 @@ class CourseSection
             $this->log->debug($noFolderCodeMatch);
         }
         $this->log->info(count($regexMatchAndFolderCodeMatch) . ' Canvas CourseSection.SisSourceId were matched to a folderCode');
+    }
+
+
+    /**
+     * Returns the Canvas CourseSection.SisSourceIds to match to Schoolbox folder codes
+     *
+     * @return string[]
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function getSectionSisSourceIds(): array
+    {
+        $pb          = $this->courseBridge->getCanvasCoursesToImport();
+        $whereClause = $pb->getWhere()[0];
+        $sql         = "
+            SELECT cs.sis_source_id
+            FROM course_dim c
+            JOIN course_section_dim cs ON cs.course_id = c.id
+            WHERE {$whereClause}
+        ";
+        return $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
     }
 
 

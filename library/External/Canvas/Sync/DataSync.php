@@ -170,7 +170,7 @@ class DataSync
         $this->log->info("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge     = new Bridge\Account($this->schoolboxDb);
         $assignmentBridge  = new Bridge\Assignment($this->markTypeMapper->findAll());
-        $courseBridge      = new Bridge\Course($this->schoolboxDb);
+        $courseBridge      = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
 
         // Import Canvas Accounts => Schoolbox Faculty folders
@@ -202,6 +202,7 @@ class DataSync
             $this->canvasDb,
             $this->schoolboxDb,
             $this->folderMapper,
+            $courseBridge,
             $this->log
         );
         $sectionBridge->execute();

@@ -15,7 +15,10 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
 use UnderflowException;
 use UnexpectedValueException;
+use function array_map;
 use function count;
+use function date;
+use function implode;
 use function preg_match;
 
 /**
@@ -25,14 +28,19 @@ class Course
 {
 
     /** @var IConnector */
+    private $canvasDb;
+
+    /** @var IConnector */
     private $schoolboxDb;
 
 
     /**
+     * @param IConnector $canvasDb
      * @param IConnector $schoolboxDb
      */
-    public function __construct(IConnector $schoolboxDb)
+    public function __construct(IConnector $canvasDb, IConnector $schoolboxDb)
     {
+        $this->canvasDb = $canvasDb;
         $this->schoolboxDb = $schoolboxDb;
     }
 
@@ -154,23 +162,35 @@ class Course
         return $folder->setUnitSpecification($unitSpec);
     }
 
+
     /**
-     * Return a predicate that will filter the Canvas courses that should be synchronised
+     * Returns a predicate to match Canvas Course and CourseSections that should be synchronised
      *
-     * @todo We could alternatively use `course.code LIKE '%NOT'` but there are ~27 rows where this is inconsistent with the `name` test.
-     *       Need to confirm with client the test by which we filter courses, either by `name`, `code`, both?
+     * Course must:
+     *   * Have workflow_state 'available' or 'completed'
      *
-     * @param string $courseTable
+     * CourseSection must:
+     *   * Has a SisSourceId LIKE 'Y2019C%NOT' but NOT LIKE 'Y%C%TEACHNOT' (where year is from 2019 to current calendar year + 1)
+     *
+     * @param string $courseAlias
+     * @param string $sectionAlias
      * @return Builder
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    public function courseFilterPredicate(string $courseTable = 'course'): Builder
+    public function getCanvasCoursesToImport(string $courseAlias = 'c', string $sectionAlias = 'cs'): Builder
     {
-        return (new Builder($this->schoolboxDb, $courseTable))
-            ->all((new Builder($this->schoolboxDb, $courseTable))
-                ->like('name', '%notif%')
-                ->in('workflow_state', ['available', 'completed'])
-            );
+        $minYear = 2019;
+        $maxYear = date('Y') + 1;  // We need to include next year for students who commence Yr 12 curriculum in T4 of Yr 11.
+        $innerPb = new Builder($this->canvasDb, '');
+        for ($year = $minYear; $year <= $maxYear; $year++) {
+            $innerPb->like("{$sectionAlias}.sis_source_id", "Y{$year}C%NOT");
+        }
+        $outerPb = (new Builder($this->canvasDb, ''))
+            ->any($innerPb)
+            ->notLike("{$sectionAlias}.sis_source_id", "Y%C%TEACHNOT")
+            ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
+
+        return (new Builder($this->canvasDb, ''))->all($outerPb);
     }
 }

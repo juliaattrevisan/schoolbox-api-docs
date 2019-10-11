@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
 use InvalidArgumentException;
+use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -27,6 +28,7 @@ use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
 use function array_key_exists;
+use function array_map;
 use function count;
 
 /**
@@ -147,7 +149,8 @@ class Courses
         // Fetch all relevant courses and their assignments
         // If multiple courses with same code over multiple years, split into timeless courseSpec + per-time unitSpec
 
-        $courseFilterPb    = $this->courseBridge->courseFilterPredicate();
+        $canvasCourseIds = $this->getCanvasCourseIdsToImport();
+        $courseFilterPb = (new Builder($this->canvasDb, ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql       = "
         SELECT 
@@ -298,6 +301,36 @@ class Courses
         $this->deleteUnSynchronizedCourseGroups($synchronizedCourseGroupFolderIds);
 
         $this->printCounts();
+    }
+
+
+    /**
+     * Returns the canvas ids of the Canvas courses to import
+     *
+     * Course must:
+     *   * Have workflow_state 'available' or 'completed'
+     *   * Have 1+ CourseSections where the Sections:
+     *     * Has a SisSourceId LIKE 'Y2019C%NOT', ... where year is from 2019 to current calendar year + 1
+     *
+     * @return int[]
+     * @throws Database\Exception
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function getCanvasCourseIdsToImport(): array
+    {
+        $pb          = $this->courseBridge->getCanvasCoursesToImport();
+        $whereClause = $pb->getWhere()[0];
+        $sql         = "
+            SELECT DISTINCT c.canvas_id
+            FROM course_dim c
+            JOIN course_section_dim cs ON cs.course_id = c.id
+            WHERE {$whereClause}
+        ";
+        $canvasIds = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+        return array_map(static function (string $canvasId) {
+            return (int)$canvasId;
+        }, $canvasIds);
     }
 
 
