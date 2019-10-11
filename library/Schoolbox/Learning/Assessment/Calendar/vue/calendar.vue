@@ -1013,7 +1013,8 @@
         text-align: center !important;
     }
 
-    a.fc-timeline-event.fc-h-event.fc-event.fc-start.fc-end.source.personal.fc-draggable.fc-resizable {
+    .fc-dayGridMonth-view a.fc-timeline-event,
+    .fc-resourceTimelineWeek-view a.fc-timeline-event {
         width: auto !important;
     }
 </style>
