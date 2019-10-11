@@ -375,8 +375,7 @@ class Interactions
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $data[$row['role_type']][$row['datetime']] = [
                 (int)$row['timestamp'],
-                (int)$row['num'],
-                $row['datetime']
+                (int)$row['num']
             ];
 
             /* Have Total series data in the same format
