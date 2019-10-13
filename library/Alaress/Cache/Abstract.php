@@ -21,6 +21,12 @@ abstract class Alaress_Cache_Abstract
     protected $url = '';
 
     /**
+     * Paramaters passed to the cache fetch, currently supports providing headers to the request
+     * @var array
+     */
+    protected $params = [];
+
+    /**
      * A prefix for cached filenames
      *
      * @var string
@@ -120,6 +126,8 @@ abstract class Alaress_Cache_Abstract
         }
 
         $this->url = $url;
+
+        $this->params = $params;
 
         /* Logging class handles verbosity and any logging
          */
@@ -234,7 +242,11 @@ abstract class Alaress_Cache_Abstract
         $httpClient = new GuzzleClient(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
 
         try {
-            $httpClient->get($url, ['headers' => ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'], 'save_to' => $this->cachedFile]);
+            $headers = ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'];
+            if(is_array($this->params['headers']) ) {
+                $headers = array_merge($this->params['headers'], $headers);
+            }
+            $httpClient->get($url, ['headers' => $headers, 'save_to' => $this->cachedFile]);
         } catch (RequestException $e) {
             return false;
         }
@@ -475,6 +487,29 @@ abstract class Alaress_Cache_Abstract
     public function invalidateCache(): void
     {
         $this->remove($this->cachedFile);
+    }
+
+    /**
+     * Get for parameters
+     *
+     * @return array
+     */
+    protected function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * Setter for params
+     *
+     * @vars array
+     * @param array $params
+     * @return self
+     */
+    protected function setParameters(array $params): \Alaress_Twitter_Cache
+    {
+        $this->parameters = $params;
+        return $this;
     }
 }
 
