@@ -356,10 +356,10 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         ];
 
         $urlReplacement = [
-            $this->getViewer()->getId(),
-            $this->getViewer()->getExternalId(),
-            $this->getViewer()->getUsername(),
-            $this->getViewer()->getEmail()
+            $this->getUser()->getId(),
+            $this->getUser()->getExternalId(),
+            $this->getUser()->getUsername(),
+            $this->getUser()->getEmail()
         ];
 
         return str_ireplace($urlTokens, $urlReplacement, $url);
