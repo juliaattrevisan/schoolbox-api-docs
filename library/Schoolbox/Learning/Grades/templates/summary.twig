@@ -128,7 +128,7 @@
                                                     {% if feedback %}
                                                         <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
                                                         <p class="comment">{{ feedback.comment | nl2br }}</p>
-                                                        {% if assessment.useRubric  %}
+                                                        {% if assessment.useRubric or feedback.allFiles | length  %}
                                                             <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
                                                                 View more feedback</a>
                                                         {% endif %}
