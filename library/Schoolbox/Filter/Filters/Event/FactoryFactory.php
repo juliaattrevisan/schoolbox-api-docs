@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Event;
 use InvalidArgumentException;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Filter\IFactory;
@@ -42,6 +43,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 $this->getDefaultsMapper(),
                 $this->getSelectionMapper(),
                 $this->getMapperFactory()->get(EventTypeMapper::class)
+            );
+        }
+        if ($filterDefinitionClass === Campus\Definition::class) {
+            return new Campus\Factory(
+                $this->getOptionMapper(),
+                $this->getDefaultsMapper(),
+                $this->getSelectionMapper(),
+                $this->getMapperFactory()->get(CampusMapper::class)
             );
         }
 

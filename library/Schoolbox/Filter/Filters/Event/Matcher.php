@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Event;
 
+use Calendar\Event\Type\Day\Event as SchoolboxEvent;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Collection;
 
@@ -47,22 +48,42 @@ class Matcher
      */
     public function __invoke(EventInterface $event): bool
     {
-        // The only thing I know how to check yet is the event type.
         foreach ($this->filters as $filterClass => $filter) {
+
+            // Event type check
             if ($filterClass === EventType\Definition::class) {
                 // No items selected: filter in
                 if ($filter === null || count($filter) === 0) {
-                    return true;
+                    continue;
                 }
 
                 // Check this event's type, and compare it to what is selected
                 $type = (int)$event->getType();
                 if ($type <= 0) {
                     // No type? This filter doesn't apply to this event
-                    return true;
+                    continue;
                 }
 
-                return $filter->contains($type);
+                if (!$filter->contains($type)) {
+                    return false;
+                }
+            }
+
+            // Campus check: applies only to Schoolbox events
+            if ($filterClass === Campus\Definition::class) {
+                // No items selected: filter in
+                if ($filter === null || count($filter) === 0) {
+                    continue;
+                }
+                if ($event instanceof SchoolboxEvent) {
+                    // This is comma-separated
+                    $campusList = explode(',', $event->getCampusList());
+
+                    // Campus must match at least one in the filter
+                    if (!array_intersect($filter->getAll(), $campusList)) {
+                        return false;
+                    }
+                }
             }
         }
         return true;
