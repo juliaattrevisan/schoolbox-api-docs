@@ -33,7 +33,7 @@
 <fieldset>
     <legend>Submissions</legend>
     <div class="row">
-        <div class="small-12 columns">
+        <div class="medium-6 columns">
             <label for="acceptOnline">Accepts Online Submissions?</label>
             <select name="acceptOnline" id="acceptOnline">
                 {% set options = {
@@ -46,19 +46,8 @@
                 {% endfor %}
             </select>
         </div>
-    </div>
 
-    {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
-
-    {% if context.baseContext is not unitSpecification %}
-        {% include '@learningAssessment/fragments/dates.twig' %}
-    {% endif %}
-
-    {# Similarity Check
-     # Plagscan is now opt-in on a per-assessment basis because $
-     #}
-    <div class="row">
-        <div class="small-12 columns">
+        <div class="medium-6 columns" id="similarityRow">
             <label for="similarityCheckEnabled">Similarity Check</label> <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span>
             <div class="switch round">
                 <input id="similarityCheckEnabled" name="similarityCheckEnabled" type="checkbox" {{ assessment.similarityCheckEnabled ? 'checked' : '' }}>
@@ -69,6 +58,10 @@
             </div>
         </div>
     </div>
+    {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+    {% if context.baseContext is not unitSpecification %}
+        {% include '@learningAssessment/fragments/dates.twig' %}
+    {% endif %}
 </fieldset>
 
 
@@ -173,6 +166,16 @@
          */
         $acceptOnlineToggle.change(function() {
             toggleDates($(this));
+        });
+
+        /* Show the similarity checkbox if single or multi submit options selected */
+        $('#similarityRow').hide();
+        $('#acceptOnline').change(function(){
+            if($('#acceptOnline').val() != '0') {
+                $('#similarityRow').show();
+            } else {
+                $('#similarityRow').hide();
+            }
         });
     });
 </script>
