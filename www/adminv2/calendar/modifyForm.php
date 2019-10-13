@@ -35,6 +35,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
                 /* Add urls
                  */
                 $config->setUrl($attribs['url']);
+                $config->setAuthorization($attribs['authorization']);
+
 
                 /* Add permissions for campus (or use the default empty array if not chosen)
                  */
