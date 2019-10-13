@@ -23,15 +23,14 @@
         />
 
         {# Input for criterion name #}
-        <input type="text"
+        <textarea rows="3"
                {% if new %}data-rubric-criterion-new="1"{% endif %}
                data-rubric-criterion
                data-template="rubric-criterion-name"
                {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][name]"{% endif %}
-               value="{{ criterion.name }}"
                {% if showNames %}id="i{{ criterion.id }}"{% endif %}
                {% if readonly %}readonly{% endif %}
-        />
+        />{{ criterion.name }}</textarea>
 
         {# Input for criterion curriculum codes #}
         {% if curriculumTaggingEnabled %}
