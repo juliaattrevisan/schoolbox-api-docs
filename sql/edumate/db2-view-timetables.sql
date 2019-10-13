@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_TIMETABLE_DAYS AS
+CREATE OR REPLACE VIEW SCHOOLBOX_TIMETABLE_DAYS AS
 SELECT
 	edumate.timetable.timetable_id,
 	edumate.term.start_date,
@@ -11,7 +11,7 @@ INNER JOIN edumate.term_group ON edumate.term.term_id = edumate.term_group.term_
 INNER JOIN edumate.cycle ON edumate.cycle.cycle_id = edumate.term_group.cycle_id
 ;
 
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_TIMETABLE_DEFINITION AS
+CREATE OR REPLACE VIEW SCHOOLBOX_TIMETABLE_DEFINITION AS
 SELECT DISTINCT
         edumate.timetable.timetable_id AS "CAMPUS",
         edumate.period.period,
@@ -31,7 +31,7 @@ AND edumate.term.start_date <= current date
 AND edumate.term.end_date >= current date
 ;
 
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_TIMETABLE AS
+CREATE OR REPLACE VIEW SCHOOLBOX_TIMETABLE AS
 SELECT
 	edumate.cycle_day.day_index as "DAY_NUMBER",
 	edumate.period.short_name as "PERIOD_NUMBER",
@@ -45,7 +45,7 @@ INNER JOIN edumate.cycle_day ON edumate.cycle_day.cycle_day_id = edumate.period_
 INNER JOIN edumate.period ON edumate.period.period_id = edumate.period_cycle_day.period_id
 INNER JOIN edumate.class ON edumate.class.class_id = edumate.period_class.class_id
 INNER JOIN edumate.course ON edumate.course.course_id = edumate.class.course_id
-INNER JOIN edumate.perd_cls_teacher ON edumate.perd_cls_teacher.period_class_id = edumate.period_class.period_class_id 
+INNER JOIN edumate.perd_cls_teacher ON edumate.perd_cls_teacher.period_class_id = edumate.period_class.period_class_id
 	AND edumate.perd_cls_teacher.is_primary = 1
 INNER JOIN edumate.teacher ON edumate.teacher.teacher_id = edumate.perd_cls_teacher.teacher_id
 INNER JOIN edumate.staff ON edumate.staff.contact_id = edumate.teacher.contact_id

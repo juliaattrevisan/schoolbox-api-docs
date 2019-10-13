@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_STUDENTS AS
+CREATE OR REPLACE VIEW SCHOOLBOX_STUDENTS AS
 WITH student_single_form AS (
 SELECT
 ROW_NUMBER() OVER
@@ -17,7 +17,7 @@ edumate.student_form_run.student_id,
 edumate.form.form,
 edumate.form_run.form_run,
 replace(edumate.contact.firstname,'&#039;','''') AS FIRSTNAME,
-replace(edumate.contact.surname,'&#039;','''') AS SURNAME,  
+replace(edumate.contact.surname,'&#039;','''') AS SURNAME,
 COALESCE(edumate.salutation.salutation||CHR(32),'')||LEFT(replace(coordinator.firstname,'&amp;#039;',''''),1)||'. '||replace(coordinator.surname,'&amp;#039;','''') AS FORM_STAFF_NAME,
 CASE
 WHEN edumate.student_form_run.start_date_locked = 1
@@ -187,7 +187,7 @@ INNER JOIN edumate.student ON edumate.student.student_id = future_student_single
 INNER JOIN edumate.contact ON edumate.contact.contact_id = edumate.student.contact_id
 LEFT JOIN edumate.sys_user ON edumate.contact.contact_id = edumate.sys_user.contact_id
 LEFT JOIN future_student_house_info ON future_student_house_info.student_id = edumate.student.student_id
-LEFT JOIN future_student_tutors ON future_student_tutors.student_id = edumate.student.student_id     
+LEFT JOIN future_student_tutors ON future_student_tutors.student_id = edumate.student.student_id
 ;
 
 

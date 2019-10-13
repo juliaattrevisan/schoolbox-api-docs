@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_CLASSES AS
+CREATE OR REPLACE VIEW SCHOOLBOX_CLASSES AS
 select distinct
 coalesce(edumate.class.class, edumate.class.print_name, edumate.course.course, edumate.course.print_name) as "CLASS",
 edumate.course.code||'.'||edumate.class.identifier AS "CLASS_CODE"
@@ -29,7 +29,7 @@ end
 )
 ;
 
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_REPORT_PERIODS AS
+CREATE OR REPLACE VIEW SCHOOLBOX_REPORT_PERIODS AS
 SELECT
 report_period,
 start_date,
@@ -37,7 +37,7 @@ end_date
 FROM EDUMATE.report_period
 ;
 
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_STUDENTCLASS AS
+CREATE OR REPLACE VIEW SCHOOLBOX_STUDENTCLASS AS
 select
 edumate.student.student_number,
 edumate.course.code||'.'||edumate.class.identifier AS "CLASS_CODE",
@@ -72,7 +72,7 @@ current date >= (
 )
 ;
 
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_TEACHERCLASS AS
+CREATE OR REPLACE VIEW SCHOOLBOX_TEACHERCLASS AS
 select
 edumate.staff.staff_number,
 edumate.course.code||'.'||edumate.class.identifier AS "CLASS_CODE",
