@@ -24,7 +24,7 @@ class ViewNameMapping
     public const VIEW_MONTH_FC_NAME = 'dayGridMonth';
     public const VIEW_WEEK_FC_NAME  = 'timeGridWeek';
     public const VIEW_DAY_FC_NAME   = 'timeGridDay';
-    public const VIEW_LIST_FC_NAME  = 'listWeek';
+    public const VIEW_LIST_FC_NAME  = 'list';
 
     public const MAP_FC_TO_STORED = [
         self::VIEW_DAY_FC_NAME   => self::VIEW_DAY_STORED_NAME,

@@ -62,6 +62,7 @@
                 currentEvent: {},
                 newEvent: {},
                 currentDisplay: null,
+                duration: 10,
             }
         },
         computed: {
@@ -441,7 +442,7 @@
             },
 
             currentViewIsList() {
-                return this.currentDisplay === 'listMonth';
+                return this.currentDisplay === 'list';
             }
         },
         mounted() {
@@ -509,9 +510,10 @@
                 week: {
                     columnHeaderFormat: formats.displayWeekDay
                 },
-                listMonth: {
+                list: {
                     buttonText: 'List',
-                    duration: { days: 100 },
+                    duration: { days: this.duration },
+
                 }
             }"
             :event-time-format="helper.eventTimeFormat"
@@ -529,14 +531,14 @@
             :header="{
                 left: 'today,prev,next',
                 center: 'title',
-                right: 'customFilters,listMonth,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
             :buttonText="{
                 today:    'Today',
                 month:    'Month',
                 week:     'Week',
                 day:      'Day',
-                listMonth: 'List',
+                list: 'List',
             }"
             :default-date="config.defaultDate"
             :default-view="config.defaultView || 'dayGridMonth'"
