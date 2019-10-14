@@ -68,12 +68,12 @@ $app = new class extends CliTool\App
     private function migrateBasicUser(): void
     {
         $this->getDatabaseInternal()->executeQuery(
-            "INSERT INTO `sis_user_profile` (external_id, title, firstname, lastname, created_at, updated_at)
+            "INSERT IGNORE INTO `sis_user_profile` (external_id, title, firstname, lastname, created_at, updated_at)
                     SELECT `user`.`synergy_id`, `user`.`title`, `user`.`firstname`, `user`.`lastname`, NOW(), NOW()
                     FROM `user`
                     LEFT JOIN `groups`       ON `user`.`group_id` = `groups`.`id`
                     LEFT JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
-                    WHERE (synergy_id IS NOT NULL AND synergy_id != '') AND
+                    WHERE user.deleted_at IS NULL AND (synergy_id IS NOT NULL AND synergy_id != '') AND 
                     (`groups`.`group_type` = 'student'
                     OR `groups`.`group_type` = 'parent'
                     OR `groups`.`group_type` = 'staff')"
@@ -87,7 +87,7 @@ $app = new class extends CliTool\App
     private function migrateStudent(): void
     {
         $this->getDatabaseInternal()->executeQuery(
-            "INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `username`, `email`, `gender`, `emergency_contact_name_1`, `emergency_contact_phone_1`,
+            "INSERT IGNORE INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `username`, `email`, `gender`, `emergency_contact_name_1`, `emergency_contact_phone_1`,
 `emergency_contact_phone_alt_1`, `emergency_contact_name_2`, `emergency_contact_phone_2`, `emergency_contact_phone_alt_2`,
 `emergency_contact_name_3`, `emergency_contact_phone_3`, `emergency_contact_phone_alt_3`, `campus_name`, `head_of_house_id`,
 `head_of_house_name`, `house_name`, `form_name`, `form_teacher_id`, `form_teacher_name`,`tutor_group`, `tutor_teacher_id`,
@@ -104,7 +104,7 @@ JOIN `groups` ON `user`.`group_id` = `groups`.`id`
 LEFT JOIN `house`  ON `user`.`house` = `house`.`id`
 JOIN `userCampus`  ON `user`.`id` = `userCampus`.`uid`
 JOIN `luCampus`    ON `userCampus`.`campus` = `luCampus`.`id`
-WHERE `groups`.`group_type` = 'student'
+WHERE user.deleted_at IS NULL AND `groups`.`group_type` = 'student'
 GROUP BY `userCampus`.`uid`
 ORDER BY `userCampus`.`uid`"
         );
@@ -117,12 +117,12 @@ ORDER BY `userCampus`.`uid`"
     private function migrateParent(): void
     {
         $this->getDatabaseInternal()->executeQuery(
-            "INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_home`, `phone_work`, `username`, `email`, created_at, updated_at)
+            "INSERT IGNORE INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_home`, `phone_work`, `username`, `email`, created_at, updated_at)
 SELECT `sis_user_profile`.`id`, NULL, NULL, NULL,`user`.`username`, `user`.`alt_email`, NOW(), NOW()
 FROM `user`
 JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
 JOIN `groups` ON `user`.`group_id` = `groups`.`id`
-WHERE `groups`.`group_type` = 'parent'"
+WHERE user.deleted_at IS NULL AND `groups`.`group_type` = 'parent'"
         );
     }
 
@@ -133,7 +133,7 @@ WHERE `groups`.`group_type` = 'parent'"
     private function migrateStaff(): void
     {
         $this->getDatabaseInternal()->executeQuery(
-            "INSERT INTO `sis_user_profile_staff` (`sis_user_profile_id`, `username`, `email`,`category`, `position_title`, `department`, `phone`,
+            "INSERT IGNORE INTO `sis_user_profile_staff` (`sis_user_profile_id`, `username`, `email`,`category`, `position_title`, `department`, `phone`,
 `room`, `building`, `campus_name`, created_at, updated_at)
 SELECT `sis_user_profile`.`id`,`user`.`username`, `user`.`alt_email`, NULL, `user`.`position_title`, NULL, NULL, NULL, NULL, `luCampus`.`name`, NOW(), NOW()
 FROM `user`
@@ -141,7 +141,7 @@ JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id
 JOIN `groups` ON `user`.`group_id` = `groups`.`id`
 JOIN `userCampus`  ON `user`.`id` = `userCampus`.`uid`
 JOIN `luCampus`    ON `userCampus`.`campus` = `luCampus`.`id`
-WHERE `groups`.`group_type` = 'staff'
+WHERE user.deleted_at IS NULL AND `groups`.`group_type` = 'staff'
 GROUP BY `userCampus`.`uid`
 ORDER BY `userCampus`.`uid`"
         );
@@ -154,7 +154,7 @@ ORDER BY `userCampus`.`uid`"
     private function migrateRelation(): void
     {
         $this->getDatabaseInternal()->executeQuery(
-            "INSERT INTO `sis_user_profile_relation` (`child_profile_id`, `user_profile_id`, `type`)
+            "INSERT IGNORE INTO `sis_user_profile_relation` (`child_profile_id`, `user_profile_id`, `type`)
 SELECT up2.id as child_id, up1.id as parent_id, 'Parent'
 FROM user_relation
 JOIN user user1 ON user_relation.user_id = user1.id
