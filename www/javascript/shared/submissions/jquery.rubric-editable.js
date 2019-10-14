@@ -58,8 +58,8 @@
         $rb.off('blur keydown', '[data-spawn]');
         $rb.on('blur keydown', '[data-spawn]', function (e) {
 
-            // ignore anything except hitting return
-            if (e.type === 'keydown' && e.keyCode != 13) {
+            // ignore all key presses except for a non-shift return (ie shift+return is ignored)
+            if (e.type === 'keydown' && (e.keyCode !== 13 || e.shiftKey)) {
                 return true;
             }
 
