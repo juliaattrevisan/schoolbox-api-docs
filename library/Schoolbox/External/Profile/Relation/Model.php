@@ -20,11 +20,6 @@ class Model
     private $userProfileId;
 
     /**
-     * @var bool
-     */
-    private $emergencyContact;
-
-    /**
      * @var string
      */
     private $type;
@@ -43,14 +38,6 @@ class Model
     public function getUserProfileId(): int
     {
         return $this->userProfileId;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getEmergencyContact(): bool
-    {
-        return $this->emergencyContact;
     }
 
     /**
@@ -79,16 +66,6 @@ class Model
     public function setUserProfileId(int $userProfileId): self
     {
         $this->userProfileId = $userProfileId;
-        return $this;
-    }
-
-    /**
-     * @param bool $emergencyContact
-     * @return Model
-     */
-    public function setEmergencyContact(bool $emergencyContact): self
-    {
-        $this->emergencyContact = $emergencyContact;
         return $this;
     }
 
