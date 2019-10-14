@@ -169,7 +169,12 @@
         });
 
         /* Show the similarity checkbox if single or multi submit options selected */
-        $('#similarityRow').hide();
+        if($('#acceptOnline').val() != '0') {
+            $('#similarityRow').show();
+        } else {
+            $('#similarityRow').hide();
+        }
+
         $('#acceptOnline').change(function(){
             if($('#acceptOnline').val() != '0') {
                 $('#similarityRow').show();
