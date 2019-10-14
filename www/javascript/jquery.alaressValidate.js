@@ -16,6 +16,8 @@
     $.alaressValidate.defaultErrorPlacement = function(error, element) {
         if (element.is('[data-radio-block]')) {
             element.parents('fieldset').find('div.error-placeholder').html(error);
+        } else if (element.closest('.input-group').length) {
+            error.insertAfter(element.closest('.input-group'));
         } else if (element.is('.selectized')) {
             error.insertAfter(element.closest('div, fieldset').find('.selectize-control'));
         } else if (element.is('[type="checkbox"], [type="radio"]')) {
@@ -35,8 +37,6 @@
             // get(0) does the same thing using jquery instead of css selectors, and doesn't break.
             error.insertBefore(element.closest(parentSearch).find('input[type=checkbox], input[type=radio]').get(0));
 
-        } else if (element.closest('.input-group').length) {
-            error.insertAfter(element.closest('.input-group'));
         } else {
             error.insertAfter(element);
         }

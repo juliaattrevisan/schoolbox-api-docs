@@ -218,6 +218,9 @@ th, td{
 			flex: 0 0 auto;
 		}
 	}
+    .selectized.error ~ .selectize-control {
+      margin-bottom: 0;
+    }
 	@media #{$small-only} {
 		flex-wrap: wrap;
 
