@@ -30,7 +30,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('child_profile_id', self::TYPE_INTEGER);
         $this->uses('user_profile_id', self::TYPE_INTEGER);
-        $this->uses('emergency_contact', self::TYPE_BOOLEAN);
         $this->uses('type', self::TYPE_STRING);
         $this->joins('child_profile_id', Profile\Mapper::class, 'id', null, null, 'childProfileId', 'childProfileId');
         $this->joins('user_profile_id', Profile\Mapper::class, 'id', null, null, 'userProfileId', 'userProfileId');
