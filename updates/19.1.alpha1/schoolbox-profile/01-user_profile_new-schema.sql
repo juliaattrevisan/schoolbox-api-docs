@@ -136,7 +136,6 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_relation`
 (
     `child_profile_id`  INT UNSIGNED NOT NULL,
     `user_profile_id`   INT UNSIGNED NOT NULL,
-    `emergency_contact` TINYINT(1)   NOT NULL,
     `type`              VARCHAR(55)  NOT NULL,
     INDEX `fk_sis_profile_relation_1_idx` (`child_profile_id` ASC),
     INDEX `fk_sis_profile_relation_2_idx` (`user_profile_id` ASC),
