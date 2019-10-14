@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX idx_external_id
+CREATE UNIQUE INDEX idx_external_id
     ON sis_user_profile (external_id);
 
 /*
