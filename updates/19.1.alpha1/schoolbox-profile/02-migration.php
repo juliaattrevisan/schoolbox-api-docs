@@ -154,8 +154,8 @@ ORDER BY `userCampus`.`uid`"
     private function migrateRelation(): void
     {
         $this->getDatabaseInternal()->executeQuery(
-            "INSERT INTO `sis_user_profile_relation` (`child_profile_id`, `user_profile_id`, `emergency_contact`, `type`)
-SELECT up2.id as child_id, up1.id as parent_id, 0, 'Parent'
+            "INSERT INTO `sis_user_profile_relation` (`child_profile_id`, `user_profile_id`, `type`)
+SELECT up2.id as child_id, up1.id as parent_id, 'Parent'
 FROM user_relation
 JOIN user user1 ON user_relation.user_id = user1.id
 JOIN sis_user_profile up1 ON user1.synergy_id = up1.external_id
