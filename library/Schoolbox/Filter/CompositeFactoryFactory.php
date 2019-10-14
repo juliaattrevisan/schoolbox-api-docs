@@ -31,7 +31,7 @@ class CompositeFactoryFactory implements IFactoryFactory
     /**
      * Constructor
      *
-     * @param IFactoryFactory ...$factoryFactories
+     * @param IFactoryFactory[] $factoryFactories
      */
     public function __construct(IFactoryFactory... $factoryFactories)
     {

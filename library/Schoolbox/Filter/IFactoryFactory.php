@@ -32,9 +32,15 @@ interface IFactoryFactory
 
 
     /**
+     * Build a codec for this entity.
+     *
+     * It is the responsibility of the codec to translate between a query string
+     * and a collection of `Selection\Model` instances.
+     *
      * @return ICodec
      */
     public function buildCodec(): ICodec;
+
 
     /**
      * Build a set of key converters for filters configured as enabled for the specified page
@@ -92,6 +98,7 @@ interface IFactoryFactory
      * and groups.
      *
      * TODO this shouldn't be here: it's only added so the composite may use it
+     * TODO this should be removed, and its responsibilities moved to `convertSelectionsToFilters`
      *
      * @param null[]|Collection[] $filters
      * @param User                $viewee

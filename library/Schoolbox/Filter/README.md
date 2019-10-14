@@ -1,40 +1,55 @@
 # Filters - a quick developer's guide
 
+
+## Purpose of this document
+
+This document is intended to give developers a brief overview of the Filters
+sub-system of Schoolbox, so that they may use filters in their own work.
+
 > This documentation is a work in progress, and subject to change and expansion.
+>
 
-## tl;dr
+## Overview
 
-In short, filters are for letting the end user display a subset of the entire
+In brief, filters are for letting the end user display a subset of the entire
 record set that would otherwise display on a page. This has the benefits of:
 * reducing page load time
 * reducing memory usage
 * reducing the amount of information displayed to only what is necessary for the
   end user's purpose
 
-At the time of writing, they are being used only for filtering assessments:
-however, there is no reason why a filter that filters data other than
-assessments could not be implemented.
 
 ## Examples
 
+
 ## Concepts
+
 
 ## Interfaces
 
 ### Factory Factory (`\Schoolbox\Filter\IFactoryFactory`)
 
-> Yes, this is a real thing!
+The Factory Factory interface defines a responsibility for building a Factory
+for a particular Definition (`buildFilterFactoryForFilter`).
 
-The Factory Factory is an interface which defines responsibilities for building
-a Factory for a filter implementation, as well as the rendering of the filter
-panel.
+In addition, it defines responsibilities for:
+* Building Codecs
+* Building a set of Key Converters
+* Converting selections into a 2D array of IDs, for later passing into an
+  ID Finder
+* Building the current state of Filters for a page
+* Building a Panel so that a page's Filters may be rendered
+* Checking whether any filters should be set to a default value based on the
+  user whose page is being viewed (`checkTeacherFolders`)
 
-> TODO filter panel and factory building sound like dual responsibilities
+> Note that the above additional responsibilities are arguably not part of what
+> the Factory Factory should do, and developers will generally not have to worry
+> about them anyway: they are mostly handled in the the core abstract
+> implementation `\Schoolbox\Filter\AbstractFactoryFactory`.
 
-It is expected there will only be one Factory Factory per type of object that is
-being filtered. (Currently, only assessment filters exist: these are created by
-the `\Schoolbox\Filter\Filters\Assessment\FactoryFactory` implementation of this
-interface.)
+It is expected there will only be one Factory Factory per type of entity that is
+being filtered.
+
 
 ### Factory (`\Schoolbox\Filter\IFactory`)
 
@@ -43,6 +58,7 @@ for a particular filter implementation, these being:
 * Component
 * Definition
 * Key Converter
+
 
 ### Component (`\Schoolbox\Filter\IComponent`)
 
