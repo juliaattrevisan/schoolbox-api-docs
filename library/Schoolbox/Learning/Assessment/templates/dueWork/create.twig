@@ -47,7 +47,7 @@
             </select>
         </div>
 
-        <div class="medium-6 columns" id="similarityRow">
+        <div class="medium-6 columns" id="similarityRow"{% if not assessment.acceptOnline %} style="display: none"{% endif %}>
             <label for="similarityCheckEnabled">Similarity Check</label> <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span>
             <div class="switch round">
                 <input id="similarityCheckEnabled" name="similarityCheckEnabled" type="checkbox" {{ assessment.similarityCheckEnabled ? 'checked' : '' }}>
@@ -156,7 +156,8 @@
             }
         }
 
-        var $acceptOnlineToggle = $('#acceptOnline');
+        var $acceptOnlineToggle = $('#acceptOnline'),
+            $similarityRow      = $('#similarityRow');
 
         /* Initial state
          */
@@ -169,17 +170,11 @@
         });
 
         /* Show the similarity checkbox if single or multi submit options selected */
-        if($('#acceptOnline').val() != '0') {
-            $('#similarityRow').show();
-        } else {
-            $('#similarityRow').hide();
-        }
-
-        $('#acceptOnline').change(function(){
-            if($('#acceptOnline').val() != '0') {
-                $('#similarityRow').show();
+        $acceptOnlineToggle.change(function(){
+            if($acceptOnlineToggle.val() !== '0') {
+                $similarityRow.show();
             } else {
-                $('#similarityRow').hide();
+                $similarityRow.hide();
             }
         });
     });
