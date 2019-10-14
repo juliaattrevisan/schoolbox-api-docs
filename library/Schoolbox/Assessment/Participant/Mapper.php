@@ -9,6 +9,10 @@ namespace Schoolbox\Assessment\Participant;
 
 use PDO;
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\Task\CompletionMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
@@ -73,6 +77,7 @@ class Mapper extends BaseMapper
      * @param PDOStatement $statement
      * @return Model[]|GenericCollection
      * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
@@ -90,6 +95,163 @@ class Mapper extends BaseMapper
 
         return $collection;
     }
+
+
+    /**
+     * Soft deletes all Teacher Returns related to the specified participant
+     *
+     * @param Model $participant
+     */
+    public function softDeleteReturnsAndFeedback(Model $participant): void
+    {
+        $assessment = $participant->getPlan()->getAssessment();
+
+        if ($assessment->getDueWork() instanceof SubmissionBox) {
+
+            // delete submission return
+            $returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+            $returnMapper->suppressNotification();
+            $returnMapper->deleteByColumnList([
+                'box_id' => $assessment->getDueWork()->getId(),
+                'owner'  => $participant->getUser()->getId(),
+            ]);
+            $returnMapper->restoreNotification();
+
+            // delete submission
+            $submissionMapper = SubmissionBox\Submission\SubmissionMapper::getInstance();
+            $submissionMapper->suppressNotification();
+            $submissionMapper->deleteByColumnList([
+                'box_id' => $assessment->getDueWork()->getId(),
+                'owner'  => $participant->getUser()->getId(),
+            ]);
+            $submissionMapper->restoreNotification();
+
+        } elseif ($assessment->getTask() instanceof Task) {
+
+            // delete completion
+            $taskCompletionMapper = CompletionMapper::getInstance();
+            $taskCompletionMapper->suppressNotification();
+            $taskCompletionMapper->deleteByColumnList([
+                    'task_id'    => $assessment->getTask()->getId(),
+                    'student_id' => $participant->getUser()->getId(),
+                ]
+            );
+            $taskCompletionMapper->restoreNotification();
+
+        } elseif ($assessment->getQuiz() instanceof Quiz) {
+
+            // delete attempt
+            $attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
+            $attemptMapper->suppressNotification();
+            $attemptMapper->deleteByColumnList([
+                    'assess_id' => $assessment->getQuiz()->getId(),
+                    'user_id'   => $participant->getUser()->getId(),
+                ]
+            );
+            $attemptMapper->restoreNotification();
+        }
+    }
+
+
+    /**
+     * Restore soft-deleted returns and feedback
+     * @param Model $participant
+     */
+    public function restoreReturnsAndFeedback(Model $participant): void
+    {
+        $assessment = $participant->getPlan()->getAssessment();
+        $excludedAt  = $participant->getExcludedAt();
+
+        if ($assessment->getDueWork() instanceof SubmissionBox) {
+
+            // restore submission
+            $submissionMapper = SubmissionBox\Submission\SubmissionMapper::getInstance();
+            $submissionMapper->suppressNotification();
+            try {
+                $submissions = $submissionMapper->findByColumnList([
+                    'box_id' => $assessment->getDueWork()->getId(),
+                    'owner'  => $participant->getUser()->getId(),
+                ], ['deleted' => true]);
+                if ($excludedAt) {
+                    $submissions = $submissions->filter(
+                        function (SubmissionBox\Submission\Submission $submission) use ($excludedAt) {
+                            return $submission->getDeletedAt() && $submission->getDeletedAt()->eq($excludedAt);
+                        }
+                    );
+                }
+                $submissionMapper->restoreSoftDeleted($submissions);
+            } catch (BaseMapper\Exception $e) {
+                // noop
+            }
+            $submissionMapper->restoreNotification();
+
+            // restore submission return
+            $returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+            $returnMapper->suppressNotification();
+            try {
+                $returns = $returnMapper->findByColumnList([
+                    'box_id' => $assessment->getDueWork()->getId(),
+                    'owner'  => $participant->getUser()->getId(),
+                ], ['deleted' => true]);
+                if ($excludedAt) {
+                    $returns = $returns->filter(
+                        function (SubmissionBox\ReturnedWork $return) use ($excludedAt) {
+                            return $return->getDeletedAt() && $return->getDeletedAt()->eq($excludedAt);
+                        }
+                    );
+                }
+                $returnMapper->restoreSoftDeleted($returns);
+            } catch (BaseMapper\Exception $e) {
+                // noop
+            }
+            $returnMapper->restoreNotification();
+
+        } elseif ($assessment->getTask() instanceof Task) {
+
+            // restore completion
+            $taskCompletionMapper = CompletionMapper::getInstance();
+            $taskCompletionMapper->suppressNotification();
+            try {
+                $completion = $taskCompletionMapper->findByColumnList([
+                    'task_id'    => $assessment->getTask()->getId(),
+                    'student_id' => $participant->getUser()->getId(),
+                ], ['deleted' => true]);
+                if ($excludedAt) {
+                    $completion = $completion->filter(
+                        function (Task\Completion $completion) use ($excludedAt) {
+                            return $completion->getDeletedAt() && $completion->getDeletedAt()->eq($excludedAt);
+                        }
+                    );
+                }
+                $taskCompletionMapper->restoreSoftDeleted($completion);
+            } catch (BaseMapper\Exception $e) {
+                // noop
+            }
+            $taskCompletionMapper->restoreNotification();
+
+        } elseif ($assessment->getQuiz() instanceof Quiz) {
+            $attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
+            $attemptMapper->suppressNotification();
+            try {
+                $attempts = $attemptMapper->findByColumnList([
+                    'assess_id' => $assessment->getQuiz()->getId(),
+                    'user_id'   => $participant->getUser()->getId(),
+                ], ['deleted' => true]);
+                if ($excludedAt) {
+                    $attempts = $attempts->filter(
+                        function (\Schoolbox\Learning\Quiz\Attempt\Model $attempt) use ($excludedAt) {
+                            return $attempt->getDeleted() && $attempt->getDeleted()->eq($excludedAt);
+                        }
+                    );
+                }
+                $attemptMapper->restoreSoftDeleted($attempts);
+            } catch (BaseMapper\Exception $e) {
+                // noop
+            }
+            $attemptMapper->restoreNotification();
+        }
+    }
+
 
     /**
      * Any notifications related to assessment participations must be deferred

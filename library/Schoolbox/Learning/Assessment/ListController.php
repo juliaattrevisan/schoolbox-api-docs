@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -22,7 +23,8 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper;
-use Schoolbox\Assessment\Participant as ParticipantModels;
+use Schoolbox\Assessment\Participant\Model as ParticipantModel;
+use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
@@ -381,75 +383,125 @@ class ListController extends Web\Controller\Base
 
 
     /**
-     * @param GenericCollection|ParticipantModels\Plan\Model[] $plans
-     * @param array                                            $inclusionFlags
-     * @param array                                            $userPlanIndices
+     * @param GenericCollection|PlanModel[] $plans
+     * @param array                         $inclusionFlags  userId => 0 ... excluded, 1 ... included
+     * @param array                         $userPlanIndices userId => planId
      * @throws DomainException
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices)
+    private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices): void
     {
-        $partMap = $this->participantDataSource->getParticipantMapper();
-
-        $planIds = $plans->getPropertyValues('id');
+        $participantMapper = $this->participantDataSource->getParticipantMapper();
 
         // plans are saved; persistipation
         foreach ($inclusionFlags as $userId => $userIncluded) {
-            $existingParticipation = $partMap->findByColumnList([
-                'participant_plan_id' => $planIds,
-                'user_id'             => $userId
-            ]);
-
+            /** @var ParticipantModel|null $existingParticipation */
+            $existingParticipation = $this->getExistingParticipation($plans, $userId);
+            /** @var PlanModel $userPlan */
+            $userPlan = $plans[$userPlanIndices[$userId]];
             if ($userIncluded) {
-                // look up the plan
-                $userPlan = $plans[$userPlanIndices[$userId]];
-
                 if (!$userPlan) {
                     throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were " . json_encode($plans->keys()) . ')');
                 }
 
                 // generate a record if there is ALREADY existing participation, OR the plan is NOT dynamic
-                if ($existingParticipation->count() || !$userPlan->isDynamic()) {
-                    // this action needs to enforce the constraint of a user being in 0..1 plan
-                    // TODO atomicity!!! :'(
-                    $partMap->delete($existingParticipation);
-                    $partMap->save($this->makeAParticipation($userId, $userPlan));
+                if (!$existingParticipation && $userPlan->isDynamic()) {
+                    continue;
+                }
+
+                if ($existingParticipation && !$existingParticipation->isExcluded() && ($existingParticipation->getPlan()->getId() === $userPlan->getId())) {
+                    // nothing changed
+                    continue;
+                }
+
+                // delete existing participation
+                if ($existingParticipation) {
+                    if ($existingParticipation->isExcluded()) {
+                        $participantMapper->restoreReturnsAndFeedback($existingParticipation);
+                    }
+                    $participantMapper->delete($existingParticipation);
+                }
+
+                if (!$userPlan->isDynamic()) {
+                    // we need to generate a record so we have *something* to exclude
+                    $newParticipation = $participantMapper->createModel();
+                    $newParticipation->setUser($this->userMapper->createModel($userId))
+                                     ->setPlan($userPlan);
+                    $participantMapper->save($newParticipation);
                 }
             } else {
-                if ($existingParticipation->count() === 0) {
-                    // we need to generate a record so we have *something* to exclude
-                    $existingParticipation = $partMap->createCollection([
-                        $this->makeAParticipation($userId, $plans->filterBy('isDynamic', true)->first())
-                    ]);
+                // excluded
+                if ($existingParticipation && $existingParticipation->isExcluded() && $existingParticipation->getPlan()->getId() === $userPlan->getId()) {
+                    // nothing changed
+                    continue;
+                }
+                if ($existingParticipation) {
+                    if (!$existingParticipation->isExcluded()) {
+                        $participantMapper->softDeleteReturnsAndFeedback($existingParticipation);
+                    }
+                    $participantMapper->delete($existingParticipation);
                 }
 
-                foreach ($existingParticipation as $record) {
-                    $record->setExcludedAt(\Alaress_Date_Format::now());
-                }
-
-                $partMap->save($existingParticipation);
+                // we need to generate a record so we have *something* to exclude
+                $newParticipation = $participantMapper->createModel();
+                $newParticipation->setUser($this->userMapper->createModel($userId))
+                                 ->setPlan($userPlan)
+                                 ->setExcludedAt(\Alaress_Date_Format::now());
+                $participantMapper->save($newParticipation);
             }
         }
     }
 
 
-    /**
-     * @param int $userId
-     * @param ParticipantModels\Plan\Model $plan
-     * @return ParticipantModels\Model
-     */
-    private function makeAParticipation($userId, $plan)
-    {
-        $partMap = $this->participantDataSource->getParticipantMapper();
-        $userMap = $this->userMapper;
+    /** @var GenericCollection|null $existingParticipationPerUser */
+    private $existingParticipationPerUser;
 
-        return $partMap->createModel()
-            ->setUser($userMap->createModel($userId))
-            ->setPlan($plan);
+
+    /**
+     * Gets existing participation
+     * @param GenericCollection $plans
+     * @param int               $userId
+     * @return ParticipantModel|null
+     */
+    private function getExistingParticipation(GenericCollection $plans, int $userId): ?ParticipantModel
+    {
+        // If haven't got participation data, get it
+        if (!$this->existingParticipationPerUser) {
+            $participantMapper = $this->participantDataSource->getParticipantMapper();
+            $planIds           = $plans->getPropertyValues('id');
+
+            try {
+                $allExistingParticipation = $participantMapper->findByColumnList([
+                    'participant_plan_id' => $planIds,
+                ]);
+            } catch (Mapper\Exception $e) {
+                $this->existingParticipationPerUser = new Collection();
+                return null;
+            }
+
+            // userId => plan (should only have one plan per user)
+            $this->existingParticipationPerUser = $allExistingParticipation->groupByCallback(function (ParticipantModel $model) {
+                return $model->getUser()->getId();
+            });
+        }
+
+        // Check to see whether only one participation exists for the current user and get it
+        if ($this->existingParticipationPerUser->offsetExists($userId)) {
+            /** @var GenericCollection $existingParticipationCollection */
+            $existingParticipationCollection = $this->existingParticipationPerUser->getOffset($userId);
+            if ($existingParticipationCollection->count() > 1) {
+                throw new DomainException('More than one existing participation found for an user');
+            }
+            if ($existingParticipationCollection->count() === 1) {
+                return $existingParticipationCollection->first();
+            }
+        }
+        return null;
     }
+
 
     /**
      * The return of this method will be a UNION of all plans that exist for the given assessment ID

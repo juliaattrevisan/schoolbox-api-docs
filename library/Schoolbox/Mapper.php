@@ -3699,6 +3699,30 @@ abstract class Mapper implements IMapper, Serializable
         return true;
     }
 
+    /** @var Propagator */
+    private $propagatorTmp;
+
+    /**
+     * Set MockPropagator to suppress notification
+     * @return $this
+     */
+    protected function suppressNotification()
+    {
+        $this->propagatorTmp = $this->propagator;
+        $this->propagator    = new MockPropagator();
+        return $this;
+    }
+
+    /**
+     * Restore notification (Must call suppressNotification first)
+     * @return $this
+     */
+    protected function restoreNotification()
+    {
+        $this->propagator = $this->propagatorTmp;
+        unset($this->propagatorTmp);
+        return $this;
+    }
 
     /**
      * Compares two objects mapped by this mapper and returns an array of the differences between.
