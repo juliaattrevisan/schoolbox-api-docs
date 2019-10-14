@@ -1,6 +1,12 @@
 <?php
 
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Calendar\Event\Access;
+use Schoolbox\Permission\Access\Access as FolderAccess;
+use Schoolbox\Mapper\Exception as MapperException;
+
 /**
  * @deprecated - did this ever work??
  * Class Event_Attendance_Controller
@@ -401,5 +407,29 @@ class Event_Attendance_Controller extends Controller
     public function getLeaveController()
     {
         return $this->leaveController;
+    }
+
+    /**
+     * Is user permitted to modify the event
+     *
+     * @param Schoolbox\User $user
+     * @param int $eventId
+     * @return bool
+     * @throws Exception
+     */
+    public function isPermitted(Schoolbox\User $user, $eventId)
+    {
+        $access = new Access(new FolderAccess());
+        $eventMapper = new EventMapper;
+        try {
+            $event = $eventMapper->findById($eventId);
+        } catch (MapperException $e) {
+            error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
+            exit;
+        }
+        if ($access->checkExisting($user, $event)) {
+            return true;
+        }
+        return false;
     }
 }
