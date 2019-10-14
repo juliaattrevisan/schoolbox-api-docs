@@ -829,9 +829,7 @@ class Processor
         /* Purge old relations before re-inserting them
          */
         if ($this->perform) {
-            $this->database->executeQuery("
-                DELETE FROM {$this->relationMapper->getTable()}
-            ");
+            $this->relationMapper->truncate();
         }
 
         $this->log('Removing old relations', self::LOG_OK);
