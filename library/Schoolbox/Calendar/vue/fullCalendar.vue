@@ -61,6 +61,7 @@
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 currentEvent: {},
                 newEvent: {},
+                currentDisplay: null,
             }
         },
         computed: {
@@ -160,6 +161,26 @@
              * @param info
              */
             viewSkeletonRender(info) {
+
+                let self = this,
+                    customGroup = document.querySelector('.fc-custom-group');
+
+                self.currentDisplay = info.view.type;
+
+                document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach(function (element) {
+                    if (self.currentViewIsList()) {
+                        element.classList.add('hide');
+                        if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
+                            customGroup.classList.remove('hide')
+                        }
+                    } else {
+                        element.classList.remove('hide');
+                        if (customGroup?.classList) {
+                            customGroup.classList.add('hide');
+                        }
+                    }
+                });
+
                 axios.post(
                     URL_STATE_CHANGE,
                     qs.stringify({calendarView: info.view.type})
@@ -388,6 +409,43 @@
                 // (for the same reason as `onLoading`)
                 return this.helper.dayTitleFormat(dateObject);
             },
+
+            registerListCustomInputFields() {
+                // Prepare input fields
+                let  self = this,
+                    wrapper = document.createElement('div'),
+                    startDate = document.createElement('input'),
+                    endDate = document.createElement('input');
+
+                startDate.setAttribute('id', 'start_date');
+                startDate.setAttribute('name', 'start_date');
+                startDate.setAttribute('data-datepicker', '');
+                startDate.setAttribute('data-datepicker-buttontext', '');
+
+                endDate.setAttribute('id', 'end_date');
+                endDate.setAttribute('name', 'end_date');
+                endDate.setAttribute('data-datepicker', '');
+                endDate.setAttribute('data-datepicker-buttontext', '');
+
+                if (self.currentViewIsList()) {
+                    wrapper.setAttribute('class', 'fc-custom-group');
+                } else {
+                    wrapper.setAttribute('class', 'fc-custom-group hide');
+                }
+
+                wrapper.appendChild(startDate);
+
+                wrapper.appendChild(endDate);
+
+                document.querySelector('.fc-toolbar > .fc-left').appendChild(wrapper);
+            },
+
+            currentViewIsList() {
+                return this.currentDisplay === 'listMonth';
+            }
+        },
+        mounted() {
+            this.registerListCustomInputFields();
         }
     }
 
@@ -450,6 +508,10 @@
                 },
                 week: {
                     columnHeaderFormat: formats.displayWeekDay
+                },
+                listMonth: {
+                    buttonText: 'List',
+                    duration: { days: 100 },
                 }
             }"
             :event-time-format="helper.eventTimeFormat"
@@ -467,13 +529,14 @@
             :header="{
                 left: 'today,prev,next',
                 center: 'title',
-                right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                right: 'customFilters,listMonth,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
             :buttonText="{
                 today:    'Today',
                 month:    'Month',
                 week:     'Week',
-                day:      'Day'
+                day:      'Day',
+                listMonth: 'List',
             }"
             :default-date="config.defaultDate"
             :default-view="config.defaultView || 'dayGridMonth'"
@@ -491,6 +554,8 @@
         />
 
         <toast ref="toast"></toast>
+
+<!--        <div class="input-group"><input type="text" id="datepicker-datetime-allday-textless-button" data-datepicker="" data-datepicker-buttontext="" ></div>-->
     </div>
 </template>
 
