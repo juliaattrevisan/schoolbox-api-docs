@@ -55,11 +55,11 @@
                 <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
                     {# yay html tables... -_-; #}
                     {% if rowspan %}
-                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name }}</span></th>
+                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name | nl2br }}</span></th>
                         {% set rowspan = 0 %}
                     {% endif %}
 
-                    <th class="rb-criterion-name">{{ critUsage.indicator.name }}</th>
+                    <th class="rb-criterion-name">{{ critUsage.indicator.name | nl2br }}</th>
 
                     {% set indicatorId   = critUsage.indicator.id %}
                     {% set indicatorMark = rubricMarkedGrid
