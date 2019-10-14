@@ -82,6 +82,7 @@ class Processor
         'Surname',
         'Email',
         'Gender',
+        'Campus',
         'Emergency Contact Name 1',
         'Emergency Contact Phone 1',
         'Emergency Contact Phone Alt 1',
@@ -415,6 +416,7 @@ class Processor
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
                 ->setGender($row['Gender'])
+                ->setCampusName($row['Campus'])
                 ->setEmergencyContactName1($row['Emergency Contact Name 1'])
                 ->setEmergencyContactPhone1($row['Emergency Contact Phone 1'])
                 ->setEmergencyContactPhoneAlt1($row['Emergency Contact Phone Alt 1'])
