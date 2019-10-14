@@ -469,6 +469,67 @@
             },
 
             /**
+             * Customise the behaviour for month view button. With this in place, once the user clicked on month button,
+             * the initial month view will go to the current date
+             */
+            clickMonthView() {
+                this.switchView('dayGridMonth');
+            },
+
+            /**
+             * Customise the behaviour for week view button. With this in place, once the user clicked on month button,
+             * the initial month view will go to the current date
+             */
+            clickWeekView() {
+                this.switchView('resourceTimelineWeek');
+            },
+
+            /**
+             * Customise the behaviour for week view button. With this in place, once the user clicked on month button,
+             * the initial month view will go to the current date
+             */
+            clickSemesterView() {
+                this.switchView('resourceTimelineSemester');
+            },
+
+            /**
+             * Custom method for switching calendar view
+             * @param viewType
+             */
+            switchView(viewType) {
+                let self = this,
+                    api = self.$refs.fullCalendar.getApi();
+
+                /**
+                 * Since clicking of month and week view needs to be customised, so that initial loading of month or week
+                 * view goes to the current date.
+                 *
+                 * We need to do this trick so that we'll be able to show the loading pop-up.
+                 * And without this, you'll notice that there's a delay before the switch happens without any indicator
+                 * that the calendar is still being rendered in the background.
+                 *
+                 * You'll be able to replicate it by just removing all the lines below except for line 519 and 522.
+                 */
+                new Promise(function(resolve) {
+                    self.onLoading(true);
+                    setTimeout(() => resolve(1), 1000);
+                }).then(function(result) {
+                    // Semester view, will just use the term start date that's set on page load
+                    if (viewType !== VIEW_RESOURCE_TIMELINE_SEMESTER) {
+                        api.gotoDate(self.convertDateToDateString(new Date()));
+                    }
+
+                    api.changeView(viewType);
+
+                    return result;
+                }).then(function(result) {
+                    self.onLoading(false);
+
+                    return result;
+                });
+            },
+
+            /**
              * Customise today button behaviour for semester view.
              *
              * Clicking today button while on semester view will navigate to
@@ -809,9 +870,6 @@
                     ],
                     resourceAreaWidth: '15%',
                     filterResourcesWithEvents: true,
-                },
-                dayGridMonth: {
-                    eventLimit: config.eventLimit,
                 }
             }"
             :week-label="''"
@@ -819,12 +877,10 @@
             :header="{
                 left: 'customToday,customPrev,customNext',
                 center: 'title',
-                right: 'resourceTimelineSemester,dayGridMonth,resourceTimelineWeek'
+                right: 'resourceTimelineSemester,customDayGridMonth,customResourceTimelineWeek'
             }"
             :buttonText="{
                 today:'Today',
-                month:'Month',
-                resourceTimelineWeek:'Week',
                 resourceTimelineSemester:'Semester',
             }"
             :custom-buttons="{
@@ -834,11 +890,24 @@
                 },
                 customPrev: {
                     icon: 'chevron-left',
-                    click: this.clickPrev.bind(this)
+                    click: this.clickPrev.bind(this),
                 },
                 customToday: {
                     text: 'Today',
-                    click: this.clickToday.bind(this)
+                    click: this.clickToday.bind(this),
+                },
+                customDayGridMonth: {
+                    eventLimit: config.eventLimit,
+                    text: 'Month',
+                    click: this.clickMonthView.bind(this),
+                },
+                customResourceTimelineWeek: {
+                    text: 'Week',
+                    click: this.clickWeekView.bind(this),
+                },
+                resourceTimelineSemester: {
+                    text: 'Semester',
+                    click: this.clickSemesterView.bind(this),
                 }
             }"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
@@ -945,7 +1014,8 @@
         text-align: center !important;
     }
 
-    a.fc-timeline-event.fc-h-event.fc-event.fc-start.fc-end.source.personal.fc-draggable.fc-resizable {
+    .fc-dayGridMonth-view a.fc-timeline-event,
+    .fc-resourceTimelineWeek-view a.fc-timeline-event {
         width: auto !important;
     }
 </style>
