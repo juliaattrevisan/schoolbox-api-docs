@@ -135,14 +135,30 @@ class Controller extends Base
     }
 
 
+    /**
+     * Export csv from db, for a given $type (student staff parent relation)
+     *
+     * @param string $type
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     */
     public function getExport(string $type)
     {
         /** @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');
 
-        $exporter = new Exporter($type, $db);
+        $content = (new Exporter($type, $db))->process();
 
-        $exporter->process();
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', \strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"export-{$type}.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
     }
-
 }

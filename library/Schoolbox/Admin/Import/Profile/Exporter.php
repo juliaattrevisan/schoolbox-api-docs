@@ -102,11 +102,9 @@ class Exporter
      *
      * @throws \InvalidArgumentException
      */
-    public function process(): void
+    public function process(): string
     {
-        // header()
-
-        echo $this->processOne();
+        return $this->processOne();
     }
 
 
@@ -145,7 +143,7 @@ class Exporter
 
         /* Each csv row follows this template
          */
-        $template = array_keys(Mapping::IMPORT_COLUMNS_STUDENT);
+        $template = array_fill_keys(array_keys(Mapping::IMPORT_COLUMNS_STUDENT), '');
         $template['Type'] = Mapping::CSV_STUDENT;
 
         /* For each profile, flatten and assemble a single row of data
@@ -155,7 +153,7 @@ class Exporter
 
             foreach (Mapping::IMPORT_COLUMNS_STUDENT as $heading => $column) {
                 $method = null;
-                $value = null;
+                $value = '';
 
                 /* Try getting the column value from the extension
                  */
