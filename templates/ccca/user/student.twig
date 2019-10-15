@@ -6,11 +6,3 @@
         <dd class="small-8 medium-9 columns">{{ externalUser.StudentMobilePhone }}</dd>
     {% endif %}
 {% endblock extraDetails %}
-
-
-{% block buttons %}
-    {{ parent() }}
-    {% if isStaff %}
-        <li><a class="icon-progress" href="https://goedpotential.com/88/report.htm#students-layout=full,sid={{ user.externalId }}" target="_blank">Analytics</a></li>
-    {% endif %}
-{% endblock buttons %}
