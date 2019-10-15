@@ -443,10 +443,17 @@
                 if (!document.querySelector('.fc-custom-group')) {
                     // Prepare input fields
                     let self = this,
-                        wrapper = document.createElement('div'),
+                        container = document.createElement('div'),
                         startDate = document.createElement('input'),
+                        startDateFieldWrapper = document.createElement('div'),
                         endDate = document.createElement('input'),
-                        updateRangeButton = document.createElement('input');
+                        endDateFieldWrapper = document.createElement('div'),
+                        updateRangeButton = document.createElement('input'),
+                        buttonWrapper = document.createElement('div');
+
+                    startDateFieldWrapper.setAttribute('class', 'small-4 columns');
+                    endDateFieldWrapper.setAttribute('class', 'small-4 columns');
+                    buttonWrapper.setAttribute('class', 'small-4 columns');
 
                     // Start date field
                     startDate.setAttribute('id', 'start_date');
@@ -454,7 +461,6 @@
                     startDate.setAttribute('data-datepicker', '');
                     startDate.setAttribute('data-datepicker-buttontext', '');
                     if (self.listViewDateRange.start) startDate.setAttribute('value', self.listViewDateRange.start);
-
 
                     // End date field
                     endDate.setAttribute('id', 'end_date');
@@ -469,16 +475,22 @@
                     updateRangeButton.setAttribute('value', 'Update');
 
                     if (self.currentViewIsList()) {
-                        wrapper.setAttribute('class', 'fc-custom-group');
+                        container.setAttribute('class', 'fc-custom-group row');
                     } else {
-                        wrapper.setAttribute('class', 'fc-custom-group hide');
+                        container.setAttribute('class', 'fc-custom-group row hide');
                     }
 
-                    wrapper.appendChild(startDate);
-                    wrapper.appendChild(endDate);
-                    wrapper.appendChild(updateRangeButton);
+                    // Wrap input fields to columns
+                    startDateFieldWrapper.appendChild(startDate);
+                    endDateFieldWrapper.appendChild(endDate);
+                    buttonWrapper.appendChild(updateRangeButton);
 
-                    document.querySelector('.fc-toolbar > .fc-left').appendChild(wrapper);
+                    // Append fields into the container
+                    container.appendChild(startDateFieldWrapper);
+                    container.appendChild(endDateFieldWrapper);
+                    container.appendChild(buttonWrapper);
+
+                    document.querySelector('.fc-toolbar > .fc-left').appendChild(container);
 
                     // Register an event listener when update button is clicked.
                     document.querySelector('#update_date_range_button').addEventListener('click', function () {

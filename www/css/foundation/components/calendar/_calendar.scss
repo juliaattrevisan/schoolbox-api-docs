@@ -146,3 +146,18 @@
         }
     }
 }
+
+.fc-custom-group.row .small-4.columns {
+  padding-left: 0;
+}
+
+.fc-custom-group.row {
+  margin-left: 0 !important;
+}
+
+@media #{$large-up} {
+  .fc-custom-group.row {
+    top: 1rem;
+    position: absolute;
+  }
+}
