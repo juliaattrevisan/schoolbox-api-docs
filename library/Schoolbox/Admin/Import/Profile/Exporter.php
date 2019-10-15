@@ -11,6 +11,7 @@ use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Profile;
 use Schoolbox\External\Profile\Model;
+use Schoolbox\Mapper;
 
 /**
  * Class Exporter
@@ -24,6 +25,15 @@ use Schoolbox\External\Profile\Model;
  */
 class Exporter
 {
+
+    /**
+     * Export type
+     * One of [student, staff, parent, relation]
+     *
+     * @var string
+     */
+    private $type;
+
 
     /**
      * @var Mapping
@@ -62,28 +72,12 @@ class Exporter
 
 
     /**
-     * @var IConnector
-     */
-    private $database;
-
-
-    /**
-     * An array of log messages
-     *
-     * @var array
-     */
-    private $log = [];
-
-
-    /**
      * Exporter constructor.
      *
-     * @param string               $type
-     * @param IConnector           $database
-     * @param LoggerInterface|null $logger
+     * @param string $type
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $type, IConnector $database, LoggerInterface $logger = null)
+    public function __construct(string $type)
     {
         $this->mapping = new Mapping($type);
         $this->baseProfileMapper = new Profile\Mapper();
@@ -91,8 +85,6 @@ class Exporter
         $this->studentProfileMapper = new Profile\Student\Mapper();
         $this->staffProfileMapper = new Profile\Staff\Mapper();
         $this->relationMapper = new Profile\Relation\Mapper();
-        $this->database = $database;
-        $this->logger = $logger;
 
         $this->type = $type;
     }
@@ -100,22 +92,8 @@ class Exporter
 
     /**
      * Export based on the $type specified
-     *
-     * @throws \InvalidArgumentException
      */
     public function process(): string
-    {
-        return $this->processOne();
-    }
-
-
-    /**
-     * Export one of the csv types
-     *
-     * @return string
-     * @throws \InvalidArgumentException
-     */
-    public function processOne(): string
     {
         if ($this->mapping->isStudentProfile($this->type)) {
             return $this->exportStudentProfile();
@@ -132,14 +110,58 @@ class Exporter
 
 
     /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportStudentProfile(): string
+    {
+        return $this->exportProfile(Mapping::CSV_STUDENT, Mapping::IMPORT_COLUMNS_STUDENT, $this->studentProfileMapper);
+    }
+
+
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportStaffProfile(): string
+    {
+        return $this->exportProfile(Mapping::CSV_STAFF, Mapping::IMPORT_COLUMNS_STAFF, $this->staffProfileMapper);
+    }
+
+
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportParentProfile(): string
+    {
+        return $this->exportProfile(Mapping::CSV_PARENT, Mapping::IMPORT_COLUMNS_PARENT, $this->parentProfileMapper);
+    }
+
+
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportRelation(): string
+    {
+        return $this->exportProfile(Mapping::CSV_RELATION, Mapping::IMPORT_COLUMNS_RELATION, $this->relationMapper);
+    }
+
+
+    /**
      * Configurable method for exporting an arbitrary profile
      *
-     * @param string            $type
-     * @param array             $columnSpec
-     * @param \Schoolbox\Mapper $mapper      One of student/staff/parent/relation mappers
+     * @param string $type
+     * @param array  $columnSpec
+     * @param Mapper $mapper    One of student/staff/parent/relation mappers
      * @return false|string
      */
-    private function exportProfile(string $type, array $columnSpec, \Schoolbox\Mapper $mapper)
+    private function exportProfile(string $type, array $columnSpec, Mapper $mapper)
     {
         /* Header row
          */
@@ -185,13 +207,22 @@ class Exporter
                     // noop: set as null
                 }
 
-                /* If it's an ADF, use a db date
+                /* Assign data to $row template
                  */
                 if ($value instanceof \Alaress_Date_Format) {
+
+                    /* If it's an ADF, use a db date
+                     */
                     $row[$heading] = $value->getDatabaseDate();
                 } elseif ($value instanceof Model) {
+
+                    /* If it's a BaseProfile instance, use the external id
+                     */
                     $row[$heading] = $value->getExternalId();
                 } else {
+
+                    /* Otherwise just use whatever's there
+                     */
                     $row[$heading] = $value;
                 }
             }
@@ -215,49 +246,5 @@ class Exporter
         fclose($fp);
 
         return $contents;
-    }
-
-
-    /**
-     * Export csv-formatted data from nested profile structs
-     *
-     * @return string
-     */
-    public function exportStudentProfile(): string
-    {
-        return $this->exportProfile(Mapping::CSV_STUDENT, Mapping::IMPORT_COLUMNS_STUDENT, $this->studentProfileMapper);
-    }
-
-
-    /**
-     * Export csv-formatted data from nested profile structs
-     *
-     * @return string
-     */
-    public function exportStaffProfile(): string
-    {
-        return $this->exportProfile(Mapping::CSV_STAFF, Mapping::IMPORT_COLUMNS_STAFF, $this->staffProfileMapper);
-    }
-
-
-    /**
-     * Export csv-formatted data from nested profile structs
-     *
-     * @return string
-     */
-    public function exportParentProfile(): string
-    {
-        return $this->exportProfile(Mapping::CSV_PARENT, Mapping::IMPORT_COLUMNS_PARENT, $this->parentProfileMapper);
-    }
-
-
-    /**
-     * Export csv-formatted data from nested profile structs
-     *
-     * @return string
-     */
-    public function exportRelation(): string
-    {
-        return $this->exportProfile(Mapping::CSV_RELATION, Mapping::IMPORT_COLUMNS_RELATION, $this->relationMapper);
     }
 }
