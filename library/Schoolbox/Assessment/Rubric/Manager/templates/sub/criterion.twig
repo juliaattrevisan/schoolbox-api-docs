@@ -102,7 +102,7 @@
     {% if criterionUsageCount > 0 %}
         <div data-reveal id="criterion-{{ criterion.id }}" class="reveal-modal">
             <article>
-                <h2>{{ criterion.name }}</h2>
+                <h2>{{ criterion.name | nl2br }}</h2>
                 <p>{{ locale.rubricCriterion.proper }} is in use on {{ criterionUsageCount}}
                     {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
                 </p>
