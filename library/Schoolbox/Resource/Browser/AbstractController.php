@@ -16,6 +16,7 @@ use Schoolbox\Config;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
@@ -286,6 +287,15 @@ abstract class AbstractController extends BaseController
             $data['namespace'] = $this->namespace;
 
         }
+
+        $zone = new GenericZone('cms', $this->fileMapper);
+        $zone->setAttachmentsLabel('')
+             ->setAttachPrompt('upload files to this location')
+             ->setMimeFilter('*/*')
+             ->setMulti(true)
+             ->setThumbnailSize(64)
+             ->setModalTitle('Select file');
+        $data['attachzone'] = $zone->getTwigContext();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@resourceBrowser/browse.twig', $data)->setTab($this->tab)

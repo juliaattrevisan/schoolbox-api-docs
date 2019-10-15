@@ -60,11 +60,7 @@
 
     <div class="small-12 column">
         {% if access > 1 %}
-        <div class="s32">
-            <div class="dzone">
-                <span>You can drag multiple files onto this location</span>
-            </div>
-        </div>
+            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         {% endif %}
         {% set actionBarList %}
             {# Actions differ by namespace #}
