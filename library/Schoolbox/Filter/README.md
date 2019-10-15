@@ -78,10 +78,32 @@ passed to the template, as defined in the filter's Definition.
 ### Definition (`\Schoolbox\Filter\IDefinition`)
 
 The Definition interface defines the responsibilities for a bunch of stuff:
-* The pages on which the filter may live
-* ...
+* The pages on which the filter may live (`getPages`)
+* Whether a filter is necessary on a particular page (`isMandatory`)
+* Other methods, used mainly by the filter administration page
 
-> TODO figure out what else this defines, and whether it's too much
+In practise, developers don't need to know about this interface's methods, as
+all of them are implemented in the core abstract implementation
+`\Schoolbox\Filter\AbstractDefinition`. However, this class itself defines a set
+of methods which may be overridden, the most important being:
+* addition of options from a database table (`insertDynamicOptions`)
+  * maybe based on the page that the filter is on?
+* removal of options that cannot be selected (`unsetInvalidOptions`)
+* setting of whether an option should be selected by default
+  (`getInitialSelectedState`)
+* addition of options known at time of writing (`getCustomKeys`)
+* addition of options from a database table (`getAbstractKeys`)
+* sorting of the filter's options (`sortFilterOptions`)
+* where the filter's template lives (`getTemplatesDir`)
+  * in practise, these will always be in the either the filter's `templates`
+    folder, or a `templates` folder of a superclass. It will always be defined
+    as part of the `@filterDefinitions` namespace, where `@filterDefinitions`
+    maps to `~/library/Schoolbox/Filter/Filters`
+
+> TODO figure out the difference between:
+> * `getAbstractKeys`
+> * `getCustomKeys`
+> * `insertDynamicOptions`
 
 
 ### Key Converter (`\Schoolbox\Filter\IKeyConverter`)
