@@ -47,11 +47,11 @@
             <tr>
                 {# yay html tables... -_-; #}
                 {% if rowspan %}
-                    <th class="rb-group-name"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
+                    <th class="rb-group-name"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name | nl2br }}</th>
                     {% set rowspan = 0 %}
                 {% endif %}
 
-                <th class="rb-criterion-name">{{ critUsage.indicator.name }}</th>
+                <th class="rb-criterion-name">{{ critUsage.indicator.name | nl2br }}</th>
 
                 {% set indicatorMark = rubricMarkedGrid
                     ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)

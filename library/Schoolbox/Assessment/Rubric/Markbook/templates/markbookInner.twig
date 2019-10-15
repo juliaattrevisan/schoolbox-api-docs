@@ -120,12 +120,12 @@
                                             <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
                                         </th>
                                     {% endif %}
-                                    <th class="capability" title="{{ capability.name }}">{{ capability.name }}</th>
+                                    <th class="capability" title="{{ capability.name }}">{{ capability.name }}{# TODO SA-9440 | nl2br #}</th>
                                 </tr>
 
                                 {% for indicatorId, indicator in capability.indicators %}
                                     <tr class="indicator-row">
-                                        <th class="indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
+                                        <th class="indicator" title="{{ indicator.name }}">{{ indicator.name }}{# TODO SA-9440 | nl2br #}</th>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}

@@ -18,14 +18,13 @@
         />
 
         {# Input for group name #}
-        <input type="text"
+        <textarea rows="3"
                {% if new %}data-rubric-group-new="1"{% endif %}
                data-rubric-group
                data-template="rubric-group-name"
                {% if group %}name="crits[{{ group.id }}][name]"{% endif %}
-               value="{{ group.name }}"
                {% if readonly > 0 %}readonly{% endif %}
-        />
+        />{{ group.name }}</textarea>
 
         {# Input for group curriculum codes #}
         {% if curriculumTaggingEnabled %}

@@ -51,7 +51,7 @@
                 disabled:           isDisabled
             } only %}
         {% else %}
-            <span>{{ capability.name }}</span>
+            <span>{{ capability.name | nl2br }}</span>
         {% endif %}
 
         {% if showIndicators %}

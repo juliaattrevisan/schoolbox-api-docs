@@ -32,7 +32,7 @@
             {% if group.name %}
                 <label>
                     {%- if group.inUseExcluding(rubricGrid.assessment) -%}
-                        {{ groupName }}
+                        {{ groupName | nl2br }}
                         <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
                         <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                     {% else %}
@@ -40,7 +40,7 @@
                     {% endif %}
                 </label>
             {% else %}
-                <label class="meta">{{ groupName }}</label>
+                <label class="meta">{{ groupName | nl2br }}</label>
             {% endif %}
         </th>
     </tr>

@@ -4,7 +4,7 @@
     Usage:
         roleSelection: Selection\Model       - The default selections for user's role (if we 'reset' filters)
         userSelection: null|Selection\Model  - This user's current selection (used if we 'clear' filters). Null if not user-configurable
-        label:         string                - Label to render out
+        label:         string                - Label to render out (may have newlines)
         idSuffix:      string                - (optional) suffix to ensure ID uniqueness
         disabled:      bool                  - (optional) If true and userSelection exists, set value in hidden field, and disable checkbox
 #}
@@ -32,5 +32,5 @@
             {% if disabled %}disabled data-disabled{% endif %}
             {% block extraAttrs %}{% endblock %}
     >
-    <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}" class="noselect">{{ label }}</label>
+    <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}" class="noselect">{{ label | nl2br }}</label>
 {% endif %}

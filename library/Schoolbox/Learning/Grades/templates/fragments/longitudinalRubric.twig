@@ -21,7 +21,7 @@
                                     <div class="card small small-12">
                                         <h3>
                                         <span data-collapser="true" class="expander" title="{{ capability.name }}">
-                                            <a href="#">{{ capability.name }}</a>
+                                            <a href="#">{{ capability.name | nl2br }}</a>
                                         </span>
                                         </h3>
                                     </div>
@@ -29,7 +29,7 @@
                                 {% for indicator in capability.indicators %}
                                     <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
                                         <div class="content">
-                                            <h4>{{ indicator.name }}</h4>
+                                            <h4>{{ indicator.name | nl2br }}</h4>
                                             <ul class="information-list">
                                                 {% for activity in indicator.activities %}
                                                     <li>
