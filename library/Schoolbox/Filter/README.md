@@ -111,7 +111,14 @@ of methods which may be overridden, the most important being:
 The Key Converter interface defines the responsibilities a filter requires for
 converting a set of available options into a list of actual selections.
 
-> TODO flesh this out once I understand more
+As with the Definition, it has a core abstract implementation
+(`\Schoolbox\Filter\AbstractKeyConverter`) which covers most of the interface,
+and adds further interface requirements:
+* Convert selections to a one-dimensional list of item keys (`getSelectedItems`)
+* Get a list of all possible item keys (`getAllPossibleItems`)
+* Get the item referenced by an keys (`getItem`)
+* Assert whether a provided keys is valid (`assertValidKey`)
+
 
 ### ID Finder (`\Schoolbox\Filter\IdFinder`)
 
@@ -120,6 +127,9 @@ list of selected filters into a list of IDs of items that match the filters.
 
 This list of IDs can then be passed directly to a mapper's `findByColumn` method
 for performant retrieval of matching items.
+
+> The ID finder isn't the only thing that filters can do anymore
+
 
 ## Practical guides
 
