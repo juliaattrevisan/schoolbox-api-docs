@@ -137,14 +137,24 @@ class Exporter
      */
     public function exportStudentProfile(): string
     {
-        $fp = fopen('php://temp', 'w');
 
-        $profiles = $this->studentProfileMapper->findAll();
+        /* Header row
+         */
+        $headings = array_keys(Mapping::IMPORT_COLUMNS_STUDENT);
 
         /* Each csv row follows this template
          */
-        $template = array_fill_keys(array_keys(Mapping::IMPORT_COLUMNS_STUDENT), '');
+        $template = array_fill_keys($headings, '');
         $template['Type'] = Mapping::CSV_STUDENT;
+
+        /* Header row
+         */
+        $fp = fopen('php://temp', 'w');
+        fputcsv($fp, $headings);
+
+        /* Yank each profile
+         */
+        $profiles = $this->studentProfileMapper->findAll();
 
         /* For each profile, flatten and assemble a single row of data
          */
