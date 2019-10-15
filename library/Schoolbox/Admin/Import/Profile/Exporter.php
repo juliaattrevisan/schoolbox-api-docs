@@ -92,16 +92,59 @@ class Exporter
         $this->relationMapper = new Profile\Relation\Mapper();
         $this->database = $database;
         $this->logger = $logger;
+
+        $this->type = $type;
     }
 
 
     /**
+     * Export based on the $type specified
+     *
      * @throws \InvalidArgumentException
      */
-    public function export(): void
+    public function process(): void
     {
-        /* Export based on the $type specified
-         */
+        // header()
+
+        $this->processOne();
     }
 
+
+    /**
+     * Export one of the csv types
+     *
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    public function processOne(): void
+    {
+        if ($this->mapping->isStudentProfile($this->type)) {
+            return $this->exportStudentProfile();
+        } elseif ($this->mapping->isStaffProfile($this->type)) {
+            return $this->exportStaffProfile();
+        } elseif ($this->mapping->isParentProfile($this->type)) {
+            return $this->exportParentProfile();
+        } elseif ($this->mapping->isRelation($this->type)) {
+            return $this->exportRelation();
+        }
+
+        throw new \InvalidArgumentException("Unrecognised csv type {$this->type}");
+    }
+
+
+    public function exportStudentProfile()
+    {
+    }
+
+    public function exportStaffProfile()
+    {
+    }
+
+    public function exportParentProfile()
+    {
+    }
+
+    public function exportRelation()
+    {
+    }
 }
