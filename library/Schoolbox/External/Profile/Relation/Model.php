@@ -7,73 +7,88 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Profile\Relation;
 
+use Schoolbox\External\Profile\Model as BaseProfile;
+
+/**
+ * Class Model
+ *
+ * @package Schoolbox\External\Profile\Relation
+ */
 class Model
 {
-    /**
-     * @var int
-     */
-    private $childProfileId;
 
     /**
-     * @var int
+     * @var null|Model
      */
-    private $userProfileId;
+    private $childProfile;
+
+
+    /**
+     * @var null|Model
+     */
+    private $userProfile;
+
 
     /**
      * @var string
      */
     private $type;
 
-    /**
-     * @return int
-     */
-    public function getChildProfileId(): int
-    {
-        return $this->childProfileId;
-    }
 
     /**
-     * @return int
+     * @return null|BaseProfile
      */
-    public function getUserProfileId(): int
+    public function getChildProfile(): ?BaseProfile
     {
-        return $this->userProfileId;
+        return $this->childProfile;
     }
 
+
     /**
-     * @return string
+     * @param null|BaseProfile $childProfile
+     * @return Model
      */
-    public function getType(): string
+    public function setChildProfile(?BaseProfile $childProfile): self
+    {
+        $this->childProfile = $childProfile;
+        return $this;
+    }
+
+
+    /**
+     * @return null|BaseProfile
+     */
+    public function getUserProfile(): ?BaseProfile
+    {
+        return $this->userProfile;
+    }
+
+
+    /**
+     * @param null|BaseProfile $userProfile
+     * @return Model
+     */
+    public function setUserProfile(?BaseProfile $userProfile): self
+    {
+        $this->userProfile = $userProfile;
+        return $this;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getType(): ?string
     {
         return $this->type;
     }
 
 
     /**
-     * @param int $childProfileId
+     * @param null|string $type
      * @return Model
      */
-    public function setChildProfileId(int $childProfileId): self
-    {
-        $this->childProfileId = $childProfileId;
-        return $this;
-    }
-
-    /**
-     * @param int $userProfileId
-     * @return Model
-     */
-    public function setUserProfileId(int $userProfileId): self
-    {
-        $this->userProfileId = $userProfileId;
-        return $this;
-    }
-
-    /**
-     * @param string $type
-     * @return Model
-     */
-    public function setType(string $type): self
+    public function setType(?string $type): self
     {
         $this->type = $type;
         return $this;

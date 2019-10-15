@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Import\Profile;
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Profile;
+use Schoolbox\External\Profile\Model;
 
 /**
  * Class Exporter
@@ -188,15 +189,19 @@ class Exporter
                  */
                 if ($value instanceof \Alaress_Date_Format) {
                     $row[$heading] = $value->getDatabaseDate();
+                } elseif ($value instanceof Model) {
+                    $row[$heading] = $value->getExternalId();
                 } else {
                     $row[$heading] = $value;
                 }
             }
 
-            /* This can get cleared in the iteration, so set this last
-             * and in the same format as the import csv
+            /* This can get cleared in the iteration, so set this last and in the same format as the import csv
+             * Relation csv has a special meaning for this column so ignore it for that usage
              */
-            $row['Type'] = ucwords($type);
+            if ($type !== Mapping::CSV_RELATION) {
+                $row['Type'] = ucwords($type);
+            }
 
             /* Values only, comma separated
              */
@@ -246,8 +251,13 @@ class Exporter
     }
 
 
-    public function exportRelation()
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportRelation(): string
     {
-        return '';
+        return $this->exportProfile(Mapping::CSV_RELATION, Mapping::IMPORT_COLUMNS_RELATION, $this->relationMapper);
     }
 }
