@@ -15,6 +15,11 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Admin\Import\Profile
+ */
 class Module extends BaseModule
 {
     /**
@@ -31,21 +36,14 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
-         */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
-
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
+        $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '', 'getIndex', $getPerms);
-        $this->register('POST', '/upload', 'postUpload', $postPerms);
+        $this->register('GET', '', 'getIndex', $perms);
+        $this->register('GET', '/export/{type}', 'getExport', $perms);
+        $this->register('POST', '/upload', 'postUpload', $perms);
     }
 
 
