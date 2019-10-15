@@ -182,6 +182,25 @@
                     }
                 });
 
+                if (self.currentViewIsList()) {
+                    self.registerListCustomInputFields();
+
+                    /**
+                     * Re-initialise datepicker upon date update on list view.
+                     * Without this, date picker fields just turns into a normal text field.
+                      */
+                    let attachAlaressDatePicker = function () {
+                        var $dateinput = $(this);
+                        if ($dateinput.attr('data-datepicker-id') === undefined) {
+                            $dateinput.alaressDateTimePicker();
+                        }
+                    };
+
+                    $(function () {
+                        $('[data-datepicker]').each(attachAlaressDatePicker);
+                    });
+                }
+
                 axios.post(
                     URL_STATE_CHANGE,
                     qs.stringify({calendarView: info.view.type})
@@ -411,34 +430,62 @@
                 return this.helper.dayTitleFormat(dateObject);
             },
 
+            /**
+             * Register customised input fields for list view
+             */
             registerListCustomInputFields() {
-                // Prepare input fields
-                let  self = this,
-                    wrapper = document.createElement('div'),
-                    startDate = document.createElement('input'),
-                    endDate = document.createElement('input');
 
-                startDate.setAttribute('id', 'start_date');
-                startDate.setAttribute('name', 'start_date');
-                startDate.setAttribute('data-datepicker', '');
-                startDate.setAttribute('data-datepicker-buttontext', '');
+                // Make sure that there's only one of the custom input field
+                if (!document.querySelector('.fc-custom-group')) {
+                    // Prepare input fields
+                    let self = this,
+                        wrapper = document.createElement('div'),
+                        startDate = document.createElement('input'),
+                        endDate = document.createElement('input'),
+                        updateRangeButton = document.createElement('input');
 
-                endDate.setAttribute('id', 'end_date');
-                endDate.setAttribute('name', 'end_date');
-                endDate.setAttribute('data-datepicker', '');
-                endDate.setAttribute('data-datepicker-buttontext', '');
+                    // Start date field
+                    startDate.setAttribute('id', 'start_date');
+                    startDate.setAttribute('name', 'start_date');
+                    startDate.setAttribute('data-datepicker', '');
+                    startDate.setAttribute('data-datepicker-buttontext', '');
 
-                if (self.currentViewIsList()) {
-                    wrapper.setAttribute('class', 'fc-custom-group');
-                } else {
-                    wrapper.setAttribute('class', 'fc-custom-group hide');
+                    // End date field
+                    endDate.setAttribute('id', 'end_date');
+                    endDate.setAttribute('name', 'end_date');
+                    endDate.setAttribute('data-datepicker', '');
+                    endDate.setAttribute('data-datepicker-buttontext', '');
+
+                    // Update button
+                    updateRangeButton.setAttribute('id', 'update_date_range_button');
+                    updateRangeButton.setAttribute('type', 'submit');
+                    updateRangeButton.setAttribute('value', 'Update');
+
+                    if (self.currentViewIsList()) {
+                        wrapper.setAttribute('class', 'fc-custom-group');
+                    } else {
+                        wrapper.setAttribute('class', 'fc-custom-group hide');
+                    }
+
+                    wrapper.appendChild(startDate);
+                    wrapper.appendChild(endDate);
+                    wrapper.appendChild(updateRangeButton);
+
+                    document.querySelector('.fc-toolbar > .fc-left').appendChild(wrapper);
+
+                    // Register an event listener when update button is clicked.
+                    document.querySelector('#update_date_range_button').addEventListener('click', function () {
+                        if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
+                            let startDateValue = moment(document.querySelector('#start_date').value, 'DD/MM/YYYY'),
+                                endDateValue = moment(document.querySelector('#end_date').value, 'DD/MM/YYYY');
+
+                            if (startDateValue.isValid() && endDateValue.isValid()) {
+                                self.duration = self.helper.dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
+                                self.$refs.fullCalendar.getApi().gotoDate(startDateValue.format('YYYY-MM-DD'));
+                            }
+                        }
+                    });
                 }
-
-                wrapper.appendChild(startDate);
-
-                wrapper.appendChild(endDate);
-
-                document.querySelector('.fc-toolbar > .fc-left').appendChild(wrapper);
             },
 
             currentViewIsList() {
@@ -556,8 +603,6 @@
         />
 
         <toast ref="toast"></toast>
-
-<!--        <div class="input-group"><input type="text" id="datepicker-datetime-allday-textless-button" data-datepicker="" data-datepicker-buttontext="" ></div>-->
     </div>
 </template>
 
