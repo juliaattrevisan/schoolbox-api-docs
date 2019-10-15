@@ -16,14 +16,14 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 
 /**
- * Class Processor
+ * Class Importer
  *
  * Determine which Profile Import files were passed, based on header contents,
  * and process them iteratively
  *
  * @package Schoolbox\Admin\Import\Profile
  */
-class Processor
+class Importer
 {
 
     /**
@@ -126,7 +126,7 @@ class Processor
 
 
     /**
-     * Processor constructor.
+     * Importer constructor.
      *
      * @param string     $type
      * @param IStorage   $file
@@ -172,7 +172,7 @@ class Processor
      * @throws Exception
      * @throws DefinitionException
      */
-    public function process(): Processor
+    public function process(): Importer
     {
         try {
             $this->log("Starting processing {$this->file->getBasename()}", self::LOG_OK);

@@ -11,7 +11,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web;
 use InvalidArgumentException;
-use Schoolbox\Admin\Import\Profile\Processor;
+use Schoolbox\Admin\Import\Profile\Importer;
+use Schoolbox\Admin\Import\Profile\Mapping;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
@@ -28,10 +29,10 @@ class Controller extends Web\Controller\Base
      * Processor consts for declaring which file is being supplied
      */
     private const REQUIRED_USER_PROFILE_CSVS = [
-        Processor::CSV_STUDENT,
-        Processor::CSV_PARENT,
-        Processor::CSV_STAFF,
-        Processor::CSV_RELATION
+        Mapping::CSV_STUDENT,
+        Mapping::CSV_PARENT,
+        Mapping::CSV_STAFF,
+        Mapping::CSV_RELATION
     ];
 
     /**
@@ -191,7 +192,7 @@ class Controller extends Web\Controller\Base
                             // this is where the action happens
                             $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
                         } else {
-                            (new Processor($keyspace, $file, $db, $log))->setPerform(true)->process();
+                            (new Importer($keyspace, $file, $db, $log))->setPerform(true)->process();
                         }
                     }
 

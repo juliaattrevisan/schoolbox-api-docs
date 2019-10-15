@@ -106,15 +106,15 @@ class Controller extends Base
                 $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
 
                 try {
-                    $processor = new Processor($this->getRequest()->post['file'], $attachment[0], $db);
+                    $importer = new Importer($this->getRequest()->post['file'], $attachment[0], $db);
 
                     /* Actually persist changes
                      */
                     if ((bool)$this->getRequest()->query['perform']) {
-                        $processor->setPerform(true);
+                        $importer->setPerform(true);
                     }
 
-                    $logs = $processor->process()->getLog();
+                    $logs = $importer->process()->getLog();
                 } catch (\InvalidArgumentException $e) {
                     $errors[] = $e->getMessage();
                 }
