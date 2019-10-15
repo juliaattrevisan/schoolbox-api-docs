@@ -87,8 +87,15 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * @param Storage\Mapper  $storageMapper
-     * @param ImporterFactory $importerFactory
+     * Controller constructor.
+     *
+     * @param Storage\Mapper                   $storageMapper
+     * @param ImporterFactory                  $importerFactory
+     * @param External\Profile\Mapper          $baseMapper
+     * @param External\Profile\Parent\Mapper   $parentMapper
+     * @param External\Profile\Student\Mapper  $studentMapper
+     * @param External\Profile\Staff\Mapper    $staffMapper
+     * @param External\Profile\Relation\Mapper $relationMapper
      */
     public function __construct(
         Storage\Mapper $storageMapper,
@@ -98,8 +105,7 @@ class Controller extends Web\Controller\Base
         External\Profile\Student\Mapper $studentMapper,
         External\Profile\Staff\Mapper $staffMapper,
         External\Profile\Relation\Mapper $relationMapper
-)
-    {
+    ) {
         $this->storageMapper = $storageMapper;
         $this->importerFactory = $importerFactory;
         $this->baseProfileMapper = $baseMapper;

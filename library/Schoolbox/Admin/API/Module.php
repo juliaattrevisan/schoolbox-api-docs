@@ -1,21 +1,24 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Admin\API;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\External;
 use Schoolbox\Import\ImporterFactory;
 
-
-class Module extends BaseModule {
-
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Admin\API
+ */
+class Module extends BaseModule
+{
     protected $basename = 'adminApi';
 
     /**
@@ -49,14 +52,19 @@ class Module extends BaseModule {
      * init time.
      *
      * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
         $injector->params[Controller::class] = [
             'storageMapper'   => $injector->get('mapperFactory')->getLazy(\Schoolbox\Resource\Storage\Mapper::class),
-            'importerFactory' => $injector->lazyNew(ImporterFactory::class)
+            'importerFactory' => $injector->lazyNew(ImporterFactory::class),
+            'baseMapper' => $this->getMapperFactory()->getLazy(External\Profile\Mapper::class),
+            'parentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Parent\Mapper::class),
+            'studentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Student\Mapper::class),
+            'staffMapper' => $this->getMapperFactory()->getLazy(External\Profile\Staff\Mapper::class),
+            'relationMapper' => $this->getMapperFactory()->getLazy(External\Profile\Relation\Mapper::class),
         ];
     }
-
-
 }
