@@ -124,11 +124,6 @@
                                         <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
                                     {% endblock details_studentId %}
 
-                                    {% block details_gender %}
-                                        <dt class="small-4 medium-3 columns">Gender:</dt>
-                                        <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>
-                                    {% endblock details_gender %}
-
                                     {% block details_dob %}
                                         {% if  externalUser.StudentBirthDate is not empty  %}
                                             <dt class="small-4 medium-3 columns">Date of Birth:</dt>
@@ -242,6 +237,11 @@
                                         {#<dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>#}
                                         {#{% endif %}#}
                                     {% endblock details_studiesCode %}
+
+                                    {% block details_gender %}
+                                        {#<dt class="small-4 medium-3 columns">Gender:</dt>
+                                        <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>#}
+                                    {% endblock details_gender %}
 
                                     {% block details_coach %}
                                     {% endblock details_coach %}

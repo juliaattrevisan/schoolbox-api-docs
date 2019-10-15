@@ -73,7 +73,7 @@ class External_Schoolbox_User implements External_UserInterface
                 SELECT    external_id AS StudentID,
                           firstname AS StudentGiven1,
                           lastname AS StudentSurname,
-                          '' AS StudentGender,
+                          gender AS StudentGender,
                           UNIX_TIMESTAMP(date_of_birth) AS StudentBirthDate,
                           tutor_teacher_name AS StudentTutorName,
                           tutor_group AS StudentTutorDescription,

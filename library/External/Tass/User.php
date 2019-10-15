@@ -145,7 +145,7 @@ class External_Tass_User implements External_UserInterface
             s.stud_code AS StudentID,
             s.preferred_name AS StudentGiven1,
             s.surname AS StudentSurname,
-            '' AS StudentGender,
+            s.sex AS StudentGender
             CONVERT(nvarchar(30), s.dob, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
             '' AS StudentTutorName,
             '' AS StudentHeadOfHouse,
