@@ -128,9 +128,7 @@ class Processor
      */
     public function __construct(string $type, IStorage $file, IConnector $database, LoggerInterface $logger = null)
     {
-        if (!\in_array($type, [Mapping::CSV_STUDENT, Mapping::CSV_STAFF, Mapping::CSV_PARENT, Mapping::CSV_RELATION], true)) {
-            throw new \InvalidArgumentException('Unknown csv type.');
-        }
+        Mapping::assertType($type);
 
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();

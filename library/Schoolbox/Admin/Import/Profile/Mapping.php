@@ -132,4 +132,18 @@ class Mapping
         'Guardian ID' => 'user_profile_id',
         'Type' => 'type',
     ];
+
+
+    /**
+     * Assert that the requested $type is valid
+     *
+     * @param string $type
+     * @throws \InvalidArgumentException
+     */
+    public static function assertType(string $type): void
+    {
+        if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATION], true)) {
+            throw new \InvalidArgumentException('Unknown csv type.');
+        }
+    }
 }
