@@ -27,15 +27,6 @@ class Processor
 {
 
     /**
-     * Strings that denote a csv file
-     */
-    public const CSV_STUDENT = Role::STUDENT;
-    public const CSV_STAFF = Role::STAFF;
-    public const CSV_PARENT = Role::PARENT;
-    public const CSV_RELATION = 'relation';
-
-
-    /**
      * Status string for successful row processing
      */
     private const LOG_OK = 'OK';
@@ -137,7 +128,7 @@ class Processor
      */
     public function __construct(string $type, IStorage $file, IConnector $database, LoggerInterface $logger = null)
     {
-        if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATION], true)) {
+        if (!\in_array($type, [Mapping::CSV_STUDENT, Mapping::CSV_STAFF, Mapping::CSV_PARENT, Mapping::CSV_RELATION], true)) {
             throw new \InvalidArgumentException('Unknown csv type.');
         }
 
@@ -247,7 +238,7 @@ class Processor
      */
     private function isStudentProfile(): bool
     {
-        return $this->type === self::CSV_STUDENT;
+        return $this->type === Mapping::CSV_STUDENT;
     }
 
 
@@ -285,7 +276,7 @@ class Processor
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
-            if (strcasecmp($row['Type'], self::CSV_STUDENT)) {
+            if (strcasecmp($row['Type'], Mapping::CSV_STUDENT)) {
                 $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i}  is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
@@ -458,7 +449,7 @@ class Processor
      */
     private function isStaffProfile(): bool
     {
-        return $this->type === self::CSV_STAFF;
+        return $this->type === Mapping::CSV_STAFF;
     }
 
 
@@ -496,7 +487,7 @@ class Processor
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
-            if (strcasecmp($row['Type'], self::CSV_STAFF)) {
+            if (strcasecmp($row['Type'], Mapping::CSV_STAFF)) {
                 $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i}  is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
@@ -569,7 +560,7 @@ class Processor
      */
     private function isParentProfile(): bool
     {
-        return $this->type === self::CSV_PARENT;
+        return $this->type === Mapping::CSV_PARENT;
     }
 
 
@@ -607,7 +598,7 @@ class Processor
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
-            if (strcasecmp($row['Type'], self::CSV_PARENT)) {
+            if (strcasecmp($row['Type'], Mapping::CSV_PARENT)) {
                 $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i} is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
@@ -676,7 +667,7 @@ class Processor
      */
     private function isRelation(): bool
     {
-        return $this->type === self::CSV_RELATION;
+        return $this->type === Mapping::CSV_RELATION;
     }
 
 

@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
+use Schoolbox\Role;
+
 /**
  * Class Mapping
  *
@@ -22,11 +24,20 @@ class Mapping
 {
 
     /**
+     * Strings that denote a csv file
+     */
+    public const CSV_STUDENT = Role::STUDENT;
+    public const CSV_STAFF = Role::STAFF;
+    public const CSV_PARENT = Role::PARENT;
+    public const CSV_RELATION = 'relation';
+
+
+    /**
      * Columns in a Parent CSV
      */
     public const IMPORT_COLUMNS_PARENT = [
         'External ID' => 'external_id',
-        'Type' => Processor::CSV_PARENT,
+        'Type' => self::CSV_PARENT,
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
@@ -44,7 +55,7 @@ class Mapping
      */
     public const IMPORT_COLUMNS_STUDENT = [
         'External ID' => 'external_id',
-        'Type' => Processor::CSV_STUDENT,
+        'Type' => self::CSV_STUDENT,
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
@@ -96,7 +107,7 @@ class Mapping
      */
     public const IMPORT_COLUMNS_STAFF = [
         'External ID' => 'external_id',
-        'Type' => Processor::CSV_STAFF,
+        'Type' => self::CSV_STAFF,
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
