@@ -50,14 +50,20 @@ In addition, it defines responsibilities for:
 It is expected there will only be one Factory Factory per type of entity that is
 being filtered.
 
+Developers will generally only need to know about `buildFilterFactoryForFilter`
+and its implementations: they will need to add a case to an implementation of
+this method in order to create a new filter implementation.
+
 
 ### Factory (`\Schoolbox\Filter\IFactory`)
 
-The Factory interface defines responsibities for building the required objects
+The Factory interface defines responsibilities for building the required objects
 for a particular filter implementation, these being:
 * Component
 * Definition
 * Key Converter
+
+It is created by the Factory Factory's `buildFilterFactoryForFilter` method.
 
 
 ### Component (`\Schoolbox\Filter\IComponent`)
@@ -65,9 +71,9 @@ for a particular filter implementation, these being:
 The Component interface defines the responsibilities required for rendering a
 filter in its panel.
 
-Components are rendered using Twig, and thus need to define:
-* how to find the template for rendering them
-* which variables need to be passed to the template
+Components are rendered using Twig, and thus need to define which variables are
+passed to the template, as defined in the filter's Definition.
+
 
 ### Definition (`\Schoolbox\Filter\IDefinition`)
 
@@ -76,6 +82,7 @@ The Definition interface defines the responsibilities for a bunch of stuff:
 * ...
 
 > TODO figure out what else this defines, and whether it's too much
+
 
 ### Key Converter (`\Schoolbox\Filter\IKeyConverter`)
 
