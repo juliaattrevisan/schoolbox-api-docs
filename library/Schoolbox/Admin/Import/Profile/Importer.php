@@ -128,20 +128,36 @@ class Importer
     /**
      * Importer constructor.
      *
-     * @param string     $type
-     * @param IStorage   $file
-     * @param IConnector $database
-     * @param LoggerInterface|null $logger
+     * @param string                  $type
+     * @param IStorage                $file
+     * @param IConnector              $database
+     * @param Profile\Mapper          $baseProfileMapper
+     * @param Profile\Parent\Mapper   $parentProfileMapper
+     * @param Profile\Student\Mapper  $studentProfileMapper
+     * @param Profile\Staff\Mapper    $staffProfileMapper
+     * @param Profile\Relation\Mapper $relationMapper
+     * @param LoggerInterface|null    $logger
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $type, IStorage $file, IConnector $database, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        string $type,
+        IStorage $file,
+        IConnector $database,
+        Profile\Mapper $baseProfileMapper,
+        Profile\Parent\Mapper $parentProfileMapper,
+        Profile\Student\Mapper $studentProfileMapper,
+        Profile\Staff\Mapper $staffProfileMapper,
+        Profile\Relation\Mapper $relationMapper,
+        LoggerInterface $logger = null
+    ) {
         $this->mapping = new Mapping($type);
-        $this->baseProfileMapper = new Profile\Mapper();
-        $this->parentProfileMapper = new Profile\Parent\Mapper();
-        $this->studentProfileMapper = new Profile\Student\Mapper();
-        $this->staffProfileMapper = new Profile\Staff\Mapper();
-        $this->relationMapper = new Profile\Relation\Mapper();
+
+        $this->baseProfileMapper = $baseProfileMapper;
+        $this->parentProfileMapper = $parentProfileMapper;
+        $this->studentProfileMapper = $studentProfileMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
+        $this->relationMapper = $relationMapper;
+
         $this->database = $database;
         $this->logger = $logger;
 

@@ -13,6 +13,7 @@ use Alaress\Web;
 use InvalidArgumentException;
 use Schoolbox\Admin\Import\Profile\Importer;
 use Schoolbox\Admin\Import\Profile\Mapping;
+use Schoolbox\External;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
@@ -24,6 +25,7 @@ use Schoolbox\Mapper;
  */
 class Controller extends Web\Controller\Base
 {
+
     /**
      * Profile CSVs
      * Processor consts for declaring which file is being supplied
@@ -35,6 +37,7 @@ class Controller extends Web\Controller\Base
         Mapping::CSV_RELATION
     ];
 
+
     /**
      * Timetable and Enrolment CSVs
      */
@@ -44,21 +47,66 @@ class Controller extends Web\Controller\Base
         'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
     ];
 
+
     /** @var Storage\Mapper */
     private $storageMapper;
+
 
     /** @var ImporterFactory */
     private $importerFactory;
 
 
     /**
+     * @var External\Profile\Mapper
+     */
+    private $baseProfileMapper;
+
+
+    /**
+     * @var External\Profile\Parent\Mapper
+     */
+    private $parentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Student\Mapper
+     */
+    private $studentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Staff\Mapper
+     */
+    private $staffProfileMapper;
+
+
+    /**
+     * @var External\Profile\Relation\Mapper
+     */
+    private $relationMapper;
+
+
+    /**
      * @param Storage\Mapper  $storageMapper
      * @param ImporterFactory $importerFactory
      */
-    public function __construct(Storage\Mapper $storageMapper, ImporterFactory $importerFactory)
+    public function __construct(
+        Storage\Mapper $storageMapper,
+        ImporterFactory $importerFactory,
+        External\Profile\Mapper $baseMapper,
+        External\Profile\Parent\Mapper $parentMapper,
+        External\Profile\Student\Mapper $studentMapper,
+        External\Profile\Staff\Mapper $staffMapper,
+        External\Profile\Relation\Mapper $relationMapper
+)
     {
-        $this->storageMapper   = $storageMapper;
+        $this->storageMapper = $storageMapper;
         $this->importerFactory = $importerFactory;
+        $this->baseProfileMapper = $baseMapper;
+        $this->parentProfileMapper = $parentMapper;
+        $this->studentProfileMapper = $studentMapper;
+        $this->staffProfileMapper = $staffMapper;
+        $this->relationMapper = $relationMapper;
     }
 
 
@@ -192,7 +240,17 @@ class Controller extends Web\Controller\Base
                             // this is where the action happens
                             $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
                         } else {
-                            (new Importer($keyspace, $file, $db, $log))->setPerform(true)->process();
+                            (new Importer(
+                                $keyspace,
+                                $file,
+                                $db,
+                                $this->baseProfileMapper,
+                                $this->parentProfileMapper,
+                                $this->studentProfileMapper,
+                                $this->staffProfileMapper,
+                                $this->relationMapper,
+                                $log
+                            ))->setPerform(true)->process();
                         }
                     }
 

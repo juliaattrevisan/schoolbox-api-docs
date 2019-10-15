@@ -31,6 +31,7 @@ class Controller extends Base
 {
     use ImportNavigation;
 
+
     /**
      * @var External\Profile\Mapper
      */
@@ -160,7 +161,16 @@ class Controller extends Base
                 $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
 
                 try {
-                    $importer = new Importer($this->getRequest()->post['file'], $attachment[0], $db);
+                    $importer = new Importer(
+                        $this->getRequest()->post['file'],
+                        $attachment[0],
+                        $db,
+                        $this->baseProfileMapper,
+                        $this->parentProfileMapper,
+                        $this->studentProfileMapper,
+                        $this->staffProfileMapper,
+                        $this->relationMapper
+                    );
 
                     /* Actually persist changes
                      */
