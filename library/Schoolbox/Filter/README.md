@@ -120,15 +120,54 @@ and adds further interface requirements:
 * Assert whether a provided keys is valid (`assertValidKey`)
 
 
-### ID Finder (`\Schoolbox\Filter\IdFinder`)
+### Filter Consumers
+
+Filter Consumers are able to take a list of selected filters, and do something
+with them.
+
+Currently, there are two types of Filter Consumer:
+* the ID Finder converts the filter into a list of IDs for passing into a query
+* the Matcher acts as a filter, which is applied after
+
+Both types of Filter Consumer must be able to examine a list of filters passed
+to them. This implies that they have some knowledge of filter implementations:
+arguably this knowledge could be moved to within individual implementations.
+
+
+#### ID Finder (`\Schoolbox\Filter\IdFinder`)
 
 The ID Finder interface defines the responsibilities required for converting a
 list of selected filters into a list of IDs of items that match the filters.
 
-This list of IDs can then be passed directly to a mapper's `findByColumn` method
-for performant retrieval of matching items.
+An ID Finder operates _before_ results are retrieved: it's intended to add a
+further filter (in the form of a list of IDs) to a search query, so that the
+query returns less data and runs more quickly.
+(In practise, the list of IDs is to a mapper's `findByColumn` method.)
 
-> The ID finder isn't the only thing that filters can do anymore
+ID Finder implementations must implement:
+* a method for fetching a static instance, as ID Finders are intended to be
+  singleton objects (`getInstance`)
+* a method for translating a list of selected filters to a list of IDs
+  (`findIdsByFilters`)
+
+> Only one of these exists: it exists for assessment filters.
+>
+> The Matcher paradigm was not viable for assessment filtering for performance
+> reasons: constructing fetched assessments into usable objects is an expensive
+> operation, reducing the counts fetched in the first place is important.
+
+
+#### Matcher
+
+A Matcher operates on a collection of entities _after_ all results have been
+retrieved by some other process. It is designed to be usable as the callback for
+`array_filter` or `\Schoolbox\Collection::filter`.
+
+> Only one of these exists: it exists for the event filter.
+>
+> The ID Finder paradigm was not viable for event filtering, because not all
+> events are from Schoolbox: this means they don't all have IDs, and we are not
+> able to pass a list of IDs to external sources even if they have IDs.
 
 
 ## Practical guides
