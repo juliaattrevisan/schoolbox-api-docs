@@ -145,7 +145,6 @@ class Exporter
         /* Each csv row follows this template
          */
         $template = array_fill_keys($headings, '');
-        $template['Type'] = Mapping::CSV_STUDENT;
 
         /* Header row
          */
@@ -191,6 +190,11 @@ class Exporter
                     $row[$heading] = $value;
                 }
             }
+
+            /* This can get cleared in the iteration, so set this last
+             * and in the same format as the import csv
+             */
+            $row['Type'] = ucwords(Mapping::CSV_STUDENT);
 
             /* Values only, comma separated
              */
