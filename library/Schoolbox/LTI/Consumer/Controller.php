@@ -327,7 +327,7 @@ class Controller extends Base
                 'componentId' => $component->getInstance()->getId(),
             ]);
 
-        $launchPresentationReturnUrl = "{$this->baseUrl}homepage/{$folder->getId()}";
+        $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
 
         // Check if the LTI component is a picker and already has a resource URL specified
 
