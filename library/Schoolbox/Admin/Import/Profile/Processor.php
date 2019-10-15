@@ -296,7 +296,7 @@ class Processor
                 ->setLastname($row['Surname']);
 
             $studentProfile
-                ->setDateOfBirth(\Alaress_Date_Format::now())
+                ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime($row['Date of Birth'])))
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
                 ->setGender($row['Gender'])
