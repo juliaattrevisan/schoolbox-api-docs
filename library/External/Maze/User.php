@@ -294,6 +294,7 @@ class External_Maze_User implements External_UserInterface
 				ST.STKEY AS StudentID,
 				ST.FIRST_NAME AS StudentGiven1,
 				ST.SURNAME AS StudentSurname,
+			    '' AS StudentGender,
 				SUBSTRING(CONVERT(VARCHAR, ST.BIRTHDATE, 120), 0, 11) AS StudentBirthDate,
 				(ADVISOR.FIRST_NAME + ' ' + ADVISOR.SURNAME) AS StudentTutorName,
 				KGC.DESCRIPTION AS StudentTutorDescription,

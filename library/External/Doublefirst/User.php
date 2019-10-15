@@ -355,6 +355,7 @@ class External_Doublefirst_User implements External_UserInterface
                 p.AdmissionNo                                       AS AdmissionNo,
                 ForeName                                            AS StudentGiven1,
                 Surname                                             AS StudentSurname,
+                ''                                                  AS StudentGender,
                 CONVERT(nvarchar(30), BirthDate, ".self::FORMAT_ISO8601." )              AS StudentBirthDate,                
                 ''                                                  AS StudentTutorName,
                 ''                                                  AS StudentHeadOfHouse,
