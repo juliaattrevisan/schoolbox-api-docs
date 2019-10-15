@@ -106,48 +106,111 @@ class Exporter
     {
         // header()
 
-        $this->processOne();
+        echo $this->processOne();
     }
 
 
     /**
      * Export one of the csv types
      *
-     * @return void
+     * @return string
      * @throws \InvalidArgumentException
      */
-    public function processOne(): void
+    public function processOne(): string
     {
         if ($this->mapping->isStudentProfile($this->type)) {
-            $this->exportStudentProfile();
+            return $this->exportStudentProfile();
         } elseif ($this->mapping->isStaffProfile($this->type)) {
-            $this->exportStaffProfile();
+            return $this->exportStaffProfile();
         } elseif ($this->mapping->isParentProfile($this->type)) {
-            $this->exportParentProfile();
+            return $this->exportParentProfile();
         } elseif ($this->mapping->isRelation($this->type)) {
-            $this->exportRelation();
+            return $this->exportRelation();
         }
+
+        return '';
     }
 
 
-    public function exportStudentProfile()
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportStudentProfile(): string
     {
+        $fp = fopen('php://temp', 'w');
+
         $profiles = $this->studentProfileMapper->findAll();
 
+        /* Each csv row follows this template
+         */
+        $template = array_keys(Mapping::IMPORT_COLUMNS_STUDENT);
+        $template['Type'] = Mapping::CSV_STUDENT;
+
+        /* For each profile, flatten and assemble a single row of data
+         */
         foreach ($profiles as $profile) {
-            new \Alaress_Probe($profile);
+            $row = $template;
+
+            foreach (Mapping::IMPORT_COLUMNS_STUDENT as $heading => $column) {
+                $method = null;
+                $value = null;
+
+                /* Try getting the column value from the extension
+                 */
+                try {
+                    $method = $this->studentProfileMapper->getGetMethodName($this->studentProfileMapper->getPropertyFromColumn($column));
+                    $value = $profile->$method();
+                } catch (\InvalidArgumentException $e) {
+                    // noop: set as null
+                }
+
+                /* If it isn't there, try looking in the base profile
+                 */
+                try {
+                    $method = $this->baseProfileMapper->getGetMethodName($this->baseProfileMapper->getPropertyFromColumn($column));
+                    $value = $profile->getBaseProfile()->$method();
+                } catch (\InvalidArgumentException $e) {
+                    // noop: set as null
+                }
+
+                /* If it's an ADF, use a db date
+                 */
+                if ($value instanceof \Alaress_Date_Format) {
+                    $row[$heading] = $value->getDatabaseDate();
+                } else {
+                    $row[$heading] = $value;
+                }
+            }
+
+            /* Values only, comma separated
+             */
+            fputcsv($fp, array_values($row));
         }
+
+        rewind($fp);
+
+        $contents = stream_get_contents($fp);
+
+        fclose($fp);
+
+        return $contents;
     }
+
 
     public function exportStaffProfile()
     {
+        return '';
     }
 
     public function exportParentProfile()
     {
+        return '';
     }
 
     public function exportRelation()
     {
+        return '';
     }
 }
