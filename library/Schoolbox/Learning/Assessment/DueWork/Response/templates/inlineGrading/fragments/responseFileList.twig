@@ -26,8 +26,13 @@
             <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2">
                 {% for currentFile in response.allFiles %}
                     {% set selected = '' %}
-                    {% set defaultSelectedFile = selectedFileHash|length == 0 and loop.index0 == 0 %}
-                    {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
+                    {% if selecteFileHash is defined %}
+                        {% set defaultSelectedFile = selectedFileHash|length and length == 0 and loop.index0 == 0 %}
+                        {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
+                    {% else %}
+                        {% set defaultSelectedFile = null %}
+                        {% set hasSelectedFile = false %}
+                    {% endif %}
 
                     {% if hasSelectedFile or defaultSelectedFile %}
                         {% set selected = 'selected' %}
@@ -47,6 +52,8 @@
                             {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan, participant: participant} only %}
                             <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
                         </nav>
+                        {% set latestFeedback    = latestFeedback ?? participant.findMostRecentInstructorGivenFeedback %}
+
                         <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
                             {% if currentFile.kami and kamiEnabled %}
                                 {% set kamiExportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {

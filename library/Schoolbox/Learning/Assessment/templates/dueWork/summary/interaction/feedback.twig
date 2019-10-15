@@ -104,7 +104,7 @@ feedback: currentFeedback,
                 {% if url %}
                 <a href="{{ url }}" title="{{ tooltip }}">
                     {% endif %}
-                    <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
+                    <img src="/portrait.php?id={{ currentFeedback.reviewer.id }}&amp;size=square64" alt="">
                     <p>
                         {{ prefix }}
                         <span class="pipe meta">
@@ -203,12 +203,17 @@ feedback: currentFeedback,
                 {% include '@rubric/grid.twig' with {
                     rubricGrid:       currentFeedback.rubricMarkedGrid.grid,
                     rubricMarkedGrid: currentFeedback.rubricMarkedGrid,
+                    learner: participant.user,
                     markVisibility: currentFeedback.isSelfAssessment
-                                    or participant.assessable.isFeedbackVisibleToUser(USER),
-                    useMarkRange: assessment.useMarkRange,
+                    or participant.assessable.isFeedbackVisibleToUser(USER),
                     showDescriptorValue: showDescriptorValue,
+                    showGroupTotal: showGroupTotal,
                     showRubricTotal: showRubricTotal,
-                    showGroupTotal: showGroupTotal
+                    self: false,
+                    studentView: true,
+                    selfAssess: selfAssess ?? false,
+                    selfReflect: selfReflect ?? false,
+                    selfAssessmentFeedback: selfAssessmentFeedback ?? null
                 } only %}
             </div>
         {% endif %}

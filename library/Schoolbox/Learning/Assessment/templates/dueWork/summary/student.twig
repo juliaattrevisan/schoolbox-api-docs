@@ -91,11 +91,12 @@ Data:
 {% if authoritativeFeedback %}
     {% include '@learningAssessment/dueWork/summary/mark.twig' with {
         feedback: authoritativeFeedback,
+        selfAssessmentFeedback: selfAssessmentFeedback,
         participant: participant,
+        selfAssess: selfAssess,
     } %}
 {% else %}
     {% include '@learningAssessment/dueWork/summary/markingGuide.twig' with {
-        rubricContext: emptyRubricContext,
         participant: participant,
     } %}
 {% endif %}

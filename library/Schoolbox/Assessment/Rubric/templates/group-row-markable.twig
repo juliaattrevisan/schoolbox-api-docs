@@ -5,7 +5,7 @@
 {# What could the difference between these two things possibly be? #}
 {% set capabilityMaxValue = groupUsage.maxValue %}
 {% set capabilityMaxFromIndicators   = groupUsage.calculateMaxValueFromIndicators %}
-{% set capabilityNormMark = capabilityMark.retrieveNormalizedMark %}
+{% set capabilityNormMark = capabilityMark is not null ? capabilityMark.retrieveNormalizedMark : null %}
 
 {% set markScheme = capabilityMark.markScheme ?? rubricGrid.assessment.markScheme %}
 {% set markType   = markScheme.generateContext %}
@@ -13,24 +13,26 @@
     {% set letterGradeBracket = false %}
 
     {# TODO assumes values are always descending which might not be the case? #}
-    {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
-        {# If cap mark has been given, find the bracket that matches the given mark #}
-        {% if capabilityMark.value != null %}
-            {# Is this below the last? If so use the last one #}
-            {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
+    {% if markScheme.gradeGroup is defined %}
+        {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
+            {# If cap mark has been given, find the bracket that matches the given mark #}
+            {% if capabilityMark.value != null %}
+                {# Is this below the last? If so use the last one #}
+                {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
+                    {% set letterGradeBracket = gradeLevel.lowerBound %}
+                {% endif %}
+            {% elseif loop.last %}
+                {# If no cap mark has been given yet, default to selecting the lowest bracket in the dropdown #}
                 {% set letterGradeBracket = gradeLevel.lowerBound %}
             {% endif %}
-        {% elseif loop.last %}
-            {# If no cap mark has been given yet, default to selecting the lowest bracket in the dropdown #}
-            {% set letterGradeBracket = gradeLevel.lowerBound %}
-        {% endif %}
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 
     {% if rubricGrid.isCapabilityMarkShown(groupUsage.capability) %}
         <tr>
             <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
                 <span data-group-summary="{{ rubricId }}-{{ capabilityId }}"
-                      data-mark="{{ capabilityMark.value }}"
+                      data-mark="{{ capabilityMark ? capabilityMark.value : null }}"
                       data-scaled-mark="{{ capabilityScaledMark }}"
                       data-max="{{ capabilityMaxValue }}"
                       data-row-max-sum="{{ capabilityMaxFromIndicators }}"
@@ -41,7 +43,7 @@
                     {# This is the value we insert into the database. #}
                     <input type="hidden"
                            data-db-mark
-                           value="{{ capabilityMark.value }}"
+                           value="{{ capabilityMark ? capabilityMark.value : null }}"
                            name="{{ formField }}[groups][{{ capabilityId }}][unscaledMark]">
 
                     {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
@@ -58,7 +60,7 @@
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark.value }}"/> / {{ capabilityMaxValue }}
+                               value="{{ capabilityMark ? capabilityMark.value : null }}"/> / {{ capabilityMaxValue }}
 
                     {% elseif markType.mode == 'letter' %}
                         <select data-group-mark
@@ -81,12 +83,12 @@
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark.retrieveNormalizedMark | round(2) }}"/> %
+                               value="{{ capabilityMark ? (capabilityMark.retrieveNormalizedMark | round(2)) : null }}"/> %
                     {% endif %}
 
                     {% if groupUsage.containsDescriptorsWithValue %}
                         <a data-use-descriptor-values class="fieldAssign">Assign <span class="descriptor-sum" data-group-descriptor-sum>
-                                {{ capabilityMark.indicatorMarkSumScaled }}
+                                {{ capabilityMark ? capabilityMark.indicatorMarkSumScaled : null }}
                             </span> from descriptors</a>
                     {% endif %}
                     {% if markType.mode == 'letter' or markType.mode == 'percent' %}
@@ -95,7 +97,7 @@
                 </span>
 
                 {# Self-Assessment #}
-                {% if selfAssessmentFeedback.isSelfGrading %}
+                {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading %}
                     {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
                     <p class="meta">{{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }}</p>
                 {% endif %}

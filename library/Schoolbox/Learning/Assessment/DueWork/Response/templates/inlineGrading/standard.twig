@@ -20,7 +20,6 @@ Usage:
     errors            string[]
     participant       Participant
     plagscanEnabled   bool
-    rubricContext     null|array
     interactionLocked bool                             Is the assessment due in an archived term?
     reviewRoute       string                           The mechansim by which feedback is being given
  #}
@@ -89,7 +88,7 @@ Usage:
 
 {# A preview of the file currently selected #}
 {% block responseFilePreview %}
-    {% if response and file %}
+    {% if response and file and subfragment.data is defined %}
         {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
     {% endif %}
 {% endblock %}
@@ -100,6 +99,7 @@ Usage:
         assessment: assessment,
         participant: participant,
         response: response,
+        latestFeedback: feedback,
         kamiEnabled: true,
         plagscanEnabled: plagscanEnabled
     } only %}
@@ -164,12 +164,12 @@ Usage:
                                 ? 'grid.twig'
                                 : 'grid-markable.twig'
                             %}
+                            {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}
 
                             {% include '@rubric/' ~ rubricTemplate with {
-                                useMarkRange: assessment.useMarkRange,
                                 rubricGrid: assessment.rubricGrid,
-                                rubricMarkedGrid: feedback.rubricMarkedGrid,
-                                selfAssessmentFeedback: selfAssessmentFeedback,
+                                rubricMarkedGrid: rubricMarkedGrid,
+                                selfAssessmentFeedback: selfAssessmentFeedback ?? null,
                                 learner: participant.user,
                                 markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
                                 showDescriptorValue: showDescriptorValue,
@@ -178,8 +178,7 @@ Usage:
                                 self: self,
                                 studentView: studentView,
                                 selfAssess: selfAssess,
-                                selfReflect: selfReflect,
-                                descriptorMetadata: descriptorMetadata
+                                selfReflect: selfReflect
                             } only %}
                         </fieldset>
                     {% endif %}
@@ -305,9 +304,9 @@ Usage:
                 {% endblock %}
             </section>
         </form>
-    </fieldset>
-</div>
+    </div>
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
 
 <div id='toaster' class="toast" data-alert data-save-draft></div>
+</div>

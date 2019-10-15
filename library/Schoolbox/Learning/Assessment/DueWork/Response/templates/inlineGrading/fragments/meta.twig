@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    {% if not hideDropdown %}
+    {% if hideDropdown is defined and not hideDropdown %}
         <nav>
             <a class="icon-more" title="" data-dropdown="header-options"></a>
         </nav>
