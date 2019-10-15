@@ -5,9 +5,6 @@
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery.scrollTo/jquery.scrollTo.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
-
-
 
 {% if namespace == 'myFilesBrowser' %}
     {% set fileController   = 'myFile' %}
@@ -193,100 +190,6 @@
             var target  = tree.find('a[id=' + openNode + '_anchor]');
 
             target.trigger('click');
-        });
-
-        var loadingClass = 'icon-loading',
-            fileClass    = 'icon-document',
-            failClass    = 'icon-alert';
-
-        $('#async').fileDrop({
-            dictDefaultMessage:'You can drag files into this space.',
-            previewsContainer: '#preview-container',
-
-            addedfile: function (file) {
-
-                var name = file.name.substr(0, file.name.lastIndexOf('.')),
-                    data = {
-                        '{{ folderVar }}': openNode,
-                        description: name,
-                        comment: '',
-                        visible: 1
-                    };
-
-                var parent = [ openNode ],
-                    newNode = {
-                        text: name,
-                        icon: loadingClass,
-                        type: 'file',
-                        li_attr: {
-                            'data-permission': 'write'
-                        }
-                    };
-
-                var el = $(file.previewElement);
-
-                $.each(data, function (k, v) {
-
-                    // set data for ajax form submission on both preview elements
-                    el.data(k, v);
-                    newNode.li_attr['data-' + k] = v;
-
-                });
-
-                jstree.create_node(parent, newNode, 'last', function (freshNode) {
-                    $(file.previewElement).data('node', freshNode);
-                });
-            },
-
-            sending: function (file, xhr, formData) {
-
-                var data = $(file.previewElement).data();
-
-                if (data) {
-                    // jam file data into form data
-                    $.each(data, function (k, v) {
-                        formData.append(k, v);
-                    });
-                }
-            },
-
-            success: function (file, response) {
-
-                var newFileId = response.id,
-                    el        = $(file.previewElement),
-                    node      = el.data('node');
-
-                node.li_attr['data-id'] = newFileId;
-                node.icon = fileClass;
-
-                // update the "original" too
-                node.original.li_attr['data-id'] = newFileId;
-                node.original.icon = fileClass;
-
-                // get the li in the tree
-                var $li = $(jstree.get_node(node.id, true));
-
-                // manipulate the visual output
-                $li.data('id', newFileId)
-                   .find('.' + loadingClass)
-                   .removeClass(loadingClass)
-                   .addClass(fileClass);
-
-            },
-
-            error: function (file, response) {
-
-                var el   = $(file.previewElement),
-                    node = el.data('node');
-
-                node.icon = failClass;
-                node.original.icon = failClass;
-
-                var $li = $(jstree.get_node(node.id, true));
-
-                $li.find('.' + loadingClass).removeClass(loadingClass).addClass(failClass).attr('title', response.error);
-                $li.find('a.jstree-anchor').append('<span class="meta"> - ' + response.error + '</span>');
-            }
         });
 
         {# Add delete confirmation if it is available by intercepting delete requests #}
