@@ -202,28 +202,28 @@ class Processor
      */
     private function processOne(Reader $reader): int
     {
-        if ($this->isStudentProfile()) {
+        if ($this->mapping->isStudentProfile($this->type)) {
 
             /* Process the Student Profile csv
              */
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STUDENT));
 
             return $this->processStudentProfile($reader);
-        } elseif ($this->isStaffProfile()) {
+        } elseif ($this->mapping->isStaffProfile($this->type)) {
 
             /* Process the Staff Profile csv
              */
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STAFF));
 
             return $this->processStaffProfile($reader);
-        } elseif ($this->isParentProfile()) {
+        } elseif ($this->mapping->isParentProfile($this->type)) {
 
             /* Process the Parent Profile csv
              */
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_PARENT));
 
             return $this->processParentProfile($reader);
-        } elseif ($this->isRelation()) {
+        } elseif ($this->mapping->isRelation($this->type)) {
 
             /* Process the Relations csv
              */
@@ -233,17 +233,6 @@ class Processor
         }
 
         throw new \InvalidArgumentException('Unrecognised csv containing header row ' . implode(', ', $reader->readHeaderRow()));
-    }
-
-
-    /**
-     * The type that was chosen in the dropdown declares this to be a Student csv
-     *
-     * @return bool
-     */
-    private function isStudentProfile(): bool
-    {
-        return $this->type === Mapping::CSV_STUDENT;
     }
 
 
@@ -448,17 +437,6 @@ class Processor
 
 
     /**
-     * The type that was chosen in the dropdown declares this to be a Staff csv
-     *
-     * @return bool
-     */
-    private function isStaffProfile(): bool
-    {
-        return $this->type === Mapping::CSV_STAFF;
-    }
-
-
-    /**
      * Process staff profile csv
      *
      * @param Reader $reader
@@ -559,17 +537,6 @@ class Processor
 
 
     /**
-     * The type that was chosen in the dropdown declares this to be a Parent csv
-     *
-     * @return bool
-     */
-    private function isParentProfile(): bool
-    {
-        return $this->type === Mapping::CSV_PARENT;
-    }
-
-
-    /**
      * Process parent profile csv
      *
      * @param Reader $reader
@@ -662,17 +629,6 @@ class Processor
         }
 
         return \count($affectedProfileIds);
-    }
-
-
-    /**
-     * The type that was chosen in the dropdown declares this to be a Relation csv
-     *
-     * @return bool
-     */
-    private function isRelation(): bool
-    {
-        return $this->type === Mapping::CSV_RELATION;
     }
 
 

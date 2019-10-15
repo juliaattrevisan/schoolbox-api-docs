@@ -146,4 +146,52 @@ class Mapping
             throw new \InvalidArgumentException('Unknown csv type.');
         }
     }
+
+
+    /**
+     * The type that was chosen in the dropdown declares this to be a Student csv
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function isStudentProfile(string $type): bool
+    {
+        return $type === self::CSV_STUDENT;
+    }
+
+
+    /**
+     * The type that was chosen in the dropdown declares this to be a Staff csv
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function isStaffProfile(string $type): bool
+    {
+        return $type === self::CSV_STAFF;
+    }
+
+
+    /**
+     * The type that was chosen in the dropdown declares this to be a Parent csv
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function isParentProfile(string $type): bool
+    {
+        return $type === self::CSV_PARENT;
+    }
+
+
+    /**
+     * The type that was chosen in the dropdown declares this to be a Relation csv
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function isRelation(string $type): bool
+    {
+        return $type === self::CSV_RELATION;
+    }
 }
