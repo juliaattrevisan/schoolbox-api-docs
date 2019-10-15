@@ -7,7 +7,7 @@ This document is intended to give developers a brief overview of the Filters
 sub-system of Schoolbox, so that they may use filters in their own work.
 
 > This documentation is a work in progress, and subject to change and expansion.
->
+
 
 ## Overview
 
@@ -17,12 +17,6 @@ record set that would otherwise display on a page. This has the benefits of:
 * reducing memory usage
 * reducing the amount of information displayed to only what is necessary for the
   end user's purpose
-
-
-## Examples
-
-
-## Concepts
 
 
 ## Interfaces
@@ -53,6 +47,13 @@ being filtered.
 Developers will generally only need to know about `buildFilterFactoryForFilter`
 and its implementations: they will need to add a case to an implementation of
 this method in order to create a new filter implementation.
+
+The Factory Factory is expected to be a singleton: it exists in the dependency
+injection container, with the key `filters.factoryFactory`.
+
+> The Factory Factory in the DI container is a composite of several predefined
+> Factory Factory instances; one for each type of entity the Filter system is
+> capable of filtering.
 
 
 ### Factory (`\Schoolbox\Filter\IFactory`)
@@ -150,7 +151,8 @@ ID Finder implementations must implement:
 * a method for translating a list of selected filters to a list of IDs
   (`findIdsByFilters`)
 
-> Only one of these exists: it exists for assessment filters.
+> Only one of these exists: it exists for assessment filters. (It exists in the
+> DI container, with the key `filters.assessmentIdFinder`.)
 >
 > The Matcher paradigm was not viable for assessment filtering for performance
 > reasons: constructing fetched assessments into usable objects is an expensive
@@ -172,12 +174,15 @@ retrieved by some other process. It is designed to be usable as the callback for
 
 ## Practical guides
 
+These guides are intended for getting a developer to understand the fundamentals
+of developing for filters.
+
+
 ### Enabling filters on a page
 
 * Add a `\Schoolbox\Filter\Page\Model::PAGE_*` constant for the new page
-* Alter the required database columns to recognize the new filters
-  * the `filter_page.page` and `filter_selection.page` enums need to have an
-    option added, which matches the value of the constant added above
+* Add the value above to the `filter_page.page` and `filter_selection.page`
+  enums in the Schoolbox database
 * Add this constant to the `params` parameter for the `page` column mappings in
   `\Schoolbox\Filter\Page\Mapper::mapping` and
   `\Schoolbox\Filter\Selection\Mapper::mapping`
@@ -185,10 +190,33 @@ retrieved by some other process. It is designed to be usable as the callback for
   * `\Schoolbox\Filter\Controller::buildFilteredPageLabels`
   * `\Schoolbox\Filter\Module::registerRoutes`
   * `\Schoolbox\Filter\Page\Model::getPageRoleTypes`
-* Update the `getPages` of each Definition implementation that the page uses
+* Update the `getPages` of each Definition implementation that you intend the
+  page to use
+* In your page's module:
+  * inject the Factory Factory as a controller parameter:
+    ```php
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
+        ];
+    }
+    ```
 * In your controller:
   * inject a Factory Factory as a constructor param
-  * generate the filter panel's Twig data:
+    ```php
+    /**
+     * @var \Schoolbox\Filter\IFactoryFactory
+     */
+    private $filterFactoryFactory;
+
+    public function __construct(\Schoolbox\Filter\IFactoryFactory $filterFactoryFactory)
+    {
+        $this->filterFactoryFactory = $filterFactoryFactory;
+    }
+    ```
+  * generate the filter panel's Twig data in a controller action:
     ```php
     $page        = \Schoolbox\Filter\Page\Model::PAGE_NEW_FILTER;
     $filterPanel = $this->filterFactoryFactory->buildPanel(
@@ -200,33 +228,24 @@ retrieved by some other process. It is designed to be usable as the callback for
     );
     ```
   * inject the Twig data into the controller action's Twig template
+    ```php
+    $this->response->content->set(
+        $this->buildHtmlOutput(
+            '@moduleName/index.twig',
+            [
+                'filterPanel' => $filterPanel,
+            ]
+        )
+    );
+    ```
 * In the Twig template:
-  * ```twig
+  * Output the filter
+    ```twig
     {% include '@filters/panel.twig' with {
-        contentId: reportContentId,
+        contentId: 'filterPanel',
         panel:     filterPanel,
-        quickload: true
     } only %}
     ```
-* In the controller's module:
-  * inject the Factory Factory as a constructor param:
-    ```php
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
-                /** @var RosettaStone $rosettaStone */
-                $rosettaStone = $injector->get('l10n');
-                return new \Schoolbox\Filter\Filters\Assessment\FactoryFactory(
-                    $this->getMapperFactory(),
-                    $rosettaStone
-                );
-            }),
-        ];
-    }
-    ```
-* > TODO write about how to develop filters on the front end
 
 
 ### Creating a new filter implementation
@@ -262,9 +281,7 @@ retrieved by some other process. It is designed to be usable as the callback for
 
 ### Adding an existing filter to a page which already supports filters
 
+Since
+
 * Update the Definition implementation's `getPages` to return the page's
   `\Schoolbox\Filter\Page\Model::PAGE_*` constant
-
-## Technical discussion
-
-> TODO isn't technical discussion covered by everything above?
