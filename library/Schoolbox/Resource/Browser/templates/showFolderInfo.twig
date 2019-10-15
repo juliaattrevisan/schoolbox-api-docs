@@ -60,7 +60,29 @@
 
     <div class="small-12 column">
         {% if access > 1 %}
-            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+            <script type="text/javascript">
+                $(function () {
+                    var $attachzone = $('#cms-zone');
+                        controlUploadButton = function () {
+                            var $uploadButton = $('#uploadButton'),
+                                dropzone      = $attachzone.data('plugin_resourceAttach').dropzone;
+                            if (dropzone.getQueuedFiles().length === 0 && dropzone.getUploadingFiles().length === 0) {
+                                $uploadButton.removeClass('hide');
+                            }
+                            if (dropzone.getAcceptedFiles().length === 0) {
+                                $uploadButton.addClass('hide');
+                            }
+                        };
+                    $attachzone
+                        .on('success.attachzone', controlUploadButton)
+                        .on('removedfile.attachzone', controlUploadButton)
+                        .on('error.attachzone', controlUploadButton)
+                })
+            </script>
+            <form action="/cms/{{ fileController }}Form.php?ajax=1" method="post">
+                {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                <input type="submit" value="Upload" class="hide" id="uploadButton" />
+            </form>
         {% endif %}
         {% set actionBarList %}
             {# Actions differ by namespace #}
