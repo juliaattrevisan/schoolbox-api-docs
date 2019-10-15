@@ -54,106 +54,6 @@ class Processor
 
 
     /**
-     * Columns in a Parent CSV
-     */
-    private const IMPORT_COLUMNS_PARENT = [
-        'External ID',
-        'Type',
-        'Username',
-        'Title',
-        'Firstname',
-        'Surname',
-        'Email',
-        'Mobile',
-        'Home Phone',
-        'Work Phone'
-    ];
-
-
-    /**
-     * Columns in a Student csv
-     */
-    private const IMPORT_COLUMNS_STUDENT = [
-        'External ID',
-        'Type',
-        'Username',
-        'Title',
-        'Firstname',
-        'Surname',
-        'Email',
-        'Gender',
-        'Campus',
-        'Emergency Contact Name 1',
-        'Emergency Contact Phone 1',
-        'Emergency Contact Phone Alt 1',
-        'Emergency Contact Name 2',
-        'Emergency Contact Phone 2',
-        'Emergency Contact Phone Alt 2',
-        'Emergency Contact Name 3',
-        'Emergency Contact Phone 3',
-        'Emergency Contact Phone Alt 3',
-        'Mobile',
-        'Date of Birth',
-        'House',
-        'Head of House ID',
-        'Head of House Name',
-        'Form',
-        'Form Teacher ID',
-        'Form Teacher Name',
-        'Tutor Group',
-        'Tutor Teacher ID',
-        'Tutor Teacher Name',
-        'Year Level',
-        'Year Level Coordinator ID',
-        'Year Level Coordinator Name',
-        'Studies Code',
-        'Medical Alert',
-        'Comment',
-        'Contact Alert',
-        'Legal Alert',
-        'Enrolment Date',
-        'Leaving Date',
-        'IB',
-        'ILP',
-        'ESL',
-        'Special Needs',
-        'Boarding Status'
-    ];
-
-
-    /**
-     * Columns in a Staff csv
-     */
-    private const IMPORT_COLUMNS_STAFF = [
-        'External ID',
-        'Type',
-        'Username',
-        'Title',
-        'Firstname',
-        'Surname',
-        'Email',
-        'Work Phone',
-        'Staff Category',
-        'Position Title',
-        'Department',
-        'Building',
-        'Room',
-        'Campus'
-    ];
-
-
-    /**
-     * Columns in a Relation csv
-     */
-    private const IMPORT_COLUMNS_RELATION = [
-        'Student ID',
-        'Guardian ID',
-        'Type',
-
-    ];
-
-
-    /**
      * Upload type
      * One of [student, staff, parent, relation]
      *
@@ -310,28 +210,28 @@ class Processor
 
             /* Process the Student Profile csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_STUDENT);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STUDENT));
 
             return $this->processStudentProfile($reader);
         } elseif ($this->isStaffProfile()) {
 
             /* Process the Staff Profile csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_STAFF);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STAFF));
 
             return $this->processStaffProfile($reader);
         } elseif ($this->isParentProfile()) {
 
             /* Process the Parent Profile csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_PARENT);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_PARENT));
 
             return $this->processParentProfile($reader);
         } elseif ($this->isRelation()) {
 
             /* Process the Relations csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_RELATION));
 
             return $this->processRelation($reader);
         }
