@@ -63,6 +63,10 @@
                 newEvent: {},
                 currentDisplay: null,
                 duration: 10,
+                listViewDateRange: {
+                    start: null,
+                    end: null,
+                }
             }
         },
         computed: {
@@ -449,12 +453,15 @@
                     startDate.setAttribute('name', 'start_date');
                     startDate.setAttribute('data-datepicker', '');
                     startDate.setAttribute('data-datepicker-buttontext', '');
+                    if (self.listViewDateRange.start) startDate.setAttribute('value', self.listViewDateRange.start);
+
 
                     // End date field
                     endDate.setAttribute('id', 'end_date');
                     endDate.setAttribute('name', 'end_date');
                     endDate.setAttribute('data-datepicker', '');
                     endDate.setAttribute('data-datepicker-buttontext', '');
+                    if (self.listViewDateRange.end) endDate.setAttribute('value', self.listViewDateRange.end);
 
                     // Update button
                     updateRangeButton.setAttribute('id', 'update_date_range_button');
@@ -480,6 +487,9 @@
                                 endDateValue = moment(document.querySelector('#end_date').value, 'DD/MM/YYYY');
 
                             if (startDateValue.isValid() && endDateValue.isValid()) {
+                                self.listViewDateRange.start = document.querySelector('#start_date').value;
+                                self.listViewDateRange.end = document.querySelector('#end_date').value;
+
                                 self.duration = self.helper.dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                                 self.$refs.fullCalendar.getApi().gotoDate(startDateValue.format('YYYY-MM-DD'));
                             }
