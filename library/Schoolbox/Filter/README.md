@@ -162,8 +162,16 @@ ID Finder implementations must implement:
 #### Matcher
 
 A Matcher operates on a collection of entities _after_ all results have been
-retrieved by some other process. It is designed to be usable as the callback for
-`array_filter` or `\Schoolbox\Collection::filter`.
+retrieved by some other process.
+
+It is designed to be usable as the callback for `array_filter` or
+`\Schoolbox\Collection::filter`. Therefore, it must implement one method which
+is usable as a filter callback:
+* accepts a filterable entity as its only parameter
+* return `true` if the entity is to be preserved in the filtered record set
+
+(The Matcher object itself may be used as a filter, if the magic method
+`__invoke` is implemented as the filter method.)
 
 > Only one of these exists: it exists for the event filter.
 >
@@ -251,17 +259,15 @@ of developing for filters.
 ### Creating a new filter implementation
 
 * Determine the entity that the filter will actually operate on
-  * As mentioned under Factory Factory, all existing filters operate on the
-    Assessment object `\Schoolbox\Learning\Assessment\DataModel\Mapper`
-* Create a Factory implementation for the new filter
-  * Depending on how closely related the new filter is to existing ones, its
-    `buildComponent` and `buildKeyConverter` might be able to create instances
-    of already existing classes. `buildDefinition` will have to create a new
-    class though
-* Create a Definition implementation for the new filter
-  * The `getPages` method will determine the filter pages on which this filter
-    will show: see "Adding an existing filter" below
-  * > TODO document the process of creating new classes
+  * if no Factory Factory or Filter Consumer exists for the entity:
+    * create a Factory Factory
+      (this should extend `\Schoolbox\Filter\AbstractFactoryFactory`)
+      * add it to the `\Schoolbox\Filter\CompositeFactoryFactory` in the DI key
+        `filters.factoryFactory` in
+        `\Alaress\Application\Kernel::installDependencies`
+    * create a Filter Consumer
+      * an ID Finder should be appropriate if the filtering will take place at a
+        query level, otherwise a Matcher will be required
 * Insert a new row into the `filter` database table for the new filter
   * the `entity` column value needs to be the fully-qualified class name of the
     entity the filter will operate on
@@ -269,6 +275,15 @@ of developing for filters.
     Definition class
   * leave the leading `\` character off both values
     * note that `\` is escaped by another `\` in MySQL/MariaDB queries
+* Create a Factory implementation for the new filter
+  * Depending on how closely related the new filter is to existing ones, its
+    `buildComponent` and `buildKeyConverter` might be able to create instances
+    of already existing classes. `buildDefinition` will have to create a new
+    class though
+* Create a Definition implementation for the new filter
+  * In practise, this will extend `\Schoolbox\Filter\AbstractDefinition`
+* Create a Component implementation (if a custom implementation is required)
+* Create a Key Converter implementation (if a custom implementation is required)
 * Find the Factory Factory implementation which creates filters for the entity
   that is being filtered
   * Each Factory Factory has an `ENTITY` class constant: find the one that
@@ -276,12 +291,13 @@ of developing for filters.
     exists
   * Update that implementation's `buildFilterFactoryForFilter` method to be able
     to create an instance of the new filter
-* Add a case to the ID finder for this class
+* Add a case to the Filter Consumer for this entity
+  * ID Finders will need their `findIdsByFilters` method updated
+  * Matchers are more freeform, but somehow their filter method must recognise
+    the new filter, and accept/reject the entity
 
 
 ### Adding an existing filter to a page which already supports filters
-
-Since
 
 * Update the Definition implementation's `getPages` to return the page's
   `\Schoolbox\Filter\Page\Model::PAGE_*` constant
