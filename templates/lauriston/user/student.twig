@@ -23,32 +23,4 @@
     {% block buttons_grades %}
     {% endblock buttons_grades %}
 
-    {% if isStaff %}
-        <ul class="flex-list flex-wrap buttons">
-            <li>
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Assessment%20Data&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class=" icon-due-work"
-                   data-plugin="preview"
-                   >Assessment Data</a>
-            </li>
-            <li>
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Reporting%20Grades&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class=" icon-progress"
-                   data-plugin="preview"
-                   >Reporting {{ locale.grades.properPlural }}</a>
-            </li>
-            <li>
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Learning%20Support&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class=" icon-staff"
-                   data-plugin="preview"
-                   >Locate Student</a>
-            </li>
-            <li>
-                <a href="https://reports.lauriston.vic.edu.au/ReportServer/Pages/ReportViewer.aspx?/Schoolbox/Students/Student%20Notes&rs:Command=Render&rc:Stylesheet=notoolbar&rc:Zoom=Page%20Width&ID={{ user.externalId }}"
-                   class=" icon-forms"
-                   data-plugin="preview"
-                   >Student Notes</a>
-            </li>
-        </ul>
-    {% endif %}
 {% endblock buttons_island %}
