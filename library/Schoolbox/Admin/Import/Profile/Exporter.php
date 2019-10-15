@@ -131,16 +131,18 @@ class Exporter
 
 
     /**
-     * Export csv-formatted data from nested profile structs
+     * Configurable method for exporting an arbitrary profile
      *
-     * @return string
+     * @param string            $type
+     * @param array             $columnSpec
+     * @param \Schoolbox\Mapper $mapper      One of student/staff/parent/relation mappers
+     * @return false|string
      */
-    public function exportStudentProfile(): string
+    private function exportProfile(string $type, array $columnSpec, \Schoolbox\Mapper $mapper)
     {
-
         /* Header row
          */
-        $headings = array_keys(Mapping::IMPORT_COLUMNS_STUDENT);
+        $headings = array_keys($columnSpec);
 
         /* Each csv row follows this template
          */
@@ -153,21 +155,21 @@ class Exporter
 
         /* Yank each profile
          */
-        $profiles = $this->studentProfileMapper->findAll();
+        $profiles = $mapper->findAll();
 
         /* For each profile, flatten and assemble a single row of data
          */
         foreach ($profiles as $profile) {
             $row = $template;
 
-            foreach (Mapping::IMPORT_COLUMNS_STUDENT as $heading => $column) {
+            foreach ($columnSpec as $heading => $column) {
                 $method = null;
                 $value = '';
 
                 /* Try getting the column value from the extension
                  */
                 try {
-                    $method = $this->studentProfileMapper->getGetMethodName($this->studentProfileMapper->getPropertyFromColumn($column));
+                    $method = $mapper->getGetMethodName($mapper->getPropertyFromColumn($column));
                     $value = $profile->$method();
                 } catch (\InvalidArgumentException $e) {
                     // noop: set as null
@@ -194,7 +196,7 @@ class Exporter
             /* This can get cleared in the iteration, so set this last
              * and in the same format as the import csv
              */
-            $row['Type'] = ucwords(Mapping::CSV_STUDENT);
+            $row['Type'] = ucwords($type);
 
             /* Values only, comma separated
              */
@@ -211,15 +213,38 @@ class Exporter
     }
 
 
-    public function exportStaffProfile()
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportStudentProfile(): string
     {
-        return '';
+        return $this->exportProfile(Mapping::CSV_STUDENT, Mapping::IMPORT_COLUMNS_STUDENT, $this->studentProfileMapper);
     }
 
-    public function exportParentProfile()
+
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportStaffProfile(): string
     {
-        return '';
+        return $this->exportProfile(Mapping::CSV_STAFF, Mapping::IMPORT_COLUMNS_STAFF, $this->staffProfileMapper);
     }
+
+
+    /**
+     * Export csv-formatted data from nested profile structs
+     *
+     * @return string
+     */
+    public function exportParentProfile(): string
+    {
+        return $this->exportProfile(Mapping::CSV_PARENT, Mapping::IMPORT_COLUMNS_PARENT, $this->parentProfileMapper);
+    }
+
 
     public function exportRelation()
     {
