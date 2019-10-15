@@ -188,7 +188,7 @@ class Controller extends BaseController
             $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey(
                 $folderId,
                 $critName,
-                $groupName
+                isset($groupModel) ? $groupModel->getName() : $groupName
             );
 
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
