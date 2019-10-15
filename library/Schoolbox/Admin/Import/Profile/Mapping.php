@@ -140,7 +140,7 @@ class Mapping
      * @param string $type
      * @throws \InvalidArgumentException
      */
-    public static function assertType(string $type): void
+    public function __construct(string $type)
     {
         if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATION], true)) {
             throw new \InvalidArgumentException('Unknown csv type.');

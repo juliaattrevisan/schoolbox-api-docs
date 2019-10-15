@@ -60,6 +60,12 @@ class Processor
 
 
     /**
+     * @var Mapping
+     */
+    private $mapping;
+
+
+    /**
      * @var Profile\Mapper
      */
     private $baseProfileMapper;
@@ -110,12 +116,14 @@ class Processor
      */
     private $perform = false;
 
+
     /**
      * The log object to which log entries are written
      *
      * @var LoggerInterface
      */
     private $logger;
+
 
     /**
      * Processor constructor.
@@ -128,8 +136,7 @@ class Processor
      */
     public function __construct(string $type, IStorage $file, IConnector $database, LoggerInterface $logger = null)
     {
-        Mapping::assertType($type);
-
+        $this->mapping = new Mapping($type);
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
         $this->studentProfileMapper = new Profile\Student\Mapper();
