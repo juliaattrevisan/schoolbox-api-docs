@@ -119,21 +119,24 @@ class Exporter
     public function processOne(): void
     {
         if ($this->mapping->isStudentProfile($this->type)) {
-            return $this->exportStudentProfile();
+            $this->exportStudentProfile();
         } elseif ($this->mapping->isStaffProfile($this->type)) {
-            return $this->exportStaffProfile();
+            $this->exportStaffProfile();
         } elseif ($this->mapping->isParentProfile($this->type)) {
-            return $this->exportParentProfile();
+            $this->exportParentProfile();
         } elseif ($this->mapping->isRelation($this->type)) {
-            return $this->exportRelation();
+            $this->exportRelation();
         }
-
-        throw new \InvalidArgumentException("Unrecognised csv type {$this->type}");
     }
 
 
     public function exportStudentProfile()
     {
+        $profiles = $this->studentProfileMapper->findAll();
+
+        foreach ($profiles as $profile) {
+            new \Alaress_Probe($profile);
+        }
     }
 
     public function exportStaffProfile()

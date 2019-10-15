@@ -133,4 +133,16 @@ class Controller extends Base
             'perform' => (bool)$this->getRequest()->query['perform']
         ])->setTitle('Import User Profile'));
     }
+
+
+    public function getExport(string $type)
+    {
+        /** @var IConnector $db */
+        $db = $this->getDi()->get('databaseInternal');
+
+        $exporter = new Exporter($type, $db);
+
+        $exporter->process();
+    }
+
 }
