@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\External;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -29,6 +30,59 @@ use Schoolbox\Resource\Attachment\Zone;
 class Controller extends Base
 {
     use ImportNavigation;
+
+    /**
+     * @var External\Profile\Mapper
+     */
+    private $baseProfileMapper;
+
+
+    /**
+     * @var External\Profile\Parent\Mapper
+     */
+    private $parentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Student\Mapper
+     */
+    private $studentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Staff\Mapper
+     */
+    private $staffProfileMapper;
+
+
+    /**
+     * @var External\Profile\Relation\Mapper
+     */
+    private $relationMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param External\Profile\Mapper          $baseMapper
+     * @param External\Profile\Parent\Mapper   $parentMapper
+     * @param External\Profile\Student\Mapper  $studentMapper
+     * @param External\Profile\Staff\Mapper    $staffMapper
+     * @param External\Profile\Relation\Mapper $relationMapper
+     */
+    public function __construct(
+        External\Profile\Mapper $baseMapper,
+        External\Profile\Parent\Mapper $parentMapper,
+        External\Profile\Student\Mapper $studentMapper,
+        External\Profile\Staff\Mapper $staffMapper,
+        External\Profile\Relation\Mapper $relationMapper
+    ) {
+        $this->baseProfileMapper = $baseMapper;
+        $this->parentProfileMapper = $parentMapper;
+        $this->studentProfileMapper = $studentMapper;
+        $this->staffProfileMapper = $staffMapper;
+        $this->relationMapper = $relationMapper;
+    }
 
     /**
      * Provide form
@@ -144,10 +198,14 @@ class Controller extends Base
      */
     public function getExport(string $type)
     {
-        /** @var IConnector $db */
-        $db = $this->getDi()->get('databaseInternal');
-
-        $content = (new Exporter($type, $db))->process();
+        $content = (new Exporter(
+            $type,
+            $this->baseProfileMapper,
+            $this->parentProfileMapper,
+            $this->studentProfileMapper,
+            $this->staffProfileMapper,
+            $this->relationMapper
+        ))->process();
 
         $headers = $this->getResponse()->headers;
         $headers->set('Pragma', ' ');

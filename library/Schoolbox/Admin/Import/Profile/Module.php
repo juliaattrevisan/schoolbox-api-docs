@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\External;
 
 /**
  * Class Module
@@ -78,6 +79,12 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
-        $injector->params[Controller::class] = [];
+        $injector->params[Controller::class] = [
+            'baseMapper' => $this->getMapperFactory()->getLazy(External\Profile\Mapper::class),
+            'parentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Parent\Mapper::class),
+            'studentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Student\Mapper::class),
+            'staffMapper' => $this->getMapperFactory()->getLazy(External\Profile\Staff\Mapper::class),
+            'relationMapper' => $this->getMapperFactory()->getLazy(External\Profile\Relation\Mapper::class),
+        ];
     }
 }

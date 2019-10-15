@@ -74,17 +74,28 @@ class Exporter
     /**
      * Exporter constructor.
      *
-     * @param string $type
+     * @param string                  $type
+     * @param Profile\Mapper          $baseProfileMapper
+     * @param Profile\Parent\Mapper   $parentProfileMapper
+     * @param Profile\Student\Mapper  $studentProfileMapper
+     * @param Profile\Staff\Mapper    $staffProfileMapper
+     * @param Profile\Relation\Mapper $relationMapper
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $type)
-    {
+    public function __construct(
+        string $type,
+        Profile\Mapper $baseProfileMapper,
+        Profile\Parent\Mapper $parentProfileMapper,
+        Profile\Student\Mapper $studentProfileMapper,
+        Profile\Staff\Mapper $staffProfileMapper,
+        Profile\Relation\Mapper $relationMapper
+    ) {
         $this->mapping = new Mapping($type);
-        $this->baseProfileMapper = new Profile\Mapper();
-        $this->parentProfileMapper = new Profile\Parent\Mapper();
-        $this->studentProfileMapper = new Profile\Student\Mapper();
-        $this->staffProfileMapper = new Profile\Staff\Mapper();
-        $this->relationMapper = new Profile\Relation\Mapper();
+        $this->baseProfileMapper = $baseProfileMapper;
+        $this->parentProfileMapper = $parentProfileMapper;
+        $this->studentProfileMapper = $studentProfileMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
+        $this->relationMapper = $relationMapper;
 
         $this->type = $type;
     }
