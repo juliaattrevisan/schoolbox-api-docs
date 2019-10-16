@@ -30,7 +30,12 @@ class RouteLookup {
         if (!isset($data['format'])) {
             $data['format'] = '';
         }
-        return $this->getRouter()->generate($name, $data);
+
+        try {
+            return $this->getRouter()->generate($name, $data);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
