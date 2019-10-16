@@ -50,6 +50,28 @@ class HomePageCest
         $i->canSeeHttpHeader('location', '/');
     }
 
+    /** @noinspection PhpUnused */
+    /**
+     * @param IntegrationTester $i
+     */
+    public function createFolderWithCurriculumTaggingOff(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp      = time();
+        $homepageTitle = 'Testing Folder (Homepage) Create with curriculum tagging off at ' . $timestamp;
+
+        #WHEN
+        $createFolderRequest = new Payload\Resource\Folder\Create();
+        $createFolderRequest->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
+        $createFolderRequest->setName($homepageTitle);
+        $createFolderRequest->unsetCurriculumCodes();
+        $i->sendRequest($createFolderRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(303);
+        $i->canSeeHttpHeader('location', '/');
+    }
+
     /**
      * Create a homepage and uploads the file to the homepage component directly. Drag drop path
      *
