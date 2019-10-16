@@ -89,6 +89,8 @@
                                 dataType: 'json'
                             },
                             jstree = $('#tree').jstree(true);
+
+                        $uploadButton.prop('disabled', true);
                         $.ajax(ajaxParams)
                             .done(function (data) {
                                 // The response contains all items in the folder.
@@ -102,6 +104,10 @@
 
                                 // Then remove all the files I just uploaded
                                 $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
+                            })
+                            .fail(function () {
+                                // I don't know what a fail message could look like?
+                                $uploadButton.prop('disabled', false);
                             });
                     })
                 });
