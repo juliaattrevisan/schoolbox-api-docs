@@ -212,33 +212,30 @@ class Controller extends Assessment\Controller
             }
         }
 
-        // Generate rubric context for every feedback
-        $timeline = null;
-        if ($participant) {
-            $timeline = (new FullTimeline($participant))->getForUser($this->getUser());
-        }
-
-
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                '',
+            ]),
             'assessment'  => $assessment,
             'student'     => $student,
             'participant' => $participant,
-            'timeline'    => $timeline,
+
+            'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
+            'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
+            'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
+            'selfReflect'            => $participant ? (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
+            'selfAssess'             => $participant ? (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
 
             /* Plagscan status
              */
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanEnabled'        => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
-            'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
-            'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
-            'selfReflect'            => (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant),
-            'selfAssess'             => (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant),
         ];
 
         $routeArgs = [
