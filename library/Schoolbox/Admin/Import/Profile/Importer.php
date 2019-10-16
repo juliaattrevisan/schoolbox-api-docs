@@ -742,7 +742,7 @@ class Importer
 
             $this->log("Created relation called \"{$row['Type']}\" between guardian {$row['Guardian ID']} and student {$row['Student ID']}", self::LOG_OK);
 
-            /* These two humans have relations
+            /* Keep a count of successfully-constructed relations
              */
             $n++;
         }
