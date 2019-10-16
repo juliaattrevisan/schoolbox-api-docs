@@ -53,7 +53,11 @@
 
                                 <ul class="flex-list buttons">
                                     <li>
-                                        <a href="/adminv2/import/profile/staff.csv" class="icon-download button">Download Staff Template</a>
+                                        {% if profiles.numStaff %}
+                                            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
+                                        {% else %}
+                                            <a href="/adminv2/import/profile/staff.csv" class="icon-download button">Download Staff Template</a>
+                                        {% endif %}
                                     </li>
                                     <li>
                                         <input type="submit" class="button" value="Dry Run">
@@ -97,7 +101,11 @@
 
                                 <ul class="flex-list buttons">
                                     <li>
-                                        <a href="/adminv2/import/profile/student.csv" class="icon-download button">Download Student Template</a>
+                                        {% if profiles.numStudents %}
+                                            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
+                                        {% else %}
+                                            <a href="/adminv2/import/profile/student.csv" class="icon-download button">Download Student Template</a>
+                                        {% endif %}
                                     </li>
                                     <li>
                                         <input type="submit" class="button" value="Dry Run">
@@ -134,7 +142,11 @@
 
                                 <ul class="flex-list buttons">
                                     <li>
-                                        <a href="/adminv2/import/profile/parent.csv" class="icon-download button">Download Parent Template</a>
+                                        {% if profiles.numParents %}
+                                            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
+                                        {% else %}
+                                            <a href="/adminv2/import/profile/parent.csv" class="icon-download button">Download Parent Template</a>
+                                        {% endif %}
                                     </li>
                                     <li>
                                         <input type="submit" class="button" value="Dry Run">
@@ -173,7 +185,11 @@
 
                                 <ul class="flex-list buttons">
                                     <li>
-                                        <a href="/adminv2/import/profile/relationship.csv" class="icon-download button">Download Relationship Template</a>
+                                        {% if profiles.numRelationships %}
+                                            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+                                        {% else %}
+                                            <a href="/adminv2/import/profile/relationship.csv" class="icon-download button">Download Relationship Template</a>
+                                        {% endif %}
                                     </li>
                                     <li>
                                         <input type="submit" class="button" value="Dry Run">
