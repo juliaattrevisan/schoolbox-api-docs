@@ -22,8 +22,12 @@ use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
 use Twig\Loader\FilesystemLoader;
 use Twig\Error\LoaderError;
+use function array_merge;
 
 class Module {
+
+    /** @var RouteParser */
+    private static $routeParser;
 
     /**
      * The dependency injection container.
@@ -65,6 +69,9 @@ class Module {
      * List of routes that can be pre-configured for registration
      *
      * @var array
+     * @internal string   $routeIndex[0] eg 'GET'
+     * @internal string   $routeIndex[1] eg '/{studentId}/{classId}/update'
+     * @internal string[] $routeIndex[2] eg ['studentId' => '\d+']   (note that classId does not have a regex constraint)
      */
     protected $routeIndex   = [];
 
@@ -104,6 +111,9 @@ class Module {
     /**
      * Shorthand for all the things you can configure on a route
      *
+     * @todo does not yet support repetition quantifiers in route, eg 'year:\d{4}'
+     * @see \Alaress\Module\Test\RouterParserTest
+     *
      * @param string             $httpMethod            typically one of 'GET' or 'POST', but any HTTP method is okay here
      * @param string             $path                  parameterised form of the URL that accepts tokens in-line
      *                                                   - the notation for setting a token is {param:regex}
@@ -113,25 +123,8 @@ class Module {
      */
     protected function register($httpMethod, $path, $controllerMethodName, IAuthorizationRule $permissions = null, callable $preload = null)
     {
-        $tokens = [];
-
-        // extract tokens from path, if any
-        if (preg_match_all('`{(/?[^:]+):([^}]+)}`', $path, $matches)) {
-            $count = count($matches[0]);
-
-            list($fullMatch, $param, $token) = $matches;
-
-            for ($i = 0; $i < $count; ++$i) {
-                // obtain token reference
-                $tokens[$param[$i]] = $token[$i];
-
-                // make shorthanded route aura friendly
-                $path = str_replace($fullMatch[$i], "{{$param[$i]}}", $path);
-            }
-        }
-
         // index the route
-        $this->routeIndex[$controllerMethodName] = [ $httpMethod, $path, $tokens ];
+        $this->routeIndex[$controllerMethodName] = array_merge([$httpMethod], $this->getRouterParser()->parse($path));
 
         if ($preload) {
             // index the preloader
@@ -720,4 +713,17 @@ class Module {
         return $this;
     }
 
+
+    /**
+     * Lazily created and return a RouteParser
+     *
+     * @return RouteParser
+     */
+    private function getRouterParser(): RouteParser
+    {
+        if (!self::$routeParser) {
+            self::$routeParser = new RouteParser();
+        }
+        return self::$routeParser;
+    }
 }
