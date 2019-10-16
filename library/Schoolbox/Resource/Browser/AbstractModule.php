@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -36,6 +36,7 @@ abstract class AbstractModule extends BaseModule
         $this->addGetRoute($router, 'showFolderInfo', $basePath, '/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
         $this->addGetRoute($router, 'showFileInfo', $basePath, '/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
         $this->addGetRoute($router, 'showMultiFileInfo', $basePath, '/file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
+        $this->addPostRoute($router, 'postFiles', $basePath, '/{folderId}/files')->addTokens([ 'folderId' => '\d+' ]);
     }
 
 
@@ -104,4 +105,4 @@ abstract class AbstractModule extends BaseModule
      */
     protected abstract function getControllerClass();
 
-} 
+}
