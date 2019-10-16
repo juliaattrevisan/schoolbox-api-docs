@@ -464,7 +464,7 @@ abstract class AbstractController extends BaseController
     {
         $folder  = $this->folderMapper->findById($folderId);
         $factory = new Resource\Attachment\Collector\CollectorFactory($this->fileMapper);
-        $results = $factory->build($this->request->post->get('attachment'));
+        $results = $factory->build($this->request->post->get('attachment'))->getAll();
 
         /** @var Resource\AbstractFile[] $results */
         foreach ($results as $file) {
@@ -473,7 +473,7 @@ abstract class AbstractController extends BaseController
             $file
                 ->setOwner($this->getUser())
                 ->setFolder($folder)
-                ->setTitle($file->getStorage()->getBasename());
+                ->setTitle($file->getStorage()->getFilename());
         }
         $this->fileMapper->save($results);
 

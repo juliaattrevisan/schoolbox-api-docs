@@ -63,10 +63,10 @@
             <script type="text/javascript">
                 $(function () {
                     // Show/hide the upload button based on whether any files are in the list
-                    var $attachzone = $('#cms-zone');
+                    var $attachzone = $('#cms-zone'),
+                        $uploadButton = $('#uploadButton'),
                         controlUploadButton = function () {
-                            var $uploadButton = $('#uploadButton'),
-                                dropzone      = $attachzone.data('plugin_resourceAttach').dropzone;
+                            var dropzone = $attachzone.data('plugin_resourceAttach').dropzone;
                             if (dropzone.getQueuedFiles().length === 0 && dropzone.getUploadingFiles().length === 0) {
                                 $uploadButton.removeClass('hide').prop('disabled', false);
                             }
@@ -85,7 +85,19 @@
                     // AJAX submission, then do something when it's uploaded
                     $('#uploadForm').on('submit', function (event) {
                         event.preventDefault();
-                        console.log($(this).serializeArray());
+                        var ajaxParams = {
+                            url: this.action,
+                            method: this.method,
+                            data: $(this).serializeArray(),
+                            dataType: 'json'
+                        };
+                        $.ajax(ajaxParams)
+                            .done(function () {
+                                // Update the jstree I guess
+                                // Then remove all the files I just uploaded
+                                $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
+                                $uploadButton.addClass('hide').prop('disabled', true);
+                            });
                     })
                 });
             </script>
