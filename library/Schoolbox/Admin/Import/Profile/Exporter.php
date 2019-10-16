@@ -25,14 +25,6 @@ class Exporter
 {
 
     /**
-     * Relative location of first-time-usage csvs
-     *
-     * @var string
-     */
-    private $csvLocation = '../../../../../www/adminv2/import/profile';
-
-
-    /**
      * Export type
      * One of [student, staff, parent, relationship]
      *
@@ -181,14 +173,6 @@ class Exporter
     private function exportProfile(string $type, array $columnSpec, Mapper $mapper)
     {
 
-        /* Yank each profile; if there aren't any profiles to load, send back a default csv's contents
-         */
-        $profiles = $mapper->findAll();
-
-        if (!$profiles->count()) {
-            return file_get_contents(__DIR__ . "/{$this->csvLocation}/{$type}.csv");
-        }
-
         /* Header row
          */
         $headings = array_keys($columnSpec);
@@ -201,6 +185,10 @@ class Exporter
          */
         $fp = fopen('php://temp', 'w');
         fputcsv($fp, $headings);
+
+        /* Yank each profile; if there aren't any profiles to load, send back a default csv's contents
+         */
+        $profiles = $mapper->findAll();
 
         /* For each profile, flatten and assemble a single row of data
          */
