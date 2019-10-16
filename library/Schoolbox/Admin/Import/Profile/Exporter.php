@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
 use Schoolbox\External\Profile;
 use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
@@ -25,6 +26,14 @@ use Schoolbox\Mapper;
  */
 class Exporter
 {
+
+    /**
+     * Relative location of first-time-usage csvs
+     *
+     * @var string
+     */
+    private $csvLocation = '../../../../../www/adminv2/import/profile';
+
 
     /**
      * Export type
@@ -90,12 +99,12 @@ class Exporter
         Profile\Staff\Mapper $staffProfileMapper,
         Profile\Relation\Mapper $relationMapper
     ) {
-        $this->mapping = new Mapping($type);
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
+        $this->mapping              = new Mapping($type);
+        $this->baseProfileMapper    = $baseProfileMapper;
+        $this->parentProfileMapper  = $parentProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationMapper = $relationMapper;
+        $this->staffProfileMapper   = $staffProfileMapper;
+        $this->relationMapper       = $relationMapper;
 
         $this->type = $type;
     }
@@ -174,6 +183,15 @@ class Exporter
      */
     private function exportProfile(string $type, array $columnSpec, Mapper $mapper)
     {
+
+        /* Yank each profile; if there aren't any profiles to load, send back a default csv's contents
+         */
+        $profiles = $mapper->findAll();
+
+        if (!$profiles->count()) {
+            return file_get_contents(__DIR__ . "/{$this->csvLocation}/{$type}.csv");
+        }
+
         /* Header row
          */
         $headings = array_keys($columnSpec);
@@ -186,10 +204,6 @@ class Exporter
          */
         $fp = fopen('php://temp', 'w');
         fputcsv($fp, $headings);
-
-        /* Yank each profile
-         */
-        $profiles = $mapper->findAll();
 
         /* For each profile, flatten and assemble a single row of data
          */
