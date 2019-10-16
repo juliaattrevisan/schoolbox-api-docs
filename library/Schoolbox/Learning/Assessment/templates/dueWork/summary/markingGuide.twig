@@ -5,7 +5,8 @@
  #}
 {% if assessment.useRubric or participant.assessable.useRubric %}
     {% include '@learningAssessment/dueWork/summary/rubric.twig' with {
+        selfAssessmentFeedback: selfAssessmentFeedback,
         participant: participant,
-        markVisibility: false,
+        markVisibility: selfAssessmentFeedback ? true : false,
     } %}
 {% endif %}

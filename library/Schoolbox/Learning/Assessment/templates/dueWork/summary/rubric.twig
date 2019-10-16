@@ -7,9 +7,10 @@
             rubricMarkedGrid: markVisibility ?? rubricMarkedGrid,
             markVisibility: markVisibility ?? participant.assessable.isFeedbackVisibleToUser(USER),
             showDescriptorValue: showDescriptorValue,
-            selfAssessmentFeedback: null,
+            selfAssessmentFeedback: selfAssessmentFeedback,
             showGroupTotal: showGroupTotal,
-            showRubricTotal: showRubricTotal
+            showRubricTotal: showRubricTotal,
+            learner: participant ? participant.user : null
         } only %}
     </div>
 </div>
