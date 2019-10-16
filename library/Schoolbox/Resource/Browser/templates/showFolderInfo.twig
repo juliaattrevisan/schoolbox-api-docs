@@ -59,7 +59,7 @@
     </div>
 
     <div class="small-12 column">
-        {% if access > 1 %}
+        {% if access > 1 and folder.id %}
             <script type="text/javascript">
                 $(function () {
                     // Show/hide the upload button based on whether any files are in the list
