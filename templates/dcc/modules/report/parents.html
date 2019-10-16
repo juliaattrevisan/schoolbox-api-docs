@@ -1,0 +1,208 @@
+<div class="row">
+    <div class="small-12 column">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h1>Parent Directory {HEADING}</h1>
+            </div>
+            <nav class="noprint">
+                <a class="icon-more" href="#" data-dropdown="header-options" title="Actions"></a>
+            </nav>
+            <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+                <!-- BEGIN email_all_parents_link -->
+                <li>
+                    <a data-action='email-all-parents' class="icon-email" href="#">Email All Parents</a>
+                </li>
+                <!-- END email_all_parents_link -->
+                <li>
+                    <a data-action='search' class="icon-search" href="#">Search</a>
+                </li>
+                <li>
+                    <a data-action='print' class="icon-print" href="#">Print</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div data-searchfilteroptions class="small-12 island noprint">
+        <h2 class="subheader">Search Filter Options</h2>
+        <section class="content">
+            <form method='get' action='?'>
+                <div class="row">
+                    <div class="large-{SEARCH_WIDTH} columns">
+                        <label>
+                            Name
+                            <input type='text' name='searchName' value="{SEARCH_NAME}"/>
+                        </label>
+                    </div>
+                    <!-- BEGIN has_boarder -->
+                    <div class="large-2 columns">
+                        <label>
+                            Boarder
+                            <select name='searchBoardingStatus'>
+                                <option value='' {SEARCH_BOARDINGSTATUS_NONE} /></option>
+                                <option value='yes' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
+                                <option value='no' {SEARCH_BOARDINGSTATUS_NO} />No</option>
+                            </select>
+                        </label>
+                    </div>
+                    <!-- END has_boarder -->
+                    <div class="large-2 columns">
+                        <label>
+                            Form
+                            <select name="searchForm">
+                                <!-- BEGIN search_form_option -->
+                                <option value='{SEARCHFORM_VALUE}' {SEARCHFORM_SELECTED}>{SEARCHFORM_DESCRIPTION}</option>
+                                <!-- END search_form_option -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="large-2 columns">
+                        <label>
+                            Year
+                            <!-- BEGIN all_year_selector -->
+                            <select name='searchYear'>
+                                <option value="" selected></option>
+                                <!-- BEGIN all_year_option -->
+                                <option value="{YEAR_CODE}">{YEAR_DESCRIPTION}</option>
+                                <!-- END all_year_option -->
+                            </select>
+                            <!-- END all_year_selector -->
+                        </label>
+                    </div>
+                    <div class="large-12 columns">
+                        <label>
+                            <input type='submit' value='Search' />
+                        </label>
+                    </div>
+                </div>
+            </form>
+        <section>
+    </div>
+</div>
+
+<!-- BEGIN empty -->
+<div class="row">
+    <div class="small-12 island">
+        <div class="empty-state">
+            <i class="icon-user"></i>
+            <p>Sorry, no records were found that matched your search, please revise your search below and try again.</p>
+        </div>
+    </div>
+</div>
+<!-- END empty -->
+
+<!-- BEGIN student -->
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">
+            <!-- BEGIN private -->
+            {STUDENT_FIRSTNAME} {STUDENT_SURNAME} (YEAR {STUDENT_YEAR}) {STUDENT_HOUSE} {STUDENT_BOARDER}
+            <span data-tooltip="demo" class="hint has-tip tip-top" data-width="200" title="Details have not been made available">?</span>
+            <!-- END private -->
+            <!-- BEGIN public -->
+            {STUDENT_FIRSTNAME} {STUDENT_SURNAME}  (YEAR {STUDENT_YEAR}) {STUDENT_HOUSE} {STUDENT_BOARDER}
+            <!-- END public -->
+        </h2>
+    </div>
+
+    <!-- BEGIN contact -->
+    <!-- BEGIN primary -->
+    <div class="large-6 columns end">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td>{CONTACT_TITLE} {CONTACT_FIRSTNAME} {CONTACT_SURNAME}</td>
+                </tr>
+                <tr>
+                    <td>Home Phone</td>
+                    <td>{CONTACT_PHONE}</td>
+                </tr>
+                <tr>
+                    <td>Mobile</td>
+                    <td>{CONTACT_MOBILE}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a></td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- END primary -->
+    <!-- BEGIN spouse -->
+    <div class="large-6 columns end">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td>{SPOUSE_TITLE} {SPOUSE_FIRSTNAME} {SPOUSE_SURNAME}</td>
+                </tr>
+                <tr>
+                    <td>Home Phone</td>
+                    <td>{CONTACT_PHONE}</td>
+                </tr>
+                <tr>
+                    <td>Mobile</td>
+                    <td>{SPOUSE_CONTACT_MOBILE}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><a href="mailto:{SPOUSE_CONTACT_EMAIL}">{SPOUSE_CONTACT_EMAIL}</a></td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- END spouse -->
+    <!-- END contact -->
+</div>
+<!-- END student -->
+
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-action="print"]').artificialPrint();
+
+        /* Make search filter options panel appear either by
+         * clicking the button or by default, if any search
+         * parameters were used
+         */
+        $('[data-action="search"]').click(function() {
+            $('[data-searchfilteroptions]').show();
+        });
+
+        /* Default visibility of search panel
+         */
+        $('[data-searchfilteroptions]').hide();
+
+        <!-- BEGIN show_filter_options -->
+        $('[data-searchfilteroptions]').show();
+        <!-- END show_filter_options -->
+    });
+</script>
+
+<!-- BEGIN email_all_parents -->
+<script type="text/javascript">
+    $(function() {
+        $('[data-action="email-all-parents"]').click(function(event) {
+            event.preventDefault();
+
+            $('[data-emailallparents]').submit();
+        });
+    });
+</script>
+<form data-emailallparents action="/mail/createMail.php" method="post">
+    <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
+    <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+</form>
+<!-- END email_all_parents -->
