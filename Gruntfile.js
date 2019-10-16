@@ -110,7 +110,7 @@ var jsSrc = {
         'www/javascript/shared/datetime/jquery.sync-dates.js',
 
         // Flatpickr date selector
-        'www/javascript/components/flatpickr/dist/flatpickr.js',
+        'node_modules/flatpickr/dist/flatpickr.js',
 
         // Loads Flatpickr into a modal
         'www/javascript/shared/datetime/attacher.datepicker.js',
