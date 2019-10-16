@@ -14,6 +14,7 @@
     import CreateEventModal           from './createEventModal';
     import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
+    import FlatPickr                  from "./flatPickr";
     import axios                      from 'axios'
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
@@ -53,6 +54,7 @@
             MetaList,
             FullCalendar,
             RevealModal,
+            FlatPickr,
         },
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
@@ -435,6 +437,10 @@
                 return this.helper.dayTitleFormat(dateObject);
             },
 
+            onQuickSwitch(value) {
+                this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
+            },
+
             /**
              * Register customised input fields for list view
              */
@@ -629,6 +635,15 @@
             @eventClick="onEventClick"
             @eventResize="onEventResize"
             @eventDrop="onEventDrop"
+        />
+
+        <flat-pickr
+                ref="flatPickr"
+                :config="{
+                    defaultDate: config.defaultDate,
+                    selector: '.fc-center'
+                }"
+                @dateSelected="onQuickSwitch"
         />
 
         <toast ref="toast"></toast>
