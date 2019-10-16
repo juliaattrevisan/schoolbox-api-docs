@@ -25,7 +25,7 @@
                     </ul>
                 </div>
                 <div class="small-12 medium-6 columns">
-                    <form method="post" action="/adminv2/import/profile/upload">
+                    <form method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}">
                         <input type="hidden" name="file" value="parent" />
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
