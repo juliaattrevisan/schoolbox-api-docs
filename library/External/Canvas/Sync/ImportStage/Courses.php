@@ -172,7 +172,7 @@ class Courses
         FROM course_dim course
         JOIN enrollment_term_dim enrollment_term ON enrollment_term.id = course.enrollment_term_id
         JOIN account_dim account ON course.account_id = account.id
-        LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state != 'deleted'
+        LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state = 'published'
         WHERE $courseFilterWhere
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment.id DESC
         ";
