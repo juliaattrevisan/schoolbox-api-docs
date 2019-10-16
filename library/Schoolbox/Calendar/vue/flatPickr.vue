@@ -10,7 +10,8 @@
         props: ['config'],
         data() {
             return {
-                selector: this.config.selector
+                selector: this.config.selector,
+                activeFlatPickr: {},
             }
         },
         components: {flatpickr},
@@ -19,11 +20,15 @@
                 this.$emit('dateSelected', {
                     selectedDate: dateStr
                 });
+            },
+
+            updateActiveDate(val) {
+                this.activeFlatPickr.setDate(val)
             }
         },
         mounted() {
             // Initialise flatpickr on mount
-            flatpickr(this.selector, {
+            this.activeFlatPickr = flatpickr(this.selector, {
                 defaultDate: this.config.defaultDate,
                 onChange: this.onChange,
             })

@@ -525,6 +525,33 @@
 
             currentViewIsList() {
                 return this.currentDisplay === 'list';
+            },
+
+            /**
+             * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickPrev() {
+                let api = this.$refs.fullCalendar.getApi();
+                    api.prev();
+                    this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickNext() {
+                let api = this.$refs.fullCalendar.getApi();
+                    api.next();
+                    this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickToday() {
+                let api = this.$refs.fullCalendar.getApi();
+                    api.today();
+                    this.$refs.flatPickr.updateActiveDate(api.getDate());
             }
         },
         mounted() {
@@ -618,10 +645,22 @@
                 },
                 quickSwitchButton: {
                     text: ' ',
-                }
+                },
+                customPrev: {
+                    icon: 'chevron-left',
+                    click: this.clickPrev.bind(this),
+                },
+                customNext: {
+                    icon: 'chevron-right',
+                    click: this.clickNext.bind(this),
+                },
+                customToday: {
+                    text: 'Today',
+                    click: this.clickToday.bind(this),
+                },
             }"
             :header="{
-                left: 'quickSwitchButton,today,prev,next',
+                left: 'quickSwitchButton,customToday,customPrev,customNext',
                 center: 'title',
                 right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
