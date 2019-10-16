@@ -398,7 +398,7 @@ class Healthcheck
             'SCHOOLBOX_TIMETABLE_DEFINITION'
         ];
 
-        $this->selectTest($db2inst1Tables, null, 'DB2INST1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($db2inst1Tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /**

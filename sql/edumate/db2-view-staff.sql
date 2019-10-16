@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_STAFF AS
+CREATE OR REPLACE VIEW SCHOOLBOX_STAFF AS
 select
 edumate.staff.staff_number,
 edumate.salutation.salutation,

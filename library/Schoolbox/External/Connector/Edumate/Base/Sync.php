@@ -36,7 +36,7 @@ class Sync extends Base implements ISync
             NULL           AS "student_boarder",
             NULL           AS "student_boarding_house",
             NULL           AS "student_campus"
-            FROM DB2INST1.SCHOOLBOX_STUDENTS
+            FROM SCHOOLBOX_STUDENTS
         ';
 
         return new Iterator\Student(
@@ -67,10 +67,10 @@ class Sync extends Base implements ISync
                 NULL                     AS "student_gender",
                 S.FIRSTNAME              AS "student_preferred",
                 S.SURNAME                AS "student_surname"
-            FROM DB2INST1.SCHOOLBOX_PARENTS AS P
-            INNER JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT
+            FROM SCHOOLBOX_PARENTS AS P
+            INNER JOIN SCHOOLBOX_PARENT_STUDENT
                 AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
-            INNER JOIN DB2INST1.SCHOOLBOX_STUDENTS
+            INNER JOIN SCHOOLBOX_STUDENTS
                 AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
             WHERE P.CARER_NUMBER IS NOT NULL
 
@@ -93,10 +93,10 @@ class Sync extends Base implements ISync
                 NULL                     AS "student_gender",
                 S.FIRSTNAME              AS "student_preferred",
                 S.SURNAME                AS "student_surname"
-            FROM DB2INST1.SCHOOLBOX_PARENTS AS P
-            INNER JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT
+            FROM SCHOOLBOX_PARENTS AS P
+            INNER JOIN SCHOOLBOX_PARENT_STUDENT
                 AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
-            INNER JOIN DB2INST1.SCHOOLBOX_STUDENTS
+            INNER JOIN SCHOOLBOX_STUDENTS
                 AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
             WHERE P.SPOUSE_CARER_NUMBER IS NOT NULL
         ';
@@ -132,7 +132,7 @@ class Sync extends Base implements ISync
                 NULL          AS "staff_year_level",
                 NULL          AS "staff_year_level_description"                
                 
-            FROM DB2INST1.SCHOOLBOX_STAFF
+            FROM SCHOOLBOX_STAFF
             WHERE USERNAME IS NOT NULL
         ';
 

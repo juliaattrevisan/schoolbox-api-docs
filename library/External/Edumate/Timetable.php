@@ -26,7 +26,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getConnection()->prepareQuery('
             SELECT PERIOD "desc", START_TIME "start", END_TIME "end", PERIOD_NUMBER "number", 1 "sequence"
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE_DEFINITION TD
+            FROM SCHOOLBOX_TIMETABLE_DEFINITION TD
             WHERE TD.DAY_NUMBER = :day
             AND TD.CAMPUS = :campus
             ORDER BY TD.START_TIME ASC
@@ -80,7 +80,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     {
         $stmt = $this->getConnection()->prepareQuery('
             SELECT DAYS_IN_CYCLE
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE_DAYS
+            FROM SCHOOLBOX_TIMETABLE_DAYS
             WHERE TIMETABLE_ID = :campus
             AND START_DATE <= :date
             AND END_DATE >= :date
@@ -108,7 +108,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     {
         $stmt = $this->getConnection()->prepareQuery('
             SELECT START_DATE, CYCLE_START_DAY, DAYS_IN_CYCLE
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE_DAYS
+            FROM SCHOOLBOX_TIMETABLE_DAYS
             WHERE START_DATE <= :date
             AND END_DATE >= :date
             AND TIMETABLE_ID = :campus
@@ -204,13 +204,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         if ($this->getGroupHandler()->isStudent($userId)) {
             $type = 'STUDENT';
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                LEFT JOIN SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STUDENT_NUMBER = :sn
             ";
         } elseif ($this->getGroupHandler()->isStaff($userId)) {
             $type = 'STAFF';
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                LEFT JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STAFF_NUMBER = :sn
             ";
         } else {
@@ -227,8 +227,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $stmt = $this->getConnection()->prepareQuery(
             "
             SELECT PERIOD_NUMBER, T.CLASS_CODE AS CODE, C.{$type}_NUMBER AS STAFFID, ROOM, CL.CLASS
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE T
-            LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
+            FROM SCHOOLBOX_TIMETABLE T
+            LEFT JOIN SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
             AND DAY_NUMBER = :d AND $campus
         "
@@ -301,12 +301,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         if ($this->getGroupHandler()->isStudent($userId)) {
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                LEFT JOIN SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STUDENT_NUMBER = :sn
             ";
         } elseif ($this->getGroupHandler()->isStaff($userId)) {
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                LEFT JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STAFF_NUMBER = :sn
             ";
         } else {
@@ -324,8 +324,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $stmt = $this->getConnection()->prepareQuery(
             "
             SELECT PERIOD_NUMBER, T.DAY_NUMBER, T.CLASS_CODE AS CODE, T.STAFF_NUMBER AS STAFFID, ROOM, CL.CLASS
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE T
-            LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
+            FROM SCHOOLBOX_TIMETABLE T
+            LEFT JOIN SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
             AND $campusSql
             AND DAY_NUMBER <= :d
@@ -415,10 +415,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 ST.SALUTATION AS "StaffTitle",
                 ST.FIRSTNAME AS "StaffPreferredName",
                 ST.SURNAME AS "StaffSurname"
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE AS T
-            INNER JOIN DB2INST1.SCHOOLBOX_CLASSES AS CL ON
+            FROM SCHOOLBOX_TIMETABLE AS T
+            INNER JOIN SCHOOLBOX_CLASSES AS CL ON
                 T.CLASS_CODE = CL.CLASS_CODE
-            INNER JOIN DB2INST1.SCHOOLBOX_STAFF AS ST ON
+            INNER JOIN SCHOOLBOX_STAFF AS ST ON
                 T.STAFF_NUMBER = ST.STAFF_NUMBER
             WHERE T.ROOM = :room
             ORDER BY

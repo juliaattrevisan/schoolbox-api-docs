@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_PARENT_STUDENT AS
+CREATE OR REPLACE VIEW SCHOOLBOX_PARENT_STUDENT AS
 SELECT
         edumate.student.student_number,
         edumate.carer.carer_number
@@ -39,7 +39,7 @@ INNER JOIN edumate.contact ON
 INNER JOIN edumate.carer ON edumate.carer.contact_id = edumate.contact.contact_id
 ;
 
-CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_PARENTS AS
+CREATE OR REPLACE VIEW SCHOOLBOX_PARENTS AS
 SELECT DISTINCT
 car1.carer_number,
 replace(c1.firstname, '&#039;','''')||CHR(32)||replace(c1.surname, '&#039;','''') AS FULL_NAME,
