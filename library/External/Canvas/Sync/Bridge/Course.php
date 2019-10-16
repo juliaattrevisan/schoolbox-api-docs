@@ -172,6 +172,8 @@ class Course
      * CourseSection must:
      *   * Has a SisSourceId LIKE 'Y2019C%NOT' but NOT LIKE 'Y%C%TEACHNOT' (where year is from 2019 to current calendar year + 1)
      *
+     * Or the the Schoolbox Test Course: canvas_id = 3137
+     *
      * @param string $courseAlias
      * @param string $sectionAlias
      * @return Builder
@@ -186,11 +188,18 @@ class Course
         for ($year = $minYear; $year <= $maxYear; $year++) {
             $innerPb->like("{$sectionAlias}.sis_source_id", "Y{$year}C%NOT");
         }
-        $outerPb = (new Builder($this->canvasDb, ''))
+        $stAloyCourses = (new Builder($this->canvasDb, ''))
             ->any($innerPb)
             ->notLike("{$sectionAlias}.sis_source_id", "Y%C%TEACHNOT")
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
+        $sbTestCourses = (new Builder($this->canvasDb, ''))
+            ->equals("{$courseAlias}.canvas_id", 3137)
+            ->notNull("{$sectionAlias}.sis_source_id");
 
-        return (new Builder($this->canvasDb, ''))->all($outerPb);
+        $outerPb = (new Builder($this->canvasDb, ''))
+            ->all($stAloyCourses)
+            ->all($sbTestCourses);
+
+        return (new Builder($this->canvasDb, ''))->any($outerPb);
     }
 }
