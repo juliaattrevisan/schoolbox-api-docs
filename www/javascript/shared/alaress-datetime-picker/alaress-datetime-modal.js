@@ -121,8 +121,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var newDate, latestDate;
 
     // Accommodating the "start of the week" SB config
-    Flatpickr.localize(Flatpickr.l10ns.default);
-    Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
+    flatpickr.localize(flatpickr.l10ns.default);
+    flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
 
     var flatPickrConf = {
         defaultDate: twigVars.date,
@@ -977,7 +977,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     /**
      * Adds heatmap to a month view of flatpickr
      *
-     * @param {Flatpickr} instance
+     * @param {flatpickr} instance
      */
     function applyHeatToCalendar(instance) {
         // loop through all days and set a heatmap height
@@ -995,7 +995,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     /**
      * Ergh... the fact that this function even exists.....
      *
-     * @param {Flatpickr} instance
+     * @param {flatpickr} instance
      */
     function applyHeatEverywhere(instance) {
         applyHeatToCalendar(instance);
