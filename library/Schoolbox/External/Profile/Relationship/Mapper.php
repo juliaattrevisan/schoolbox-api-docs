@@ -67,7 +67,7 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
-            $relation = $this->hydrate($row);
+            $relationship = $this->hydrate($row);
 
             /* Child profile
              */
@@ -81,11 +81,11 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Assign them (they should both exist due to FKs)
              */
-            $relation->setChildProfile($childProfile)->setUserProfile($userProfile);
+            $relationship->setChildProfile($childProfile)->setUserProfile($userProfile);
 
             /* Stack 'em
              */
-            $collection->add($relation);
+            $collection->add($relationship);
         }
 
         return $collection;
