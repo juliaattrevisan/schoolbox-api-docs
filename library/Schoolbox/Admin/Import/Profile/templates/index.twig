@@ -27,10 +27,10 @@
             </ul>
         </section>
 
-        {% include '@adminImportProfile/staff.twig' with {attachzone: attachzone.staff, numProfiles: profiles.staff} only %}
-        {% include '@adminImportProfile/student.twig' with {attachzone: attachzone.student, numProfiles: profiles.student} only %}
-        {% include '@adminImportProfile/parent.twig' with {attachzone: attachzone.parent, numProfiles: profiles.parent} only %}
-        {% include '@adminImportProfile/relationship.twig' with {attachzone: attachzone.relationship, numProfiles: profiles.relationship} only %}
+        {% include '@adminImportProfile/staff.twig' with {attachzone: attachzone.staff, numProfiles: profiles.numStaff} only %}
+        {% include '@adminImportProfile/student.twig' with {attachzone: attachzone.student, numProfiles: profiles.numStudents} only %}
+        {% include '@adminImportProfile/parent.twig' with {attachzone: attachzone.parent, numProfiles: profiles.numParents} only %}
+        {% include '@adminImportProfile/relationship.twig' with {attachzone: attachzone.relationship, numProfiles: profiles.numRelationships} only %}
 
     </div>
 </div>
