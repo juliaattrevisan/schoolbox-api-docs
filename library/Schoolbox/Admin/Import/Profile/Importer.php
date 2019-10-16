@@ -493,18 +493,30 @@ class Importer
 
             $create = true;
 
-            /* Try to find a baseProfile that matches the externalId
+            /* Try to find an existing staffProfile that matches the externalId
+             * If one already exists, use it; otherwise spawn a new one
              */
             try {
                 $staffProfile = $this->staffProfileMapper->findByExternalId($row['External ID']);
-                $baseProfile = $staffProfile->getBaseProfile();
 
                 $create = false;
             } catch (Exception $e) {
                 $staffProfile = $this->staffProfileMapper->createModel();
+            }
+
+            /* Try to find a baseProfile that matches the externalId
+             * If one already exists, use it; otherwise spawn a new one
+             */
+            try {
+                $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $row['External ID']);
+            } catch (Exception $e) {
                 $baseProfile = $this->baseProfileMapper->createModel();
             }
 
+            /* Note that baseProfiles can be shared among multiple role types
+             * A baseProfile might exist already, but for a different role type
+             * Therefore you must check these separately and assemble accordingly
+             */
             $baseProfile
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
