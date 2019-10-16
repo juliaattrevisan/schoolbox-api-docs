@@ -99,10 +99,10 @@ class Controller extends Base
             'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachzone' => [
-                'student' => $this->getAttachZone('student', 'Upload Student CSV file'),
-                'parent' => $this->getAttachZone('parent', 'Upload Parent CSV file'),
-                'relationship' => $this->getAttachZone('relationship', 'Upload Relationship CSV file'),
-                'staff' => $this->getAttachZone('staff', 'Upload Staff CSV file'),
+                Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
+                Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
+                Mapping::CSV_RELATIONSHIP => $this->getAttachZone(Mapping::CSV_RELATIONSHIP, 'Upload Relationship CSV file'),
+                Mapping::CSV_STAFF => $this->getAttachZone(Mapping::CSV_STAFF, 'Upload Staff CSV file'),
             ],
 
             /* Check which tables have data; if there is any content, link to the exporter
