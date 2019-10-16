@@ -93,7 +93,7 @@ HELP;
             UserProfile\Student\Mapper::getInstance(),
             UserProfile\Parent\Mapper::getInstance(),
             UserProfile\Staff\Mapper::getInstance(),
-            UserProfile\Relation\Mapper::getInstance()
+            UserProfile\Relationship\Mapper::getInstance()
         );
 
         try {
