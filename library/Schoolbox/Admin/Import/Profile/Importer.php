@@ -728,10 +728,13 @@ class Importer
 
             /* Otherwise both exist; build relation
              */
+            $userProfile = $this->parentProfileMapper->findById($cache[Role::PARENT ][$row['Guardian ID']])->getBaseProfile();
+            $childProfile = $this->studentProfileMapper->findById($cache[Role::STUDENT ][$row['Student ID']])->getBaseProfile();
+
             $relation = $this->relationMapper->createModel()
-                ->setUserProfileId($cache[Role::PARENT ][$row['Guardian ID']])
+                ->setUserProfile($userProfile)
                 ->setType($row['Type'])
-                ->setChildProfileId($cache[Role::STUDENT ][$row['Student ID']]);
+                ->setChildProfile($childProfile);
 
             if ($this->perform) {
                 $this->relationMapper->save($relation);

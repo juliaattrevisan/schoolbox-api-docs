@@ -30,11 +30,9 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('sis_user_profile_relation');
         $this->hasModel(Model::class);
-        $this->uses('child_profile_id', self::TYPE_MODEL);
-        $this->uses('user_profile_id', self::TYPE_MODEL);
         $this->uses('type', self::TYPE_STRING);
-        $this->joins('child_profile_id', Profile\Mapper::class, 'id', null, null, 'childProfile', 'childProfile');
-        $this->joins('user_profile_id', Profile\Mapper::class, 'id', null, null, 'userProfile', 'userProfile');
+        $this->joins('child_profile_id', Profile\Mapper::class, 'id', self::TYPE_MODEL, null, 'childProfile', 'childProfile');
+        $this->joins('user_profile_id', Profile\Mapper::class, 'id', self::TYPE_MODEL, null, 'userProfile', 'userProfile');
     }
 
 
