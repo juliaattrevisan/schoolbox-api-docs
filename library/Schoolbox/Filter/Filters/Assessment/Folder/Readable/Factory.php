@@ -93,6 +93,9 @@ class Factory extends FolderFilter\Factory
                              ->notNull('cc.code')
                              ->isNull('cc.deleted_at')
             )->indexBy($folderIdColumn);
+            $otherClasses = $otherClasses
+                ->diffBy($myClasses, $folderIdColumn)
+                ->diffBy($myGroups, $folderIdColumn);
         }
 
         if ($getOtherGroups) {
@@ -101,6 +104,10 @@ class Factory extends FolderFilter\Factory
                              ->notNull('cc.code')
                              ->isNull('cc.deleted_at')
             )->indexBy($folderIdColumn);
+            $otherGroups = $otherGroups
+                ->diffBy($myClasses, $folderIdColumn)
+                ->diffBy($myGroups, $folderIdColumn)
+                ->diffBy($otherClasses, $folderIdColumn);
         }
 
         // Ensure other folders don't intersect with my folders
@@ -114,8 +121,8 @@ class Factory extends FolderFilter\Factory
             $folderMapper->createCollection(),
             $myClasses,
             $myGroups,
-            $otherClasses->diffBy($myClasses, $folderIdColumn)->diffBy($myGroups, $folderIdColumn),
-            $otherGroups->diffBy($myClasses, $folderIdColumn)->diffBy($myGroups, $folderIdColumn)
+            $otherClasses,
+            $otherGroups
         );
     }
 
