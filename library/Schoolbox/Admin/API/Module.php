@@ -64,7 +64,7 @@ class Module extends BaseModule
             'parentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Parent\Mapper::class),
             'studentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Student\Mapper::class),
             'staffMapper' => $this->getMapperFactory()->getLazy(External\Profile\Staff\Mapper::class),
-            'relationMapper' => $this->getMapperFactory()->getLazy(External\Profile\Relation\Mapper::class),
+            'relationshipMapper' => $this->getMapperFactory()->getLazy(External\Profile\Relationship\Mapper::class),
         ];
     }
 }

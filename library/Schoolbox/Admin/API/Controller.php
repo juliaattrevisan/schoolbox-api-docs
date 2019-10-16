@@ -34,7 +34,7 @@ class Controller extends Web\Controller\Base
         Mapping::CSV_STUDENT,
         Mapping::CSV_PARENT,
         Mapping::CSV_STAFF,
-        Mapping::CSV_RELATION
+        Mapping::CSV_RELATIONSHIP
     ];
 
 
@@ -81,21 +81,21 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * @var External\Profile\Relation\Mapper
+     * @var External\Profile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
      * Controller constructor.
      *
-     * @param Storage\Mapper                   $storageMapper
-     * @param ImporterFactory                  $importerFactory
-     * @param External\Profile\Mapper          $baseMapper
-     * @param External\Profile\Parent\Mapper   $parentMapper
-     * @param External\Profile\Student\Mapper  $studentMapper
-     * @param External\Profile\Staff\Mapper    $staffMapper
-     * @param External\Profile\Relation\Mapper $relationMapper
+     * @param Storage\Mapper                       $storageMapper
+     * @param ImporterFactory                      $importerFactory
+     * @param External\Profile\Mapper              $baseMapper
+     * @param External\Profile\Parent\Mapper       $parentMapper
+     * @param External\Profile\Student\Mapper      $studentMapper
+     * @param External\Profile\Staff\Mapper        $staffMapper
+     * @param External\Profile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
         Storage\Mapper $storageMapper,
@@ -104,7 +104,7 @@ class Controller extends Web\Controller\Base
         External\Profile\Parent\Mapper $parentMapper,
         External\Profile\Student\Mapper $studentMapper,
         External\Profile\Staff\Mapper $staffMapper,
-        External\Profile\Relation\Mapper $relationMapper
+        External\Profile\Relationship\Mapper $relationshipMapper
     ) {
         $this->storageMapper = $storageMapper;
         $this->importerFactory = $importerFactory;
@@ -112,7 +112,7 @@ class Controller extends Web\Controller\Base
         $this->parentProfileMapper = $parentMapper;
         $this->studentProfileMapper = $studentMapper;
         $this->staffProfileMapper = $staffMapper;
-        $this->relationMapper = $relationMapper;
+        $this->relationshipMapper = $relationshipMapper;
     }
 
 
@@ -254,7 +254,7 @@ class Controller extends Web\Controller\Base
                                 $this->parentProfileMapper,
                                 $this->studentProfileMapper,
                                 $this->staffProfileMapper,
-                                $this->relationMapper,
+                                $this->relationshipMapper,
                                 $log
                             ))->setPerform(true)->process();
                         }
