@@ -7,9 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
-use Alaress\Database\Connector\IConnector;
-use Psr\Log\LoggerInterface;
-use Schoolbox\Collection;
 use Schoolbox\External\Profile;
 use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
