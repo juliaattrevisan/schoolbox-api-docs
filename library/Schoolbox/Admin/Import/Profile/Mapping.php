@@ -29,7 +29,7 @@ class Mapping
     public const CSV_STUDENT = Role::STUDENT;
     public const CSV_STAFF = Role::STAFF;
     public const CSV_PARENT = Role::PARENT;
-    public const CSV_RELATION = 'relation';
+    public const CSV_RELATIONSHIP = 'relationship';
 
 
     /**
@@ -125,9 +125,9 @@ class Mapping
 
 
     /**
-     * Columns in a Relation csv
+     * Columns in a Relationship csv
      */
-    public const IMPORT_COLUMNS_RELATION = [
+    public const IMPORT_COLUMNS_RELATIONSHIP = [
         'Student ID' => 'child_profile_id',
         'Guardian ID' => 'user_profile_id',
         'Type' => 'type',
@@ -142,7 +142,7 @@ class Mapping
      */
     public function __construct(string $type)
     {
-        if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATION], true)) {
+        if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATIONSHIP], true)) {
             throw new \InvalidArgumentException('Unknown csv type.');
         }
     }
@@ -190,8 +190,8 @@ class Mapping
      * @param string $type
      * @return bool
      */
-    public function isRelation(string $type): bool
+    public function isRelationship(string $type): bool
     {
-        return $type === self::CSV_RELATION;
+        return $type === self::CSV_RELATIONSHIP;
     }
 }

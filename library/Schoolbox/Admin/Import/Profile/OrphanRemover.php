@@ -44,32 +44,32 @@ class OrphanRemover
 
 
     /**
-     * @var Profile\Relation\Mapper
+     * @var Profile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
      * OrphanRemover constructor.
      *
-     * @param Profile\Mapper          $baseProfileMapper
-     * @param Profile\Student\Mapper  $studentProfileMapper
-     * @param Profile\Parent\Mapper   $parentProfileMapper
-     * @param Profile\Staff\Mapper    $staffProfileMapper
-     * @param Profile\Relation\Mapper $relationMapper
+     * @param Profile\Mapper              $baseProfileMapper
+     * @param Profile\Student\Mapper      $studentProfileMapper
+     * @param Profile\Parent\Mapper       $parentProfileMapper
+     * @param Profile\Staff\Mapper        $staffProfileMapper
+     * @param Profile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
         Profile\Mapper $baseProfileMapper,
         Profile\Student\Mapper $studentProfileMapper,
         Profile\Parent\Mapper $parentProfileMapper,
         Profile\Staff\Mapper $staffProfileMapper,
-        Profile\Relation\Mapper $relationMapper
+        Profile\Relationship\Mapper $relationshipMapper
     ) {
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationMapper = $relationMapper;
+        $this->relationshipMapper = $relationshipMapper;
     }
 
     /**
@@ -95,13 +95,13 @@ class OrphanRemover
 
         if ($orphans) {
 
-            /* Remove orphaned profiles' relations
+            /* Remove orphaned profiles' relationships
              *
-             * Sometimes data is broken such that there are relations between base profiles
+             * Sometimes data is broken such that there are relationships between base profiles
              * but they don't have any extensions in student, parent or staff tables
              */
-            $this->baseProfileMapper->getDatabase()->query("
-                DELETE FROM {$this->relationMapper->getTable()}
+            $this->relationshipMapper->getDatabase()->query("
+                DELETE FROM {$this->relationshipMapper->getTable()}
                 WHERE child_profile_id IN ({$orphans})
                 OR user_profile_id IN ({$orphans})
             ");

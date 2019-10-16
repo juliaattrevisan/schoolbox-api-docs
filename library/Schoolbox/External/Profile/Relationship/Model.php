@@ -5,26 +5,26 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Profile\Relation;
+namespace Schoolbox\External\Profile\Relationship;
 
 use Schoolbox\External\Profile\Model as BaseProfile;
 
 /**
  * Class Model
  *
- * @package Schoolbox\External\Profile\Relation
+ * @package Schoolbox\External\Profile\Relationship
  */
 class Model
 {
 
     /**
-     * @var null|Model
+     * @var null|BaseProfile
      */
     private $childProfile;
 
 
     /**
-     * @var null|Model
+     * @var null|BaseProfile
      */
     private $userProfile;
 

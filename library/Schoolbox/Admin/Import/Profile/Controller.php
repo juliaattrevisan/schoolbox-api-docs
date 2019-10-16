@@ -23,7 +23,7 @@ use Schoolbox\Resource\Attachment\Zone;
  *    student.csv
  *    parent.csv
  *    staff.csv
- *    relation.csv
+ *    relationship.csv
  *
  * @package Schoolbox\Admin\Import\Profile
  */
@@ -57,32 +57,32 @@ class Controller extends Base
 
 
     /**
-     * @var External\Profile\Relation\Mapper
+     * @var External\Profile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
      * Controller constructor.
      *
-     * @param External\Profile\Mapper          $baseMapper
-     * @param External\Profile\Parent\Mapper   $parentMapper
-     * @param External\Profile\Student\Mapper  $studentMapper
-     * @param External\Profile\Staff\Mapper    $staffMapper
-     * @param External\Profile\Relation\Mapper $relationMapper
+     * @param External\Profile\Mapper              $baseMapper
+     * @param External\Profile\Parent\Mapper       $parentMapper
+     * @param External\Profile\Student\Mapper      $studentMapper
+     * @param External\Profile\Staff\Mapper        $staffMapper
+     * @param External\Profile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
         External\Profile\Mapper $baseMapper,
         External\Profile\Parent\Mapper $parentMapper,
         External\Profile\Student\Mapper $studentMapper,
         External\Profile\Staff\Mapper $staffMapper,
-        External\Profile\Relation\Mapper $relationMapper
+        External\Profile\Relationship\Mapper $relationshipMapper
     ) {
         $this->baseProfileMapper = $baseMapper;
         $this->parentProfileMapper = $parentMapper;
         $this->studentProfileMapper = $studentMapper;
         $this->staffProfileMapper = $staffMapper;
-        $this->relationMapper = $relationMapper;
+        $this->relationshipMapper = $relationshipMapper;
     }
 
     /**
@@ -101,7 +101,7 @@ class Controller extends Base
             'attachzone' => [
                 'student' => $this->getAttachZone('student', 'Upload Student CSV file'),
                 'parent' => $this->getAttachZone('parent', 'Upload Parent CSV file'),
-                'relation' => $this->getAttachZone('relation', 'Upload Relationship CSV file'),
+                'relationship' => $this->getAttachZone('relationship', 'Upload Relationship CSV file'),
                 'staff' => $this->getAttachZone('staff', 'Upload Staff CSV file'),
             ]
         ])->setTitle('Import User Profile'));
@@ -169,7 +169,7 @@ class Controller extends Base
                         $this->parentProfileMapper,
                         $this->studentProfileMapper,
                         $this->staffProfileMapper,
-                        $this->relationMapper
+                        $this->relationshipMapper
                     );
 
                     /* Actually persist changes
@@ -200,7 +200,7 @@ class Controller extends Base
 
 
     /**
-     * Export csv from db, for a given $type (student staff parent relation)
+     * Export csv from db, for a given $type (student staff parent relationship)
      *
      * @param string $type
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -214,7 +214,7 @@ class Controller extends Base
             $this->parentProfileMapper,
             $this->studentProfileMapper,
             $this->staffProfileMapper,
-            $this->relationMapper
+            $this->relationshipMapper
         ))->process();
 
         $headers = $this->getResponse()->headers;

@@ -46,7 +46,7 @@ class Importer
 
     /**
      * Upload type
-     * One of [student, staff, parent, relation]
+     * One of [student, staff, parent, relationship]
      *
      * @var string
      */
@@ -90,9 +90,9 @@ class Importer
 
 
     /**
-     * @var Profile\Relation\Mapper
+     * @var Profile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
@@ -128,15 +128,15 @@ class Importer
     /**
      * Importer constructor.
      *
-     * @param string                  $type
-     * @param IStorage                $file
-     * @param IConnector              $database
-     * @param Profile\Mapper          $baseProfileMapper
-     * @param Profile\Parent\Mapper   $parentProfileMapper
-     * @param Profile\Student\Mapper  $studentProfileMapper
-     * @param Profile\Staff\Mapper    $staffProfileMapper
-     * @param Profile\Relation\Mapper $relationMapper
-     * @param LoggerInterface|null    $logger
+     * @param string                      $type
+     * @param IStorage                    $file
+     * @param IConnector                  $database
+     * @param Profile\Mapper              $baseProfileMapper
+     * @param Profile\Parent\Mapper       $parentProfileMapper
+     * @param Profile\Student\Mapper      $studentProfileMapper
+     * @param Profile\Staff\Mapper        $staffProfileMapper
+     * @param Profile\Relationship\Mapper $relationshipMapper
+     * @param LoggerInterface|null        $logger
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -147,7 +147,7 @@ class Importer
         Profile\Parent\Mapper $parentProfileMapper,
         Profile\Student\Mapper $studentProfileMapper,
         Profile\Staff\Mapper $staffProfileMapper,
-        Profile\Relation\Mapper $relationMapper,
+        Profile\Relationship\Mapper $relationshipMapper,
         LoggerInterface $logger = null
     ) {
         $this->mapping = new Mapping($type);
@@ -156,7 +156,7 @@ class Importer
         $this->parentProfileMapper = $parentProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationMapper = $relationMapper;
+        $this->relationshipMapper = $relationshipMapper;
 
         $this->database = $database;
         $this->logger = $logger;
@@ -239,13 +239,13 @@ class Importer
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_PARENT));
 
             return $this->processParentProfile($reader);
-        } elseif ($this->mapping->isRelation($this->type)) {
+        } elseif ($this->mapping->isRelationship($this->type)) {
 
-            /* Process the Relations csv
+            /* Process the Relationships csv
              */
-            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_RELATION));
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_RELATIONSHIP));
 
-            return $this->processRelation($reader);
+            return $this->processRelationship($reader);
         }
 
         throw new \InvalidArgumentException('Unrecognised csv containing header row ' . implode(', ', $reader->readHeaderRow()));
@@ -372,7 +372,7 @@ class Importer
 
         /* Delete everyone we didn't created/update
          */
-        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
+        $this->log("Removing profiles that weren't created/updated, and their relationships too", self::LOG_OK);
 
         if ($this->perform && \count($affectedProfileIds)) {
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->studentProfileMapper);
@@ -409,10 +409,10 @@ class Importer
 
         if ($deletions) {
 
-            /* Remove relations that they once held
+            /* Remove relationships that they once held
              */
             $this->database->executeQuery("
-                DELETE FROM {$this->relationMapper->getTable()}
+                DELETE FROM {$this->relationshipMapper->getTable()}
                 WHERE child_profile_id IN ({$deletions})
                 OR user_profile_id IN ({$deletions})
             ");
@@ -430,7 +430,7 @@ class Importer
          */
         $orphans = $this->removeOrphanedProfiles();
 
-        $this->log("Removed {$orphans} orphaned profiles and their associated relations", self::LOG_OK);
+        $this->log("Removed {$orphans} orphaned profiles and their associated relationships", self::LOG_OK);
     }
 
 
@@ -447,7 +447,7 @@ class Importer
             $this->studentProfileMapper,
             $this->parentProfileMapper,
             $this->staffProfileMapper,
-            $this->relationMapper
+            $this->relationshipMapper
         ))->remove();
     }
 
@@ -542,7 +542,7 @@ class Importer
 
         /* Delete everyone we didn't created/update
          */
-        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
+        $this->log("Removing profiles that weren't created/updated, and their relationships too", self::LOG_OK);
 
         if ($this->perform && \count($affectedProfileIds)) {
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->staffProfileMapper);
@@ -638,7 +638,7 @@ class Importer
 
         /* Delete everyone we didn't created/update
          */
-        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
+        $this->log("Removing profiles that weren't created/updated, and their relationships too", self::LOG_OK);
 
         if ($this->perform && \count($affectedProfileIds)) {
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->parentProfileMapper);
@@ -649,7 +649,7 @@ class Importer
 
 
     /**
-     * Process the Relations csv
+     * Process the Relationships csv
      *
      * @param Reader $reader
      * @return int number of rows processed
@@ -658,12 +658,12 @@ class Importer
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function processRelation(Reader $reader): int
+    private function processRelationship(Reader $reader): int
     {
         /* Remember a set of (profile_id, external_id) tuples to save on db pounding
-         * while trying to derive relations between external_ids from csv
+         * while trying to derive relationships between external_ids from csv
          *
-         * Our schema creates relations between profile_ids, not external_ids
+         * Our schema creates relationships between profile_ids, not external_ids
          * so we might as well cache these to save on performance penalty
          */
         $statement = $this->database->prepareQuery("
@@ -696,53 +696,53 @@ class Importer
             $cache[$roleType][$externalId] = $profileId;
         }
 
-        /* Purge old relations before re-inserting them
+        /* Purge old relationships before re-inserting them
          */
         if ($this->perform) {
-            $this->relationMapper->truncate();
+            $this->relationshipMapper->truncate();
         }
 
-        $this->log('Removing old relations', self::LOG_OK);
+        $this->log('Removing old relationships', self::LOG_OK);
 
-        /* Process each relation
+        /* Process each relationship
          */
         $n = 0;
 
         foreach ($reader as $row) {
 
-            /* Check that both relations exist. They might not exist because the
-             * relation csv may contain data that wasn't in the other three files
+            /* Check that both relationships exist. They might not exist because the
+             * relationship csv may contain data that wasn't in the other three files
              * (probably from human error but who knows)
              */
             if (!$cache[Role::PARENT ][$row['Guardian ID']]) {
-                $this->log("Relation between guardian {$row['Guardian ID']} and student {$row['Student ID']}: guardian {$row['Guardian ID']} doesn't exist", self::LOG_SKIP);
+                $this->log("Relationship between guardian {$row['Guardian ID']} and student {$row['Student ID']}: guardian {$row['Guardian ID']} doesn't exist", self::LOG_SKIP);
 
                 continue;
             }
 
             if (!$cache[Role::STUDENT ][$row['Student ID']]) {
-                $this->log("Relation between guardian {$row['Guardian ID']} and student {$row['Student ID']}: student {$row['Student ID']} doesn't exist", self::LOG_SKIP);
+                $this->log("Relationship between guardian {$row['Guardian ID']} and student {$row['Student ID']}: student {$row['Student ID']} doesn't exist", self::LOG_SKIP);
 
                 continue;
             }
 
-            /* Otherwise both exist; build relation
+            /* Otherwise both exist; build relationship
              */
             $userProfile = $this->parentProfileMapper->findById($cache[Role::PARENT ][$row['Guardian ID']])->getBaseProfile();
             $childProfile = $this->studentProfileMapper->findById($cache[Role::STUDENT ][$row['Student ID']])->getBaseProfile();
 
-            $relation = $this->relationMapper->createModel()
+            $relationship = $this->relationshipMapper->createModel()
                 ->setUserProfile($userProfile)
                 ->setType($row['Type'])
                 ->setChildProfile($childProfile);
 
             if ($this->perform) {
-                $this->relationMapper->save($relation);
+                $this->relationshipMapper->save($relationship);
             }
 
-            $this->log("Created relation called \"{$row['Type']}\" between guardian {$row['Guardian ID']} and student {$row['Student ID']}", self::LOG_OK);
+            $this->log("Created relationship called \"{$row['Type']}\" between guardian {$row['Guardian ID']} and student {$row['Student ID']}", self::LOG_OK);
 
-            /* Keep a count of successfully-constructed relations
+            /* Keep a count of successfully-constructed relationships
              */
             $n++;
         }

@@ -37,7 +37,7 @@ class Exporter
 
     /**
      * Export type
-     * One of [student, staff, parent, relation]
+     * One of [student, staff, parent, relationship]
      *
      * @var string
      */
@@ -75,20 +75,20 @@ class Exporter
 
 
     /**
-     * @var Profile\Relation\Mapper
+     * @var Profile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
      * Exporter constructor.
      *
-     * @param string                  $type
-     * @param Profile\Mapper          $baseProfileMapper
-     * @param Profile\Parent\Mapper   $parentProfileMapper
-     * @param Profile\Student\Mapper  $studentProfileMapper
-     * @param Profile\Staff\Mapper    $staffProfileMapper
-     * @param Profile\Relation\Mapper $relationMapper
+     * @param string                      $type
+     * @param Profile\Mapper              $baseProfileMapper
+     * @param Profile\Parent\Mapper       $parentProfileMapper
+     * @param Profile\Student\Mapper      $studentProfileMapper
+     * @param Profile\Staff\Mapper        $staffProfileMapper
+     * @param Profile\Relationship\Mapper $relationshipMapper
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -97,14 +97,14 @@ class Exporter
         Profile\Parent\Mapper $parentProfileMapper,
         Profile\Student\Mapper $studentProfileMapper,
         Profile\Staff\Mapper $staffProfileMapper,
-        Profile\Relation\Mapper $relationMapper
+        Profile\Relationship\Mapper $relationshipMapper
     ) {
         $this->mapping              = new Mapping($type);
         $this->baseProfileMapper    = $baseProfileMapper;
         $this->parentProfileMapper  = $parentProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->staffProfileMapper   = $staffProfileMapper;
-        $this->relationMapper       = $relationMapper;
+        $this->relationshipMapper   = $relationshipMapper;
 
         $this->type = $type;
     }
@@ -121,8 +121,8 @@ class Exporter
             return $this->exportStaffProfile();
         } elseif ($this->mapping->isParentProfile($this->type)) {
             return $this->exportParentProfile();
-        } elseif ($this->mapping->isRelation($this->type)) {
-            return $this->exportRelation();
+        } elseif ($this->mapping->isRelationship($this->type)) {
+            return $this->exportRelationship();
         }
 
         return '';
@@ -167,9 +167,9 @@ class Exporter
      *
      * @return string
      */
-    public function exportRelation(): string
+    public function exportRelationship(): string
     {
-        return $this->exportProfile(Mapping::CSV_RELATION, Mapping::IMPORT_COLUMNS_RELATION, $this->relationMapper);
+        return $this->exportProfile(Mapping::CSV_RELATIONSHIP, Mapping::IMPORT_COLUMNS_RELATIONSHIP, $this->relationshipMapper);
     }
 
 
@@ -178,7 +178,7 @@ class Exporter
      *
      * @param string $type
      * @param array  $columnSpec
-     * @param Mapper $mapper    One of student/staff/parent/relation mappers
+     * @param Mapper $mapper    One of student/staff/parent/relationship mappers
      * @return false|string
      */
     private function exportProfile(string $type, array $columnSpec, Mapper $mapper)
@@ -253,9 +253,9 @@ class Exporter
             }
 
             /* This can get cleared in the iteration, so set this last and in the same format as the import csv
-             * Relation csv has a special meaning for this column so ignore it for that usage
+             * Relationship csv has a special meaning for this column so ignore it for that usage
              */
-            if ($type !== Mapping::CSV_RELATION) {
+            if ($type !== Mapping::CSV_RELATIONSHIP) {
                 $row['Type'] = ucwords($type);
             }
 

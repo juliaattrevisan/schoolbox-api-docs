@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Profile\Relation;
+namespace Schoolbox\External\Profile\Relationship;
 
 use PDOStatement;
 use Schoolbox\External\Profile;
@@ -14,7 +14,7 @@ use Schoolbox\GenericCollection;
 /**
  * Class Mapper
  *
- * @package Schoolbox\External\Profile\Relation
+ * @package Schoolbox\External\Profile\Relationship
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
