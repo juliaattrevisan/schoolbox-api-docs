@@ -529,6 +529,13 @@
         },
         mounted() {
             this.registerListCustomInputFields();
+
+            // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
+            let quickSwithIcon = document.createElement('a');
+            quickSwithIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+            quickSwithIcon.innerHTML += '<span class="splash animate"></span>';
+
+            document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwithIcon);
         }
     }
 
@@ -609,9 +616,12 @@
                     text: 'Filters',
                     click: onFilterClick
                 },
+                quickSwitchButton: {
+                    text: ' ',
+                }
             }"
             :header="{
-                left: 'today,prev,next',
+                left: 'quickSwitchButton,today,prev,next',
                 center: 'title',
                 right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
@@ -620,7 +630,7 @@
                 month:    'Month',
                 week:     'Week',
                 day:      'Day',
-                list: 'List',
+                list:     'List',
             }"
             :default-date="config.defaultDate"
             :default-view="config.defaultView || 'dayGridMonth'"
@@ -641,7 +651,7 @@
                 ref="flatPickr"
                 :config="{
                     defaultDate: config.defaultDate,
-                    selector: '.fc-center'
+                    selector: '.fc-quickSwitchButton-button'
                 }"
                 @dateSelected="onQuickSwitch"
         />
@@ -649,6 +659,13 @@
         <toast ref="toast"></toast>
     </div>
 </template>
+
+<style>
+    .fc-quickSwitchButton-button
+    a.adtp-btn.icon-calendar.no-text {
+        padding: 0 !important;
+    }
+</style>
 
 <style lang="scss">
     @import '~@fullcalendar/core/main.css';
