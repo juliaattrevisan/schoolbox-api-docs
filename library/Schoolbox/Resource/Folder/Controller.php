@@ -418,20 +418,20 @@ class Controller extends BaseController
     /**
      * Creates a new, or updates an existing, folder.
      *
-     * @param Model    $folder             The folder to persist
-     * @param string   $name
-     * @param bool     $inherit
-     * @param int      $templateId
-     * @param string   $colour
-     * @param string   $coverImage
-     * @param array    $curriculumCodeIds
-     * @param string[] $rolePermissions    Maps role ids to permission levels
-     * @param bool     $recursePermissions If true && $user is SU, applies 'inherit' to entire subtree
-     * @param array    $classCodes
-     * @param array    $yearLevelIds       Comma-separated YearLevel ids
-     * @param bool     $recurseYearLevels  If true
-     * @param User     $user               the effecting user
-     * @return Model                       Representing the freshly saved folder
+     * @param Model       $folder             The folder to persist
+     * @param string      $name
+     * @param bool        $inherit
+     * @param int         $templateId
+     * @param string|null $colour
+     * @param string|null $coverImage
+     * @param array|null  $curriculumCodeIds
+     * @param string[]    $rolePermissions    Maps role ids to permission levels
+     * @param bool        $recursePermissions If true && $user is SU, applies 'inherit' to entire subtree
+     * @param array       $classCodes
+     * @param array       $yearLevelIds       Comma-separated YearLevel ids
+     * @param bool        $recurseYearLevels  If true
+     * @param User        $user               the effecting user
+     * @return Model                          Representing the freshly saved folder
      * @throws InvalidArgumentException
      * @throws MapperException
      * @throws RangeException if the database fails to save your folder
@@ -447,7 +447,7 @@ class Controller extends BaseController
         int $templateId,
         ?string $colour,
         ?string $coverImage,
-        array $curriculumCodeIds,
+        ?array $curriculumCodeIds,
         array $rolePermissions,
         bool $recursePermissions,
         array $classCodes,
@@ -505,7 +505,9 @@ class Controller extends BaseController
         }
 
         // update Curriculum codes
-        $this->updateFolderCurriculumNodes($folder, $curriculumCodeIds);
+        if (isset($curriculumCodeIds)) {
+            $this->updateFolderCurriculumNodes($folder, $curriculumCodeIds);
+        }
 
         // update role permission
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
