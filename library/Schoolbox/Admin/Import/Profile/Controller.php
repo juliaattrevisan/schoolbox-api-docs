@@ -103,6 +103,15 @@ class Controller extends Base
                 'parent' => $this->getAttachZone('parent', 'Upload Parent CSV file'),
                 'relationship' => $this->getAttachZone('relationship', 'Upload Relationship CSV file'),
                 'staff' => $this->getAttachZone('staff', 'Upload Staff CSV file'),
+            ],
+
+            /* Check which tables have data; if there is any content, link to the exporter
+             */
+            'profiles' => [
+                'numParents' => $this->parentProfileMapper->countAll(),
+                'numStaff' => $this->staffProfileMapper->countAll(),
+                'numStudents' => $this->studentProfileMapper->countAll(),
+                'numRelationships' => $this->relationshipMapper->countAll()
             ]
         ])->setTitle('Import User Profile'));
     }
