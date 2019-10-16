@@ -78,4 +78,9 @@ abstract class Modify extends Payload\Request
         array_unshift($curriculumCodes, '');
         $this->setFormParam("curriculumCodes", $curriculumCodes);
     }
+
+    public function unsetCurriculumCodes(): void
+    {
+        $this->unsetFormParam('curriculumCodes');
+    }
 }
