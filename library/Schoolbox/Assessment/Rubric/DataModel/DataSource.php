@@ -1001,6 +1001,10 @@ class DataSource
                 $capabilityUsage->getIndicatorUsages()->add($indicatorUsage);
             }
 
+            if ($capInUse && null === $capability['maxValue']) {
+                $capabilityUsage->setMaxValue($capabilityUsage->calculateMaxValueFromIndicators());
+            }
+
             if ($capInUse) {
                 $grid->getCapabilityUsages()->add($capabilityUsage);
             }
