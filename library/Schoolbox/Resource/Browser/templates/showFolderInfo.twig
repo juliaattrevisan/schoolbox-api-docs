@@ -62,24 +62,34 @@
         {% if access > 1 %}
             <script type="text/javascript">
                 $(function () {
+                    // Show/hide the upload button based on whether any files are in the list
                     var $attachzone = $('#cms-zone');
                         controlUploadButton = function () {
                             var $uploadButton = $('#uploadButton'),
                                 dropzone      = $attachzone.data('plugin_resourceAttach').dropzone;
                             if (dropzone.getQueuedFiles().length === 0 && dropzone.getUploadingFiles().length === 0) {
-                                $uploadButton.removeClass('hide');
+                                $uploadButton.removeClass('hide').prop('disabled', false);
                             }
                             if (dropzone.getAcceptedFiles().length === 0) {
-                                $uploadButton.addClass('hide');
+                                $uploadButton.addClass('hide').prop('disabled', true);
                             }
                         };
                     $attachzone
                         .on('success.attachzone', controlUploadButton)
                         .on('removedfile.attachzone', controlUploadButton)
-                        .on('error.attachzone', controlUploadButton)
-                })
+                        .on('error.attachzone', controlUploadButton);
+
+                    // Upload form:
+                    // Set the folder ID each time a folder gets navigated to
+
+                    // AJAX submission, then do something when it's uploaded
+                    $('#uploadForm').on('submit', function (event) {
+                        event.preventDefault();
+                        console.log($(this).serializeArray());
+                    })
+                });
             </script>
-            <form action="/cms/{{ fileController }}Form.php?ajax=1" method="post">
+            <form id="uploadForm" action="{{ routeLookup(namespace ~ '.postFiles', {folderId: folder.id}) }}" method="post">
                 {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
                 <input type="submit" value="Upload" class="hide" id="uploadButton" />
             </form>

@@ -185,6 +185,24 @@ abstract class AbstractController extends BaseController
 
 
     /**
+     * Helper function for getting a folder's attachzone
+     *
+     * @return array
+     */
+    private function getFolderAttachzoneData(): array
+    {
+        $zone = new GenericZone('cms', $this->fileMapper);
+        $zone->setAttachmentsLabel('')
+             ->setAttachPrompt('upload files to this location')
+             ->setMimeFilter('*/*')
+             ->setMulti(true)
+             ->setThumbnailSize(64)
+             ->setModalTitle('Select file');
+        return $zone->getTwigContext();
+    }
+
+
+    /**
      * @param FolderInterface $folder
      * @return array
      */
@@ -288,14 +306,7 @@ abstract class AbstractController extends BaseController
 
         }
 
-        $zone = new GenericZone('cms', $this->fileMapper);
-        $zone->setAttachmentsLabel('')
-             ->setAttachPrompt('upload files to this location')
-             ->setMimeFilter('*/*')
-             ->setMulti(true)
-             ->setThumbnailSize(64)
-             ->setModalTitle('Select file');
-        $data['attachzone'] = $zone->getTwigContext();
+        $data['attachzone'] = $this->getFolderAttachzoneData();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@resourceBrowser/browse.twig', $data)->setTab($this->tab)
@@ -353,10 +364,12 @@ abstract class AbstractController extends BaseController
      */
     public function showFolderInfo($folderId)
     {
+        $data = $this->getFolderData($folderId);
+        $data['attachzone'] = $this->getFolderAttachzoneData();
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/showFolderInfo.twig',
             'format'   => 'nochrome',
-            'data'     => $this->getFolderData($folderId),
+            'data'     => $data,
         ]);
     }
 
