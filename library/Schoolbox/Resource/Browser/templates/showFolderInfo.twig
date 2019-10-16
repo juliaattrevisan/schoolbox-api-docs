@@ -79,24 +79,29 @@
                         .on('removedfile.attachzone', controlUploadButton)
                         .on('error.attachzone', controlUploadButton);
 
-                    // Upload form:
-                    // Set the folder ID each time a folder gets navigated to
-
-                    // AJAX submission, then do something when it's uploaded
+                    // AJAX submission: add any new files to the tree
                     $('#uploadForm').on('submit', function (event) {
                         event.preventDefault();
                         var ajaxParams = {
-                            url: this.action,
-                            method: this.method,
-                            data: $(this).serializeArray(),
-                            dataType: 'json'
-                        };
+                                url: this.action,
+                                method: this.method,
+                                data: $(this).serializeArray(),
+                                dataType: 'json'
+                            },
+                            jstree = $('#tree').jstree(true);
                         $.ajax(ajaxParams)
-                            .done(function () {
-                                // Update the jstree I guess
+                            .done(function (data) {
+                                // The response contains all items in the folder.
+                                // Add any new ones.
+                                data.forEach(function (item) {
+                                    var existingNode = jstree.get_node(item.id);
+                                    if (!existingNode) {
+                                        jstree.create_node(item.parent, item);
+                                    }
+                                });
+
                                 // Then remove all the files I just uploaded
                                 $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
-                                $uploadButton.addClass('hide').prop('disabled', true);
                             });
                     })
                 });
