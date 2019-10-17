@@ -1,16 +1,10 @@
-{% extends '@adminImport/upload.twig' %}
+{% extends '@adminImportIndex/shared/upload.twig' %}
 
 {% block title %}
-    Import Timetables
+    Import Timetable
 {% endblock %}
 
 {% block helpText %}
-    {% if hasExternalDb %}
-        <div class="empty-state">
-            <i class="icon-teacher"></i>
-            <p>Your timetable data is stored in your external database - you do not need to upload it here.</p>
-        </div>
-    {% else %}
     <section>
         <div class="content">
             <p>
@@ -33,8 +27,8 @@
             </section>
         </div>
     </section>
-        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-    {% endif %}
+
+    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 {% endblock helpText %}
 
 {% block form %}

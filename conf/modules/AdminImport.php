@@ -54,5 +54,8 @@ class AdminImport implements ModuleConfigInterface
          */
         (new Import\TimetableStructure\Module($di))->init('/adminv2/import/timetableStructure');
 
+        /* Timetable
+         */
+        (new Import\Timetable\Module($di))->init('/adminv2/import/timetable');
     }
 }

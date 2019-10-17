@@ -75,7 +75,6 @@ class Module extends BaseModule
      * init time.
      *
      * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {

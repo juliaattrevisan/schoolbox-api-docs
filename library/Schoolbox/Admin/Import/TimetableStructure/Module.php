@@ -30,7 +30,6 @@ class Module extends BaseModule
     protected $basename = 'adminImportTimetableStructure';
 
 
-
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -76,7 +75,6 @@ class Module extends BaseModule
      * init time.
      *
      * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
