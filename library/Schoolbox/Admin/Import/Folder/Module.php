@@ -1,13 +1,10 @@
 <?php
 /**
- * Bulk add folders admin page
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
-namespace Schoolbox\Admin\BulkAddFolders;
+namespace Schoolbox\Admin\Import\Folder;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
@@ -22,20 +19,27 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\RoleMapper;
 
+/**
+ * Class Module
+ *
+ * Bulk add folders admin page
+ *
+ * @package Schoolbox\Admin\Import\Folder
+ */
 class Module extends BaseModule
 {
     /**
      * @var string
      */
-    protected $basename = 'adminBulkAddFolders';
+    protected $basename = 'adminImportFolder';
 
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'getIndex', $basePath, "");
-        $this->addPostRoute($router, 'postImportResults', $basePath, "");
+        $this->addGetRoute($router, 'getIndex', $basePath, '');
+        $this->addPostRoute($router, 'postImportResults', $basePath, '');
     }
 
     /**
@@ -58,9 +62,10 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(
             Controller::class,
             [
-                'roleMapper'             => $mapperFactory->getLazy(RoleMapper::class),
-                'errorMapper'            => $mapperFactory->getLazy(Error\Mapper::class),
-                'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class)
+                'roleMapper' => $mapperFactory->getLazy(RoleMapper::class),
+                'errorMapper' => $mapperFactory->getLazy(Error\Mapper::class),
+                'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class),
+                'configLoader' => $injector->lazyGet('config'),
             ]
         ));
     }

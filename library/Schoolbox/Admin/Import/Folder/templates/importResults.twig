@@ -1,10 +1,14 @@
-{# Shared navigation menu #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-{{ renderAdminNavigation(pageCurrent) }}
+<div class="row">
+    <div class="small-12 island">
+        <h1>Import Folders</h1>
+    </div>
+</div>
 
 <div class="row">
     <div class="large-12 columns">
-        <h3>Bulk Add Folders</h3>
         <table>
             <thead>
                 <tr>
@@ -36,6 +40,6 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="/adminv2/bulk-add-folders" class="button icon-previous">Back to folders</a>
+        <a href="{{ routeLookupIfAuthorized('adminImportFolder.getIndex') }}" class="button icon-previous">Back to folders</a>
     </div>
 </div>

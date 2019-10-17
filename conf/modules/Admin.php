@@ -23,9 +23,6 @@ class Admin implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-        // Admin bulk add folders
-        (new \Schoolbox\Admin\BulkAddFolders\Module($di))->init('/adminv2/bulk-add-folders');
-
         // Admin course builder page
         (new \Schoolbox\Admin\CourseBuilder\Module($di))->init('/adminv2/course-builder');
 

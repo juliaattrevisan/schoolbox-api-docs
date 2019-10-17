@@ -78,6 +78,11 @@ class Direct implements INavigation
                 $router->generate('adminImportPhotos.getIndex'),
                 $currentPage === 'adminImportPhotos'
             ),
+            new Node(
+                'Folders',
+                $router->generate('adminImportFolder.getIndex'),
+                $currentPage === 'adminImportFolder'
+            ),
         ];
 
         /* Optional Pastoral Module

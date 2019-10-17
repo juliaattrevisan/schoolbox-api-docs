@@ -32,13 +32,17 @@ class AdminImport implements ModuleConfigInterface
          */
         (new Import\Module($di))->init('/adminv2/import');
 
+        /**
+         * Direct Import
+         */
+
+        /* User Accounts
+         */
+        (new Import\UserAccount\Module($di))->init('/adminv2/import/userAccount');
+
         /* User Photos
          */
         (new Import\Photos\Module($di))->init('/adminv2/import/photos');
-
-        /* User Profile
-         */
-        (new Import\Profile\Module($di))->init('/adminv2/import/profile');
 
         /* Pastoral Care
          */
@@ -46,9 +50,18 @@ class AdminImport implements ModuleConfigInterface
             (new Import\Pastoral\Module($di))->init('/adminv2/import-pastoral');
         }
 
-        /* User Accounts
+        /* Import folders
+         * (bulk add folders)
          */
-        (new Import\UserAccount\Module($di))->init('/adminv2/import/userAccount');
+        (new Import\Folder\Module($di))->init('/adminv2/import/folder');
+
+        /**
+         * School Data
+         */
+
+        /* User Profile
+         */
+        (new Import\Profile\Module($di))->init('/adminv2/import/profile');
 
         /* Timetable Structure
          */

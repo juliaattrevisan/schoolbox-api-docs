@@ -1,6 +1,12 @@
-{# Shared navigation menu #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-{{ renderAdminNavigation(pageCurrent) }}
+<div class="row">
+    <div class="small-12 island">
+        <h1>Import Folders</h1>
+        {% include '@adminImportIndex/navigation/subnavigation.twig' with { allNodes: allNavigation } %}
+    </div>
+</div>
 
 <script>
     $(function() {
@@ -18,8 +24,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/adminv2/bulk-add-folders" method="post" enctype="multipart/form-data" name="form" id="form">
-            <h2 class="subheader">Bulk Add Folders</h2>
+        <form action="{{ routeLookupIfAuthorized('adminImportFolder.postImportResults') }}" method="post" enctype="multipart/form-data" name="form" id="form">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">

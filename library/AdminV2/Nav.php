@@ -22,7 +22,6 @@ class AdminV2_Nav
         'setting'            => 'Settings',
         'terminology'        => 'Terminology',
         'calendar'           => 'Calendar',
-        'bulk-add-folders'   => 'Folder',
         'rollover'           => 'Rollover',
         'grades'             => 'Grades',
         'rubric-results'     => 'Rubrics',
