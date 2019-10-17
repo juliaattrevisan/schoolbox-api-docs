@@ -696,8 +696,35 @@
              */
             determineVisibleRange(currentDate) {
                 // Find the range in the list of terms.
-                let dateString = this.convertDateToDateString(currentDate);
-                return this.allTerms[this.findTermIndex(dateString)] || null;
+                let dateString = this.convertDateToDateString(currentDate),
+                    termIndex  = this.findTermIndex(dateString);
+
+                // Ensure that visible range starts on Monday (round down),
+                // and ends on Monday (round up), all without using Moment
+                // (Not initialized on initial calendar load)
+                if (this.allTerms[termIndex]) {
+                    let startDate = new Date(this.allTerms[termIndex].start),
+                        endDate   = new Date(this.allTerms[termIndex].end),
+                        startDay  = startDate.getDay() || 7,
+                        endDay    = endDate.getDay() || 7;
+
+                    // Round start down to previous Monday
+                    if (startDay !== 1) {
+                        startDate.setHours(-24 * (startDay - 1));
+                    }
+
+                    // Round end up to next Monday
+                    if (endDay !== 1) {
+                        endDate.setHours(24 * (8 - endDay));
+                    }
+
+                    return {
+                        start: startDate,
+                        end:   endDate,
+                    };
+                }
+
+                return null;
             },
 
             /**
