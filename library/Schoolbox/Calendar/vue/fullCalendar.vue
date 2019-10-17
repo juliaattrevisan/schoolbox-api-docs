@@ -33,6 +33,7 @@
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
+    const FORMAT_FLATPICKR_DATE = 'DD/MM/YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
 
     // TODO let display formats be configurable
@@ -62,7 +63,7 @@
                 currentEvent: {},
                 newEvent: {},
                 currentDisplay: null,
-                duration: 10,
+                duration: 31,
                 listViewDateRange: {
                     start: null,
                     end: null,
@@ -460,14 +461,20 @@
                     startDate.setAttribute('name', 'start_date');
                     startDate.setAttribute('data-datepicker', '');
                     startDate.setAttribute('data-datepicker-buttontext', '');
-                    if (self.listViewDateRange.start) startDate.setAttribute('value', self.listViewDateRange.start);
+                    startDate.setAttribute('value',
+                        (self.listViewDateRange.start) ? self.listViewDateRange.start : this.toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
+                    );
+
 
                     // End date field
                     endDate.setAttribute('id', 'end_date');
                     endDate.setAttribute('name', 'end_date');
                     endDate.setAttribute('data-datepicker', '');
                     endDate.setAttribute('data-datepicker-buttontext', '');
-                    if (self.listViewDateRange.end) endDate.setAttribute('value', self.listViewDateRange.end);
+                    endDate.setAttribute('value',
+                        (self.listViewDateRange.end) ? self.listViewDateRange.end : this.toMoment(new Date()).add(self.duration, 'days').format(FORMAT_FLATPICKR_DATE)
+                    );
+
 
                     // Update button
                     updateRangeButton.setAttribute('id', 'update_date_range_button');
