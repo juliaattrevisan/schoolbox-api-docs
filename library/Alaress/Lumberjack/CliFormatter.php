@@ -51,7 +51,7 @@ class CliFormatter extends NormalizerFormatter {
         // regular colours
         Monolog\Logger::DEBUG     => [ 'd', self::cyan, '' ],
         Monolog\Logger::INFO      => [ ' ', '', '' ],
-        Monolog\Logger::NOTICE    => [ ' ', '', '' ],
+        Monolog\Logger::NOTICE    => [ ' ', self::yellow, '' ],
         Monolog\Logger::WARNING   => [ '*', self::black, self::bg_yellow ],
         Monolog\Logger::ERROR     => [ '*', self::red, '' ],
         Monolog\Logger::CRITICAL  => [ '!', self::light_red, '' ],
