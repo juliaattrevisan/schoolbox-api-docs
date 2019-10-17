@@ -103,7 +103,7 @@ trait ImportNavigation
     {
         $args = [
 //            new Node(
-//                'User',
+//                'User Accounts',
 //                $router->generate('adminImportUser.upload'),
 //                $currentPage === 'adminImportUser'
 //            ),
