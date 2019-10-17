@@ -34,7 +34,7 @@ class Controller extends Base
     /**
      * @var string
      */
-    private $basename = 'adminImportUserAccount';
+    protected $basename = 'adminImportUserAccount';
 
 
     /**
@@ -85,7 +85,7 @@ class Controller extends Base
         return [
             'allBreadcrumbs' => $this->buildDirectBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildDirectNavigation($this->getRouter(), $this->basename)->getAllNodes(),
-            'basename' => 'adminImportUserAccount',
+            'basename' => $this->basename,
             'now' => \Alaress_Date_Format::now(),
         ];
     }
