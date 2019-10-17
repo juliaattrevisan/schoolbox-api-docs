@@ -80,7 +80,8 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'importerFactory' => $injector->lazyNew(ImporterFactory::class)
+            'importerFactory' => $injector->lazyNew(ImporterFactory::class),
+            'configLoader' => $injector->lazyGet('config'),
         ];
     }
 }

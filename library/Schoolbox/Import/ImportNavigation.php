@@ -7,8 +7,6 @@
 namespace Schoolbox\Import;
 
 use Aura\Router\Router;
-use Schoolbox\L10n\Mapper as L10nMapper;
-use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 
@@ -74,61 +72,4 @@ trait ImportNavigation
     }
 
 
-    /**
-     * Builds breadcrumbs for the Direct Import page.
-     *
-     * @param Router $router
-     * @return array
-     * @throws \Aura\Router\Exception\RouteNotFound
-     */
-    protected function buildDirectBreadcrumbs(Router $router): array
-    {
-        return [
-            ['Administration', '/adminv2/home'],
-            ['Direct Import', $router->generate('adminImportIndex.getDirectIndex')],
-        ];
-    }
-
-
-    /**
-     * Builds navigation for this page.
-     *
-     * @param Router $router
-     * @param string $currentPage
-     * @return Navigator
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
-     */
-    protected function buildDirectNavigation(Router $router, string $currentPage = ''): Navigator
-    {
-        $args = [
-            new Node(
-                'User Accounts',
-                $router->generate('adminImportUserAccount.getUpload'),
-                $currentPage === 'adminImportUserAccount'
-            ),
-//            new Node(
-//                'User Photos',
-//                $router->generate('adminImportPhotos.getIndex'),
-//                $currentPage === 'adminImportPhotos'
-//            ),
-        ];
-
-        /* Optional Pastoral Module
-         */
-        if ($this->getConfigLoader()->get('pastoral_enabled')) {
-            $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
-
-            $args[] = new Node(
-                $rosettaStone->translate('pastoralCare', false, true) . ' Records',
-                $router->generate('adminImportPastoral.getIndex'),
-                $currentPage === 'adminImportPastoral'
-            );
-        }
-
-        /* Folders
-         */
-
-        return new Navigator($args);
-    }
 }

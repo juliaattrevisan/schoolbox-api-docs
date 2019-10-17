@@ -1,17 +1,16 @@
 <?php
 /**
- * Pastoral import page
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Exception;
 use External_Pastoral;
+use Schoolbox\Admin\Import\Navigation\Direct;
+use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Collection;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -22,6 +21,13 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Controller
+ *
+ * Pastoral import page
+ *
+ * @package Schoolbox\Admin\Import\Pastoral
+ */
 class Controller extends Base
 {
     use ImportNavigation;
@@ -38,6 +44,13 @@ class Controller extends Base
     /** @var ErrorMapper */
     protected $errorMapper;
 
+
+    /**
+     * @var INavigation
+     */
+    protected $navigation;
+
+
     /**
      * Controller constructor.
      */
@@ -47,6 +60,8 @@ class Controller extends Base
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setPastoralLogMapper(PastoralLogMapper::getInstance());
+
+        $this->navigation = new Direct($this->getConfigLoader());
     }
 
     /**
@@ -58,8 +73,8 @@ class Controller extends Base
             [
                 'template' => '@adminImportPastoral/index.twig',
                 'data'     => [
-                    'allBreadcrumbs' => $this->buildDirectBreadcrumbs($this->getRouter()),
-                    'allNavigation'  => $this->buildDirectNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                    'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                    'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                     'externalEnabled' => $this->getConfigMapper()->get("external_pastoral"),
                 ],
             ]
@@ -74,8 +89,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/log.twig',
             'data'     => [
-                'allBreadcrumbs' => $this->buildDirectBreadcrumbs($this->getRouter()),
-                'allNavigation'  => $this->buildDirectNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
             ],
         ]);
@@ -91,8 +106,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/logDetail.twig',
             'data'     => [
-                'allBreadcrumbs' => $this->buildDirectBreadcrumbs($this->getRouter()),
-                'allNavigation'  => $this->buildDirectNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'log'            => $log,
             ],
         ]);
@@ -122,8 +137,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template'   => '@adminImportPastoral/log.twig',
             'data'       => [
-                'allBreadcrumbs' => $this->buildDirectBreadcrumbs($this->getRouter()),
-                'allNavigation'  => $this->buildDirectNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
                 'message'        => true,
             ],

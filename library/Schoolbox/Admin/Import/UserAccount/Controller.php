@@ -12,7 +12,11 @@ use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Admin\Import\Navigation\Direct;
+use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\AbstractImporter;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Notif\CacheableLoggerInterface;
@@ -44,13 +48,21 @@ class Controller extends Base
 
 
     /**
+     * @var INavigation
+     */
+    protected $navigation;
+
+
+    /**
      * Controller constructor.
      *
      * @param ImporterFactory $importerFactory
+     * @param IConfigLoader   $configLoader
      */
-    public function __construct(ImporterFactory $importerFactory)
+    public function __construct(ImporterFactory $importerFactory, IConfigLoader $configLoader)
     {
         $this->importerFactory = $importerFactory;
+        $this->navigation = new Direct($configLoader);
     }
 
 
@@ -83,8 +95,8 @@ class Controller extends Base
     protected function getBaseData(): array
     {
         return [
-            'allBreadcrumbs' => $this->buildDirectBreadcrumbs($this->getRouter()),
-            'allNavigation' => $this->buildDirectNavigation($this->getRouter(), $this->basename)->getAllNodes(),
+            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+            'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename' => $this->basename,
             'now' => \Alaress_Date_Format::now(),
         ];

@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Import\Navigation\Direct;
+use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Import\ImportNavigation;
 
 /**
@@ -22,6 +24,7 @@ class Controller extends Base
 {
 
     use ImportNavigation;
+
 
     /**
      * Controller constructor.
@@ -42,7 +45,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct.twig', [
             'pageCurrent' => 'import/direct',
-            'allNavigation'  => $this->buildDirectNavigation($this->getRouter())->getAllNodes()
+            'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('Direct Import'));
     }
 
@@ -58,7 +61,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData.twig', [
             'pageCurrent' => 'import/schoolData',
-            'allNavigation'  => $this->buildSchoolDataNavigation($this->getRouter())->getAllNodes()
+            'allNavigation'  => (new SchoolData($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('School Data Import'));
     }
 }
