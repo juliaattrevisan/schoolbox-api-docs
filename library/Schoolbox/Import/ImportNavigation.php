@@ -53,11 +53,11 @@ trait ImportNavigation
                 $router->generate('adminImportProfile.getIndex'),
                 $currentPage === 'adminImportProfile'
             ),
-//            new Node(
-//                'Timetable Structure',
-//                $router->generate('adminImportStructure.upload'),
-//                $currentPage === 'adminImportStructure'
-//            ),
+            new Node(
+                'Timetable Structure',
+                $router->generate('adminImportTimetableStructure.getUpload'),
+                $currentPage === 'adminImportTimetableStructure'
+            ),
 //            new Node(
 //                'Timetable',
 //                $router->generate('adminImportTimetable.upload'),

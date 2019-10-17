@@ -24,7 +24,7 @@ use Schoolbox\Resource\Storage;
 /**
  * Class Controller
  *
- * @package Schoolbox\Admin\Import\User
+ * @package Schoolbox\Admin\Import\UserAccount
  */
 class Controller extends Base
 {
@@ -40,7 +40,7 @@ class Controller extends Base
     /**
      * @var ImporterFactory
      */
-    private $importerFactory;
+    protected $importerFactory;
 
 
     /**
@@ -135,7 +135,7 @@ class Controller extends Base
             $reader = $this->buildReader($upload = $this->buildUpload());
         } catch (Exception $e) {
             $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
-            $this->getResponse()->redirect->to($this->getRouter()->generate($this->basename.'.upload'));
+            $this->getResponse()->redirect->to($this->getRouter()->generate("{$this->basename}.getUpload"));
 
             return;
         }

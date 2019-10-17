@@ -22,7 +22,7 @@
         </section>
 
         {% block form %}
-        <form action="{{ routeLookup('adminImportUserAccount.postImport') }}" method="post">
+        <form action="{{ routeLookup(basename ~ '.postImport') }}" method="post">
             <section class="content">
                 {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
             </section>

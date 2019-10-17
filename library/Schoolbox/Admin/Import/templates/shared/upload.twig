@@ -18,7 +18,7 @@
         {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
     <div class="small-12 island">
-        <form action="{{ routeLookupIfAuthorized('adminImportUserAccount.postPreview') }}" method="post">
+        <form action="{{ routeLookupIfAuthorized(basename ~ '.postPreview') }}" method="post">
             {% block helpText %}
             {% endblock helpText %}
 

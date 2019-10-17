@@ -24,7 +24,7 @@ class AdminImport implements ModuleConfigInterface
      * @return void
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function configure($kernel)
+    public function configure($kernel): void
     {
         $di = $kernel->getDependencyInjector();
 
@@ -49,6 +49,10 @@ class AdminImport implements ModuleConfigInterface
         /* User Accounts
          */
         (new Import\UserAccount\Module($di))->init('/adminv2/import/userAccount');
+
+        /* Timetable Structure
+         */
+        (new Import\TimetableStructure\Module($di))->init('/adminv2/import/timetableStructure');
 
     }
 }
