@@ -87,7 +87,7 @@ Format for STRUCTURE_FILE:
 Format for TIMETABLE_FILE:
 {$displayFormat(Importer\Timetable::getFormat())}
 Format for ENROLMENT_FILE:
-{$displayFormat(Importer\Enrolment::getFormat())}
+{$displayFormat(Importer\TimetableEnrolment::getFormat())}
 
 HELP;
     exit(1);
@@ -136,7 +136,7 @@ if (isset($options['timetable'])) {
 
 if (isset($options['enrolment'])) {
     $logger->info('Starting enrolment import...');
-    $parser = new Importer\Enrolment($getReader($options['enrolment'], $logger), $logger, $update);
+    $parser = new Importer\TimetableEnrolment($getReader($options['enrolment'], $logger), $logger, $update);
     $parser->save();
     $logger->info('Timetable import done!');
 } else {

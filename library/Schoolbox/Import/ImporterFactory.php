@@ -27,7 +27,7 @@ class ImporterFactory
 
     public const IMPORT_TIMETABLE = 'adminImportTimetable';
 
-    public const IMPORT_ENROLMENT = 'adminImportEnrolment';
+    public const IMPORT_ENROLMENT = 'adminImportTimetableEnrolment';
 
 
     /**
@@ -51,7 +51,7 @@ class ImporterFactory
             case self::IMPORT_TIMETABLE:
                 return new Importer\Timetable($reader, $log, $performUpdate);
             case self::IMPORT_ENROLMENT:
-                return new Importer\Enrolment($reader, $log, $performUpdate);
+                return new Importer\TimetableEnrolment($reader, $log, $performUpdate);
             default:
                 throw new \OutOfRangeException(sprintf('No importer matches basename "%s"', $basename));
         }

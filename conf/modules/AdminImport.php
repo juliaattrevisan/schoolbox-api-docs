@@ -57,5 +57,9 @@ class AdminImport implements ModuleConfigInterface
         /* Timetable
          */
         (new Import\Timetable\Module($di))->init('/adminv2/import/timetable');
+
+        /* Timetable Enrolment
+         */
+        (new Import\TimetableEnrolment\Module($di))->init('/adminv2/import/timetableEnrolment');
     }
 }

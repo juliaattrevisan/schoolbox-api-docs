@@ -63,11 +63,11 @@ trait ImportNavigation
                 $router->generate('adminImportTimetable.getUpload'),
                 $currentPage === 'adminImportTimetable'
             ),
-//            new Node(
-//                'Enrolment',
-//                $router->generate('adminImportEnrolment.upload'),
-//                $currentPage === 'adminImportEnrolment'
-//            ),
+            new Node(
+                'Timetable Enrolment',
+                $router->generate('adminImportTimetableEnrolment.getUpload'),
+                $currentPage === 'adminImportTimetableEnrolment'
+            ),
         ];
 
         return new Navigator($args);

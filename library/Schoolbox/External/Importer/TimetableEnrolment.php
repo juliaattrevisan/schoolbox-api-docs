@@ -1,11 +1,5 @@
 <?php
 /**
- * Importer for student enrolment into the Schoolbox connector.
- * Saves into the following tables:
- * * class_user
- * Assumes that `Schoolbox\External\Importer\TimetableStructure` and
- * `Schoolbox\External\Importer\Timetable` have been run.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -21,7 +15,19 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
 
-class Enrolment extends AbstractImporter
+/**
+ * Class TimetableEnrolment
+ *
+ * Importer for student enrolment into the Schoolbox connector.
+ * Saves into the following tables:
+ * * class_user
+ *
+ * Assumes that `Schoolbox\External\Importer\TimetableStructure` and
+ * `Schoolbox\External\Importer\Timetable` have been run.
+ *
+ * @package Schoolbox\External\Importer
+ */
+class TimetableEnrolment extends AbstractImporter
 {
     /**
      * @var \Alaress\Database\Connector\IConnector

@@ -1,16 +1,9 @@
 <?php
 /**
- * Importer for timetable structure into the Schoolbox connector.
- * Saves into the following tables:
- * * timetable_cycle
- * * timetable_campus
- * * timetable_period
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\External\Importer;
 
 use Alaress_Date_Format;
@@ -24,6 +17,17 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 
+/**
+ * Class TimetableStructure
+ *
+ * Importer for timetable structure into the Schoolbox connector.
+ * Saves into the following tables:
+ * * timetable_cycle
+ * * timetable_campus
+ * * timetable_period
+ *
+ * @package Schoolbox\External\Importer
+ */
 class TimetableStructure extends AbstractImporter
 {
 
@@ -176,7 +180,7 @@ class TimetableStructure extends AbstractImporter
 
             $periodStart = null;
             $periodFinish = null;
-            
+
             try {
                 if (empty($row['Period Start'])) {
                     $this->log->notice(
