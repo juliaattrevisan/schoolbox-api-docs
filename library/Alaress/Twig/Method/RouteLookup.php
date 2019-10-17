@@ -24,9 +24,10 @@ class RouteLookup {
      *
      * @param  string $name The name of the route to look up.
      * @param  array  $data Any params to pass as part of the route.
-     * @return string
+     * @return false|string
      */
-    public function execute($name, $data = array()) {
+    public function execute($name, $data = array())
+    {
         // Ensure format is set to something, even if empty.
         if (!isset($data['format'])) {
             $data['format'] = '';
