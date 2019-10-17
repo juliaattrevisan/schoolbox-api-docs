@@ -1002,6 +1002,9 @@ class DataSource
             }
 
             if ($capInUse) {
+                if (null === $capability['maxValue']) {
+                    $capabilityUsage->setMaxValue($capabilityUsage->calculateMaxValueFromIndicators());
+                }
                 $grid->getCapabilityUsages()->add($capabilityUsage);
             }
         }
