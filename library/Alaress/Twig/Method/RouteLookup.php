@@ -9,6 +9,7 @@
 
 namespace Alaress\Twig\Method;
 
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 
 class RouteLookup {
@@ -33,7 +34,7 @@ class RouteLookup {
 
         try {
             return $this->getRouter()->generate($name, $data);
-        } catch (\Exception $e) {
+        } catch (RouteNotFound $e) {
             return false;
         }
     }
