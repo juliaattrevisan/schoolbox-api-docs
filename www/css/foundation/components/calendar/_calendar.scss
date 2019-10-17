@@ -150,14 +150,26 @@
 .fc-custom-group.row .small-4.columns {
   padding-left: 0;
 }
-
 .fc-custom-group.row {
   margin-left: 0 !important;
+  width: 100% !important;
 }
 
-@media #{$large-up} {
-  .fc-custom-group.row {
-    top: 1rem;
-    position: absolute;
+.fc-custom-group .input-group {
+  flex-wrap: nowrap !important;
+}
+
+@media #{$small-only} {
+  .fc-custom-group div:last-child {
+    padding-right: 0;
   }
 }
+
+.fc-custom-group.row {
+  padding-left: 0;
+  @media #{$medium-up} {
+    top: .5rem;
+    position: relative;
+  }
+}
+
