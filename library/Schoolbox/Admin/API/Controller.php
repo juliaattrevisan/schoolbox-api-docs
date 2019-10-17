@@ -11,7 +11,9 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web;
 use InvalidArgumentException;
-use Schoolbox\Admin\Import\Profile\Processor;
+use Schoolbox\Admin\Import\Profile\Importer;
+use Schoolbox\Admin\Import\Profile\Mapping;
+use Schoolbox\External;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
@@ -23,16 +25,18 @@ use Schoolbox\Mapper;
  */
 class Controller extends Web\Controller\Base
 {
+
     /**
      * Profile CSVs
      * Processor consts for declaring which file is being supplied
      */
     private const REQUIRED_USER_PROFILE_CSVS = [
-        Processor::CSV_STUDENT,
-        Processor::CSV_PARENT,
-        Processor::CSV_STAFF,
-        Processor::CSV_RELATION
+        Mapping::CSV_STUDENT,
+        Mapping::CSV_PARENT,
+        Mapping::CSV_STAFF,
+        Mapping::CSV_RELATIONSHIP
     ];
+
 
     /**
      * Timetable and Enrolment CSVs
@@ -43,21 +47,72 @@ class Controller extends Web\Controller\Base
         'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
     ];
 
+
     /** @var Storage\Mapper */
     private $storageMapper;
+
 
     /** @var ImporterFactory */
     private $importerFactory;
 
 
     /**
-     * @param Storage\Mapper  $storageMapper
-     * @param ImporterFactory $importerFactory
+     * @var External\Profile\Mapper
      */
-    public function __construct(Storage\Mapper $storageMapper, ImporterFactory $importerFactory)
-    {
-        $this->storageMapper   = $storageMapper;
+    private $baseProfileMapper;
+
+
+    /**
+     * @var External\Profile\Parent\Mapper
+     */
+    private $parentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Student\Mapper
+     */
+    private $studentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Staff\Mapper
+     */
+    private $staffProfileMapper;
+
+
+    /**
+     * @var External\Profile\Relationship\Mapper
+     */
+    private $relationshipMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param Storage\Mapper                       $storageMapper
+     * @param ImporterFactory                      $importerFactory
+     * @param External\Profile\Mapper              $baseMapper
+     * @param External\Profile\Parent\Mapper       $parentMapper
+     * @param External\Profile\Student\Mapper      $studentMapper
+     * @param External\Profile\Staff\Mapper        $staffMapper
+     * @param External\Profile\Relationship\Mapper $relationshipMapper
+     */
+    public function __construct(
+        Storage\Mapper $storageMapper,
+        ImporterFactory $importerFactory,
+        External\Profile\Mapper $baseMapper,
+        External\Profile\Parent\Mapper $parentMapper,
+        External\Profile\Student\Mapper $studentMapper,
+        External\Profile\Staff\Mapper $staffMapper,
+        External\Profile\Relationship\Mapper $relationshipMapper
+    ) {
+        $this->storageMapper = $storageMapper;
         $this->importerFactory = $importerFactory;
+        $this->baseProfileMapper = $baseMapper;
+        $this->parentProfileMapper = $parentMapper;
+        $this->studentProfileMapper = $studentMapper;
+        $this->staffProfileMapper = $staffMapper;
+        $this->relationshipMapper = $relationshipMapper;
     }
 
 
@@ -191,7 +246,17 @@ class Controller extends Web\Controller\Base
                             // this is where the action happens
                             $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
                         } else {
-                            (new Processor($keyspace, $file, $db, $log))->setPerform(true)->process();
+                            (new Importer(
+                                $keyspace,
+                                $file,
+                                $db,
+                                $this->baseProfileMapper,
+                                $this->parentProfileMapper,
+                                $this->studentProfileMapper,
+                                $this->staffProfileMapper,
+                                $this->relationshipMapper,
+                                $log
+                            ))->setPerform(true)->process();
                         }
                     }
 

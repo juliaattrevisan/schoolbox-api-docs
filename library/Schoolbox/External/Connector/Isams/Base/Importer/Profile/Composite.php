@@ -70,9 +70,9 @@ class Composite implements Importer\IStrategy
 
 
     /**
-     * @var UserProfile\Relation\Mapper
+     * @var UserProfile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
@@ -84,14 +84,14 @@ class Composite implements Importer\IStrategy
     /**
      * Composite constructor.
      *
-     * @param LoggerInterface             $log
-     * @param bool                        $perform
-     * @param Importer\Batchxml           $batchxml
-     * @param UserProfile\Mapper          $baseProfileMapper
-     * @param UserProfile\Student\Mapper  $studentProfileMapper
-     * @param UserProfile\Parent\Mapper   $parentProfileMapper
-     * @param UserProfile\Staff\Mapper    $staffProfileMapper
-     * @param UserProfile\Relation\Mapper $relationMapper
+     * @param LoggerInterface                 $log
+     * @param bool                            $perform
+     * @param Importer\Batchxml               $batchxml
+     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param UserProfile\Student\Mapper      $studentProfileMapper
+     * @param UserProfile\Parent\Mapper       $parentProfileMapper
+     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -101,7 +101,7 @@ class Composite implements Importer\IStrategy
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relation\Mapper $relationMapper
+        UserProfile\Relationship\Mapper $relationshipMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -112,7 +112,7 @@ class Composite implements Importer\IStrategy
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationMapper = $relationMapper;
+        $this->relationshipMapper = $relationshipMapper;
     }
 
 
@@ -134,7 +134,7 @@ class Composite implements Importer\IStrategy
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationMapper
+                $this->relationshipMapper
             ));
 
         foreach ($this->registry as $strategy) {

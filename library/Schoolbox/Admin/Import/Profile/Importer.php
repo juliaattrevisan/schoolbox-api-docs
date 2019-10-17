@@ -16,24 +16,15 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 
 /**
- * Class Processor
+ * Class Importer
  *
  * Determine which Profile Import files were passed, based on header contents,
  * and process them iteratively
  *
  * @package Schoolbox\Admin\Import\Profile
  */
-class Processor
+class Importer
 {
-
-    /**
-     * Strings that denote a csv file
-     */
-    public const CSV_STUDENT = Role::STUDENT;
-    public const CSV_STAFF = Role::STAFF;
-    public const CSV_PARENT = Role::PARENT;
-    public const CSV_RELATION = 'relation';
-
 
     /**
      * Status string for successful row processing
@@ -54,108 +45,8 @@ class Processor
 
 
     /**
-     * Columns in a Parent CSV
-     */
-    private const IMPORT_COLUMNS_PARENT = [
-        'External ID',
-        'Type',
-        'Username',
-        'Title',
-        'Firstname',
-        'Surname',
-        'Email',
-        'Mobile',
-        'Home Phone',
-        'Work Phone'
-    ];
-
-
-    /**
-     * Columns in a Student csv
-     */
-    private const IMPORT_COLUMNS_STUDENT = [
-        'External ID',
-        'Type',
-        'Username',
-        'Title',
-        'Firstname',
-        'Surname',
-        'Email',
-        'Gender',
-        'Campus',
-        'Emergency Contact Name 1',
-        'Emergency Contact Phone 1',
-        'Emergency Contact Phone Alt 1',
-        'Emergency Contact Name 2',
-        'Emergency Contact Phone 2',
-        'Emergency Contact Phone Alt 2',
-        'Emergency Contact Name 3',
-        'Emergency Contact Phone 3',
-        'Emergency Contact Phone Alt 3',
-        'Mobile',
-        'Date of Birth',
-        'House',
-        'Head of House ID',
-        'Head of House Name',
-        'Form',
-        'Form Teacher ID',
-        'Form Teacher Name',
-        'Tutor Group',
-        'Tutor Teacher ID',
-        'Tutor Teacher Name',
-        'Year Level',
-        'Year Level Coordinator ID',
-        'Year Level Coordinator Name',
-        'Studies Code',
-        'Medical Alert',
-        'Comment',
-        'Contact Alert',
-        'Legal Alert',
-        'Enrolment Date',
-        'Leaving Date',
-        'IB',
-        'ILP',
-        'ESL',
-        'Special Needs',
-        'Boarding Status'
-    ];
-
-
-    /**
-     * Columns in a Staff csv
-     */
-    private const IMPORT_COLUMNS_STAFF = [
-        'External ID',
-        'Type',
-        'Username',
-        'Title',
-        'Firstname',
-        'Surname',
-        'Email',
-        'Work Phone',
-        'Staff Category',
-        'Position Title',
-        'Department',
-        'Building',
-        'Room',
-        'Campus'
-    ];
-
-
-    /**
-     * Columns in a Relation csv
-     */
-    private const IMPORT_COLUMNS_RELATION = [
-        'Student ID',
-        'Guardian ID',
-        'Type',
-
-    ];
-
-
-    /**
      * Upload type
-     * One of [student, staff, parent, relation]
+     * One of [student, staff, parent, relationship]
      *
      * @var string
      */
@@ -166,6 +57,12 @@ class Processor
      * @var IStorage
      */
     private $file;
+
+
+    /**
+     * @var Mapping
+     */
+    private $mapping;
 
 
     /**
@@ -193,9 +90,9 @@ class Processor
 
 
     /**
-     * @var Profile\Relation\Mapper
+     * @var Profile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
@@ -219,6 +116,7 @@ class Processor
      */
     private $perform = false;
 
+
     /**
      * The log object to which log entries are written
      *
@@ -226,26 +124,40 @@ class Processor
      */
     private $logger;
 
+
     /**
-     * Processor constructor.
+     * Importer constructor.
      *
-     * @param string     $type
-     * @param IStorage   $file
-     * @param IConnector $database
-     * @param LoggerInterface|null $logger
+     * @param string                      $type
+     * @param IStorage                    $file
+     * @param IConnector                  $database
+     * @param Profile\Mapper              $baseProfileMapper
+     * @param Profile\Parent\Mapper       $parentProfileMapper
+     * @param Profile\Student\Mapper      $studentProfileMapper
+     * @param Profile\Staff\Mapper        $staffProfileMapper
+     * @param Profile\Relationship\Mapper $relationshipMapper
+     * @param LoggerInterface|null        $logger
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $type, IStorage $file, IConnector $database, LoggerInterface $logger = null)
-    {
-        if (!\in_array($type, [self::CSV_STUDENT, self::CSV_STAFF, self::CSV_PARENT, self::CSV_RELATION], true)) {
-            throw new \InvalidArgumentException('Unknown csv type.');
-        }
+    public function __construct(
+        string $type,
+        IStorage $file,
+        IConnector $database,
+        Profile\Mapper $baseProfileMapper,
+        Profile\Parent\Mapper $parentProfileMapper,
+        Profile\Student\Mapper $studentProfileMapper,
+        Profile\Staff\Mapper $staffProfileMapper,
+        Profile\Relationship\Mapper $relationshipMapper,
+        LoggerInterface $logger = null
+    ) {
+        $this->mapping = new Mapping($type);
 
-        $this->baseProfileMapper = new Profile\Mapper();
-        $this->parentProfileMapper = new Profile\Parent\Mapper();
-        $this->studentProfileMapper = new Profile\Student\Mapper();
-        $this->staffProfileMapper = new Profile\Staff\Mapper();
-        $this->relationMapper = new Profile\Relation\Mapper();
+        $this->baseProfileMapper = $baseProfileMapper;
+        $this->parentProfileMapper = $parentProfileMapper;
+        $this->studentProfileMapper = $studentProfileMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
+        $this->relationshipMapper = $relationshipMapper;
+
         $this->database = $database;
         $this->logger = $logger;
 
@@ -276,7 +188,7 @@ class Processor
      * @throws Exception
      * @throws DefinitionException
      */
-    public function process(): Processor
+    public function process(): Importer
     {
         try {
             $this->log("Starting processing {$this->file->getBasename()}", self::LOG_OK);
@@ -306,48 +218,37 @@ class Processor
      */
     private function processOne(Reader $reader): int
     {
-        if ($this->isStudentProfile()) {
+        if ($this->mapping->isStudentProfile($this->type)) {
 
             /* Process the Student Profile csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_STUDENT);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STUDENT));
 
             return $this->processStudentProfile($reader);
-        } elseif ($this->isStaffProfile()) {
+        } elseif ($this->mapping->isStaffProfile($this->type)) {
 
             /* Process the Staff Profile csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_STAFF);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STAFF));
 
             return $this->processStaffProfile($reader);
-        } elseif ($this->isParentProfile()) {
+        } elseif ($this->mapping->isParentProfile($this->type)) {
 
             /* Process the Parent Profile csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_PARENT);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_PARENT));
 
             return $this->processParentProfile($reader);
-        } elseif ($this->isRelation()) {
+        } elseif ($this->mapping->isRelationship($this->type)) {
 
-            /* Process the Relations csv
+            /* Process the Relationships csv
              */
-            $reader->setExpectedColumns(self::IMPORT_COLUMNS_RELATION);
+            $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_RELATIONSHIP));
 
-            return $this->processRelation($reader);
+            return $this->processRelationship($reader);
         }
 
         throw new \InvalidArgumentException('Unrecognised csv containing header row ' . implode(', ', $reader->readHeaderRow()));
-    }
-
-
-    /**
-     * The type that was chosen in the dropdown declares this to be a Student csv
-     *
-     * @return bool
-     */
-    private function isStudentProfile(): bool
-    {
-        return $this->type === self::CSV_STUDENT;
     }
 
 
@@ -385,7 +286,7 @@ class Processor
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
-            if (strcasecmp($row['Type'], self::CSV_STUDENT)) {
+            if (strcasecmp($row['Type'], Mapping::CSV_STUDENT)) {
                 $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i}  is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
@@ -411,7 +312,7 @@ class Processor
                 ->setLastname($row['Surname']);
 
             $studentProfile
-                ->setDateOfBirth(\Alaress_Date_Format::now())
+                ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime($row['Date of Birth'])))
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
                 ->setGender($row['Gender'])
@@ -471,7 +372,7 @@ class Processor
 
         /* Delete everyone we didn't created/update
          */
-        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
+        $this->log("Removing profiles that weren't created/updated, and their relationships too", self::LOG_OK);
 
         if ($this->perform && \count($affectedProfileIds)) {
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->studentProfileMapper);
@@ -508,10 +409,10 @@ class Processor
 
         if ($deletions) {
 
-            /* Remove relations that they once held
+            /* Remove relationships that they once held
              */
             $this->database->executeQuery("
-                DELETE FROM {$this->relationMapper->getTable()}
+                DELETE FROM {$this->relationshipMapper->getTable()}
                 WHERE child_profile_id IN ({$deletions})
                 OR user_profile_id IN ({$deletions})
             ");
@@ -529,7 +430,7 @@ class Processor
          */
         $orphans = $this->removeOrphanedProfiles();
 
-        $this->log("Removed {$orphans} orphaned profiles and their associated relations", self::LOG_OK);
+        $this->log("Removed {$orphans} orphaned profiles and their associated relationships", self::LOG_OK);
     }
 
 
@@ -546,19 +447,8 @@ class Processor
             $this->studentProfileMapper,
             $this->parentProfileMapper,
             $this->staffProfileMapper,
-            $this->relationMapper
+            $this->relationshipMapper
         ))->remove();
-    }
-
-
-    /**
-     * The type that was chosen in the dropdown declares this to be a Staff csv
-     *
-     * @return bool
-     */
-    private function isStaffProfile(): bool
-    {
-        return $this->type === self::CSV_STAFF;
     }
 
 
@@ -596,25 +486,37 @@ class Processor
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
-            if (strcasecmp($row['Type'], self::CSV_STAFF)) {
+            if (strcasecmp($row['Type'], Mapping::CSV_STAFF)) {
                 $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i}  is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
 
             $create = true;
 
-            /* Try to find a baseProfile that matches the externalId
+            /* Try to find an existing staffProfile that matches the externalId
+             * If one already exists, use it; otherwise spawn a new one
              */
             try {
                 $staffProfile = $this->staffProfileMapper->findByExternalId($row['External ID']);
-                $baseProfile = $staffProfile->getBaseProfile();
 
                 $create = false;
             } catch (Exception $e) {
                 $staffProfile = $this->staffProfileMapper->createModel();
+            }
+
+            /* Try to find a baseProfile that matches the externalId
+             * If one already exists, use it; otherwise spawn a new one
+             */
+            try {
+                $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $row['External ID']);
+            } catch (Exception $e) {
                 $baseProfile = $this->baseProfileMapper->createModel();
             }
 
+            /* Note that baseProfiles can be shared among multiple role types
+             * A baseProfile might exist already, but for a different role type
+             * Therefore you must check these separately and assemble accordingly
+             */
             $baseProfile
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
@@ -652,24 +554,13 @@ class Processor
 
         /* Delete everyone we didn't created/update
          */
-        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
+        $this->log("Removing profiles that weren't created/updated, and their relationships too", self::LOG_OK);
 
         if ($this->perform && \count($affectedProfileIds)) {
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->staffProfileMapper);
         }
 
         return \count($affectedProfileIds);
-    }
-
-
-    /**
-     * The type that was chosen in the dropdown declares this to be a Parent csv
-     *
-     * @return bool
-     */
-    private function isParentProfile(): bool
-    {
-        return $this->type === self::CSV_PARENT;
     }
 
 
@@ -707,7 +598,7 @@ class Processor
             /* Every row comes with a type; use this as extra surety
              * If it doesn't match, log it and continue
              */
-            if (strcasecmp($row['Type'], self::CSV_PARENT)) {
+            if (strcasecmp($row['Type'], Mapping::CSV_PARENT)) {
                 $this->log("Profile for {$row['Firstname']} {$row['Surname']}: this is a {$this->type} csv file, but row {$i} is for {$row['Type']}", self::LOG_SKIP);
                 continue;
             }
@@ -759,7 +650,7 @@ class Processor
 
         /* Delete everyone we didn't created/update
          */
-        $this->log("Removing profiles that weren't created/updated, and their relations too", self::LOG_OK);
+        $this->log("Removing profiles that weren't created/updated, and their relationships too", self::LOG_OK);
 
         if ($this->perform && \count($affectedProfileIds)) {
             $this->removeUnaffectedProfiles($affectedProfileIds, $this->parentProfileMapper);
@@ -770,18 +661,7 @@ class Processor
 
 
     /**
-     * The type that was chosen in the dropdown declares this to be a Relation csv
-     *
-     * @return bool
-     */
-    private function isRelation(): bool
-    {
-        return $this->type === self::CSV_RELATION;
-    }
-
-
-    /**
-     * Process the Relations csv
+     * Process the Relationships csv
      *
      * @param Reader $reader
      * @return int number of rows processed
@@ -790,12 +670,12 @@ class Processor
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function processRelation(Reader $reader): int
+    private function processRelationship(Reader $reader): int
     {
         /* Remember a set of (profile_id, external_id) tuples to save on db pounding
-         * while trying to derive relations between external_ids from csv
+         * while trying to derive relationships between external_ids from csv
          *
-         * Our schema creates relations between profile_ids, not external_ids
+         * Our schema creates relationships between profile_ids, not external_ids
          * so we might as well cache these to save on performance penalty
          */
         $statement = $this->database->prepareQuery("
@@ -828,50 +708,53 @@ class Processor
             $cache[$roleType][$externalId] = $profileId;
         }
 
-        /* Purge old relations before re-inserting them
+        /* Purge old relationships before re-inserting them
          */
         if ($this->perform) {
-            $this->relationMapper->truncate();
+            $this->relationshipMapper->truncate();
         }
 
-        $this->log('Removing old relations', self::LOG_OK);
+        $this->log('Removing old relationships', self::LOG_OK);
 
-        /* Process each relation
+        /* Process each relationship
          */
         $n = 0;
 
         foreach ($reader as $row) {
 
-            /* Check that both relations exist. They might not exist because the
-             * relation csv may contain data that wasn't in the other three files
+            /* Check that both relationships exist. They might not exist because the
+             * relationship csv may contain data that wasn't in the other three files
              * (probably from human error but who knows)
              */
             if (!$cache[Role::PARENT ][$row['Guardian ID']]) {
-                $this->log("Relation between guardian {$row['Guardian ID']} and student {$row['Student ID']}: guardian {$row['Guardian ID']} doesn't exist", self::LOG_SKIP);
+                $this->log("Relationship between guardian {$row['Guardian ID']} and student {$row['Student ID']}: guardian {$row['Guardian ID']} doesn't exist", self::LOG_SKIP);
 
                 continue;
             }
 
             if (!$cache[Role::STUDENT ][$row['Student ID']]) {
-                $this->log("Relation between guardian {$row['Guardian ID']} and student {$row['Student ID']}: student {$row['Student ID']} doesn't exist", self::LOG_SKIP);
+                $this->log("Relationship between guardian {$row['Guardian ID']} and student {$row['Student ID']}: student {$row['Student ID']} doesn't exist", self::LOG_SKIP);
 
                 continue;
             }
 
-            /* Otherwise both exist; build relation
+            /* Otherwise both exist; build relationship
              */
-            $relation = $this->relationMapper->createModel()
-                ->setUserProfileId($cache[Role::PARENT ][$row['Guardian ID']])
+            $userProfile = $this->parentProfileMapper->findById($cache[Role::PARENT ][$row['Guardian ID']])->getBaseProfile();
+            $childProfile = $this->studentProfileMapper->findById($cache[Role::STUDENT ][$row['Student ID']])->getBaseProfile();
+
+            $relationship = $this->relationshipMapper->createModel()
+                ->setUserProfile($userProfile)
                 ->setType($row['Type'])
-                ->setChildProfileId($cache[Role::STUDENT ][$row['Student ID']]);
+                ->setChildProfile($childProfile);
 
             if ($this->perform) {
-                $this->relationMapper->save($relation);
+                $this->relationshipMapper->save($relationship);
             }
 
-            $this->log("Created relation called \"{$row['Type']}\" between guardian {$row['Guardian ID']} and student {$row['Student ID']}", self::LOG_OK);
+            $this->log("Created relationship called \"{$row['Type']}\" between guardian {$row['Guardian ID']} and student {$row['Student ID']}", self::LOG_OK);
 
-            /* These two humans have relations
+            /* Keep a count of successfully-constructed relationships
              */
             $n++;
         }

@@ -1,0 +1,50 @@
+{##
+ # relationship.twig
+ #
+ # Renders the Relationship island
+ #
+ # @param attachzone attachzone
+ # @param int        numProfiles
+ #}
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <h2>Relationships</h2>
+
+                    <p>
+                        This file will establish relationships between Parents and Students or between connected Parents.
+                    </p>
+
+                    <h3>Instructions</h3>
+
+                    <ul>
+                        <li>Each record must contain the relationship information for two people including Role Types, External IDs, and Relationship Type.</li>
+                        <li>The record will be skipped if either External ID does not match.</li>
+                        <li>The Relationship Type is an open field that can contain any relationship description required, eg parent, guardian, spouse, aunt, etc.</li>
+                    </ul>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <form method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}">
+                        <input type="hidden" name="file" value="relationship" />
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+                        <ul class="flex-list buttons">
+                            <li>
+                                {% if numProfiles %}
+                                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+                                {% else %}
+                                    <a href="/adminv2/import/profile/relationship.csv" class="icon-download button">Download Relationship Template</a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <input type="submit" class="button" value="Dry Run">
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

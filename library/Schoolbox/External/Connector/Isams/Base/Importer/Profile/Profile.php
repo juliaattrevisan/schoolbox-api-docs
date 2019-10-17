@@ -74,22 +74,22 @@ class Profile implements IStrategy
 
 
     /**
-     * @var UserProfile\Relation\Mapper
+     * @var UserProfile\Relationship\Mapper
      */
-    private $relationMapper;
+    private $relationshipMapper;
 
 
     /**
      * Profile constructor.
      *
-     * @param LoggerInterface             $log
-     * @param bool                        $perform
-     * @param Batchxml                    $batchxml
-     * @param UserProfile\Mapper          $baseProfileMapper
-     * @param UserProfile\Student\Mapper  $studentProfileMapper
-     * @param UserProfile\Parent\Mapper   $parentProfileMapper
-     * @param UserProfile\Staff\Mapper    $staffProfileMapper
-     * @param UserProfile\Relation\Mapper $relationMapper
+     * @param LoggerInterface                 $log
+     * @param bool                            $perform
+     * @param Batchxml                        $batchxml
+     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param UserProfile\Student\Mapper     $studentProfileMapper
+     * @param UserProfile\Parent\Mapper       $parentProfileMapper
+     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -99,7 +99,7 @@ class Profile implements IStrategy
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relation\Mapper $relationMapper
+        UserProfile\Relationship\Mapper $relationshipMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -109,7 +109,7 @@ class Profile implements IStrategy
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationMapper = $relationMapper;
+        $this->relationshipMapper = $relationshipMapper;
     }
 
 
@@ -129,7 +129,7 @@ class Profile implements IStrategy
         /* Purge old relations before re-inserting them
          */
         if ($this->perform) {
-            $this->relationMapper->truncate();
+            $this->relationshipMapper->truncate();
         }
 
         /* Import students' profile data
@@ -153,7 +153,7 @@ class Profile implements IStrategy
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationMapper
+                $this->relationshipMapper
             ))->remove();
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
@@ -719,13 +719,12 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $relation = $this->relationMapper->createModel()
-                    ->setUserProfileId($parentBaseProfile->getId())
-                    ->setChildProfileId($studentBaseProfile->getId())
-                    ->setEmergencyContact(false)
+                $relationship = $this->relationshipMapper->createModel()
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
                     ->setType($relationship);
 
-                $this->relationMapper->save($relation);
+                $this->relationshipMapper->save($relationship);
             }
 
             /* Accumulate messages

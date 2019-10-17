@@ -1,0 +1,49 @@
+{##
+ # parent.twig
+ #
+ # Renders the Parent island
+ #
+ # @param attachzone attachzone
+ # @param int        numProfiles
+ #}
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <h2>Parents</h2>
+
+                    <p>
+                        This file will populate the records for Parents in your school.
+                    </p>
+
+                    <h3>Instructions</h3>
+
+                    <ul>
+                        <li>Download the template for this user type and populate all fields.</li>
+                        <li>Once your CSV is ready, drop it in the attach zone.</li>
+                    </ul>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <form method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}">
+                        <input type="hidden" name="file" value="parent" />
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+                        <ul class="flex-list buttons">
+                            <li>
+                                {% if numProfiles %}
+                                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
+                                {% else %}
+                                    <a href="/adminv2/import/profile/parent.csv" class="icon-download button">Download Parent Template</a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <input type="submit" class="button" value="Dry Run">
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

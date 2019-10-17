@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\External;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -22,13 +23,67 @@ use Schoolbox\Resource\Attachment\Zone;
  *    student.csv
  *    parent.csv
  *    staff.csv
- *    relation.csv
+ *    relationship.csv
  *
  * @package Schoolbox\Admin\Import\Profile
  */
 class Controller extends Base
 {
     use ImportNavigation;
+
+
+    /**
+     * @var External\Profile\Mapper
+     */
+    private $baseProfileMapper;
+
+
+    /**
+     * @var External\Profile\Parent\Mapper
+     */
+    private $parentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Student\Mapper
+     */
+    private $studentProfileMapper;
+
+
+    /**
+     * @var External\Profile\Staff\Mapper
+     */
+    private $staffProfileMapper;
+
+
+    /**
+     * @var External\Profile\Relationship\Mapper
+     */
+    private $relationshipMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param External\Profile\Mapper              $baseMapper
+     * @param External\Profile\Parent\Mapper       $parentMapper
+     * @param External\Profile\Student\Mapper      $studentMapper
+     * @param External\Profile\Staff\Mapper        $staffMapper
+     * @param External\Profile\Relationship\Mapper $relationshipMapper
+     */
+    public function __construct(
+        External\Profile\Mapper $baseMapper,
+        External\Profile\Parent\Mapper $parentMapper,
+        External\Profile\Student\Mapper $studentMapper,
+        External\Profile\Staff\Mapper $staffMapper,
+        External\Profile\Relationship\Mapper $relationshipMapper
+    ) {
+        $this->baseProfileMapper = $baseMapper;
+        $this->parentProfileMapper = $parentMapper;
+        $this->studentProfileMapper = $studentMapper;
+        $this->staffProfileMapper = $staffMapper;
+        $this->relationshipMapper = $relationshipMapper;
+    }
 
     /**
      * Provide form
@@ -44,10 +99,19 @@ class Controller extends Base
             'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachzone' => [
-                'student' => $this->getAttachZone('student', 'Upload Student CSV file'),
-                'parent' => $this->getAttachZone('parent', 'Upload Parent CSV file'),
-                'relation' => $this->getAttachZone('relation', 'Upload Relationship CSV file'),
-                'staff' => $this->getAttachZone('staff', 'Upload Staff CSV file'),
+                Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
+                Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
+                Mapping::CSV_RELATIONSHIP => $this->getAttachZone(Mapping::CSV_RELATIONSHIP, 'Upload Relationship CSV file'),
+                Mapping::CSV_STAFF => $this->getAttachZone(Mapping::CSV_STAFF, 'Upload Staff CSV file'),
+            ],
+
+            /* Check which tables have data; if there is any content, link to the exporter
+             */
+            'profiles' => [
+                'numParents' => $this->parentProfileMapper->countAll(),
+                'numStaff' => $this->staffProfileMapper->countAll(),
+                'numStudents' => $this->studentProfileMapper->countAll(),
+                'numRelationships' => $this->relationshipMapper->countAll()
             ]
         ])->setTitle('Import User Profile'));
     }
@@ -106,15 +170,24 @@ class Controller extends Base
                 $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
 
                 try {
-                    $processor = new Processor($this->getRequest()->post['file'], $attachment[0], $db);
+                    $importer = new Importer(
+                        $this->getRequest()->post['file'],
+                        $attachment[0],
+                        $db,
+                        $this->baseProfileMapper,
+                        $this->parentProfileMapper,
+                        $this->studentProfileMapper,
+                        $this->staffProfileMapper,
+                        $this->relationshipMapper
+                    );
 
                     /* Actually persist changes
                      */
                     if ((bool)$this->getRequest()->query['perform']) {
-                        $processor->setPerform(true);
+                        $importer->setPerform(true);
                     }
 
-                    $logs = $processor->process()->getLog();
+                    $logs = $importer->process()->getLog();
                 } catch (\InvalidArgumentException $e) {
                     $errors[] = $e->getMessage();
                 }
@@ -132,5 +205,37 @@ class Controller extends Base
             'file' => $this->getRequest()->post['file'],
             'perform' => (bool)$this->getRequest()->query['perform']
         ])->setTitle('Import User Profile'));
+    }
+
+
+    /**
+     * Export csv from db, for a given $type (student staff parent relationship)
+     *
+     * @param string $type
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     */
+    public function getExport(string $type)
+    {
+        $content = (new Exporter(
+            $type,
+            $this->baseProfileMapper,
+            $this->parentProfileMapper,
+            $this->studentProfileMapper,
+            $this->staffProfileMapper,
+            $this->relationshipMapper
+        ))->process();
+
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', \strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"export-{$type}.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
     }
 }
