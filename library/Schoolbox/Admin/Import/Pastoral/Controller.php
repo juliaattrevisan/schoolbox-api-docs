@@ -12,6 +12,7 @@ use External_Pastoral;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
@@ -53,15 +54,17 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     *
+     * @param IConfigLoader $configLoader
      */
-    public function __construct()
+    public function __construct(IConfigLoader $configLoader)
     {
         $this->setConfigMapper(ConfigMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setPastoralLogMapper(PastoralLogMapper::getInstance());
 
-        $this->navigation = new Direct($this->getConfigLoader());
+        $this->navigation = new Direct($configLoader);
     }
 
     /**
