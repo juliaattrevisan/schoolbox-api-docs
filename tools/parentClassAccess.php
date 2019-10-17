@@ -8,9 +8,11 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -96,6 +98,7 @@ HELP;
 
         $loadStudents = $this->getOpt(self::OPT_LONG_STUDENTS);
 
+        /** @var Folder\Model[] $folders */
         $folders = [];
         $classes = [];
 
@@ -142,9 +145,7 @@ HELP;
                 $currentFolder = $folderMapper->findById($folderId);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $codeString = implode(',', $codes);
-
                 $this->getLogger()->warning("Failed to find folder with id: {$folderId}. Skipping adding users from '{$codeString}' to folder id {$folderId}");
-
                 continue;
             }
 
@@ -152,7 +153,7 @@ HELP;
 
             if ($loadStudents) {
                 // Remove all students from specified classes
-                $students = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::STUDENT);
+                $students = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::STUDENT, UserAccess::ACCESS_READ, false);
                 $this->getLogger()->notice("Removing student access from '{$folders[$folderId]->getTitle()}'");
 
                 if ($this->perform()) {
@@ -166,7 +167,7 @@ HELP;
             }
 
             // Remove all parents from specified classes
-            $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::PARENT);
+            $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::PARENT, UserAccess::ACCESS_READ, false);
             $this->getLogger()->notice("Removing parent access from '{$folders[$folderId]->getTitle()}'");
 
             if ($this->perform()) {
@@ -176,6 +177,11 @@ HELP;
                         'sid' => $folderId
                     ]);
                 }
+            }
+
+            if ($currentFolder->getInherit()) {
+                $this->getLogger()->error("'{$folders[$folderId]->getTitle()}' (id: {$folders[$folderId]->getId()}) inherits permissions, cannot create group members");
+                continue;
             }
 
             // Add parents from class codes to the specified classes
