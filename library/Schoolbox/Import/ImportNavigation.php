@@ -70,18 +70,6 @@ trait ImportNavigation
 //            ),
         ];
 
-        /* Optional Pastoral Module
-         */
-        if ($this->getConfigLoader()->get('pastoral_enabled')) {
-            $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
-
-            $args[] = new Node(
-                $rosettaStone->translate('pastoralCare', false, true) . ' Records',
-                $router->generate('adminImportPastoral.getIndex'),
-                $currentPage === 'adminImportPastoral'
-            );
-        }
-
         return new Navigator($args);
     }
 
@@ -137,6 +125,9 @@ trait ImportNavigation
                 $currentPage === 'adminImportPastoral'
             );
         }
+
+        /* Folders
+         */
 
         return new Navigator($args);
     }
