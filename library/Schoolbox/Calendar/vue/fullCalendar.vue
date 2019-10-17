@@ -700,9 +700,8 @@
 </template>
 
 <style>
-    .fc-quickSwitchButton-button
-    a.adtp-btn.icon-calendar.no-text {
-        padding: 0 !important;
+    .fc-button-group > .fc-button {
+        padding: 0 0.6rem !important;
     }
 </style>
 
