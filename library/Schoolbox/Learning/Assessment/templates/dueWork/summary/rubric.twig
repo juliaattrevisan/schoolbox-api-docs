@@ -4,11 +4,13 @@
 
         {% include '@rubric/grid.twig' with {
             rubricGrid: assessment.rubricGrid,
+            rubricMarkedGrid: markVisibility ?? rubricMarkedGrid,
             markVisibility: markVisibility ?? participant.assessable.isFeedbackVisibleToUser(USER),
-            useMarkRange: assessment.useMarkRange,
             showDescriptorValue: showDescriptorValue,
+            selfAssessmentFeedback: selfAssessmentFeedback,
             showGroupTotal: showGroupTotal,
-            showRubricTotal: showRubricTotal
+            showRubricTotal: showRubricTotal,
+            learner: participant ? participant.user : null
         } only %}
     </div>
 </div>

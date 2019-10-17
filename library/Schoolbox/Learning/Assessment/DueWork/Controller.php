@@ -36,6 +36,8 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as Plags
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradableWithResponse;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
@@ -210,30 +212,30 @@ class Controller extends Assessment\Controller
             }
         }
 
-        // Generate rubric context for every feedback
-        $timeline = null;
-        if ($participant) {
-            $timeline = (new FullTimeline($participant))->getForUser($this->getUser());
-        }
-
-
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                '',
+            ]),
             'assessment'  => $assessment,
             'student'     => $student,
             'participant' => $participant,
-            'timeline'    => $timeline,
+
+            'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
+            'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
+            'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
+            'selfReflect'            => $participant ? (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
+            'selfAssess'             => $participant ? (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
 
             /* Plagscan status
              */
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanEnabled'        => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
-            'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];
 
         $routeArgs = [
@@ -253,6 +255,8 @@ class Controller extends Assessment\Controller
         // TODO SA-6125 - this duplicates module route auth logic. Need to find a way to define this logic in one place only.
         try {
             $assessment->assertAcceptSubmission($participant);
+            $twigData['submissionsBlocked']    = false;
+            $twigData['acknowlegementBlocked'] = false;
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
 

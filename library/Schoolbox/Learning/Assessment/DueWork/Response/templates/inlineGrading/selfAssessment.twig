@@ -16,7 +16,7 @@
         title: locale.selfAssessment.proper ~ ' for',
         assessment: assessment,
         participant: participant,
-        responseList: responseList,
+        responseList: responseList ?? null,
         response: response,
         readonly: readonly,
         deleteRoute: false,
@@ -47,7 +47,7 @@
 
 {# Instructions for the self-assessment #}
 {% block instructions %}
-    {% if rubricContext.rubric %}
+    {% if assessment.useRubric %}
         {% set text = 'rubric and'  %}
     {% endif %}
 
@@ -96,16 +96,15 @@
                 rubricGrid: assessment.rubricGrid,
                 rubricMarkedGrid: feedback.rubricMarkedGrid,
                 learner: participant.user,
-                markType: rubricContext.markType,
                 markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
                 showDescriptorValue: showDescriptorValue,
                 showGroupTotal: showGroupTotal,
                 showRubricTotal: showRubricTotal,
                 self: self,
                 studentView: true,
+                selfAssessmentFeedback: selfAssessmentFeedback,
                 selfAssess: selfAssess,
-                selfReflect: selfReflect,
-                useMarkRange: assessment.useMarkRange
+                selfReflect: selfReflect
             } only %}
         </fieldset>
     {% endif %}
@@ -118,6 +117,7 @@
         tabIndex: 2,
         readonly: readonly,
         selfAssessment: true,
+        participant: participant,
         feedback: feedback
         } only %}
     </div>

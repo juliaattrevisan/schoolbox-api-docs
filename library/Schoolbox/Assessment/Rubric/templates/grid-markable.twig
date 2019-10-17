@@ -114,7 +114,7 @@
                 </span>
 
                 {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
-                {% if selfAssessmentFeedback.isSelfGrading %}
+                {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading %}
                     ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment.proper }})
                 {% endif %}
             </th>

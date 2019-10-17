@@ -13,6 +13,9 @@ Data:
         <section>
             {% include '@learningAssessment/dueWork/summary/interaction/card.twig' with {
                 currentFeedback: feedback,
+                selfAssessmentFeedback: selfAssessmentFeedback,
+                selfAssess: selfAssess,
+                selfReflect: false,
                 participant: participant,
                 hasCollapser: false,
                 collapsed: false,

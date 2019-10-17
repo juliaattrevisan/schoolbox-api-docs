@@ -11,9 +11,9 @@
     ]
 #}
 
-{% if selfAssessment %}
+{% if selfAssessment is defined and selfAssessment %}
     {% set placeholder = 'Your ' ~ locale.selfAssessment %}
-{% elseif selfReflection %}
+{% elseif selfReflection is defined and selfReflection %}
     {% set placeholder = 'Your ' ~ locale.selfReflection %}
 {% elseif readonly %}
     {% set placeholder = '(no comment given)' %}
@@ -28,5 +28,5 @@
             placeholder="{{ placeholder }}"
             rows="3"
             {% if readonly %}readonly{% endif %}
-    >{{ feedback.comment }}</textarea>
+    >{{ feedback is not null ? feedback.comment : ''}}</textarea>
 </label>

@@ -85,7 +85,7 @@
                     assessment: currentInteraction.assessable,
                     assessmentId: currentInteraction.assessable.id,
                     response: currentInteraction,
-                    plagscanId: currentFile.plagscan.plagscanId
+                    plagscanId: currentFile.plagscan ? currentFile.plagscan.plagscanId : null
                 } %}
             {% endfor %}
         </ul>

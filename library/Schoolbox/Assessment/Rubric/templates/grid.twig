@@ -6,7 +6,6 @@
  # * rubricMarkedGrid:        the marked rubric grid, shouldst there be one
  # * selfAssessmentFeedback:  the self-assessed feedback, shouldst there be one
  # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
- # * useMarkRange:            ? Should be inferred from grid's assessment (assessment.markRange)
  # * showRubricTotal:         ? Whether to show the totals at the bottom of overall rubric
  #                              This is false for student views, but true for staff views
  # * showGroupTotal:          ? Whether to show group totals at the bottom of each capability, can be inferred from
@@ -40,7 +39,7 @@
 
         {# Only show capability summary if there's something to actually show #}
         {% set capabilityMark               = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set showSummaryForThisCapability = showSummaryCapability and (selfAssessmentFeedback.isSelfGrading or capabilityMark.retrieveHumanReadableMark is not null) %}
+        {% set showSummaryForThisCapability = showSummaryCapability and ((selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading) or capabilityMark.retrieveHumanReadableMark is not null) %}
         {% set rowspan                      = groupUsage.indicatorUsages|length + (showSummaryForThisCapability ? 1 : 0) %}
 
         {% for critIndex, critUsage in groupUsage.indicatorUsages %}
@@ -96,7 +95,7 @@
                             {# Self-Assessment #}
                             {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
                                 <img class="rb-self-reflection-choice"
-                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                     src="/portrait.php?id={{ learner.id }}&amp;size=square32"
                                      title="{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                             {% endif %}
                             </div>
@@ -117,7 +116,7 @@
                     {{ capabilityMark.retrieveHumanReadableMark }}
 
                     {# Self-Assessment #}
-                    {% if selfAssessmentFeedback.isSelfGrading %}
+                    {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading %}
                         {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
                         ({{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }})
                     {% endif %}

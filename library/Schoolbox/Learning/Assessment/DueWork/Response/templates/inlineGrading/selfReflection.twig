@@ -16,7 +16,7 @@
         title: locale.selfReflection.proper ~ ' for',
         assessment: assessment,
         participant: participant,
-        responseList: responseList,
+        responseList: responseList ?? null,
         response: response,
         readonly: readonly,
         deleteRoute: false,
@@ -47,7 +47,7 @@
 
 {# Instructions for the self-reflection #}
 {% block instructions %}
-    {% if rubricContext.rubric %}
+    {% if assessment.useRubric %}
         {% set text = 'rubric and'  %}
     {% endif %}
 
@@ -98,6 +98,7 @@
             tabIndex: 2,
             readonly: readonly,
             selfReflection: true,
+            participant: participant,
             feedback: feedback
         } only %}
     </div>

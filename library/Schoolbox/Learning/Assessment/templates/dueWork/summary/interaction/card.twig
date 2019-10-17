@@ -5,7 +5,7 @@
     {% if url %}
     <a href="{{ url }}" title="{{ tooltip }}">
         {% endif %}
-        <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
+        <img src="/portrait.php?id={{ currentFeedback.reviewer.id }}&amp;size=square64" alt="">
         <p>
             {{ prefix }}
             <p class="meta">
