@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -108,7 +108,7 @@ $this->setBlock('rule', 'condition', 'condition_block');
 $this->setBlock('rule', 'effect',    'effect_block');
 $this->setBlock(TEMPLATE_content, 'token', 'token_block');
 
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'setting');
 $this->setTitle('Admin - WebDAV Configuration');
 

@@ -18,7 +18,7 @@ $this->setBlock('file', 'enabled', 'enabled_block');
 $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'allowed-file');
 
 /** @var Collection|Mimetype[] $mimes */

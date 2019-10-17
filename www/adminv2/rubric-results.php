@@ -21,7 +21,7 @@ $this->setBlock(TEMPLATE_content, 'list', 'list_block');
 $this->setBlock('list', 'list_item', 'list_item_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'rubric-results');
 
 $stmt = Database::getInstance()->prepare("

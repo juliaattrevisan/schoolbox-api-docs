@@ -27,7 +27,7 @@ if(in_array($this->arg[0], array('enable','disable'))) {
 }
 
 $this->setFile(TEMPLATE_content, '/adminv2/messages/index.html');
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'messages');
 $this->setTitle('Admin - Messages');
 

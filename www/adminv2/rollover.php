@@ -24,7 +24,7 @@ if (!$group->isSuperuser()) {
 
 $this->setFile(TEMPLATE_content, 'adminv2/rollover.html');
 
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'rollover');
 
 $openCategory = 0;

@@ -30,7 +30,7 @@ $this->setBlock(TEMPLATE_content, 'component_page', 'component_page_block');
 $this->setBlock('component_page', 'component', 'component_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'homepage');
 
 // Get list of templates

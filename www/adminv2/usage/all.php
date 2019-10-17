@@ -19,5 +19,5 @@ $this->setVar(array(
 ));
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'usage');

@@ -18,7 +18,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/grades.html');
 $this->setTitle('Admin - Grades');
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'grades');
 
 $this->setBlock(TEMPLATE_content, 'submission_grade_group', 'submission_grade_group_block');

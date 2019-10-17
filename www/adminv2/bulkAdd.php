@@ -10,7 +10,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/bulkAdd.html');
 $this->setBlock(TEMPLATE_content, 'user', 'user_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'user');
 
 /* Two types of upload.. either single user.. or via csv file..
