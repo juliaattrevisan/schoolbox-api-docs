@@ -51,12 +51,7 @@ class AdminV2_Nav
             'ups'                => ['name' => 'User Provisioning System',    'visible' => true],
             'shaps/provisioning' => ['name' => 'Schoolbox Help Provisioning', 'visible' => true],
             'video'              => ['name' => 'Media Queue',                 'visible' => true],
-
-             /* If it's schoolbox, add the (import/schoolData => 'School Data Import') tuple
-              * (it only displays if are using the schoolbox connector)
-              */
             'import/schoolData'  => ['name' => 'School Data Import',          'visible' => $configLoader->get('external_type') === 'schoolbox'],
-
             'import/direct'      => ['name' => 'Direct Import',               'visible' => true],
             'filters'            => ['name' => 'Filters',                     'visible' => true],
             'feature-tours'      => ['name' => 'Feature Tours',               'visible' => true],
