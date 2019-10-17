@@ -36,7 +36,8 @@ class AdminV2_Nav
         'ups'                => 'User Provisioning System',
         'shaps/provisioning' => 'Schoolbox Help Provisioning',
         'video'              => 'Media Queue',
-        'import'             => 'Import',
+        'import/schoolData'  => 'School Data Import',
+        'import/direct'      => 'Direct Import',
         'filters'            => 'Filters',
         'feature-tours'      => 'Feature Tours',
     );

@@ -96,7 +96,7 @@ class Controller extends Base
     public function getIndex()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
-            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
+            'allBreadcrumbs' => $this->buildSchoolDataBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachzone' => [
                 Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
@@ -197,7 +197,7 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
-            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
+            'allBreadcrumbs' => $this->buildSchoolDataBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachment' => $this->getRequest()->post['attachment'],
             'errors' => $errors,
