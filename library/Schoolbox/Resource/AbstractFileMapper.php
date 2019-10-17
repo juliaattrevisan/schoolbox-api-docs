@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -94,6 +94,7 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('description', self::TYPE_STRING, null, 'title');
+        $this->uses('modified_by', self::TYPE_INTEGER, null, 'modifiedById');
         $this->uses('submitted', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
 
         $this->joins('owner', UserMapper::class, 'id');

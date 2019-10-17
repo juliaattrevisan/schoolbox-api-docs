@@ -144,7 +144,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setBlock('files', 'file_no_url', 'file_no_url_block');
             $this->setBlock('files', 'modify_file', 'modify_file_block');
             $this->setBlock('files', 'owner_exists', 'owner_exists_block');
+            $this->setBlock('files', 'modifiedBy_exists', 'modifiedBy_exists_block');
             $this->setBlock('files', 'owner_deleted', 'owner_deleted_block');
+            $this->setBlock('files', 'file_posted_at', 'file_posted_at_block');
+            $this->setBlock('files', 'file_modified_at', 'file_modified_at_block');
 
 
             $this->setVar('empty_state_block', '');
@@ -170,10 +173,20 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 /** @var Schoolbox\Resource\File\Model[] $fileList */
                 if (count($fileList)) {
+                    $userMapper = new Schoolbox\UserMapper();
                     $folderId =$this->getContext()->getId();
                     foreach ($fileList as $file) {
                         if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                             continue;
+                        }
+                        if ($file->getModifiedById() !== null) {
+                            try {
+                                $modifiedBy = $userMapper->findById($file->getModifiedById());
+                            } catch (\Schoolbox\Mapper\Exception $e) {
+                                $modifiedBy = null;
+                            }
+                        } else {
+                            $modifiedBy = null;
                         }
                         $this->setVar([
                             'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
@@ -184,6 +197,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             'FILE_POSTED_BY_ID'    => $file->getOwner()->getId(),
                             'FILE_POSTED_DATE'     => $file->getCreatedAt()->getShort(),
                             'FILE_POSTED_RELATIVE' => $file->getCreatedAt()->getRelativeTime(),
+                            'FILE_MODIFIED_BY'     => ($modifiedBy !== null) ? $modifiedBy->formatName() :null,
+                            'FILE_MODIFIED_BY_ID'  => $file->getModifiedById(),
                             'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
                             'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                             'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
@@ -199,10 +214,22 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         // Owner name and optional link
                         if ($file->getOwner()->isDeleted()) {
                             $this->setVar('owner_exists_block', '');
+                            $this->setVar('modifiedBy_exists_block', '');
+                            $this->setVar('file_modified_at_block', '');
+                            $this->setVar('file_posted_at_block', '');
                             $this->parse('owner_deleted_block', 'owner_deleted');
-                        } else {
-                            $this->parse('owner_exists_block', 'owner_exists');
+                        } else if ($file->getModifiedById() !== null && trim($file->getModifiedById()) !== '') {
+                            $this->setVar('owner_exists_block', '');
                             $this->setVar('owner_deleted_block', '');
+                            $this->setVar('file_posted_at_block', '');
+                            $this->parse('modifiedBy_exists_block', 'modifiedBy_exists');
+                            $this->parse('file_modified_at_block', 'file_modified_at');
+                        } else {
+                            $this->setVar('owner_deleted_block', '');
+                            $this->setVar('file_modified_at_block', '');
+                            $this->setVar('modifiedBy_exists_block', '');
+                            $this->parse('owner_exists_block', 'owner_exists');
+                            $this->parse('file_posted_at_block', 'file_posted_at');
                         }
 
                         //set name
