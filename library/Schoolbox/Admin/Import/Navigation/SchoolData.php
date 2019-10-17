@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import\Navigation;
 
 use Aura\Router\Router;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 
@@ -23,18 +22,9 @@ class SchoolData implements INavigation
 {
 
     /**
-     * @var IConfigLoader
-     */
-    private $configLoader;
-
-
-    /**
      * Direct constructor.
-     *
-     * @param IConfigLoader $configLoader
      */
-    public function __construct(IConfigLoader $configLoader) {
-        $this->configLoader = $configLoader;
+    public function __construct() {
     }
 
 

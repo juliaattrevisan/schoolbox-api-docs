@@ -25,15 +25,6 @@ class Controller extends Base
 
     use ImportNavigation;
 
-
-    /**
-     * Controller constructor.
-     */
-    public function __construct()
-    {
-    }
-
-
     /**
      * Landing Page for Direct Import
      *
@@ -61,7 +52,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData.twig', [
             'pageCurrent' => 'import/schoolData',
-            'allNavigation'  => (new SchoolData($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
+            'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('School Data Import'));
     }
 }

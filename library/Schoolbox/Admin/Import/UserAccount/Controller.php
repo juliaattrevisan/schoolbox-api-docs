@@ -14,7 +14,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\AbstractImporter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImporterFactory;

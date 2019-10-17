@@ -1,7 +1,5 @@
 <?php
 /**
- * Photo upload admin page
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -19,6 +17,13 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use Schoolbox\Import\ImportNavigation;
 
+/**
+ * Class Controller
+ *
+ * Photo upload admin page
+ *
+ * @package Schoolbox\Admin\Import\Photos
+ */
 class Controller extends Base
 {
     use ImportNavigation;
