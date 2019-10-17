@@ -45,5 +45,10 @@ class AdminImport implements ModuleConfigInterface
         if ($di->get('config')->get('pastoral_enabled')) {
             (new Import\Pastoral\Module($di))->init('/adminv2/import-pastoral');
         }
+
+        /* User Accounts
+         */
+        (new Import\UserAccount\Module($di))->init('/adminv2/import/userAccount');
+
     }
 }

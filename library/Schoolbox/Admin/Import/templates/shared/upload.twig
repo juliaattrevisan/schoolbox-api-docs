@@ -15,10 +15,10 @@
             </div>
         {% endif %}
 
-        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
+        {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
     <div class="small-12 island">
-        <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
+        <form action="{{ routeLookupIfAuthorized('adminImportUserAccount.postPreview') }}" method="post">
             {% block helpText %}
             {% endblock helpText %}
 

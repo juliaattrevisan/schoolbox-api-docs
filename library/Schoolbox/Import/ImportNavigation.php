@@ -102,11 +102,11 @@ trait ImportNavigation
     protected function buildDirectNavigation(Router $router, string $currentPage = ''): Navigator
     {
         $args = [
-//            new Node(
-//                'User Accounts',
-//                $router->generate('adminImportUser.upload'),
-//                $currentPage === 'adminImportUser'
-//            ),
+            new Node(
+                'User Accounts',
+                $router->generate('adminImportUserAccount.getUpload'),
+                $currentPage === 'adminImportUserAccount'
+            ),
 //            new Node(
 //                'User Photos',
 //                $router->generate('adminImportPhotos.getIndex'),
