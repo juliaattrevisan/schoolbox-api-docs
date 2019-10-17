@@ -84,6 +84,10 @@ class AdminV2_Nav
              * If it's schoolbox, add the (import/schoolData => 'School Data Import') tuple
              * (it only displays if are using the schoolbox connector)
              */
+            if ($href === 'import/schoolData' && $this->configLoader->get('external_type') !== 'schoolbox') {
+                continue;
+            }
+
             $page->setVar([
                 'ADMNAV_HREF'    => $href,
                 'ADMNAV_CURRENT' => $currentPage == $href ? 'active' : '',
