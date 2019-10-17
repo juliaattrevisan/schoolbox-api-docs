@@ -31,7 +31,7 @@ class Controller extends Base
      */
     public function getDirectIndex()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/navigation/direct.twig', [
             'pageCurrent' => 'import/direct',
             'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('Direct Import'));
@@ -47,7 +47,7 @@ class Controller extends Base
      */
     public function getSchoolDataIndex()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/navigation/schoolData.twig', [
             'pageCurrent' => 'import/schoolData',
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('School Data Import'));
