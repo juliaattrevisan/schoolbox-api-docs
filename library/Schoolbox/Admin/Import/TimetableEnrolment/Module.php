@@ -40,7 +40,8 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\IsSuperuser(),
+            new Rule\IsConfigSetTo('external_type', 'schoolbox', $this->getConfig())
         );
 
         $this->register('GET', '', 'getUpload', $perms);
