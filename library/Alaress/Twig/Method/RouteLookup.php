@@ -9,6 +9,7 @@
 
 namespace Alaress\Twig\Method;
 
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 
 class RouteLookup {
@@ -23,14 +24,20 @@ class RouteLookup {
      *
      * @param  string $name The name of the route to look up.
      * @param  array  $data Any params to pass as part of the route.
-     * @return string
+     * @return false|string
      */
-    public function execute($name, $data = array()) {
+    public function execute($name, $data = array())
+    {
         // Ensure format is set to something, even if empty.
         if (!isset($data['format'])) {
             $data['format'] = '';
         }
-        return $this->getRouter()->generate($name, $data);
+
+        try {
+            return $this->getRouter()->generate($name, $data);
+        } catch (RouteNotFound $e) {
+            return false;
+        }
     }
 
     /**
