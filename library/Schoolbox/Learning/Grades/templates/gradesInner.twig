@@ -90,7 +90,7 @@
                                                 {% endif %}
                                                 {% if feedback %}
                                                     <p class="comment">{{ feedback.comment | nl2br }}</p>
-                                                    {% if assessment.useRubric and summaryRoute %}
+                                                    {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
                                                         <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
                                                             View more feedback</a>
                                                     {% endif %}
