@@ -33,6 +33,7 @@
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
+    const FORMAT_FLATPICKR_DATE = 'DD/MM/YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
 
     // TODO let display formats be configurable
@@ -61,6 +62,12 @@
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 currentEvent: {},
                 newEvent: {},
+                currentDisplay: null,
+                duration: 31,
+                listViewDateRange: {
+                    start: null,
+                    end: null,
+                }
             }
         },
         computed: {
@@ -160,6 +167,45 @@
              * @param info
              */
             viewSkeletonRender(info) {
+
+                let self = this,
+                    customGroup = document.querySelector('.fc-custom-group');
+
+                self.currentDisplay = info.view.type;
+
+                document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach(function (element) {
+                    if (self.currentViewIsList()) {
+                        element.classList.add('hide');
+                        if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
+                            customGroup.classList.remove('hide')
+                        }
+                    } else {
+                        element.classList.remove('hide');
+                        if (customGroup?.classList) {
+                            customGroup.classList.add('hide');
+                        }
+                    }
+                });
+
+                if (self.currentViewIsList()) {
+                    self.registerListCustomInputFields();
+
+                    /**
+                     * Re-initialise datepicker upon date update on list view.
+                     * Without this, date picker fields just turns into a normal text field.
+                      */
+                    let attachAlaressDatePicker = function () {
+                        var $dateinput = $(this);
+                        if ($dateinput.attr('data-datepicker-id') === undefined) {
+                            $dateinput.alaressDateTimePicker();
+                        }
+                    };
+
+                    $(function () {
+                        $('[data-datepicker]').each(attachAlaressDatePicker);
+                    });
+                }
+
                 axios.post(
                     URL_STATE_CHANGE,
                     qs.stringify({calendarView: info.view.type})
@@ -388,6 +434,95 @@
                 // (for the same reason as `onLoading`)
                 return this.helper.dayTitleFormat(dateObject);
             },
+
+            /**
+             * Register customised input fields for list view
+             */
+            registerListCustomInputFields() {
+
+                // Make sure that there's only one of the custom input field
+                if (!document.querySelector('.fc-custom-group')) {
+                    // Prepare input fields
+                    let self = this,
+                        container = document.createElement('div'),
+                        startDate = document.createElement('input'),
+                        startDateFieldWrapper = document.createElement('div'),
+                        endDate = document.createElement('input'),
+                        endDateFieldWrapper = document.createElement('div'),
+                        updateRangeButton = document.createElement('input'),
+                        buttonWrapper = document.createElement('div');
+
+                    startDateFieldWrapper.setAttribute('class', 'small-4 columns');
+                    endDateFieldWrapper.setAttribute('class', 'small-4 columns');
+                    buttonWrapper.setAttribute('class', 'small-4 columns');
+
+                    // Start date field
+                    startDate.setAttribute('id', 'start_date');
+                    startDate.setAttribute('name', 'start_date');
+                    startDate.setAttribute('data-datepicker', '');
+                    startDate.setAttribute('data-datepicker-buttontext', '');
+                    startDate.setAttribute('value',
+                        (self.listViewDateRange.start) ? self.listViewDateRange.start : this.toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
+                    );
+
+
+                    // End date field
+                    endDate.setAttribute('id', 'end_date');
+                    endDate.setAttribute('name', 'end_date');
+                    endDate.setAttribute('data-datepicker', '');
+                    endDate.setAttribute('data-datepicker-buttontext', '');
+                    endDate.setAttribute('value',
+                        (self.listViewDateRange.end) ? self.listViewDateRange.end : this.toMoment(new Date()).add(self.duration, 'days').format(FORMAT_FLATPICKR_DATE)
+                    );
+
+
+                    // Update button
+                    updateRangeButton.setAttribute('id', 'update_date_range_button');
+                    updateRangeButton.setAttribute('type', 'submit');
+                    updateRangeButton.setAttribute('value', 'Update');
+
+                    if (self.currentViewIsList()) {
+                        container.setAttribute('class', 'fc-custom-group row');
+                    } else {
+                        container.setAttribute('class', 'fc-custom-group row hide');
+                    }
+
+                    // Wrap input fields to columns
+                    startDateFieldWrapper.appendChild(startDate);
+                    endDateFieldWrapper.appendChild(endDate);
+                    buttonWrapper.appendChild(updateRangeButton);
+
+                    // Append fields into the container
+                    container.appendChild(startDateFieldWrapper);
+                    container.appendChild(endDateFieldWrapper);
+                    container.appendChild(buttonWrapper);
+
+                    document.querySelector('.fc-toolbar > .fc-left').appendChild(container);
+
+                    // Register an event listener when update button is clicked.
+                    document.querySelector('#update_date_range_button').addEventListener('click', function () {
+                        if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
+                            let startDateValue = moment(document.querySelector('#start_date').value, 'DD/MM/YYYY'),
+                                endDateValue = moment(document.querySelector('#end_date').value, 'DD/MM/YYYY');
+
+                            if (startDateValue.isValid() && endDateValue.isValid()) {
+                                self.listViewDateRange.start = document.querySelector('#start_date').value;
+                                self.listViewDateRange.end = document.querySelector('#end_date').value;
+
+                                self.duration = self.helper.dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
+                                self.$refs.fullCalendar.getApi().gotoDate(startDateValue.format('YYYY-MM-DD'));
+                            }
+                        }
+                    });
+                }
+            },
+
+            currentViewIsList() {
+                return this.currentDisplay === 'list';
+            }
+        },
+        mounted() {
+            this.registerListCustomInputFields();
         }
     }
 
@@ -450,6 +585,11 @@
                 },
                 week: {
                     columnHeaderFormat: formats.displayWeekDay
+                },
+                list: {
+                    buttonText: 'List',
+                    duration: { days: this.duration },
+
                 }
             }"
             :event-time-format="helper.eventTimeFormat"
@@ -467,13 +607,14 @@
             :header="{
                 left: 'today,prev,next',
                 center: 'title',
-                right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
             :buttonText="{
                 today:    'Today',
                 month:    'Month',
                 week:     'Week',
-                day:      'Day'
+                day:      'Day',
+                list: 'List',
             }"
             :default-date="config.defaultDate"
             :default-view="config.defaultView || 'dayGridMonth'"
