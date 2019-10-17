@@ -39,7 +39,7 @@
     </div>
 {% if externalEnabled == '1' %}
     <div class="small-12 island">
-        <form data-form-import method="post" action="/adminv2/import-pastoral/process">
+        <form data-form-import method="post" action="{{ routeLookupIfAuthorized('adminImportPastoral.postImport') }}">
             <section>
                 <div class="content">
                     <p>
@@ -57,7 +57,7 @@
                 </div>
                 <div class="component-action">
                     <section>
-                        <a href="/adminv2/import-pastoral/log" class="button">View Import Logs</a>
+                        <a href="{{ routeLookupIfAuthorized('adminImportPastoral.getLog') }}" class="button">View Import Logs</a>
                     </section>
                 </div>
             </section>

@@ -47,7 +47,7 @@ class AdminImport implements ModuleConfigInterface
         /* Pastoral Care
          */
         if ($di->get('config')->get('pastoral_enabled')) {
-            (new Import\Pastoral\Module($di))->init('/adminv2/import-pastoral');
+            (new Import\Pastoral\Module($di))->init('/adminv2/import/pastoral');
         }
 
         /* Import folders

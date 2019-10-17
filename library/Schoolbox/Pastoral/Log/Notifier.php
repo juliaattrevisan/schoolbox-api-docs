@@ -42,7 +42,7 @@ class Notifier extends AbstractModuleNotifier
             $builder = new Builder();
             $builder->setTitle(sprintf("%s import completed", $this->l10n->translate('pastoralCare', false, true)))
                 ->setIcon("/images/icon.php?size=".$this->iconSize."&icon=".NSMapper::NS_PASTORAL_LOG)
-                ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
+                ->setHref("/adminv2/import/pastoral/log/{$model->getImportId()}")
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
                 ->addTopic("pastoral_log.{$model->getImportId()}.created")
