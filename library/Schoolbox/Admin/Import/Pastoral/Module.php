@@ -14,13 +14,17 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\Log\Mapper;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Admin\Import\Pastoral
+ */
 class Module extends BaseModule
 {
+
     /**
      * @inheritdoc
      */
@@ -64,8 +68,8 @@ class Module extends BaseModule
 
         if (array_key_exists('logId', $params)) {
             try {
-                /** @var \Schoolbox\Pastoral\Log\Mapper $logMapper */
-                $logMapper = $this->getMapperFactory()->get(\Schoolbox\Pastoral\Log\Mapper::class);
+                /** @var Mapper $logMapper */
+                $logMapper = $this->getMapperFactory()->get(Mapper::class);
 
                 $injectedValues['log'] = $logMapper->findByColumn('import_id', $params['logId']);
             } catch (MapperException $e) {
