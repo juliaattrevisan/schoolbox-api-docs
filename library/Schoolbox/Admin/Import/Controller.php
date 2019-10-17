@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\Import;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
-use Schoolbox\Import\ImportNavigation;
 
 /**
  * Class Controller
@@ -22,8 +21,6 @@ use Schoolbox\Import\ImportNavigation;
  */
 class Controller extends Base
 {
-
-    use ImportNavigation;
 
     /**
      * Landing Page for Direct Import

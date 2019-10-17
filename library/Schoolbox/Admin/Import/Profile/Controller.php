@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\Import\Profile;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\External;
-use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -29,8 +28,6 @@ use Schoolbox\Resource\Attachment\Zone;
  */
 class Controller extends Base
 {
-    use ImportNavigation;
-
 
     /**
      * @var External\Profile\Mapper

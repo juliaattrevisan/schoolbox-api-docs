@@ -17,7 +17,6 @@ use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\External\Importer\AbstractImporter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImporterFactory;
-use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -31,8 +30,6 @@ use Schoolbox\Resource\Storage;
  */
 class Controller extends Base
 {
-
-    use ImportNavigation;
 
     /**
      * @var string

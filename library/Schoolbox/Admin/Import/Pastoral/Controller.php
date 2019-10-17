@@ -13,7 +13,6 @@ use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
 use Schoolbox\Pastoral\Log\Model as PastoralLog;
@@ -31,7 +30,6 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
-    use ImportNavigation;
 
     /** @var ConfigMapper */
     protected $configMapper;

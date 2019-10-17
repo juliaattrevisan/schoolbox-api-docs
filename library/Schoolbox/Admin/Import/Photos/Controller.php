@@ -15,7 +15,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
-use Schoolbox\Import\ImportNavigation;
 
 /**
  * Class Controller
@@ -26,8 +25,6 @@ use Schoolbox\Import\ImportNavigation;
  */
 class Controller extends Base
 {
-    use ImportNavigation;
-
 
     /**
      * @var StorageMapper $storageMapper
