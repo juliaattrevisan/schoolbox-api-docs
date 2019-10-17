@@ -524,7 +524,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files (Webpack)";
 npm run build;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files (Grunt)";
-grunt js;
+grunt build.js;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
 /vagrant/tools/pkg-build-sass.sh --sass;
