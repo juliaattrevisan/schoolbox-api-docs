@@ -3,7 +3,9 @@
         <h1>Schoolbox Administration › {{ links[pageCurrent] }}</h1>
         <ul class="sub-nav">
             {% for key,value in links %}
+                {% if value.visible %}
                 <li class="{% if key == pageCurrent %}active{% endif %}"><a href="/adminv2/{{ key }}">{{ value.name }}</a></li>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>
