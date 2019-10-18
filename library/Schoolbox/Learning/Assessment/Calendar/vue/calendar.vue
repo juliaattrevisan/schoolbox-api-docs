@@ -1011,8 +1011,10 @@
         padding: 0 !important;
     }
 
-    .fc-resourceTimelineSemester-view .fc-timeline-event {
+    .fc-resourceTimelineSemester-view .fc-event-container > .fc-timeline-event {
         position: absolute !important;
+        top: 1px !important;
+        height: 31px !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-event-container .fc-timeline-event:not(.placeholder),
@@ -1022,7 +1024,11 @@
     }
 
     .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
-        height: auto !important;
+        height: 35px !important;
+    }
+
+    .fc-time-area .fc-rows .fc-widget-content div {
+        height: 35px !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-head tr td:first-child .fc-widget-header div {
@@ -1044,5 +1050,22 @@
     .fc-dayGridMonth-view a.fc-timeline-event,
     .fc-resourceTimelineWeek-view a.fc-timeline-event {
         width: auto !important;
+    }
+
+    .fc-unthemed .fc-popover .fc-header .fc-close {
+        margin: 0 !important;
+    }
+
+    .fc-icon-x::before {
+        display: none !important;
+        content: none !important;
+    }
+
+    .fc-icon-x::after {
+        color: #000 !important;
+        font-size: 1.5rem !important;
+        top: 0 !important;
+        right: 1px !important;
+        line-height: 0 !important;
     }
 </style>
