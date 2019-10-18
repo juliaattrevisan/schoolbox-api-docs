@@ -1647,10 +1647,14 @@ class Leave_Controller extends Controller
      */
     public function sendParentNotice($request)
     {
-        if ((Cfg::get('parent_notification') == 0) || (Cfg::get('parent_notification') == 'false')) {
+        /* Address the double negative and the fact this comes out as a boolean now
+         */
+        $enabled = !Cfg::get('parent_notification');
+
+        if ($enabled) {
 
             /* Choose the Factory, have it produce() the notice object and send
-                */
+             */
             $leaveFactory = new Leave_Notice_Factory($request);
             $leaveFactory->produceParentFactory()->produce()->send();
         }
