@@ -196,6 +196,9 @@ class Course
             ->equals("{$courseAlias}.canvas_id", 3137)
             ->notNull("{$sectionAlias}.sis_source_id");
 
+        // Uncomment this line to just import the StAloy Schoolbox test course
+//        return (new Builder($this->canvasDb, ''))->all($sbTestCourses);
+
         $outerPb = (new Builder($this->canvasDb, ''))
             ->all($stAloyCourses)
             ->all($sbTestCourses);
