@@ -35,8 +35,8 @@ class AssignmentDates
      * @param bool        $allDay           TRUE if a specific for when the assignment is due was not given. The effective time will be 11:59pm
      * @param string|null $allDayDate       The date version of the due date if the all_day flag is 'true'
      * @param string|null $lockAt           Timestamp for when the Assignment is locked
-     * @param string|null $unitImplOpenDate Derived from Canvas CourseSection, CourseSection.EnrollmentTerm, CourseSection.Course, CourseSection.Course.EnrollmentTerm dates
-     * @param string|null $unitImplDueDate  Derived from Canvas CourseSection, CourseSection.EnrollmentTerm, CourseSection.Course, CourseSection.Course.EnrollmentTerm dates
+     * @param string      $unitImplOpenDate Derived from Canvas CourseSection, CourseSection.EnrollmentTerm, CourseSection.Course, CourseSection.Course.EnrollmentTerm dates
+     * @param string      $unitImplDueDate  Derived from Canvas CourseSection, CourseSection.EnrollmentTerm, CourseSection.Course, CourseSection.Course.EnrollmentTerm dates
      * @return string[]
      */
     public function assessmentDates(
@@ -45,8 +45,8 @@ class AssignmentDates
         bool $allDay,
         ?string $allDayDate,
         ?string $lockAt,
-        ?string $unitImplOpenDate,
-        ?string $unitImplDueDate
+        string $unitImplOpenDate,
+        string $unitImplDueDate
     ): array {
         $publishDate = $unlockAt ?? $unitImplOpenDate;
         $openDate    = $unlockAt ?? $unitImplOpenDate;
