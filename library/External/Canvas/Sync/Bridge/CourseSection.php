@@ -255,7 +255,7 @@ class CourseSection
         };
         $treeBuilder  = new TreeBuilder($this->folderMapper);
 
-        $this->log->info(sprintf('Building folder tree from root %d', $this->getClassFolder()->getId()));
+        $this->log->notice(sprintf('Building folder tree from root %d', $this->getClassFolder()->getId()));
         $this->folderTree = $treeBuilder->buildTree($this->getClassFolder()->getId(), $hashFunction);
 
         // Get all folders that ARE or WERE classes
@@ -275,7 +275,7 @@ class CourseSection
             LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             WHERE {$whereClause}";
 
-        $this->log->info("Fetching Schoolbox folders that ARE or WERE classes");
+        $this->log->notice("Fetching Schoolbox folders that ARE or WERE classes");
         $statement = $this->schoolboxDb->executeQuery($sql, $outerPb->getParams());
 
         while ($row = $statement->fetch()) {
@@ -456,16 +456,16 @@ class CourseSection
             $this->folderIdToSisSourceIdMap[$folder->getId()]            = $sisSourceId;
         }
 
-        $this->log->info(count($this->sisSourceIdToYearAndFolderCodeMap) . ' distinct Canvas CourseSection.SisSourceId processed');
-        $this->log->info(count($regexNotMatch) . ' Canvas CourseSection.SisSourceId were not able to be parsed');
+        $this->log->notice(count($this->sisSourceIdToYearAndFolderCodeMap) . ' distinct Canvas CourseSection.SisSourceId processed');
+        $this->log->notice(count($regexNotMatch) . ' Canvas CourseSection.SisSourceId were not able to be parsed');
         foreach ($regexNotMatch as $notMatch) {
             $this->log->debug($notMatch);
         }
-        $this->log->info(count($regexMatchButNoFolderCodeMatch) . ' Canvas CourseSection.SisSourceId did not have a folderCode match found');
+        $this->log->notice(count($regexMatchButNoFolderCodeMatch) . ' Canvas CourseSection.SisSourceId did not have a folderCode match found');
         foreach ($regexMatchButNoFolderCodeMatch as $noFolderCodeMatch) {
             $this->log->debug($noFolderCodeMatch);
         }
-        $this->log->info(count($regexMatchAndFolderCodeMatch) . ' Canvas CourseSection.SisSourceId were matched to a folderCode');
+        $this->log->notice(count($regexMatchAndFolderCodeMatch) . ' Canvas CourseSection.SisSourceId were matched to a folderCode');
     }
 
 

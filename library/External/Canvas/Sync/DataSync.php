@@ -167,7 +167,7 @@ class DataSync
             $this->schoolboxDb->beginTransaction();
         }
 
-        $this->log->info("Building data structures to map Canvas entities to Schoolbox entities...");
+        $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge     = new Bridge\Account($this->schoolboxDb);
         $assignmentBridge  = new Bridge\Assignment($this->markTypeMapper->findAll());
         $courseBridge      = new Bridge\Course($this->canvasDb, $this->schoolboxDb);

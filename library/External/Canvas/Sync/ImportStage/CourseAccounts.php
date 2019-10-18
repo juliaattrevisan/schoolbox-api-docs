@@ -109,7 +109,7 @@ class CourseAccounts
      */
     public function synchronise(): void
     {
-        $this->log->info("Synchronising canvas accounts to course folders...");
+        $this->log->notice("Synchronising canvas accounts to course folders...");
         $this->resetCounts();
 
         $canvasAccountTree = $this->buildCanvasCourseAccountTree();
@@ -313,11 +313,11 @@ class CourseAccounts
 
     private function outputResults(): void
     {
-        $this->log->info($this->countCanvasAccountsSynchronised . ' Canvas Accounts synchronised');
-        $this->log->info($this->countFoldersCreated . ' Schoolbox folders created');
-        $this->log->info($this->countFoldersUpdated . ' Schoolbox folders updated');
-        $this->log->info($this->countFoldersMoved . ' Schoolbox folders moved');
-        $this->log->info($this->countFoldersDeleted . ' Schoolbox folders deleted');
+        $this->log->notice($this->countCanvasAccountsSynchronised . ' Canvas Accounts synchronised');
+        $this->log->notice($this->countFoldersCreated . ' Schoolbox folders created');
+        $this->log->notice($this->countFoldersUpdated . ' Schoolbox folders updated');
+        $this->log->notice($this->countFoldersMoved . ' Schoolbox folders moved');
+        $this->log->notice($this->countFoldersDeleted . ' Schoolbox folders deleted');
     }
 
 
@@ -353,7 +353,7 @@ class CourseAccounts
             }
 
             if (!array_key_exists($canvasId, $canvasIds)) {
-                $this->log->info("Deleting folder '{$folder->getName()}'");
+                $this->log->notice("Deleting folder '{$folder->getName()}'");
                 $this->countFoldersDeleted++;
                 $this->folderMapper->deleteByColumn('id', $folder->getId());
             }

@@ -143,7 +143,7 @@ class Courses
      */
     public function synchronise(): void
     {
-        $this->log->info("Synchronising Canvas Courses + Assignments => Schoolbox CourseSpec, UnitSpec, SubmissionBoxSpec...");
+        $this->log->notice("Synchronising Canvas Courses + Assignments => Schoolbox CourseSpec, UnitSpec, SubmissionBoxSpec...");
         $this->resetCounts();
 
         // Fetch all relevant courses and their assignments
@@ -1073,22 +1073,22 @@ class Courses
      */
     private function printCounts(): void
     {
-        $this->log->info($this->countCourseGroupsSynchronised . ' Canvas CourseGroups synchronised');
-        $this->log->info($this->countCourseGroupsCreated . ' Schoolbox CourseSpecs created');
-        $this->log->info($this->countCourseGroupsUpdated . ' Schoolbox CourseSpecs updated');
-        $this->log->info($this->countCourseGroupsMoved . ' Schoolbox CourseSpecs moved');
-        $this->log->info($this->countCourseGroupsDeleted . ' Schoolbox CourseSpecs deleted');
+        $this->log->notice($this->countCourseGroupsSynchronised . ' Canvas CourseGroups synchronised');
+        $this->log->notice($this->countCourseGroupsCreated . ' Schoolbox CourseSpecs created');
+        $this->log->notice($this->countCourseGroupsUpdated . ' Schoolbox CourseSpecs updated');
+        $this->log->notice($this->countCourseGroupsMoved . ' Schoolbox CourseSpecs moved');
+        $this->log->notice($this->countCourseGroupsDeleted . ' Schoolbox CourseSpecs deleted');
 
-        $this->log->info($this->countCoursesSynchronised . ' Canvas courses synchronised');
-        $this->log->info($this->countCoursesCreated . ' Schoolbox UnitSpecs created');
-        $this->log->info($this->countCoursesUpdated . ' Schoolbox UnitSpecs updated');
-        $this->log->info($this->countCoursesMoved . ' Schoolbox UnitSpecs moved');
-        $this->log->info($this->countCoursesDeleted . ' Schoolbox UnitSpecs deleted');
+        $this->log->notice($this->countCoursesSynchronised . ' Canvas courses synchronised');
+        $this->log->notice($this->countCoursesCreated . ' Schoolbox UnitSpecs created');
+        $this->log->notice($this->countCoursesUpdated . ' Schoolbox UnitSpecs updated');
+        $this->log->notice($this->countCoursesMoved . ' Schoolbox UnitSpecs moved');
+        $this->log->notice($this->countCoursesDeleted . ' Schoolbox UnitSpecs deleted');
 
-        $this->log->info($this->countAssignmentsSynchronised . ' Canvas assignments synchronised');
-        $this->log->info($this->countSubmissionBoxCreated . ' Schoolbox SubmissionBox Specs created');
-        $this->log->info($this->countSubmissionBoxUpdated . ' Schoolbox SubmissionBox Specs updated');
-        $this->log->info($this->countSubmissionBoxMoved . ' Schoolbox SubmissionBox Specs moved');
-        $this->log->info($this->countSubmissionBoxDeleted . ' Schoolbox SubmissionBox Specs deleted');
+        $this->log->notice($this->countAssignmentsSynchronised . ' Canvas assignments synchronised');
+        $this->log->notice($this->countSubmissionBoxCreated . ' Schoolbox SubmissionBox Specs created');
+        $this->log->notice($this->countSubmissionBoxUpdated . ' Schoolbox SubmissionBox Specs updated');
+        $this->log->notice($this->countSubmissionBoxMoved . ' Schoolbox SubmissionBox Specs moved');
+        $this->log->notice($this->countSubmissionBoxDeleted . ' Schoolbox SubmissionBox Specs deleted');
     }
 }

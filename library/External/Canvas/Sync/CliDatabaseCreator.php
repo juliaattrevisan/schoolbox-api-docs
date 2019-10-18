@@ -71,9 +71,9 @@ class CliDatabaseCreator extends CliTool\App
         }
 
         if ($this->perform()) {
-            $this->getLogger()->info('Running in perform mode (-p): changes will be written to database');
+            $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
         } else {
-            $this->getLogger()->info('Running in dry-run mode: use -p to write changes to database');
+            $this->getLogger()->notice('Running in dry-run mode: use -p to write changes to database');
         }
 
         // Information
@@ -98,7 +98,7 @@ class CliDatabaseCreator extends CliTool\App
         // Check whether the database already exists.
         try {
             $rootDb->connect($this->dbHost, $canvasDbName, $this->dbRootUser, $this->dbRootPassword);
-            $this->getLogger()->info("Database {$canvasDbName} already exists.");
+            $this->getLogger()->notice("Database {$canvasDbName} already exists.");
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         } catch (Database\Exception $e) {
             // Expected
@@ -128,7 +128,7 @@ class CliDatabaseCreator extends CliTool\App
                 $this->getLogger()->warning("Error creating database {$canvasDbName}: {$e->getMessage()}");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
-            $this->getLogger()->info("Database {$canvasDbName} has been created.");
+            $this->getLogger()->notice("Database {$canvasDbName} has been created.");
 
             // Grant permissions to schoolbox user to new database
             try {
@@ -143,7 +143,7 @@ class CliDatabaseCreator extends CliTool\App
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
         } else {
-            $this->getLogger()->info("Database {$canvasDbName} would have been created: run with -p flag to actually create database");
+            $this->getLogger()->notice("Database {$canvasDbName} would have been created: run with -p flag to actually create database");
         }
     }
 

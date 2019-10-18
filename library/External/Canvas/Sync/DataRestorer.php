@@ -66,7 +66,7 @@ class DataRestorer
     {
         $this->dropCanvasDbTables();
 
-        $this->log->info("Re-creating DB schema...");
+        $this->log->notice("Re-creating DB schema...");
         $errors = false;
         foreach ($schema as $tableIndex => $tableData) {
             $columns     = $tableData['columns'];
@@ -259,7 +259,7 @@ class DataRestorer
      */
     private function dropCanvasDbTables(): void
     {
-        $this->log->info("Dropping all tables from {$this->canvasDbName}");
+        $this->log->notice("Dropping all tables from {$this->canvasDbName}");
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 0');
         $tables = $this->canvasDb->executeQuery(
             'SELECT table_name FROM information_schema.tables WHERE table_schema = :db_name',
