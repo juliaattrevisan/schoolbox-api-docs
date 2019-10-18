@@ -1,0 +1,45 @@
+{% extends '@adminImportIndex/upload.twig' %}
+
+{% block title %}
+    Import User Accounts
+{% endblock %}
+
+{% block helpText %}
+<section>
+    <div class="content">
+        <p>Provide a file containing a list of users in the CSV format in the template below.</p>
+        <ul>
+            <li>You may remove columns that you do not wish to update.</li>
+            <li>Users can be identified in any of the following ways:
+                <ul>
+                    <li>Schoolbox User ID</li>
+                    <li>Username</li>
+                    <li>External ID + Role</li>
+                </ul>
+            </li>
+            <li>Any columns with a question mark are toggle fields.
+                <ul>
+                    <li>If their value is "1" or "Y", they are switched on.</li>
+                    <li>If their value is "0" or "N", they are switched off.</li>
+                    <li>If their value is empty, they are left unchanged.</li>
+                    <li>The "Delete?" field is a toggle field as well - "1" or "Y" will delete that user!</li>
+                </ul>
+            </li>
+            <li>The following fields will be left unchanged if they are blank.
+                <ul>
+                    <li>All identifier fields</li>
+                    <li>All toggle fields</li>
+                    <li>Password</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="component-action">
+        <section>
+            <a href="/adminv2/import/userTemplate.csv" class="button">Download Template</a>
+        </section>
+    </div>
+</section>
+{% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+{% endblock helpText %}

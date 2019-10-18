@@ -10,8 +10,9 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\External;
-use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -29,8 +30,6 @@ use Schoolbox\Resource\Attachment\Zone;
  */
 class Controller extends Base
 {
-    use ImportNavigation;
-
 
     /**
      * @var External\Profile\Mapper
@@ -63,6 +62,12 @@ class Controller extends Base
 
 
     /**
+     * @var INavigation
+     */
+    protected $navigation;
+
+
+    /**
      * Controller constructor.
      *
      * @param External\Profile\Mapper              $baseMapper
@@ -83,6 +88,8 @@ class Controller extends Base
         $this->studentProfileMapper = $studentMapper;
         $this->staffProfileMapper = $staffMapper;
         $this->relationshipMapper = $relationshipMapper;
+
+        $this->navigation = new SchoolData();
     }
 
     /**
@@ -96,8 +103,8 @@ class Controller extends Base
     public function getIndex()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
-            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
-            'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
+            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+            'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachzone' => [
                 Mapping::CSV_STUDENT => $this->getAttachZone(Mapping::CSV_STUDENT, 'Upload Student CSV file'),
                 Mapping::CSV_PARENT => $this->getAttachZone(Mapping::CSV_PARENT, 'Upload Parent CSV file'),
@@ -197,8 +204,8 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
-            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
-            'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
+            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+            'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachment' => $this->getRequest()->post['attachment'],
             'errors' => $errors,
             'logs' => $logs,

@@ -1,0 +1,98 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Import Folders</h1>
+        {% include '@adminImportIndex/navigation/subnavigation.twig' with { allNodes: allNavigation } %}
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $('[data-checkbox-inherit]').change(function(event) {
+            if ($(event.target).prop('checked')) {
+                $('#permissions').addClass('hide');
+            } else {
+                $('#permissions').removeClass('hide');
+            }
+        });
+    });
+</script>
+
+{# Config page contents #}
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="{{ routeLookupIfAuthorized('adminImportFolder.postImportResults') }}" method="post" enctype="multipart/form-data" name="form" id="form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>First, download the template from the link below, then enter your required class pages or folders and upload your CSV.</p>
+                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                    </div>
+                </fieldset>
+                <div class="component-action">
+                    <section>
+                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button" title="Download template">Download Template</a>
+                    </section>
+                </div>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Default Access Permissions</label>
+                    </div>
+                    <div class="small-12 columns">
+                        <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" />
+                        <label for="inherit" class="checkbox-label">Inherit permissions from parent folder</label>
+                    </div>
+                </fieldset>
+                <table id="permissions" class="no-margin">
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>None</th>
+                            <th>Read</th>
+                            <th>Write</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in roles %}
+                            <tr>
+                                <td>{{ role.getName }}</td>
+                                <td>
+                                    <input type="radio" name="groupPerm[{{ role.getId }}]" checked id="groupNone{{ role.getId }}" value="0" {{ permissions['unit'][role.getId][0] }}>
+                                    <label class="radio-label" for="groupNone{{ role.getId }}"></label>
+                                </td>
+                                <td>
+                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {{ permissions['unit'][role.getId][1] }}>
+                                    <label class="radio-label" for="groupRead{{ role.getId }}"></label>
+                                </td>
+                                <td>
+                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2" {{ permissions['unit'][role.getId][2] }}>
+                                    <label class="radio-label" for="groupWrite{{ role.getId }}"></label>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for='template'>
+                            Homepage Template
+                            <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each uploaded folder.">?</span>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <select name='template'>
+                            <option value='0'>No template</option>
+                            {% for template in templates %}
+                                <option value="{{ template.getId }}">{{ template.getName }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" value="Import" />
+        </form>
+    </div>
+</div>

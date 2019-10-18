@@ -1,0 +1,44 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>
+            {% block title %}
+            {% endblock %}
+        </h1>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">
+            {% block subtitle %}
+            {% endblock %}
+        </h2>
+
+        <section class="no-margin">
+            <ul class="information-list ups" data-log>
+                {% include '@upsRuleset/log/lines.twig' %}
+            </ul>
+        </section>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        // allow records to expand/collapse
+        $('[data-log]').on('click', '[data-collapser]', function (e) {
+            e.preventDefault();
+
+            var target    = $(this).data('collapser'),
+                component = $('[data-collapsable=' + target + ']');
+
+            if (component.attr('data-collapse-state') == 'collapsed') {
+                component.stop().removeClass('hide').slideUp(1).slideDown();
+                component.attr('data-collapse-state', 'uncollapsed');
+            }
+            else {
+                component.attr('data-collapse-state', 'collapsed');
+                component.stop().slideUp();
+            }
+        });
+    });
+</script>

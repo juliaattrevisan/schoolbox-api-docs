@@ -39,7 +39,8 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\IsSuperuser(),
+            new Rule\IsSchoolboxConnector($this->getConfig())
         );
 
         $this->register('GET', '', 'getIndex', $perms);

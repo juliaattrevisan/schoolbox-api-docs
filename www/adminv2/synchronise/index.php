@@ -21,7 +21,7 @@ $processor->execute();
  */
 $this->setFile(TEMPLATE_content, 'adminv2/synchronise/view.html');
 
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'synchronise');
 
 $this->setVar(array(

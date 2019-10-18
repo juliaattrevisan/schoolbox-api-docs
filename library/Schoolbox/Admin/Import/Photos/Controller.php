@@ -1,7 +1,5 @@
 <?php
 /**
- * Photo upload admin page
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,37 +7,56 @@
 namespace Schoolbox\Admin\Import\Photos;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Import\Navigation\Direct;
+use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
-use Schoolbox\Import\ImportNavigation;
 
+/**
+ * Class Controller
+ *
+ * Photo upload admin page
+ *
+ * @package Schoolbox\Admin\Import\Photos
+ */
 class Controller extends Base
 {
-    use ImportNavigation;
 
     /**
      * @var StorageMapper $storageMapper
      */
     protected $storageMapper;
 
+
     /**
      * @var UserMapper $userMapper
      */
     protected $userMapper;
+
+
+    /**
+     * @var INavigation
+     */
+    protected $navigation;
+
 
     /**
      * Controller constructor.
      *
      * @param StorageMapper $storageMapper
      * @param UserMapper    $userMapper
+     * @param IConfigLoader $configLoader
      */
-    public function __construct(Storage\Mapper $storageMapper, UserMapper $userMapper)
+    public function __construct(Storage\Mapper $storageMapper, UserMapper $userMapper, IConfigLoader $configLoader)
     {
         $this->storageMapper = $storageMapper;
         $this->userMapper = $userMapper;
+
+        $this->navigation = new Direct($configLoader);
     }
 
 
@@ -162,8 +179,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPhotos/index.twig',
             'data' => [
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
-                'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
+                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                 'attachzone' => $this->getAttachZone(),
                 'users' => $users,
                 'surname' => $surname

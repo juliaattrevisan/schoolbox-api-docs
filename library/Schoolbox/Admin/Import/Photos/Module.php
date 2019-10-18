@@ -1,12 +1,9 @@
 <?php
 /**
- * Import portrait pictures for users
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Admin\Import\Photos;
 
 use Alaress\Module\Module as BaseModule;
@@ -18,9 +15,21 @@ use InvalidArgumentException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Module
+ *
+ * Import portrait pictures for users
+ *
+ * @package Schoolbox\Admin\Import\Photos
+ */
 class Module extends BaseModule
 {
+
+    /**
+     * @var string
+     */
     protected $basename = 'adminImportPhotos';
+
 
     /**
      * Hook method for setting up routes via self::register()
@@ -43,6 +52,7 @@ class Module extends BaseModule
         $this->register('POST', '/delete', 'postDelete', $superuserOnly);
     }
 
+
     /**
      * @inheritdoc
      */
@@ -51,6 +61,7 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -58,6 +69,7 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
+
 
     /**
      * Override with any steps required for a controller and its routes
@@ -75,6 +87,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'storageMapper' => $this->getMapperFactory()->getLazy(Storage\Mapper::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'configLoader' => $injector->lazyGet('config'),
         ];
     }
 }

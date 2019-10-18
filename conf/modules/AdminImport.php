@@ -8,7 +8,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Import\IntroModule;
+use Schoolbox\Admin\Import;
 
 /**
  * Configuration for admin import module
@@ -24,26 +24,55 @@ class AdminImport implements ModuleConfigInterface
      * @return void
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function configure($kernel)
+    public function configure($kernel): void
     {
         $di = $kernel->getDependencyInjector();
 
         /* Introduction to Admin Importers
          */
-        (new IntroModule($di))->init('/adminv2/import');
+        (new Import\Module($di))->init('/adminv2/import');
+
+        /**
+         * Direct Import
+         */
+
+        /* User Accounts
+         */
+        (new Import\UserAccount\Module($di))->init('/adminv2/import/userAccount');
 
         /* User Photos
          */
-        (new \Schoolbox\Admin\Import\Photos\Module($di))->init('/adminv2/import/photos');
-
-        /* User Profile
-         */
-        (new \Schoolbox\Admin\Import\Profile\Module($di))->init('/adminv2/import/profile');
+        (new Import\Photos\Module($di))->init('/adminv2/import/photos');
 
         /* Pastoral Care
          */
         if ($di->get('config')->get('pastoral_enabled')) {
-            (new \Schoolbox\Admin\Import\Pastoral\Module($di))->init('/adminv2/import-pastoral');
+            (new Import\Pastoral\Module($di))->init('/adminv2/import/pastoral');
         }
+
+        /* Import folders
+         * (bulk add folders)
+         */
+        (new Import\Folder\Module($di))->init('/adminv2/import/folder');
+
+        /**
+         * School Data
+         */
+
+        /* User Profile
+         */
+        (new Import\Profile\Module($di))->init('/adminv2/import/profile');
+
+        /* Timetable Structure
+         */
+        (new Import\TimetableStructure\Module($di))->init('/adminv2/import/timetableStructure');
+
+        /* Timetable
+         */
+        (new Import\Timetable\Module($di))->init('/adminv2/import/timetable');
+
+        /* Timetable Enrolment
+         */
+        (new Import\TimetableEnrolment\Module($di))->init('/adminv2/import/timetableEnrolment');
     }
 }

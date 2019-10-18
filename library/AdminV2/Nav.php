@@ -1,68 +1,104 @@
 <?php
+
+use Schoolbox\IConfigLoader;
+
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 class AdminV2_Nav
 {
-    private $nav = array(
-        'home'               => 'Home',
-        'user'               => 'Users',
-        'menu-side'          => 'Side Menu',
-        'menu-top'           => 'Top Menu',
-        'profile-button'     => 'Profile Buttons',
-        'dashboard'          => 'Dashboard',
-        'homepage'           => 'Homepages',
-        'eportfolio'         => 'ePortfolios',
-        'eportfolio/deploy'  => 'ePortfolio Deployment',
-        'news'               => 'News',
-        'allowed-file'       => 'Allowed Files',
-        'setting'            => 'Settings',
-        'terminology'        => 'Terminology',
-        'calendar'           => 'Calendar',
-        'bulk-add-folders'   => 'Folder',
-        'rollover'           => 'Rollover',
-        'grades'             => 'Grades',
-        'rubric-results'     => 'Rubrics',
-        'terms'              => 'Terms',
-        'course-builder'     => 'Course Builder',
-        'messages'           => 'Notifications',
-        'lists'              => 'Lists',
-        'lti'                => 'LTI Providers',
-        'usage'              => 'Usage',
-        'engagement'         => 'Engagement',
-        'ups'                => 'User Provisioning System',
-        'shaps/provisioning' => 'Schoolbox Help Provisioning',
-        'video'              => 'Media Queue',
-        'import'             => 'Import',
-        'filters'            => 'Filters',
-        'feature-tours'      => 'Feature Tours',
-    );
 
-    public function parse(SitePage $page, $currentPage = 'home')
+    /**
+     * @var array
+     */
+    private $nav;
+
+
+    /**
+     * AdminV2_Nav constructor.
+     *
+     * @param IConfigLoader $configLoader
+     */
+    public function __construct(IConfigLoader $configLoader)
+    {
+        $this->nav = [
+            'home'               => ['name' => 'Home',                        'visible' => true],
+            'user'               => ['name' => 'Users',                       'visible' => true],
+            'menu-side'          => ['name' => 'Side Menu',                   'visible' => true],
+            'menu-top'           => ['name' => 'Top Menu',                    'visible' => true],
+            'profile-button'     => ['name' => 'Profile Buttons',             'visible' => true],
+            'dashboard'          => ['name' => 'Dashboard',                   'visible' => true],
+            'homepage'           => ['name' => 'Homepages',                   'visible' => true],
+            'eportfolio'         => ['name' => 'ePortfolios',                 'visible' => true],
+            'eportfolio/deploy'  => ['name' => 'ePortfolio Deployment',       'visible' => true],
+            'news'               => ['name' => 'News',                        'visible' => true],
+            'allowed-file'       => ['name' => 'Allowed Files',               'visible' => true],
+            'setting'            => ['name' => 'Settings',                    'visible' => true],
+            'terminology'        => ['name' => 'Terminology',                 'visible' => true],
+            'calendar'           => ['name' => 'Calendar',                    'visible' => true],
+            'rollover'           => ['name' => 'Rollover',                    'visible' => true],
+            'grades'             => ['name' => 'Grades',                      'visible' => true],
+            'rubric-results'     => ['name' => 'Rubrics',                     'visible' => true],
+            'terms'              => ['name' => 'Terms',                       'visible' => true],
+            'course-builder'     => ['name' => 'Course Builder',              'visible' => true],
+            'messages'           => ['name' => 'Notifications',               'visible' => true],
+            'lists'              => ['name' => 'Lists',                       'visible' => true],
+            'lti'                => ['name' => 'LTI Providers',               'visible' => true],
+            'usage'              => ['name' => 'Usage',                       'visible' => true],
+            'engagement'         => ['name' => 'Engagement',                  'visible' => true],
+            'ups'                => ['name' => 'User Provisioning System',    'visible' => true],
+            'shaps/provisioning' => ['name' => 'Schoolbox Help Provisioning', 'visible' => true],
+            'video'              => ['name' => 'Media Queue',                 'visible' => true],
+            'import/schoolData'  => ['name' => 'School Data Import',          'visible' => $configLoader->get('external_type') === 'schoolbox'],
+            'import/direct'      => ['name' => 'Direct Import',               'visible' => true],
+            'filters'            => ['name' => 'Filters',                     'visible' => true],
+            'feature-tours'      => ['name' => 'Feature Tours',               'visible' => true],
+        ];
+    }
+
+
+    /**
+     * phpliberty island
+     *
+     * @param SitePage $page
+     * @param string   $currentPage
+     */
+    public function parse(SitePage $page, $currentPage = 'home'): void
     {
         $page->setFile('nav', 'adminv2/nav.html');
         $page->setBlock('nav', 'admin_nav_item', 'admin_nav_item_block');
 
-        foreach ($this->nav as $href => $label) {
-            $page->setVar(array(
+        foreach ($this->nav as $href => $node) {
+            if (!$node['visible']) {
+                continue;
+            }
+
+            $label = $node['name'];
+
+            $page->setVar([
                 'ADMNAV_HREF'    => $href,
-                'ADMNAV_CURRENT' => $currentPage == $href ? 'active' : '',
+                'ADMNAV_CURRENT' => $currentPage === $href ? 'active' : '',
                 'ADMNAV_LABEL'   => $label
-            ));
+            ]);
+
             $page->parse('admin_nav_item_block', 'admin_nav_item', true);
         }
 
-        $page->setVar(array(
-            'CURRENT_ADMIN_LOCATION' => $this->nav[$currentPage]
-        ));
+        $page->setVar([
+            'CURRENT_ADMIN_LOCATION' => $this->nav[$currentPage]['name']
+        ]);
 
         $page->parse('ADMIN_NAV', 'nav');
     }
 
-    public function getNavigation() {
+
+    /**
+     * @return array
+     */
+    public function getNavigation(): array
+    {
         return $this->nav;
     }
 }

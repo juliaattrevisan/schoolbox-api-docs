@@ -1,11 +1,9 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Import;
 
 use Alaress\Csv\Reader;
@@ -13,17 +11,23 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Importer;
 use Schoolbox\Resource\Storage;
 
-
+/**
+ * Class ImporterFactory
+ *
+ * Spawn one of the strategies that imports data
+ *
+ * @package Schoolbox\Import
+ */
 class ImporterFactory
 {
 
-    public const IMPORT_USER = 'adminImportUser';
+    public const IMPORT_USER = 'adminImportUserAccount';
 
-    public const IMPORT_STRUCTURE = 'adminImportStructure';
+    public const IMPORT_STRUCTURE = 'adminImportTimetableStructure';
 
     public const IMPORT_TIMETABLE = 'adminImportTimetable';
 
-    public const IMPORT_ENROLMENT = 'adminImportEnrolment';
+    public const IMPORT_ENROLMENT = 'adminImportTimetableEnrolment';
 
 
     /**
@@ -35,8 +39,9 @@ class ImporterFactory
      * @param bool            $performUpdate
      *
      * @return Importer\AbstractImporter
+     * @throws \OutOfRangeException
      */
-    public function buildImporter(string $basename, Reader $reader, LoggerInterface $log, $performUpdate = false)
+    public function buildImporter(string $basename, Reader $reader, LoggerInterface $log, $performUpdate = false): ?\Schoolbox\External\Importer\AbstractImporter
     {
         switch ($basename) {
             case self::IMPORT_USER:
@@ -46,7 +51,7 @@ class ImporterFactory
             case self::IMPORT_TIMETABLE:
                 return new Importer\Timetable($reader, $log, $performUpdate);
             case self::IMPORT_ENROLMENT:
-                return new Importer\Enrolment($reader, $log, $performUpdate);
+                return new Importer\TimetableEnrolment($reader, $log, $performUpdate);
             default:
                 throw new \OutOfRangeException(sprintf('No importer matches basename "%s"', $basename));
         }
@@ -61,7 +66,7 @@ class ImporterFactory
      * @return Reader
      * @throws \RuntimeException
      */
-    public function buildReader(string $basename, Storage\IStorage $upload)
+    public function buildReader(string $basename, Storage\IStorage $upload): \Alaress\Csv\Reader
     {
         $reader = new Reader($upload->readStream());
         $reader->setLoadFromFirst(true);

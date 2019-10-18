@@ -19,7 +19,7 @@ $this->setBlock(TEMPLATE_content, 'service', 'service_block');
 
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'user');
 
 $userHandler = new User();

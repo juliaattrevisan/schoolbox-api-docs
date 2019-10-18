@@ -29,7 +29,7 @@ $this->setBlock('layout', 'position_right', 'position_right_block');
 $this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'dashboard');
 
 // Get list of roles

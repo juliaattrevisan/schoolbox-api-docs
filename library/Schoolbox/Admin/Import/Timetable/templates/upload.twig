@@ -1,0 +1,38 @@
+{% extends '@adminImportIndex/upload.twig' %}
+
+{% block title %}
+    Import Timetable
+{% endblock %}
+
+{% block helpText %}
+    <section>
+        <div class="content">
+            <p>
+                Provide a file containing your timetable in the CSV format in the template below.
+            </p>
+            <ul>
+                <li>You must upload your entire timetable in one CSV - any existing timetable will be deleted.</li>
+                <li>You must have first uploaded your timetable structure.</li>
+                <li>
+                    The values you enter for <strong>Term Campus</strong>, <strong>Term Title</strong>,
+                    <strong>Period Day</strong> and <strong>Period Title</strong> must exactly match a row
+                    in your timetable structure.
+                </li>
+                <li>Any empty fields will be filled with the previous non-empty value in that column.</li>
+            </ul>
+        </div>
+        <div class="component-action">
+            <section>
+                <a href="/adminv2/import/timetableTemplate.csv" class="button">Download Template</a>
+            </section>
+        </div>
+    </section>
+
+    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+{% endblock helpText %}
+
+{% block form %}
+    {% if not hasExternalDb %}
+        {{ parent() }}
+    {% endif %}
+{% endblock form %}

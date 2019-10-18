@@ -1,0 +1,36 @@
+{% extends '@adminImportIndex/upload.twig' %}
+
+{% block title %}
+    Import Timetable Enrolment
+{% endblock %}
+
+{% block helpText %}
+    <section>
+        <div class="content">
+            <p>
+                Provide a file containing your class enrolments in the CSV format in the template below.
+            </p>
+            <ul>
+                <li>You must upload your entire enrolment in one CSV - any existing enrolments will be deleted.</li>
+                <li>You must have first uploaded your timetable structure and timetable.</li>
+                <li>
+                    Any class codes in your upload that do not correspond to existing classes will have new classes created for them.
+                    The student or staff member will be associated with this new class, but it will not be on the timetable.
+                </li>
+            </ul>
+        </div>
+        <div class="component-action">
+            <section>
+                <a href="/adminv2/import/enrolmentTemplate.csv" class="button">Download Template</a>
+            </section>
+        </div>
+    </section>
+
+    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+{% endblock helpText %}
+
+{% block form %}
+    {% if not hasExternalDb %}
+        {{ parent() }}
+    {% endif %}
+{% endblock form %}

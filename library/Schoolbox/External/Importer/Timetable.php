@@ -1,16 +1,9 @@
 <?php
 /**
- * Importer for timetable into the Schoolbox connector.
- * Saves into the following tables:
- * * class
- * * class_period
- * Assumes that `Schoolbox\External\Importer\TimetableStructure` has been run.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\External\Importer;
 
 use Schoolbox\Campus;
@@ -26,6 +19,17 @@ use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Timetable
+ *
+ * Importer for timetable into the Schoolbox connector.
+ * Saves into the following tables:
+ * * class
+ * * class_period
+ * Assumes that `Schoolbox\External\Importer\TimetableStructure` has been run.
+ *
+ * @package Schoolbox\External\Importer
+ */
 class Timetable extends AbstractImporter
 {
     /**

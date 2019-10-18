@@ -26,7 +26,7 @@ $this->setBlock(TEMPLATE_content, 'download_report', 'download_report_block');
 $this->setVar('filter_block', '');
 
 // include the admin navigation
-$nav = new AdminV2_Nav();
+$nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'home');
 
 $this->setTitle('Admin - Reports');
