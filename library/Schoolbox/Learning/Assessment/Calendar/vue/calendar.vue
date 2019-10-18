@@ -50,8 +50,6 @@
         data() {
             return {
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin ],
-                currentEvent: {},
-                newEvent: {},
                 selectedFilters: null,
                 eventTypeResources: [],
                 folderResources: [],
@@ -284,10 +282,7 @@
 
                 if (!self.currentViewIsSemester() ||
                     (self.currentViewIsSemester() && eventInfo.el.getAttribute('event-group-id-placeholder') === null)) {
-                    // Ideally the current event would be a part of the modal,
-                    // not this component, but :shrug:
-                    this.currentEvent = eventInfo.event;
-                    this.$refs.event.open();
+                    this.$refs.event.open(eventInfo.event);
                 } else {
                     this.renderPopOver(eventInfo);
 
@@ -851,7 +846,6 @@
     <div>
         <view-event-modal ref="event"
                           return-to="assessmentCalendar"
-                          :event="currentEvent"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"

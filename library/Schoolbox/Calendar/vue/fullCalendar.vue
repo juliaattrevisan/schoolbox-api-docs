@@ -62,8 +62,6 @@
         data() {
             return {
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
-                currentEvent: {},
-                newEvent: {},
                 currentDisplay: null,
                 duration: 31,
                 listViewDateRange: {
@@ -303,14 +301,13 @@
              */
             onDateClick(dateClickInfo) {
                 let [firstEventType] = this.config.eventTypes;
-                this.newEvent = {
+                this.$refs.createEvent.open({
                     date:        dateClickInfo.date,
                     allDay:      dateClickInfo.allDay,
                     title:       '',
                     detail:      '',
                     type:        firstEventType ? firstEventType.id : null,
-                };
-                this.$refs.createEvent.open();
+                });
             },
 
             /**
@@ -323,8 +320,7 @@
             onEventClick(eventInfo) {
                 // Ideally the current event would be a part of the modal,
                 // not this component, but :shrug:
-                this.currentEvent = eventInfo.event;
-                this.$refs.event.open();
+                this.$refs.event.open(eventInfo.event);
             },
 
             /**
@@ -587,7 +583,6 @@
                       @filterChanged="updateSelectedFilters" />
 
         <create-event-modal ref="createEvent"
-                            :event="newEvent"
                             :user-id="config.userId"
                             :task-type-id="config.taskTypeId"
                             :event-types="config.eventTypes"
@@ -601,7 +596,6 @@
                             @eventCreated="addEvent" />
 
         <view-event-modal ref="event"
-                          :event="currentEvent"
                           :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"

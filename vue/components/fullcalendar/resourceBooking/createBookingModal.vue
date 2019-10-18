@@ -25,7 +25,6 @@
     export default {
         name: "create-booking-modal",
         props: [
-            'event',
             'toMoment',
             'bookingPath',
             'dateFormats',
@@ -35,6 +34,7 @@
             return {
                 startDate: this.getStartDate(),
                 startTime: '',
+                event: {},
             }
         },
         components: {RevealModal},
@@ -42,7 +42,8 @@
             /**
              * Open the modal.
              */
-            open() {
+            open(event) {
+                this.event = event;
                 this.$refs.modal.open();
             },
 

@@ -44,8 +44,6 @@
         data() {
             return {
                 calendarPlugins: [ interactionPlugin, momentPlugin, resourceTimelinePlugin ],
-                currentEvent: {},
-                selectedEvent: {},
             }
         },
         computed: {
@@ -169,14 +167,12 @@
                 // Just a proposal.
                 // If the user doesn't have the rights to create a booking, just don't show the modal.
                 if (this.config.bookingIsAuthorized) {
-                    this.selectedEvent = {
+                    this.$refs.createBooking.open({
                         date: dateClickInfo.date,
                         allDay: dateClickInfo.allDay,
                         name: dateClickInfo.resource.extendedProps.name,
                         id: dateClickInfo.resource.id,
-                    };
-
-                    this.$refs.createBooking.open();
+                    });
                 }
             },
 
@@ -188,10 +184,7 @@
              * @param eventInfo
              */
             onEventClick(eventInfo) {
-                // Ideally the current event would be a part of the modal,
-                // not this component, but :shrug:
-                this.currentEvent = eventInfo.event;
-                this.$refs.event.open();
+                this.$refs.event.open(eventInfo.event);
             },
 
             /**
@@ -257,7 +250,6 @@
                       @filterChanged="reloadEvents" />
 
         <create-booking-modal ref="createBooking"
-                              :event="selectedEvent"
                               :to-moment="toMoment"
                               :booking-path="config.createBookingPath"
                               :date-formats="formats"
@@ -265,7 +257,6 @@
         />
 
         <view-event-modal ref="event"
-                          :event="currentEvent"
                           :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
