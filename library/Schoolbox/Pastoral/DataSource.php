@@ -17,6 +17,8 @@ use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use PDO;
+use function array_merge;
+use function count;
 
 /**
  * Data source for pastoral care records.
@@ -106,14 +108,13 @@ class DataSource
     /**
      * Gets number of records for particular student visible to the given viewer
      * @param User     $viewer
-     * @param User     $student
+     * @param int      $studentId
      * @param int|null $typeId
-     * @param array    $pastoralGroupIds
      * @return int
      */
-    public function countRecords(User $viewer, User $student, ?int $typeId, array $pastoralGroupIds): int
+    public function countRecords(User $viewer, int $studentId, ?int $typeId): int
     {
-        $where = $this->getWhere($viewer, $student->getId(), $typeId, $pastoralGroupIds, null);
+        $where = $this->getPermissionClause($viewer, $studentId, $typeId);
         $sql   = "
         SELECT count(*)
                 FROM pastoral p
@@ -128,21 +129,22 @@ class DataSource
 
     /**
      * Gets records for particular student visible to the given viewer
-     * @param User     $viewer
-     * @param User     $student
-     * @param int|null $typeId
-     * @param array    $pastoralGroupIds
-     * @param int      $offset
-     * @param int      $limit
+     * @param User      $viewer
+     * @param int       $studentId
+     * @param int|null  $typeId
+     * @param int       $offset
+     * @param int       $limit
+     * @param int|null  $linkedStudentId
      * @return GenericCollection|Model[]
      */
-    public function findRecords(User $viewer, User $student, ?int $typeId, array $pastoralGroupIds, int $offset, int $limit): GenericCollection
+    public function findRecords(User $viewer, int $studentId, ?int $typeId, int $offset, int $limit, ?int $linkedStudentId): GenericCollection
     {
-        $rawRecords = $this->findRawRecords($viewer, $typeId, $pastoralGroupIds, null, $student->getId(), $offset, $limit);
+        $rawRecords = $this->findRawRecords($viewer, $typeId, $studentId, $offset, $limit, [], $linkedStudentId);
         $userMapper = $this->mapper->getJoinMapper('owner');
 
         // hydrate the parent records first
-        $parentRecords = Model::createCollection();
+        $targetRecords   = Model::createCollection();
+        $parentTargetMap = [];
         foreach ($rawRecords as $rawRecord) {
             try {
                 $record = $this->mapper->hydrate($rawRecord);
@@ -152,18 +154,23 @@ class DataSource
                 /** @var User $modifiedBy */
                 $modifiedBy = $userMapper->hydrate($rawRecord, 'u');
                 $record->setModifiedBy($modifiedBy);
+                // initialize related records
+                $record->setRelatedRecords(Model::createCollection());
             } catch (MapperException $e) {
                 // noop
                 continue;
             }
 
             // keep key as record id
-            $parentRecords->offsetSet($record->getId(), $record);
+            $targetRecords->offsetSet($record->getId(), $record);
+
+            // get ids to find linked records
+            if (!empty($rawRecord['parent_id'])) {
+                $parentTargetMap[(int)$rawRecord['parent_id']] = $record->getId();
+            }
         }
 
-        // hydrate related records
-        $parentIds        = $parentRecords->getPropertyValues('id');
-        $linkedRecordRows = $this->findRawRecords($viewer, $typeId, $pastoralGroupIds, $parentIds, null, null, null);
+        $linkedRecordRows = $this->findRawRecords($viewer, $typeId, null, null, null, $targetRecords->keys(), null);
 
         foreach ($linkedRecordRows as $linkedRecordRow) {
             try {
@@ -173,38 +180,80 @@ class DataSource
                 $linkedRecord->setOwner($owner);
                 /** @var User $student */
                 $student = $userMapper->hydrate($linkedRecordRow, 'u');
+                if ($student->isDeleted()) {
+                    // should not display linked record for deleted student
+                    continue;
+                }
                 $linkedRecord->setStudent($student);
             } catch (MapperException $e) {
                 // noop
                 continue;
             }
 
-            /** @var Model $parentRecord */
-            $parentRecord = $parentRecords->offsetGet($linkedRecordRow['parent_id']);
-            $parentRecord->setRelatedRecords($parentRecord->getRelatedRecords()->add($linkedRecord));
-            $linkedRecord->setParent($parentRecord);
+            // attach current linked record to a record
+            if ($targetRecords->keyExists((int)$linkedRecordRow['parent_id'])) {
+                // target is parent of linked
+                $siblingRecordId = (int)$linkedRecordRow['parent_id'];
+                $targetRecord = $targetRecords->offsetGet($siblingRecordId);
+                $targetRecord->setRelatedRecords($targetRecord->getRelatedRecords()->add($linkedRecord));
+                $linkedRecord->setParent($targetRecord);
+
+            } elseif (array_key_exists((int)$linkedRecordRow['parent_id'], $parentTargetMap)) {
+                // target parent = linked parent
+                $siblingRecordId = (int)$parentTargetMap[$linkedRecordRow['parent_id']];
+                $targetRecord = $targetRecords->offsetGet($siblingRecordId);
+                $targetRecord->setRelatedRecords($targetRecord->getRelatedRecords()->add($linkedRecord));
+
+            } elseif (array_key_exists((int)$linkedRecordRow['id'], $parentTargetMap)) {
+                // linked is parent of target
+                $siblingRecordId = (int)$parentTargetMap[$linkedRecordRow['id']];
+                $targetRecord = $targetRecords->offsetGet($siblingRecordId);
+                $targetRecord->setRelatedRecords($targetRecord->getRelatedRecords()->add($linkedRecord));
+                $targetRecord->setParent($linkedRecord);
+
+            }
+
         }
-        return $parentRecords;
+
+        // if getting list for two students, remove one without any linked record
+        if ($linkedStudentId) {
+            $targetRecords = $targetRecords->filter(
+                static function (Model $record) {
+                    return $record->getRelatedRecords() && $record->getRelatedRecords()->count() > 0;
+                }
+            );
+        }
+
+        return $targetRecords;
     }
 
 
     /**
      * Gets raw result records
-     * @param User       $viewer
-     * @param int|null   $typeId
-     * @param array      $pastoralGroupIds
-     * @param array|null $parentRecordIds
-     * @param int|null   $studentId
-     * @param int|null   $offset
-     * @param int|null   $limit
+     * @param User     $viewer
+     * @param int|null $typeId
+     * @param int|null $studentId
+     * @param int|null $offset
+     * @param int|null $limit
+     * @param array    $linkedRecordIds
+     * @param int|null $linkedStudentId
      * @return array
      */
-    private function findRawRecords(User $viewer, ?int $typeId, array $pastoralGroupIds, ?array $parentRecordIds, ?int $studentId, ?int $offset, ?int $limit): array
+    private function findRawRecords(User $viewer, ?int $typeId, ?int $studentId, ?int $offset, ?int $limit, array $linkedRecordIds, ?int $linkedStudentId): array
     {
-        $where = $this->getWhere($viewer, $studentId, $typeId, $pastoralGroupIds, $parentRecordIds);
-
-        if (!empty($parentRecordIds)) {
-            $userColumn = 'p.student_id';
+        $permissionClause = $this->getPermissionClause($viewer, $studentId, $typeId);
+        $where            = $permissionClause['sql'];
+        $params           = $permissionClause['params'];
+        if (!empty($linkedRecordIds)) {
+            $userColumn   = 'p.student_id';
+            $linkedClause = $this->getLinkedClause(null, $linkedRecordIds);
+            $where        .= " AND {$linkedClause['sql']}";
+            $params       = array_merge($params, $linkedClause['params']);
+        } elseif (null !== $linkedStudentId) {
+            $userColumn   = 'p.modified_by_user_id';
+            $linkedClause = $this->getLinkedClause($linkedStudentId, null);
+            $where        .= " AND {$linkedClause['sql']}";
+            $params       = array_merge($params, $linkedClause['params']);
         } else {
             if (null !== $studentId) {
                 $userColumn = 'p.modified_by_user_id';
@@ -233,7 +282,7 @@ class DataSource
         FROM pastoral p
         INNER JOIN `user` o ON p.owner_id = o.id
         INNER JOIN `user` u ON {$userColumn} = u.id
-        WHERE {$where['sql']}
+        WHERE {$where}
         GROUP BY p.id
         ORDER BY p.updated_at DESC
         ";
@@ -242,37 +291,85 @@ class DataSource
             $sql .= " LIMIT {$limit}" . (empty($offset) ? '' : " OFFSET {$offset}");
         }
 
-        $stmt = $this->mapper->getDatabase()->query($sql, $where['params']);
+        $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Generates where clause with parameters to find visible pastoral records
-     * @param User       $viewer
-     * @param int|null   $studentId
-     * @param int|null   $typeId
-     * @param array      $pastoralGroupIds
-     * @param array|null $parentRecordIds
+     * @param int|null  $studentId
+     * @param array|null $recordIds
      * @return array
      */
-    private function getWhere(User $viewer, ?int $studentId, ?int $typeId, array $pastoralGroupIds, ?array $parentRecordIds): array
+    private function getLinkedClause(?int $studentId, ?array $recordIds): array
     {
-        // Pastoral records that we are interested in
-        $validPb = (new Builder($this->mapper->getDatabase(), 'p'))->setParamPrefix('pv');
-
-        // This query expects either parent record ids or student id is set.
-        if (!empty($parentRecordIds)) {
-            $validPb->in('p.parent_id', $parentRecordIds);
-        } else {
-            if (null !== $studentId) {
-                $validPb->equals('p.student_id', $studentId);
-            } else {
-                return [];
+        $pb = [];
+        for ($i = 0; $i < 3; $i++) {
+            $limitPb = (new Builder($this->mapper->getDatabase(), 'pastoral'))
+                ->setParamPrefix("ln{$i}");
+            if ($studentId) {
+                $limitPb->equals('pastoral.student_id', $studentId);
+            } elseif (!empty($recordIds)) {
+                $limitPb->in('pastoral.id', $recordIds);
             }
+            $pb[$i] = $limitPb;
         }
-        $validPb->isNull('p.deleted_at');
+
+        $sql = "
+                        (
+                                    `p`.`parent_id` IN (
+                                        SELECT    `id`
+                                        FROM      `pastoral`
+                                        WHERE     `deleted_at` IS NULL 
+                                          AND     {$pb[0]->getWhere()[0]}
+                                    ) OR p.`parent_id` IN (
+                                        SELECT    `parent_id`
+                                        FROM      `pastoral`
+                                        WHERE     `deleted_at` IS NULL
+                                          AND     {$pb[1]->getWhere()[0]}
+                                          AND     pastoral.student_id <> p.student_id
+                                    ) OR p.`id` IN (
+                                        SELECT    `parent_id`
+                                        FROM      `pastoral`
+                                        WHERE     `deleted_at` IS NULL 
+                                          AND     {$pb[2]->getWhere()[0]}
+                                    )
+                        )
+        ";
+
+
+        return [
+            'sql'    => $sql,
+            'params' => array_merge($pb[0]->getParams(), $pb[1]->getParams(), $pb[2]->getParams()),
+        ];
+    }
+
+    /**
+     * Generates where clause with parameters to find visible pastoral records
+     * @param User     $viewer
+     * @param int|null $studentId
+     * @param int|null $typeId
+     * @param string   $alias
+     * @return array
+     */
+    private function getPermissionClause(User $viewer, ?int $studentId, ?int $typeId, string $alias = 'p'): array
+    {
+        if ($viewer->getPastoralGroupsMemberships() === null) {
+            $viewer->setPastoralGroupsMemberships(
+                $this->accessLevelCensor->getPastoralGroupMemberMapper()->findByColumn('user_id', $viewer->getId())
+            );
+        }
+        $pastoralGroupIds = $viewer->getPastoralGroupsMemberships()->getPropertyValues('id');
+
+        // Pastoral records that we are interested in
+        $validPb = (new Builder($this->mapper->getDatabase(), $alias))->setParamPrefix("{$alias}v");
+
+        if (null !== $studentId) {
+            $validPb->equals("{$alias}.student_id", $studentId);
+        }
+
+        $validPb->isNull("{$alias}.deleted_at");
         if (null !== $typeId) {
-            $validPb->equals('p.type_id', $typeId);
+            $validPb->equals("{$alias}.type_id", $typeId);
         }
         $where  = implode(' AND ', $validPb->getWhere());
         $params = $validPb->getParams();
@@ -280,53 +377,54 @@ class DataSource
         // Check access for the current user
         if (!$this->accessLevelCensor->isPastoralModerator($viewer)) {
             // owner
-            $ownerPb = (new Builder($this->mapper->getDatabase(), 'p'))
-                ->setParamPrefix('po')
-                ->equals('p.owner_id', $viewer->getId());
+            $ownerPb = (new Builder($this->mapper->getDatabase(), $alias))
+                ->setParamPrefix("{$alias}o")
+                ->equals("{$alias}.owner_id", $viewer->getId());
 
             // allowed by pastoral_access
-            $paInnerPb1 = (new Builder($this->mapper->getDatabase(), 'pa1'))
-                ->setParamPrefix('pa1')
+            $paInnerPb1 = (new Builder($this->mapper->getDatabase(), "{$alias}a1"))
+                ->setParamPrefix("{$alias}a1")
                 ->equals('user_id', $viewer->getId())
                 ->equals('role_id', $viewer->getRole()->getId());
             if (!empty($pastoralGroupIds)) {
                 $paInnerPb1->in('group_id', $pastoralGroupIds);
             }
-            $hasAccessPb    = (new Builder($this->mapper->getDatabase(), 'pa1'))
-                ->setParamPrefix('pa1')
+            $hasAccessPb    = (new Builder($this->mapper->getDatabase(), "{$alias}a1"))
+                ->setParamPrefix("{$alias}a1")
                 ->any($paInnerPb1)
                 ->isNull('deleted_at')
                 ->greaterThan('access', 0);
             $whereHasAccess = implode(' AND ', $hasAccessPb->getWhere());
 
             // rejected by pastoral_access
-            $paInnerPb2 = (new Builder($this->mapper->getDatabase(), 'pa2'))
-                ->setParamPrefix('pa2')
+            $paInnerPb2 = (new Builder($this->mapper->getDatabase(), "{$alias}a2"))
+                ->setParamPrefix("{$alias}a2")
                 ->equals('user_id', $viewer->getId())
                 ->equals('role_id', $viewer->getRole()->getId());
             if (!empty($pastoralGroupIds)) {
                 $paInnerPb2->in('group_id', $pastoralGroupIds);
             }
-            $noAccessPb    = (new Builder($this->mapper->getDatabase(), 'pa2'))
-                ->setParamPrefix('pa2')
+            $noAccessPb    = (new Builder($this->mapper->getDatabase(), "{$alias}a2"))
+                ->setParamPrefix("{$alias}a2")
                 ->any($paInnerPb2)
                 ->isNull('deleted_at')
                 ->equals('access', 0);
             $whereNoAccess = implode(' AND ', $noAccessPb->getWhere());
 
             // Generate where string using the results
-            $where  .= "
+            $where .= "
                 AND
                 (
                     (
-                      p.id IN (SELECT pastoral_id FROM pastoral_access pa1 WHERE {$whereHasAccess})
+                      {$alias}.id IN (SELECT pastoral_id FROM pastoral_access {$alias}a1 WHERE {$whereHasAccess})
                       AND
-                      p.id NOT IN (SELECT pastoral_id FROM pastoral_access pa2 WHERE {$whereNoAccess})
+                      {$alias}.id NOT IN (SELECT pastoral_id FROM pastoral_access {$alias}a2 WHERE {$whereNoAccess})
                     ) OR (
                       {$ownerPb->getWhere()[0]}
                     )
                 )
             ";
+
             $params = array_merge(
                 $ownerPb->getParams(),
                 $paInnerPb1->getParams(),
@@ -342,7 +440,6 @@ class DataSource
             'params' => $params,
         ];
     }
-
 
     /**
      * User-sensitive wrapper for `Mapper::findByTag`.
@@ -417,18 +514,31 @@ class DataSource
         );
     }
 
+
     /**
-     * Wrapper for `Mapper::getLinkedStudents`.
-     *
-     * This method isn't user-sensitive, but must be exposed to web request code.
-     *
-     * @param User $student
-     *
+     * @param User $viewer
+     * @param int  $studentId
      * @return array
      */
-    public function getLinkedStudents(User $student): array
+    public function getLinkedStudentRecordCount(User $viewer, int $studentId): array
     {
-        return $this->mapper->getLinkedStudents($student);
+        $permissionClause = $this->getPermissionClause($viewer, null, null, 'p');
+        $linkedClause     = $this->getLinkedClause($studentId, null);
+
+        $sql = "
+                SELECT  p.student_id,
+                        COUNT(*)            AS `count`,
+                        `user`.`lastname`   AS `last_name`,
+                        `user`.`firstname`  AS `first_name`
+                FROM    pastoral p JOIN `user` ON p.student_id = `user`.id AND `user`.deleted_at IS NULL
+                WHERE   {$permissionClause['sql']}
+                        AND
+                        {$linkedClause['sql']}
+                GROUP BY p.student_id
+        ";
+
+        $stmt = $this->mapper->getDatabase()->query($sql, array_merge($permissionClause['params'], $linkedClause['params']));
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
@@ -479,7 +589,7 @@ class DataSource
         $searchResults = $filteredRecords->indexBy('id')->keys();
 
         // Record the search results that were returned by the search by imploding their IDs down into CSV
-        if (\count($searchResults)) {
+        if (count($searchResults)) {
             $auditRecord = $this->pastoralAuditMapper->createModel()
                                                      ->setUser($currentUser)
                                                      ->setSearch($search)

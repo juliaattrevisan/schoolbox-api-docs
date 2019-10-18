@@ -121,6 +121,25 @@ $app = new class extends CliTool\App
 
             // pastoral access
             $accessMapper->save($access);
+
+            // add linked records
+            $currentId = $pastoral->getId();
+
+            try {
+                $link = $pastoralMapper->findById($currentId - rand(1, 4));
+                if ($pastoral->getStudent()->getId() === $link->getStudent()->getId() || $link->getParent()) {
+                    continue;
+                    }
+                foreach ($link->getRelatedRecords() as $relatedRecord) {
+                    if ($relatedRecord->getStudent()->getId() === $pastoral->getStudent()->getId()) {
+                        continue 2;
+                    }
+                }
+                $pastoral->setParent($link);
+                $pastoralMapper->save($pastoral);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
         }
     }
 

@@ -263,14 +263,6 @@ class Controller extends Base
         $auditRecord->setUser($user);
         $this->pastoralAuditMapper->save($auditRecord);
 
-        // Find pastoral groups which the current user is a member of
-        $groupMemberships = $this->pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
-        $pastoralGroupIds = [];
-        foreach ($groupMemberships as $groupMembership) {
-            /** @var PastoralGroupMember $groupMembership */
-            $pastoralGroupIds[] = $groupMembership->getGroup()->getId();
-        }
-
         $typeId = is_numeric($get['type']) ? (int)$get['type'] : null;
 
         // Limit the number of pastoral records to display on each page of pastoral records
@@ -279,7 +271,7 @@ class Controller extends Base
         // Set the current page number
         $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? (int)$get['pageCurrent'] : 1;
 
-        $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $pastoralGroupIds);
+        $recordCount = $this->pastoralDataSource->countRecords($user, $student->getId(), $typeId);
 
         $maxPage = (int)ceil($recordCount / $resultsPerPage);
         if ($maxPage < 1) {
@@ -292,7 +284,7 @@ class Controller extends Base
             $pageCurrent = 1;
         }
         // populate related records
-        $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $pastoralGroupIds, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage);
+        $pageRecords = $this->pastoralDataSource->findRecords($user, $student->getId(), $typeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
@@ -303,7 +295,7 @@ class Controller extends Base
                 'student'        => $student,
                 'pageCurrent'    => $pageCurrent,
                 'types'          => $this->pastoralTypeMapper->findAll(),
-                'linkedStudents' => $this->pastoralDataSource->getLinkedStudents($student),
+                'linkedStudents' => $this->pastoralDataSource->getLinkedStudentRecordCount($user, $student->getId()),
                 'typeSelected'   => $typeId,
             ],
             'title'    => $student->getFullName(),
@@ -333,37 +325,49 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        // Retrieve all of the students pastoral records
-
-        $records = $this->pastoralDataSource->findLinked($this->getUser(), $student, $linkedStudent, $get['type']);
+        $typeId = is_numeric($get['type']) ? (int)$get['type'] : null;
 
         // Limit the number of pastoral records to display on each page of pastoral records
-
-        $resultsPerPage = $this->config->get('pastoral_page_size');
+        $resultsPerPage = (int)$this->config->get('pastoral_page_size');
 
         // Set the current page number
+        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? (int)$get['pageCurrent'] : 1;
 
-        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? $get['pageCurrent'] : 1;
-
-        if ($pageCurrent > ceil($records->count() / $resultsPerPage)) {
-            $pageCurrent = ceil($records->count() / $resultsPerPage);
-        } else {
-            if ($pageCurrent < 1) {
-                $pageCurrent = 1;
+        // Retrieve all of the students pastoral records
+        $recordCount = 0;
+        $linkedCounts = $this->pastoralDataSource->getLinkedStudentRecordCount($this->getUser(), $student->getId());
+        foreach ($linkedCounts as $linkedCount) {
+            if ((int)$linkedCount['student_id'] === $linkedStudent->getId()) {
+                $recordCount = (int)$linkedCount['count'];
+                break;
             }
         }
+
+        $maxPage = (int)ceil($recordCount / $resultsPerPage);
+        if ($maxPage < 1) {
+            $maxPage = 1;
+        }
+
+        if ($pageCurrent > $maxPage) {
+            $pageCurrent = $maxPage;
+        } elseif ($pageCurrent < 1) {
+            $pageCurrent = 1;
+        }
+
+        // populate related records
+        $pageRecords = $this->pastoralDataSource->findRecords($this->getUser(), $student->getId(), $typeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, $linkedStudent->getId());
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/student_linked.twig',
             'data'     => [
                 'user'           => $this->getUser(),
-                'recordCount'    => $records->count(),
-                'records'        => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
+                'recordCount'    => $recordCount,
+                'records'        => $pageRecords,
                 'student'        => $student,
                 'linkedStudent'  => $linkedStudent,
                 'pageCurrent'    => $pageCurrent,
                 'types'          => $this->pastoralTypeMapper->findAll(),
-                'linkedStudents' => $this->pastoralDataSource->getLinkedStudents($student),
+                'linkedStudents' => $linkedCounts,
                 'typeSelected'   => $get['type'],
             ],
             'title' => 'Linked Records',
