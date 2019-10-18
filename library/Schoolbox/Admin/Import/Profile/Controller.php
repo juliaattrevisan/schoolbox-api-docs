@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\External;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;

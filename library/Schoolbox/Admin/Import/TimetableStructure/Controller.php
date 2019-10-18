@@ -44,6 +44,6 @@ class Controller extends UserAccount\Controller
     {
         parent::__construct($importerFactory, $configLoader);
 
-        $this->navigation = new SchoolData($configLoader);
+        $this->navigation = new SchoolData();
     }
 }

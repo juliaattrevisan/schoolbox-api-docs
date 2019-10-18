@@ -33,6 +33,7 @@ class Module extends BaseModule
      */
     protected $basename = 'adminImportFolder';
 
+
     /**
      * {@inheritdoc}
      */
@@ -42,13 +43,15 @@ class Module extends BaseModule
         $this->addPostRoute($router, 'postImportResults', $basePath, '');
     }
 
+
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
-
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
         $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
     }
+
 
     /**
      * {@inheritdoc}
@@ -70,10 +73,12 @@ class Module extends BaseModule
         ));
     }
 
+
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) {
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }

@@ -35,7 +35,8 @@ class Direct implements INavigation
      *
      * @param IConfigLoader $configLoader
      */
-    public function __construct(IConfigLoader $configLoader) {
+    public function __construct(IConfigLoader $configLoader)
+    {
         $this->configLoader = $configLoader;
     }
 

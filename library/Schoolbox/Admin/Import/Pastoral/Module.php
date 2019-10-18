@@ -44,7 +44,9 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $preload = function ($params) { return $this->preload($params); };
+        $preload = function ($params) {
+            return $this->preload($params);
+        };
 
         $this->register('GET', '', 'getIndex', $perms);
         $this->register('GET', '/log', 'getLog', $perms);

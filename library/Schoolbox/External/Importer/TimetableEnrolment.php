@@ -155,10 +155,8 @@ class TimetableEnrolment extends AbstractImporter
                 $user = $enrolment->getUser();
                 $enrolmentItems[] = "(NULL, '".$class->getId()."', '".$user->getId()."')";
             } else {
-                if (!$class->getId()) {
-                    if (!isset($createdClasses[$class->getCode()])) {
-                        $createdClasses[$class->getCode()] = true;
-                    }
+                if (!$class->getId() && !isset($createdClasses[$class->getCode()])) {
+                    $createdClasses[$class->getCode()] = true;
                 }
             }
         }

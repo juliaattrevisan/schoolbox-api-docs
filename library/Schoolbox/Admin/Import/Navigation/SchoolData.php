@@ -22,13 +22,6 @@ class SchoolData implements INavigation
 {
 
     /**
-     * Direct constructor.
-     */
-    public function __construct() {
-    }
-
-
-    /**
      * Builds breadcrumbs for the Direct Import page.
      *
      * @param Router $router

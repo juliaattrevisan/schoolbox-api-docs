@@ -13,7 +13,6 @@ use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
-use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Application;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
