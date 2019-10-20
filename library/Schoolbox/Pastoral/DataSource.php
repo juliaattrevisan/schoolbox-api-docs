@@ -215,15 +215,6 @@ class DataSource
 
         }
 
-        // if getting list for two students, remove one without any linked record
-        if ($linkedStudentId) {
-            $targetRecords = $targetRecords->filter(
-                static function (Model $record) {
-                    return $record->getRelatedRecords() && $record->getRelatedRecords()->count() > 0;
-                }
-            );
-        }
-
         return $targetRecords;
     }
 
@@ -246,12 +237,12 @@ class DataSource
         $params           = $permissionClause['params'];
         if (!empty($linkedRecordIds)) {
             $userColumn   = 'p.student_id';
-            $linkedClause = $this->getLinkedClause(null, $linkedRecordIds);
+            $linkedClause = $this->getLinkedClause($viewer, null, $linkedRecordIds);
             $where        .= " AND {$linkedClause['sql']}";
             $params       = array_merge($params, $linkedClause['params']);
         } elseif (null !== $linkedStudentId) {
             $userColumn   = 'p.modified_by_user_id';
-            $linkedClause = $this->getLinkedClause($linkedStudentId, null);
+            $linkedClause = $this->getLinkedClause($viewer, $linkedStudentId, null);
             $where        .= " AND {$linkedClause['sql']}";
             $params       = array_merge($params, $linkedClause['params']);
         } else {
@@ -296,42 +287,53 @@ class DataSource
     }
 
     /**
-     * @param int|null  $studentId
+     * @param User       $viewer
+     * @param int|null   $studentId
      * @param array|null $recordIds
      * @return array
      */
-    private function getLinkedClause(?int $studentId, ?array $recordIds): array
+    private function getLinkedClause(User $viewer, ?int $studentId, ?array $recordIds): array
     {
-        $pb = [];
+        if (!$studentId && (!$recordIds || empty($recordIds))) {
+            return [
+                'sql'    => '',
+                'params' => [],
+            ];
+        }
+
+        $whereClauses = [];
+        $params       = [];
         for ($i = 0; $i < 3; $i++) {
-            $limitPb = (new Builder($this->mapper->getDatabase(), 'pastoral'))
-                ->setParamPrefix("ln{$i}");
-            if ($studentId) {
-                $limitPb->equals('pastoral.student_id', $studentId);
-            } elseif (!empty($recordIds)) {
-                $limitPb->in('pastoral.id', $recordIds);
+            $permissionClause = $this->getPermissionClause($viewer, $studentId, null, "pl{$i}");
+            $whereClauses[$i] = $permissionClause['sql'];
+            $params[$i]       = $permissionClause['params'];
+            if (!empty($recordIds)) {
+                $limitPb          = (new Builder($this->mapper->getDatabase(), "pl{$i}"))
+                    ->setParamPrefix("ln{$i}")
+                    ->in('id', $recordIds);
+                $whereClauses[$i] .= " AND {$limitPb->getWhere()[0]} ";
+                $params[$i]       += $limitPb->getParams();
             }
-            $pb[$i] = $limitPb;
         }
 
         $sql = "
                         (
                                     `p`.`parent_id` IN (
                                         SELECT    `id`
-                                        FROM      `pastoral`
+                                        FROM      `pastoral` as pl0
                                         WHERE     `deleted_at` IS NULL 
-                                          AND     {$pb[0]->getWhere()[0]}
+                                          AND     {$whereClauses[0]}
                                     ) OR p.`parent_id` IN (
                                         SELECT    `parent_id`
-                                        FROM      `pastoral`
+                                        FROM      `pastoral` as pl1
                                         WHERE     `deleted_at` IS NULL
-                                          AND     {$pb[1]->getWhere()[0]}
-                                          AND     pastoral.student_id <> p.student_id
+                                          AND     {$whereClauses[1]}
+                                          AND     pl1.student_id <> p.student_id
                                     ) OR p.`id` IN (
                                         SELECT    `parent_id`
-                                        FROM      `pastoral`
+                                        FROM      `pastoral` as pl2
                                         WHERE     `deleted_at` IS NULL 
-                                          AND     {$pb[2]->getWhere()[0]}
+                                          AND     {$whereClauses[2]}
                                     )
                         )
         ";
@@ -339,7 +341,7 @@ class DataSource
 
         return [
             'sql'    => $sql,
-            'params' => array_merge($pb[0]->getParams(), $pb[1]->getParams(), $pb[2]->getParams()),
+            'params' => array_merge($params[0], $params[1], $params[2]),
         ];
     }
 
@@ -523,7 +525,7 @@ class DataSource
     public function getLinkedStudentRecordCount(User $viewer, int $studentId): array
     {
         $permissionClause = $this->getPermissionClause($viewer, null, null, 'p');
-        $linkedClause     = $this->getLinkedClause($studentId, null);
+        $linkedClause     = $this->getLinkedClause($viewer, $studentId, null);
 
         $sql = "
                 SELECT  p.student_id,
