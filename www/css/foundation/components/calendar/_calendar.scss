@@ -149,6 +149,9 @@
 
 .fc-custom-group.row .small-4.columns {
   padding-left: 0;
+  @-moz-document url-prefix() {
+    padding-right: 2.5rem;
+  }
 }
 .fc-custom-group.row {
   margin-left: 0 !important;
