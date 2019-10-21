@@ -693,9 +693,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 }
             }
 
-            html += '<div id="calendar-response-fc"></div>';
+            html += '<div data-fullcalendar></div>';
             $pickerResponseEvents.append(html);
-            var $calendarDiv = $pickerResponseEvents.find('#calendar-response-fc');
+            var $calendarDiv = $pickerResponseEvents.find('div[data-fullcalendar]');
 
             var calendar = new FullCalendar.Calendar(
                 $calendarDiv[0],
@@ -712,12 +712,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     defaultView: 'timeGridDay',
                     events: events,
                     eventColor: '#def',
-                    height: 0, // Height is calculated below on render
                     defaultDate: data.date,
-                    datesRender: function () {
-                        // Calculate the height available and set it
-                        setFullCalendarHeight(target, this);
-                    }
                 }
             );
             calendar.render();
