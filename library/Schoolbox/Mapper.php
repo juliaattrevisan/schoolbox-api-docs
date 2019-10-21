@@ -253,6 +253,9 @@ abstract class Mapper implements IMapper, Serializable
     /** @var Propagator */
     protected $propagator;
 
+    /** @var ?bool $notificationSuppressed */
+    protected $notificationSuppressed;
+
     /** @var bool */
     private $localBodyCacheBypass = false;
 
@@ -665,6 +668,10 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getEventPropagator()
     {
+        if ($this->notificationSuppressed) {
+            return new MockPropagator();
+        }
+
         if (!$this->propagator) {
             if (!self::$prop) {
                 // We don't have a propagator setup, lets connect to the rabbit
@@ -3699,29 +3706,20 @@ abstract class Mapper implements IMapper, Serializable
         return true;
     }
 
-    /** @var Propagator */
-    private $propagatorTmp;
-
     /**
-     * Set MockPropagator to suppress notification
-     * @return $this
+     * Suppress notification
      */
     protected function suppressNotification()
     {
-        $this->propagatorTmp = $this->propagator;
-        $this->propagator    = new MockPropagator();
-        return $this;
+        $this->notificationSuppressed = true;
     }
 
     /**
-     * Restore notification (Must call suppressNotification first)
-     * @return $this
+     * Resume notification
      */
-    protected function restoreNotification()
+    protected function resumeNotification()
     {
-        $this->propagator = $this->propagatorTmp;
-        unset($this->propagatorTmp);
-        return $this;
+        unset ($this->notificationSuppressed);
     }
 
     /**

@@ -102,7 +102,7 @@ class Mapper extends BaseMapper
      *
      * @param Model $participant
      */
-    public function softDeleteReturnsAndFeedback(Model $participant): void
+    public function softDeleteResponsesAndFeedbacks(Model $participant): void
     {
         $assessment = $participant->getPlan()->getAssessment();
 
@@ -115,7 +115,7 @@ class Mapper extends BaseMapper
                 'box_id' => $assessment->getDueWork()->getId(),
                 'owner'  => $participant->getUser()->getId(),
             ]);
-            $returnMapper->restoreNotification();
+            $returnMapper->resumeNotification();
 
             // delete submission
             $submissionMapper = SubmissionBox\Submission\SubmissionMapper::getInstance();
@@ -124,7 +124,7 @@ class Mapper extends BaseMapper
                 'box_id' => $assessment->getDueWork()->getId(),
                 'owner'  => $participant->getUser()->getId(),
             ]);
-            $submissionMapper->restoreNotification();
+            $submissionMapper->resumeNotification();
 
         } elseif ($assessment->getTask() instanceof Task) {
 
@@ -136,7 +136,7 @@ class Mapper extends BaseMapper
                     'student_id' => $participant->getUser()->getId(),
                 ]
             );
-            $taskCompletionMapper->restoreNotification();
+            $taskCompletionMapper->resumeNotification();
 
         } elseif ($assessment->getQuiz() instanceof Quiz) {
 
@@ -148,7 +148,7 @@ class Mapper extends BaseMapper
                     'user_id'   => $participant->getUser()->getId(),
                 ]
             );
-            $attemptMapper->restoreNotification();
+            $attemptMapper->resumeNotification();
         }
     }
 
@@ -160,51 +160,38 @@ class Mapper extends BaseMapper
     public function restoreReturnsAndFeedback(Model $participant): void
     {
         $assessment = $participant->getPlan()->getAssessment();
-        $excludedAt  = $participant->getExcludedAt();
+        $excludedAt = $excludedAt = $participant->getExcludedAt() instanceof \Alaress_Date_NullDate ? null : $participant->getExcludedAt();
 
         if ($assessment->getDueWork() instanceof SubmissionBox) {
 
             // restore submission
             $submissionMapper = SubmissionBox\Submission\SubmissionMapper::getInstance();
             $submissionMapper->suppressNotification();
+            $params = [
+                'box_id' => $assessment->getDueWork()->getId(),
+                'owner'  => $participant->getUser()->getId(),
+            ];
+            if ($excludedAt) {
+                $params['deleted_at'] = $excludedAt;
+            }
             try {
-                $submissions = $submissionMapper->findByColumnList([
-                    'box_id' => $assessment->getDueWork()->getId(),
-                    'owner'  => $participant->getUser()->getId(),
-                ], ['deleted' => true]);
-                if ($excludedAt) {
-                    $submissions = $submissions->filter(
-                        function (SubmissionBox\Submission\Submission $submission) use ($excludedAt) {
-                            return $submission->getDeletedAt() && $submission->getDeletedAt()->eq($excludedAt);
-                        }
-                    );
-                }
+                $submissions = $submissionMapper->findByColumnList($params, ['deleted' => true]);
                 $submissionMapper->restoreSoftDeleted($submissions);
             } catch (BaseMapper\Exception $e) {
                 // noop
             }
-            $submissionMapper->restoreNotification();
+            $submissionMapper->resumeNotification();
 
             // restore submission return
             $returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
             $returnMapper->suppressNotification();
             try {
-                $returns = $returnMapper->findByColumnList([
-                    'box_id' => $assessment->getDueWork()->getId(),
-                    'owner'  => $participant->getUser()->getId(),
-                ], ['deleted' => true]);
-                if ($excludedAt) {
-                    $returns = $returns->filter(
-                        function (SubmissionBox\ReturnedWork $return) use ($excludedAt) {
-                            return $return->getDeletedAt() && $return->getDeletedAt()->eq($excludedAt);
-                        }
-                    );
-                }
+                $returns = $returnMapper->findByColumnList($params, ['deleted' => true]);
                 $returnMapper->restoreSoftDeleted($returns);
             } catch (BaseMapper\Exception $e) {
                 // noop
             }
-            $returnMapper->restoreNotification();
+            $returnMapper->resumeNotification();
 
         } elseif ($assessment->getTask() instanceof Task) {
 
@@ -212,43 +199,37 @@ class Mapper extends BaseMapper
             $taskCompletionMapper = CompletionMapper::getInstance();
             $taskCompletionMapper->suppressNotification();
             try {
-                $completion = $taskCompletionMapper->findByColumnList([
+                $params = [
                     'task_id'    => $assessment->getTask()->getId(),
                     'student_id' => $participant->getUser()->getId(),
-                ], ['deleted' => true]);
+                ];
                 if ($excludedAt) {
-                    $completion = $completion->filter(
-                        function (Task\Completion $completion) use ($excludedAt) {
-                            return $completion->getDeletedAt() && $completion->getDeletedAt()->eq($excludedAt);
-                        }
-                    );
+                    $params['deleted_at'] = $excludedAt;
                 }
+                $completion = $taskCompletionMapper->findByColumnList($params, ['deleted' => true]);
                 $taskCompletionMapper->restoreSoftDeleted($completion);
             } catch (BaseMapper\Exception $e) {
                 // noop
             }
-            $taskCompletionMapper->restoreNotification();
+            $taskCompletionMapper->resumeNotification();
 
         } elseif ($assessment->getQuiz() instanceof Quiz) {
             $attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
             $attemptMapper->suppressNotification();
             try {
-                $attempts = $attemptMapper->findByColumnList([
+                $params = [
                     'assess_id' => $assessment->getQuiz()->getId(),
                     'user_id'   => $participant->getUser()->getId(),
-                ], ['deleted' => true]);
+                ];
                 if ($excludedAt) {
-                    $attempts = $attempts->filter(
-                        function (\Schoolbox\Learning\Quiz\Attempt\Model $attempt) use ($excludedAt) {
-                            return $attempt->getDeleted() && $attempt->getDeleted()->eq($excludedAt);
-                        }
-                    );
+                    $params['deleted_at'] = $excludedAt;
                 }
+                $attempts = $attemptMapper->findByColumnList($params, ['deleted' => true]);
                 $attemptMapper->restoreSoftDeleted($attempts);
             } catch (BaseMapper\Exception $e) {
                 // noop
             }
-            $attemptMapper->restoreNotification();
+            $attemptMapper->resumeNotification();
         }
     }
 

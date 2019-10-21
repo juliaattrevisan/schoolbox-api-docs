@@ -440,7 +440,7 @@ class ListController extends Web\Controller\Base
                 }
                 if ($existingParticipation) {
                     if (!$existingParticipation->isExcluded()) {
-                        $participantMapper->softDeleteReturnsAndFeedback($existingParticipation);
+                        $participantMapper->softDeleteResponsesAndFeedbacks($existingParticipation);
                     }
                     $participantMapper->delete($existingParticipation);
                 }
