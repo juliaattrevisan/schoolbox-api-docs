@@ -1649,7 +1649,7 @@ class Leave_Controller extends Controller
     {
         /* Address the double negative and the fact this comes out as a boolean now
          */
-        $enabled = !Cfg::get('boarder_leave_parent_notification_enabled');
+        $enabled = Cfg::get('boarder_leave_parent_notification_enabled');
 
         if ($enabled) {
 
