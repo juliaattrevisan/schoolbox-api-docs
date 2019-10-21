@@ -379,11 +379,11 @@ class CourseSections
                 if (($overrideCanvasId !== null) && !array_key_exists($overrideCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'])) {
                     $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId] = [
                         'title'        => $row['override.title'],
-                        'unlock_at'    => $row['assignment.unlock_at'],
-                        'lock_at'      => $row['assignment.lock_at'],
-                        'due_at'       => $row['assignment.due_at'],
-                        'all_day'      => $row['assignment.all_day'] === 'true',
-                        'all_day_date' => $row['assignment.all_day_date'],
+                        'unlock_at'    => $row['override.unlock_at'],
+                        'lock_at'      => $row['override.lock_at'],
+                        'due_at'       => $row['override.due_at'],
+                        'all_day'      => $row['override.all_day'] === 'true',
+                        'all_day_date' => $row['override.all_day_date'],
                         'sections'     => [],
                         'groups'       => [],
                         'ad_hoc_users' => [],
@@ -631,7 +631,7 @@ class CourseSections
 
                         foreach ($courseData['sections'] as $sectionCanvasId => $section) {
                             $sectionSisSourceId = $section['sis_source_id'];
-                            // Do we have not overrides for this section and assignment is not for everyone?
+                            // Do we not have overrides for this section and assignment is not for everyone?
                             if (!array_key_exists($sectionSisSourceId, $overridesPerSection) && $assignment['visibility'] !== 'everyone') {
                                 // No need to import this assignment into this class.
                                 continue;
@@ -669,15 +669,37 @@ class CourseSections
                             }
                             $classTeacher = $classTeacherCache[$sectionSisSourceId];
 
-                            $submissionBoxImpl                                          = $this->syncAssignmentWithSubmissionBoxImpl(
+                            // If assignment has a section override, then use section dates as assignment dates, so section overrides dates can be NULL
+                            $sectionOverride = null;
+                            foreach($overridesPerSection[$sectionSisSourceId] ?? [] as $overrideCanvasId => $override){
+                                if (count($override['sections'])) {
+                                    $sectionOverride = $override;
+                                    break;
+                                }
+                            }
+                            if ($sectionOverride) {
+                                $unlockAt   = $sectionOverride['unlock_at'];
+                                $lockAt     = $sectionOverride['lock_at'];
+                                $dueAt      = $sectionOverride['due_at'];
+                                $allDay     = $sectionOverride['all_day'];
+                                $allDayDate = $sectionOverride['all_day_date'];
+                            } else {
+                                $unlockAt   = $assignment['unlock_at'];
+                                $lockAt     = $assignment['lock_at'];
+                                $dueAt      = $assignment['due_at'];
+                                $allDay     = $assignment['all_day'];
+                                $allDayDate = $assignment['all_day_date'];
+                            }
+
+                            $submissionBoxImpl = $this->syncAssignmentWithSubmissionBoxImpl(
                                 $assignmentCanvasId,
                                 $unitImpl,
                                 $classTeacher,
-                                $assignment['unlock_at'],
-                                $assignment['lock_at'],
-                                $assignment['due_at'],
-                                $assignment['all_day'],
-                                $assignment['all_day_date']
+                                $unlockAt,
+                                $lockAt,
+                                $dueAt,
+                                $allDay,
+                                $allDayDate
                             );
                             $submissionBoxImplSynchronised[$submissionBoxImpl->getId()] = $submissionBoxImpl;
                             $this->countCanvasAssignmentsSynchronised++;
@@ -958,7 +980,6 @@ class CourseSections
      * @return SubmissionBox
      * @throws Database\Exception
      * @throws Mapper\Exception
-     * @throws PDOException
      * @throws UnexpectedValueException
      */
     private function syncAssignmentWithSubmissionBoxImpl(
