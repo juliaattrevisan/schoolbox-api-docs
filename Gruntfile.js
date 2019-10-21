@@ -152,6 +152,12 @@ var jsSrc = {
         'www/javascript/shared/masonry/jquery.masonry.js',
         'www/javascript/shared/masonry/jquery.masonry.spectrum.js'
     ],
+    fullcalendar: [
+        // Required for the datepicker calendar for now
+        'node_modules/@fullcalendar/core/main.js',
+        'node_modules/@fullcalendar/daygrid/main.js',
+        'node_modules/@fullcalendar/timegrid/main.js',
+    ],
     vue: [ // Death to jQuery!
         'node_modules/es6-object-assign/dist/object-assign-auto.js',
         'node_modules/vue/dist/vue.min.js',
@@ -162,6 +168,7 @@ var jsSrc = {
 var jsDest = {
     main: 'www/javascript/components/<%= pkg.name %>.min.js',
     masonry: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
+    fullcalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
     vue: 'www/javascript/components/<%= pkg.name %>-vue.min.js'
 };
 
@@ -194,6 +201,10 @@ module.exports = function(grunt) {
                 src: jsSrc.masonry,
                 dest: jsDest.masonry
             },
+            fullcalendar: {
+                src: jsSrc.fullcalendar,
+                dest: jsDest.fullcalendar
+            },
             vue: {
                 src: jsSrc.vue,
                 dest: jsDest.vue
@@ -212,6 +223,10 @@ module.exports = function(grunt) {
             masonry: {
                 src: jsSrc.masonry,
                 dest: jsDest.masonry
+            },
+            fullcalendar: {
+                src: jsSrc.fullcalendar,
+                dest: jsDest.fullcalendar
             },
             vue: {
                 src: jsSrc.vue,

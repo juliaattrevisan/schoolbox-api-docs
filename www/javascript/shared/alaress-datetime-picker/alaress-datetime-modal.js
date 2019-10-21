@@ -697,25 +697,29 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             $pickerResponseEvents.append(html);
             var $calendarDiv = $pickerResponseEvents.find('#calendar-response-fc');
 
-            $calendarDiv.fullCalendar({
-                header: false,
-                eventLimit: true,
-                scrollTime: dateDisplayFormats.calendarStartTime,
-                views: {
-                    agendaDay: {
-                        eventLimit: 4
+            var calendar = new FullCalendar.Calendar(
+                $calendarDiv[0],
+                {
+                    plugins: ['timeGrid'],
+                    header: false,
+                    eventLimit: true,
+                    scrollTime: dateDisplayFormats.calendarStartTime,
+                    views: {
+                        day: {
+                            eventLimit: 4
+                        }
+                    },
+                    defaultView: 'timeGridDay',
+                    events: events,
+                    eventColor: '#def',
+                    height: 0, // Height is calculated below on render
+                    defaultDate: data.date,
+                    viewRender: function () {
+                        // Calculate the height available and set it
+                        setFullCalendarHeight(target);
                     }
-                },
-                defaultView: 'agendaDay',
-                events: events,
-                eventColor: '#def',
-                height: 0, // Height is calculated below on render
-                defaultDate: moment(data.date),
-                viewRender: function () {
-                    // Calculate the height available and set it
-                    setFullCalendarHeight(target);
                 }
-            });
+            );
 
             // If the div where the calendar is going is hidden at this time - render will need to be called when it is
             // visible.
@@ -724,16 +728,18 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 // If it was hidden because the tab wasn't open
                 $modal.find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
                     setTimeout(function () {
-                        $calendarDiv.fullCalendar('render');
+                        calendar.render();
                     }, 80);
                 });
 
                 // If it was hidden because the full due work list was expanded (quickly before the calendar loaded)
                 $pickerResponse.find('[data-hide-full-due]').one('click', function () {  // purposefully `one`, not `on`
                     setTimeout(function () {
-                        $calendarDiv.fullCalendar('render');
+                        calendar.render();
                     }, 80);
                 });
+            } else {
+                calendar.render();
             }
 
         }
