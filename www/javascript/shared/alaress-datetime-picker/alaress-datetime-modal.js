@@ -714,9 +714,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     eventColor: '#def',
                     height: 0, // Height is calculated below on render
                     defaultDate: data.date,
-                    viewRender: function () {
+                    datesRender: function () {
                         // Calculate the height available and set it
-                        setFullCalendarHeight(target);
+                        setFullCalendarHeight(target, this);
                     }
                 }
             );
@@ -910,8 +910,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * This will create an interval to loop until the due work card has loaded (if there will be one).
      *
      * @param target
+     * @param calendar
      */
-    function setFullCalendarHeight(target) {
+    function setFullCalendarHeight(target, calendar) {
 
         var intervalLength = 0; // Run this immediately (an interval will be set after the first run)
 
@@ -934,7 +935,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 }
 
                 // Set the fullcalendar height
-                $('#' + target + 'Response' + twigVars.id + '-events #calendar-response-fc').fullCalendar('option', 'height', calendarHeight);
+                calendar.setOption('height', calendarHeight);
 
                 // Stop this from running again
                 clearInterval(calcInterval);
