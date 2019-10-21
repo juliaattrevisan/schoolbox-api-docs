@@ -167,19 +167,20 @@ class Courses
                assignment.submission_types 'assignment.submission_types',
                assignment.created_at       'assignment.created_at',
                assignment.updated_at       'assignment.updated_at',
-               assignment.muted            'assignment.muted',
-               assignment.position         'assignment.position'
+               assignment.muted            'assignment.muted'
         FROM course_dim course
         JOIN enrollment_term_dim enrollment_term ON enrollment_term.id = course.enrollment_term_id
         JOIN account_dim account ON course.account_id = account.id
         LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state = 'published'
+        LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
         WHERE $courseFilterWhere
-        ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment.id DESC
+        ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment_group.position, assignment.position
         ";
         $statement = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
 
         // Parse results into hierarchical structure
         $accountsData = [];
+        $assessmentSequence = 1; // TODO remove hard-coding in develop branch
         while ($row = $statement->fetch()) {
             $accountCanvasId    = (int)$row['account.canvas_id'];
             $courseCode         = $row['course.code'];
@@ -217,7 +218,7 @@ class Courses
                     'created_at'       => $row['assignment.created_at'],
                     'updated_at'       => $row['assignment.updated_at'],
                     'muted'            => $row['assignment.muted'] === 'true',
-                    'position'         => (int)$row['assignment.position'],
+                    'position'         => $assessmentSequence++,
                 ];
             }
         }
