@@ -171,9 +171,10 @@
 
         /* Show the similarity checkbox if single or multi submit options selected */
         $acceptOnlineToggle.change(function(){
-            if($acceptOnlineToggle.val() !== '0') {
+            if ($acceptOnlineToggle.val() !== '0') {
                 $similarityRow.show();
             } else {
+                $('#similarityCheckEnabled').prop('checked', false);
                 $similarityRow.hide();
             }
         });
