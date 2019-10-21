@@ -669,7 +669,9 @@ abstract class Mapper implements IMapper, Serializable
     public function getEventPropagator()
     {
         if ($this->notificationSuppressed) {
-            return new MockPropagator();
+            self::$prop = new MockPropagator();
+            $this->propagator = self::$prop;
+            return  $this->propagator;
         }
 
         if (!$this->propagator) {
