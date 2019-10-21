@@ -144,14 +144,14 @@
                     return false;
                 }
 
-                let bookingStatus = eventRenderInfo.event.extendedProps.data.booking.status,
+                let bookingStatus = eventRenderInfo.event.extendedProps.data.booking?.status,
                     isEventRendered = true;
 
-                if (bookingStatus.isRejected) {
+                if (bookingStatus?.isRejected) {
                     eventRenderInfo.el.classList.add('rejected');
-                } else if (bookingStatus.isApproved) {
+                } else if (bookingStatus?.isApproved) {
                     eventRenderInfo.el.classList.add('approved');
-                } else if (bookingStatus.isPending) {
+                } else if (bookingStatus?.isPending) {
                     eventRenderInfo.el.classList.add('pending');
                 }
 

@@ -149,15 +149,15 @@
                     return false;
                 }
 
-                let bookingStatus = event.event.extendedProps.data.booking.status,
+                let bookingStatus = event.event.extendedProps.data.booking?.status,
                     element = event.el;
 
                 // Add booking styles
-                if (bookingStatus.isRejected) {
+                if (bookingStatus?.isRejected) {
                     element.classList.add('rejected');
-                } else if (bookingStatus.isApproved) {
+                } else if (bookingStatus?.isApproved) {
                     element.classList.add('approved');
-                } else if (bookingStatus.isPending) {
+                } else if (bookingStatus?.isPending) {
                     element.classList.add('pending');
                 }
 
