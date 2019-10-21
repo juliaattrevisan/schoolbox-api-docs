@@ -11,9 +11,15 @@ namespace Schoolbox\Resource\File;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\IHomepageCleanable;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use PDO;
+use PDOStatement;
 
 
 /**
@@ -53,7 +59,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $this->uses('comment', self::TYPE_STRING, null, 'description'); // TODO rename that field!
         $this->uses('hidden', self::TYPE_BOOLEAN);
         $this->uses('modified', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'modifiedAt');
-
+        $this->joins('modified_by', UserMapper::class, 'id');
         $this->joins('category', Resource\Folder\Mapper::class, 'id', null, null, 'folder', 'category');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
@@ -92,11 +98,13 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 {$this->getJoinColumnString('hash', 'h')},
                 {$this->getJoinColumnString('hash.allowedFileExtension', 'm')},
                 {$this->getJoinColumnString('owner', 'u')},
+                {$this->getJoinColumnString('modified_by', 'um')},
                 {$this->getJoinColumnString($this->getFolderFieldname(), 'c')}
             FROM {$table}
             LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$this->getJoinSql('hash.allowedFileExtension', 'h', 'm', true)}
             LEFT JOIN {$this->getJoinSql('owner', $table, 'u', true)}
+            LEFT JOIN {$this->getJoinSql('modified_by', $table, 'um', true)}
             LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
         ";
 
@@ -257,5 +265,53 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      */
     public function homepageClean($cid){
         $this->deleteByColumn('category',$cid);
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     * @throws Exception
+     * @throws Deleted
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            // can't set storage if it doesn't exist
+            if (!$r['h.hash']) {
+                continue;
+            }
+
+            $file = $this->hydrate($r);
+
+            $mimetype = $this->getJoinMapper('hash')->hydrateJoin($r, 'allowedFileExtension', 'm');
+
+            /** @var Storage $store */
+            $store = $this->hydrateJoin($r, 'hash', 'h')
+                          ->setMimetype($mimetype);
+
+            // ensure the path is set
+            $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
+
+            $file->setStorage($store);
+            $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
+            $file->setModifiedBy($this->hydrateJoin($r, 'modified_by', 'um'));
+
+            if ($file->getFolder() && (int)$file->getFolder()->getId() === 0) {
+
+                // root folder
+                $folder = $this->getJoinMapper($this->getFolderFieldname())->findById(0);
+            } else {
+                $folder = $this->hydrateJoin($r, $this->getFolderFieldname(), 'c');
+            }
+
+            $file->setFolder($folder);
+
+            $c->add($file);
+        }
+
+        return $c;
     }
 }

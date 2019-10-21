@@ -79,7 +79,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         }
 
         /* Need title injected here
-             */
+         */
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'has_file', 'has_file_block');
@@ -173,21 +173,18 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 /** @var Schoolbox\Resource\File\Model[] $fileList */
                 if (count($fileList)) {
-                    $userMapper = new Schoolbox\UserMapper();
                     $folderId =$this->getContext()->getId();
                     foreach ($fileList as $file) {
                         if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                             continue;
                         }
-                        if ($file->getModifiedById() !== null) {
-                            try {
-                                $modifiedBy = $userMapper->findById($file->getModifiedById());
-                            } catch (\Schoolbox\Mapper\Exception $e) {
-                                $modifiedBy = null;
-                            }
-                        } else {
-                            $modifiedBy = null;
+
+                        $modifiedById = null;
+
+                        if (null !== $file->getModifiedBy()) {
+                            $modifiedById = $file->getModifiedBy()->getId();
                         }
+
                         $this->setVar([
                             'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
                             'FILE_ID'              => $file->getId(),
@@ -197,8 +194,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             'FILE_POSTED_BY_ID'    => $file->getOwner()->getId(),
                             'FILE_POSTED_DATE'     => $file->getCreatedAt()->getShort(),
                             'FILE_POSTED_RELATIVE' => $file->getCreatedAt()->getRelativeTime(),
-                            'FILE_MODIFIED_BY'     => ($modifiedBy !== null) ? $modifiedBy->formatName() :null,
-                            'FILE_MODIFIED_BY_ID'  => $file->getModifiedById(),
+                            'FILE_MODIFIED_BY'     => (($modifiedById !== null) ? $file->getModifiedBy()->formatName() : null),
+                            'FILE_MODIFIED_BY_ID'  => $modifiedById,
                             'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
                             'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                             'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
@@ -218,7 +215,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             $this->setVar('file_modified_at_block', '');
                             $this->setVar('file_posted_at_block', '');
                             $this->parse('owner_deleted_block', 'owner_deleted');
-                        } else if ($file->getModifiedById() !== null && trim($file->getModifiedById()) !== '') {
+                        } else if ($modifiedById !== null) {
                             $this->setVar('owner_exists_block', '');
                             $this->setVar('owner_deleted_block', '');
                             $this->setVar('file_posted_at_block', '');

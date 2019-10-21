@@ -112,7 +112,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
                 error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
             }
 
-            $file->setModifiedById($_SESSION['user']->getId());
+            $file->setModifiedBy($_SESSION['user']);
             $file->setFolder(FolderMapper::getInstance()->createModel()->setId($_POST['category']));
             $affectedIds = FileMapper::getInstance()->save($file);
 

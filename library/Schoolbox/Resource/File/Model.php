@@ -32,9 +32,6 @@ class Model extends AbstractFile
     /** @var Alaress_Date_Format */
     protected $modifiedAt;
 
-    /** @var int */
-    protected $modifiedById;
-
 
     /**
      * @return string
@@ -104,23 +101,4 @@ class Model extends AbstractFile
         $this->modifiedAt = $modifiedAt;
         return $this;
     }
-
-    /**
-     * @return int|null
-     */
-    public function getModifiedById(): ?int
-    {
-        return $this->modifiedById;
-    }
-
-    /**
-     * @param $modifiedById
-     * @return self
-     */
-    public function setModifiedById($modifiedById): self
-    {
-        $this->modifiedById = $modifiedById;
-        return $this;
-    }
-
 }

@@ -94,11 +94,8 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('description', self::TYPE_STRING, null, 'title');
-        $this->uses('modified_by', self::TYPE_INTEGER, null, 'modifiedById');
         $this->uses('submitted', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
-
         $this->joins('owner', UserMapper::class, 'id');
-
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('hash', Resource\Storage\Mapper::class, 'hash', null, null, 'storage');
     }
@@ -145,19 +142,16 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
             }
 
             $file = $this->hydrate($r);
+            $mimetype = $this->getJoinMapper('hash')->hydrateJoin($r, 'allowedFileExtension', 'm');
 
             /** @var Storage $store */
             $store = $this->hydrateJoin($r, 'hash', 'h')
-                          ->setMimetype(
-                              $this->getJoinMapper('hash')
-                                   ->hydrateJoin($r, 'allowedFileExtension', 'm')
-                          );
+                          ->setMimetype($mimetype);
 
             // ensure the path is set
             $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
 
             $file->setStorage($store);
-
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
 
             if ($file->getFolder() && (int)$file->getFolder()->getId() === 0) {
