@@ -28,6 +28,9 @@
 
     {% block mainHeader %}
         <link rel="stylesheet" type="text/css" href="/css/{{ config.site_location }}/chrome-foundation.css?v={{ config.site_version }}" />
+
+        <link rel="stylesheet" type="text/css" href="/css/{{ config.site_location }}/datepicker-fullcalendar.css?v={{ config.site_version }}" />
+
         <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
         {% if tour.data and not user.impersonated %}
         {% autoescape 'js' %}
@@ -38,6 +41,7 @@
         {% endif %}
         <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+
         <script src="/javascript/shared/browser-redirect.js"></script>
         <script type="text/javascript" src="/javascript/math/jscurry-0.3.0.js"></script>
         <script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>

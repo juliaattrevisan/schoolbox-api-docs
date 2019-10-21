@@ -188,6 +188,26 @@ HELP;
                     $logger->warning("Something went wrong building editor CSS (exit code: {$outputCode})");
                 }
 
+
+                // Build the datepicker's required CSS
+                $logger->info("Building CSS for datepicker FullCalendar");
+                $datepickerIn = SITE_root . '/www/css/foundation/datepicker-fullcalendar.scss';
+                $datepickerInInstance = SITE_root . '/www/css/foundation/datepicker-fullcalendar-'.INSTANCE_ID.'.scss';
+                $datepickerOut = SITE_root . '/www/css/'.$siteLocation.'/datepicker-fullcalendar.css';
+
+                $datepickerInContent = file_get_contents($datepickerIn);
+                $datepickerInContent = str_replace('utils/skin', 'utils/skin-'.INSTANCE_ID, $datepickerInContent);
+                $datepickerInContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $datepickerInContent);
+                file_put_contents($datepickerInInstance, $datepickerInContent);
+
+                $cmd     = sprintf('sass --style compressed --sourcemap=none %s %s', escapeshellarg($datepickerInInstance), escapeshellarg($datepickerOut));
+                exec($cmd, $output, $outputCode);
+
+                if ($outputCode !== 0) {
+                    $logger->warning("Something went wrong building datepicker FullCalendar CSS (exit code: {$outputCode})");
+                }
+
+
                 // Move all of the CSS files to S3
 
                 $logger->info("Copying output to FS_STORAGE");
