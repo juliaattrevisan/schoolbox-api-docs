@@ -167,7 +167,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 }
 
                 $key = ($room['ClassCampus'] ?? '') . $room['ClassCode'];
-                if ($key !== '' && !(array_key_exists($key, $categoryList))) {
+                if ($room['ClassCode'] && $key !== '' && !(array_key_exists($key, $categoryList))) {
                     $categoryList[$key] = FolderMapper::getInstance()->findForCampusAndClass(
                         $room['ClassCampus'] ?? '',
                         $room['ClassCode']
