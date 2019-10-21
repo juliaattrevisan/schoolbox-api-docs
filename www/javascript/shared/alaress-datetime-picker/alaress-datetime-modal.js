@@ -720,28 +720,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     }
                 }
             );
-
-            // If the div where the calendar is going is hidden at this time - render will need to be called when it is
-            // visible.
-            if ($calendarDiv.not(':visible')) {
-
-                // If it was hidden because the tab wasn't open
-                $modal.find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
-                    setTimeout(function () {
-                        calendar.render();
-                    }, 80);
-                });
-
-                // If it was hidden because the full due work list was expanded (quickly before the calendar loaded)
-                $pickerResponse.find('[data-hide-full-due]').one('click', function () {  // purposefully `one`, not `on`
-                    setTimeout(function () {
-                        calendar.render();
-                    }, 80);
-                });
-            } else {
-                calendar.render();
-            }
-
+            calendar.render();
         }
 
         if (template == 'duework' && data.students.length > 0) {
