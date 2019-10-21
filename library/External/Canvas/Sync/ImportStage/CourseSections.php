@@ -268,6 +268,7 @@ class CourseSections
                     section_student.canvas_id      'section_student.canvas_id',
                     section_student.sis_user_id    'section_student.sis_user_id',
                     assignment.canvas_id           'assignment.canvas_id',
+                    assignment.title               'assignment.title',
                     assignment.visibility          'assignment.visibility',
                     assignment.unlock_at           'assignment.unlock_at',
                     assignment.lock_at             'assignment.lock_at',
@@ -364,6 +365,7 @@ class CourseSections
                 if (!array_key_exists($assignmentCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'])) {
                     $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId] = [
                         'unlock_at'    => $row['assignment.unlock_at'],
+                        'title'        => $row['assignment.title'],
                         'lock_at'      => $row['assignment.lock_at'],
                         'due_at'       => $row['assignment.due_at'],
                         'all_day'      => $row['assignment.all_day'] === 'true',
@@ -486,7 +488,7 @@ class CourseSections
                          *   derive section user sets from canvas
                          */
 
-                        $this->log->info("Processing Canvas Assignment (CanvasId: $assignmentCanvasId)");
+                        $this->log->info("Processing Canvas Assignment '{$assignment['title']}' (CanvasId: $assignmentCanvasId)");
 
                         // Split overrides (particularly group+adHoc overrides, sections are trivial) over sections.
                         // Section override     => 1 section
