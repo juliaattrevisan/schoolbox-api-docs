@@ -43,6 +43,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         submit: $byTimetable.find('[data-adtp-tt-submit]')
     };
 
+    var fullCalendars = {};
+
     // Listen for the modal open
     $('#adtp-modal-wrapper-' + twigVars.id).on('open.fndtn.reveal', function () {
         resetCalendar();
@@ -697,6 +699,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             $pickerResponseEvents.append(html);
             var $calendarDiv = $pickerResponseEvents.find('div[data-fullcalendar]');
 
+            // Kill off the fullcalendar for this target, and rebuild it
+            if (fullCalendars[target]) {
+                fullCalendars[target].destroy();
+            }
             var calendar = new FullCalendar.Calendar(
                 $calendarDiv[0],
                 {
@@ -715,6 +721,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     defaultDate: data.date,
                 }
             );
+            fullCalendars[target] = calendar;
             calendar.render();
         }
 
@@ -898,49 +905,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         }
     }
-
-
-    /**
-     * Determine the amount of space available for fullcalendar in the right panel, then set it.
-     * This will create an interval to loop until the due work card has loaded (if there will be one).
-     *
-     * @param target
-     * @param calendar
-     */
-    function setFullCalendarHeight(target, calendar) {
-
-        var intervalLength = 0; // Run this immediately (an interval will be set after the first run)
-
-        var calcInterval = setInterval(function () {
-
-            var $dueWorkCard = $('#' + target + 'Response' + twigVars.id + '-duework'), // The 'heaviest workload' card (with the 'mini' heading)
-                dueWorkHeightInner = $dueWorkCard.height();                             // Height of the card above, excluding padding & margins
-
-            // Check if the height should now be set (either no due work or due work hasn't loaded)
-            if ((pickerOptions.type != 'duework') || (pickerOptions.type == 'duework' && dueWorkHeightInner > 0)) {
-
-                var calendarHeight = $modal.find('[data-adtp-left-panel=' + target + ']').outerHeight(true),                   // The height of the left panel
-                    calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true),  // Height of the 'your calendar' heading
-                    dueWorkHeightOuter = $dueWorkCard.outerHeight(true);                                                                        // Height of the card above, including padding & margins
-
-                // Subtract heights from the left panel height as necessary
-                calendarHeight -= calendarTitleHeight;
-                if (pickerOptions.type == 'duework') {
-                    calendarHeight -= dueWorkHeightOuter;
-                }
-
-                // Set the fullcalendar height
-                calendar.setOption('height', calendarHeight);
-
-                // Stop this from running again
-                clearInterval(calcInterval);
-            }
-
-            intervalLength = 500;
-
-        }, intervalLength);
-    }
-
 
     /**
      * Whichever dates are visible in the timetable, apply heat to them
