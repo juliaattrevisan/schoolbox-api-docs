@@ -37,6 +37,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 vStudents.StudentID,
                 vStudents.StudentGiven1,
                 vStudents.StudentSurname,
+                '' AS StudentGender,
                 CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
                 vStudents.StudentTutorName,
                 vStudents.StudentHeadOfHouse,
