@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge;
 
+use Psr\Log\LoggerInterface;
 use function strcmp;
 
 /**
@@ -81,24 +82,28 @@ class AssignmentDates
      * @param $closeDate
      * @return array
      */
-    public function normaliseDates(string $publishDate, string $openDate, string $dueDate, string $closeDate): array
+    public function normaliseDates(string $publishDate, string $openDate, string $dueDate, string $closeDate, LoggerInterface $log): array
     {
         // 1. DueDate is most important, it should not change
 
         // 2. PublishDate controls when student/parent may see assessment, must not be after dueDate
         if (strcmp($publishDate, $dueDate) > 0) {
+            $log->warning("Publish date changed from '$publishDate' to due '$dueDate'");
             $publishDate = $dueDate;
         }
 
         // 3. OpenDate must not be before publish date, or after due date
         if (strcmp($publishDate, $openDate) > 0) {
+            $log->warning("Open date changed from '$openDate' to publish date '$publishDate'");
             $openDate = $publishDate;
         } elseif (strcmp($openDate, $dueDate) > 0) {
+            $log->warning("Open date changed from '$openDate' to due '$dueDate'");
             $openDate = $dueDate;
         }
 
         // 4. Close date cannot be before dueDate
         if (strcmp($dueDate, $closeDate) > 0) {
+            $log->warning("Close date changed from '$closeDate' to due '$dueDate'");
             $closeDate = $dueDate;
         }
 

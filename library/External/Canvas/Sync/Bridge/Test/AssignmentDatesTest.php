@@ -10,6 +10,7 @@ namespace External\Canvas\Sync\Bridge\Test;
 use Alaress\DataStructures\Permutations;
 use External\Canvas\Sync\Bridge\AssignmentDates;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use function array_push;
 use function strcmp;
 
@@ -35,7 +36,7 @@ class AssignmentDatesTest extends TestCase
     {
         $assignmentDates = new AssignmentDates();
 
-        [$publishDate, $openDate, $dueDate, $closeDate] = $assignmentDates->normaliseDates($publishDateIn, $openDateIn, $dueDateIn, $closeDateIn);
+        [$publishDate, $openDate, $dueDate, $closeDate] = $assignmentDates->normaliseDates($publishDateIn, $openDateIn, $dueDateIn, $closeDateIn, new NullLogger());
 
         $msg =
             "Dates are invalid.\n" .

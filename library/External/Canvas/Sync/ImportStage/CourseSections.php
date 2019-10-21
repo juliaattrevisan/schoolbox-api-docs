@@ -978,7 +978,7 @@ class CourseSections
         [$publishDate, $openDate, $dueDate, $closeDate] = $this->assignmentDatesBridge
             ->assessmentDates($unlockAt, $dueAt, $allDay, $allDayDate, $lockAt, $unitOpenDate, $unitDueDate);
         [$publishDate, $openDate, $dueDate, $closeDate] = $this->assignmentDatesBridge
-            ->normaliseDates($publishDate, $openDate, $dueDate, $closeDate);
+            ->normaliseDates($publishDate, $openDate, $dueDate, $closeDate, $this->log);
 
         $owner = $classTeacher ?? $submissionBoxSpec->getOwner();
 
@@ -1109,7 +1109,7 @@ class CourseSections
                 $submissionBoxImpl->getAssessmentModel()->getPublishDate()->getDatabase(),
                 $submissionBoxImpl->getAssessmentModel()->getDueDate()->getDatabase()
             );
-            [$publish, $open, $due, $close] = $this->assignmentDatesBridge->normaliseDates($publish, $open, $due, $close);
+            [$publish, $open, $due, $close] = $this->assignmentDatesBridge->normaliseDates($publish, $open, $due, $close, $this->log);
         }
 
         $plan = $this->findPlan($submissionBoxImpl, $canvasId);
