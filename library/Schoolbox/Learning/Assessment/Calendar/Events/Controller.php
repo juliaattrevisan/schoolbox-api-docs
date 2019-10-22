@@ -131,7 +131,7 @@ class Controller extends Base
     {
         $this->response->content->set(
             $this->buildJsonOutput(
-                array_values(array_reduce($this->buildEventOutput(), [$this, 'groupEvents']))
+                array_values(array_reduce($this->buildEventOutput(), [$this, 'groupEvents'], []))
             )
         );
     }
