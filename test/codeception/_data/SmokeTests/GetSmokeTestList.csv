@@ -22,7 +22,7 @@ Admin,Superuser,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/h
 ,Superuser,Import a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar
 ,Superuser,Subscibe to a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe
 ,Superuser,Cleanup calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup
-,Superuser,Bulk add folders,https://vagrant.dev.schoolbox.cloud/adminv2/bulk-add-folders
+,Superuser,Bulk add folders,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder
 ,Superuser,Rollover folders,https://vagrant.dev.schoolbox.cloud/adminv2/rollover
 ,Superuser,Setup grades,https://vagrant.dev.schoolbox.cloud/adminv2/grades
 ,Superuser,Setup rubric resultset,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results
@@ -44,7 +44,7 @@ Admin,Superuser,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/h
 ,Superuser,Setup UPS rules,https://vagrant.dev.schoolbox.cloud/adminv2/ups
 ,Superuser,Setup UPS rules for students,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student
 ,Superuser,View Media Queue,https://vagrant.dev.schoolbox.cloud/adminv2/video
-,Superuser,Import users,https://vagrant.dev.schoolbox.cloud/adminv2/import/user
+,Superuser,Import users,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount
 ,Superuser,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload
 ,Superuser,Config filters,https://vagrant.dev.schoolbox.cloud/adminv2/filters
 ,Superuser,Configure filters on pending assessment,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending
