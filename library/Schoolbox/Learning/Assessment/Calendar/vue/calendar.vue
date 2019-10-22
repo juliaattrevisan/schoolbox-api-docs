@@ -299,6 +299,7 @@
              * @param eventInfo
              */
             onEventClick(eventInfo) {
+                this.currentEvent = eventInfo.event;
                 this.$refs.event.open();
                 // var self = this;
                 //
