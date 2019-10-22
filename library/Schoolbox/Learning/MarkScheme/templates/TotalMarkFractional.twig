@@ -42,7 +42,7 @@
                 parts[0] = $.trim(parts[0]);
                 parts[1] = $.trim(parts[1]);
 
-                if ($.isNumeric(parts[0]) && $.isNumeric(parts[1])) {
+                if ($.isNumeric(parts[0])) {
                     var numerator = parseInt(parts[0]);
                     var denominator = $(element).attr('data-validation-limit');
 
@@ -53,14 +53,18 @@
                  # so test that it's one of the available customisable options
                  #}
                 return $(element).parents('.combobox').find('.combobox_selector li:contains("' + $(element).val() + '")').length > 0;
-
-            }, 'The grade must be between 0 and ' + $('input[name="mark"]').attr('data-validation-limit') + '.');
+            });
 
             $("[data-feedback-form]").alaressValidate(
                 {
                     rules: {
                         mark: {
                             withinRange: true
+                        }
+                    },
+                    messages: {
+                        mark: {
+                            withinRange: 'The grade must be between 0 and ' + $('input[name="mark"]').attr('data-validation-limit') + '.'
                         }
                     }
                 }
