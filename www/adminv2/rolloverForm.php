@@ -1,5 +1,4 @@
 <?php
-use Schoolbox\Collection;
 use Schoolbox\Resource\HomepageConfig;
 
 /**
@@ -57,7 +56,7 @@ function traverse($categoryId, $catsWithCodes = array())
 {
     $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
     $allFolders = $folderMapper->findByParent($categoryId);
-    
+
     /* For JSON ajax
      */
     foreach ($allFolders as $currentFolder) {
@@ -101,7 +100,7 @@ function rollover($categoryId)
         $cat = $catMapper->findById($cat['id']);
         $cat->setName(sprintf('%s [%s]', $cat->getName(), $cat->getCodeString()));
         $codeMapper->delete($cat->getCodes());
-        $cat->setCodes(new Collection());
+        $cat->setCodes($codeMapper->createCollection());
         $catMapper->save($cat);
     }
 
