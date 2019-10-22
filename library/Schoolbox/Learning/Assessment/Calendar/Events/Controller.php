@@ -113,6 +113,18 @@ class Controller extends Base
      */
     public function getEvents(): void
     {
+        $this->response->content->set($this->buildJsonOutput($this->buildEventOutput()));
+    }
+
+
+    /**
+     * Build a list of events to output.
+     *
+     * @return array
+     * @throws MapperException
+     */
+    private function buildEventOutput(): array
+    {
         $qsFilters      = $this->request->query->get('filters', []);
         $page           = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
         $codec          = $this->filterFactoryFactory->buildCodec();
@@ -175,7 +187,6 @@ class Controller extends Base
 
         // The API's renderAll returns a list of json-encoded events.
         // Decode them all, and then re-encode.
-        $output = array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON));
-        $this->response->content->set($this->buildJsonOutput($output));
+        return array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON));
     }
 }
