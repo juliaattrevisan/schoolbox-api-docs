@@ -1,7 +1,6 @@
 <?php
 
 use BrowscapPHP\Browscap;
-use Doctrine\Common\Cache\FilesystemCache;
 use Psr\Log\NullLogger;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -129,7 +128,7 @@ function useSAMLKerberos() {
 
     $bc = new Browscap(
         new SimpleCacheAdapter(
-            new FilesystemCache(__DIR__ . '/../../tools/browscap')
+            new Alaress_Saml_CacheReader(__DIR__ . '/../../tools/browscap')
         ),
         new NullLogger()
     );

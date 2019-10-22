@@ -13,7 +13,7 @@ require "saml-setup.php";
 echo "<pre>";
 $bc = new Browscap(
     new SimpleCacheAdapter(
-        new FilesystemCache(__DIR__ . '/../../tools/browscap')
+        new Alaress_Saml_CacheReader(__DIR__ . '/../../tools/browscap')
     ),
     new NullLogger()
 );
