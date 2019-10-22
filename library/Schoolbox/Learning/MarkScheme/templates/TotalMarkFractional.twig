@@ -29,32 +29,6 @@
         $(function() {
             $('#mark-{{ participant.user.id }}').combobox({{ errors | json_encode | raw }});
 
-            {# Explode on the slash to determine numerator/denominator
-             # Unfortunately this replicates backend logic
-             # Both parts must be numeric
-             # Numerator must be at least 0 otherwise it's an illegal attribution
-             #}
-            jQuery.validator.addMethod("withinRange", function(value, element) {
-                var parts = $(element).val().split('/');
-
-                {# Trim perhaps-adjacent spaces to test for numeric representation
-                 #}
-                parts[0] = $.trim(parts[0]);
-                parts[1] = $.trim(parts[1]);
-
-                if ($.isNumeric(parts[0])) {
-                    var numerator = parseInt(parts[0]);
-                    var denominator = $(element).attr('data-validation-limit');
-
-                    return numerator >= 0 && numerator <= denominator;
-                }
-
-                {# Otherwise it could be one of the submission states like Absent or Not Submitted
-                 # so test that it's one of the available customisable options
-                 #}
-                return $(element).parents('.combobox').find('.combobox_selector li:contains("' + $(element).val() + '")').length > 0;
-            });
-
             $("[data-feedback-form]").alaressValidate(
                 {
                     rules: {
