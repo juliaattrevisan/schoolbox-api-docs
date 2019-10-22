@@ -14,6 +14,7 @@
 
     // Various URLs this calendar can make use of
     const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    const URL_ASSESSMENT_GROUPED_EVENT_SOURCE = '/learning/assessment/calendar/events/grouped';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
@@ -67,9 +68,10 @@
                         id: 'events',
                         events: this.events,
                     },
-                    // {
-                    //     id: 'eventGroups',
-                    // },
+                    {
+                        id: 'groupedEvents',
+                        events: this.groupedEvents,
+                    },
                 ]
             }
         },
@@ -214,11 +216,107 @@
                         self.$refs.fullCalendar.getApi().refetchResources();
 
                         // Filter out events which don't start
-                        successCallback(response.filter(v => 'start' in v));
+                        successCallback(response.data.filter(v => 'start' in v));
                     }
                 );
                 // Fail callback: consider a message saying something failed
             },
+
+
+            groupedEvents(fetchInfo, successCallback) {
+
+                let self = this;
+
+                // No filters loaded yet? Render nothing.
+                // The selected filters get populated by `onFilterChange`:
+                // this is called by the filter's `filterContentLoaded` trigger.
+                if (self.selectedFilters === null) {
+                    successCallback([]);
+                    return;
+                }
+
+                // AJAX params: the same for all requests
+                let ajaxParams = {
+                    headers: {
+                        'X-Requested-With' : 'XMLHttpRequest'
+                    },
+                    params: {
+                        start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                        end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                        filters: self.selectedFilters,
+                    },
+                    paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                };
+
+                axios.get(URL_ASSESSMENT_GROUPED_EVENT_SOURCE, ajaxParams).then(
+                    function (response) {
+                        // Assign event grouping and resourceIds into every event
+                        response.data = response.data.map(function(element) {
+                            // Consider not allowing events to be editable on this calendar?
+                            // element.editable = false;
+                            // element.data.meta.editable = false;
+                            // What is the resource ID?
+                            // It depends on whether the event has a folder.
+                            element.resourceId = self.buildResourceIdFromEvent(element);
+                            // if (element.resourceId) {
+                            //     element.data.meta.eventGrouping =
+                            //         self.toMoment(element.start).format('YYYY')
+                            //         + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
+                            //         + element.resourceId;
+                            // }
+                            return element;
+                        });
+
+                        response.data.forEach(function(element) {
+                            // Create a place holder
+                            // if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
+                            //
+                            //     let itemCountByGroup = response.data.filter(function(val) {
+                            //         return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
+                            //     }).length;
+                            //
+                            //     newResponse.push({
+                            //         allDay: true,
+                            //         editable: false,
+                            //         draggable: false,
+                            //         resourceId: element.resourceId,
+                            //         title: itemCountByGroup,
+                            //         start: element.start,
+                            //         end: null,
+                            //         data: {
+                            //             placeholder: true,
+                            //             meta: {
+                            //                 folderId: element.data.meta.folderId,
+                            //                 folderName: element.data.meta.folderName,
+                            //                 eventGrouping: element.data.meta.eventGrouping,
+                            //                 weekNo: self.toMoment(element.start).isoWeek(),
+                            //             }
+                            //         },
+                            //     });
+                            // }
+
+                            // Add new resource here too
+                            if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                                self.folderResources.push({
+                                    id:                   element.resourceId,
+                                    title:                element.data.meta.folderName,
+                                    eventBackgroundColor: element.data.meta.colour || self.defaultBgColour,
+                                });
+                            }
+
+                            // eventGroupingCursor = element.data.meta.eventGrouping;
+                            // newResponse.push(element);
+                        });
+
+                        // Reload resources here too
+                        self.$refs.fullCalendar.getApi().refetchResources();
+
+                        // Filter out events which don't start
+                        successCallback(response.data.filter(v => 'start' in v));
+                    }
+                );
+            },
+
 
             /**
              * Resource source.
