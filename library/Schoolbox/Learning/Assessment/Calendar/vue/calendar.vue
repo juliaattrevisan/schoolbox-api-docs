@@ -264,7 +264,7 @@
                     element.classList.add('fc-more');
                 } else {
                     if (self.currentViewIsSemester()) {
-                        element.style.width = '95%';
+                        element.style.width = 'auto';
                     }
                     element.setAttribute('event-group-id', eventGrouping);
                     element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
@@ -982,6 +982,11 @@
         margin-left: 0 !important;
     }
 
+    .fc-ltr .fc-timeline-event .fc-title {
+         padding-left: 3px !important;
+         margin-left: 0 !important;
+     }
+
     .fc-timeline-event, .fc-day-grid-event {
         border: 0 !important;
     }
@@ -1007,8 +1012,14 @@
         text-align: left !important;
     }
 
+    .fc-timeline-event-div {
+        padding-bottom: 2px !important;
+    }
+
     .fc-resourceTimelineSemester-view .fc-popover .fc-timeline-event {
         padding: 0 !important;
+        position: relative;
+        width: 100% !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-event-container > .fc-timeline-event {
