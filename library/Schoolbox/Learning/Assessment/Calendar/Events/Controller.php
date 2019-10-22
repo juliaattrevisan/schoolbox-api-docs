@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
 use Calendar_Api_Composite;
@@ -128,7 +129,11 @@ class Controller extends Base
      */
     public function getGroupedEvents(): void
     {
-        $this->response->content->set($this->buildJsonOutput($this->buildEventOutput()));
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                array_values(array_reduce($this->buildEventOutput(), [$this, 'groupEvents']))
+            )
+        );
     }
 
 
@@ -203,6 +208,82 @@ class Controller extends Base
 
         // The API's renderAll returns a list of json-encoded events.
         // Decode them all, and then re-encode.
-        return array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON));
+        return array_map(
+            static function ($v) {
+                return json_decode($v, true);
+            },
+            $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)
+        );
+    }
+
+
+    /**
+     * Reduce function for grouping all events by their resource.
+     *
+     * @param array|null $carry
+     * @param array      $event
+     * @return array
+     */
+    private function groupEvents(?array $carry, array $event): array
+    {
+        if (!isset($carry)) {
+            $carry = [];
+        }
+
+        // What's the event's resource?
+        $resourceId = null;
+        if (isset($event['data']['meta']['folderId'])) {
+            $resourceId = sprintf('folder-%d', $event['data']['meta']['folderId']);
+        } elseif (isset($event['data']['meta']['eventTypeId'])) {
+            $resourceId = sprintf('eventType-%d', $event['data']['meta']['eventTypeId']);
+        }
+
+
+        // Year/week grouping:
+        //         self.toMoment(element.start).format('YYYY')
+        //         + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
+        $grouping = null;
+        if ($resourceId) {
+            $start    = new Alaress_Date_Format(
+                $event['start'],
+                [Alaress_Date_Format::DATABASE_FORMAT, Alaress_Date_Format::DATABASE_DATE_FORMAT]
+            );
+            $grouping = sprintf('%s-%d-%02d', $resourceId, $start->getYear(), $start->getUsingFormat('W'));
+
+            if (!isset($carry[$grouping])) {
+                $carry[$grouping]          = [
+                    'allday'     => false,
+                    'editable'   => false,
+                    'draggable'  => false,
+                    'resourceId' => $resourceId,
+                    'title'      => 0,
+                    'start'      => $start->getDatabaseDate(),
+                    'end'        => null,
+                    'data'       => [
+                        'placeholder' => true,
+                        'meta'        => [
+                            'folderId'   => $event['data']['meta']['folderId'] ?? null,
+                            'folderName' => $event['data']['meta']['folderName'] ?? null,
+                            // Add something to the description of each item here
+                        ],
+                    ],
+                ];
+                $carry[$grouping]['title'] = 0;
+            }
+
+            $carry[$grouping]['title']++;
+        }
+
+
+        // Group events by their week as well
+//        if (event?.data?.meta?.folderId) {
+//            return RESOURCE_FOLDER_PREFIX + String(event.data.meta.folderId);
+//        }
+//        if (event?.data?.meta?.eventTypeId) {
+//            return RESOURCE_EVENT_TYPE_PREFIX + String(event.data.meta.eventTypeId);
+//        }
+
+
+        return $carry;
     }
 }
