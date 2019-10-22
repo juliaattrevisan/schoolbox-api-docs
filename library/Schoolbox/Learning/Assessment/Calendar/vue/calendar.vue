@@ -152,10 +152,6 @@
 
                 axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams).then(
                     function (response) {
-                        // Massage the data to inject placeholders
-                        let newResponse = [],
-                            eventGroupingCursor = '';
-
                         // Assign event grouping and resourceIds into every event
                         response.data = response.data.map(function(element) {
                             // Consider not allowing events to be editable on this calendar?
@@ -164,42 +160,42 @@
                             // What is the resource ID?
                             // It depends on whether the event has a folder.
                             element.resourceId = self.buildResourceIdFromEvent(element);
-                            if (element.resourceId) {
-                                element.data.meta.eventGrouping =
-                                    self.toMoment(element.start).format('YYYY')
-                                    + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
-                                    + element.resourceId;
-                            }
+                            // if (element.resourceId) {
+                            //     element.data.meta.eventGrouping =
+                            //         self.toMoment(element.start).format('YYYY')
+                            //         + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
+                            //         + element.resourceId;
+                            // }
                             return element;
                         });
 
                         response.data.forEach(function(element) {
                             // Create a place holder
-                            if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
-
-                                let itemCountByGroup = response.data.filter(function(val) {
-                                    return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
-                                }).length;
-
-                                newResponse.push({
-                                    allDay: true,
-                                    editable: false,
-                                    draggable: false,
-                                    resourceId: element.resourceId,
-                                    title: itemCountByGroup,
-                                    start: element.start,
-                                    end: null,
-                                    data: {
-                                        placeholder: true,
-                                        meta: {
-                                            folderId: element.data.meta.folderId,
-                                            folderName: element.data.meta.folderName,
-                                            eventGrouping: element.data.meta.eventGrouping,
-                                            weekNo: self.toMoment(element.start).isoWeek(),
-                                        }
-                                    },
-                                });
-                            }
+                            // if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
+                            //
+                            //     let itemCountByGroup = response.data.filter(function(val) {
+                            //         return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
+                            //     }).length;
+                            //
+                            //     newResponse.push({
+                            //         allDay: true,
+                            //         editable: false,
+                            //         draggable: false,
+                            //         resourceId: element.resourceId,
+                            //         title: itemCountByGroup,
+                            //         start: element.start,
+                            //         end: null,
+                            //         data: {
+                            //             placeholder: true,
+                            //             meta: {
+                            //                 folderId: element.data.meta.folderId,
+                            //                 folderName: element.data.meta.folderName,
+                            //                 eventGrouping: element.data.meta.eventGrouping,
+                            //                 weekNo: self.toMoment(element.start).isoWeek(),
+                            //             }
+                            //         },
+                            //     });
+                            // }
 
                             // Add new resource here too
                             if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
@@ -210,15 +206,15 @@
                                 });
                             }
 
-                            eventGroupingCursor = element.data.meta.eventGrouping;
-                            newResponse.push(element);
+                            // eventGroupingCursor = element.data.meta.eventGrouping;
+                            // newResponse.push(element);
                         });
 
                         // Reload resources here too
                         self.$refs.fullCalendar.getApi().refetchResources();
 
                         // Filter out events which don't start
-                        successCallback(newResponse.filter(v => 'start' in v));
+                        successCallback(response.filter(v => 'start' in v));
                     }
                 );
                 // Fail callback: consider a message saying something failed
