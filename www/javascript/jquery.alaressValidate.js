@@ -72,6 +72,15 @@
 
 
     /**
+     * Unfortunately this replicates backend logic
+     *
+     */
+    jQuery.validator.addMethod("withinLetterGradeRange", function(value, element) {
+        return $(element).find('option:contains("' + $(element).val() + '")').length > 0;
+    });
+
+
+    /**
      * Unified interface for form validation
      *
      * @param options

@@ -32,27 +32,19 @@
                 {
                     rules: {
                         mark: {
-                            min: {
-                                depends: function () {
-                                    if ($.isNumeric($(this).val()) && parseInt($(this).val()) < 0) {
-                                        return true;
-                                    }
-                                }
-                            },
-                            max: {
-                                depends: function () {
-                                    if ($.isNumeric($(this).val()) && $(this).val() > parseInt($(this).attr('data-validation-limit'))) {
-                                        return $(this).attr('data-validation-limit');
-                                    }
-                                }
-                            }
+                            withinLetterGradeRange: true
                         }
                     },
                     messages: {
-                        mark: 'The grade must be between 0 and ' + $('input[name="mark"]').attr('data-validation-limit') + '.'
+                        mark: {
+                            withinLetterGradeRange: 'Please select one of the available letter grade options.'
+                        }
                     }
                 }
             );
+
+            {# Always run upon load #}
+            $('[data-feedback-form]').valid();
         });
     </script>
 
@@ -65,6 +57,7 @@
     <select class="letter-grade-select" data-mark-input name="mark" tabindex="{{ tabIndex }}" title="Select a {{ locale.grades.proper }}">
 
         {# Empty state #}
+
         {% set found = (humanReadableMark is null) %}
         <option value="" disabled {% if humanReadableMark is null %}selected{% endif %}>(no grade)</option>
 
