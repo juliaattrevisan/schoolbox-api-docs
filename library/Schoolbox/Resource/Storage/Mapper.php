@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\FilesystemFactory;
@@ -28,6 +29,7 @@ use Schoolbox\Video\QueueMapper;
  * Storage Mapper. Maps storage table to Schoolbox storage objects
  *
  * @package Schoolbox\Resource\Storage
+ * @method GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends BaseMapper implements Receiver
 {
