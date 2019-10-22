@@ -262,9 +262,9 @@ class Controller extends Base
                     'data'       => [
                         'placeholder' => true,
                         'meta'        => [
-                            'folderId'   => $event['data']['meta']['folderId'] ?? null,
+                            'detail'     => [],
+                            'folderId'   => $event['data']['meta']['folderId']   ?? null,
                             'folderName' => $event['data']['meta']['folderName'] ?? null,
-                            // Add something to the description of each item here
                         ],
                     ],
                 ];
@@ -272,6 +272,9 @@ class Controller extends Base
             }
 
             $carry[$grouping]['title']++;
+
+            // Stick title of event into detail
+            $carry[$grouping]['data']['meta']['detail'][] = $event['title'] ?? null;
         }
 
 
