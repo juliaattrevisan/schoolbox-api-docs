@@ -24,8 +24,8 @@ use Schoolbox\File\Mimetype;
  */
 class Manager
 {
-    const FS_STORAGE = 'storage';
-    const FS_TEMP    = 'upload';
+    public const FS_STORAGE = 'storage';
+    public const FS_TEMP    = 'upload';
 
     /** @var Alaress_Byte_Format */
     protected $alaressByteFormat;
