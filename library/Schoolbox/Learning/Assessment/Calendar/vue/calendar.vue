@@ -62,6 +62,15 @@
                 defaultBgColour: '#0066b0',
                 maxDate: null,
                 minDate: null,
+                eventSources: [
+                    {
+                        id: 'events',
+                        events: this.events,
+                    },
+                    // {
+                    //     id: 'eventGroups',
+                    // },
+                ]
             }
         },
         computed: {
@@ -145,7 +154,7 @@
                     function (response) {
                         // Massage the data to inject placeholders
                         let newResponse = [],
-                            eventGroupingCursor = ''
+                            eventGroupingCursor = '';
 
                         // Assign event grouping and resourceIds into every event
                         response.data = response.data.map(function(element) {
@@ -933,7 +942,7 @@
             }"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-render="eventRender"
-            :events="events"
+            :event-sources="eventSources"
             :resources="resources"
             :scheduler-license-key="config.schedulerLicenseKey"
             :first-day="1"
