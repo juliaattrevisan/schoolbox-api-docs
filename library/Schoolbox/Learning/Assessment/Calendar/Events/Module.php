@@ -44,6 +44,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getEvents', $routePerms);
+        $this->register('GET', '/grouped', 'getGroupedEvents', $routePerms);
     }
 
 

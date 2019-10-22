@@ -118,10 +118,26 @@ class Controller extends Base
 
 
     /**
+     * Returns the grouped events for the assessment calendar, as a JSON feed.
+     *
+     * @api   GET /learning/assessment/calendar/events/grouped
+     * @since 19.1
+     *
+     * @throws MapperException      if somehow a mapper call couldn't create a model?
+     * @throws ApplicationException if start and end weren't both supplied as query string params
+     */
+    public function getGroupedEvents(): void
+    {
+        $this->response->content->set($this->buildJsonOutput($this->buildEventOutput()));
+    }
+
+
+    /**
      * Build a list of events to output.
      *
      * @return array
-     * @throws MapperException
+     * @throws MapperException      if somehow a mapper call couldn't create a model?
+     * @throws ApplicationException if start and end weren't both supplied as query string params
      */
     private function buildEventOutput(): array
     {
