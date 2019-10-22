@@ -27,7 +27,7 @@
         $(function() {
             $('#mark-{{ participant.user.id }}').combobox({{ errors | json_encode | raw }});
 
-            $("[data-feedback-form]").alaressValidate(
+            $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]').alaressValidate(
                 {
                     rules: {
                         mark: {
@@ -43,7 +43,7 @@
             );
 
             {# Always run upon load #}
-            $('[data-feedback-form]').valid();
+            $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]').valid();
         });
     </script>
 {% endif %}

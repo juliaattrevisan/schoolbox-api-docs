@@ -114,7 +114,7 @@
     <div class="small-12 column">
 
         {% if fbUrl %}
-        <form data-feedback-form method="post" action="{{ fbUrl }}">
+        <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ fbUrl }}">
             {% endif %}
 
             <input type="hidden" name="responseId" value="{{ response.id }}"/>
