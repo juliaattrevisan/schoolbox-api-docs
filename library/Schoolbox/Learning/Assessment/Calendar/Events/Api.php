@@ -86,7 +86,7 @@ class Api implements Calendar_Api_EventType_Interface
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
-        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->user);
+//        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->user);
 
         $stack = new Collection();
         foreach ($assessments as $assessment) {
@@ -147,10 +147,10 @@ class Api implements Calendar_Api_EventType_Interface
             return null;
         }
 
-        // Current user doesn't have permission?
-        if (!$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
-            return null;
-        }
+//        // Current user doesn't have permission?
+//        if (!$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
+//            return null;
+//        }
 
         $event = new Event();
 
