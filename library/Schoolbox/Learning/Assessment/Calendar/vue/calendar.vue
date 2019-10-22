@@ -63,16 +63,16 @@
                 defaultBgColour: '#0066b0',
                 maxDate: null,
                 minDate: null,
-                eventSources: [
-                    {
+                eventSources: {
+                    events: {
                         id: 'events',
                         events: this.events,
                     },
-                    {
+                    groupedEvents: {
                         id: 'groupedEvents',
                         events: this.groupedEvents,
                     },
-                ]
+                }
             }
         },
         computed: {
@@ -381,19 +381,20 @@
              * @param eventInfo
              */
             onEventClick(eventInfo) {
-                var self = this;
-
-                if (!self.currentViewIsSemester() ||
-                    (self.currentViewIsSemester() && eventInfo.el.getAttribute('event-group-id-placeholder') === null)) {
-                    this.$refs.event.open(eventInfo.event);
-                } else {
-                    this.renderPopOver(eventInfo);
-
-                    // Add event listener for our customised popover
-                    document.querySelector(".fc-close").addEventListener('click', function (element) {
-                        self.destroyPopOver();
-                    });
-                }
+                this.$refs.event.open();
+                // var self = this;
+                //
+                // if (!self.currentViewIsSemester() ||
+                //     (self.currentViewIsSemester() && eventInfo.el.getAttribute('event-group-id-placeholder') === null)) {
+                //     this.$refs.event.open(eventInfo.event);
+                // } else {
+                //     this.renderPopOver(eventInfo);
+                //
+                //     // Add event listener for our customised popover
+                //     document.querySelector(".fc-close").addEventListener('click', function (element) {
+                //         self.destroyPopOver();
+                //     });
+                // }
             },
 
             /**
@@ -513,7 +514,10 @@
              * @param info
              */
             viewSkeletonRender(info) {
-                var self = this;
+                var self = this,
+                    api  = self.$refs.fullCalendar.getApi(),
+                    eventSource = api.getEventSourceById('events'),
+                    groupedEventSource = api.getEventSourceById('groupedEvents');
 
                 self.currentView = info.view.type;
 
@@ -522,6 +526,24 @@
                 if (self.currentViewIsSemester()) {
                     self.redrawWeekNumbers();
                     self.cleanupMonthHeaderInlineStyles();
+
+                    // Add grouped events source if it's not there:
+                    // remove standard source if it is
+                    if (eventSource) {
+                        eventSource.remove();
+                    }
+                    if (!groupedEventSource) {
+                        api.addEventSource(this.eventSources.groupedEvents);
+                    }
+                } else {
+                    // Add standard events source if it's not there:
+                    // remove grouped source if it is
+                    if (groupedEventSource) {
+                        groupedEventSource.remove();
+                    }
+                    if (!eventSource) {
+                        api.addEventSource(this.eventSources.events);
+                    }
                 }
 
                 self.maxDate = self.getMaxTermDate();
@@ -1036,7 +1058,6 @@
             }"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-render="eventRender"
-            :event-sources="eventSources"
             :resources="resources"
             :scheduler-license-key="config.schedulerLicenseKey"
             :first-day="1"
