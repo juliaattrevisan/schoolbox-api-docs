@@ -264,10 +264,10 @@ class Controller extends Base
                     'data'       => [
                         'placeholder' => true,
                         'meta'        => [
-                            'folderId'      => $event['data']['meta']['folderId']      ?? null,
-                            'folderName'    => $event['data']['meta']['folderName']    ?? null,
-                            'eventTypeId'   => $event['data']['meta']['eventTypeId']   ?? null,
-                            'eventTypeName' => $event['data']['meta']['eventTypeName'] ?? null,
+                            'folderId'      => $event['data']['meta']['folderId']    ?? null,
+                            'folderName'    => $event['data']['meta']['folderName']  ?? null,
+                            'eventTypeId'   => $event['data']['meta']['eventTypeId'] ?? null,
+                            'eventTypeName' => $event['data']['meta']['type']        ?? null,
                         ],
                         'subEvents' => [],
                     ],
