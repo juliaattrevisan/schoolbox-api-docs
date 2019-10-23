@@ -1032,7 +1032,7 @@
         height: 35px !important;
     }
 
-    .fc-time-area .fc-rows .fc-widget-content div {
+    .fc-resourceTimelineSemester-view .fc-time-area .fc-rows .fc-widget-content div {
         height: 35px !important;
     }
 
