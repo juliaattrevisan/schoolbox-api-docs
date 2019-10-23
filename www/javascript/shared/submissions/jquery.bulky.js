@@ -138,14 +138,14 @@
              */
             $checks = bulky.element.find(opt.checkboxSelector);
 
-            if ($checks.length === numInvalid) {
+            if (!$checks.length || $checks.length === numInvalid) {
 
-                /* If they're all invalid
+                /* If they're all invalid, or there are no checkboxes
                  */
                 bulky.submitButton.hide();
                 bulky.element.find(opt.unavailableTextSelector).show();
                 bulky.element.find(opt.availableTextSelector).hide();
-            } else if ($checks.length) {
+            } else {
 
                 /* There are some checkboxes to submit
                  */
@@ -154,13 +154,6 @@
                 bulky.submitButton.show();
                 bulky.element.find(opt.unavailableTextSelector).hide();
                 bulky.element.find(opt.availableTextSelector).show();
-            } else {
-
-                /* There are no checkboxes available
-                 */
-                bulky.submitButton.hide();
-                bulky.element.find(opt.unavailableTextSelector).show();
-                bulky.element.find(opt.availableTextSelector).hide();
             }
         });
 
