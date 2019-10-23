@@ -115,7 +115,7 @@
                     /* Checkbox must pass this conditional to be provided
                      */
                     if (!opt.checkboxConditionality(id)) {
-                        $chk.prop('disabled', true).prop('checked', false);
+                        $chk.prop('disabled', true).removeAttr('checked');
                         $lbl.text($lbl.text() + ' (invalid)');
                     }
 
@@ -177,7 +177,12 @@
          */
         this.submitButton.on('click', function (e) {
             e.preventDefault();
-            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function () { return opt.userList.find('[data-participant='+this.id+'] [data-action-bar]').get(); }));
+
+            /* Find all the action bars that were in the checkbox list
+             */
+            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function() {
+                return opt.userList.find('[data-participant='+this.id+'] [data-action-bar]').get();
+            }));
         });
 
 
@@ -189,8 +194,8 @@
         this.element.on('click', '.button', function () {
             bulky.element.foundation('reveal', 'close');
         });
-
     }
+
 
     /**
      * Private method; expects to be applied to Bulky
@@ -201,9 +206,7 @@
         if (typeof text === 'string' && text.trim().length) {
             this.submitButton.text(text.trim());
         }
-
     }
-
 
 
     /**
