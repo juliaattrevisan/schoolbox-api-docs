@@ -238,6 +238,11 @@
                                         {#{% endif %}#}
                                     {% endblock details_studiesCode %}
 
+                                    {% block details_gender %}
+                                        {#<dt class="small-4 medium-3 columns">Gender:</dt>
+                                        <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>#}
+                                    {% endblock details_gender %}
+
                                     {% block details_coach %}
                                     {% endblock details_coach %}
                                 {% endif %}

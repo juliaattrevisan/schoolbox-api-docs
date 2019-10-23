@@ -156,6 +156,7 @@ class External_Schooledge_User implements External_UserInterface
                 s.Code AS StudentID,
                 s.FirstName AS StudentGiven1,
                 s.LastName AS StudentSurname,
+                '' AS StudentGender,
                 CONVERT(nvarchar(30), s.DOB, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
                 s.House AS StudentHouseDescription,
                 s.House AS StudentHouse,

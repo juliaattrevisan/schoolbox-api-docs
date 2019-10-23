@@ -208,6 +208,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentID'               => $currentStudent['ID'],
                 'StudentGiven1'           => $currentStudent['Firstname'],
                 'StudentSurname'          => $currentStudent['Surname'],
+                'StudentGender'           => '',
                 'StudentBirthDate'        => $currentStudent['Birthdate'],
                 'StudentHouse'            => $currentStudent['HeadOfHouse'],
                 'StudentYearLevel'        => $currentStudent['YearLevel'],

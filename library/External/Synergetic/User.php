@@ -331,6 +331,7 @@ class External_Synergetic_User implements External_UserInterface
             SELECT      vStudentsAll.StudentID,
                         vStudentsAll.StudentGiven1,
                         vStudentsAll.StudentSurname,
+                        vStudentsAll.StudentGender,
                         CONVERT(nvarchar(30), vStudentsAll.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
                         vStudentsAll.StudentTutorName,
                         vStudentsAll.StudentHeadOfHouse,

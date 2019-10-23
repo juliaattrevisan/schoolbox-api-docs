@@ -129,6 +129,7 @@ class External_Isams_User implements External_UserInterface
                         StudentID               AS StudentID,
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
+                        ''                      AS StudentGender,
                         CONVERT(nvarchar(30), DOB, ".self::FORMAT_ISO8601." ) AS StudentBirthDate,                
                         ''                      AS StudentTutorName,
                         ''                      AS StudentHeadOfHouse,

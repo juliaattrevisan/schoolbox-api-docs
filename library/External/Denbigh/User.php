@@ -218,6 +218,7 @@ class External_Denbigh_User implements External_UserInterface
             'StudentID'                => '',
             'StudentGiven1'            => '',
             'StudentSurname'           => '',
+            'StudentGender'            => '',
             'StudentBirthDate'         => '0',
             'StudentTutorName'         => '',
             'StudentHeadOfHouse'       => '',
@@ -247,6 +248,7 @@ class External_Denbigh_User implements External_UserInterface
             $adaption['StudentID']                = $student['denbighID'];
             $adaption['StudentGiven1']            = $student['given_names'];
             $adaption['StudentSurname']           = $student['surname'];
+            $adaption['StudentGender']            = $student['gender'];
             $adaption['StudentBirthDate']         = $student['dateOfBirth'];
             $adaption['TeacherTutorID']           = $student['tutor_denbighID'];
             $adaption['StudentTutorDescription']  = $student['tutorGroup'];

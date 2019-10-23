@@ -171,6 +171,7 @@ class Freedom implements IQueryHelper
                 S.STUDKEY                       AS StudentID,
                 S.GIVEN_NAME                    AS StudentGiven1,
                 S.LEGAL_SURNAME                 AS StudentSurname,
+                S.SEX                           AS StudentGender,
                 S.BIRTH_DATE                    AS StudentBirthDate,
                 S_HOUSE.DESCRIPTION             AS StudentHouseDescription,
                 S.HOUSE                         AS StudentHouse,

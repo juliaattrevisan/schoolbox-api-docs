@@ -38,6 +38,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
             SELECT      uvStudents.StudentID,
                         uvStudents.StudentGiven1,
                         uvStudents.StudentSurname,
+                        '' AS StudentGender,
                         CONVERT(nvarchar(30), uvStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
                         uvStudents.StudentTutorName,
                         uvStudents.StudentHeadOfHouse,
