@@ -167,6 +167,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+
+            // The size of something could have changed: reflow
+            resizeCalendars();
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -188,6 +191,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             // Unhide the event calendar (in the case it was hidden via expanding due work)
             $('#calendarResponse' + twigVars.id + '-events').removeClass('hide');
+            resizeCalendars();
         },
         onMonthChange: function (selectedDates, dateStr, instance) {
             if (isDueWorkType(twigVars.type)) {
@@ -198,6 +202,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+            resizeCalendars();
         },
         onYearChange: function (selectedDates, dateStr, instance) {
             if (isDueWorkType(twigVars.type)) {
@@ -208,6 +213,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+            resizeCalendars();
         },
         onValueUpdate: function (selectedDates, dateStr, instance) {
             if (isDueWorkType(twigVars.type)) {
@@ -218,6 +224,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+            resizeCalendars();
         }
 
     };
@@ -344,6 +351,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         else {
             noTimetableData();
         }
+
+        // The size of something could have changed: reflow
+        resizeCalendars();
     }
 
     /**
@@ -728,6 +738,18 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         if (template == 'duework' && data.students.length > 0) {
             $modal.find('[data-collapser]').collapsable();
         }
+    }
+
+
+    /**
+     * Update the size of every calendar to match its container.
+     *
+     * (Each calendar is configured to have an automatic height)
+     */
+    function resizeCalendars() {
+        Object.keys(fullCalendars).forEach(function (key) {
+            fullCalendars[key].updateSize();
+        })
     }
 
 
