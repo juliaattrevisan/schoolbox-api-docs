@@ -248,6 +248,8 @@ class Controller extends Base
                 $event['start'],
                 [Alaress_Date_Format::DATABASE_FORMAT, Alaress_Date_Format::DATABASE_DATE_FORMAT]
             );
+            $start    = $start->startOfWeek();
+            $end      = (clone $start)->endOfWeek()->addDays(1);
             $grouping = sprintf('%s-%d-%02d', $resourceId, $start->getYear(), $start->getUsingFormat('W'));
 
             if (!isset($carry[$grouping])) {
@@ -258,7 +260,7 @@ class Controller extends Base
                     'resourceId' => $resourceId,
                     'title'      => 0,
                     'start'      => $start->getDatabaseDate(),
-                    'end'        => null,
+                    'end'        => $end->getDatabaseDate(),
                     'data'       => [
                         'placeholder' => true,
                         'meta'        => [
