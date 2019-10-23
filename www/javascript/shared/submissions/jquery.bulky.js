@@ -89,6 +89,11 @@
         this.element.on('open.fndtn.reveal', function () {
             var $checks;
 
+            /* Number of invalid checkboxes
+             * If all checkboxes are invalid, hide the action button and display different text
+             */
+            var numInvalid = 0;
+
             // cache this value before we inject the contents
             $(this).data('fixedContentHeight', $(this).outerHeight());
 
@@ -117,6 +122,8 @@
                     if (!opt.checkboxConditionality(id)) {
                         $chk.prop('disabled', true).removeAttr('checked');
                         $lbl.text($lbl.text() + ' (invalid)');
+
+                        numInvalid++;
                     }
 
                     // because outerHtml doesn't exist as a thing -_-
@@ -131,12 +138,26 @@
              */
             $checks = bulky.element.find(opt.checkboxSelector);
 
-            if ($checks.length) {
+            if ($checks.length === numInvalid) {
+
+                /* If they're all invalid
+                 */
+                bulky.submitButton.hide();
+                bulky.element.find(opt.unavailableTextSelector).show();
+                bulky.element.find(opt.availableTextSelector).hide();
+            } else if ($checks.length) {
+
+                /* There are some checkboxes to submit
+                 */
                 refreshSubmitText.call(bulky, $checks.length, $checks.length);
+
                 bulky.submitButton.show();
                 bulky.element.find(opt.unavailableTextSelector).hide();
                 bulky.element.find(opt.availableTextSelector).show();
             } else {
+
+                /* There are no checkboxes available
+                 */
                 bulky.submitButton.hide();
                 bulky.element.find(opt.unavailableTextSelector).show();
                 bulky.element.find(opt.availableTextSelector).hide();
