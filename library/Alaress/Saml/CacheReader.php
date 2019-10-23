@@ -5,6 +5,7 @@
  */
 declare(strict_types=1);
 
+namespace Alaress\Saml;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\FilesystemCache;
 
@@ -12,7 +13,7 @@ use Doctrine\Common\Cache\FilesystemCache;
  * Filesystem cache driver.
  * Ported read functionality from FilesystemCache
  */
-class Alaress_Saml_CacheReader extends CacheProvider
+class CacheReader extends CacheProvider
 {
 
     /**
