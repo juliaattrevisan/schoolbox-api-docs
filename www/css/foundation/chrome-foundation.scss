@@ -117,7 +117,7 @@
 @import 'components/sportsfixtures/sportsfixtures';
 
 // Flatpickr
-@import '../../javascript/components/flatpickr/dist/flatpickr.css';
+@import 'components/flatpickr/flatpickr'; // For now, till we manage to move our whole flatpickr to webpack
 @import 'components/alaress-datetime-picker/alaress-datetime-picker';
 
 // Needs to be included outside of container in order to work

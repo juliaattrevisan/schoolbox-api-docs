@@ -17,7 +17,6 @@
     export default {
         name: "view-event-modal",
         props: {
-            event: {},
             toMoment: {},
             taskTypeId: {},
             eventModifyFormUrl: {},
@@ -36,6 +35,11 @@
             MetaItem,
             MetaList,
             RevealModal
+        },
+        data() {
+            return {
+                event: {},
+            }
         },
         computed: {
             window: () => window,
@@ -174,7 +178,9 @@
             /**
              * Open this modal.
              */
-            open() {
+            open(event) {
+                this.event = event;
+
                 this.$refs.modal.open();
             },
 

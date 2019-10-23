@@ -1,5 +1,6 @@
 $pickr-month-height: rem-calc(40);
 $pickr-month-padding: rem-calc(5);
+$pickr-top-month-padding: rem-calc(2);
 
 $pickr-border-color: #e6e6e6;
 $pickr-border: rem-calc(1) solid $pickr-border-color;
@@ -76,6 +77,7 @@ input.datepicker-input {
         height: $pickr-month-height;
         line-height: $pickr-month-height + $pickr-month-padding;
         width: $pickr-month-height;
+        position: inherit;
     }
 
     .flatpickr-prev-month {
@@ -87,7 +89,7 @@ input.datepicker-input {
     }
 
     .flatpickr-current-month {
-        top: $pickr-month-padding;
+        top: $pickr-top-month-padding;
 
         input.cur-year {
             font-weight: $font-weight-normal;

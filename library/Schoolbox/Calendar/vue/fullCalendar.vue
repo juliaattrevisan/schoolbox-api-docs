@@ -14,6 +14,7 @@
     import CreateEventModal           from './createEventModal';
     import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
+    import FlatPickr                  from "./flatPickr";
     import axios                      from 'axios'
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
@@ -53,6 +54,7 @@
             MetaList,
             FullCalendar,
             RevealModal,
+            FlatPickr,
         },
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
@@ -60,8 +62,6 @@
         data() {
             return {
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
-                currentEvent: {},
-                newEvent: {},
                 currentDisplay: null,
                 duration: 31,
                 listViewDateRange: {
@@ -301,14 +301,13 @@
              */
             onDateClick(dateClickInfo) {
                 let [firstEventType] = this.config.eventTypes;
-                this.newEvent = {
+                this.$refs.createEvent.open({
                     date:        dateClickInfo.date,
                     allDay:      dateClickInfo.allDay,
                     title:       '',
                     detail:      '',
                     type:        firstEventType ? firstEventType.id : null,
-                };
-                this.$refs.createEvent.open();
+                });
             },
 
             /**
@@ -321,8 +320,7 @@
             onEventClick(eventInfo) {
                 // Ideally the current event would be a part of the modal,
                 // not this component, but :shrug:
-                this.currentEvent = eventInfo.event;
-                this.$refs.event.open();
+                this.$refs.event.open(eventInfo.event);
             },
 
             /**
@@ -435,6 +433,10 @@
                 return this.helper.dayTitleFormat(dateObject);
             },
 
+            onQuickSwitch(value) {
+                this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
+            },
+
             /**
              * Register customised input fields for list view
              */
@@ -519,10 +521,44 @@
 
             currentViewIsList() {
                 return this.currentDisplay === 'list';
+            },
+
+            /**
+             * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickPrev() {
+                let api = this.$refs.fullCalendar.getApi();
+                    api.prev();
+                    this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickNext() {
+                let api = this.$refs.fullCalendar.getApi();
+                    api.next();
+                    this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickToday() {
+                let api = this.$refs.fullCalendar.getApi();
+                    api.today();
+                    this.$refs.flatPickr.updateActiveDate(api.getDate());
             }
         },
         mounted() {
             this.registerListCustomInputFields();
+
+            // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
+            let quickSwitchIcon = document.createElement('a');
+                quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+                quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
+
+            document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
         }
     }
 
@@ -547,7 +583,6 @@
                       @filterChanged="updateSelectedFilters" />
 
         <create-event-modal ref="createEvent"
-                            :event="newEvent"
                             :user-id="config.userId"
                             :task-type-id="config.taskTypeId"
                             :event-types="config.eventTypes"
@@ -561,7 +596,6 @@
                             @eventCreated="addEvent" />
 
         <view-event-modal ref="event"
-                          :event="currentEvent"
                           :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
@@ -603,9 +637,24 @@
                     text: 'Filters',
                     click: onFilterClick
                 },
+                quickSwitchButton: {
+                    text: ' ',
+                },
+                customPrev: {
+                    icon: 'chevron-left',
+                    click: this.clickPrev.bind(this),
+                },
+                customNext: {
+                    icon: 'chevron-right',
+                    click: this.clickNext.bind(this),
+                },
+                customToday: {
+                    text: 'Today',
+                    click: this.clickToday.bind(this),
+                },
             }"
             :header="{
-                left: 'today,prev,next',
+                left: 'quickSwitchButton,customToday,customPrev,customNext',
                 center: 'title',
                 right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
@@ -614,7 +663,7 @@
                 month:    'Month',
                 week:     'Week',
                 day:      'Day',
-                list: 'List',
+                list:     'List',
             }"
             :default-date="config.defaultDate"
             :default-view="config.defaultView || 'dayGridMonth'"
@@ -631,9 +680,24 @@
             @eventDrop="onEventDrop"
         />
 
+        <flat-pickr
+                ref="flatPickr"
+                :config="{
+                    defaultDate: config.defaultDate,
+                    selector: '.fc-quickSwitchButton-button'
+                }"
+                @dateSelected="onQuickSwitch"
+        />
+
         <toast ref="toast"></toast>
     </div>
 </template>
+
+<style>
+    .fc-button-group > .fc-button {
+        padding: 0 0.6rem !important;
+    }
+</style>
 
 <style lang="scss">
     @import '~@fullcalendar/core/main.css';

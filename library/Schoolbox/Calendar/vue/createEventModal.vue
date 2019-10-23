@@ -7,7 +7,6 @@
     export default {
         name: "create-event-modal",
         props: [
-            'event',
             'userId',
             'eventTypes',
             'taskTypeId',
@@ -22,6 +21,11 @@
         ],
         components: {
             RevealModal,
+        },
+        data() {
+            return {
+                event: {},
+            }
         },
         computed: {
             window: () => window,
@@ -78,7 +82,9 @@
             /**
              * Open this modal.
              */
-            open() {
+            open(event) {
+                this.event = event;
+
                 this.$refs.modal.open();
             },
 

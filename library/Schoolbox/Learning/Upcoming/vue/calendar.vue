@@ -1,7 +1,6 @@
 <template>
     <div>
         <view-event-modal ref="event"
-                          :event="currentEvent"
                           :to-moment="toMoment"
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
@@ -80,8 +79,6 @@
         data() {
             return {
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
-                currentEvent: {},
-                newEvent: {},
                 selectedFilters: null,
             }
         },
@@ -195,10 +192,7 @@
              * @param eventInfo
              */
             onEventClick(eventInfo) {
-                // Ideally the current event would be a part of the modal,
-                // not this component, but :shrug:
-                this.currentEvent = eventInfo.event;
-                this.$refs.event.open();
+                this.$refs.event.open(eventInfo.event);
             },
 
             /**

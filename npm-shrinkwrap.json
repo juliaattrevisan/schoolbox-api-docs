@@ -2887,7 +2887,7 @@
     "es6-promise": {
       "version": "4.2.8",
       "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.2.8.tgz",
-      "integrity": "sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w=="
+      "integrity": "sha1-TrIVlMlyvEBVPSduUQU5FD21Pgo="
     },
     "escape-string-regexp": {
       "version": "1.0.5",
@@ -3243,6 +3243,11 @@
           }
         }
       }
+    },
+    "flatpickr": {
+      "version": "4.6.3",
+      "resolved": "https://registry.npmjs.org/flatpickr/-/flatpickr-4.6.3.tgz",
+      "integrity": "sha512-007VucCkqNOMMb9ggRLNuJowwaJcyOh4sKAFcdGfahfGc7JQbf94zSzjdBq/wVyHWUEs5o3+idhFZ0wbZMRmVQ=="
     },
     "flush-write-stream": {
       "version": "1.0.3",
@@ -5215,7 +5220,7 @@
     "locutus": {
       "version": "2.0.11",
       "resolved": "https://registry.npmjs.org/locutus/-/locutus-2.0.11.tgz",
-      "integrity": "sha512-C0q1L38lK5q1t+wE0KY21/9szrBHxye6o2z5EJzU+5B79tubNOC+nLAEzTTn1vPUGoUuehKh8kYKqiVUTWRyaQ==",
+      "integrity": "sha1-g/hRCZcf091iBIKgQ4GRbkox1PA=",
       "requires": {
         "es6-promise": "^4.2.5"
       }
