@@ -262,10 +262,12 @@ class Controller extends Base
                     'data'       => [
                         'placeholder' => true,
                         'meta'        => [
-                            'detail'     => [],
-                            'folderId'   => $event['data']['meta']['folderId']   ?? null,
-                            'folderName' => $event['data']['meta']['folderName'] ?? null,
+                            'folderId'      => $event['data']['meta']['folderId']      ?? null,
+                            'folderName'    => $event['data']['meta']['folderName']    ?? null,
+                            'eventTypeId'   => $event['data']['meta']['eventTypeId']   ?? null,
+                            'eventTypeName' => $event['data']['meta']['eventTypeName'] ?? null,
                         ],
+                        'subEvents' => [],
                     ],
                 ];
                 $carry[$grouping]['title'] = 0;
@@ -273,19 +275,13 @@ class Controller extends Base
 
             $carry[$grouping]['title']++;
 
-            // Stick title of event into detail
-            $carry[$grouping]['data']['meta']['detail'][] = $event['title'] ?? null;
+            // Populate some fields of sub-event
+            $carry[$grouping]['data']['subEvents'][] = [
+                'title' => $event['title'],
+                'start' => $event['start'],
+                'end'   => $event['end'],
+            ];
         }
-
-
-        // Group events by their week as well
-//        if (event?.data?.meta?.folderId) {
-//            return RESOURCE_FOLDER_PREFIX + String(event.data.meta.folderId);
-//        }
-//        if (event?.data?.meta?.eventTypeId) {
-//            return RESOURCE_EVENT_TYPE_PREFIX + String(event.data.meta.eventTypeId);
-//        }
-
 
         return $carry;
     }
