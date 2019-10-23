@@ -230,6 +230,7 @@ class Controller extends Base
             $carry = [];
         }
 
+
         // What's the event's resource?
         $resourceId = null;
         if (isset($event['data']['meta']['folderId'])) {
@@ -239,9 +240,8 @@ class Controller extends Base
         }
 
 
-        // Year/week grouping:
-        //         self.toMoment(element.start).format('YYYY')
-        //         + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
+        // Figure out the grouping for this event:
+        // it will be based on the resource ID and the event's start week
         $grouping = null;
         if ($resourceId) {
             $start    = new Alaress_Date_Format(
