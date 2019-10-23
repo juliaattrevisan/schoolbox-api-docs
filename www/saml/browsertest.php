@@ -1,9 +1,9 @@
 <?php
 use BrowscapPHP\Browscap;
-use Doctrine\Common\Cache\FilesystemCache;
 use Psr\Log\NullLogger;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Alaress\Saml\CacheReader;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -13,7 +13,7 @@ require "saml-setup.php";
 echo "<pre>";
 $bc = new Browscap(
     new SimpleCacheAdapter(
-        new Alaress_Saml_CacheReader(__DIR__ . '/../../tools/browscap')
+        new CacheReader(__DIR__ . '/../../tools/browscap')
     ),
     new NullLogger()
 );
