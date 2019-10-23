@@ -64,9 +64,11 @@
          */
         var opt = this.options;
 
-        // install listeners
-        this.element.on('change', opt.checkboxSelector, function () {
 
+        /**
+         * Determine how many items were selected and update the button text accordingly
+         */
+        function setupActionButton() {
             var $checks = bulky.element.find(opt.checkboxSelector);
 
             // see if the list has anything selected
@@ -77,11 +79,18 @@
 
             if (len) {
                 bulky.submitButton.removeAttr('disabled');
-
             } else {
                 bulky.submitButton.attr('disabled', 'disabled');
             }
+        }
+
+
+        /* Event listener to change button text
+         */
+        this.element.on('change', opt.checkboxSelector, function () {
+            setupActionButton();
         });
+
 
         /**
          * When the modal opens
@@ -154,6 +163,10 @@
                 bulky.submitButton.show();
                 bulky.element.find(opt.unavailableTextSelector).hide();
                 bulky.element.find(opt.availableTextSelector).show();
+
+                /* Initial conditions of the submit button
+                 */
+                setupActionButton();
             }
         });
 
