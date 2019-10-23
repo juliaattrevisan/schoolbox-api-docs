@@ -31,6 +31,7 @@
 
     const VIEW_RESOURCE_TIMELINE_SEMESTER = 'resourceTimelineSemester';
     const VIEW_RESOURCE_TIMELINE_WEEK = 'resourceTimelineWeek';
+    const VIEW_DAY_GRID_MONTH = 'dayGridMonth';
 
     const RESOURCE_FOLDER_PREFIX = 'folder-';
     const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
@@ -484,7 +485,7 @@
              * the initial month view will go to the current date
              */
             clickMonthView() {
-                this.switchView('dayGridMonth');
+                this.switchView(VIEW_DAY_GRID_MONTH);
             },
 
             /**
@@ -492,7 +493,7 @@
              * the initial month view will go to the current date
              */
             clickWeekView() {
-                this.switchView('resourceTimelineWeek');
+                this.switchView(VIEW_RESOURCE_TIMELINE_WEEK);
             },
 
             /**
@@ -500,7 +501,7 @@
              * the initial month view will go to the current date
              */
             clickSemesterView() {
-                this.switchView('resourceTimelineSemester');
+                this.switchView(VIEW_RESOURCE_TIMELINE_SEMESTER);
             },
 
             /**
