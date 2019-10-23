@@ -1,4 +1,3 @@
-var glob  = require('glob');
 var shell = require('shelljs');
 
 var jsSrc = {
