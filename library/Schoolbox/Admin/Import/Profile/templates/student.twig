@@ -14,22 +14,15 @@
                     <h2>Students</h2>
 
                     <p>
-                        This file will populate the records for Students in your school.
+                        This file will populate the School Data Store for users in the Student role type.
                     </p>
 
-                    <h3>Instructions</h3>
-
-                    <ul>
-                        <li>Download the template for this user type and populate all fields.</li>
-                        <li>Information for the Emergency Contact columns of CSV.</li>
-                        <li>
-                            <ul>
-                                <li>Any details entered in these columns will be shown on the User Profile page of a current Student, if viewed by a Staff member.</li>
-                                <li>The User Profile will display any text provided in these columns, it does not link to a Parent User ID.</li>
-                            </ul>
-                        </li>
-                        <li>Once your CSV is ready, drop it in the attach zone.</li>
-                    </ul>
+                    <p>
+                        <em>
+                            Note: Any details entered in the Emergency Contact columns will be shown on
+                            the User Profile page of a current Student, if viewed by a Staff member.
+                        </em>
+                    </p>
                 </div>
                 <div class="small-12 medium-6 columns">
                     <form method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}">

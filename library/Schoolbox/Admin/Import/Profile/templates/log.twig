@@ -52,7 +52,7 @@
         {% if perform %}
             <ul class="flex-list buttons">
                 <li><a href="{{ routeLookupIfAuthorized('adminImportProfile.getIndex') }}" class="icon-previous button">Back</a></li>
-                <li><a href="/adminv2/ups" class="icon-previous button">Go To UPS</a></li>
+                <li><a href="{{ routeLookupIfAuthorized('upsRuleset.intro') }}" class="icon-previous button">Go To UPS</a></li>
             </ul>
         {% else %}
             <script>

@@ -14,16 +14,16 @@
                     <h2>Relationships</h2>
 
                     <p>
-                        This file will establish relationships between Parents and Students or between connected Parents.
+                        This file will establish relationships between Parents and Students.
                     </p>
 
-                    <h3>Instructions</h3>
-
-                    <ul>
-                        <li>Each record must contain the relationship information for two people including Role Types, External IDs, and Relationship Type.</li>
-                        <li>The record will be skipped if either External ID does not match.</li>
-                        <li>The Relationship Type is an open field that can contain any relationship description required, eg parent, guardian, spouse, aunt, etc.</li>
-                    </ul>
+                    <p>
+                        <em>
+                            Note: Each record must contain the relationship information for Students and Parents,
+                            including External IDs and Relationship Type. The Relationship Type is an open text
+                            field that can contain any relationship description required.
+                        </em>
+                    </p>
                 </div>
                 <div class="small-12 medium-6 columns">
                     <form method="post" action="{{ routeLookupIfAuthorized('adminImportProfile.postUpload') }}">
