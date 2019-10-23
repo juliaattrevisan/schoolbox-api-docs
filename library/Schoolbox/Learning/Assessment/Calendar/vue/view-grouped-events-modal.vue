@@ -57,69 +57,71 @@
                     modifyLink = null,
                     deleteLink = null;
 
-                // Modify/delete links
-                if (metadata?.editable) {
-                    if (data?.custom?.modifyLink) {
-                        modifyLink = data?.custom?.modifyLink;
-                    } else if (metadata?.eventId) {
-                        modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=' + this.returnTo;
-                        deleteLink = this.eventModifyFormActionUrl + '?action=Delete&id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
-                    }
-                }
+                // // Modify/delete links
+                // if (metadata?.editable) {
+                //     if (data?.custom?.modifyLink) {
+                //         modifyLink = data?.custom?.modifyLink;
+                //     } else if (metadata?.eventId) {
+                //         modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=' + this.returnTo;
+                //         deleteLink = this.eventModifyFormActionUrl + '?action=Delete&id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
+                //     }
+                // }
 
                 return {
-                    eventId: metadata?.eventId,
-                    seriesId: metadata?.seriesId,
-                    editable: metadata?.editable,
-                    detail: metadata?.detail,
-                    location: metadata?.location,
-                    author: {
-                        id: Math.max(0, metadata?.authorId || 0),
-                        name: metadata?.author,
-                    },
-                    reviewer: {
-                        id: Math.max(0, metadata?.reviewerId || 0),
-                        name: metadata?.reviewer,
-                    },
-                    folder: {
-                        id: Math.max(0, data?.links?.category?.id || 0),
-                    },
-                    dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
-                    booking: {
-                        isBooking: (data?.booking?.status || '').length,
-                        status: data?.booking?.status,
-                        related: data?.booking?.related || [],
-                        actions: (data?.booking?.buttons || []).filter(button => button?.href),
-                    },
-                    attendance: {
-                        // Massage attendance data into something resembling usability
-                        isAttendable: data?.attendance?.icon,
-                        status: data?.attendance?.status,
-                        actions: {
-                            toggle: {
-                                isAvailable: Boolean(data?.attendance?.requestButton),
-                                href: this.attendanceToggleUrl,
-                                text: data?.attendance?.nextAction === ATTENDANCE_ACTION_ADD ? 'RSVP' : 'Unattend',
-                            },
-                            list: {
-                                isAvailable: Boolean(data?.attendance?.listButton),
-                                href: this.attendanceListUrl + String(metadata?.eventId),
-                            },
-                        },
-                    },
-                    classAttendance: {
-                        url: data?.classAttendance?.url,
-                    },
-                    task: {
-                        isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
-                        completed: metadata?.completed,
-                    },
-                    links: {
-                        view: data?.custom?.moreDetailsLink,
-                        modify: modifyLink,
-                        delete: deleteLink,
-                        path: data?.links?.path
-                    },
+                    // eventId: metadata?.eventId,
+                    // seriesId: metadata?.seriesId,
+                    // editable: metadata?.editable,
+                    // detail: metadata?.detail,
+                    // location: metadata?.location,
+                    // author: {
+                    //     id: Math.max(0, metadata?.authorId || 0),
+                    //     name: metadata?.author,
+                    // },
+                    // reviewer: {
+                    //     id: Math.max(0, metadata?.reviewerId || 0),
+                    //     name: metadata?.reviewer,
+                    // },
+                    // folder: {
+                    //     id: Math.max(0, data?.links?.category?.id || 0),
+                    // },
+                    title:     metadata?.folderName || metadata?.eventTypeName,
+                    dateSpan:  this.determineDateSpan(event?.start, event?.end, event?.allDay),
+                    subEvents: data?.subEvents || [],
+                    // booking: {
+                    //     isBooking: (data?.booking?.status || '').length,
+                    //     status: data?.booking?.status,
+                    //     related: data?.booking?.related || [],
+                    //     actions: (data?.booking?.buttons || []).filter(button => button?.href),
+                    // },
+                    // attendance: {
+                    //     // Massage attendance data into something resembling usability
+                    //     isAttendable: data?.attendance?.icon,
+                    //     status: data?.attendance?.status,
+                    //     actions: {
+                    //         toggle: {
+                    //             isAvailable: Boolean(data?.attendance?.requestButton),
+                    //             href: this.attendanceToggleUrl,
+                    //             text: data?.attendance?.nextAction === ATTENDANCE_ACTION_ADD ? 'RSVP' : 'Unattend',
+                    //         },
+                    //         list: {
+                    //             isAvailable: Boolean(data?.attendance?.listButton),
+                    //             href: this.attendanceListUrl + String(metadata?.eventId),
+                    //         },
+                    //     },
+                    // },
+                    // classAttendance: {
+                    //     url: data?.classAttendance?.url,
+                    // },
+                    // task: {
+                    //     isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
+                    //     completed: metadata?.completed,
+                    // },
+                    // links: {
+                    //     view: data?.custom?.moreDetailsLink,
+                    //     modify: modifyLink,
+                    //     delete: deleteLink,
+                    //     path: data?.links?.path
+                    // },
                 };
             }
         },
@@ -162,7 +164,7 @@
                     }
                 }
 
-                if (momentEnd && !momentStart.isSame(momentEnd)) {
+                if (momentEnd && momentEnd.isValid() && !momentStart.isSame(momentEnd)) {
                     // Start and end aren't the same - stitch them together.
                     if (!allDay && momentStart.isSame(momentEnd, 'day')) {
                         // Between two times on the same day - show the timespan but only one date
@@ -182,6 +184,16 @@
 
 <template>
     <reveal-modal ref="modal">
-        <h2>{{ eventExtendedProps.dateSpan }}</h2>
+        <h2>{{ eventExtendedProps.title }}: {{ eventExtendedProps.dateSpan }}</h2>
+
+        <h3>{{ eventExtendedProps.subEvents.length }} {{ eventExtendedProps.subEvents.length === 1 ? 'event' : 'events'}}</h3>
+
+        <ul>
+            <li v-for="subEvent in eventExtendedProps.subEvents">
+                {{ subEvent.title }}: {{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}
+            </li>
+        </ul>
+
+        <!-- Go to the week view -->
     </reveal-modal>
 </template>
