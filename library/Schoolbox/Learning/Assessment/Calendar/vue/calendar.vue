@@ -1073,4 +1073,13 @@
         right: 1px !important;
         line-height: 0 !important;
     }
+
+    a.fc-not-start .fc-title-wrap .fc-title {
+        padding-left: 8px !important;
+    }
+
+    .fc-timeline-event.fc-not-start::before,
+    .fc-timeline-event.fc-not-end::after {
+        content: none;
+    }
 </style>
