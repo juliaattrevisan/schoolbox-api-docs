@@ -222,11 +222,12 @@
     {% endset %}
 
     {% include '@learningAssessment/fragments/actionBar.twig' with {
-    actionStyle:  actionStyle,
-    attachedMsg:  attachedMsg,
-    massActions:  massActions,
-    dataAttrs:    dataAttrs,
-    buttons:      buttons
+        actionStyle:  actionStyle,
+        attachedMsg:  attachedMsg,
+        massActions:  massActions,
+        dataAttrs:    dataAttrs,
+        buttons:      buttons,
+        participant:  participant
     } only %}
 
 {% endblock %}
@@ -352,6 +353,16 @@
                         userSelector: '[data-mass-publish]',
                         userList: $userList,
                         onSubmit: function (toPublish) {
+
+                            {# The people you want to publish must have currently-valid data
+                             # Otherwise you'll end up potentially publishing invalid dat
+                             #}
+                            $.each(toPublish, function(index, element) {
+                                console.log($(element).attr('data-action-bar'));
+                            });
+
+                            return;
+
                             var draftFeedbackIds = [],
                                 $actionBars      = [],
                                 $toast = $('[data-save-draft]');
