@@ -53,8 +53,9 @@
         var parts = $(element).val().split('/');
 
         /* Trim perhaps-adjacent spaces to test for numeric representation
+         * This rule might also be used for percentage, so remove that symbol too
          */
-        parts[0] = $.trim(parts[0]);
+        parts[0] = $.trim(parts[0].replace('%', ''));
         parts[1] = $.trim(parts[1]);
 
         if ($.isNumeric(parts[0])) {
