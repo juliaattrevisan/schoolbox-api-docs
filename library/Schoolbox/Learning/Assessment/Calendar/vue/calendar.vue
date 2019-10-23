@@ -30,6 +30,7 @@
     const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
     const VIEW_RESOURCE_TIMELINE_SEMESTER = 'resourceTimelineSemester';
+    const VIEW_RESOURCE_TIMELINE_WEEK = 'resourceTimelineWeek';
 
     const RESOURCE_FOLDER_PREFIX = 'folder-';
     const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
@@ -423,6 +424,16 @@
 
                 self.maxDate = self.getMaxTermDate();
                 self.minDate = self.getMinTermDate();
+
+                // Do some recalculation for event elements on week view
+                if (self.currentViewIsWeek()) {
+                    document.querySelectorAll('.fc-timeline-event:not(.placeholder)').forEach(function (element, index) {
+                        let elementTopValue = parseFloat(element.style.top);
+                        if (elementTopValue > 0) {
+                            element.style.top = elementTopValue - 2 + 'px'
+                        }
+                    });
+                }
             },
 
             /**
@@ -680,6 +691,14 @@
              */
             currentViewIsSemester() {
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
+            },
+
+            /**
+             * Check if the current calendar view is in week
+             * @returns {boolean}
+             */
+            currentViewIsWeek() {
+                return this.currentView === VIEW_RESOURCE_TIMELINE_WEEK;
             },
 
             /**
