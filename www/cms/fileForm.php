@@ -210,6 +210,7 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
             $result = "Insufficient permssions";
         } else {
             $file->setFolder(FolderMapper::getInstance()->createModel($_POST['categoryID']));
+            $file->setModifiedBy($_SESSION['user']);
             $file->setModifiedAt(Alaress_Date_Format::now());
 
             FileMapper::getInstance()->save($file);
