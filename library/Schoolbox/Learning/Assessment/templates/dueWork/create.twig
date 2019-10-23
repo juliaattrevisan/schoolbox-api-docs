@@ -163,17 +163,19 @@
          */
         toggleDates($acceptOnlineToggle);
 
-        /* Update upon change
-         */
-        $acceptOnlineToggle.change(function() {
-            toggleDates($(this));
-        });
+        $acceptOnlineToggle.on('change', function() {
 
-        /* Show the similarity checkbox if single or multi submit options selected */
-        $acceptOnlineToggle.change(function(){
-            if($acceptOnlineToggle.val() !== '0') {
+            /* Update upon change
+             */
+            toggleDates($(this));
+
+            /* Show the similarity checkbox if single or multi submit options selected
+             * Disable it for the "None" option
+             */
+            if ($acceptOnlineToggle.val() !== '0') {
                 $similarityRow.show();
             } else {
+                $('#similarityCheckEnabled').prop('checked', false);
                 $similarityRow.hide();
             }
         });
