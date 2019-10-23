@@ -1640,17 +1640,14 @@ class Leave_Controller extends Controller
     /**
      * Send a notice to a parent when someone creates a leave request
      *
-     * At Kings Live, parent_notification started saving as integer 1/0, instead
-     * of the usual true/false string?
-     *
      * @param \Leave_Request $request
      */
     public function sendParentNotice($request)
     {
-        if ((Cfg::get('parent_notification') == 0) || (Cfg::get('parent_notification') == 'false')) {
+        if (Cfg::get('boarder_leave_parent_notification_enabled')) {
 
             /* Choose the Factory, have it produce() the notice object and send
-                */
+             */
             $leaveFactory = new Leave_Notice_Factory($request);
             $leaveFactory->produceParentFactory()->produce()->send();
         }
