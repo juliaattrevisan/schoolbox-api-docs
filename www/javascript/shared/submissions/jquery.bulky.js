@@ -22,7 +22,10 @@
         availableTextSelector: '[data-mass-available]',
         participantSelector: '[data-participant]',
         actionBarSelector: '[data-action-bar]',
-        userSelector: null
+        userSelector: null,
+        checkboxConditionality: function(id) {
+            return true;
+        }
     };
 
     function Bulky(element, options) {
@@ -78,8 +81,7 @@
 
             bulky.list.html(
 
-                opt.userList.find(opt.actionBarSelector + opt.userSelector).closest(opt.labelSelector).map(function () {
-
+                opt.userList.find(opt.actionBarSelector + opt.userSelector).closest(opt.labelSelector).map(function() {
                     var $item = bulky.template.clone(),
                         tag   = $item.prop("tagName").toLowerCase(),
                         $lbl  = $item.find(opt.labelSelector),
@@ -87,11 +89,19 @@
                         id    = $(this).closest(opt.participantSelector).data('participant'),
                         html;
 
+                    /* Assign ids
+                     */
                     $chk.attr('id', id);
                     $lbl.attr('for', id);
 
                     // apply the name
                     $lbl.text($(this).data('participantName'));
+
+                    if (opt.checkboxConditionality(id)) {
+
+                    } else {
+
+                    }
 
                     // because outerHtml doesn't exist as a thing -_-
                     html = ['<', tag, '>', $item.html(), '</', tag, '>' ].join('');
