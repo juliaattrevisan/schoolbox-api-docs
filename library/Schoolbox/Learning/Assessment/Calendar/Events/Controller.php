@@ -254,7 +254,7 @@ class Controller extends Base
 
             if (!isset($carry[$grouping])) {
                 $carry[$grouping]          = [
-                    'allday'     => false,
+                    'allDay'     => true,
                     'editable'   => false,
                     'draggable'  => false,
                     'resourceId' => $resourceId,
@@ -279,9 +279,10 @@ class Controller extends Base
 
             // Populate some fields of sub-event
             $carry[$grouping]['data']['subEvents'][] = [
-                'title' => $event['title'],
-                'start' => $event['start'],
-                'end'   => $event['end'],
+                'title'  => $event['title'],
+                'start'  => $event['start'],
+                'end'    => $event['end'],
+                'allDay' => $event['allDay'],
             ];
         }
 
