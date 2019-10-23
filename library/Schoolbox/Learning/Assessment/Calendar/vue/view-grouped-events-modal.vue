@@ -1,18 +1,7 @@
 <script>
     import RevealModal from '@schoolbox/reveal-modal'
-    import MetaList    from '@schoolbox/meta/list'
-    import MetaItem    from '@schoolbox/meta/item'
-    import axios       from 'axios';
-    import qs          from 'qs';
 
-    const EFFICACY_SELF = 'self';
-    const EFFICACY_SERIES = 'series';
-
-    const EVENT_MODIFIED = 'eventModified';
-    const EVENT_DELETED = 'eventDeleted';
-
-    const ATTENDANCE_ACTION_ADD = 'add';
-    const ATTENDANCE_ACTION_REMOVE = 'remove';
+    const EVENT_VIEW_WEEK = 'eventViewWeek';
 
     export default {
         name: "view-grouped-events-modal",
@@ -33,13 +22,9 @@
             }
         },
         components: {
-            MetaItem,
-            MetaList,
             RevealModal
         },
         computed: {
-            window: () => window,
-
             /**
              * Generate extended properties for the component's event.
              *
@@ -53,75 +38,12 @@
                 // Also need to render the event's buttons
                 let event      = this.event,
                     data       = event?.extendedProps?.data,
-                    metadata   = data?.meta,
-                    modifyLink = null,
-                    deleteLink = null;
-
-                // // Modify/delete links
-                // if (metadata?.editable) {
-                //     if (data?.custom?.modifyLink) {
-                //         modifyLink = data?.custom?.modifyLink;
-                //     } else if (metadata?.eventId) {
-                //         modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=' + this.returnTo;
-                //         deleteLink = this.eventModifyFormActionUrl + '?action=Delete&id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
-                //     }
-                // }
+                    metadata   = data?.meta;
 
                 return {
-                    // eventId: metadata?.eventId,
-                    // seriesId: metadata?.seriesId,
-                    // editable: metadata?.editable,
-                    // detail: metadata?.detail,
-                    // location: metadata?.location,
-                    // author: {
-                    //     id: Math.max(0, metadata?.authorId || 0),
-                    //     name: metadata?.author,
-                    // },
-                    // reviewer: {
-                    //     id: Math.max(0, metadata?.reviewerId || 0),
-                    //     name: metadata?.reviewer,
-                    // },
-                    // folder: {
-                    //     id: Math.max(0, data?.links?.category?.id || 0),
-                    // },
                     title:     metadata?.folderName || metadata?.eventTypeName,
                     dateSpan:  this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     subEvents: data?.subEvents || [],
-                    // booking: {
-                    //     isBooking: (data?.booking?.status || '').length,
-                    //     status: data?.booking?.status,
-                    //     related: data?.booking?.related || [],
-                    //     actions: (data?.booking?.buttons || []).filter(button => button?.href),
-                    // },
-                    // attendance: {
-                    //     // Massage attendance data into something resembling usability
-                    //     isAttendable: data?.attendance?.icon,
-                    //     status: data?.attendance?.status,
-                    //     actions: {
-                    //         toggle: {
-                    //             isAvailable: Boolean(data?.attendance?.requestButton),
-                    //             href: this.attendanceToggleUrl,
-                    //             text: data?.attendance?.nextAction === ATTENDANCE_ACTION_ADD ? 'RSVP' : 'Unattend',
-                    //         },
-                    //         list: {
-                    //             isAvailable: Boolean(data?.attendance?.listButton),
-                    //             href: this.attendanceListUrl + String(metadata?.eventId),
-                    //         },
-                    //     },
-                    // },
-                    // classAttendance: {
-                    //     url: data?.classAttendance?.url,
-                    // },
-                    // task: {
-                    //     isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
-                    //     completed: metadata?.completed,
-                    // },
-                    // links: {
-                    //     view: data?.custom?.moreDetailsLink,
-                    //     modify: modifyLink,
-                    //     delete: deleteLink,
-                    //     path: data?.links?.path
-                    // },
                 };
             }
         },
@@ -178,6 +100,20 @@
                 // Otherwise start and end are the same - just show the start
                 return start;
             },
+
+
+            /**
+             * Event listener for clicking the "view week" button.
+             *
+             * Closes the modal and emits a signal for the calendar to switch to
+             * the current week.
+             *
+             * @param date
+             */
+            onClickViewWeek(date) {
+                this.$refs.modal.close();
+                this.$emit(EVENT_VIEW_WEEK, date);
+            },
         },
     }
 </script>
@@ -194,6 +130,10 @@
             </li>
         </ul>
 
-        <!-- Go to the week view -->
+        <div class="component-action" v-if="event.start">
+            <section>
+                <a class="button" @click.prevent="onClickViewWeek(event.start)">View week</a>
+            </section>
+        </div>
     </reveal-modal>
 </template>

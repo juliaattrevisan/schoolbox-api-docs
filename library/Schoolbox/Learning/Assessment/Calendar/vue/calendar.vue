@@ -888,6 +888,20 @@
             reloadEvents() {
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
+
+            /**
+             * Go to the week view for a particular date.
+             *
+             * Listens to the "eventViewWeek" event from the grouped events
+             * modal.
+             *
+             * @param date
+             */
+            viewWeek(date) {
+                let api = this.$refs.fullCalendar.getApi();
+                api.gotoDate(date);
+                api.changeView('resourceTimelineWeek');
+            },
         }
     }
 </script>
@@ -914,7 +928,9 @@
                                    :to-moment="toMoment"
                                    :format-display-date="formats.displayDate"
                                    :format-display-time="formats.displayTime"
-                                   :format-display-datetime="formats.displayDatetime" />
+                                   :format-display-datetime="formats.displayDatetime"
+                                   @eventViewWeek="viewWeek"
+        />
 
         <full-calendar
             ref="fullCalendar"
