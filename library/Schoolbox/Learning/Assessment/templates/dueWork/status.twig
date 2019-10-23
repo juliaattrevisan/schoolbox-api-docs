@@ -300,8 +300,6 @@
         {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
-                    var $massPublishButton = $('[data-mass="publish"]');
-
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusPending: '{{ statusPending }}',
