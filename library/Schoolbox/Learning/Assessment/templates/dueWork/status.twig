@@ -246,6 +246,9 @@
                     <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
                 </div>
             </section>
+            <div data-publish-all-errors class="hide alert-box alert">
+                Fix errors please
+            </div>
             <div class="component-action">
                 <section>
                     {%- spaceless -%}
@@ -352,17 +355,21 @@
                         },
                         userSelector: '[data-mass-publish]',
                         userList: $userList,
+
+                        {# The people you want to publish must have currently-valid data
+                         # Otherwise you'll end up potentially publishing invalid data
+                         #}
+                        checkboxConditionality: function(id) {
+                            return $('[data-feedback-form="' + id + '"]').valid();
+                        },
+
+                        {# When you hit Publish All, it attempts to saves each draft feedback in the list
+                         # It gets those feedbacks' ids and publishes them in the back end
+                         #
+                         # This should take an intersect of the checkbox list that you saw in the modal
+                         # and the available drafts in the quickmark screen
+                         #}
                         onSubmit: function (toPublish) {
-
-                            {# The people you want to publish must have currently-valid data
-                             # Otherwise you'll end up potentially publishing invalid dat
-                             #}
-                            $.each(toPublish, function(index, element) {
-                                console.log($(element).attr('data-action-bar'));
-                            });
-
-                            return;
-
                             var draftFeedbackIds = [],
                                 $actionBars      = [],
                                 $toast = $('[data-save-draft]');
@@ -384,7 +391,6 @@
                             $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
                                 'drafts': draftFeedbackIds
                             }).done(function (response) {
-
                                 var feedbackErrors = false;
 
                                 for (var feedbackId in response) {
@@ -399,7 +405,7 @@
                                         $publishButton.html('Publish');
                                         $publishButton.removeAttr('disabled');
 
-                                        if(isPublishSuccess){
+                                        if (isPublishSuccess) {
                                             draftPublishSuccess($actionBar, $publishButton);
                                         }
                                     }
@@ -411,9 +417,8 @@
                                 } else {
                                     $toast.toastTimeout({text: 'Published all drafts', css: 'success'});
                                 }
-                            })
-                            .fail(function () {
-                                {# Something went wrong, display an error toast#}
+                            }).fail(function () {
+                                {# Something went wrong, display an error toast #}
                                 $toast.toastTimeout({text: 'Unable to publish draft feedbacks.', css: 'alert'});
                             });
                         }
