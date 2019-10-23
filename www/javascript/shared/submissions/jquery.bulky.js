@@ -114,10 +114,9 @@
 
                     /* Checkbox must pass this conditional to be provided
                      */
-                    if (opt.checkboxConditionality(id)) {
-
-                    } else {
-
+                    if (!opt.checkboxConditionality(id)) {
+                        $chk.prop('disabled', true).prop('checked', false);
+                        $lbl.text($lbl.text() + ' (invalid)');
                     }
 
                     // because outerHtml doesn't exist as a thing -_-
