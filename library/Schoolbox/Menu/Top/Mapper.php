@@ -40,7 +40,11 @@ class Mapper extends BaseMapper
      */
     public function findTabsForUser($user)
     {
-        $campusList = array();
+        if (!$user->getCampusCollection()) {
+            throw new MapperException('User has no campus, and therefore has no menu');
+        }
+
+        $campusList = [];
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
         }

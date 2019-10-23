@@ -41,7 +41,7 @@ class Mapper extends BaseMapper
     {
         $params = [];
 
-        if($user->isSuperuser()) {
+        if ($user->isSuperuser()) {
             $query = "
                 SELECT DISTINCT {$this->getColumnString()}
                 FROM menu_side
@@ -51,13 +51,16 @@ class Mapper extends BaseMapper
             ";
         }
         else {
+            if (!$user->getCampusCollection()) {
+                throw new MapperException('User has no campus, and therefore has no menu');
+            }
 
-            $campusList = array();
+            $campusList = [];
             foreach ($user->getCampusCollection() as $campus) {
                 $campusList[] = $campus->getId();
             }
 
-            if(count($campusList) < 1) {
+            if (count($campusList) < 1) {
                 throw new MapperException('User has no campus, and therefore has no menu');
             }
 
