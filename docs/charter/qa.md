@@ -50,6 +50,11 @@ Was the section easy to use?
 How many clicks and steps does it take to do the action and is this needlessly complicated. Is the display
 clunky and hard to read? Is there too much information? How slow did the section load?
 
+Does this work on our main browsers we support?
+
+If the change is a front end change you have to test the main browsers we support and in a mobile view.
+It is good to test on Firefox, Google Chrome, IE 11 (through a vm) and mobile view at a minimum.
+
 **Regressions**
 
 Has the change in this code effected sections outside of the area the change was looking to fix or create?
@@ -70,6 +75,9 @@ Has any data been compromised by the change in the code, can a user see somethin
     * Was the feature slow to load? 
     * Hard to understand? 
     * Instructions for user on how to use wrong?
+* Does the change effect the front end (styling, js ect.)?
+    * If so does it work on google chrome, firefox, IE 11 and mobile viewport?
+    * We also support safari, but I generally stick to the three above.
 * Strange user behavior doesn't break the system?
     * Different language characters.
     * Null values, incorrect input.
