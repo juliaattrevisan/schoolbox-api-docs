@@ -5,7 +5,6 @@
  * @link        https://schoolbox.com.au/
  */
 ;(function ($, window, document, undefined) {
-
     var pluginName = 'bulky';
 
     var currentlyOpenModal = null;
@@ -23,11 +22,22 @@
         participantSelector: '[data-participant]',
         actionBarSelector: '[data-action-bar]',
         userSelector: null,
+
+        /* A function to determine whether an element should be submittable
+         */
         checkboxConditionality: function(id) {
             return true;
         }
     };
 
+
+    /**
+     * Bulk Checklist
+     *
+     * @param element
+     * @param options
+     * @constructor
+     */
     function Bulky(element, options) {
         var bulky = this;
 
@@ -50,7 +60,8 @@
             throw "Did not find matching list for data-list-id";
         }
 
-
+        /* A convenience var
+         */
         var opt = this.options;
 
         // install listeners
@@ -72,15 +83,19 @@
             }
         });
 
+        /**
+         * When the modal opens
+         */
         this.element.on('open.fndtn.reveal', function () {
-
             var $checks;
 
             // cache this value before we inject the contents
             $(this).data('fixedContentHeight', $(this).outerHeight());
 
+            /* Iterate through all these nodes and assign ids
+             * Then construct a html fragment to insert into the modal
+             */
             bulky.list.html(
-
                 opt.userList.find(opt.actionBarSelector + opt.userSelector).closest(opt.labelSelector).map(function() {
                     var $item = bulky.template.clone(),
                         tag   = $item.prop("tagName").toLowerCase(),
@@ -97,6 +112,8 @@
                     // apply the name
                     $lbl.text($(this).data('participantName'));
 
+                    /* Checkbox must pass this conditional to be provided
+                     */
                     if (opt.checkboxConditionality(id)) {
 
                     } else {
@@ -107,10 +124,12 @@
                     html = ['<', tag, '>', $item.html(), '</', tag, '>' ].join('');
 
                     return html;
-
                 }).get().join('')
             );
 
+            /* All the checkboxes that have been ticked
+             * Change contents of modal accordingly
+             */
             $checks = bulky.element.find(opt.checkboxSelector);
 
             if ($checks.length) {
@@ -118,15 +137,17 @@
                 bulky.submitButton.show();
                 bulky.element.find(opt.unavailableTextSelector).hide();
                 bulky.element.find(opt.availableTextSelector).show();
-
             } else {
                 bulky.submitButton.hide();
                 bulky.element.find(opt.unavailableTextSelector).show();
                 bulky.element.find(opt.availableTextSelector).hide();
             }
-
         });
 
+
+        /**
+         * When the modal finishes opening
+         */
         this.element.on('opened.fndtn.reveal', function () {
             currentlyOpenModal = $(this);
             // start listening
@@ -134,6 +155,10 @@
             refreshModalHeight.call(window);
         });
 
+
+        /**
+         * When the modal finishes closing
+         */
         this.element.on('closed.fndtn.reveal', function () {
             currentlyOpenModal = null;
 
@@ -147,11 +172,21 @@
             bulky.submitButton.removeAttr('disabled');
         });
 
+
+        /**
+         * When a submit button has been clicked
+         */
         this.submitButton.on('click', function (e) {
             e.preventDefault();
             opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function () { return opt.userList.find('[data-participant='+this.id+'] [data-action-bar]').get(); }));
         });
 
+
+        /**
+         * When any of the other component action buttons have been clicked
+         * Typically it's "Cancel" or the Action button itself, after which
+         * the modal can be dismissed
+         */
         this.element.on('click', '.button', function () {
             bulky.element.foundation('reveal', 'close');
         });
