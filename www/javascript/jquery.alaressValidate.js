@@ -50,6 +50,16 @@
      * Numerator must be at least 0 otherwise it's an illegal attribution
      */
     jQuery.validator.addMethod("withinRange", function(value, element) {
+
+        /* Null/empty setting is permitted
+         */
+        if (null == $(element).val() || '' === $(element).val()) {
+            return true;
+        }
+
+        /* Is it one of the Total Mark or Percentage strings?
+         * If so, interpret it differently than a Submission State
+         */
         var parts = $(element).val().split('/');
 
         /* Trim perhaps-adjacent spaces to test for numeric representation
@@ -67,7 +77,11 @@
         /* Otherwise it could be one of the submission states like Absent or Not Submitted
          * so test that it's one of the available customisable options
          */
-        return $(element).parents('.combobox').find('.combobox_selector li:contains("' + $(element).val() + '")').length > 0;
+        var val = $(element).val();
+
+        return $(element).parents('.combobox').find('.combobox_selector li').filter(function() {
+            return $(this).text() === val;
+        }).length > 0;
     });
 
 
@@ -77,7 +91,15 @@
      * It's not just some random unordered list
      */
     jQuery.validator.addMethod("withinLetterGradeRange", function(value, element) {
-        return $(element).find('option:contains("' + $(element).val() + '")').length > 0;
+
+        /* Otherwise it could be one of the submission states like Absent or Not Submitted
+         * so test that it's one of the available customisable options
+         */
+        var val = $(element).val();
+
+        return $(element).find('option').filter(function() {
+            return $(this).val() === val;
+        }).length > 0;
     });
 
 
