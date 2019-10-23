@@ -305,7 +305,7 @@ $allow-sidebar-stash: $large-up;
     .account-menu,
     .account-drop {
       right: 0;
-      z-index: 100001;
+      z-index: 100001 !important;
     }
   }
 }
