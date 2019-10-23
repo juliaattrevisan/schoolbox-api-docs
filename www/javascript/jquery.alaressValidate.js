@@ -57,7 +57,7 @@
             return true;
         }
 
-        /* Is it one of the Total Mark or Percentage strings?
+        /* Is it one of the Total Mark string format?
          * If so, interpret it differently than a Submission State
          */
         var parts = $(element).val().split('/');
@@ -79,6 +79,45 @@
          */
         var val = $(element).val();
 
+        return $(element).parents('.combobox').find('.combobox_selector li').filter(function() {
+            return $(this).text() === val;
+        }).length > 0;
+    });
+
+
+    /**
+     * Explode on the slash to determine numerator/denominator
+     * Unfortunately this replicates backend logic
+     * Value must be at least 0 otherwise it's an illegal attribution
+     */
+    jQuery.validator.addMethod("withinPercentageRange", function(value, element) {
+
+        /* Null/empty setting is permitted
+         */
+        if (null == $(element).val() || '' === $(element).val()) {
+            return true;
+        }
+
+        /* Is it a Percentage string format?
+         * If so, interpret it differently than a Submission State
+         */
+        var val = $(element).val();
+
+        /* Trim perhaps-adjacent spaces to test for numeric representation
+         * This rule might also be used for percentage, so remove that symbol too
+         */
+        val = $.trim(val.replace('%', ''));
+
+        if ($.isNumeric(val)) {
+            var numerator = parseInt(val);
+            var denominator = $(element).attr('data-validation-limit');
+
+            return numerator >= 0 && numerator <= denominator;
+        }
+
+        /* Otherwise it could be one of the submission states like Absent or Not Submitted
+         * so test that it's one of the available customisable options
+         */
         return $(element).parents('.combobox').find('.combobox_selector li').filter(function() {
             return $(this).text() === val;
         }).length > 0;
