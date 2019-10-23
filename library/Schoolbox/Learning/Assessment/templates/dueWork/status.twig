@@ -301,14 +301,13 @@
             <script type="text/javascript">
                 $(function () {
                     var $massPublishButton = $('[data-mass="publish"]');
+
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
                         reviewedText: '{{ labelReviewed }}',
-
                         onPreDraftCallback: function(){
-                            $massPublishButton.attr('disabled', 'disabled');
                         },
                         onDraftCallback: function (userId, isSuccess, message, feedbackId) {
                             var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -316,10 +315,8 @@
                             $publishButton.attr('data-draft-id', feedbackId);
                             $actionBar.attr('data-mass-publish', '');
                             $actionBar.removeAttr('data-mass-submit');
-                            $massPublishButton.removeAttr('disabled');
                         },
                         onPrePublishCallback: function(){
-                            $massPublishButton.attr('disabled', 'disabled');
                         },
                         onPublishCallback: function (userId) {
                             var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -333,7 +330,6 @@
                                     $ackButton.remove();
                                 }
                             });
-                            $massPublishButton.removeAttr('disabled');
                         }
                     });
 
@@ -345,11 +341,14 @@
                             if (!len) {
                                 return 'None Selected';
                             }
+
                             if (len == all) {
                                 return 'Publish All';
                             }
+
                             return 'Publish ' + len + ' Selected';
                         },
+
                         userSelector: '[data-mass-publish]',
                         userList: $userList,
 
