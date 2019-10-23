@@ -73,7 +73,8 @@
 
     /**
      * Unfortunately this replicates backend logic
-     *
+     * Letter Grades, though similar to other types, are distinct due to <option> structure in a select
+     * It's not just some random unordered list
      */
     jQuery.validator.addMethod("withinLetterGradeRange", function(value, element) {
         return $(element).find('option:contains("' + $(element).val() + '")').length > 0;
