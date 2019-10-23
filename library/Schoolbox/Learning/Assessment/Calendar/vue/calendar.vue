@@ -11,6 +11,7 @@
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
     import {stringify}        from 'qs';
     import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
+    import ViewGroupedEventsModal     from './view-grouped-events-modal';
 
     // Various URLs this calendar can make use of
     const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -37,6 +38,7 @@
 
     export default {
         components: {
+            ViewGroupedEventsModal,
             ViewEventModal,
             FullCalendar,
             RevealModal,
@@ -300,7 +302,11 @@
              */
             onEventClick(eventInfo) {
                 this.currentEvent = eventInfo.event;
-                this.$refs.event.open();
+                if (eventInfo.event.source.id === 'groupedEvents') {
+                    this.$refs.groupedEvents.open();
+                } else {
+                    this.$refs.event.open();
+                }
                 // var self = this;
                 //
                 // if (!self.currentViewIsSemester() ||
@@ -316,82 +322,82 @@
                 // }
             },
 
-            /**
-             * Custom method to render event popover for semester view
-             */
-            renderPopOver(eventInfo) {
-                this.destroyPopOver();
-
-                let popOver = document.getElementById('popOver'),
-                    popOverContent = '',
-                    popOverHeader = '',
-                    dateGroup = '',
-                    resources = eventInfo.event.getResources();
-
-                if (resources.length === 0) {
-                    return;
-                }
-
-                let resourceId = resources[0].id,
-                    eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
-                    eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
-                    resourceCol = document.querySelectorAll("[data-resource-id='"+ resourceId +"']"),
-                    popOverPlaceholder = document.querySelector('.fc-body .fc-time-area .fc-rows'),
-                    tmpEvent = [];
-
-                popOver = document.createElement('div');
-                popOver.setAttribute('id', 'popOver');
-                popOver.setAttribute('style', 'left:' + eventInfo.el.offsetLeft + 'px;top:' + resourceCol[0].offsetTop +'px;z-index:1000;padding:5px');
-                popOver.className = 'fc-popover fc-more-popover';
-
-                popOverHeader = '<div class="fc-header fc-widget-header">' +
-                    '<span class="fc-title">Week '+ eventInfo.event.extendedProps.data.meta.weekNo +'</span>' +
-                    '<span class="fc-close fc-icon fc-icon-x"></span></div>';
-
-                eventGroup.forEach(function(group, index) {
-                    var event = eventGroup[index];
-                        event.style.removeProperty('left');
-                        event.style.removeProperty('right');
-                        event.style.removeProperty('top');
-
-                    tmpEvent.push(event.outerHTML);
-                });
-
-                tmpEvent.forEach(function(event, index) {
-                    var tmpPopOverEvent = $(tmpEvent[index])[0],
-                        popOverContentDate = '';
-
-                    tmpPopOverEvent.classList.remove('hide', 'fc-draggable', 'fc-resizable');
-
-                    if (tmpPopOverEvent.getAttribute('event-group-date') !== dateGroup) {
-                        dateGroup = tmpPopOverEvent.getAttribute('event-group-date');
-                        popOverContentDate = '<p style="font-weight: bold; margin-bottom: 0">' + dateGroup + '</ p>';
-                    }
-
-                    popOverContent += popOverContentDate + '<div class="fc-timeline-event-div" style="padding-bottom:40px;display:flex">' + tmpPopOverEvent.outerHTML + '</div>';
-                });
-
-                popOver.innerHTML = popOverHeader + popOverContent;
-
-                popOverPlaceholder.insertBefore(popOver, popOverPlaceholder.firstChild);
-
-                this.registerSemViewEventClickListener();
-            },
-
-            /**
-             * Listen on popover event clicks with semester view
-             */
-            registerSemViewEventClickListener() {
-                var popOverEvents = document.querySelectorAll("#popOver .fc-timeline-event-div");
-
-                var openModal = function() {
-                    document.querySelectorAll('.fc-event-container [event-id="'+ this.firstChild.getAttribute("event-id") +'"]')[0].click();
-                };
-
-                popOverEvents.forEach(function(event, index) {
-                    popOverEvents[index].addEventListener('click', openModal, false);
-                });
-            },
+            // /**
+            //  * Custom method to render event popover for semester view
+            //  */
+            // renderPopOver(eventInfo) {
+            //     this.destroyPopOver();
+            //
+            //     let popOver = document.getElementById('popOver'),
+            //         popOverContent = '',
+            //         popOverHeader = '',
+            //         dateGroup = '',
+            //         resources = eventInfo.event.getResources();
+            //
+            //     if (resources.length === 0) {
+            //         return;
+            //     }
+            //
+            //     let resourceId = resources[0].id,
+            //         eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
+            //         eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
+            //         resourceCol = document.querySelectorAll("[data-resource-id='"+ resourceId +"']"),
+            //         popOverPlaceholder = document.querySelector('.fc-body .fc-time-area .fc-rows'),
+            //         tmpEvent = [];
+            //
+            //     popOver = document.createElement('div');
+            //     popOver.setAttribute('id', 'popOver');
+            //     popOver.setAttribute('style', 'left:' + eventInfo.el.offsetLeft + 'px;top:' + resourceCol[0].offsetTop +'px;z-index:1000;padding:5px');
+            //     popOver.className = 'fc-popover fc-more-popover';
+            //
+            //     popOverHeader = '<div class="fc-header fc-widget-header">' +
+            //         '<span class="fc-title">Week '+ eventInfo.event.extendedProps.data.meta.weekNo +'</span>' +
+            //         '<span class="fc-close fc-icon fc-icon-x"></span></div>';
+            //
+            //     eventGroup.forEach(function(group, index) {
+            //         var event = eventGroup[index];
+            //             event.style.removeProperty('left');
+            //             event.style.removeProperty('right');
+            //             event.style.removeProperty('top');
+            //
+            //         tmpEvent.push(event.outerHTML);
+            //     });
+            //
+            //     tmpEvent.forEach(function(event, index) {
+            //         var tmpPopOverEvent = $(tmpEvent[index])[0],
+            //             popOverContentDate = '';
+            //
+            //         tmpPopOverEvent.classList.remove('hide', 'fc-draggable', 'fc-resizable');
+            //
+            //         if (tmpPopOverEvent.getAttribute('event-group-date') !== dateGroup) {
+            //             dateGroup = tmpPopOverEvent.getAttribute('event-group-date');
+            //             popOverContentDate = '<p style="font-weight: bold; margin-bottom: 0">' + dateGroup + '</ p>';
+            //         }
+            //
+            //         popOverContent += popOverContentDate + '<div class="fc-timeline-event-div" style="padding-bottom:40px;display:flex">' + tmpPopOverEvent.outerHTML + '</div>';
+            //     });
+            //
+            //     popOver.innerHTML = popOverHeader + popOverContent;
+            //
+            //     popOverPlaceholder.insertBefore(popOver, popOverPlaceholder.firstChild);
+            //
+            //     this.registerSemViewEventClickListener();
+            // },
+            //
+            // /**
+            //  * Listen on popover event clicks with semester view
+            //  */
+            // registerSemViewEventClickListener() {
+            //     var popOverEvents = document.querySelectorAll("#popOver .fc-timeline-event-div");
+            //
+            //     var openModal = function() {
+            //         document.querySelectorAll('.fc-event-container [event-id="'+ this.firstChild.getAttribute("event-id") +'"]')[0].click();
+            //     };
+            //
+            //     popOverEvents.forEach(function(event, index) {
+            //         popOverEvents[index].addEventListener('click', openModal, false);
+            //     });
+            // },
 
             /**
              * Helper function for converting a Date object to a Moment object.
@@ -902,6 +908,13 @@
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents"
         />
+
+        <view-grouped-events-modal ref="groupedEvents"
+                                   :event="currentEvent"
+                                   :to-moment="toMoment"
+                                   :format-display-date="formats.displayDate"
+                                   :format-display-time="formats.displayTime"
+                                   :format-display-datetime="formats.displayDatetime" />
 
         <full-calendar
             ref="fullCalendar"
