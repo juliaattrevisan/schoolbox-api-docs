@@ -17,8 +17,8 @@
 
 <div class="row collapse">
     <div class="tabs-content">
-        <div class="content active" id="byDate-{{ id }}" role="tabpanel" aria-hidden="false">
-            <div class="small-12 medium-{{ width }} columns" data-adtp-left-panel="calendar">
+        <div class="content active" id="byDate-{{ id }}" role="tabpanel" aria-hidden="false" data-equalizer-mq="medium-up">
+            <div class="small-12 medium-{{ width }} columns" data-adtp-left-panel="calendar" data-equalizer-watch>
 
                 {# Placeholder for calendar ot be rendered in #}
                 <div id="pickerCalendar{{ id }}"></div>
@@ -26,7 +26,7 @@
             </div>
             {# Hide second column if showing just a calendar #}
             {% if type == 'event' or type =='duework' %}
-                <div class="small-12 medium-{{ width }} columns">
+                <div class="small-12 medium-{{ width }} columns" data-equalizer-watch>
 
                     {# Placeholder for appointments to be rendered in #}
                     <div id="calendarResponse{{ id }}" class="adtp-response" data-adtp-response-date="">
@@ -42,9 +42,9 @@
             </div>
         </div>
         {% if timetable %}
-            <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
+            <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true" data-equalizer-mq="medium-up">
 
-                <div class="small-12 medium-{{ width }} columns" data-adtp-left-panel="timetable">
+                <div class="small-12 medium-{{ width }} columns" data-adtp-left-panel="timetable" data-equalizer-watch>
 
                     {# Placeholder for timetable ot be rendered in #}
                     <div id="timetable{{ id }}">
@@ -140,7 +140,7 @@
                 </div>
 
                 {% if type == 'event' or type =='duework' %}
-                    <div class="small-12 medium-{{ width }} columns">
+                    <div class="small-12 medium-{{ width }} columns" data-equalizer-watch>
 
                         {# Placeholder for appointments to be rendered in #}
                         <div id="timetableResponse{{ id }}" data-adtp-response-date="" class="adtp-response">
@@ -155,7 +155,7 @@
                 <div class="small-12 medium-12 columns">
                     <a class="button submit timetable-submit" data-adtp-tt-submit data-timetable-value="">Update</a>
                 </div>
-                
+
             </div>
         {% endif %}
     </div>

@@ -42,7 +42,7 @@ Feature Tour | (n.) A walk-through of a screen or feature via a series of dialog
 Filters | (n.) Often refers to the Filters panel that exists in a few places in Schoolbox. Eg. the Pending Assessments page
 Fixtures, Sports Fixtures | (n.) A feature in Schoolbox used for managing teams & games.
 Foundation | (n.) The CSS framework we use - https://foundation.zurb.com/
-Full Calendar | (n.) A jQuery plugin we use for calendars - https://fullcalendar.io/
+Full Calendar | (n.) A JavaScript calendar we use throughout Schoolbox - https://fullcalendar.io/
 Grunt | (n.) A task runner we use for building JS and CSS - https://gruntjs.com/
 Inline Grader | (n.) A page in the LMS of Schoolbox that simultaneously shows a student's submission as well as the means to grade it
 Jellytot | (n.) Internal nomenclature for what the world calls a 'kebab' menu. The dropdown menu accessed by an icon that looks like 3 vertical dots. “Jellytot” comes from the Jelly Baby sweets, which someone thought resembled the icon.

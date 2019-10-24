@@ -33,7 +33,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var momentDate = moment(twigVars.date, momentFormat);
 
     // Timetable picker
-    var $byTimetable = $('#byTimetable-' + twigVars.id);
+    var $byDate      = $('#byDate-' + twigVars.id),
+        $byTimetable = $('#byTimetable-' + twigVars.id);
+    $byDate.on('toggled', resizeCalendars);
+    $byTimetable.on('toggled', resizeCalendars);
 
     // Timetable elements
     var timetable = {
@@ -43,8 +46,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         submit: $byTimetable.find('[data-adtp-tt-submit]')
     };
 
+    var fullCalendars = {};
+
     // Listen for the modal open
-    $('#adtp-modal-wrapper-' + twigVars.id).on('open.fndtn.reveal', function () {
+    $('#adtp-modal-wrapper-' + twigVars.id).on('opened.fndtn.reveal', function () {
         resetCalendar();
         adtp.setCalendarAllDay(isInputAllDay(), twigVars.id);
         if (twigVars.timetable) {
@@ -165,6 +170,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+
+            // The size of something could have changed: reflow
+            resizeCalendars();
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -186,6 +194,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             // Unhide the event calendar (in the case it was hidden via expanding due work)
             $('#calendarResponse' + twigVars.id + '-events').removeClass('hide');
+            resizeCalendars();
         },
         onMonthChange: function (selectedDates, dateStr, instance) {
             if (isDueWorkType(twigVars.type)) {
@@ -196,6 +205,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+            resizeCalendars();
         },
         onYearChange: function (selectedDates, dateStr, instance) {
             if (isDueWorkType(twigVars.type)) {
@@ -206,6 +216,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+            resizeCalendars();
         },
         onValueUpdate: function (selectedDates, dateStr, instance) {
             if (isDueWorkType(twigVars.type)) {
@@ -216,6 +227,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+            resizeCalendars();
         }
 
     };
@@ -342,6 +354,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         else {
             noTimetableData();
         }
+
+        // The size of something could have changed: reflow
+        resizeCalendars();
     }
 
     /**
@@ -693,54 +708,51 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 }
             }
 
-            html += '<div id="calendar-response-fc"></div>';
+            html += '<div data-fullcalendar></div>';
             $pickerResponseEvents.append(html);
-            var $calendarDiv = $pickerResponseEvents.find('#calendar-response-fc');
+            var $calendarDiv = $pickerResponseEvents.find('div[data-fullcalendar]');
 
-            $calendarDiv.fullCalendar({
-                header: false,
-                eventLimit: true,
-                scrollTime: dateDisplayFormats.calendarStartTime,
-                views: {
-                    agendaDay: {
-                        eventLimit: 4
-                    }
-                },
-                defaultView: 'agendaDay',
-                events: events,
-                eventColor: '#def',
-                height: 0, // Height is calculated below on render
-                defaultDate: moment(data.date),
-                viewRender: function () {
-                    // Calculate the height available and set it
-                    setFullCalendarHeight(target);
-                }
-            });
-
-            // If the div where the calendar is going is hidden at this time - render will need to be called when it is
-            // visible.
-            if ($calendarDiv.not(':visible')) {
-
-                // If it was hidden because the tab wasn't open
-                $modal.find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
-                    setTimeout(function () {
-                        $calendarDiv.fullCalendar('render');
-                    }, 80);
-                });
-
-                // If it was hidden because the full due work list was expanded (quickly before the calendar loaded)
-                $pickerResponse.find('[data-hide-full-due]').one('click', function () {  // purposefully `one`, not `on`
-                    setTimeout(function () {
-                        $calendarDiv.fullCalendar('render');
-                    }, 80);
-                });
+            // Kill off the fullcalendar for this target, and rebuild it
+            if (fullCalendars[target]) {
+                fullCalendars[target].destroy();
             }
-
+            var calendar = new FullCalendar.Calendar(
+                $calendarDiv[0],
+                {
+                    plugins: ['list'],
+                    header: false,
+                    eventLimit: true,
+                    scrollTime: dateDisplayFormats.calendarStartTime,
+                    views: {
+                        day: {
+                            eventLimit: 4
+                        }
+                    },
+                    defaultView: 'listDay',
+                    events: events,
+                    eventColor: '#def',
+                    defaultDate: data.date,
+                }
+            );
+            fullCalendars[target] = calendar;
+            calendar.render();
         }
 
         if (template == 'duework' && data.students.length > 0) {
             $modal.find('[data-collapser]').collapsable();
         }
+    }
+
+
+    /**
+     * Update the size of every calendar to match its container.
+     *
+     * (Each calendar is configured to have an automatic height)
+     */
+    function resizeCalendars() {
+        Object.keys(fullCalendars).forEach(function (key) {
+            fullCalendars[key].updateSize();
+        })
     }
 
 
@@ -918,48 +930,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         }
     }
-
-
-    /**
-     * Determine the amount of space available for fullcalendar in the right panel, then set it.
-     * This will create an interval to loop until the due work card has loaded (if there will be one).
-     *
-     * @param target
-     */
-    function setFullCalendarHeight(target) {
-
-        var intervalLength = 0; // Run this immediately (an interval will be set after the first run)
-
-        var calcInterval = setInterval(function () {
-
-            var $dueWorkCard = $('#' + target + 'Response' + twigVars.id + '-duework'), // The 'heaviest workload' card (with the 'mini' heading)
-                dueWorkHeightInner = $dueWorkCard.height();                             // Height of the card above, excluding padding & margins
-
-            // Check if the height should now be set (either no due work or due work hasn't loaded)
-            if ((pickerOptions.type != 'duework') || (pickerOptions.type == 'duework' && dueWorkHeightInner > 0)) {
-
-                var calendarHeight = $modal.find('[data-adtp-left-panel=' + target + ']').outerHeight(true),                   // The height of the left panel
-                    calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true),  // Height of the 'your calendar' heading
-                    dueWorkHeightOuter = $dueWorkCard.outerHeight(true);                                                                        // Height of the card above, including padding & margins
-
-                // Subtract heights from the left panel height as necessary
-                calendarHeight -= calendarTitleHeight;
-                if (pickerOptions.type == 'duework') {
-                    calendarHeight -= dueWorkHeightOuter;
-                }
-
-                // Set the fullcalendar height
-                $('#' + target + 'Response' + twigVars.id + '-events #calendar-response-fc').fullCalendar('option', 'height', calendarHeight);
-
-                // Stop this from running again
-                clearInterval(calcInterval);
-            }
-
-            intervalLength = 500;
-
-        }, intervalLength);
-    }
-
 
     /**
      * Whichever dates are visible in the timetable, apply heat to them

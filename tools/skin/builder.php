@@ -188,6 +188,22 @@ HELP;
                     $logger->warning("Something went wrong building editor CSS (exit code: {$outputCode})");
                 }
 
+
+                // Build the datepicker's required CSS
+                $logger->info("Building CSS for datepicker FullCalendar");
+                $datepickerIn = [
+                    SITE_root . '/node_modules/@fullcalendar/core/main.css',
+                    SITE_root . '/node_modules/@fullcalendar/list/main.css',
+                ];
+                $datepickerOut = SITE_root . '/www/css/'.$siteLocation.'/datepicker-fullcalendar.css';
+
+                $datepickerInContent = [];
+                foreach ($datepickerIn as $datepickerInFile) {
+                    $datepickerInContent[] = file_get_contents($datepickerInFile);
+                }
+                file_put_contents($datepickerOut, implode("\n", $datepickerInContent));
+
+
                 // Move all of the CSS files to S3
 
                 $logger->info("Copying output to FS_STORAGE");

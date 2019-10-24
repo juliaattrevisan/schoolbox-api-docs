@@ -28,11 +28,10 @@
 
     {% block mainHeader %}
         <link rel="stylesheet" type="text/css" href="/css/{{ config.site_location }}/chrome-foundation.css?v={{ config.site_version }}" />
+
+        <link rel="stylesheet" type="text/css" href="/css/{{ config.site_location }}/datepicker-fullcalendar.css?v={{ config.site_version }}" />
+
         <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
-        <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
-        <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
-        <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
-        <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
         {% if tour.data and not user.impersonated %}
         {% autoescape 'js' %}
         <script type="text/javascript">
@@ -42,6 +41,7 @@
         {% endif %}
         <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+
         <script src="/javascript/shared/browser-redirect.js"></script>
         <script type="text/javascript" src="/javascript/math/jscurry-0.3.0.js"></script>
         <script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>
