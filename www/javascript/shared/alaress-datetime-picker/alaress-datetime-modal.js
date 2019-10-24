@@ -33,7 +33,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var momentDate = moment(twigVars.date, momentFormat);
 
     // Timetable picker
-    var $byTimetable = $('#byTimetable-' + twigVars.id);
+    var $byDate      = $('#byDate-' + twigVars.id),
+        $byTimetable = $('#byTimetable-' + twigVars.id);
+    $byDate.on('toggled', resizeCalendars);
+    $byTimetable.on('toggled', resizeCalendars);
 
     // Timetable elements
     var timetable = {
