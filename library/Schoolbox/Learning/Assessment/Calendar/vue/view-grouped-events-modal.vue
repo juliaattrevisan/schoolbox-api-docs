@@ -6,7 +6,6 @@
     export default {
         name: "view-grouped-events-modal",
         props: {
-            event: {},
             toMoment: {},
             taskTypeId: {},
             eventModifyFormUrl: {},
@@ -19,6 +18,11 @@
             formatDisplayDatetime: {},
             returnTo: {
                 default: 'calendar',
+            }
+        },
+        data() {
+            return {
+                event: {},
             }
         },
         components: {
@@ -41,6 +45,7 @@
                     metadata   = data?.meta;
 
                 return {
+                    start:     event?.start,
                     title:     metadata?.folderName || metadata?.eventTypeName,
                     dateSpan:  this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     subEvents: data?.subEvents || [],
@@ -51,7 +56,8 @@
             /**
              * Open this modal.
              */
-            open() {
+            open(event) {
+                this.event = event;
                 this.$refs.modal.open();
             },
 
@@ -130,9 +136,9 @@
             </li>
         </ul>
 
-        <div class="component-action" v-if="event.start">
+        <div class="component-action" v-if="eventExtendedProps.start">
             <section>
-                <a class="button" @click.prevent="onClickViewWeek(event.start)">View week</a>
+                <a class="button" @click.prevent="onClickViewWeek(eventExtendedProps.start)">View week</a>
             </section>
         </div>
     </reveal-modal>

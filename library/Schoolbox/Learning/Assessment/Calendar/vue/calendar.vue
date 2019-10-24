@@ -303,9 +303,9 @@
             onEventClick(eventInfo) {
                 this.currentEvent = eventInfo.event;
                 if (eventInfo.event.source.id === 'groupedEvents') {
-                    this.$refs.groupedEvents.open();
+                    this.$refs.groupedEvents.open(eventInfo.event);
                 } else {
-                    this.$refs.event.open();
+                    this.$refs.event.open(eventInfo.event);
                 }
                 // var self = this;
                 //
@@ -924,7 +924,6 @@
         />
 
         <view-grouped-events-modal ref="groupedEvents"
-                                   :event="currentEvent"
                                    :to-moment="toMoment"
                                    :format-display-date="formats.displayDate"
                                    :format-display-time="formats.displayTime"
