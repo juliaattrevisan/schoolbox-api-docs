@@ -141,7 +141,14 @@
                 <li v-for="subEvent in eventExtendedProps.subEvents" class="actions-small-0">
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="#"><h3>{{ subEvent.title }}</h3></a>
+                            <template v-if="subEvent.data && subEvent.data.links && subEvent.data.links.path">
+                                <a :href="subEvent.data.links.path">
+                                    <h3>{{ subEvent.title }}</h3>
+                                </a>
+                            </template>
+                            <template v-else>
+                                <h3>{{ subEvent.title }}</h3>
+                            </template>
                             <meta-list>
                                 <meta-item>{{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item>
                             </meta-list>

@@ -283,6 +283,11 @@ class Controller extends Base
                 'start'  => $event['start'],
                 'end'    => $event['end'],
                 'allDay' => $event['allDay'],
+                'data'   => [
+                    'links'  => [
+                        'path' => $event['data']['links']['path'] ?? null,
+                    ],
+                ],
             ];
         }
 
