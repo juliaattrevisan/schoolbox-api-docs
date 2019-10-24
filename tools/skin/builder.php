@@ -193,8 +193,7 @@ HELP;
                 $logger->info("Building CSS for datepicker FullCalendar");
                 $datepickerIn = [
                     SITE_root . '/node_modules/@fullcalendar/core/main.css',
-                    SITE_root . '/node_modules/@fullcalendar/daygrid/main.css',
-                    SITE_root . '/node_modules/@fullcalendar/timegrid/main.css',
+                    SITE_root . '/node_modules/@fullcalendar/list/main.css',
                 ];
                 $datepickerOut = SITE_root . '/www/css/'.$siteLocation.'/datepicker-fullcalendar.css';
 

@@ -716,7 +716,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             var calendar = new FullCalendar.Calendar(
                 $calendarDiv[0],
                 {
-                    plugins: ['timeGrid'],
+                    plugins: ['list'],
                     header: false,
                     eventLimit: true,
                     scrollTime: dateDisplayFormats.calendarStartTime,
@@ -725,7 +725,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                             eventLimit: 4
                         }
                     },
-                    defaultView: 'timeGridDay',
+                    defaultView: 'listDay',
                     events: events,
                     eventColor: '#def',
                     defaultDate: data.date,

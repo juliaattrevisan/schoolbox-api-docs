@@ -154,8 +154,7 @@ var jsSrc = {
     fullcalendar: [
         // Required for the datepicker calendar for now
         'node_modules/@fullcalendar/core/main.js',
-        'node_modules/@fullcalendar/daygrid/main.js',
-        'node_modules/@fullcalendar/timegrid/main.js',
+        'node_modules/@fullcalendar/list/main.js'
     ],
     vue: [ // Death to jQuery!
         'node_modules/es6-object-assign/dist/object-assign-auto.js',
