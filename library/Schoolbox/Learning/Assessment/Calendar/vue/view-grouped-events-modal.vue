@@ -1,5 +1,7 @@
 <script>
     import RevealModal from '@schoolbox/reveal-modal'
+    import MetaList    from '@schoolbox/meta/list'
+    import MetaItem    from '@schoolbox/meta/item'
 
     const EVENT_VIEW_WEEK = 'eventViewWeek';
 
@@ -26,6 +28,8 @@
             }
         },
         components: {
+            MetaItem,
+            MetaList,
             RevealModal
         },
         computed: {
@@ -128,7 +132,9 @@
     <reveal-modal ref="modal">
         <h2>{{ eventExtendedProps.title }}: {{ eventExtendedProps.dateSpan }}</h2>
 
-        <h3>{{ eventExtendedProps.subEvents.length }} {{ eventExtendedProps.subEvents.length === 1 ? 'event' : 'events'}}</h3>
+        <meta-list>
+            <meta-item class="icon-calendar">{{ eventExtendedProps.subEvents.length }} {{ eventExtendedProps.subEvents.length === 1 ? 'event' : 'events'}}</meta-item>
+        </meta-list>
 
         <ul>
             <li v-for="subEvent in eventExtendedProps.subEvents">
