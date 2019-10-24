@@ -142,7 +142,9 @@
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="#"><h3>{{ subEvent.title }}</h3></a>
-                            <p class="meta">{{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</p>
+                            <meta-list>
+                                <meta-item>{{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item>
+                            </meta-list>
                         </div>
                     </div>
                 </li>
