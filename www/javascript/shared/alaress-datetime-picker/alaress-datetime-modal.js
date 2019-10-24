@@ -49,7 +49,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var fullCalendars = {};
 
     // Listen for the modal open
-    $('#adtp-modal-wrapper-' + twigVars.id).on('open.fndtn.reveal', function () {
+    $('#adtp-modal-wrapper-' + twigVars.id).on('opened.fndtn.reveal', function () {
         resetCalendar();
         adtp.setCalendarAllDay(isInputAllDay(), twigVars.id);
         if (twigVars.timetable) {
