@@ -136,11 +136,18 @@
             <meta-item class="icon-calendar">{{ eventExtendedProps.subEvents.length }} {{ eventExtendedProps.subEvents.length === 1 ? 'event' : 'events'}}</meta-item>
         </meta-list>
 
-        <ul>
-            <li v-for="subEvent in eventExtendedProps.subEvents">
-                {{ subEvent.title }}: {{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}
-            </li>
-        </ul>
+        <section>
+            <ul class="information-list">
+                <li v-for="subEvent in eventExtendedProps.subEvents" class="actions-small-0">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="#"><h3>{{ subEvent.title }}</h3></a>
+                            <p class="meta">{{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
 
         <div class="component-action" v-if="eventExtendedProps.start">
             <section>
