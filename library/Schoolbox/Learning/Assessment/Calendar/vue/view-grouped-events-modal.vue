@@ -141,8 +141,8 @@
                 <li v-for="subEvent in eventExtendedProps.subEvents" class="actions-small-0">
                     <div class="list-item">
                         <div class="card small-12">
-                            <template v-if="subEvent.data && subEvent.data.links && subEvent.data.links.path">
-                                <a :href="subEvent.data.links.path">
+                            <template v-if="subEvent.data && subEvent.data.links && subEvent.data.links.view">
+                                <a :href="subEvent.data.links.view">
                                     <h3>{{ subEvent.title }}</h3>
                                 </a>
                             </template>

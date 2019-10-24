@@ -285,7 +285,9 @@ class Controller extends Base
                 'allDay' => $event['allDay'],
                 'data'   => [
                     'links'  => [
-                        'path' => $event['data']['links']['path'] ?? null,
+                        'view' => $event['data']['custom']['moreDetailsLink']
+                            ?? $event['data']['links']['path']
+                            ?? null,
                     ],
                 ],
             ];
