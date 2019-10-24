@@ -143,11 +143,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setBlock('files', 'file_url', 'file_url_block');
             $this->setBlock('files', 'file_no_url', 'file_no_url_block');
             $this->setBlock('files', 'modify_file', 'modify_file_block');
-            $this->setBlock('files', 'owner_exists', 'owner_exists_block');
-            $this->setBlock('files', 'modifiedBy_exists', 'modifiedBy_exists_block');
-            $this->setBlock('files', 'owner_deleted', 'owner_deleted_block');
-            $this->setBlock('files', 'file_posted_at', 'file_posted_at_block');
-            $this->setBlock('files', 'file_modified_at', 'file_modified_at_block');
+            $this->setBlock('files', 'file_modify_user', 'file_modify_user_block');
+            $this->setBlock('files', 'file_deleted_user', 'file_deleted_user_block');
 
 
             $this->setVar('empty_state_block', '');
@@ -179,29 +176,20 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             continue;
                         }
 
-                        $modifiedById = null;
-                        $modifiedBy   = null;
-
-                        if (null !== $file->getModifiedBy()) {
-                            $modifiedById = $file->getModifiedBy()->getId();
-                            $modifiedBy   = $file->getModifiedBy()->formatName();
-                        }
-
-                        $fileOwner = $file->getOwner()->formatName();
+                        $mostRecentEditor = $file->getModifiedBy() ?: $file->getOwner();
+                        $message          = $file->getModifiedBy() ? 'Last updated' : 'Posted';
+                        $mostRecentDate   = $file->getModifiedAt() ?: $file->getCreatedAt();
 
                         $this->setVar([
                             'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
                             'FILE_ID'              => $file->getId(),
                             'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
                             'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
-                            'FILE_POSTED_BY'       => $fileOwner,
-                            'FILE_POSTED_BY_ID'    => $file->getOwner()->getId(),
-                            'FILE_POSTED_DATE'     => $file->getCreatedAt()->getShort(),
-                            'FILE_POSTED_RELATIVE' => $file->getCreatedAt()->getRelativeTime(),
-                            'FILE_MODIFIED_BY'     => (($modifiedById !== null) ? $modifiedBy : null),
-                            'FILE_MODIFIED_BY_ID'  => $modifiedById,
-                            'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
-                            'FILE_DELETED_BY'      => (($modifiedById !== null) ? $modifiedBy : $fileOwner),
+                            'FILE_POSTED_BY'       => $mostRecentEditor->getFullName(),
+                            'FILE_POSTED_BY_ID'    => $mostRecentEditor->getId(),
+                            'FILE_POSTED_DATE'     => $mostRecentDate->getShort(),
+                            'FILE_POSTED_RELATIVE' => $mostRecentDate->getRelativeTime(),
+                            'FILE_POSTED_MESSAGE'  => $message,
                             'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                             'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
                             'RETURN_URL'           => Redirect::RETURN_URL . '=' . Redirect::encode("/homepage/$folderId"),
@@ -215,25 +203,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             ]);
                         }
 
-                        // Owner name and optional link
-                        if ($file->getOwner()->isDeleted()) {
-                            $this->setVar('owner_exists_block', '');
-                            $this->setVar('modifiedBy_exists_block', '');
-                            $this->setVar('file_posted_at_block', '');
-                            $this->parse('file_modified_at_block', 'file_modified_at');
-                            $this->parse('owner_deleted_block', 'owner_deleted');
-                        } else if ($modifiedById !== null) {
-                            $this->setVar('owner_exists_block', '');
-                            $this->setVar('owner_deleted_block', '');
-                            $this->setVar('file_posted_at_block', '');
-                            $this->parse('modifiedBy_exists_block', 'modifiedBy_exists');
-                            $this->parse('file_modified_at_block', 'file_modified_at');
+                        $this->setVar('file_modify_user_block', '');
+                        $this->setVar('file_deleted_user_block', '');
+
+                        if (!$mostRecentEditor->isDeleted()) {
+                            $this->parse('file_modify_user_block', 'file_modify_user');
                         } else {
-                            $this->setVar('owner_deleted_block', '');
-                            $this->setVar('file_modified_at_block', '');
-                            $this->setVar('modifiedBy_exists_block', '');
-                            $this->parse('owner_exists_block', 'owner_exists');
-                            $this->parse('file_posted_at_block', 'file_posted_at');
+                            $this->parse('file_deleted_user_block', 'file_deleted_user');
                         }
 
                         //set name

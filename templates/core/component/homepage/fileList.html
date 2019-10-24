@@ -127,24 +127,14 @@
                                     <!-- END file_no_url -->
 
                                     <p class="meta {COMPONENT_COMPACTMODE_HIDE}">
-                                        <!-- BEGIN owner_exists -->
-                                        Posted by
+                                        {FILE_POSTED_MESSAGE} by
+                                        <!-- BEGIN file_modify_user  -->
                                         <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a>
-                                        <!-- END owner_exists -->
-                                        <!-- BEGIN modifiedBy_exists -->
-                                        Last Updated by
-                                        <a href="/search/user/{FILE_MODIFIED_BY_ID}">{FILE_MODIFIED_BY}</a>
-                                        <!-- END modifiedBy_exists -->
-                                        <!-- BEGIN owner_deleted -->
-                                        Last Updated by
-                                        {FILE_DELETED_BY}
-                                        <!-- END owner_deleted -->
-                                        <!-- BEGIN file_posted_at -->
+                                        <!-- END file_modify_user -->
+                                        <!-- BEGIN file_deleted_user -->
+                                        {FILE_POSTED_BY}
+                                        <!-- END file_deleted_user -->
                                         {FILE_POSTED_RELATIVE}
-                                        <!-- END file_posted_at -->
-                                        <!-- BEGIN file_modified_at -->
-                                        {FILE_MODIFIED_DATE}
-                                        <!-- END file_modified_at -->
                                     </p>
                                     <p class="{COMPONENT_COMPACTMODE_HIDE}">{FILE_COMMENT}</p>
                                 </div>
