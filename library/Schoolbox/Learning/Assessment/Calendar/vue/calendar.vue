@@ -425,16 +425,6 @@
 
                 self.maxDate = self.getMaxTermDate();
                 self.minDate = self.getMinTermDate();
-
-                // Do some recalculation for event elements on week view
-                if (self.currentViewIsWeek()) {
-                    document.querySelectorAll('.fc-timeline-event:not(.placeholder)').forEach(function (element, index) {
-                        let elementTopValue = parseFloat(element.style.top);
-                        if (elementTopValue > 0) {
-                            element.style.top = elementTopValue - 2 + 'px'
-                        }
-                    });
-                }
             },
 
             /**
@@ -626,8 +616,8 @@
                 var self = this;
 
                 if (self.currentViewIsSemester()) {
-                    this.redrawWeekNumbers();
-                    this.redrawEventRows();
+                    self.redrawWeekNumbers();
+                    self.redrawEventRows();
                 }
             },
 
@@ -1046,6 +1036,9 @@
     .fc-dayGridMonth-view .placeholder,
     .fc-resourceTimelineWeek-view .placeholder {
         display: none;
+        max-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
