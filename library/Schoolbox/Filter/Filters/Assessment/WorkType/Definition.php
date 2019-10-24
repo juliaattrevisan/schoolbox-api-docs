@@ -29,6 +29,8 @@ class Definition extends Filter\AbstractDefinition
     public const KEY_NONE = 'none';
 
     /**
+     * Indexed by workType.id
+     *
      * @var GenericCollection|WorkType\Model[]
      */
     private $workTypes;
@@ -47,7 +49,9 @@ class Definition extends Filter\AbstractDefinition
         GenericCollection $workTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->workTypes = $workTypes;
+        $this->workTypes = $workTypes->shallowClone()->indexByCallback(static function (WorkType\Model $workType): int {
+            return $workType->getId();
+        });
     }
 
 
