@@ -52,6 +52,7 @@
     jQuery.validator.addMethod("withinRange", function(value, element) {
 
         /* Null/empty setting is permitted
+         * Also, SA-1489 is a thing which might make this a bit deceiving
          */
         if (null == $(element).val() || '' === $(element).val()) {
             return true;
@@ -93,6 +94,7 @@
     jQuery.validator.addMethod("withinPercentageRange", function(value, element) {
 
         /* Null/empty setting is permitted
+         * Also, SA-1489 is a thing which might make this a bit deceiving
          */
         if (null == $(element).val() || '' === $(element).val()) {
             return true;
@@ -130,6 +132,12 @@
      * It's not just some random unordered list
      */
     jQuery.validator.addMethod("withinLetterGradeRange", function(value, element) {
+
+        /* Null/empty setting is permitted
+         */
+        if (null == $(element).val() || '' === $(element).val()) {
+            return true;
+        }
 
         /* Otherwise it could be one of the submission states like Absent or Not Submitted
          * so test that it's one of the available customisable options
