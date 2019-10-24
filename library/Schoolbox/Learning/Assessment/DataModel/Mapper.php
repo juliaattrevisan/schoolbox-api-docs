@@ -812,7 +812,9 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             $project = $model->getProject();
             if ($project) {
-                $project->setAssessments($this->createCollection());
+                if ($project->getAssessments() === null) {
+                    $project->setAssessments($this->createCollection());
+                }
                 $projects[$project->getId()] = $project;
             }
         }
