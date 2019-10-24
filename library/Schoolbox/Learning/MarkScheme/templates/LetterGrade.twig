@@ -54,41 +54,62 @@
         {% set humanReadableMark = participant.humanReadableMark(false) %}
     {% endif %}
 
+    {% set found = false %}
     <select class="letter-grade-select" data-mark-input name="mark" tabindex="{{ tabIndex }}" title="Select a {{ locale.grades.proper }}">
 
-        {# Empty state #}
+        {# If humanReadableMark is null, there isn't an existing mark; this is a new draft
+         # Select No Grade. Otherwise we need to find out whether the humanReadableMark exists
+         # in one of the other places that might match
+         #}
+        <option value="" disabled {% if humanReadableMark|length == 0 %}selected{% endif %}>(no grade)</option>
 
-        {% set found = (humanReadableMark is null) %}
-        <option value="" disabled {% if humanReadableMark is null %}selected{% endif %}>(no grade)</option>
-
-        {# Grade levels #}
+        {# If humanReadableMark has a value, look for it among the current Grade Group dropdown options.
+         # If it's not here, then it might be one of the Submission States
+         #}
         <optgroup label="{{ locale.grades.properPlural }}">
             {% for level in markScheme.gradeGroup.gradeLevels %}
-                {% set selected = false %}
-                {% if not (humanReadableMark is null) and (humanReadableMark == level.caption) %}
-                    {% set selected = true %}
+                {% set selected = '' %}
+
+                {% if humanReadableMark == level.caption %}
                     {% set found = true %}
+                    {% set selected = 'selected' %}
                 {% endif %}
-                <option {% if selected %}selected{% endif %} value="{{ level.caption }}">{{ level.caption }}</option>
+
+                <option {{ selected }} value="{{ level.caption }}">
+                    {{ level.caption }}
+                </option>
             {% endfor %}
         </optgroup>
 
-        {# Submission states #}
+        {# If it didn't exist in the Grade Group, it might have been one of the Submission States
+         # like Submitted/Absent/Pending etc. so look there as well
+         #}
         <optgroup label="States">
             {% for state in errors %}
-                {% set selected = false %}
-                {% if not (humanReadableMark is null) and (humanReadableMark == state) %}
-                    {% set selected = true %}
+                {% set selected = '' %}
+
+                {% if humanReadableMark == state %}
                     {% set found = true %}
+                    {% set selected = 'selected' %}
                 {% endif %}
-                <option {% if selected %}selected{% endif %} value="{{ state }}">{{ state }}</option>
+
+                <option {{ selected }} value="{{ state }}">
+                    {{ state }}
+                </option>
             {% endfor %}
         </optgroup>
 
-        {# If nothing at all was selected, then either a grade level or submission state changed. #}
-        {# Show this as a disabled option - on save, nothing will change #}
-        {% if not found %}
-            <option value="" disabled selected>{{ humanReadableMark }}</option>
+        {# If it still hasn't been found, then the humanReadableMark needs amendment by the teacher because:
+         #   a) it's a value from a different mark scheme than what the assessment currently uses; or
+         #   b) it's a value from a Grade Group option that no longer exists; or
+         #   c) it's a value from a Submission State option that no longer exists; or
+         #   d) some other unknown value under some other unknown circumstance
+         #
+         # Use -1 as an illegal value flag so alaressValidate can understand that this selected option
+         # should be changed to an actual option
+         #}
+        {% if humanReadableMark|length and not found %}
+            <option value="-1" selected style="display:none"></option>
         {% endif %}
     </select>
 {% endif %}

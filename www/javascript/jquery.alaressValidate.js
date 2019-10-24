@@ -139,6 +139,12 @@
             return true;
         }
 
+        /* A previously-legal value that is no longer legal
+         */
+        if ($(element).val() == -1) {
+            return false;
+        }
+
         /* Otherwise it could be one of the submission states like Absent or Not Submitted
          * so test that it's one of the available customisable options
          */
