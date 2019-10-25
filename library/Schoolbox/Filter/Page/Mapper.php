@@ -81,6 +81,7 @@ class Mapper extends \Schoolbox\Mapper
      * * Option defaults are indexed by default.roleType
      *
      * @param string $page
+     * @param string $entity
      * @return Model[]|GenericCollection
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
@@ -91,10 +92,11 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @throws \DomainException
      */
-    public function findForPage($page)
+    public function findForPageAndEntity(string $page, string $entity)
     {
-        $builder = $this->getPredicateBuilder();
-        $builder->equals('p.page', $page);
+        $builder = $this->getPredicateBuilder()
+            ->equals('p.page', $page)
+            ->equals('f.entity', $entity);
         $whereClause = implode(' AND ', $builder->getWhere());
 
         /** @var Option\Mapper $optionMapper */
@@ -102,12 +104,14 @@ class Mapper extends \Schoolbox\Mapper
         /** @var Option\Defaults\Mapper $defaultsMapper */
         $defaultsMapper = $optionMapper->getJoinMapper('defaults');
 
+
         $query = "
             SELECT
                 {$this->getColumnString('p')},
                 {$optionMapper->getColumnString('o')},
                 {$defaultsMapper->getColumnString('d')}
             FROM {$this->getTable()} p
+            JOIN {$this->getJoinSql('filter', 'p', 'f')}
             LEFT JOIN {$this->getJoinSql('options', 'p', 'o')}
             LEFT JOIN {$this->getJoinSql('options.defaults', 'o', 'd')}
             WHERE {$whereClause}

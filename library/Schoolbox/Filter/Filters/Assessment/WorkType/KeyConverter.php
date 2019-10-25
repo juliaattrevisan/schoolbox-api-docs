@@ -22,6 +22,8 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * All WorkType IDs known to the system (regardless of whether they are available)
      *
+     * Indexed by workType.id
+     *
      * @var Collection|int[]
      */
     private $workTypeIds;
@@ -34,7 +36,9 @@ class KeyConverter extends AbstractKeyConverter
     public function __construct(Filter\Model $filter, Collection $workTypeIds)
     {
         parent::__construct($filter);
-        $this->workTypeIds = $workTypeIds->shallowClone();
+        $this->workTypeIds = $workTypeIds->shallowClone()->indexByCallback(static function (int $key): int {
+            return $key;
+        });
     }
 
 

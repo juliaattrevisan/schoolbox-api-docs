@@ -101,7 +101,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     public function buildCurrentState($page, $enabledOnly): GenericCollection
     {
         /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
-        $savedPageFilters = $this->getPageMapper()->findForPage($page)->indexByCallback(function (Page\Model $pageFilter) {
+        $savedPageFilters = $this->getPageMapper()->findForPageAndEntity($page, static::getEntity())->indexByCallback(function (Page\Model $pageFilter) {
             return $pageFilter->getFilter()->getId();
         });
 
@@ -307,7 +307,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         // Note we cannot filter by $enabledOnly, $userConfigurableOnly here, as we want explicitly disabled items
         // to not be ignored later when we insert initial state to fill missing data
         /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
-        $savedPageFilters = $pageFilterMapper->findForPage($page)->indexByCallback(function (Page\Model $pageFilter) {
+        $savedPageFilters = $pageFilterMapper->findForPageAndEntity($page, static::getEntity())->indexByCallback(function (Page\Model $pageFilter) {
             return $pageFilter->getFilter()->getId();
         });
 
