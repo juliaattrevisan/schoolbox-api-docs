@@ -1,11 +1,7 @@
 <?php
 
 use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Calendar\Event\Access;
-use Schoolbox\Permission\Access\Access as FolderAccess;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Calendar\Event\Access as EventAccess;
 
 /**
  * @deprecated - did this ever work??
@@ -21,12 +17,19 @@ class Event_Attendance_Controller extends Controller
 
     private $leaveController;
 
-    public function __construct ($page = null) {
+    /**
+     * @var EventAccess
+     */
+    private $eventAccess;
+
+    public function __construct ($page = null, EventAccess $eventAccess) {
         parent::__construct($page);
 
         $this->setCalendarHandler( new Calendar );
 
         $this->setUserHandler( new User );
+
+        $this->eventAccess = $eventAccess;
 
         /* Check if Border Leave is enabled and existent first, before doing this
         */
@@ -412,22 +415,13 @@ class Event_Attendance_Controller extends Controller
     /**
      * Is user permitted to modify the event
      *
-     * @param Schoolbox\User $user
-     * @param int $eventId
+     * @param \Schoolbox\User $user
+     * @param Event           $event
      * @return bool
-     * @throws Exception
      */
-    public function isPermitted(Schoolbox\User $user, $eventId)
+    public function isPermitted(Schoolbox\User $user, Event $event)
     {
-        $access = new Access(new FolderAccess());
-        $eventMapper = new EventMapper;
-        try {
-            $event = $eventMapper->findById($eventId);
-        } catch (MapperException $e) {
-            error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
-            exit;
-        }
-        if ($access->checkExisting($user, $event)) {
+        if ($this->eventAccess->checkExisting($user, $event)) {
             return true;
         }
         return false;
