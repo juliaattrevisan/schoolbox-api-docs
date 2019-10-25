@@ -307,9 +307,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
         var $modal = $("#adtp-modal-" + pickerId);
 
-        // Only AJAX in the picker if we haven't already
-
-        if ($modal.data("status") === undefined) {
+        /* Only AJAX in the picker if we haven't already or if the current page is /calendar
+         *
+         * We need to do this so that if the user navigates through dates in the calendar page, flatpickr's default date gets updated too.
+         * We don't need to do this before as the old calendar list view gets refreshed. And with that, the flatpickr modal
+         * gets re-initialised everytime the page gets reloaded.
+         */
+        if ($modal.data("status") === undefined || window.location.pathname === '/calendar') {
             // Update picker status
             $modal.data("status", "loading");
 
