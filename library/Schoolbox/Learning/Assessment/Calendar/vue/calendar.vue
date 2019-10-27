@@ -1050,7 +1050,8 @@
     }
 
     .fc-resourceTimelineSemester-view .fc-head tr td:first-child .fc-widget-header div {
-        position: absolute !important;
+        text-align: left !important;
+        padding-top: .30rem;
     }
 
     .fc-time {
