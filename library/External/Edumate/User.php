@@ -169,7 +169,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         for ($i = $start; $i < 4, $row = $stmt->fetch(PDO::FETCH_ASSOC); ++$i) {
 
             // logic to compensate for Edumate returning blank emergency contact
-            if (!strlen($row['STUDENTEMERGENCYNAME'])) {
+            if (isset($row['STUDENTEMERGENCYNAME']) && !strlen($row['STUDENTEMERGENCYNAME'])) {
                 --$i;
                 continue;
             }

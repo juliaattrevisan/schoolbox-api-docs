@@ -133,8 +133,8 @@ class PDO extends BasePDO
 
         $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement);
 
-        if (db2_execute($this->lastStatement->getStatement())) {
-            return db2_num_rows($this->lastStatement->getStatement());
+        if (db2_execute($resource)) {
+            return db2_num_rows($resource);
         }
 
         // If the query failed, return false
@@ -156,7 +156,7 @@ class PDO extends BasePDO
 
         $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement, $mode);
 
-        if (db2_execute($this->lastStatement->getStatement())) {
+        if (db2_execute($resource)) {
             return $this->lastStatement;
         }
 
