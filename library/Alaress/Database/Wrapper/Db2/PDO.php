@@ -91,7 +91,7 @@ class PDO extends BasePDO
      */
     public function commit()
     {
-        db2_commit($this->getConnectionWithCheck());
+        return db2_commit($this->getConnectionWithCheck());
     }
 
     /**
@@ -99,7 +99,7 @@ class PDO extends BasePDO
      */
     public function rollBack()
     {
-        db2_rollback($this->getConnectionWithCheck());
+        return db2_rollback($this->getConnectionWithCheck());
     }
 
     /**
@@ -115,7 +115,7 @@ class PDO extends BasePDO
      */
     public function setAttribute($attribute, $value)
     {
-        db2_set_option($this->getConnectionWithCheck(), [$attribute => $value], 1);
+        return db2_set_option($this->getConnectionWithCheck(), [$attribute => $value], 1);
     }
 
     /**
