@@ -69,6 +69,7 @@ input.datepicker-input {
     .flatpickr-month {
         height: $pickr-month-height + $pickr-month-padding;
         margin-bottom: $pickr-month-padding;
+        font-size: .8rem;
     }
 
     .flatpickr-prev-month,
@@ -76,12 +77,12 @@ input.datepicker-input {
         top: $pickr-month-padding;
         height: $pickr-month-height;
         line-height: $pickr-month-height + $pickr-month-padding;
-        width: $pickr-month-height;
         position: inherit;
     }
 
     .flatpickr-prev-month {
         left: 0;
+        width: 0;
     }
 
     .flatpickr-next-month {
