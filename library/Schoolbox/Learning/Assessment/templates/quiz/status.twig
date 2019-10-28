@@ -1,17 +1,11 @@
 {#  usage: per-participation, configure the following vars for the parent template to use
-     - pActionResponses: a route to see the list of responses for this participation
-     - pStatusText:      the description to output under the user's name
-     - pStatusClass:     one of [ '', 'pending', 'complete' ] to denote the action status of this participation
-     - pTooltip:         a tooltip explaining the status marker
-
-    available varaibles:
+    available variables:
      - routeArgs:        an array that represents a participant, to be pushed into a routeLookup
      - assessment:       the assessment we're looking at
      - participant:      the current participant of the iteration
      - statusIncomplete: a string representing the 'incomplete' state
      - statusPending:    a string representing the 'pending' state
      - statusReviewed:   a string representing the 'reviewed' state
-
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
@@ -58,7 +52,8 @@
     {% endif %}
 
     {# Progress icon
-     # the green dot/grey square/oj diamond
+     # One of [ '', 'pending', 'complete' ] to denote the action status of this participation
+     # The green dot/grey square/oj diamond
      #}
     {% set pStatusClass %}
         {%- spaceless %}
@@ -73,6 +68,7 @@
     {% endset %}
 
     {# Progress icon tool tip
+     # A tooltip explaining the status marker
      # This is the tooltip that appears when you hover over the green dot/grey square/oj diamond
      #}
     {% set pTooltip %}
@@ -89,7 +85,9 @@
         {% endspaceless -%}
     {% endset %}
 
-    {# This is the text that appears next to the green dot/grey square/oj diamond #}
+    {# The description to output under the user's name
+     # This is the text that appears next to the green dot/grey square/oj diamond
+     #}
     {% set pStatusText %}
         {%- spaceless %}
             {% if not latestResponse %}
