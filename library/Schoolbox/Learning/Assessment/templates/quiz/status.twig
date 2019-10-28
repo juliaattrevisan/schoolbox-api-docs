@@ -50,14 +50,6 @@
     {% set pActionSummary = '' %}
 
     {% if latestResponse %}
-        {% set routeArgs = {
-            viewee: participant.user,
-            assessmentId: assessment.id,
-            assessment: assessment,
-            student: participant.user,
-            studentId: participant.user.id
-        } %}
-
         {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
     {% endif %}
 

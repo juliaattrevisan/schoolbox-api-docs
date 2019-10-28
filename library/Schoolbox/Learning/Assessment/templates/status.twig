@@ -87,6 +87,16 @@
         <section id="assessment-status">
             <ul class="information-list {{ listClass }}">
             {% for participant in assessment.allParticipants if not participant.isExcluded %}
+
+                {# Construct that represents a participant #}
+                {% set routeArgs = {
+                    viewee: participant.user,
+                    assessmentId: assessment.id,
+                    assessment: assessment,
+                    student: participant.user,
+                    studentId: participant.user.id
+                } %}
+
                 {% block participant %}{% endblock %}
             {% endfor %}
             </ul>
