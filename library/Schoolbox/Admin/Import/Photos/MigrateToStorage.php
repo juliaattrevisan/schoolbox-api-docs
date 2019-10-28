@@ -46,6 +46,14 @@ class MigrateToStorage
 
 
     /**
+     * Only update users who haven't got a portrait hash
+     *
+     * @var bool
+     */
+    private $backfill = false;
+
+
+    /**
      * MigrateToStorage constructor.
      *
      * @param string          $portraitPath
@@ -74,7 +82,7 @@ class MigrateToStorage
         /* Prepared statements
          */
         $selectResult = $this->db->prepare('
-            SELECT id, synergy_id, firstname, lastname
+            SELECT id, synergy_id, firstname, lastname, portrait_hash
             FROM `user`
             WHERE synergy_id = :externalId
             LIMIT 1
@@ -117,6 +125,13 @@ class MigrateToStorage
              */
             if ($user) {
 
+                /* If this user already has a portrait hash and we only want to backfill, skip
+                 */
+                if ($this->backfill && strlen($user['portrait_hash'])) {
+                    $this->logger->warning("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) already has a portrait image {$user['portrait_hash']}; skipped");
+                    continue;
+                }
+
                 try {
                     $path = "{$this->portraitPath}/{$file}";
 
@@ -149,5 +164,15 @@ class MigrateToStorage
                 $this->logger->warning("External id {$externalId} not found; skipped");
             }
         }
+    }
+
+    /**
+     * @param bool $backfill
+     * @return MigrateToStorage
+     */
+    public function setBackfill(bool $backfill): self
+    {
+        $this->backfill = $backfill;
+        return $this;
     }
 }
