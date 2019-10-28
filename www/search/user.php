@@ -28,8 +28,13 @@ use Schoolbox\User as SchoolboxUser;
  * @throws Twig_Error_Runtime
  * @throws Twig_Error_Syntax
  */
-function renderParent(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator)
-{
+function renderParent(
+    SitePage $page,
+    $user,
+    External_User $synUserHandler,
+    UserMapper $userMapper,
+    Eportfolio_Authenticator $authenticator
+) {
     $externalUser = $user['synergy_id'] ? $synUserHandler->getParent($user['synergy_id']) : [];
     $students = new Collection();
 
@@ -90,14 +95,18 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
  * @param External_User $synUserHandler
  * @param UserMapper $userMapper
  * @param Eportfolio_Authenticator $authenticator
- * @param IConfigLoader $config
  *
  * @throws Twig_Error_Loader
  * @throws Twig_Error_Runtime
  * @throws Twig_Error_Syntax
  */
-function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator, IConfigLoader $config)
-{
+function renderStaff(
+    SitePage $page,
+    $user,
+    External_User $synUserHandler,
+    UserMapper $userMapper,
+    Eportfolio_Authenticator $authenticator
+) {
     $externalUser = $user['synergy_id'] ? $synUserHandler->getStaff($user['synergy_id']) : [];
     /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];
@@ -136,6 +145,7 @@ function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserM
  * @param FolderMapper $folderMapper
  * @param Eportfolio_Authenticator $authenticator
  * @param ProfessionalDevelopmentMapper $pdMapper
+ * @param IConfigLoader $config
  *
  * @throws MapperException
  * @throws MapperException\Deleted
@@ -143,8 +153,18 @@ function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserM
  * @throws Twig_Error_Runtime
  * @throws Twig_Error_Syntax
  */
-function renderStudent(SitePage $page, $user, Group $groupHandler, External_User $synUserHandler, External_Class $classHandler, UserMapper $userMapper, FolderMapper $folderMapper, Eportfolio_Authenticator $authenticator, ProfessionalDevelopmentMapper $pdMapper)
-{
+function renderStudent(
+    SitePage $page,
+    $user,
+    Group $groupHandler,
+    External_User $synUserHandler,
+    External_Class $classHandler,
+    UserMapper $userMapper,
+    FolderMapper $folderMapper,
+    Eportfolio_Authenticator $authenticator,
+    ProfessionalDevelopmentMapper $pdMapper,
+    IConfigLoader $config
+) {
     $externalUser = [];
     if ($user['synergy_id']) {
         $externalUser = $synUserHandler->getStudent($user['synergy_id']);
@@ -167,7 +187,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
     // Load the list of subjects, and their teacher.
     // Then group by subject type?
     $subjects      = [];
-    $splitSubjects = ConfigMapper::getInstance()->get('mysubjects_split');
+    $splitSubjects = $config->get('mysubjects_split');
     $teacherRoles  = $groupHandler->getStaffGroupTypeIds();
     foreach ($synUserHandler->getSubjectList($student) as $subject) {
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
@@ -195,7 +215,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
 
         $classCodeString = $subject['folder']->getCodeString();
 
-        if (\Config::get('student_teacher_class_visibility')) {
+        if ($config->get('student_teacher_class_visibility')) {
             $classCodesRetained = [];
             $classCodesComplete = explode(",", $classCodeString);
 
@@ -508,7 +528,8 @@ if (is_numeric($this->arg[0])) {
             new UserMapper(),
             new FolderMapper(),
             new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
-            ProfessionalDevelopmentMapper::getInstance()
+            ProfessionalDevelopmentMapper::getInstance(),
+            $config
         );
     } elseif ($groupHandler->isStaff($user['uid'])) {
         renderStaff(
@@ -516,8 +537,7 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             new UserMapper(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
-            $config
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
         );
     } else {
         $this->pageNotFound();
