@@ -253,8 +253,8 @@ abstract class Mapper implements IMapper, Serializable
     /** @var Propagator */
     protected $propagator;
 
-    /** @var ?bool $notificationSuppressed */
-    protected $notificationSuppressed;
+    /** @var Propagator */
+    private $propagatorSuppressed;
 
     /** @var bool */
     private $localBodyCacheBypass = false;
@@ -668,12 +668,6 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getEventPropagator()
     {
-        if ($this->notificationSuppressed) {
-            self::$prop = new MockPropagator();
-            $this->propagator = self::$prop;
-            return  $this->propagator;
-        }
-
         if (!$this->propagator) {
             if (!self::$prop) {
                 // We don't have a propagator setup, lets connect to the rabbit
@@ -2015,10 +2009,6 @@ abstract class Mapper implements IMapper, Serializable
      *                                           * order:         a set of key-value pairs:
      *                                           key: column name, value: ASC or DESC
      *
-     * @throws Exception if for some reason the limit or offset parameters
-     *                   cannot be created (this should never happen in practise
-     *                   as columnList would have to contain a field named
-     *                   'limit' or 'offset')
      * @return GenericCollection
      */
     public function findByColumnList($columnList, $options = array())
@@ -3709,19 +3699,28 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * Suppress notification
+     * Set MockPropagator to suppress notification
+     * @return $this
      */
     protected function suppressNotification()
     {
-        $this->notificationSuppressed = true;
+        $this->propagatorSuppressed = $this->propagator;
+        $this->propagator    = new MockPropagator();
+        return $this;
     }
 
     /**
-     * Resume notification
+     * Restore notification (Must call suppressNotification first)
+     * @return $this
      */
-    protected function resumeNotification()
+    protected function restoreNotification()
     {
-        unset ($this->notificationSuppressed);
+        if (!isset($this->propagatorSuppressed)) {
+            return $this;
+        }
+        $this->propagator = $this->propagatorSuppressed;
+        unset($this->propagatorSuppressed);
+        return $this;
     }
 
     /**

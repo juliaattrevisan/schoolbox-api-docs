@@ -473,14 +473,9 @@ class ListController extends Web\Controller\Base
             $participantMapper = $this->participantDataSource->getParticipantMapper();
             $planIds           = $plans->getPropertyValues('id');
 
-            try {
-                $allExistingParticipation = $participantMapper->findByColumnList([
-                    'participant_plan_id' => $planIds,
-                ]);
-            } catch (Mapper\Exception $e) {
-                $this->existingParticipationPerUser = new Collection();
-                return null;
-            }
+            $allExistingParticipation = $participantMapper->findByColumnList([
+                'participant_plan_id' => $planIds,
+            ]);
 
             // userId => plan (should only have one plan per user)
             $this->existingParticipationPerUser = $allExistingParticipation->groupByCallback(function (ParticipantModel $model) {
