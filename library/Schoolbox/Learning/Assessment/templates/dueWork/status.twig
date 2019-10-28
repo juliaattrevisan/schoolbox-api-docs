@@ -1,9 +1,4 @@
 {#  usage: per-participation, configure the following vars for the parent template to use
-     - pActionResponses: a route to see the list of responses for this participation
-     - pStatusText:      the description to output under the user's name
-     - pStatusClass:     one of [ '', 'pending', 'reviewed' ] to denote the action status of this participation
-     - pTooltip:         a tooltip explaining the status marker
-
     available variables:
      - routeArgs:        an array that represents a participant, to be pushed into a routeLookup
      - assessment:       the assessment we're looking at
@@ -15,7 +10,6 @@
      - markSchemeName:   string    filename of markScheme template fragment
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
      - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
-
 #}
 {% extends '@learningAssessment/status.twig' %}
 
@@ -69,14 +63,19 @@
     {% set isPublished       = latestFeedback.published %}
     {% set canPublish        = latestFeedback and not isPublished %}
 
+    {# A route to see the list of responses for this participation #}
     {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
     {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', routeArgs) %}
     {% set pActionSobo       = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
     {% set pAckReceipt       = routeLookupIfAuthorized('learningAssessment.postStatusAcknowledge', routeArgs) %}
 
+    {# One of [ '', 'pending', 'reviewed' ] to denote the action status of this participation #}
     {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
+
+    {# A tooltip explaining the status marker #}
     {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
 
+    {# The description to output under the user's name #}
     {% set pStatusText %}
         {##
           # TODO move CSS/label generation to participant class, and dedupe usages
