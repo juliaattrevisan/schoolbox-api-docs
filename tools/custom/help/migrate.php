@@ -46,7 +46,11 @@ $app = new class extends CliTool\App
             echo <<<HELP
 
 Migrate portraits from filesystem portrait_dir into Storage and associate them
-with schoolbox user accounts. 
+with schoolbox user accounts. Each profile picture is assumed to be a jpg and
+you can dump as many as you want into the stock_portrait folder. 
+
+The backfill flag allows you to only assign images to users who don't already
+have one. Omitting it allows you to update anyone's picture.
 
 Usage: migrate.php [--backfill]
         --backfill  Only assign portrait to users who don't already have one
