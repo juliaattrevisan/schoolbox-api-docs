@@ -30,6 +30,8 @@
     const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
     const VIEW_RESOURCE_TIMELINE_SEMESTER = 'resourceTimelineSemester';
+    const VIEW_RESOURCE_TIMELINE_WEEK = 'resourceTimelineWeek';
+    const VIEW_DAY_GRID_MONTH = 'dayGridMonth';
 
     const RESOURCE_FOLDER_PREFIX = 'folder-';
     const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
@@ -262,7 +264,7 @@
                     element.classList.add('fc-more');
                 } else {
                     if (self.currentViewIsSemester()) {
-                        element.style.width = '95%';
+                        element.style.width = 'auto';
                     }
                     element.setAttribute('event-group-id', eventGrouping);
                     element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
@@ -468,7 +470,7 @@
              * the initial month view will go to the current date
              */
             clickMonthView() {
-                this.switchView('dayGridMonth');
+                this.switchView(VIEW_DAY_GRID_MONTH);
             },
 
             /**
@@ -476,7 +478,7 @@
              * the initial month view will go to the current date
              */
             clickWeekView() {
-                this.switchView('resourceTimelineWeek');
+                this.switchView(VIEW_RESOURCE_TIMELINE_WEEK);
             },
 
             /**
@@ -484,7 +486,7 @@
              * the initial month view will go to the current date
              */
             clickSemesterView() {
-                this.switchView('resourceTimelineSemester');
+                this.switchView(VIEW_RESOURCE_TIMELINE_SEMESTER);
             },
 
             /**
@@ -614,8 +616,8 @@
                 var self = this;
 
                 if (self.currentViewIsSemester()) {
-                    this.redrawWeekNumbers();
-                    this.redrawEventRows();
+                    self.redrawWeekNumbers();
+                    self.redrawEventRows();
                 }
             },
 
@@ -680,6 +682,14 @@
              */
             currentViewIsSemester() {
                 return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
+            },
+
+            /**
+             * Check if the current calendar view is in week
+             * @returns {boolean}
+             */
+            currentViewIsWeek() {
+                return this.currentView === VIEW_RESOURCE_TIMELINE_WEEK;
             },
 
             /**
@@ -976,6 +986,11 @@
         margin-left: 0 !important;
     }
 
+    .fc-ltr .fc-timeline-event .fc-title {
+         padding-left: 3px !important;
+         margin-left: 0 !important;
+     }
+
     .fc-timeline-event, .fc-day-grid-event {
         border: 0 !important;
     }
@@ -1001,8 +1016,14 @@
         text-align: left !important;
     }
 
+    .fc-timeline-event-div {
+        padding-bottom: 2px !important;
+    }
+
     .fc-resourceTimelineSemester-view .fc-popover .fc-timeline-event {
         padding: 0 !important;
+        position: relative;
+        width: 100% !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-event-container > .fc-timeline-event {
@@ -1015,18 +1036,22 @@
     .fc-dayGridMonth-view .placeholder,
     .fc-resourceTimelineWeek-view .placeholder {
         display: none;
+        max-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
         height: 35px !important;
     }
 
-    .fc-time-area .fc-rows .fc-widget-content div {
+    .fc-resourceTimelineSemester-view .fc-time-area .fc-rows .fc-widget-content div {
         height: 35px !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-head tr td:first-child .fc-widget-header div {
-        position: absolute !important;
+        text-align: right !important;
+        padding-top: .30rem;
     }
 
     .fc-time {
@@ -1061,5 +1086,14 @@
         top: 0 !important;
         right: 1px !important;
         line-height: 0 !important;
+    }
+
+    a.fc-not-start .fc-title-wrap .fc-title {
+        padding-left: 8px !important;
+    }
+
+    .fc-timeline-event.fc-not-start::before,
+    .fc-timeline-event.fc-not-end::after {
+        content: none;
     }
 </style>
