@@ -52,7 +52,9 @@
     {% endif %}
 {% endblock %}
 
-
+{# Each person in the list is rendered here
+ # Each type of assessment renders their participants uniquely
+ #}
 {% block participant %}
     {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
 
