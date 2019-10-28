@@ -111,7 +111,7 @@
     {% endset %}
 
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
-        {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
+        {% set pActionCount = (pActionSummary ? 1 : 0) %}
         <div class="small-12 column">
             <div class="row actions-small-{{ pActionCount }}">
                 <div class="list-item">
@@ -128,9 +128,6 @@
                     </nav>
                     <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                         {%- spaceless %}
-                            {% if pActionResponses %}
-                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
-                            {% endif %}
                             {% if pActionSummary %}
                                 <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
                             {% endif %}
