@@ -51,8 +51,20 @@
         {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
     {% endif %}
 
-    {# Progress icon #}
-    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.reviewComplete ? statusReviewed : statusPending) %}
+    {# Progress icon
+     # the green dot/grey square/oj diamond
+     #}
+    {% set pStatusClass %}
+        {%- spaceless %}
+            {% if participant.responseRequired %}
+                {{ statusIncomplete }}
+            {% elseif participant.reviewComplete %}
+                {{ statusReviewed }}
+            {% else %}
+                {{ statusPending }}
+            {% endif %}
+        {% endspaceless -%}
+    {% endset %}
 
     {# Progress icon tool tip
      # This is the tooltip that appears when you hover over the green dot/grey square/oj diamond
