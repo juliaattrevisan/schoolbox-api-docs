@@ -51,6 +51,8 @@
         {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
     {% endif %}
 
+    {% set pActionCount = (pActionSummary ? 1 : 0) %}
+
     {# Progress icon
      # One of [ '', 'pending', 'complete' ] to denote the action status of this participation
      # The green dot/grey square/oj diamond
@@ -111,7 +113,6 @@
     {% endset %}
 
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
-        {% set pActionCount = (pActionSummary ? 1 : 0) %}
         <div class="small-12 column">
             <div class="row actions-small-{{ pActionCount }}">
                 <div class="list-item">

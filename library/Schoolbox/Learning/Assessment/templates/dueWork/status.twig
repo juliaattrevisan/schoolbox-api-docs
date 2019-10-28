@@ -54,14 +54,18 @@
  # Each type of assessment renders their participants uniquely
  #}
 {% block participant %}
-    {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
-
     {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
     {% set isPublished       = latestFeedback.published %}
     {% set canPublish        = latestFeedback and not isPublished %}
+
+    {# Tot actions are derived from access to the Attempt History route
+     # By default this empty, hiding the tot
+     #}
+    {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
+    {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
 
     {# A route to see the list of responses for this participation #}
     {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
@@ -131,7 +135,6 @@
     {% endset %}
 
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
-        {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
         <div class="small-12 column">
             <div class="row actions-small-{{ pActionCount }}">
                 <div class="list-item">
