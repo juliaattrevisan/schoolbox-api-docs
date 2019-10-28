@@ -47,11 +47,18 @@ input.datepicker-input {
 
     .flatpickr-months {
       padding-top: .5rem;
+
+      .flatpickr-prev-month.flatpickr-prev-month,
+      .flatpickr-next-month.flatpickr-prev-month,
+      .flatpickr-prev-month.flatpickr-next-month,
+      .flatpickr-next-month.flatpickr-next-month {
+        padding-top: 0 !important;
+      }
     }
 
     .flatpickr-months .flatpickr-prev-month:hover svg,
     .flatpickr-months .flatpickr-next-month:hover svg {
-      fill: $accent-foreground;
+        fill: $accent-foreground;
     }
 
     /**
@@ -97,9 +104,12 @@ input.datepicker-input {
     }
 
     .flatpickr-current-month {
-        //margin-top: .65rem;
+      font-size: .9rem;
+      width: auto;
+      padding: 0;
+      height: auto;
 
-        input.cur-year {
+      input.cur-year {
             font-weight: $font-weight-normal;
         }
 
@@ -108,9 +118,19 @@ input.datepicker-input {
             margin-right: .45rem;
         }
 
+        .numInputWrapper span {
+          opacity: 1;
+          border: none;
+        }
+
         span.cur-month:hover {
             background: transparent;
         }
+    }
+
+    .flatpickr-monthDropdown-months {
+      width: 6.5rem;
+      height: 0;
     }
 
     .flatpickr-day {

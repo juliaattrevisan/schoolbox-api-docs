@@ -175,8 +175,6 @@
   /*
         */
   left: 0;
-  width: 0;
-  padding-top: 0;
   /*
         /*rtl:end:ignore*/
   /*
@@ -193,7 +191,6 @@
   /*
         */
   right: 0;
-  padding-top: 0;
   /*
         /*rtl:end:ignore*/
   /*
@@ -248,9 +245,9 @@
   padding: 0 4px 0 2px;
   height: 50%;
   line-height: 50%;
-  //opacity: 0;
+  opacity: 0;
   cursor: pointer;
-  //border: 1px solid rgba(57,57,57,0.15);
+  border: 1px solid rgba(57,57,57,0.15);
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
@@ -298,16 +295,16 @@
   opacity: 1;
 }
 .flatpickr-current-month {
-  font-size: .9rem;
+  font-size: 135%;
   line-height: inherit;
   font-weight: 300;
   color: inherit;
   position: absolute;
-  //width: 75%;
+  width: 75%;
   left: 12.5%;
-  //padding: 7.48px 0 0 0;
+  padding: 7.48px 0 0 0;
   line-height: 1;
-  //height: 34px;
+  height: 34px;
   display: inline-block;
   text-align: center;
   -webkit-transform: translate3d(0px, 0px, 0px);
@@ -368,7 +365,7 @@
 }
 .flatpickr-current-month .flatpickr-monthDropdown-months {
   appearance: menulist;
-  //background: transparent;
+  //background: transparent; Unfortunately, we need to do this from here as it conflicts with our styling in select fields
   border: none;
   border-radius: 0;
   box-sizing: border-box;
@@ -377,27 +374,28 @@
   font-size: inherit;
   font-family: inherit;
   font-weight: 300;
-  //height: auto;
+  height: auto;
   line-height: inherit;
   margin: -1px 0 0 0;
   outline: none;
-  //padding: 0 0 0 0.5ch;
+  padding: 0 0 0 0.5ch;
   position: relative;
   vertical-align: initial;
   -webkit-box-sizing: border-box;
   -webkit-appearance: menulist;
   -moz-appearance: menulist;
-  //width: auto;
-  width: 6.5rem;
-  min-height: 2.5rem;
+  width: auto;
 }
 .flatpickr-current-month .flatpickr-monthDropdown-months:focus,
 .flatpickr-current-month .flatpickr-monthDropdown-months:active {
   outline: none;
 }
+
+// Conflicts with our styling in select fields as well
 //.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
 //  background: rgba(0,0,0,0.05);
 //}
+
 .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
   background-color: transparent;
   outline: none;
