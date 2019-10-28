@@ -57,19 +57,15 @@
     {# Progress icon tool tip #}
     {% set pTooltip %}
         {%- spaceless %}
-        {% if latestResponse and not latestResponse.isSubmitted %}
-            Review will be required when this attempt is finished
-        {% else %}
-            {% if participant.responseRequired %}
+            {% if latestResponse and not latestResponse.isSubmitted %}
+                Review will be required when this attempt is finished
+            {% elseif participant.responseRequired %}
                 Not Attempted
+            {% elseif participant.reviewComplete %}
+                Reviewed
             {% else %}
-                {% if participant.reviewComplete %}
-                    Reviewed
-                {% else %}
-                    Review required
-                {% endif %}
+                Review required
             {% endif %}
-        {% endif %}
         {% endspaceless -%}
     {% endset %}
 
