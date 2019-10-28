@@ -69,11 +69,35 @@
     {% set pActionSobo       = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
     {% set pAckReceipt       = routeLookupIfAuthorized('learningAssessment.postStatusAcknowledge', routeArgs) %}
 
-    {# One of [ '', 'pending', 'reviewed' ] to denote the action status of this participation #}
-    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
+    {# Progress icon
+     # One of [ '', 'pending', 'complete' ] to denote the action status of this participation
+     # The green dot/grey square/oj diamond
+     #}
+    {% set pStatusClass %}
+        {%- spaceless %}
+            {% if participant.responseRequired %}
+                {{ statusIncomplete }}
+            {% elseif participant.feedbackRequired %}
+                {{ statusPending }}
+            {% else %}
+                {{ statusReviewed }}
+            {% endif %}
+        {% endspaceless -%}
+    {% endset %}
 
-    {# A tooltip explaining the status marker #}
-    {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
+    {# Progress icon tool tip
+     # A tooltip explaining the status marker
+     # This is the tooltip that appears when you hover over the green dot/grey square/oj diamond
+     #}
+    {% set pTooltip %}
+        {% if participant.responseRequired %}
+            {{ labelIncomplete }}
+        {% elseif participant.feedbackRequired %}
+            {{ labelPending }}
+        {% else %}
+            {{ labelReviewed }}
+        {% endif %}
+    {% endset %}
 
     {# The description to output under the user's name #}
     {% set pStatusText %}
@@ -96,6 +120,7 @@
                 {% else %}
                     Submitted
                 {% endif %}
+
                 {% if latestResponse.submittedOnTime %}
                     on time
                 {% else %}
