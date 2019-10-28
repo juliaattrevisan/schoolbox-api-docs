@@ -14,9 +14,9 @@ INSERT INTO config (
   '0',
   'Only show students class teachers',
   'When enabled, only show the teachers whose class a student is enrolled in when a folder contains multiple class codes. When disabled, they will see all teachers of the subject including those that do not teach them.',
-  3,
+  3, -- boolean
   '',
-  7,
+  5, -- Policy
   'true',
   'false',
   'false'
