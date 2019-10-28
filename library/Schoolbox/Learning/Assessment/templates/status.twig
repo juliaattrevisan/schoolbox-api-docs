@@ -11,11 +11,6 @@
 {# Does the information list require an extra CSS class ? eg 'expandable-card', 'sortable-card', 'card-selectable' etc #}
 {% set listClass = listClass ?: '' %}
 
-{# child templates to override with assessment-specific terms #}
-{% set labelIncomplete  = labelIncomplete ?: 'Incomplete' %}
-{% set labelPending     = labelPending    ?: 'Review Required' %}
-{% set labelReviewed    = labelReviewed   ?: 'Reviewed' %}
-
 {# child templates may override #}
 {% set routeModify = routeModify ?: routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
 {% set responseHistory = responseHistory ?: locale.submissionHistory.proper %}
