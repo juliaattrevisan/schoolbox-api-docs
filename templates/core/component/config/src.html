@@ -28,6 +28,10 @@
 
           if (select.length) {
               var categoryId = src.val().toString().replace('/homepage/', '');
+              // No folder found in the source? Just use whatever folder this component is on
+              if (categoryId === '') {
+                  categoryId = nodeId;
+              }
               select.each(function() {
                   var element = $(this);
                   src.availableByCategory({
