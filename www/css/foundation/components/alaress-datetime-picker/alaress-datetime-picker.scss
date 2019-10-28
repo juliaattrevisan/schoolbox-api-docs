@@ -37,7 +37,6 @@ input.datepicker-input {
     padding-right: 0;
 }
 
-
 /**
  * The modal
  */
@@ -45,6 +44,15 @@ input.datepicker-input {
 
     -webkit-transition: width 0.3s; /* Safari */
     transition: width 0.3s;
+
+    .flatpickr-months {
+      padding-top: .5rem;
+    }
+
+    .flatpickr-months .flatpickr-prev-month:hover svg,
+    .flatpickr-months .flatpickr-next-month:hover svg {
+      fill: $accent-foreground;
+    }
 
     /**
      * Date picker / Flatpickr
@@ -68,7 +76,6 @@ input.datepicker-input {
 
     .flatpickr-month {
         height: $pickr-month-height + $pickr-month-padding;
-        margin-bottom: $pickr-month-padding;
         font-size: .8rem;
     }
 
@@ -90,7 +97,7 @@ input.datepicker-input {
     }
 
     .flatpickr-current-month {
-        top: $pickr-top-month-padding;
+        //margin-top: .65rem;
 
         input.cur-year {
             font-weight: $font-weight-normal;
@@ -98,6 +105,7 @@ input.datepicker-input {
 
         .numInputWrapper {
             width: rem-calc(70);
+            margin-right: .45rem;
         }
 
         span.cur-month:hover {
@@ -129,6 +137,7 @@ input.datepicker-input {
         &.selected.nextMonthDay {
             background: $accent-foreground;
             border-color: $accent-foreground;
+            color: $white;
         }
 
         &[data-heat]:before {
