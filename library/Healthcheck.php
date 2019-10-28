@@ -518,6 +518,7 @@ class Healthcheck
             'luCountry',
             'luDays',
             'luDepartment',
+            'luDocumentClassification',
             'luFileType',
             'luForm',
             'luHouse',
