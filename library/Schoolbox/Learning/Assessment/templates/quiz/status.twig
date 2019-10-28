@@ -18,11 +18,6 @@
 
 {% extends '@learningAssessment/status.twig' %}
 
-
-{% set labelIncomplete = 'Not Attempted' %}
-{% set labelPending    = 'Review required' %}
-{% set labelReviewed   = 'Reviewed' %}
-
 {# Override default route #}
 {% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
 {% set responseHistory = locale.attemptHistory.proper %}
@@ -67,8 +62,23 @@
     {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.reviewComplete ? statusReviewed : statusPending) %}
 
     {# Progress icon tool tip #}
-    {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.reviewComplete ? labelReviewed  : labelPending)  %}
-    {% set pTooltip     = latestResponse and not latestResponse.isSubmitted ? 'Review will be required when this attempt is finished' : pTooltip %}
+    {% set pTooltip %}
+        {%- spaceless %}
+        {% if latestResponse and not latestResponse.isSubmitted %}
+            Review will be required when this attempt is finished
+        {% else %}
+            {% if participant.responseRequired %}
+                Not Attempted
+            {% else %}
+                {% if participant.reviewComplete %}
+                    Reviewed
+                {% else %}
+                    Review required
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% endspaceless -%}
+    {% endset %}
 
     {% set pStatusText %}
         {%- spaceless %}
