@@ -72,6 +72,18 @@ HELP;
 
         /* For each user who doesn't have a portrait_hash...
          */
+        $db = Database::getInstance();
+
+        $statement = $db->query('
+            SELECT DISTINCT synergy_id
+            FROM `user`
+            WHERE portrait_hash IS NULL
+            AND LENGTH(synergy_id) > 0
+        ');
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $externalId = $row['synergy_id'];
+        }
 
         /* Select a random image
          */
