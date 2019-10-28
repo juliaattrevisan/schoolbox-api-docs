@@ -56,20 +56,42 @@ HELP;
             exit;
         }
 
-        /* Migrate into storage
+        /* Get a list of available files...and not care about their filenames
          */
-        $migrator = new MigrateToStorage(
-            $this->getConfig()->get('portrait_dir'),
-            Database::getInstance(),
-            Mapper::getInstance(),
-            $this->getLogger()
-        );
 
-        if ($this->getOpt(self::OPT_BACKFILL)) {
-            $migrator->setBackfill(true);
-        }
+        /* For each user who doesn't have a portrait_hash...
+         */
 
-        $migrator->migrate();
+        /* Select a random image
+         */
+
+        /* Copy it to portrait_dir
+         */
+
+        /* Rename it after their synergetic_id
+         */
+
+        /* Migrate all images with --backfill arg
+         *
+         * This should avoid a race condition where a user is manually assigned a picture
+         * while this script is running
+         */
+
+
+//        /* Migrate into storage
+//         */
+//        $migrator = new MigrateToStorage(
+//            $this->getConfig()->get('portrait_dir'),
+//            Database::getInstance(),
+//            Mapper::getInstance(),
+//            $this->getLogger()
+//        );
+//
+//        if ($this->getOpt(self::OPT_BACKFILL)) {
+//            $migrator->setBackfill(true);
+//        }
+//
+//        $migrator->migrate();
     }
 };
 
