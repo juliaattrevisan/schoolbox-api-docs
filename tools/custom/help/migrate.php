@@ -58,7 +58,8 @@ HELP;
 
         /* Get a list of available files...and not care about their filenames
          */
-        $dirhandle = opendir('./stock_portrait');
+        $stockDir = __DIR__ . '/stock_portrait';
+        $dirhandle = opendir($stockDir);
 
         $files = [];
 
@@ -73,6 +74,7 @@ HELP;
         /* For each user who doesn't have a portrait_hash...
          */
         $db = Database::getInstance();
+        $assignation = [];
 
         $statement = $db->query('
             SELECT DISTINCT synergy_id
@@ -83,10 +85,11 @@ HELP;
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $externalId = $row['synergy_id'];
-        }
 
-        /* Select a random image
-         */
+            /* Select a random image
+             */
+            $assignation[$externalId] = $files[random_int(0, \count($files)-1)];
+        }
 
         /* Copy it to portrait_dir
          */
