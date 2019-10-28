@@ -130,13 +130,11 @@
                             {% if pActionSummary %}
                                 <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
                             {% endif %}
-                            {% block extra_nav_items %}{% endblock %}
                         {% endspaceless -%}
                     </ul>
                 {% endif %}
             </div>
         </div>
-
 
         {% if participant.allResponses | length %}
             <div class="small-12 large-4 column content">
