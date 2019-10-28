@@ -167,6 +167,9 @@
         {% endif %}
 
 
+        {##
+         # Action Bar at the bottom of each participant's row
+         #}
         {% set canFinish  = latestResponse and not latestResponse.submitted %}
         {% set canPublish = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
         {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}

@@ -239,7 +239,10 @@
             {% set attachedMsg = attachedMsg ~ '</a>.' %}
         {% endif %}
 
-        {# Action Bar #}
+
+        {##
+         # Action Bar at the bottom of each participant's row
+         #}
         {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
         {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
         {% set actionStyle         = isDraftFeedback or attachedMsg or pAckReceipt ? '' : 'display: none;' %}
