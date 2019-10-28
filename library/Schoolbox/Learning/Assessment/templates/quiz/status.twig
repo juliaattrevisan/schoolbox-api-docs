@@ -38,7 +38,11 @@
     </li>
 {% endblock %}
 
-{# Each person in the list is rendered here
+
+{##
+ # Participant
+ #
+ # Each person in the list is rendered here
  # Each type of assessment renders their participants uniquely
  #}
 {% block participant %}
@@ -198,8 +202,9 @@
 {% endblock %}
 
 
-
-
+{##
+ # Massive javascript hulk
+ #}
 {% block scripts %}
     <script type="application/javascript" src="/javascript/shared/submissions/jquery.bulky.js"></script>
     <div id="mass-review" class="reveal-modal" data-reveal data-list-id="mass-review-list" aria-hidden="true" role="dialog">
@@ -250,9 +255,7 @@
     </div>
 
     <script type="text/javascript">
-
-        $(function () {
-
+        $(function() {
             var $participantList  = $('#assessment-status');
 
             {# Mass review submitted but unreviewed quiz attempts #}

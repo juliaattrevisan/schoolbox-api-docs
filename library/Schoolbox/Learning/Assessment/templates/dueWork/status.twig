@@ -52,7 +52,11 @@
     {% endif %}
 {% endblock %}
 
-{# Each person in the list is rendered here
+
+{##
+ # Participant
+ #
+ # Each person in the list is rendered here
  # Each type of assessment renders their participants uniquely
  #}
 {% block participant %}
@@ -62,8 +66,8 @@
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
-    {% set isPublished  = latestFeedback.published %}
-    {% set canPublish   = latestFeedback and not isPublished %}
+    {% set isPublished       = latestFeedback.published %}
+    {% set canPublish        = latestFeedback and not isPublished %}
 
     {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
     {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', routeArgs) %}
@@ -253,7 +257,9 @@
 {% endblock %}
 
 
-
+{##
+ # Massive javascript hulk
+ #}
 {% block scripts %}
     {% if not readonly %}
         <script type="application/javascript" src="/javascript/shared/submissions/jquery.bulky.js"></script>
