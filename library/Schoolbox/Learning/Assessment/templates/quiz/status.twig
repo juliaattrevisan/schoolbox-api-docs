@@ -116,12 +116,25 @@
         <div class="small-12 column">
             <div class="row actions-small-{{ pActionCount }}">
                 <div class="list-item">
-                    {% include '@learningAssessment/fragments/participantStatus.twig' with {
-                        participant: participant,
-                        statusClass: pStatusClass,
-                        statusText: pStatusText,
-                        statusTip: pTooltip
-                    } only %}
+                    <div class="{{ cardSize ?: 'small-12' }} card">
+                        <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
+                        </a>
+                        {% if not participant.user.deleted %}
+                            <h3>
+                                <a href="/search/user/{{ participant.user.id }}" title="View Profile">{{ participant.user.fullName }}</a>
+                                {% if not participant.plan.isDynamic %}
+                                    <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
+                                {% endif %}
+                            </h3>
+                        {% else %}
+                            <h3>{{ participant.user.fullName }}</h3>
+                        {% endif %}
+                        <p class="meta">
+                            <span title="{{ pTooltip }}" data-status class="progress-tick tiny {{ pStatusClass }}"></span>
+                            <span data-status-label>{{ pStatusText }}</span>
+                        </p>
+                    </div>
                 </div>
                 {% if pActionCount %}
                     <nav>
