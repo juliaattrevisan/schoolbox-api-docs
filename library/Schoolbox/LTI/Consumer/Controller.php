@@ -327,7 +327,9 @@ class Controller extends Base
                 'componentId' => $component->getInstance()->getId(),
             ]);
 
-        $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
+        // Launch presentation return URL is the same as the standard return URL
+        // (except for Education Perfect, which is different for some reason)
+        $launchPresentationReturnUrl = $extContentReturnUrl;
 
         // Check if the LTI component is a picker and already has a resource URL specified
 
@@ -345,6 +347,9 @@ class Controller extends Base
 
         if (strlen($embedUrl) > 0) {
             if (stristr($embedUrl, 'educationperfect') !== false) {
+                // EducationPerfect is a special snowflake:
+                // it expects the homepage as the return URL?
+                $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
                 if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
                     $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
 
