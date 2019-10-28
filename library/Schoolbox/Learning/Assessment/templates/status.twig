@@ -103,7 +103,7 @@
                 {% set pStatusClass     = '' %}
                 {% set pTooltip         = '' %}
 
-                {% block config %}
+                {% block participant %}
                 <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
                     {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
                     <div class="small-12 column">

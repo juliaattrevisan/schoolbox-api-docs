@@ -53,8 +53,7 @@
 {% endblock %}
 
 
-{% block config %}
-
+{% block participant %}
     {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
