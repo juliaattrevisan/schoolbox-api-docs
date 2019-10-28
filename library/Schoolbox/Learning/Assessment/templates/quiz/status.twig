@@ -54,7 +54,9 @@
     {# Progress icon #}
     {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.reviewComplete ? statusReviewed : statusPending) %}
 
-    {# Progress icon tool tip #}
+    {# Progress icon tool tip
+     # This is the tooltip that appears when you hover over the green dot/grey square/oj diamond
+     #}
     {% set pTooltip %}
         {%- spaceless %}
             {% if latestResponse and not latestResponse.isSubmitted %}
@@ -69,24 +71,24 @@
         {% endspaceless -%}
     {% endset %}
 
+    {# This is the text that appears next to the green dot/grey square/oj diamond #}
     {% set pStatusText %}
         {%- spaceless %}
             {% if not latestResponse %}
                 Not attempted
+            {% elseif latestResponse.submittedAt.isNull %}
+                Attempt in progress
             {% else %}
-                {% if latestResponse.submittedAt.isNull %}
-                    Attempt in progress
+                {% if multipleResponses %}
+                    Reattempted
                 {% else %}
-                    {% if multipleResponses %}
-                        Reattempted
-                    {% else %}
-                        Attempted
-                    {% endif %}
-                    {% if latestResponse.submittedOnTime %}
-                        on time
-                    {% else %}
-                        late
-                    {% endif %}
+                    Attempted
+                {% endif %}
+
+                {% if latestResponse.submittedOnTime %}
+                    on time
+                {% else %}
+                    late
                 {% endif %}
             {% endif %}
         {% endspaceless -%}
