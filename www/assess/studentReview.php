@@ -37,37 +37,38 @@ $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 $config               = $this->getDi()->get('config');
 [$quizId, $sectionId, $attemptId] = $this->arg;
 if (!is_numeric($quizId)) {
-    error(112);
+    error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 if (!is_numeric($sectionId)) {
-    error(115);
+    error(Error\Mapper::ERROR_SECTION_NOT_FOUND_2);
 }
 
 if (!is_numeric($attemptId)) {
-    error(128);
+    error(Error\Mapper::ERROR_ATTEMPT_NOT_FOUND);
 }
 
 $assess  = $assessHandler->getByID($quizId);
 $section = $sectionHandler->getByID($sectionId);
-// getListByAssessAndAttempt gets a rowset for some reason!
-$attemptList = $attemptHandler->getListByAssessAndAttempt($quizId, $attemptId);
-$attempt     = array_pop($attemptList);
 
 if (!$assessHandler->isValidUrlAccess($quizId)) {
     $this->pageNotFound();
 }
 
 if ($assessHandler->isDeleted($quizId)) {
-    error(112);
+    error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 if (!$section) {
-    error(115);
+    error(Error\Mapper::ERROR_SECTION_NOT_FOUND_2);
 }
 
+// getListByAssessAndAttempt gets a rowset for some reason!
+$attemptList = $attemptHandler->getListByAssessAndAttempt($quizId, $attemptId);
+$attempt     = array_pop($attemptList);
+
 if (!$attempt) {
-    error(128);
+    error(Error\Mapper::ERROR_ATTEMPT_NOT_FOUND_2);
 } else {
     $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($quizId, $attemptId);
 }
