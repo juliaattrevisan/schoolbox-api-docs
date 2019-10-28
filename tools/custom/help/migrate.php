@@ -93,9 +93,24 @@ HELP;
 
         /* Copy it to portrait_dir
          */
+        $portraitDir = $this->getConfig()->get('portrait_dir');
 
-        /* Rename it after their synergetic_id
-         */
+        foreach ($assignation as $externalId => $stockFile) {
+            $source = "{$stockDir}/{$stockFile}";
+            $destination = "{$portraitDir}/{$externalId}.jpg";
+
+            /* Rename it after their synergetic_id
+             * Note that this preserves the original assumption that everything is a jpg
+             */
+            $success = copy($source, $destination);
+
+            if ($success) {
+                $this->getLogger()->info("Copied {$source} to {$destination}");
+            } else {
+                $this->getLogger()->warning("Could not copy {$source} to {$destination}; skipped");
+            }
+        }
+
 
         /* Migrate all images with --backfill arg
          *
