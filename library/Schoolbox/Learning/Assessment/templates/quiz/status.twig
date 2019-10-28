@@ -12,9 +12,9 @@
 
 {% extends '@learningAssessment/status.twig' %}
 
-{% set labelIncomplete  = 'Incomplete' %}
-{% set labelPending     = 'Review Required' %}
-{% set labelReviewed    = 'Reviewed' %}
+{% set labelIncomplete = 'Not Attempted' %}
+{% set labelPending    = 'Review required' %}
+{% set labelReviewed   = 'Reviewed' %}
 
 {# Override default route #}
 {% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
