@@ -47,8 +47,6 @@
     {# Tot actions are derived from access to the Attempt History route
      # By default this empty, hiding the tot
      #}
-    {% set pActionSummary = '' %}
-
     {% if latestResponse %}
         {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
     {% endif %}
