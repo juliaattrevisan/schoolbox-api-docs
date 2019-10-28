@@ -58,6 +58,17 @@ HELP;
 
         /* Get a list of available files...and not care about their filenames
          */
+        $dirhandle = opendir('./stock_portrait');
+
+        $files = [];
+
+        while ($file = readdir($dirhandle)) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $files[] = $file;
+        }
 
         /* For each user who doesn't have a portrait_hash...
          */
