@@ -58,10 +58,8 @@ class Transactor
         /** @var Audience\Model[]|GenericCollection $existingSegments */
         $existingSegments = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty());
 
-        $segmentsToAdd    = $this->audienceMapper->createCollection();
-        $segmentsToDelete = $this->audienceMapper->createCollection();
-
         // Delete any segment that currently exists, but was not posted from form (ie it's been removed by user)
+        $segmentsToDelete = $this->audienceMapper->createCollection();
         foreach ($existingSegments as $existingSegment) {
             $found = false;
             foreach ($postedSegments as $postedSegment) {
@@ -72,13 +70,39 @@ class Transactor
             }
             if (!$found) {
                 $segmentsToDelete->add($existingSegment);
+                $existingSegments->offsetUnset($existingSegment->getId());
             }
         }
+
+        // Derive unique existing segments. (I don't know how duplicates are occurring, but they are)
+        $updatedSegments = $this->audienceMapper->createCollection();
+        foreach ($existingSegments as $existingSegment) {
+            $unique = true;
+            foreach ($updatedSegments as $updatedSegment) {
+                if ($existingSegment->equals($updatedSegment)) {
+                    $segmentsToDelete->add($existingSegment);
+                    $unique = false;
+                    break;
+                }
+            }
+            if ($unique) {
+                $updatedSegments->setOffset($existingSegment->getId(), $existingSegment);
+            }
+        }
+
         // Add any segment that was posted but is not currently persisted
+        $segmentsToAdd = $this->audienceMapper->createCollection();
         foreach ($postedSegments as $postedSegment) {
             $found = false;
             foreach ($existingSegments as $existingSegment) {
                 if ($existingSegment->equals($postedSegment)) {
+                    $found = true;
+                    break;
+                }
+            }
+            // Ensure we don't persist new duplicates
+            foreach ($segmentsToAdd as $segmentToAdd) {
+                if ($segmentToAdd->equals($postedSegment)) {
                     $found = true;
                     break;
                 }
@@ -90,6 +114,11 @@ class Transactor
 
         $isSegmentsDeleted = $this->deleteRemovedSegments($article, $segmentsToDelete);
         $isSegmentsAdded   = $this->saveAddedSegments($article, $segmentsToAdd);
+
+        foreach ($segmentsToAdd as $addedSegment) {
+            $updatedSegments->offsetSet($addedSegment->getId(), $addedSegment);
+        }
+        $article->setAudience($updatedSegments);
 
         return $isSegmentsDeleted || $isSegmentsAdded;
     }
