@@ -1165,13 +1165,21 @@ $selector-width: 2.25rem;
 
 // Grades that sit along side of other elements
 .flex-grade {
+    align-items: center;
     display: flex;
 
     .sibling {
-        flex: 1 1 auto;
+        flex: 1;
+    }
+    .txt {
+      flex: 0 auto;
+      padding: 0 1rem;
+
+      p, h4 {
+        margin-bottom: 0;
+      }
     }
     .grade {
-        align-items: center;
         display: flex;
         flex: 0 1 auto;
         justify-content: center;

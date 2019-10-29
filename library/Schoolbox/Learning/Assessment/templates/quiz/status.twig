@@ -117,61 +117,63 @@
     {% endset %}
 
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
-        <div class="small-12 column">
-            <div class="row actions-small-{{ pActionCount }}">
-                <div class="list-item">
-                    <div class="{{ cardSize ?: 'small-12' }} card">
-                        <a href="/search/user/{{ participant.user.id }}" title="View Profile">
-                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
-                        </a>
-                        {% if not participant.user.deleted %}
-                            <h3>
-                                <a href="/search/user/{{ participant.user.id }}" title="View Profile">{{ participant.user.fullName }}</a>
-                                {% if not participant.plan.isDynamic %}
-                                    <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
-                                {% endif %}
-                            </h3>
-                        {% else %}
-                            <h3>{{ participant.user.fullName }}</h3>
+        <div class="flex-grade">
+            <div class="{{ cardSize ?: 'small-12' }} card sibling">
+                <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
+                </a>
+                {% if not participant.user.deleted %}
+                    <h3>
+                        <a href="/search/user/{{ participant.user.id }}" title="View Profile">{{ participant.user.fullName }}</a>
+                        {% if not participant.plan.isDynamic %}
+                            <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
                         {% endif %}
-                        <p class="meta">
-                            <span title="{{ pTooltip }}" data-status class="progress-tick tiny {{ pStatusClass }}"></span>
-                            <span data-status-label>{{ pStatusText }}</span>
-                            <span>{% if pActionSummary %} | <a href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">View {{ responseHistory }}</a>{% endif %}</span>
-                        </p>
-                    </div>
-                </div>
+                    </h3>
+                {% else %}
+                    <h3>{{ participant.user.fullName }}</h3>
+                {% endif %}
+                <p class="meta">
+                    <span title="{{ pTooltip }}" data-status class="progress-tick tiny {{ pStatusClass }}"></span>
+                    <span data-status-label>{{ pStatusText }}</span>
+                    {% if pActionSummary %}<span class="pipe meta"><a href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">View {{ responseHistory }}</a></span>{% endif %}
+                </p>
             </div>
-        </div>
+            {% if participant.allResponses | length %}
+                {% if latestResponse.submitted %}
+                    <div class="txt">
+                    <p>Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong></p>
+                    {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+                    </div>
+                {% endif %}
 
-        {% if participant.allResponses | length %}
-            <div class="small-12 large-4 column content">
                 {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
 
                 {% if latestResponse %}
                     {% if latestResponse.submitted %}
                         {% if latestFeedback %}
-                            <span class="grade {{ urgencyClass }}">
+                        <div class="grade {{ urgencyClass }}-bg">
                             <span>{{ latestFeedback.humanReadableMark }}</span>
-                         </span>
+                        </div>
                         {% else %}
+                        <div class="txt">
                             <h4>Awaiting Review</h4>
+                        </div>
                         {% endif %}
                     {% else %}
-                        <h4>In Progress</h4>
+                        <div class="txt">
+                            <h4>In Progress</h4>
+                        </div>
                     {% endif %}
                 {% else %}
                     &ndash;
                 {% endif %}
-            </div>
-            <div class="small-12 large-8 column content">
-                {% if latestResponse.submitted %}
-                    Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong>
-                    {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
-                {% endif %}
-            </div>
-        {% endif %}
-
+            {% endif %}
+        </div>
+{#                {% if pActionCount %}#}
+{#                    <nav>#}
+{#                        <a class="icon-more" title="" data-dropdown="feedback-options-{{ participant.user.id }}"></a>#}
+{#                    </nav>#}
+{#                {% endif %}#}
 
         {##
          # Action Bar at the bottom of each participant's row
