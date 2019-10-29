@@ -1184,12 +1184,18 @@ $selector-width: 2.25rem;
         flex: 0 1 auto;
         justify-content: center;
         margin-left: .75rem;
+
+        span {
+            line-height: 3.4rem;
+        }
     }
     @media #{$small-only} {
         flex-wrap: wrap;
-
+        .txt p {
+          margin-bottom: 0.5rem;
+        }
         .grade {
-            flex: 1 1 auto;
+            flex: 1 100%;
             margin-left: 0;
         }
     }
