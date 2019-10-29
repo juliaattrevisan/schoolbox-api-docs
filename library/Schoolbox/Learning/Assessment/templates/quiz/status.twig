@@ -49,9 +49,6 @@
     {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
-    {% set isPublished  = latestFeedback.published %}
-    {% set canPublish   = latestFeedback and not isPublished %}
-
     {% if not latestResponse %}
         {% set pActionSummary    = '' %}
     {% else %}
@@ -158,11 +155,9 @@
         {% endif %}
 
 
-        {% set latestResponse    = participant.findMostRecentResponse %}
-        {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
-        {% set canFinish         = latestResponse and not latestResponse.submitted %}
-        {% set canPublish        = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
-        {% set canDelete         = latestResponse and (not latestFeedback or not latestFeedback.published) %}
+        {% set canFinish  = latestResponse and not latestResponse.submitted %}
+        {% set canPublish = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
+        {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
         {# Hide if no attempts, or attempt has published review #}
         {% set actionStyle = not latestResponse or latestFeedback.published ? 'display:none;' : '' %}
@@ -175,7 +170,7 @@
         {# Buttons #}
         {% spaceless %}
             {% set buttons %}
-                <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt" >Delete Attempt</a>
+                <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt">Delete Attempt</a>
                 <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>
                 <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>
             {% endset %}
