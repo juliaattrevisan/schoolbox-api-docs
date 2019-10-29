@@ -37,6 +37,46 @@ input.datepicker-input {
     padding-right: 0;
 }
 
+.flatpickr-months {
+  margin-top: .25rem;
+  margin-bottom: .25rem;
+
+    .flatpickr-prev-month.flatpickr-prev-month,
+    .flatpickr-next-month.flatpickr-prev-month,
+    .flatpickr-prev-month.flatpickr-next-month,
+    .flatpickr-next-month.flatpickr-next-month {
+      top: .25rem;
+    }
+}
+
+.flatpickr-current-month {
+  font-size: .9rem;
+  width: 75%;
+  padding: 0;
+  height: auto;
+}
+
+.flatpickr-monthDropdown-months {
+  width: 6rem !important;
+  line-height: normal !important;
+  height: 0 !important;
+}
+
+.flatpickr-current-month {
+  .numInputWrapper {
+    width: 4rem;
+  }
+  .numInputWrapper span {
+    opacity: 1;
+    border: none;
+  }
+}
+
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+  fill: $accent-foreground;
+}
+
 /**
  * The modal
  */
@@ -47,6 +87,8 @@ input.datepicker-input {
 
     .flatpickr-months {
       padding-top: .5rem;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
 
       .flatpickr-prev-month.flatpickr-prev-month,
       .flatpickr-next-month.flatpickr-prev-month,
@@ -54,11 +96,6 @@ input.datepicker-input {
       .flatpickr-next-month.flatpickr-next-month {
         padding-top: 0 !important;
       }
-    }
-
-    .flatpickr-months .flatpickr-prev-month:hover svg,
-    .flatpickr-months .flatpickr-next-month:hover svg {
-        fill: $accent-foreground;
     }
 
     /**
@@ -104,10 +141,7 @@ input.datepicker-input {
     }
 
     .flatpickr-current-month {
-      font-size: .9rem;
-      width: auto;
-      padding: 0;
-      height: auto;
+      width: auto !important;
 
       input.cur-year {
             font-weight: $font-weight-normal;
@@ -118,19 +152,13 @@ input.datepicker-input {
             margin-right: .45rem;
         }
 
-        .numInputWrapper span {
-          opacity: 1;
-          border: none;
-        }
-
         span.cur-month:hover {
             background: transparent;
         }
     }
 
     .flatpickr-monthDropdown-months {
-      width: 6.5rem;
-      height: 0;
+      width: 6.5rem !important;
     }
 
     .flatpickr-day {
