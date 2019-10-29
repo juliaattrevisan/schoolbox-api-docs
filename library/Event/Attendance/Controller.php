@@ -22,7 +22,7 @@ class Event_Attendance_Controller extends Controller
      */
     private $eventAccess;
 
-    public function __construct ($page = null, EventAccess $eventAccess) {
+    public function __construct (SitePage $page, EventAccess $eventAccess) {
         parent::__construct($page);
 
         $this->setCalendarHandler( new Calendar );

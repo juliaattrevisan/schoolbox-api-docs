@@ -11,16 +11,19 @@ $attendanceController = new Event_Attendance_Controller($this, new EventAccess(n
 
 /**
  * @param int $eventId
- * @return object $event
- * @throws Exception
+ * @throws Exception if event is not found
+ * @throws Exception if user don't have permission
  */
-$findEvent = function (int $eventId){
+$assertEventWritable = static function (int $eventId) use ($attendanceController) {
     $eventMapper = new EventMapper;
     try {
-        return $eventMapper->findById($eventId);
+        $event = $eventMapper->findById($eventId);
     } catch (MapperException $e) {
         error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
         exit;
+    }
+    if (!$attendanceController->isPermitted($_SESSION['user'], $event)) {
+        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
     }
 };
 
@@ -32,79 +35,56 @@ $findEvent = function (int $eventId){
 $method = $this->arg[0];
 
 if ($method == 'list' && is_numeric($this->arg[1])) {
-    $event = $findEvent($this->arg[1]);
-    if ($attendanceController->isPermitted($_SESSION['user'], $event)) {
-        $data = $attendanceController->executeAttendeeList($this->arg[1]);
-        $attendanceController->renderAttendeeList($data);
-    } else {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
+    $assertEventWritable($this->arg[1]);
+    $data = $attendanceController->executeAttendeeList($this->arg[1]);
+    $attendanceController->renderAttendeeList($data);
+
 } elseif ($method == 'processModifyAttendanceList' && !empty($_POST)) {
     $data = $_POST;
-    $event = $findEvent($data['event']['id']);
+    $assertEventWritable($data['event']['id']);
+    $attendanceController->processModifyAttendanceList($data);
 
-    if ($attendanceController->isPermitted($_SESSION['user'], $event)) {
-        $attendanceController->processModifyAttendanceList($data);
-    } else {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
 } elseif ($method == 'processRemoveAttendance' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
     $eventId = $this->arg[1];
     $userId = $this->arg[2];
-    $event = $findEvent($eventId);
+    $assertEventWritable($eventId);
 
-    if ($attendanceController->isPermitted($_SESSION['user'], $event)) {
-        EventMapper::getInstance()->removeAttendance($eventId, $userId);
-    } else {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
+    EventMapper::getInstance()->removeAttendance($eventId, $userId);
 
     header('Location: ' . "/calendar/attendance/list/" . $eventId);
     exit;
 } /* Show all upcoming events with the number of attendees
  */
 else if ($method == 'upcomingEvents') {
-    $event = $findEvent($this->arg[1]);
-    if ($attendanceController->isPermitted($_SESSION['user'], $event)) {
-        $data = $attendanceController->executeUpcomingEventAttendance();
+    $assertEventWritable($this->arg[1]);
+    $data = $attendanceController->executeUpcomingEventAttendance();
 
-        $attendanceController->renderUpcomingEventAttendance($data);
-    } else {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
+    $attendanceController->renderUpcomingEventAttendance($data);
+
 } /* A csv export of all people pending for a particular event
  */
-else if ($method == 'exportPending') {
-    $event = $findEvent($this->arg[1]);
-    if ($attendanceController->isPermitted($_SESSION['user'], $event)) {
-        $data = $attendanceController->executePending($this->arg[1]);
+elseif ($method == 'exportPending') {
+    $assertEventWritable($this->arg[1]);
+    $data = $attendanceController->executePending($this->arg[1]);
 
-        $attendanceController->renderExportCSV($data);
-    } else {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
+    $attendanceController->renderExportCSV($data);
+
 } /* A csv export of all people attending a particular event
  */
-else if ($method == 'exportAttending') {
-    $event = $findEvent($this->arg[1]);
-    if ($attendanceController->isPermitted($_SESSION['user'], $event)) {
-        $data = $attendanceController->executeAttending($this->arg[1]);
+elseif ($method == 'exportAttending') {
+    $assertEventWritable($this->arg[1]);
+    $data = $attendanceController->executeAttending($this->arg[1]);
 
-        $attendanceController->renderExportCSV($data);
-    } else {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
+    $attendanceController->renderExportCSV($data);
+
 } /* A csv export of all people rejected from a particular event
  */
-else if ($method == 'exportRejected') {
-    $event = $findEvent($this->arg[1]);
-    if ($attendanceController->isPermitted($_SESSION['user'], $event)) {
-        $data = $attendanceController->executeRejected($this->arg[1]);
+elseif ($method == 'exportRejected') {
+    $assertEventWritable($this->arg[1]);
+    $data = $attendanceController->executeRejected($this->arg[1]);
 
-        $attendanceController->renderExportCSV($data);
-    } else {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
+    $attendanceController->renderExportCSV($data);
+
 } else {
     $this->pageNotFound();
 }
