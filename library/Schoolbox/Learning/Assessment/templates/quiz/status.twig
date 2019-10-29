@@ -169,11 +169,6 @@
                 {% endif %}
             {% endif %}
         </div>
-{#                {% if pActionCount %}#}
-{#                    <nav>#}
-{#                        <a class="icon-more" title="" data-dropdown="feedback-options-{{ participant.user.id }}"></a>#}
-{#                    </nav>#}
-{#                {% endif %}#}
 
         {##
          # Action Bar at the bottom of each participant's row
@@ -205,6 +200,7 @@
         buttons:      buttons,
         participant:  participant
     } only %}
+    </li>
 {% endblock %}
 
 
