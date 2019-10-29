@@ -141,11 +141,10 @@
             </div>
         </div>
 
-        {# Child templates may populate #}
         <div class="small-12 column">
 
-        {% if fbUrl %}
-        <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ fbUrl }}">
+            {% if fbUrl %}
+            <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ fbUrl }}">
             {% endif %}
 
                 <input type="hidden" name="responseId" value="{{ response.id }}"/>
@@ -175,7 +174,7 @@
                         } only %}
                     </div>
                 </div>
-                {% if fbUrl %}
+            {% if fbUrl %}
             </form>
             {% endif %}
         </div>
@@ -219,9 +218,8 @@
         {% endif %}
 
         {# Action Bar #}
-        {% set feedback            = participant.findMostRecentInstructorGivenFeedback %}
-        {% set isDraftFeedback     = feedback and not feedback.published %}
-        {% set isPublishedFeedback = feedback and feedback.published %}
+        {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
+        {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
         {% set actionStyle         = isDraftFeedback or attachedMsg or pAckReceipt ? '' : 'display: none;' %}
 
         {# Action Bar data attrs #}
@@ -241,8 +239,8 @@
                 {% if not readonly %}
                     <a  class="button"
                         data-draft="publish"
-                        {% if not feedback or feedback.published %}style="display:none;"{% endif %}
-                            {% if isDraftFeedback %}data-draft-id="{{ feedback.id }}"{% endif %}
+                        {% if not latestFeedback or latestFeedback.published %}style="display:none;"{% endif %}
+                            {% if isDraftFeedback %}data-draft-id="{{ latestFeedback.id }}"{% endif %}
                     >Publish</a>
                 {% endif %}
             {% endspaceless -%}
