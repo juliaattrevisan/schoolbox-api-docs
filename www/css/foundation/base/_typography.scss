@@ -2,17 +2,15 @@
 // TYPOGRAPHY
 //
 
-// $include-html-type-classes: $include-html-classes;
-
 // We use these to control header font styles
 // $header-font-family: $body-font-family;
 $header-font-weight: $font-weight-normal;
 // $header-font-style: normal;
 $header-font-color: $jet;
-// $header-line-height: 1.4;
+//$header-line-height: 1.4;
 $header-top-margin: 0;
 $header-bottom-margin: 1rem;
-// $header-text-rendering: optimizeLegibility;
+$header-text-rendering: auto !default;
 
 // We use these to control header font sizes
 $h1-font-size: rem-calc(($base-font-size + 12));
@@ -50,7 +48,7 @@ $paragraph-margin-bottom: rem-calc(($base-font-size - 4));
 $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 // $paragraph-aside-line-height: 1.35;
 // $paragraph-aside-font-style: italic;
-// $paragraph-text-rendering: optimizeLegibility;
+ $paragraph-text-rendering: auto !default;
 
 // We use these to style <code> tags
 $code-color: $accent-foreground;
@@ -78,9 +76,9 @@ $anchor-font-color-hover: $content-ui-foreground;
 // $list-font-family: $paragraph-font-family;
 // $list-font-size: $paragraph-font-size;
 // $list-line-height: $paragraph-line-height;
-// $list-margin-bottom: $paragraph-margin-bottom;
+//$list-margin-bottom: $paragraph-margin-bottom;
 // $list-style-position: outside;
-// $list-side-margin: 1.1rem;
+//$list-side-margin: 1.1rem;
 // $list-ordered-side-margin: 1.4rem;
 // $list-side-margin-no-bullet: 0;
 // $list-nested-margin: rem-calc(20);
@@ -153,9 +151,9 @@ p{
 	}
 }
 
-a{
-	@include single-transition(all, 0.15s, linear);
-}
+//a{
+//	@include single-transition(all, 0.15s, linear);
+//}
 
 .meta{
 	@include contrast-bg();
@@ -177,29 +175,30 @@ a{
 	}
 }
 
-blockquote{
-	background-color: $vapor;
-	font-size: rem-calc(($base-font-size - 3));
+/* Blockquotes */
+blockquote {
+  margin: 0 0 $paragraph-margin-bottom;
+  padding: $blockquote-padding;
+  border-#{$default-float}: $blockquote-border;
 
-	&:before {
-	    color: $base;
-	    content: "\201C";
-	    font-size: 4rem;
-	    line-height: 0.1rem;
-	    margin-right: 0.4rem;
-		vertical-align: -2rem;
-		font-family: Georgia, serif;
+  cite {
+    display: block;
+    font-size: $blockquote-cite-font-size;
+    color: $blockquote-cite-font-color;
+    &:before {
+      content: "\2014 \0020";
     }
 
-	p{
-		display: inline;
-		font-style: italic;
-		word-wrap: break-word;
-	}
-
-	cite:before {
-    	content: "\2014 \2009";
-	}
+    a,
+    a:visited {
+      color: $blockquote-cite-link-color;
+    }
+  }
+}
+blockquote,
+blockquote p {
+  line-height: $paragraph-line-height;
+  color: $blockquote-font-color;
 }
 
 // Deleted or struck out content
