@@ -153,7 +153,9 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
             $file->setStorage($store);
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-
+            if ($this instanceof Resource\File\Mapper) {
+                $file->setModifiedBy($this->hydrateJoin($r, 'modified_by', 'um'));
+            }
             if ($file->getFolder() && (int)$file->getFolder()->getId() === 0) {
 
                 // root folder
