@@ -274,7 +274,7 @@
                 magicline_color: '#0066b0',
                 format_tags: 'p;h2;h3;h4;pre',
                 // TODO: To confirm if this is line is still needed
-                // contentsCss: '/css/'+siteLocation+'/editor.css',
+                contentsCss: '/css/'+siteLocation+'/editor.css',
 
                 /* set to use our iframely API key for oEmbed calls
                  */
