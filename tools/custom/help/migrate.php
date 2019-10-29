@@ -108,6 +108,13 @@ HELP;
             $assignation[$externalId] = $files[random_int(0, \count($files)-1)];
         }
 
+        /* If there's nothing to do, say so and leave
+         */
+        if (!\count($assignation)) {
+            $this->getLogger()->info('No users found; everyone has pictures already.');
+            return;
+        }
+
         /* Copy it to portrait_dir
          */
         $portraitDir = $this->getConfig()->get('portrait_dir');
