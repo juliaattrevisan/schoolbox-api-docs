@@ -297,7 +297,9 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 
             $file->setStorage($store);
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-            $file->setModifiedBy($this->hydrateJoin($r, 'modified_by', 'um'));
+            if ($this instanceof self) {
+                $file->setModifiedBy($this->hydrateJoin($r, 'modified_by', 'um'));
+            }
 
             if ($file->getFolder() && (int)$file->getFolder()->getId() === 0) {
 

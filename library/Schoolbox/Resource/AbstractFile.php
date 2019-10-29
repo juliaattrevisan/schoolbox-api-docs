@@ -38,9 +38,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     /** @var User $owner */
     protected $owner;
 
-    /** @var User $modifiedBy */
-    protected $modifiedBy;
-
     /** @var IFolder $folder */
     protected $folder;
 
@@ -80,26 +77,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     public function setOwner($owner)
     {
         $this->owner = $owner;
-
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    public function getModifiedBy()
-    {
-        return $this->modifiedBy;
-    }
-
-    /**
-     * @param User $modifiedBy
-     *
-     * @return self
-     */
-    public function setModifiedBy($modifiedBy)
-    {
-        $this->modifiedBy = $modifiedBy;
 
         return $this;
     }
