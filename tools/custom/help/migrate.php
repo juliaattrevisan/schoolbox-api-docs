@@ -89,7 +89,6 @@ HELP;
          */
         $db = Database::getInstance();
         $assignation = [];
-
         $groups = implode(',', self::USER_GROUPS);
 
         $statement = $db->query("
@@ -99,6 +98,10 @@ HELP;
             AND LENGTH(synergy_id) > 0
             AND group_id IN ({$groups})
         ");
+
+        /* Log the candidates then process them
+         */
+        $this->getLogger()->info("Looking for candidates in groups {$groups}");
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $externalId = $row['synergy_id'];
