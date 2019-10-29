@@ -151,9 +151,9 @@ p{
 	}
 }
 
-//a{
-//	@include single-transition(all, 0.15s, linear);
-//}
+a{
+	@include single-transition(all, 0.15s, linear);
+}
 
 .meta{
 	@include contrast-bg();
