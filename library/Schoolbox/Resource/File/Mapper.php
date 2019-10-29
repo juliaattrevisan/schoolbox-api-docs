@@ -11,16 +11,10 @@ namespace Schoolbox\Resource\File;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\IHomepageCleanable;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
-use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use PDO;
-use PDOStatement;
-
 
 /**
  * Class Mapper
