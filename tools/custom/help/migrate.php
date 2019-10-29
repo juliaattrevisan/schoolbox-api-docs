@@ -22,16 +22,6 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Users must be in a particular group:
-     *  6   Teachers
-     *  7   Non-Teaching Staff
-     *  8   Support Registered
-     * 13   Prospects
-     */
-    private const USER_GROUPS = [6, 7, 8, 13];
-
-
-    /**
      * Backfill only users who don't have a portrait_hash yet
      */
     private const OPT_BACKFILL = 'backfill';
@@ -89,19 +79,13 @@ HELP;
          */
         $db = Database::getInstance();
         $assignation = [];
-        $groups = implode(',', self::USER_GROUPS);
 
-        $statement = $db->query("
+        $statement = $db->query('
             SELECT DISTINCT synergy_id
             FROM `user`
             WHERE portrait_hash IS NULL
             AND LENGTH(synergy_id) > 0
-            AND group_id IN ({$groups})
-        ");
-
-        /* Log the candidates then process them
-         */
-        $this->getLogger()->info("Looking for candidates in groups {$groups}");
+        ');
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $externalId = $row['synergy_id'];
