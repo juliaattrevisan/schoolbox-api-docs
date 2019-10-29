@@ -45,7 +45,6 @@
 
 
 {% block participant %}
-
     {% set latestResponse    = participant.findMostRecentResponse %}
     {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
@@ -55,6 +54,16 @@
 
     {% if not latestResponse %}
         {% set pActionSummary    = '' %}
+    {% else %}
+        {% set routeArgs = {
+            viewee: participant.user,
+            assessmentId: assessment.id,
+            assessment: assessment,
+            student: participant.user,
+            studentId: participant.user.id
+        } %}
+
+        {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
     {% endif %}
 
     {# Progress icon #}
@@ -87,65 +96,90 @@
         {% endspaceless -%}
     {% endset %}
 
-    {{ parent() }}
-{% endblock %}
+    <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
+        {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
+        <div class="small-12 column">
+            <div class="row actions-small-{{ pActionCount }}">
+                <div class="list-item">
+                    {% include '@learningAssessment/fragments/participantStatus.twig' with {
+                        participant: participant,
+                        statusClass: pStatusClass,
+                        statusText: pStatusText,
+                        statusTip: pTooltip
+                    } only %}
+                </div>
+                {% if pActionCount %}
+                    <nav>
+                        <a class="icon-more" title="" data-dropdown="feedback-options-{{ participant.user.id }}"></a>
+                    </nav>
+                    <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                        {%- spaceless %}
+                            {% if pActionResponses %}
+                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
+                            {% endif %}
+                            {% if pActionSummary %}
+                                <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
+                            {% endif %}
+                            {% block extra_nav_items %}{% endblock %}
+                        {% endspaceless -%}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
 
-{% block meta %}
-    {% if participant.allResponses | length %}
-        <div class="small-12 large-4 column content">
-            {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
 
-            {% if latestResponse %}
-                {% if latestResponse.submitted %}
-                    {% if latestFeedback %}
-                        <span class="grade {{ urgencyClass }}">
+        {% if participant.allResponses | length %}
+            <div class="small-12 large-4 column content">
+                {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
+
+                {% if latestResponse %}
+                    {% if latestResponse.submitted %}
+                        {% if latestFeedback %}
+                            <span class="grade {{ urgencyClass }}">
                             <span>{{ latestFeedback.humanReadableMark }}</span>
                          </span>
+                        {% else %}
+                            {#<a href="#" class="button expand">Review</a>#}
+                            <h4>Awaiting Review</h4>
+                        {% endif %}
                     {% else %}
-                        {#<a href="#" class="button expand">Review</a>#}
-                        <h4>Awaiting Review</h4>
+                        <h4>In Progress</h4>
                     {% endif %}
                 {% else %}
-                    <h4>In Progress</h4>
+                    &ndash;
                 {% endif %}
-            {% else %}
-                &ndash;
-            {% endif %}
-        </div>
-        <div class="small-12 large-8 column content">
-            {% if latestResponse.submitted %}
-                Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong>
-                {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
-            {% endif %}
-        </div>
-    {% endif %}
-{% endblock %}
+            </div>
+            <div class="small-12 large-8 column content">
+                {% if latestResponse.submitted %}
+                    Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong>
+                    {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
 
 
-{% block action_bar %}
+        {% set latestResponse    = participant.findMostRecentResponse %}
+        {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
+        {% set canFinish         = latestResponse and not latestResponse.submitted %}
+        {% set canPublish        = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
+        {% set canDelete         = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
-    {% set latestResponse    = participant.findMostRecentResponse %}
-    {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
-    {% set canFinish         = latestResponse and not latestResponse.submitted %}
-    {% set canPublish        = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
-    {% set canDelete         = latestResponse and (not latestFeedback or not latestFeedback.published) %}
+        {# Hide if no attempts, or attempt has published review #}
+        {% set actionStyle = not latestResponse or latestFeedback.published ? 'display:none;' : '' %}
 
-    {# Hide if no attempts, or attempt has published review #}
-    {% set actionStyle = not latestResponse or latestFeedback.published ? 'display:none;' : '' %}
+        {# Mass/Bulk actions #}
+        {% set massActions = '' %}
+        {% if canPublish %}{% set massActions = massActions ~ ' data-mass-review' %}{% endif %}
+        {% if canDelete %}{% set massActions = massActions ~ ' data-mass-delete' %}{% endif %}
 
-    {# Mass/Bulk actions #}
-    {% set massActions = '' %}
-    {% if canPublish %}{% set massActions = massActions ~ ' data-mass-review' %}{% endif %}
-    {% if canDelete %}{% set massActions = massActions ~ ' data-mass-delete' %}{% endif %}
-
-    {# Buttons #}
-    {% spaceless %}
-        {% set buttons %}
-            <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt" >Delete Attempt</a>
-            <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>
-            <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>
-        {% endset %}
-    {% endspaceless %}
+        {# Buttons #}
+        {% spaceless %}
+            {% set buttons %}
+                <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt" >Delete Attempt</a>
+                <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>
+                <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>
+            {% endset %}
+        {% endspaceless %}
 
     {% include '@learningAssessment/fragments/actionBar.twig' with {
         actionStyle:  actionStyle,
@@ -154,6 +188,8 @@
         participant:  participant
     } only %}
 {% endblock %}
+
+
 
 
 {% block scripts %}

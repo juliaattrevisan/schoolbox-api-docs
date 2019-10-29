@@ -54,6 +54,16 @@
 
 
 {% block participant %}
+    {% set routeArgs = {
+        viewee: participant.user,
+        assessmentId: assessment.id,
+        assessment: assessment,
+        student: participant.user,
+        studentId: participant.user.id
+    } %}
+
+    {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
+
     {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
@@ -98,127 +108,146 @@
         {% endspaceless -%}
     {% endset %}
 
-    {{ parent() }}
-{% endblock %}
+    <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
+        {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
+        <div class="small-12 column">
+            <div class="row actions-small-{{ pActionCount }}">
+                <div class="list-item">
+                    {% include '@learningAssessment/fragments/participantStatus.twig' with {
+                        participant: participant,
+                        statusClass: pStatusClass,
+                        statusText: pStatusText,
+                        statusTip: pTooltip
+                    } only %}
+                </div>
+                {% if pActionCount %}
+                    <nav>
+                        <a class="icon-more" title="" data-dropdown="feedback-options-{{ participant.user.id }}"></a>
+                    </nav>
+                    <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                        {%- spaceless %}
+                            {% if pActionResponses %}
+                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
+                            {% endif %}
+                            {% if pActionSummary %}
+                                <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
+                            {% endif %}
+                            {% if pActionSobo %}
+                                <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
+                            {% endif %}
+                        {% endspaceless -%}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
 
-{% block extra_nav_items %}
-    {% if pActionSobo %}
-        <li><a class="icon-due-work" href="{{ pActionSobo }}"
-               title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf
-                of {{ participant.user.firstName }}</a></li>
-    {% endif %}
-{% endblock %}
-
-{% block grading %}
-    <div class="small-12 column">
+        {# Child templates may populate #}
+        <div class="small-12 column">
 
         {% if fbUrl %}
         <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ fbUrl }}">
             {% endif %}
 
-            <input type="hidden" name="responseId" value="{{ response.id }}"/>
+                <input type="hidden" name="responseId" value="{{ response.id }}"/>
 
-            <div class="row">
-                {% if 'none' != markSchemeName | lower %}
-                    <div class="small-12 medium-3 column">
-                        <label>{{ locale.grades.proper }}
-                            {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                <div class="row">
+                    {% if 'none' != markSchemeName | lower %}
+                        <div class="small-12 medium-3 column">
+                            <label>{{ locale.grades.proper }}
+                                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                    participant: participant,
+                                    feedback: participant.findMostRecentInstructorGivenFeedback,
+                                    markScheme:  assessment.markScheme,
+                                    tabIndex:    (loop.index0 * 2) + 1,
+                                    errors:      errors,
+                                    readonly:    readonly
+                                } only %}
+                            </label>
+                        </div>
+                    {% endif %}
+
+                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
+                        {% include '@learningAssessment/dueWork/comment.twig' with {
+                            feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
-                            feedback: participant.findMostRecentInstructorGivenFeedback,
-                            markScheme:  assessment.markScheme,
-                            tabIndex:    (loop.index0 * 2) + 1,
-                            errors:      errors,
+                            tabIndex:    (loop.index0 * 2) + 2,
                             readonly:    readonly
-                            } only %}
-                        </label>
+                        } only %}
                     </div>
-                {% endif %}
-
-                <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
-                    {% include '@learningAssessment/dueWork/comment.twig' with {
-                        feedback:    participant.findMostRecentInstructorGivenFeedback,
-                        participant: participant,
-                        tabIndex:    (loop.index0 * 2) + 2,
-                        readonly:    readonly
-                    } only %}
                 </div>
-            </div>
-            {% if fbUrl %}
-        </form>
-        {% endif %}
-    </div>
-{% endblock %}
-
-{% block action_bar %}
-
-    {#
-    If there's any files, rubric marks, or kami docs
-    attached to the feedback - tell the user that this feedback also includes those.
-    #}
-    {% set hasKami = latestFeedback and latestFeedback.hasResponseWithKamiDocs %}
-    {% set fileCount = latestFeedback ? latestFeedback.allFiles.count : 0 %}
-    {% set showRubricLink = assessment.useRubric and (rubricMarks[participant.user.id]|default(false)) %}
-
-    {% if hasKami or fileCount or showRubricLink %}
-        {% set meta = [] %}
-
-        {# Kami #}
-        {% if hasKami %}
-            {% set meta = meta|merge(['annotated document']) %}
-        {% endif %}
-
-        {# Rubric #}
-        {% if showRubricLink %}
-            {% set meta = meta|merge(['rubric']) %}
-        {% endif %}
-
-        {# Files #}
-        {% if fileCount %}
-            {% set meta = meta|merge(['file' ~ (fileCount > 1 ? 's' : '') ]) %}
-        {% endif %}
-
-        {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
-        {% for mataLabel in meta %}
-            {% set attachedMsg = attachedMsg ~ mataLabel %}
-            {% if loop.revindex0 > 1 %}
-                {% set attachedMsg = attachedMsg ~ ', ' %}
-            {% elseif loop.revindex0 == 1 %}
-                {% set attachedMsg = attachedMsg ~ ' and ' %}
+                {% if fbUrl %}
+            </form>
             {% endif %}
-        {% endfor %}
-        {% set attachedMsg = attachedMsg ~ '</a>.' %}
-    {% endif %}
+        </div>
 
-    {# Action Bar #}
-    {% set feedback            = participant.findMostRecentInstructorGivenFeedback %}
-    {% set isDraftFeedback     = feedback and not feedback.published %}
-    {% set isPublishedFeedback = feedback and feedback.published %}
-    {% set actionStyle         = isDraftFeedback or attachedMsg or pAckReceipt ? '' : 'display: none;' %}
+        {#
+        If there's any files, rubric marks, or kami docs
+        attached to the feedback - tell the user that this feedback also includes those.
+        #}
+        {% set hasKami = latestFeedback and latestFeedback.hasResponseWithKamiDocs %}
+        {% set fileCount = latestFeedback ? latestFeedback.allFiles.count : 0 %}
+        {% set showRubricLink = assessment.useRubric and (rubricMarks[participant.user.id]|default(false)) %}
 
-    {# Action Bar data attrs #}
-    {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
-    {% set massActions = massActions ~ (pAckReceipt ? ' data-mass-submit' : '') %}
-    {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
+        {% if hasKami or fileCount or showRubricLink %}
+            {% set meta = [] %}
 
-
-    {% set buttons %}
-        {%- spaceless %}
-            {% if pAckReceipt %}
-                {% set soboTitle = 'Acknowledge receipt of student submission' %}
-                <a class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</a>
+            {# Kami #}
+            {% if hasKami %}
+                {% set meta = meta|merge(['annotated document']) %}
             {% endif %}
-            {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
-            {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
-            <span class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}">{{ draftSaveHtml }}</span>
-            {% if not readonly %}
-                <a  class="button"
-                    data-draft="publish"
-                    {% if not feedback or feedback.published %}style="display:none;"{% endif %}
-                    {% if isDraftFeedback %}data-draft-id="{{ feedback.id }}"{% endif %}
-                >Publish</a>
+
+            {# Rubric #}
+            {% if showRubricLink %}
+                {% set meta = meta|merge(['rubric']) %}
             {% endif %}
-        {% endspaceless -%}
-    {% endset %}
+
+            {# Files #}
+            {% if fileCount %}
+                {% set meta = meta|merge(['file' ~ (fileCount > 1 ? 's' : '') ]) %}
+            {% endif %}
+
+            {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
+            {% for mataLabel in meta %}
+                {% set attachedMsg = attachedMsg ~ mataLabel %}
+                {% if loop.revindex0 > 1 %}
+                    {% set attachedMsg = attachedMsg ~ ', ' %}
+                {% elseif loop.revindex0 == 1 %}
+                    {% set attachedMsg = attachedMsg ~ ' and ' %}
+                {% endif %}
+            {% endfor %}
+            {% set attachedMsg = attachedMsg ~ '</a>.' %}
+        {% endif %}
+
+        {# Action Bar #}
+        {% set feedback            = participant.findMostRecentInstructorGivenFeedback %}
+        {% set isDraftFeedback     = feedback and not feedback.published %}
+        {% set isPublishedFeedback = feedback and feedback.published %}
+        {% set actionStyle         = isDraftFeedback or attachedMsg or pAckReceipt ? '' : 'display: none;' %}
+
+        {# Action Bar data attrs #}
+        {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
+        {% set massActions = massActions ~ (pAckReceipt ? ' data-mass-submit' : '') %}
+        {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
+
+
+        {% set buttons %}
+            {%- spaceless %}
+                {% if pAckReceipt %}
+                    {% set soboTitle = 'Acknowledge receipt of student submission' %}
+                    <a class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</a>
+                {% endif %}
+                {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
+                {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
+                <span class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}">{{ draftSaveHtml }}</span>
+                {% if not readonly %}
+                    <a  class="button"
+                        data-draft="publish"
+                        {% if not feedback or feedback.published %}style="display:none;"{% endif %}
+                            {% if isDraftFeedback %}data-draft-id="{{ feedback.id }}"{% endif %}
+                    >Publish</a>
+                {% endif %}
+            {% endspaceless -%}
+        {% endset %}
 
     {% include '@learningAssessment/fragments/actionBar.twig' with {
         actionStyle:  actionStyle,
@@ -229,7 +258,10 @@
         participant:  participant
     } only %}
 
+    </li>
 {% endblock %}
+
+
 
 {% block scripts %}
     {% if not readonly %}
