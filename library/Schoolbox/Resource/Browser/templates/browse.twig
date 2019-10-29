@@ -156,7 +156,13 @@
 
         function rs()
         {
-            var calcd = $window.height() - $hybrid.height() - $footer.height() - metaData.height() - 120;
+            var calcd = 0;
+
+            if ($(window).width() > 1440) {
+                calcd = $window.height() - $hybrid.height() - $footer.height() - 120;
+            } else {
+                calcd = $window.height() - $hybrid.height() - $footer.height() - metaData.height() - 120;
+            }
 
             $resources.height(Math.max(200, calcd));
         }
