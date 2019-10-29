@@ -125,4 +125,4 @@ abstract class AbstractFile implements IFile, ISoftDeletable
 
         return null;
     }
-} 
+}

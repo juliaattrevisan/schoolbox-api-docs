@@ -79,7 +79,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         }
 
         /* Need title injected here
-             */
+         */
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'has_file', 'has_file_block');
@@ -143,8 +143,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setBlock('files', 'file_url', 'file_url_block');
             $this->setBlock('files', 'file_no_url', 'file_no_url_block');
             $this->setBlock('files', 'modify_file', 'modify_file_block');
-            $this->setBlock('files', 'owner_exists', 'owner_exists_block');
-            $this->setBlock('files', 'owner_deleted', 'owner_deleted_block');
+            $this->setBlock('files', 'file_modify_user', 'file_modify_user_block');
+            $this->setBlock('files', 'file_deleted_user', 'file_deleted_user_block');
 
 
             $this->setVar('empty_state_block', '');
@@ -175,34 +175,41 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                             continue;
                         }
+
+                        $mostRecentEditor = $file->getModifiedBy() ?: $file->getOwner();
+                        $message          = $file->getModifiedBy() ? 'Last updated' : 'Posted';
+                        $mostRecentDate   = $file->getModifiedAt() ?: $file->getCreatedAt();
+
                         $this->setVar([
                             'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
                             'FILE_ID'              => $file->getId(),
                             'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
                             'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
-                            'FILE_POSTED_BY'       => $file->getOwner()->formatName(),
-                            'FILE_POSTED_BY_ID'    => $file->getOwner()->getId(),
-                            'FILE_POSTED_DATE'     => $file->getCreatedAt()->getShort(),
-                            'FILE_POSTED_RELATIVE' => $file->getCreatedAt()->getRelativeTime(),
-                            'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
+                            'FILE_POSTED_BY'       => $mostRecentEditor->getFullName(),
+                            'FILE_POSTED_BY_ID'    => $mostRecentEditor->getId(),
+                            'FILE_POSTED_DATE'     => $mostRecentDate->getShort(),
+                            'FILE_POSTED_RELATIVE' => $mostRecentDate->getRelativeTime(),
+                            'FILE_POSTED_MESSAGE'  => $message,
                             'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                             'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
                             'RETURN_URL'           => Redirect::RETURN_URL . '=' . Redirect::encode("/homepage/$folderId"),
                         ]);
 
-                        if ($this->getConfig('compactMode')) {
+                        if (!$this->getConfig('compactMode')) {
+                            $this->setVar(['FILE_COMPACT' => '']);
+                        } else {
                             $this->setVar([
-                                'FILE_COMPACT' => 'compact'
+                                'FILE_COMPACT' => 'compact',
                             ]);
                         }
 
-                        // Owner name and optional link
-                        if ($file->getOwner()->isDeleted()) {
-                            $this->setVar('owner_exists_block', '');
-                            $this->parse('owner_deleted_block', 'owner_deleted');
+                        $this->setVar('file_modify_user_block', '');
+                        $this->setVar('file_deleted_user_block', '');
+
+                        if (!$mostRecentEditor->isDeleted()) {
+                            $this->parse('file_modify_user_block', 'file_modify_user');
                         } else {
-                            $this->parse('owner_exists_block', 'owner_exists');
-                            $this->setVar('owner_deleted_block', '');
+                            $this->parse('file_deleted_user_block', 'file_deleted_user');
                         }
 
                         //set name

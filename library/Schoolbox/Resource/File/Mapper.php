@@ -14,7 +14,7 @@ use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
 use Schoolbox\User;
-
+use Schoolbox\UserMapper;
 
 /**
  * Class Mapper
@@ -53,7 +53,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $this->uses('comment', self::TYPE_STRING, null, 'description'); // TODO rename that field!
         $this->uses('hidden', self::TYPE_BOOLEAN);
         $this->uses('modified', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'modifiedAt');
-
+        $this->joins('modified_by', UserMapper::class, 'id');
         $this->joins('category', Resource\Folder\Mapper::class, 'id', null, null, 'folder', 'category');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
@@ -92,11 +92,13 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 {$this->getJoinColumnString('hash', 'h')},
                 {$this->getJoinColumnString('hash.allowedFileExtension', 'm')},
                 {$this->getJoinColumnString('owner', 'u')},
+                {$this->getJoinColumnString('modified_by', 'um')},
                 {$this->getJoinColumnString($this->getFolderFieldname(), 'c')}
             FROM {$table}
             LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$this->getJoinSql('hash.allowedFileExtension', 'h', 'm', true)}
             LEFT JOIN {$this->getJoinSql('owner', $table, 'u', true)}
+            LEFT JOIN {$this->getJoinSql('modified_by', $table, 'um', true)}
             LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
         ";
 

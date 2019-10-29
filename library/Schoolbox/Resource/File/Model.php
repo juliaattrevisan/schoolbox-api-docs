@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\File;
 use Alaress_Date_Format;
 use Schoolbox\Resource\AbstractFile;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 /**
  * Class Model
@@ -32,6 +33,8 @@ class Model extends AbstractFile
     /** @var Alaress_Date_Format */
     protected $modifiedAt;
 
+    /** @var User $modifiedBy */
+    protected $modifiedBy;
 
     /**
      * @return string
@@ -102,4 +105,23 @@ class Model extends AbstractFile
         return $this;
     }
 
+    /**
+     * @return User
+     */
+    public function getModifiedBy()
+    {
+        return $this->modifiedBy;
+    }
+
+    /**
+     * @param User $modifiedBy
+     *
+     * @return Model
+     */
+    public function setModifiedBy($modifiedBy): Model
+    {
+        $this->modifiedBy = $modifiedBy;
+
+        return $this;
+    }
 }
