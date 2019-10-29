@@ -256,8 +256,7 @@
                     'a[id,href,target,data-portal];' +
                     'map[!name];' +
                     'area[!shape,!coords,!href,target,!alt];' +
-                    'img[usemap];'
-                ,
+                    'img[usemap];',
 
                 /* Remove annoying dialog that always appears
                  */
@@ -271,7 +270,7 @@
                 /* Other settings
                  */
                 toolbarCanCollapse: true,
-                removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed',
+                removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed,Link,Anchor',
                 magicline_color: '#0066b0',
                 format_tags: 'p;h2;h3;h4;pre',
                 // TODO: To confirm if this is line is still needed
