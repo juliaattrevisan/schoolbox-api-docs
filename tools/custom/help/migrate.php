@@ -157,6 +157,14 @@ HELP;
 
         $migrator->migrate();
 
+        /* Clean up any remainder files
+         */
+        foreach ($assignation as $externalId => $stockFile) {
+            $destination = "{$portraitDir}/{$externalId}.jpg";
+
+            unlink($destination);
+        }
+
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
