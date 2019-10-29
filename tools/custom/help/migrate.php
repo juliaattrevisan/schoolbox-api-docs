@@ -147,7 +147,8 @@ HELP;
             $portraitDir,
             $db,
             Mapper::getInstance(),
-            $this->getLogger()
+            $this->getLogger(),
+            $this->perform()
         );
 
         if ($this->getOpt(self::OPT_BACKFILL)) {
@@ -155,6 +156,10 @@ HELP;
         }
 
         $migrator->migrate();
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
     }
 };
 

@@ -54,19 +54,27 @@ class MigrateToStorage
 
 
     /**
+     * @var bool
+     */
+    private $perform;
+
+
+    /**
      * MigrateToStorage constructor.
      *
      * @param string          $portraitPath
      * @param IDatabase       $db
      * @param Mapper          $storageMapper
      * @param LoggerInterface $logger
+     * @param bool            $perform
      */
-    public function __construct(string $portraitPath, IDatabase $db, Mapper $storageMapper, LoggerInterface $logger)
+    public function __construct(string $portraitPath, IDatabase $db, Mapper $storageMapper, LoggerInterface $logger, bool $perform)
     {
         $this->portraitPath = $portraitPath;
         $this->db = $db;
         $this->storageMapper = $storageMapper;
         $this->logger = $logger;
+        $this->perform = $perform;
     }
 
 
@@ -132,24 +140,30 @@ class MigrateToStorage
                     }
 
                     try {
-                        $path = "{$this->portraitPath}/{$file}";
-
-                        /* Save it into brownhole
+                        /* Perform only
                          */
-                        $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
+                        if ($this->perform) {
+                            $path = "{$this->portraitPath}/{$file}";
 
-                        /* Update user with latest version
-                         */
-                        $updateResult->execute([
-                            'hash' => $portrait->getHash(),
-                            'id' => $user['id']
-                        ]);
+                            /* Save it into brownhole
+                             */
+                            $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
 
-                        $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+                            /* Update user with latest version
+                             */
+                            $updateResult->execute([
+                                'hash' => $portrait->getHash(),
+                                'id'   => $user['id']
+                            ]);
 
-                        /* Remove file when done
-                         */
-                        unlink($path);
+                            $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+
+                            /* Remove file when done
+                             */
+                            unlink($path);
+                        } else {
+                            $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) would have new portrait image {$file}");
+                        }
                     } catch (\Schoolbox\Mapper\Exception $e) {
 
                         /* Something died in storage

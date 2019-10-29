@@ -54,7 +54,8 @@ HELP;
             $this->getConfig()->get('portrait_dir'),
             Database::getInstance(),
             Mapper::getInstance(),
-            $this->getLogger()
+            $this->getLogger(),
+            $this->perform()
         ))->migrate();
     }
 };
