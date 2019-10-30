@@ -76,6 +76,10 @@ if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted
     error(ErrorMapper::ERROR_SUBJECT_DELETED);
 }
 
+if (!$folder->getId()) {
+    $this->localRedir('/resources/');
+}
+
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
 if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < UserAccess::ACCESS_READ) {
