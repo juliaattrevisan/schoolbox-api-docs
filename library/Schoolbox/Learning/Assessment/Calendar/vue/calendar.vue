@@ -572,15 +572,6 @@
                 });
             },
 
-            redrawCalendar() {
-                var self = this;
-
-                if (self.currentViewIsSemester()) {
-                    self.redrawWeekNumbers();
-                    self.redrawEventRows();
-                }
-            },
-
             /**
              * Callback when a date is rendered (i.e. the view or viewed date
              * changes).
@@ -621,18 +612,6 @@
                 document.querySelectorAll('.fc-time-area .fc-content tr')[0].querySelectorAll('div').forEach(function (element) {
                     element.removeAttribute('style');
                     element.querySelector('span').removeAttribute('style');
-                });
-            },
-
-            redrawEventRows() {
-                document.querySelectorAll('.fc-resourceTimelineSemester-view .fc-time-area [data-resource-id]').forEach(function (element, index) {
-                    var resourceColHeight = document.querySelector('.fc-resourceTimelineSemester-view .fc-resource-area [data-resource-id="'+ element.getAttribute('data-resource-id') +'"]').offsetHeight;
-
-                    element.querySelector('div').style.height = resourceColHeight + 'px';
-
-                    element.querySelectorAll('div .placeholder').forEach(function (placeholders) {
-                        placeholders.style.height = (resourceColHeight - 3) + 'px';
-                    })
                 });
             },
 
@@ -935,8 +914,6 @@
             @loading="onLoading"
             @eventClick="onEventClick"
             @dateClick="onDateClick"
-            @eventPositioned="redrawCalendar"
-            @windowResize="redrawCalendar"
             :dates-render="datesRender"
         />
     </div>
