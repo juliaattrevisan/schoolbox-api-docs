@@ -176,29 +176,29 @@ a{
 }
 
 /* Blockquotes */
-blockquote {
-  margin: 0 0 $paragraph-margin-bottom;
-  padding: $blockquote-padding;
-  border-#{$default-float}: $blockquote-border;
+blockquote{
+  background-color: $vapor;
+  font-size: rem-calc(($base-font-size - 3));
 
-  cite {
-    display: block;
-    font-size: $blockquote-cite-font-size;
-    color: $blockquote-cite-font-color;
-    &:before {
-      content: "\2014 \0020";
-    }
-
-    a,
-    a:visited {
-      color: $blockquote-cite-link-color;
-    }
+  &:before {
+    color: $base;
+    content: "\201C";
+    font-size: 4rem;
+    line-height: 0.1rem;
+    margin-right: 0.4rem;
+    vertical-align: -2rem;
+    font-family: Georgia, serif;
   }
-}
-blockquote,
-blockquote p {
-  line-height: $paragraph-line-height;
-  color: $blockquote-font-color;
+
+  p{
+    display: inline;
+    font-style: italic;
+    word-wrap: break-word;
+  }
+
+  cite:before {
+    content: "\2014 \2009";
+  }
 }
 
 // Deleted or struck out content
