@@ -532,13 +532,24 @@
                 this.listViewDateRange.start = this.toMoment(start).format(FORMAT_FLATPICKR_DATE);
                 this.listViewDateRange.end = this.toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
 
-                // Needed so that we'll have the value visible in the input field
-                document.querySelector('#start_date').setAttribute('value', this.listViewDateRange.start);
-                document.querySelector('#end_date').setAttribute('value', this.listViewDateRange.end);
+                let startDate = this.jQuery('#start_date'),
+                    endDate   = this.jQuery('#end_date');
 
-                // Needed so that when flatpickr gets initialised, the selected value will be the same as the one that's provided in the input field
-                document.querySelector('#start_date').setAttribute('data-default-date', this.listViewDateRange.start);
-                document.querySelector('#end_date').setAttribute('data-default-date', this.listViewDateRange.end);
+                // .val() is needed so that we'll have the value visible in the
+                // input field.
+                // data-default-date is needed so that when flatpickr gets
+                // initialised, the selected value will be the same as the one
+                // that's provided in the input field.
+                // The change event is required so that the date picker popup is
+                // updated with the new date.
+                startDate
+                    .val(this.listViewDateRange.start)
+                    .attr('data-default-date', this.listViewDateRange.start)
+                    .trigger('change');
+                endDate
+                    .val(this.listViewDateRange.end)
+                    .attr('data-default-date', this.listViewDateRange.end)
+                    .trigger('change');
             },
 
             /**
