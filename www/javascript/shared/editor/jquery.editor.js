@@ -270,7 +270,7 @@
                 /* Other settings
                  */
                 toolbarCanCollapse: true,
-                removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed,Link,Anchor',
+                removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed',
                 magicline_color: '#0066b0',
                 format_tags: 'p;h2;h3;h4;pre',
                 contentsCss: '/css/'+siteLocation+'/editor.css',
