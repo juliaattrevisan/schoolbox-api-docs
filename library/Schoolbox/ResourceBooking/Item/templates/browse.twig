@@ -22,7 +22,7 @@
             </li>
         {% endif %}
         <li>
-            <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read') }}" title="Availability Calendar">Availability Calendar</a>
+            <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar">Availability Calendar</a>
         </li>
         {% if isRouteAuthorized('resourceItem.add') %}
             <li class="separator">Admin Actions</li>
