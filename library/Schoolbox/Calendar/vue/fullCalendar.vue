@@ -67,7 +67,7 @@
                 listViewDateRange: {
                     start: null,
                     end: null,
-                }
+                },
             }
         },
         computed: {
@@ -397,6 +397,13 @@
             },
 
             /**
+             * Check if current display is list
+             */
+            currentViewIsList() {
+                return this.currentDisplay === 'list';
+            },
+
+            /**
              * Callback for reloading the calendar's events. May be used when
              * a series of events is deleted, as the calendar no longer knows
              * whether an event should be rendered even if it wasn't deleted.
@@ -431,10 +438,6 @@
                 // TODO this method should be unnecessary
                 // (for the same reason as `onLoading`)
                 return this.helper.dayTitleFormat(dateObject);
-            },
-
-            onQuickSwitch(value) {
-                this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
             },
 
             /**
@@ -504,8 +507,8 @@
                     // Register an event listener when update button is clicked.
                     document.querySelector('#update_date_range_button').addEventListener('click', function () {
                         if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
-                            let startDateValue = moment(document.querySelector('#start_date').value, 'DD/MM/YYYY'),
-                                endDateValue = moment(document.querySelector('#end_date').value, 'DD/MM/YYYY');
+                            let startDateValue = moment(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE),
+                                endDateValue = moment(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
 
                             if (startDateValue.isValid() && endDateValue.isValid()) {
                                 self.listViewDateRange.start = document.querySelector('#start_date').value;
@@ -519,8 +522,34 @@
                 }
             },
 
-            currentViewIsList() {
-                return this.currentDisplay === 'list';
+            /**
+             * Update list view's start and end dates on date navigation
+             * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
+             * I'm not sure if we can use it..
+             */
+            updateListViewDateRangeField(start, end = null)
+            {
+                this.listViewDateRange.start = this.toMoment(start).format(FORMAT_FLATPICKR_DATE);
+                this.listViewDateRange.end = this.toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
+
+                let startDate = this.jQuery('#start_date'),
+                    endDate   = this.jQuery('#end_date');
+
+                // .val() is needed so that we'll have the value visible in the
+                // input field.
+                // data-default-date is needed so that when flatpickr gets
+                // initialised, the selected value will be the same as the one
+                // that's provided in the input field.
+                // The change event is required so that the date picker popup is
+                // updated with the new date.
+                startDate
+                    .val(this.listViewDateRange.start)
+                    .attr('data-default-date', this.listViewDateRange.start)
+                    .trigger('change');
+                endDate
+                    .val(this.listViewDateRange.end)
+                    .attr('data-default-date', this.listViewDateRange.end)
+                    .trigger('change');
             },
 
             /**
@@ -529,7 +558,9 @@
             clickPrev() {
                 let api = this.$refs.fullCalendar.getApi();
                     api.prev();
+
                     this.$refs.flatPickr.updateActiveDate(api.getDate());
+                    this.updateListViewDateRangeField(api.getDate(), api.getDate());
             },
 
             /**
@@ -538,7 +569,9 @@
             clickNext() {
                 let api = this.$refs.fullCalendar.getApi();
                     api.next();
+
                     this.$refs.flatPickr.updateActiveDate(api.getDate());
+                    this.updateListViewDateRangeField(api.getDate(), api.getDate());
             },
 
             /**
@@ -548,7 +581,22 @@
                 let api = this.$refs.fullCalendar.getApi();
                     api.today();
                     this.$refs.flatPickr.updateActiveDate(api.getDate());
-            }
+
+                this.updateListViewDateRangeField(api.getDate());
+            },
+
+            /**
+             * Additional customisation for quick month switch button.
+             * When the user clicks on the flatpickr's date, we'll trigger fullcalendar's gotoDate.
+             */
+            onQuickSwitch(value) {
+                this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
+
+                this.updateListViewDateRangeField(
+                    value.selectedDate,
+                    value.selectedDate,
+                );
+            },
         },
         mounted() {
             this.registerListCustomInputFields();
