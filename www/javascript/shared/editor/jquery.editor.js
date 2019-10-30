@@ -256,8 +256,7 @@
                     'a[id,href,target,data-portal];' +
                     'map[!name];' +
                     'area[!shape,!coords,!href,target,!alt];' +
-                    'img[usemap];'
-                ,
+                    'img[usemap];',
 
                 /* Remove annoying dialog that always appears
                  */

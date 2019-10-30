@@ -179,10 +179,8 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
                                                     /* Shut modal, go back to Dialog
                                                      */
-                                                    $('[data-reveal]').foundation('reveal', 'close');
-
-                                                    // Show the cke dialog overlay again
-                                                    $('.cke_dialog_background_cover').removeClass('hide');
+                                                    $('#file-picker').foundation('reveal', 'close');
+                                                    $('#participant-customise-modal').css('z-index', '10000');
                                                 });
                                             } else {
                                                 // The file was rejected, probably cause it was the wrong mimetype.
@@ -263,6 +261,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             var fields = dialogFields(dialog);
 
             editorInstance.insertElement(inject(editorInstance, this.selection, fields));
+            $('#participant-customise-modal').css('z-index', '10000');
         },
 
         /**
