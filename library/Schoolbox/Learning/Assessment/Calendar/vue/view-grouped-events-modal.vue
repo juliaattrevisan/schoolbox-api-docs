@@ -150,7 +150,8 @@
                                 <h3>{{ subEvent.title }}</h3>
                             </template>
                             <meta-list>
-                                <meta-item>{{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item>
+                                <meta-item  v-if="subEvent.type">{{ subEvent.type }} due on {{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item>
+                                <meta-item v-else>{{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item>
                             </meta-list>
                         </div>
                     </div>
