@@ -508,7 +508,7 @@
                     document.querySelector('#update_date_range_button').addEventListener('click', function () {
                         if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
                             let startDateValue = moment(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE),
-                                endDateValue = moment(document.querySelector('#FORMAT_FLATPICKR_DATE').value, FORMAT_FLATPICKR_DATE);
+                                endDateValue = moment(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
 
                             if (startDateValue.isValid() && endDateValue.isValid()) {
                                 self.listViewDateRange.start = document.querySelector('#start_date').value;
