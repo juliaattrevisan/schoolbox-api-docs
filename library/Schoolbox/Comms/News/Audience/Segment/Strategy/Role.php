@@ -58,8 +58,9 @@ class Role extends SimpleStrategy
         $entityType = self::getEntityType();
         return "
             SELECT id, name, '{$entityType}' AS entity_type, null as entity_meta
-            FROM groups
+            FROM `groups`
             WHERE deleted_at IS NULL
+            AND name IS NOT NULL
             {$keywordFilter}
         ";
     }

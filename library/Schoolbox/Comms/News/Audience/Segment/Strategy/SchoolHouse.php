@@ -45,12 +45,13 @@ class SchoolHouse extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE house LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND house LIKE :{$searchPlaceholder}";
 
         $entityType = self::getEntityType();
         return "
             SELECT id, house AS name, '{$entityType}' AS entity_type, null as entity_meta
             FROM house
+            WHERE house IS NOT NULL
             {$keywordFilter}
         ";
     }

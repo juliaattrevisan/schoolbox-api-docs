@@ -48,12 +48,13 @@ class Campus extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE `name` LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
 
         $entityType = self::getEntityType();
         return "
             SELECT id, name, '{$entityType}' AS entity_type, null as entity_meta
             FROM luCampus
+            WHERE name IS NOT NULL
             {$keywordFilter}
         ";
     }
