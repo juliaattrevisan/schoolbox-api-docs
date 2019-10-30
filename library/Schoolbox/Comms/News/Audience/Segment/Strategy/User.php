@@ -68,12 +68,13 @@ class User extends SimpleStrategy
         return "
             SELECT
                 user.id,
-                CONCAT(firstname, ' ', lastname,' (',`groups`.name,')') AS name,
+                TRIM(CONCAT(COALESCE(firstname, ''), ' ', COALESCE(lastname, ''), ' (', `groups`.name, ')')) AS name,
                 '{$entityType}' AS entity_type,
                 `groups`.group_type as entity_meta
             FROM `user` 
             INNER JOIN `groups` ON user.group_id = `groups`.id
             WHERE user.deleted_at IS NULL
+            AND `groups`.name IS NOT NULL
             {$keywordFilter}
         ";
     }
