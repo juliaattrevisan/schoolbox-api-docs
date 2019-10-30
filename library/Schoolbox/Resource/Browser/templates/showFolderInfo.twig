@@ -19,57 +19,104 @@
 </ul>
 
 <div class="row">
-    <div class="small-6 medium-4 column text-center meta-preview">
+    <div class="card small-12 column meta-preview">
         {% if folder.hasHomepage %}
             <a title="View Homepage" href="/homepage/{{ folder.id }}">
         {% endif %}
         {% if folder.hasCoverImage %}
             <img class="icon" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square128" alt="{{ folder.name }}" {{ colouring }} />
         {% else %}
-            <div class="{{ nodeIcon.icon(nodeType) }} size-64" alt="{{ folder.name }}"></div>
+            <div class="{{ nodeIcon.icon(nodeType) }} size-32" alt="{{ folder.name }}"></div>
         {% endif %}
         {% if folder.hasHomepage %}
             </a>
         {% endif %}
-        {% if access > 1 %}
-            <div class="s32" style="margin-top: 1rem">
-        <div class="dzone ">
-            <span>You can drag multiple files onto this location</span>
-        </div>
-            </div>
+        <h3>
+            {% if folder.hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
+                {{ folder.name }}
+                {% if folder.hasHomepage %}</a>{% endif %}
+            <span class="hint has-tip" data-reveal-id="modal-folder-{{ folder.id }}" title="View folder permissions">?</span>
+        </h3>
+        {% if folder.group.category %}
+
+            {% if folder.codeString and folder.teachers|length > 0 %}
+                {% set type = 'class' %}
+            {% else %}
+                {% set type = 'group' %}
+            {% endif %}
+
+            <li class="meta">
+                {% if folder.group.private   %}Private {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">?</span>{% endif %}
+                {% if folder.group.moderated %}Moderated {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users can join, but only once access is approved by an admin">?</span>{% endif %}
+                {% if folder.group.free      %}Open {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Can be joined or left by anyone at any time">?</span>{% endif %}
+            </li>
+
+        {% elseif folder.codeString and folder.teachers|length > 0 %}
+            <p class="meta">Class</p>
+        {% else %}
+            <p class="meta">Folder</p>
         {% endif %}
     </div>
 
-    <div class="small-6 medium-8 column">
-        <h3>
-            {% if folder.hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
-            {{ folder.name }}
-            {% if folder.hasHomepage %}</a>{% endif %}
-            <span class="hint has-tip" data-reveal-id="modal-folder-{{ folder.id }}" title="View folder permissions">?</span>
-        </h3>
-        <ul class="inline-list">
+    <div class="small-12 column">
+        {% if access > 1 and folder.id %}
+            <script type="text/javascript">
+                $(function () {
+                    // Show/hide the upload button based on whether any files are in the list
+                    var $attachzone = $('#cms-zone'),
+                        $uploadButton = $('#uploadButton'),
+                        controlUploadButton = function () {
+                            var dropzone = $attachzone.data('plugin_resourceAttach').dropzone;
+                            if (dropzone.getQueuedFiles().length === 0 && dropzone.getUploadingFiles().length === 0) {
+                                $uploadButton.removeClass('hide').prop('disabled', false);
+                            }
+                            if (dropzone.getAcceptedFiles().length === 0) {
+                                $uploadButton.addClass('hide').prop('disabled', true);
+                            }
+                        };
+                    $attachzone
+                        .on('success.attachzone', controlUploadButton)
+                        .on('removedfile.attachzone', controlUploadButton)
+                        .on('error.attachzone', controlUploadButton);
 
-            {% if folder.group.category %}
+                    // AJAX submission: add any new files to the tree
+                    $('#uploadForm').on('submit', function (event) {
+                        event.preventDefault();
+                        var ajaxParams = {
+                                url: this.action,
+                                method: this.method,
+                                data: $(this).serializeArray(),
+                                dataType: 'json'
+                            },
+                            jstree = $('#tree').jstree(true);
 
-                {% if folder.codeString and folder.teachers|length > 0 %}
-                    {% set type = 'class' %}
-                {% else %}
-                    {% set type = 'group' %}
-                {% endif %}
+                        $uploadButton.prop('disabled', true);
+                        $.ajax(ajaxParams)
+                            .done(function (data) {
+                                // The response contains all items in the folder.
+                                // Add any new ones.
+                                data.forEach(function (item) {
+                                    var existingNode = jstree.get_node(item.id);
+                                    if (!existingNode) {
+                                        jstree.create_node(item.parent, item);
+                                    }
+                                });
 
-                <li class="meta">
-                    {% if folder.group.private   %}Private {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">?</span>{% endif %}
-                    {% if folder.group.moderated %}Moderated {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users can join, but only once access is approved by an admin">?</span>{% endif %}
-                    {% if folder.group.free      %}Open {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Can be joined or left by anyone at any time">?</span>{% endif %}
-                </li>
-
-            {% elseif folder.codeString and folder.teachers|length > 0 %}
-                <li class="meta">Class</li>
-            {% else %}
-                <li class="meta">Folder</li>
-            {% endif %}
-        </ul>
-
+                                // Then remove all the files I just uploaded
+                                $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
+                            })
+                            .fail(function () {
+                                // I don't know what a fail message could look like?
+                                $uploadButton.prop('disabled', false);
+                            });
+                    })
+                });
+            </script>
+            <form id="uploadForm" action="{{ routeLookup(namespace ~ '.postFiles', {folderId: folder.id}) }}" method="post">
+                {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                <input type="submit" value="Upload" class="hide" id="uploadButton" />
+            </form>
+        {% endif %}
         {% set actionBarList %}
             {# Actions differ by namespace #}
             {% if namespace == 'myFilesBrowser' %}
@@ -84,67 +131,59 @@
         {% include '@resourceBrowser/actionBar.twig' with { id: 'folder-actions', list: actionBarList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 4 } } %}
 
     <div class="reveal-modal" id="modal-folder-{{ folder.id }}" data-reveal>
-
         <h2>{{ folder.name }}</h2>
-
         <dl class="inline-dl">
-
-    {% if (folder.codeString and folder.teachers|length > 0) or folder.group.category %}
-        {% if folder.group.category %}
-            <dt class="small-12 medium-4">Group Administrator</dt>
-            <dd class="small-12 medium-8">
-                <div class="card tiny">
-                    <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
-                        <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
-                        <p>{{ admin.formatName }}</p>
-                    </a>
-                </div>
-            </dd>
+        {% if (folder.codeString and folder.teachers|length > 0) or folder.group.category %}
+            {% if folder.group.category %}
+                <dt class="small-12 medium-4">Group Administrator</dt>
+                <dd class="small-12 medium-8">
+                    <div class="card tiny">
+                        <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
+                            <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
+                            <p>{{ admin.formatName }}</p>
+                        </a>
+                    </div>
+                </dd>
+            {% endif %}
+            {% if folder.teachers %}
+            <dt class="small-12 medium-4">Teacher{{ folder.teachers.count == 1 ? '' : 's' }}</dt>
+                {% for i, teacher in folder.teachers %}
+                <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
+                    <div class="card tiny">
+                        <a href="/search/user/{{ teacher.id }}">
+                            <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
+                            <p>{{ teacher.formatName }}</p>
+                        </a>
+                    </div>
+                </dd>
+                {% endfor %}
+            {% endif %}
         {% endif %}
-        {% if folder.teachers %}
-        <dt class="small-12 medium-4">Teacher{{ folder.teachers.count == 1 ? '' : 's' }}</dt>
-            {% for i, teacher in folder.teachers %}
-            <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
-                <div class="card tiny">
-                    <a href="/search/user/{{ teacher.id }}">
-                        <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
-                        <p>{{ teacher.formatName }}</p>
-                    </a>
-                </div>
-            </dd>
-            {% endfor %}
-        {% endif %}
-    {% endif %}
         </dl>
 
-    {% if namespace == 'resourceBrowser' %}
-        <h3>Permissions</h3>
-        {% if folder.getInherit %}
-            <dl class="inline-dl">
-                <dd>This folder inherits its permission from the '<a href='/homepage/{{ parent.getId }}'>{{ parent.getName }}</a>' folder.</dd>
-            </dl>
-        {% else %}
-            <dl class="inline-dl">
-                {% if user.role.type == 'staff' and folder.id > 0 %}
-                    {% for access in roles %}
-                        <dt class="small-8">{{ access.role.name }}</dt>
-                        <dd class="small-4">
-                            {%- if access.type == 0 %}None{% endif -%}
-                            {%- if access.type == 1 %}Read{% endif -%}
-                            {%- if access.type == 2 %}Write{% endif -%}
-                        </dd>
-                    {% endfor %}
-                {% endif %}
-            </dl>
+        {% if namespace == 'resourceBrowser' %}
+            <h3>Permissions</h3>
+            {% if folder.getInherit %}
+                <dl class="inline-dl">
+                    <dd>This folder inherits its permission from the '<a href='/homepage/{{ parent.getId }}'>{{ parent.getName }}</a>' folder.</dd>
+                </dl>
+            {% else %}
+                <dl class="inline-dl">
+                    {% if user.role.type == 'staff' and folder.id > 0 %}
+                        {% for access in roles %}
+                            <dt class="small-8">{{ access.role.name }}</dt>
+                            <dd class="small-4">
+                                {%- if access.type == 0 %}None{% endif -%}
+                                {%- if access.type == 1 %}Read{% endif -%}
+                                {%- if access.type == 2 %}Write{% endif -%}
+                            </dd>
+                        {% endfor %}
+                    {% endif %}
+                </dl>
+            {% endif %}
         {% endif %}
-    {% endif %}
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-
-    </div>
-
-
-
-
+        </div>
     </div>
 </div>
 {% endif %}

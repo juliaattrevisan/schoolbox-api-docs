@@ -16,6 +16,7 @@ use Schoolbox\Config;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
@@ -184,6 +185,24 @@ abstract class AbstractController extends BaseController
 
 
     /**
+     * Helper function for getting a folder's attachzone
+     *
+     * @return array
+     */
+    private function getFolderAttachzoneData(): array
+    {
+        $zone = new GenericZone('cms', $this->fileMapper);
+        $zone->setAttachmentsLabel('')
+             ->setAttachPrompt('upload files to this location')
+             ->setMimeFilter('*/*')
+             ->setMulti(true)
+             ->setThumbnailSize(64)
+             ->setModalTitle('Select file');
+        return $zone->getTwigContext();
+    }
+
+
+    /**
      * @param FolderInterface $folder
      * @return array
      */
@@ -287,6 +306,8 @@ abstract class AbstractController extends BaseController
 
         }
 
+        $data['attachzone'] = $this->getFolderAttachzoneData();
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@resourceBrowser/browse.twig', $data)->setTab($this->tab)
         );
@@ -309,7 +330,7 @@ abstract class AbstractController extends BaseController
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => $this->treeBuilder->buildChildNodes($folderId, [], $mime)
+            'data'   => $this->treeBuilder->buildChildNodes($folderId, [], $mime),
         ]);
     }
 
@@ -324,7 +345,7 @@ abstract class AbstractController extends BaseController
     {
         $data = [
             'files'     => $this->fileMapper->findByFolderId($folderId)->getAll(),
-            'namespace' => $this->namespace
+            'namespace' => $this->namespace,
         ];
 
         $this->getResponse()->content->set([
@@ -343,10 +364,12 @@ abstract class AbstractController extends BaseController
      */
     public function showFolderInfo($folderId)
     {
+        $data = $this->getFolderData($folderId);
+        $data['attachzone'] = $this->getFolderAttachzoneData();
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/showFolderInfo.twig',
             'format'   => 'nochrome',
-            'data'     => $this->getFolderData($folderId),
+            'data'     => $data,
         ]);
     }
 
@@ -395,7 +418,7 @@ abstract class AbstractController extends BaseController
         $data = [
             'title' => $file->getFilename(),
             'mimeType' => $file->getMime(),
-            'filesize' => $file->getSize()
+            'filesize' => $file->getSize(),
         ];
 
         $this->getResponse()->content->set(
@@ -418,13 +441,46 @@ abstract class AbstractController extends BaseController
             'files'  => $fileIds,
             'user'   => $this->getUser(),
             'access' => Access::getInstance()->getMinFolderAccess($this->getUser(), $folderIds),
-            'namespace' => $this->namespace
+            'namespace' => $this->namespace,
         ];
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/showMultiFileInfo.twig',
             'format'   => 'nochrome',
             'data'     => $data,
+        ]);
+    }
+
+
+    /**
+     * Post a whole set of new files into the folder.
+     *
+     * @api POST /resources/folder/:folderId/files
+     * @version 19.1
+     *
+     * @param int $folderId
+     */
+    public function postFiles($folderId): void
+    {
+        $folder  = $this->folderMapper->findById($folderId);
+        $factory = new Resource\Attachment\Collector\CollectorFactory($this->fileMapper);
+        $results = $factory->build($this->request->post->get('attachment'))->getAll();
+
+        /** @var Resource\AbstractFile[] $results */
+        foreach ($results as $file) {
+            // Do something with the file
+            // Different files have different attributes
+            $file
+                ->setOwner($this->getUser())
+                ->setFolder($folder)
+                ->setTitle($file->getStorage()->getFilename());
+        }
+        $this->fileMapper->save($results);
+
+        // Output something: I guess whatever the contents of the folder are now
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => $this->treeBuilder->buildChildNodes($folderId),
         ]);
     }
 

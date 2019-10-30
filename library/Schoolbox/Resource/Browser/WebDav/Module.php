@@ -12,7 +12,6 @@ namespace Schoolbox\Resource\Browser\WebDav;
 use Aura\Di\Container;
 use PortfolioWebDAV;
 use Schoolbox\Resource\Browser\AbstractModule;
-use Schoolbox\Resource\Browser\FullAccessController;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -74,7 +73,7 @@ class Module extends AbstractModule
      */
     protected function getControllerClass()
     {
-        return FullAccessController::class;
+        return Controller::class;
     }
 
 }

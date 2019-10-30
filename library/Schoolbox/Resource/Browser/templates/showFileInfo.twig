@@ -43,44 +43,45 @@ These are its args, which is given for you
         </li>
     {% endfor %}
 </ul>
-
+<div class="card small-12 column meta-preview">
+    {% if file.mimetype.isImage %}
+        <a data-plugin="preview" href="{{ send ~ file.id }}&width=1024&height=1024">
+            <img class="icon" src="{{ image ~ file.id }}&width=64&height=64" alt="{{ file.title }}" />
+        </a>
+    {% elseif file.mimetype.isAudio %}
+        <audio id="schoolbox_video_preview"
+               controls
+               preload="none"
+               width="100%">
+            <source src="/cms/sendVideo.php?type={{ type }}&id={{ file.id }}" type='audio/mp3'>
+        </audio>
+    {% elseif file.mimetype.isVideo %}
+        <video id="schoolbox_video_preview"
+               data-videocomponent
+               controls
+               preload="none"
+               poster="/cms/videoThumb.php?type={{ type }}&id={{ file.id }}&size=poster"
+               height="200"
+               width="100%">
+            <source src="/cms/sendVideo.php?type={{ type }}&id={{ file.id }}" type='video/mp4'>
+        </video>
+    {% else %}
+        <a href="{{ send ~ file.id }}" target="_blank">
+            <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" height="32" width="32"/>
+        </a>
+    {% endif %}
+    <h3>
+        <a href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a>
+        <span class="hint has-tip" data-reveal-id="modal-file-{{ file.id }}" title="View file information">?</span>
+    </h3>
+    {% if namespace == 'resourceBrowser' and file.description %}
+        <p class="meta">{{ file.description }}</p>
+    {% else %}
+        <p class="meta">{{ file.mimetype.description }}</p>
+    {% endif %}
+</div>
 <div class="row">
-    <div class="small-6 medium-4 column text-center meta-preview">
-        {% if file.mimetype.isImage %}
-            <a data-plugin="preview" href="{{ send ~ file.id }}&width=1024&height=1024">
-                <img class="icon" src="{{ image ~ file.id }}&width=256&height=256" alt="{{ file.title }}" />
-            </a>
-        {% elseif file.mimetype.isAudio %}
-            <audio id="schoolbox_video_preview"
-                   controls
-                   preload="none"
-                   width="100%">
-                <source src="/cms/sendVideo.php?type={{ type }}&id={{ file.id }}" type='audio/mp3'>
-            </audio>
-        {% elseif file.mimetype.isVideo %}
-            <video id="schoolbox_video_preview"
-                   data-videocomponent
-                   controls
-                   preload="none"
-                   poster="/cms/videoThumb.php?type={{ type }}&id={{ file.id }}&size=poster"
-                   height="200"
-                   width="100%">
-                <source src="/cms/sendVideo.php?type={{ type }}&id={{ file.id }}" type='video/mp4'>
-            </video>
-        {% else %}
-            <a href="{{ send ~ file.id }}" target="_blank">
-                <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" height="128" width="128"/>
-            </a>
-        {% endif %}
-    </div>
-    <div class="small-6 medium-8 column">
-        <h3><a href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a><span class="hint has-tip" data-reveal-id="modal-file-{{ file.id }}" title="View file information">?</span></h3>
-        {% if namespace == 'resourceBrowser' and file.description %}
-            <p>{{ file.description }}</p>
-        {% else %}
-            <p>{{ file.mimetype.description }}</p>
-        {% endif %}
-
+    <div class="small-12 column">
         {% set fileActionList %}
             <li><a class="icon-document" data-action="open" {% if type == 'sbfs' %} data-plugin="preview" {%  endif %} href="{{ send ~ file.id }}" target="_blank">Open</a></li>
             <li><a class="icon-download" data-action="download" href="{{ send ~ file.id }}&save=1">Download</a></li>
@@ -88,21 +89,14 @@ These are its args, which is given for you
                 <li><a class="icon-modify"   data-action="modify"   href="{{ modify ~ file.id }}?{{RETURN_URL}}">Modify</a></li>
                 <li><a class="icon-delete"   data-action="delete"   href="{{ delete ~ file.id }}">Delete</a></li>
             {% endif %}
-
         {% endset %}
 
         {% include '@resourceBrowser/actionBar.twig' with { id: 'file-actions', list: fileActionList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 4 } } %}
-
         <div class="reveal-modal" data-reveal id="modal-file-{{ file.id }}">
-
             <h2>{{ file.title }}</h2>
-
             {% include '@resourceBrowser/fileInfo/file.twig' %}
-
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-
         </div>
-
     </div>
 </div>
 <script type="text/javascript">
