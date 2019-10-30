@@ -149,7 +149,7 @@ class CsvImporter
             if ($capName === $capabilityName) {
                 // Parse out descriptor values
                 $descriptorNames  = array_slice($this->square[$i], 2);
-                $descriptorValues = array_slice($this->square[$i+1], 2);
+                $descriptorValues = $this->square[$i + 1] ? array_slice($this->square[$i + 1], 2) : null;
                 $descriptors      = [];
                 $indicatorInUse   = false;
                 foreach ($descriptorNames as $level => $descriptorName) {
