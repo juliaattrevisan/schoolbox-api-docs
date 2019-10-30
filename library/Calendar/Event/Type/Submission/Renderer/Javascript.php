@@ -101,6 +101,7 @@ class Javascript extends Base
         return [
             'eventId'   => $event->getEventId(),
             'time'      => $event->getTime(),
+            'title'     => $assessable->getTitle(),
             'detail'    => Scrub::html($event->getDetail()),
             'location'  => '',
             'eventType' => 'type' . $event->getType(),

@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
 use Calendar_Api_Composite;
@@ -113,6 +114,38 @@ class Controller extends Base
      */
     public function getEvents(): void
     {
+        $this->response->content->set($this->buildJsonOutput($this->buildEventOutput()));
+    }
+
+
+    /**
+     * Returns the grouped events for the assessment calendar, as a JSON feed.
+     *
+     * @api   GET /learning/assessment/calendar/events/grouped
+     * @since 19.1
+     *
+     * @throws MapperException      if somehow a mapper call couldn't create a model?
+     * @throws ApplicationException if start and end weren't both supplied as query string params
+     */
+    public function getGroupedEvents(): void
+    {
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                array_values(array_reduce($this->buildEventOutput(), [$this, 'groupEvents'], []))
+            )
+        );
+    }
+
+
+    /**
+     * Build a list of events to output.
+     *
+     * @return array
+     * @throws MapperException      if somehow a mapper call couldn't create a model?
+     * @throws ApplicationException if start and end weren't both supplied as query string params
+     */
+    private function buildEventOutput(): array
+    {
         $qsFilters      = $this->request->query->get('filters', []);
         $page           = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
         $codec          = $this->filterFactoryFactory->buildCodec();
@@ -175,7 +208,92 @@ class Controller extends Base
 
         // The API's renderAll returns a list of json-encoded events.
         // Decode them all, and then re-encode.
-        $output = array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON));
-        $this->response->content->set($this->buildJsonOutput($output));
+        return array_map(
+            static function ($v) {
+                return json_decode($v, true);
+            },
+            $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)
+        );
+    }
+
+
+    /**
+     * Reduce function for grouping all events by their resource.
+     *
+     * @param array|null $carry
+     * @param array      $event
+     * @return array
+     */
+    private function groupEvents(?array $carry, array $event): array
+    {
+        if (!isset($carry)) {
+            $carry = [];
+        }
+
+
+        // What's the event's resource?
+        $resourceId = null;
+        if (isset($event['data']['meta']['folderId'])) {
+            $resourceId = sprintf('folder-%d', $event['data']['meta']['folderId']);
+        } elseif (isset($event['data']['meta']['eventTypeId'])) {
+            $resourceId = sprintf('eventType-%d', $event['data']['meta']['eventTypeId']);
+        }
+
+
+        // Figure out the grouping for this event:
+        // it will be based on the resource ID and the event's start week
+        $grouping = null;
+        if ($resourceId) {
+            $start    = new Alaress_Date_Format(
+                $event['start'],
+                [Alaress_Date_Format::DATABASE_FORMAT, Alaress_Date_Format::DATABASE_DATE_FORMAT]
+            );
+            $start    = $start->startOfWeek();
+            $end      = (clone $start)->endOfWeek()->addDays(1);
+            $grouping = sprintf('%s-%d-%02d', $resourceId, $start->getYear(), $start->getUsingFormat('W'));
+
+            if (!isset($carry[$grouping])) {
+                $carry[$grouping]          = [
+                    'allDay'     => true,
+                    'editable'   => false,
+                    'draggable'  => false,
+                    'resourceId' => $resourceId,
+                    'title'      => 0,
+                    'start'      => $start->getDatabaseDate(),
+                    'end'        => $end->getDatabaseDate(),
+                    'data'       => [
+                        'placeholder' => true,
+                        'meta'        => [
+                            'folderId'      => $event['data']['meta']['folderId']    ?? null,
+                            'folderName'    => $event['data']['meta']['folderName']  ?? null,
+                            'eventTypeId'   => $event['data']['meta']['eventTypeId'] ?? null,
+                            'eventTypeName' => $event['data']['meta']['type']        ?? null,
+                        ],
+                        'subEvents' => [],
+                    ],
+                ];
+                $carry[$grouping]['title'] = 0;
+            }
+
+            $carry[$grouping]['title']++;
+
+            // Populate some fields of sub-event
+            $carry[$grouping]['data']['subEvents'][] = [
+                'title'  => $event['data']['meta']['title'] ?? $event['title'],
+                'type'   => $event['data']['meta']['workType'],
+                'start'  => $event['start'],
+                'end'    => $event['end'],
+                'allDay' => $event['allDay'],
+                'data'   => [
+                    'links'  => [
+                        'view' => $event['data']['custom']['moreDetailsLink']
+                            ?? $event['data']['links']['path']
+                            ?? null,
+                    ],
+                ],
+            ];
+        }
+
+        return $carry;
     }
 }

@@ -86,8 +86,6 @@ class Api implements Calendar_Api_EventType_Interface
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
-        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->user);
-
         $stack = new Collection();
         foreach ($assessments as $assessment) {
 
@@ -134,21 +132,6 @@ class Api implements Calendar_Api_EventType_Interface
 
         // Can't show an event if I don't know when to show it
         if (!$dueDate || $dueDate instanceof Alaress_Date_NullDate) {
-            return null;
-        }
-
-        // Not published yet?
-        // TODO remove this once the TemporalState filter is added
-        $publishDate = $assessment->getPublishAt();
-        if (!$publishDate
-            || $publishDate instanceof Alaress_Date_NullDate
-            || $publishDate->gt(Alaress_Date_Format::now())
-        ) {
-            return null;
-        }
-
-        // Current user doesn't have permission?
-        if (!$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
             return null;
         }
 

@@ -11,9 +11,11 @@
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
     import {stringify}        from 'qs';
     import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
+    import ViewGroupedEventsModal     from './view-grouped-events-modal';
 
     // Various URLs this calendar can make use of
     const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    const URL_ASSESSMENT_GROUPED_EVENT_SOURCE = '/learning/assessment/calendar/events/grouped';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
@@ -38,6 +40,7 @@
 
     export default {
         components: {
+            ViewGroupedEventsModal,
             ViewEventModal,
             FullCalendar,
             RevealModal,
@@ -64,6 +67,16 @@
                 defaultBgColour: '#0066b0',
                 maxDate: null,
                 minDate: null,
+                eventSources: {
+                    events: {
+                        id: 'events',
+                        events: this.events,
+                    },
+                    groupedEvents: {
+                        id: 'groupedEvents',
+                        events: this.groupedEvents,
+                    },
+                }
             }
         },
         computed: {
@@ -145,56 +158,14 @@
 
                 axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams).then(
                     function (response) {
-                        // Massage the data to inject placeholders
-                        let newResponse = [],
-                            eventGroupingCursor = ''
-
                         // Assign event grouping and resourceIds into every event
                         response.data = response.data.map(function(element) {
-                            // Consider not allowing events to be editable on this calendar?
-                            // element.editable = false;
-                            // element.data.meta.editable = false;
-                            // What is the resource ID?
-                            // It depends on whether the event has a folder.
                             element.resourceId = self.buildResourceIdFromEvent(element);
-                            if (element.resourceId) {
-                                element.data.meta.eventGrouping =
-                                    self.toMoment(element.start).format('YYYY')
-                                    + String(self.toMoment(element.start).isoWeek()).padStart(2, 0)
-                                    + element.resourceId;
-                            }
                             return element;
                         });
 
+                        // Add new resources
                         response.data.forEach(function(element) {
-                            // Create a place holder
-                            if (self.currentViewIsSemester() && eventGroupingCursor !== element.data.meta.eventGrouping) {
-
-                                let itemCountByGroup = response.data.filter(function(val) {
-                                    return val.data.meta.eventGrouping === element.data.meta.eventGrouping;
-                                }).length;
-
-                                newResponse.push({
-                                    allDay: true,
-                                    editable: false,
-                                    draggable: false,
-                                    resourceId: element.resourceId,
-                                    title: itemCountByGroup,
-                                    start: element.start,
-                                    end: null,
-                                    data: {
-                                        placeholder: true,
-                                        meta: {
-                                            folderId: element.data.meta.folderId,
-                                            folderName: element.data.meta.folderName,
-                                            eventGrouping: element.data.meta.eventGrouping,
-                                            weekNo: self.toMoment(element.start).isoWeek(),
-                                        }
-                                    },
-                                });
-                            }
-
-                            // Add new resource here too
                             if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
                                 self.folderResources.push({
                                     id:                   element.resourceId,
@@ -202,20 +173,72 @@
                                     eventBackgroundColor: element.data.meta.colour || self.defaultBgColour,
                                 });
                             }
-
-                            eventGroupingCursor = element.data.meta.eventGrouping;
-                            newResponse.push(element);
                         });
 
                         // Reload resources here too
                         self.$refs.fullCalendar.getApi().refetchResources();
 
                         // Filter out events which don't start
-                        successCallback(newResponse.filter(v => 'start' in v));
+                        successCallback(response.data.filter(v => 'start' in v));
                     }
                 );
                 // Fail callback: consider a message saying something failed
             },
+
+
+            groupedEvents(fetchInfo, successCallback) {
+
+                let self = this;
+
+                // No filters loaded yet? Render nothing.
+                // The selected filters get populated by `onFilterChange`:
+                // this is called by the filter's `filterContentLoaded` trigger.
+                if (self.selectedFilters === null) {
+                    successCallback([]);
+                    return;
+                }
+
+                // AJAX params: the same for all requests
+                let ajaxParams = {
+                    headers: {
+                        'X-Requested-With' : 'XMLHttpRequest'
+                    },
+                    params: {
+                        start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                        end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                        filters: self.selectedFilters,
+                    },
+                    paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                };
+
+                axios.get(URL_ASSESSMENT_GROUPED_EVENT_SOURCE, ajaxParams).then(
+                    function (response) {
+                        // Assign event grouping and resourceIds into every event
+                        response.data = response.data.map(function(element) {
+                            element.resourceId = self.buildResourceIdFromEvent(element);
+                            return element;
+                        });
+
+                        // Add new resources
+                        response.data.forEach(function(element) {
+                            if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                                self.folderResources.push({
+                                    id:                   element.resourceId,
+                                    title:                element.data.meta.folderName,
+                                    eventBackgroundColor: element.data.meta.colour || self.defaultBgColour,
+                                });
+                            }
+                        });
+
+                        // Reload resources here too
+                        self.$refs.fullCalendar.getApi().refetchResources();
+
+                        // Filter out events which don't start
+                        successCallback(response.data.filter(v => 'start' in v));
+                    }
+                );
+            },
+
 
             /**
              * Resource source.
@@ -280,96 +303,12 @@
              * @param eventInfo
              */
             onEventClick(eventInfo) {
-                var self = this;
-
-                if (!self.currentViewIsSemester() ||
-                    (self.currentViewIsSemester() && eventInfo.el.getAttribute('event-group-id-placeholder') === null)) {
-                    this.$refs.event.open(eventInfo.event);
+                this.currentEvent = eventInfo.event;
+                if (eventInfo.event.source.id === 'groupedEvents') {
+                    this.$refs.groupedEvents.open(eventInfo.event);
                 } else {
-                    this.renderPopOver(eventInfo);
-
-                    // Add event listener for our customised popover
-                    document.querySelector(".fc-close").addEventListener('click', function (element) {
-                        self.destroyPopOver();
-                    });
+                    this.$refs.event.open(eventInfo.event);
                 }
-            },
-
-            /**
-             * Custom method to render event popover for semester view
-             */
-            renderPopOver(eventInfo) {
-                this.destroyPopOver();
-
-                let popOver = document.getElementById('popOver'),
-                    popOverContent = '',
-                    popOverHeader = '',
-                    dateGroup = '',
-                    resources = eventInfo.event.getResources();
-
-                if (resources.length === 0) {
-                    return;
-                }
-
-                let resourceId = resources[0].id,
-                    eventGroupId = eventInfo.event.extendedProps.data.meta.eventGrouping,
-                    eventGroup = document.querySelectorAll("[event-group-id='"+ eventGroupId +"']"),
-                    resourceCol = document.querySelectorAll("[data-resource-id='"+ resourceId +"']"),
-                    popOverPlaceholder = document.querySelector('.fc-body .fc-time-area .fc-rows'),
-                    tmpEvent = [];
-
-                popOver = document.createElement('div');
-                popOver.setAttribute('id', 'popOver');
-                popOver.setAttribute('style', 'left:' + eventInfo.el.offsetLeft + 'px;top:' + resourceCol[0].offsetTop +'px;z-index:1000;padding:5px');
-                popOver.className = 'fc-popover fc-more-popover';
-
-                popOverHeader = '<div class="fc-header fc-widget-header">' +
-                    '<span class="fc-title">Week '+ eventInfo.event.extendedProps.data.meta.weekNo +'</span>' +
-                    '<span class="fc-close fc-icon fc-icon-x"></span></div>';
-
-                eventGroup.forEach(function(group, index) {
-                    var event = eventGroup[index];
-                        event.style.removeProperty('left');
-                        event.style.removeProperty('right');
-                        event.style.removeProperty('top');
-
-                    tmpEvent.push(event.outerHTML);
-                });
-
-                tmpEvent.forEach(function(event, index) {
-                    var tmpPopOverEvent = $(tmpEvent[index])[0],
-                        popOverContentDate = '';
-
-                    tmpPopOverEvent.classList.remove('hide', 'fc-draggable', 'fc-resizable');
-
-                    if (tmpPopOverEvent.getAttribute('event-group-date') !== dateGroup) {
-                        dateGroup = tmpPopOverEvent.getAttribute('event-group-date');
-                        popOverContentDate = '<p style="font-weight: bold; margin-bottom: 0">' + dateGroup + '</ p>';
-                    }
-
-                    popOverContent += popOverContentDate + '<div class="fc-timeline-event-div" style="padding-bottom:40px;display:flex">' + tmpPopOverEvent.outerHTML + '</div>';
-                });
-
-                popOver.innerHTML = popOverHeader + popOverContent;
-
-                popOverPlaceholder.insertBefore(popOver, popOverPlaceholder.firstChild);
-
-                this.registerSemViewEventClickListener();
-            },
-
-            /**
-             * Listen on popover event clicks with semester view
-             */
-            registerSemViewEventClickListener() {
-                var popOverEvents = document.querySelectorAll("#popOver .fc-timeline-event-div");
-
-                var openModal = function() {
-                    document.querySelectorAll('.fc-event-container [event-id="'+ this.firstChild.getAttribute("event-id") +'"]')[0].click();
-                };
-
-                popOverEvents.forEach(function(event, index) {
-                    popOverEvents[index].addEventListener('click', openModal, false);
-                });
             },
 
             /**
@@ -412,7 +351,10 @@
              * @param info
              */
             viewSkeletonRender(info) {
-                var self = this;
+                var self = this,
+                    api  = self.$refs.fullCalendar.getApi(),
+                    eventSource = api.getEventSourceById('events'),
+                    groupedEventSource = api.getEventSourceById('groupedEvents');
 
                 self.currentView = info.view.type;
 
@@ -421,6 +363,24 @@
                 if (self.currentViewIsSemester()) {
                     self.redrawWeekNumbers();
                     self.cleanupMonthHeaderInlineStyles();
+
+                    // Add grouped events source if it's not there:
+                    // remove standard source if it is
+                    if (eventSource) {
+                        eventSource.remove();
+                    }
+                    if (!groupedEventSource) {
+                        api.addEventSource(this.eventSources.groupedEvents);
+                    }
+                } else {
+                    // Add standard events source if it's not there:
+                    // remove grouped source if it is
+                    if (groupedEventSource) {
+                        groupedEventSource.remove();
+                    }
+                    if (!eventSource) {
+                        api.addEventSource(this.eventSources.events);
+                    }
                 }
 
                 self.maxDate = self.getMaxTermDate();
@@ -848,6 +808,20 @@
             reloadEvents() {
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
+
+            /**
+             * Go to the week view for a particular date.
+             *
+             * Listens to the "eventViewWeek" event from the grouped events
+             * modal.
+             *
+             * @param date
+             */
+            viewWeek(date) {
+                let api = this.$refs.fullCalendar.getApi();
+                api.gotoDate(date);
+                api.changeView('resourceTimelineWeek');
+            },
         }
     }
 </script>
@@ -867,6 +841,14 @@
                           :format-display-datetime="formats.displayDatetime"
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents"
+        />
+
+        <view-grouped-events-modal ref="groupedEvents"
+                                   :to-moment="toMoment"
+                                   :format-display-date="formats.displayDate"
+                                   :format-display-time="formats.displayTime"
+                                   :format-display-datetime="formats.displayDatetime"
+                                   @eventViewWeek="viewWeek"
         />
 
         <full-calendar
@@ -943,7 +925,6 @@
             }"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-render="eventRender"
-            :events="events"
             :resources="resources"
             :scheduler-license-key="config.schedulerLicenseKey"
             :first-day="1"
