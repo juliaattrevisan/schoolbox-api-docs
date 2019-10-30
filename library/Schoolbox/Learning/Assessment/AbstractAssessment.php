@@ -209,6 +209,7 @@ abstract class AbstractAssessment implements IAssessable
         $clone->setId(null);
         $clone->setSpecificationAssessment($this);
         $clone->setSequence(null);
+        $clone->setCreatedAt(null);
 
         // This should not inherit any of the spec assessment's participants.
         // (One wonders why spec assessments even have plans?)
