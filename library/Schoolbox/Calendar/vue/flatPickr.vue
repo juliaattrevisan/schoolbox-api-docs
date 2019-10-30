@@ -58,7 +58,3 @@
         top: 0;
     }
 </style>
-
-<style lang="scss">
-    @import '~flatpickr/dist/flatpickr.min.css';
-</style>

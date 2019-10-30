@@ -365,7 +365,7 @@
 }
 .flatpickr-current-month .flatpickr-monthDropdown-months {
   appearance: menulist;
-  background: transparent;
+  //background: transparent; Unfortunately, we need to do this from here as it conflicts with our styling in select fields
   border: none;
   border-radius: 0;
   box-sizing: border-box;
@@ -390,9 +390,12 @@
 .flatpickr-current-month .flatpickr-monthDropdown-months:active {
   outline: none;
 }
-.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
-  background: rgba(0,0,0,0.05);
-}
+
+// Conflicts with our styling in select fields as well
+//.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+//  background: rgba(0,0,0,0.05);
+//}
+
 .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
   background-color: transparent;
   outline: none;
