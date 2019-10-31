@@ -152,7 +152,6 @@ class Migration extends CliTool\App
 
         // File was found locally, but not in S3
         if (!$foundInS3 && !$this->moveFileToS3($filepath, $file)) {
-            $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
             return false;
         }
 
@@ -185,6 +184,7 @@ class Migration extends CliTool\App
      */
     private function moveFileToS3(string $filepath, Storage\Model $file): bool
     {
+        $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
         $fp = fopen($filepath, 'rb');
         if (!is_resource($fp)) {
             $this->getLogger()->error("Cannot open file for reading, skipping");
