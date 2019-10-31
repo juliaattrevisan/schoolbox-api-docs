@@ -195,7 +195,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
         $caseSensitiveFields = array(
             'StudentContactID',

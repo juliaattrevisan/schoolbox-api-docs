@@ -731,7 +731,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];

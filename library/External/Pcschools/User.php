@@ -87,7 +87,7 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
         [ $sql, $params ] = $this->queryHelper->getGetStudentContactListQuery($externalUserId);
 
@@ -473,7 +473,7 @@ class External_Pcschools_User implements External_UserInterface
             $period['SUB_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['SUBJECT_PD'];
         }
 
-        // Annoyingly the `time_period` gets retrieved by the PDO driver without the trailing zeros that are required. 
+        // Annoyingly the `time_period` gets retrieved by the PDO driver without the trailing zeros that are required.
         // The data type in MSSQL is defined as a DECIMAL (4,2) so to fudge around this I'm doing a number format
 
         $period['TIME_PERIOD'] = number_format((float)$period['TIME_PERIOD'], 2);
@@ -554,16 +554,16 @@ class External_Pcschools_User implements External_UserInterface
         $classArray =$this->getDatabase()->getAll($query, $params);
 
         foreach ($classArray as $class)
-        {   
+        {
             $code = $period['TIME_PERIOD']. '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
-            $classes[$code] = [ 
+            $classes[$code] = [
                 'code'       => $code,
                 'name'       => $class['DESC'],
                 'classType'  => '',
                 'campusCode' => $period['TIME_PERIOD'],
             ];
-        }   
-        
+        }
+
         return array_values($classes);
     }
 

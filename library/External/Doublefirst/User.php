@@ -675,7 +675,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
         $query =
             "

@@ -128,7 +128,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 	/**
 	 * @inheritDoc
 	 */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
 		$query = "
 			SELECT

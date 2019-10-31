@@ -214,7 +214,7 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
         /* students profile should provide all parents, but only show contact info if not in a split family
          */
