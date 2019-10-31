@@ -691,9 +691,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param int $id
      * @param bool $recurse
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>|Model[]
      */
-    public function findAllChildren($id, $recurse = false)
+    public function findAllChildren(int $id, bool $recurse = false): GenericCollection
     {
         $collection = $this->createCollection();
 
