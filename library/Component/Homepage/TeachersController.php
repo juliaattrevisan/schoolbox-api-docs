@@ -18,6 +18,8 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
      */
     public function renderTemplate($templateHandle)
     {
+        $user = $this->getUser();
+
         if (!parent::loadTemplate($templateHandle, 'teachers')) {
             return false;
         }
@@ -114,7 +116,30 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 $userMapper = \Schoolbox\UserMapper::getInstance();
                 $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
 
-                $listSyns = $externalClassHandler->getTeachers($this->getContext()->getCodeString());
+                // If the config flag is enabled:
+                // restrict students in this class to only seeing the teacher(s)
+                // of the class they are actually enrolled in.
+                $classCodeString    = $this->getContext()->getCodeString();
+                $classCodesRetained = [];
+                if ($user->getRole()->isStudent()
+                    && $this->getConfigMapper()->get('student_teacher_class_visibility')
+                ) {
+
+                    $classCodesRetained = [];
+                    $classCodesComplete = explode(",", $classCodeString);
+
+                    foreach ($user->getSubjectCollection() as $subjectCurrent) {
+                        if (in_array($subjectCurrent['code'], $classCodesComplete)) {
+                            $classCodesRetained[] = $subjectCurrent['code'];
+                        }
+                    }
+                }
+
+                $listSyns = $externalClassHandler->getTeachers(
+                    !empty($classCodesRetained)
+                        ? implode(',', $classCodesRetained)
+                        : $classCodeString
+                );
 
                 if (is_array($listSyns)) {
                     foreach ($listSyns as $synid) {
