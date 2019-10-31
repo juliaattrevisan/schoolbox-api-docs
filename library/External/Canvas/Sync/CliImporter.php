@@ -23,7 +23,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -292,7 +292,8 @@ class CliImporter extends CliTool\App
         $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
         /** @var Assessment\Mapper */
         $assessmentMapper = $mapperFactory->get(Assessment\Mapper::class);
-        $planMapper = $mapperFactory->get(Plan\Mapper::class);
+        $planMapper = $mapperFactory->get(Participant\Plan\Mapper::class);
+        $participantMapper = $mapperFactory->get(Participant\Mapper::class);
         /** @var Folder\Mapper */
         $folderMapper = $mapperFactory->get(Folder\Mapper::class);
         /** @var UserMapper */
@@ -315,6 +316,7 @@ class CliImporter extends CliTool\App
             $submissionBoxMapper,
             $assessmentMapper,
             $planMapper,
+            $participantMapper,
             $folderMapper,
             $userMapper,
             $courseImplMapper,

@@ -24,7 +24,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
-use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -87,7 +86,7 @@ class CourseSections
     /** @var Assessment\Mapper */
     private $assessmentMapper;
 
-    /** @var Plan\Mapper */
+    /** @var Participant\Plan\Mapper */
     private $participantPlanMapper;
 
     /** @var Participant\Mapper */
@@ -170,7 +169,8 @@ class CourseSections
      * @param UnitSpec\Mapper           $unitSpecMapper
      * @param SubmissionBoxMapper       $submissionBoxMapper
      * @param Assessment\Mapper         $assessmentMapper
-     * @param Plan\Mapper               $planMapper
+     * @param Participant\Plan\Mapper   $planMapper
+     * @param Participant\Mapper        $participantMapper
      * @param Folder\Mapper             $folderMapper
      * @param UserMapper                $userMapper
      * @param LoggerInterface           $log
@@ -191,7 +191,8 @@ class CourseSections
         UnitSpec\Mapper $unitSpecMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
-        Plan\Mapper $planMapper,
+        Participant\Plan\Mapper $planMapper,
+        Participant\Mapper $participantMapper,
         Folder\Mapper $folderMapper,
         UserMapper $userMapper,
         LoggerInterface $log,
@@ -212,7 +213,7 @@ class CourseSections
         $this->submissionBoxMapper      = $submissionBoxMapper;
         $this->assessmentMapper         = $assessmentMapper;
         $this->participantPlanMapper    = $planMapper;
-        $this->participantMapper        = Participant\Mapper::getInstance(); // TODO inject
+        $this->participantMapper        = $participantMapper;
         $this->folderMapper             = $folderMapper;
         $this->userMapper               = $userMapper;
         $this->log                      = $log;
@@ -444,7 +445,7 @@ class CourseSections
         /**
          * Indexed by plan.id
          *
-         * @var Plan\Model[] $plansSynchronised
+         * @var Participant\Plan\Model[] $plansSynchronised
          */
         $plansSynchronised = [];
 
@@ -1089,7 +1090,7 @@ class CourseSections
      * @param string|null   $allDayDate
      * @param string[]|null $participants Student's externalIds
      * @param int[]         $studentExternalIdUserIdMap
-     * @return Plan\Model
+     * @return Participant\Plan\Model
      * @throws Database\Exception
      * @throws InvalidColumnException
      * @throws Mapper\Exception
@@ -1106,7 +1107,7 @@ class CourseSections
         ?string $allDayDate,
         ?array $participants,
         array $studentExternalIdUserIdMap
-    ): Plan\Model {
+    ): Participant\Plan\Model {
         // Create a dynamic plan if assignment is for 'everyone'.
         // This will always have NULL fields to allow the assignment's details to flow through.
         $isEveryonePlan = $canvasId === null;
@@ -1198,13 +1199,13 @@ class CourseSections
      *
      * @param SubmissionBox $submissionBoxImpl
      * @param int           $overrideCanvasId
-     * @return Plan\Model|null
+     * @return Participant\Plan\Model|null
      * @throws Database\Exception
      * @throws InvalidColumnException
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
      */
-    private function findPlan(SubmissionBox $submissionBoxImpl, int $overrideCanvasId): ?Plan\Model
+    private function findPlan(SubmissionBox $submissionBoxImpl, int $overrideCanvasId): ?Participant\Plan\Model
     {
         $pb          = $this->assignmentOverrideBridge->equalsCanvasOverride(
             $overrideCanvasId,
@@ -1224,7 +1225,7 @@ class CourseSections
         if (!count($rows)) {
             return null;
         }
-        /** @var Plan\Model[] $plans */
+        /** @var Participant\Plan\Model[] $plans */
         $plans = [];
         foreach ($rows as $row) {
             $planId        = $row['pp.id'];
@@ -1262,7 +1263,7 @@ class CourseSections
      * @param string|null   $open
      * @param string|null   $due
      * @param string|null   $close
-     * @return Plan\Model
+     * @return Participant\Plan\Model
      * @throws Database\Exception
      * @throws UnexpectedValueException
      */
@@ -1274,8 +1275,8 @@ class CourseSections
         ?string $open,
         ?string $due,
         ?string $close
-    ): Plan\Model {
-        $plan = (new Plan\Model())
+    ): Participant\Plan\Model {
+        $plan = (new Participant\Plan\Model())
             ->setAssessment($submissionBoxImpl->getAssessmentModel())
             ->setName($planName)
             ->setIsDynamic($isDynamic)
