@@ -770,11 +770,11 @@ class External_Synergetic_User implements External_UserInterface
                                 Semester.FileSemester = a.FileSemester AND
                                 Semester.FileYear = a.FileYear AND
                                 Semester.SystemCurrentFlag = 1
-            WHERE           StudentID = :externalId AND
+            WHERE           StudentID IN ($externalUserId) AND
                             StudentContactType IN ({$contactTypes['placeholders']})
         ";
 
-        $statement = $this->getConnector()->executeQuery($query, array_merge($contactTypes['bindings'], ['externalId' => $externalUserId]));
+        $statement = $this->getConnector()->executeQuery($query, $contactTypes['bindings']);
         $contacts = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
         $contactReturn = [];
