@@ -4,6 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
@@ -11,15 +12,15 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress_Date_Format;
-use DateTime;
 use External_Ping;
 use External_Synergetic_ValidateExternalIdTrait;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
+use Exception;
 
 class Document extends Base implements IDocument
 {
@@ -33,8 +34,9 @@ class Document extends Base implements IDocument
      * Performs normal setup stuff, and also determines which schema to use
      * based on database version.
      *
-     * @param IConfigLoader    $config
+     * @param IConfigLoader   $config
      * @param null|IConnector $databaseExternal
+     * @throws Exception
      */
     public function __construct(IConfigLoader $config, ?IConnector $databaseExternal)
     {
@@ -47,8 +49,9 @@ class Document extends Base implements IDocument
      * What schema does the document integration use?
      *
      * @return string
+     * @throws Exception
      */
-    private function retrieveDocumentSchema()
+    private function retrieveDocumentSchema(): string
     {
         // TODO inject ping/diagnostic object
         $externalPing = new External_Ping();
@@ -63,7 +66,7 @@ class Document extends Base implements IDocument
     /**
      * @inheritdoc
      *
-     * @param User $student
+     * @param User  $student
      * @param array $classificationCode
      *
      * @return array
@@ -72,15 +75,174 @@ class Document extends Base implements IDocument
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
+        if (!$this->isExternalIdValid($student->getExternalId()) || !$student->getRole()->isStudent() || empty($classificationCodes)) {
+            return [];
+        }
+
+        // Add date filter (if we find a parseable date in the config)
+        $minimumDateString = $this->config->get('external_document_report_minimum_date');
+        $date              = empty($minimumDateString) ? null : new Alaress_Date_Format($minimumDateString, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+        // Find the documents for this user
+        // Reports archive table
+        $documentsArchive = $this->findDocumentsFromArchive($classificationCodes, $student->getExternalId(), null, $date);
+        // Documents tables
+        $documentsRef = $this->findDocumentsFromReference($classificationCodes, $student->getExternalId(), null, $date);
+        $documentsDoc = $this->findDocumentsFromDocTable($classificationCodes, $student->getExternalId(), null, $date);
+
+        // Get all documents for the student
+        $documentCollection = (new Collection($documentsArchive))
+            ->mergeUnique(new Collection($documentsRef))
+            ->mergeUnique(new Collection($documentsDoc))
+            ->map(
+                function (array $a) {
+                    $a["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($a["CreatedDate"]);
+                    return $a;
+                }
+            )->sortByCallback(function ($a, $b) {
+                /** @var Alaress_Date_Format $dateA */
+                $dateA = $a['CreatedDate'];
+                /** @var Alaress_Date_Format $dateB */
+                $dateB = $b['CreatedDate'];
+                return $dateA->lt($dateB);
+            });
+        return $documentCollection->getAll();
+    }
+
+    /**
+     * @param string $table
+     * @return bool
+     */
+    private function isTableAccessible(string $table): bool
+    {
+        try {
+            $this->databaseExternal->executeQuery("SELECT 1 FROM {$table}");
+            return true;
+        } catch (AlaressDatabaseException $e) {
+            // There was no access to the 'pvDocumentReferences' views. Fail silently without adding the SQL
+            // that references this table.
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param User   $student
+     * @param string $documentId
+     * @param string $source
+     * @param array  $classificationCodes
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes): array
+    {
+        // If the user does not have a valid external ID, or is not a student- return an empty collection
+
         if (!$this->isExternalIdValid($student->getExternalId()) || !$student->getRole()->isStudent()) {
             return [];
         }
 
-        // Otherwise attempt to find the documents for this user
+        // Add date filter (if we find a parseable date in the config)
+        $minimumDateString = $this->config->get('external_document_report_minimum_date');
+        $date              = empty($minimumDateString) ? null : new Alaress_Date_Format($minimumDateString, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
-        $query =
-            "
+        // Create query to get the document from the database
+        if ($source == 'tDocuments') {
+            $documents = $this->findDocumentsFromDocTable($classificationCodes, $student->getExternalId(), $documentId, $date);
+            if (empty($documents)) {
+                $documents = $this->findDocumentsFromReference($classificationCodes, $student->getExternalId(), $documentId, $date);
+            }
+        } elseif ($source == 'StudentReportsArchive') {
+            $documents = $this->findDocumentsFromArchive($classificationCodes, $student->getExternalId(), $documentId, $date);
+        }
+
+        if (!isset($documents) || count($documents) < 1) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
+        }
+
+        $row = $documents[0];
+        return [
+            'filename' => $row["filename"],
+            'filesize' => strlen($row["Document"]),
+            'blob'     => $row["Document"],
+        ];
+    }
+
+    /**
+     * Gets documents from tDocuments table
+     * @param array                    $classificationCodes
+     * @param string                   $externalId
+     * @param string|null              $documentSeq
+     * @param Alaress_Date_Format|null $date
+     * @return array
+     */
+    private function findDocumentsFromDocTable(array $classificationCodes, string $externalId, ?string $documentSeq, ?Alaress_Date_Format $date): array
+    {
+        // If there's any DocMan classifications entered into the config - union docman docs on
+        $cc      = PredicateBuilder::getArrayBindings($classificationCodes, 'cc');
+        $content = $documentSeq ? 'Document, ' : '';
+        $query   = "
+                SELECT  d.tDocumentsSeq AS ID,
+                        {$content}
+                        d.Description,
+                        CONCAT(d.Description,'.',d.DocumentType) as filename,
+                        YEAR(d.SourceDate) AS FileYear,
+                        CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
+                        'tDocuments' AS Source
+                FROM    {$this->schema}.tDocuments d
+                JOIN    {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
+                WHERE   dr.ID = :externalId
+                AND     d.ClassificationCode IN ({$cc['placeholders']})
+            ";
+
+        $params['externalId'] = $externalId;
+        $params               = array_merge($params, $cc['bindings']);
+
+        if ($documentSeq) {
+            $query                .= ' AND d.tDocumentsSeq = :documentId';
+            $params['documentId'] = $documentSeq;
+        }
+
+        if (null !== $date) {
+            $query              .= ' AND d.SourceDate >= :dateFrom ';
+            $params['dateFrom'] = $date->getDatabaseDate();
+        }
+        $documentsQuery = $this->databaseExternal->executeQuery($query, $params);
+        return $documentsQuery->fetchAll();
+    }
+
+    /**
+     * Gets documents from StudentReportsArchiveLink table
+     * @param array                    $classificationCodes
+     * @param string                   $externalId
+     * @param string|null              $documentSeq
+     * @param Alaress_Date_Format|null $date
+     * @return array
+     */
+    private function findDocumentsFromArchive(array $classificationCodes, string $externalId, ?string $documentSeq, ?Alaress_Date_Format $date)
+    {
+        // Get classification code for archive and check whether it's included in the classification codes
+        $includeArchive = false;
+        if ($this->isTableAccessible('luDocumentClassification')) {
+            $bindingsCC     = PredicateBuilder::getArrayBindings($classificationCodes, 'cc');
+            $queryCC        = "
+            SELECT  count(*) as result
+            FROM    luDocumentClassification
+            WHERE   SynergyMeaning = 'StudentReports'
+              AND   Code IN ({$bindingsCC['placeholders']})
+        ";
+            $includeArchive = $this->databaseExternal->executeQuery($queryCC, $bindingsCC['bindings'])->fetchColumn();
+        }
+        if (!$includeArchive) {
+            return [];
+        }
+
+        // If there's any DocMan classifications entered into the config - union docman docs on
+        $content = $documentSeq ? 'Document, ' : '';
+        $query   = "
             SELECT      sral.StudentReportsArchiveSeq as ID,
+                        {$content}
                         sral.Description,
                         CONCAT(sral.Description,'.PDF') as filename,
                         sral.FileYear,
@@ -89,80 +251,45 @@ class Document extends Base implements IDocument
             FROM        {$this->schema}.StudentReportsArchiveLink sral
             JOIN        {$this->schema}.StudentReportsArchive sra ON 
                         sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-            WHERE       ID = :id1
-        ";
+            WHERE       ID = :externalId
+            ";
 
-        $params = ['id1' => $student->getExternalId()];
+        $params['externalId'] = $externalId;
 
-        // Add date filter (if we find a parseable date in the config)
+        if ($documentSeq) {
+            $query                .= ' AND sra.StudentReportsArchiveSeq = :documentId';
+            $params['documentId'] = $documentSeq;
+        }
 
-        $minimumDateString = $this->config->get('external_document_report_minimum_date');
+        if (null !== $date) {
+            $query              .= ' AND sra.CreatedDate >= :dateFrom ';
+            $params['dateFrom'] = $date->getDatabaseDate();
+        }
+        $documentsQuery = $this->databaseExternal->executeQuery($query, $params);
+        return $documentsQuery->fetchAll();
+    }
 
-        $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+    /**
+     * Gets documents from pvDocumentReferences view
+     * @param                          $classificationCodes
+     * @param                          $externalId
+     * @param string|null              $documentSeq
+     * @param Alaress_Date_Format|null $date
+     * @return array
+     */
+    private function findDocumentsFromReference($classificationCodes, $externalId, ?string $documentSeq, ?Alaress_Date_Format $date)
+    {
 
-        if ($date !== false) {
-            $query .= ' AND sra.CreatedDate >= :date1';
-
-            $params = array_merge($params, [
-                'date1' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
-            ]);
+        if (!$this->isTableAccessible("{$this->schema}.pvDocumentReferences")) {
+            return [];
         }
 
         // If there's any DocMan classifications entered into the config - union docman docs on
-        $bindings = $this->buildBindingsForClassifications($classificationCodes);
-
-        if (count($bindings) > 0) {
-            $query .= "
-                UNION
-
-                SELECT  d.tDocumentsSeq AS ID,
-                        d.Description,
-                        CONCAT(d.Description,'.',d.DocumentType) as filename,
-                        YEAR(d.SourceDate) AS FileYear,
-                        CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
-                        'tDocuments' AS Source
-                FROM    {$this->schema}.tDocuments d
-                JOIN    {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
-                WHERE   dr.ID = :id2
-            ";
-
-            $params['id2'] = $student->getExternalId();
-
-            if ($date !== false) {
-                $query .= ' AND d.SourceDate >= :date2 ';
-
-                $params = array_merge($params, [
-                    'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                ]);
-            }
-
-            $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
-
-            $params = array_merge(
-                $params,
-                array_map(
-                    'trim',
-                    $bindings['bindings']
-                )
-            );
-
-            try {
-                // Check if we have permission to the `pvDocumentReferences` view. This will fail into the exception
-                // block and stop us from adding the query and breaking the feature if permission to this table is
-                // not available.
-
-                // TODO: Remove external query to check for access once all schools have added the appropriate permission
-
-                $this->databaseExternal->executeQuery("SELECT 1 FROM {$this->schema}.pvDocumentReferences");
-
-                // If that query worked we can assume they have updated their DB permissions and use this extra source
-
-                $bindings = $this->buildBindingsForClassifications($classificationCodes, 'pvd');
-
-                $query .= "
-                    UNION
-                    
+        $cc      = PredicateBuilder::getArrayBindings($classificationCodes, 'cc');
+        $content = $documentSeq ? 'Document, ' : '';
+        $query   = "
                     SELECT      d.tDocumentsSeq AS ID,
+                                {$content}
                                 d.Description,
                                 CONCAT(d.Description,'.',d.DocumentType) as filename,
                                 YEAR(d.SourceDate) AS FileYear,
@@ -170,225 +297,23 @@ class Document extends Base implements IDocument
                                 'tDocuments' AS Source
                     FROM        {$this->schema}.pvDocumentReferences dr
                     INNER JOIN  {$this->schema}.tDocuments d ON d.tDocumentsSeq = dr.tDocumentsSeq
-                    WHERE       dr.ID = :id3
-                ";
+                    WHERE       dr.ID = :externalId
+                    AND         d.ClassificationCode IN ({$cc['placeholders']})
+            ";
 
-                $params['id3'] = $student->getExternalId();
+        $params['externalId'] = $externalId;
+        $params               = array_merge($params, $cc['bindings']);
 
-                if ($date !== false) {
-                    $query .= ' AND d.SourceDate >= :date3 ';
-
-                    $params = array_merge($params, [
-                        'date3' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                    ]);
-                }
-
-                $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
-
-                $params = array_merge(
-                    $params,
-                    array_map(
-                        'trim',
-                        $bindings['bindings']
-                    )
-                );
-            } catch (AlaressDatabaseException $e) {
-                // There was no access to the 'pvDocumentReferences' views. Fail silently without adding the SQL
-                // that references this table.
-            }
+        if ($documentSeq) {
+            $query                .= ' AND d.tDocumentsSeq = :documentId';
+            $params['documentId'] = $documentSeq;
         }
 
-        $query .= "
-            ORDER BY FileYear DESC, CreatedDate DESC
-        ";
-
-        // Get all documents for the student
-
+        if (null !== $date) {
+            $query              .= ' AND d.SourceDate >= :dateFrom ';
+            $params['dateFrom'] = $date->getDatabaseDate();
+        }
         $documentsQuery = $this->databaseExternal->executeQuery($query, $params);
-        $documents = $documentsQuery->fetchAll();
-
-        $documentsUnique = [];
-
-        foreach ($documents as &$document) {
-            if (!isset($documentsUnique["{$document["Source"]}.{$document["ID"]}"])) {
-                $document["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"]);
-                $documentsUnique["{$document["Source"]}.{$document["ID"]}"] = $document;
-            }
-        }
-
-        return $documentsUnique;
-    }
-
-    /**
-     *
-     * @param User   $student
-     * @param string $documentId
-     * @param string $source
-     * @param array $classificationCodes
-     *
-     * @return array
-     * @throws SchoolboxException
-     */
-    public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes)
-    {
-        // If the user does not have a valid external ID, or is not a student- return an empty collection
-
-        if (!$this->isExternalIdValid($student->getExternalId()) || !$student->getRole()->isStudent()) {
-            return [];
-        }
-
-        $params = [
-            'id'         => $student->getExternalId(),
-            'documentId' => $documentId,
-        ];
-
-        // Create query to get the document from the database
-
-        if ($source == 'tDocuments') {
-            $bindings = $this->buildBindingsForClassifications($classificationCodes);
-
-            // If there's no classifications in config - error out because they shouldn't be getting anything
-            // from DocMan
-            if (empty($bindings)) {
-                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
-            }
-
-            // Loading from generic DocMan table
-
-            $query = "
-                SELECT    Document,
-                          CONCAT(Description,'.',DocumentType) as filename,
-                          Description
-                FROM      {$this->schema}.tDocuments d
-                JOIN      {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
-                WHERE     dr.ID = :id
-                AND       d.tDocumentsSeq = :documentId
-            ";
-
-
-            try {
-                // Check if we have permission to the `pvDocumentReferences` view. This will fail into the exception
-                // block and stop us from adding the query and breaking the feature if permission to this table is
-                // not available.
-
-                // TODO: Remove external query to check for access once all schools have added the appropriate permission
-
-                $this->databaseExternal->executeQuery("SELECT 1 FROM {$this->schema}.pvDocumentReferences");
-
-                // If that query worked we can assume they have updated their DB permissions and use this extra source
-
-                $bindings = $this->buildBindingsForClassifications($classificationCodes, 'pvd');
-
-                $query = "
-                    
-                    SELECT      d.Document,
-                                CONCAT(d.Description,'.',d.DocumentType) as filename,
-                                d.Description
-                    FROM        {$this->schema}.pvDocumentReferences dr
-                    INNER JOIN  {$this->schema}.tDocuments d ON d.tDocumentsSeq = dr.tDocumentsSeq
-                    WHERE       dr.ID = :id
-                    AND         d.tDocumentsSeq = :documentId
-                ";
-
-            } catch (AlaressDatabaseException $e) {
-                // There was no access to the 'pvDocumentReferences' views. Fail silently without adding the SQL
-                // that references this table.
-            }
-
-
-            // Add date filter (if we find a parseable date in the config)
-
-            $minimumDateString = $this->config->get('external_document_report_minimum_date');
-
-            $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
-
-            if ($date !== false) {
-                $query .= ' AND d.SourceDate >= :date';
-
-                $params = array_merge($params, [
-                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                ]);
-            }
-
-            // Check this document is in one of the classifications in config
-
-            $query .= " AND d.ClassificationCode IN ({$bindings['placeholders']})";
-
-            $params = array_merge(
-                $params,
-                array_map(
-                    'trim',
-                    $bindings['bindings']
-                )
-            );
-        } elseif ($source == 'StudentReportsArchive') {
-            // Loading from school reports archive table
-
-            $query = "
-                SELECT    Document,
-                          CONCAT(Description,'.PDF') AS filename,
-                          Description
-                FROM      {$this->schema}.StudentReportsArchive sra
-                JOIN      {$this->schema}.StudentReportsArchiveLink sral ON 
-                          sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-                WHERE     ID = :id
-                AND       sra.StudentReportsArchiveSeq = :documentId
-            ";
-
-            // Add date filter (if we find a parseable date in the config)
-
-            $minimumDateString = $this->config->get('external_document_report_minimum_date');
-
-            $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
-
-            if ($date !== false) {
-                $query .= ' AND sra.CreatedDate >= :date ';
-
-                $params = array_merge($params, [
-                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                ]);
-            }
-        } else {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
-        }
-
-        // Get the document from the database
-
-        $result = $this->databaseExternal->executeQuery($query, $params);
-
-        if ($row = $result->fetch()) {
-            // If we found a database record, return an array with the details necessary for downloading using
-            // the historical code
-
-            return [
-                'filename' => $row["filename"],
-                'filesize' => strlen($row["Document"]),
-                'blob'     => $row["Document"],
-            ];
-        }
-
-        // If we got here the document could not be located in the database
-
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
-    }
-
-    /**
-     * Builds placeholders and bindings for document classifications.
-     *
-     * @param array $classificationCodes
-     * @param string $suffix Suffix for bindings
-     *
-     * @return array Empty if there's no document classifications.
-     *               Otherwise:
-     *               bindings:     the parameters to bind to a query
-     *               placeholders: the IN part of a query
-     */
-    private function buildBindingsForClassifications(array $classificationCodes, string $suffix = ''): array
-    {
-        if (count($classificationCodes) > 0) {
-            return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode' . $suffix);
-        }
-
-        return [];
+        return $documentsQuery->fetchAll();
     }
 }
