@@ -29,12 +29,16 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      */
     const TYPE_NAME = 'members';
 
+    /** @var External_UserInterface $externalUser */
+    private $externalUser;
 
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
-     * @return boolean
+     * @return bool
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function renderTemplate($templateHandle)
     {
@@ -160,11 +164,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $emailall = [];
 
             $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
-            $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
-            $viewer = $this->getUser();
-
-            $isParent = $_SESSION['user']->getRole()->isParent();
+            $studentPhotoHidden   = $this->getConfigMapper()->get('protect_student_photo');
             $restrictParentEmails = $this->getConfigMapper()->get('restrict_parent_emails');
+            $reportStaffAccess    = $this->getConfigMapper()->get('report_staff_access');
+            $viewer = $this->getUser();
 
             if ($userListCount > 0) {
                 $i = 0;
@@ -172,10 +175,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                     /* Member bulk email
                      */
-                    if ($user->getEmail()) {
-                        if ($restrictParentEmails && $isParent && $user->getRole()->isParent()){
-                            continue;
-                        }
+                    if ($user->getEmail() && $this->isEmailVisible($user, $viewer, $restrictParentEmails, $reportStaffAccess)) {
                         $emailall[] = Scrub::text($user->getFormattedEmailDisplay());
                     }
 
@@ -264,5 +264,63 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         }
 
         return true; // everything went according to plan
+    }
+
+    /**
+     * Checks email visibility
+     * @param \Schoolbox\User $viewee
+     * @param \Schoolbox\User $viewer
+     * @param bool            $restrictParentEmails
+     * @param bool            $reportStaffAccess
+     * @return bool
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function isEmailVisible(Schoolbox\User $viewee, Schoolbox\User $viewer, bool $restrictParentEmails, bool $reportStaffAccess)
+    {
+        // Super user and Staff can see all users' email address
+        if ($viewer->isSuperuser() || $viewer->getRole()->isStaff()) {
+            return true;
+        }
+
+        // Student can never see parents' email address
+        if ($viewer->getRole()->isStudent()) {
+            return !$viewee->getRole()->isParent();
+        }
+
+        // Current user is a parent
+        // a parent viewing a staff
+        if ($viewee->getRole()->isStaff()) {
+            return $reportStaffAccess;
+        }
+
+        // a parent viewing a student
+        if ($viewee->getRole()->isStudent()) {
+            // viewee is  viewer's enrolled student
+            $externalChildren = $this->getExternalUser()->getEnrolledStudents($viewer->getExternalId());
+            return in_array($viewee->getExternalId(), array_column($externalChildren, 'RelatedID'));
+        }
+
+        // a parent viewing a parent
+        if ($viewee->getRole()->isParent()) {
+            // 'restrict_parent_emails' config is off and viewer's SIS contact flag is on (externalUser.DirectoryIncludeFlag)
+            if ($restrictParentEmails) {
+                return false;
+            }
+            $exParent = $this->getExternalUser()->getParent($viewee->getExternalId());
+            return $exParent && $exParent['DirectoryIncludeFlag'];
+        }
+    }
+
+    /**
+     * Gets external user interface
+     * @return External_UserInterface
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function getExternalUser(): External_UserInterface
+    {
+        if (!$this->externalUser) {
+            $this->externalUser = $this->getSitePage()->getDi()->get('externalUser');
+        }
+        return $this->externalUser;
     }
 }
