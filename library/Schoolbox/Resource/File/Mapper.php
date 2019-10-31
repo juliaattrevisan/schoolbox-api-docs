@@ -60,6 +60,32 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
     }
 
     /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        $hashJoin = $this->getJoinMapper('hash');
+
+        $table = $this->getTable();
+
+        // much join.
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('hash', 'h')},
+                   {$hashJoin->getJoinColumnString('allowedFileExtension', 'm')},
+                   {$this->getJoinColumnString('owner', 'u')},
+                   {$this->getJoinColumnString('modified_by', 'um')},
+                   {$this->getJoinColumnString($this->getFolderFieldname(), 'c')}
+            FROM `$table`
+            LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
+            LEFT JOIN {$hashJoin->getJoinSql('allowedFileExtension', 'h', 'm', true)}
+            LEFT JOIN {$this->getJoinSql('owner', $table, 'u', true)}
+            LEFT JOIN {$this->getJoinSql('modified_by', $table, 'um', true)}
+            {$this->getFolderJoin()} {$this->getJoinSql($this->getFolderFieldname(), $table, 'c', true)}
+        ";
+    }
+
+    /**
      * Port of handler method `File->getAllInCategory()`.
      *
      * @param array  $folderIds
@@ -86,21 +112,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         }
         // much join many wow
         $table     = $this->getTable();
-        $baseQuery = "
-            SELECT
-                {$this->getColumnString()},
-                {$this->getJoinColumnString('hash', 'h')},
-                {$this->getJoinColumnString('hash.allowedFileExtension', 'm')},
-                {$this->getJoinColumnString('owner', 'u')},
-                {$this->getJoinColumnString('modified_by', 'um')},
-                {$this->getJoinColumnString($this->getFolderFieldname(), 'c')}
-            FROM {$table}
-            LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
-            LEFT JOIN {$this->getJoinSql('hash.allowedFileExtension', 'h', 'm', true)}
-            LEFT JOIN {$this->getJoinSql('owner', $table, 'u', true)}
-            LEFT JOIN {$this->getJoinSql('modified_by', $table, 'um', true)}
-            LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
-        ";
+        $baseQuery = $this->getSelectString();
 
         // Slam together a queery
         $whereParts  = [
