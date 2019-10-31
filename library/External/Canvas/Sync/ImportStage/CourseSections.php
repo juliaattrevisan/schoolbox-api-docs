@@ -179,6 +179,7 @@ class CourseSections
      * @param Bridge\CourseGroup        $courseGroupBridge
      * @param Bridge\CourseSection      $courseSectionBridge
      * @param Bridge\CourseSectionDates $courseSectionDatesBridge
+     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
      */
     public function __construct(
         IConnector $canvasDb,
@@ -200,7 +201,8 @@ class CourseSections
         Bridge\Course $courseBridge,
         Bridge\CourseGroup $courseGroupBridge,
         Bridge\CourseSection $courseSectionBridge,
-        Bridge\CourseSectionDates $courseSectionDatesBridge
+        Bridge\CourseSectionDates $courseSectionDatesBridge,
+        Bridge\AssignmentOverride $assignmentOverrideBridge
     ) {
         $this->canvasDb                 = $canvasDb;
         $this->schoolboxDb              = $schoolboxDb;
@@ -222,7 +224,7 @@ class CourseSections
         $this->courseGroupBridge        = $courseGroupBridge;
         $this->courseSectionBridge      = $courseSectionBridge;
         $this->courseSectionDatesBridge = $courseSectionDatesBridge;
-        $this->assignmentOverrideBridge = new Bridge\AssignmentOverride($this->schoolboxDb); // TODO inject
+        $this->assignmentOverrideBridge = $assignmentOverrideBridge;
     }
 
 

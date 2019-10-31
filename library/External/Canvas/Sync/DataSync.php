@@ -234,7 +234,8 @@ class DataSync
             $courseBridge,
             $courseGroupBridge,
             $sectionBridge,
-            new Bridge\CourseSectionDates()
+            new Bridge\CourseSectionDates(),
+            new Bridge\AssignmentOverride($this->schoolboxDb)
         ))->synchronise();
 
         if (!$this->persist) {
