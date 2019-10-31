@@ -415,6 +415,7 @@
                     let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
                     if (this.allTerms[termIndex-1]) {
                         api.gotoDate(this.allTerms[termIndex-1].start);
+                        this.redrawWeekNumbers();
                     }
                 } else {
                     api.prev();
