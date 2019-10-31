@@ -35,7 +35,11 @@ use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
 use UnderflowException;
 use UnexpectedValueException;
+use function fclose;
+use function file_exists;
 use function floor;
+use function fopen;
+use function fwrite;
 use function json_decode;
 use function memory_get_peak_usage;
 use function microtime;
@@ -201,10 +205,8 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        if ($this->perform()) {
-            $this->storeTempFile($dumpResponse, $dumpFile);
-            $this->storeTempFile($schemaResponse, $schemaFile);
-        }
+        $this->storeTempFile($dumpResponse, $dumpFile);
+        $this->storeTempFile($schemaResponse, $schemaFile);
 
         // Download data files
         $this->getLogger()->notice('Downloading latest data.');
@@ -365,12 +367,13 @@ class CliImporter extends CliTool\App
                 continue;
             }
             $tableFile     = $tableData['files'][0];
-            $tableDataFile = fopen($this->perform() ? "$tempDir/$tableName.gz" : '/dev/null', 'wb');
+            $fileName      = "$tempDir/$tableName.gz";
+            $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName  : '/dev/null', 'wb');
             try {
-                $this->getLogger()->debug("Downloading $tableName to $tempDir/$tableName.gz.");
+                $this->getLogger()->debug("Downloading $tableName to $fileName");
                 $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
             } catch (GuzzleException $e) {
-                $this->getLogger()->warning("Failed to download $tempDir/$tableName.gz: {$e->getMessage()}");
+                $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
             }
         }
     }
@@ -379,15 +382,19 @@ class CliImporter extends CliTool\App
     /**
      * Stores response to a file
      *
+     * Will only overwrite a previously saved file if tool running in 'perform' mode
+     *
      * @param string $response
      * @param string $path
      */
     public function storeTempFile(string $response, string $path): void
     {
         $this->getLogger()->debug("Saving temp file to path '$path'");
-        $fp = fopen($path, 'wb');
-        fwrite($fp, $response);
-        fclose($fp);
+        if ($this->perform() || !file_exists($path)) {
+            $fp = fopen($path, 'wb');
+            fwrite($fp, $response);
+            fclose($fp);
+        }
     }
 
 
