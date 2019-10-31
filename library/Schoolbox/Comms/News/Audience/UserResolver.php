@@ -120,8 +120,7 @@ class UserResolver implements IUserResolver
                 try {
                     $folder = $this->folderMapper->findCheaplyById($entityValue);
                     if ($folder->getInherit()) {
-                        $folder = $this->folderMapper->findNearestNonInheritingAncestralNode($folder);
-                        $entityValue = $folder->getId();
+                        $entityValue = (string)$this->folderMapper->findNearestNonInheritingAncestralNode($folder)->getId();
                     }
                 } catch (Exception $e) {
                     return [];
