@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -19,6 +19,7 @@ use Schoolbox;
  */
 abstract class AbstractFolderMapper extends Schoolbox\Mapper
 {
+    public const COL_PARENT = 'parent';
 
     /**
      * Setup method. Implementing classes to define their SQL map here.
@@ -32,4 +33,4 @@ abstract class AbstractFolderMapper extends Schoolbox\Mapper
         $this->joins('parent', static::class, 'id');
     }
 
-} 
+}
