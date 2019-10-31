@@ -1596,7 +1596,7 @@ class CourseSections
             ->setPublishDate(Alaress_Date_Format::newDatabaseDate($publishDate))
             ->setOpenDate(Alaress_Date_Format::newDatabaseDate($openDate))
             ->setDueDate(Alaress_Date_Format::newDatabaseDate($dueDate))
-            ->setPlans(Plan\Model::createCollection())
+            ->setPlans(Participant\Plan\Model::createCollection())
             ->setCloseDate(Alaress_Date_Format::newDatabaseDate($closeDate))
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
