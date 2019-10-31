@@ -12,24 +12,33 @@ use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem;
+use Monolog\Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage;
 use function array_filter;
 use function basename;
 use function chunk_split;
+use function closedir;
 use function count;
+use function dirname;
 use function explode;
 use function fclose;
 use function file_exists;
 use function filesize;
 use function fopen;
 use function get_class;
+use function is_dir;
 use function is_resource;
+use function opendir;
+use function readdir;
 use function rmdir;
+use function shell_exec;
 use function sprintf;
 use function str_replace;
+use function strpos;
 use function unlink;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Migrates all files from local configured 'storage_dir' to AWS S3
@@ -50,13 +59,24 @@ class Migration extends CliTool\App
     /** @var Alaress_Byte_Format */
     private $byteFormat;
 
+    /** @var int */
+    private $countStorageFilesUploaded;
 
+    /** @var int */
+    private $countTranscodeFilesUploaded;
+
+    /** @var int */
+    private $countBytesUploaded;
+
+
+    /** @inheritDoc */
     public function getShortOpts(): array
     {
         return ['h'];
     }
 
 
+    /** @inheritDoc */
     public function getLongOpts(): array
     {
         return ['help'];
@@ -107,21 +127,57 @@ class Migration extends CliTool\App
      */
     private function migrateFiles(): void
     {
-        $count = $countUploaded = 0;
+        // Reset counts for logging
+        $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = 0;
+        $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
 
-        // Retrieve and iterate all files from the database
+        // Retrieve and iterate all files referenced by `storage` table in database
         $files    = $this->storageMapper->findAll();
         $countAll = $files->count();
         foreach ($files as $file) {
             $count++;
             $this->getLogger()->notice("Checking file $count/$countAll  {$file->getHash()}, '{$file->getBasename()}'");
             if ($this->migrateFile($file)) {
-                $countUploaded++;
+                $countFilesInS3++;
             }
         }
 
-        $this->getLogger()->notice(sprintf("Files in S3:     %d", $countUploaded));
-        $this->getLogger()->notice(sprintf("Files not in S3: %d", $countAll - $countUploaded));
+        if ($this->perform()) {
+            $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
+        } else {
+            $storageAfterTransfer = $storageBeforeTransfer - $this->countBytesUploaded;
+        }
+        $this->getLogger()->notice(sprintf("Files in storage table:     %d", $countAll));
+        $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
+        $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
+        $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
+        $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
+        $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
+        $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
+        $countNotInS3 = $countAll - $countFilesInS3;
+        $level        = $countNotInS3 ? Logger::WARNING : Logger::NOTICE;
+        $this->getLogger()->log($level, sprintf("Storage files not in S3:    %d", $countNotInS3));
+
+        if ($this->perform()) {
+            $remainingFiles = explode(PHP_EOL, shell_exec("find {$this->storageDir} -type f") ?? '');
+            $level = count($remainingFiles) ? Logger::WARNING : Logger::NOTICE;
+            $this->getLogger()->log($level, sprintf("Files in local storage dir: %d", count($remainingFiles)));
+            foreach ($remainingFiles as $remainingFile) {
+                $this->getLogger()->debug($remainingFile);
+            }
+        }
+    }
+
+
+    /**
+     * Returns a directory's size in bytes
+     *
+     * @param string $dirName
+     * @return int
+     */
+    private function getDirectorySize(string $dirName): int
+    {
+        return (int)shell_exec("du -s -B 1 {$dirName} | cut -f 1");
     }
 
 
@@ -140,51 +196,42 @@ class Migration extends CliTool\App
         // Does file already exist in S3?
         $foundInS3 = $file->exists();
 
+        // Handle each of four possible scenarios re: file's presence on local and S3 filesystems:
         if (!$foundLocally) {
             if (!$foundInS3) {
                 $this->getLogger()->warning("File not found locally or in S3, skipping");
-                return false;
+            } else {
+                $this->getLogger()->info("File not found locally but exists in S3, skipping");
             }
-            $this->getLogger()->info("File not found locally but exists in S3, skipping");
-            return true;
-        }
-
-
-        // File was found locally, but not in S3
-        if (!$foundInS3 && !$this->moveFileToS3($filepath, $file)) {
-            return false;
-        }
-
-        if ($foundLocally && $this->perform()) {
-            $this->getLogger()->info("File in S3, deleting local file '$filepath'");
-            unlink($filepath);
-            // Recursively delete empty folders we might have created since deleting the file
-            $directoryArray = array_filter(explode("/", chunk_split(basename($filepath), 5, '/')));
-            $filepath       = str_replace("/" . basename($filepath), "", $filepath);
-            for ($i = count($directoryArray) - 1; $i >= 0; $i--) {
-                if (!$this->isDirectoryEmpty($filepath)) {
-                    break;
-                }
-                $this->getLogger()->debug("Removing directory '$filepath'");
-                rmdir($filepath);
-                $filepath = str_replace("/" . $directoryArray[$i], "", $filepath);
+        } elseif (!$foundInS3) {
+            $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
+            if ($this->moveFileToS3($filepath, $file)) {
+                $foundInS3 = true;
+                $this->countStorageFilesUploaded++;
+            }
+        } else {
+            $this->getLogger()->info("File both on local disk and in S3, deleting local copy");
+            if ($this->perform()) {
+                unlink($filepath);
             }
         }
 
-        return true;
+        $this->moveTranscodeFilesToS3($filepath);
+        $this->deleteEmptyDirectoryAncestors($filepath);
+
+        return $foundInS3;
     }
 
 
     /**
-     * Moves file from local to S3 filesystem
+     * Moves file from local to S3 filesystem, deleting local copy
      *
-     * @param string        $filepath
-     * @param Storage\Model $file
+     * @param string         $filepath
+     * @param Flysystem\File $file
      * @return bool Whether the move was successful
      */
-    private function moveFileToS3(string $filepath, Storage\Model $file): bool
+    private function moveFileToS3(string $filepath, Flysystem\File $file): bool
     {
-        $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
         $fp = fopen($filepath, 'rb');
         if (!is_resource($fp)) {
             $this->getLogger()->error("Cannot open file for reading, skipping");
@@ -192,11 +239,83 @@ class Migration extends CliTool\App
         }
 
         if ($this->perform()) {
-            $file->writeStream($fp);
+            $writeSucceeded = $file->writeStream($fp);
+        } else {
+            $writeSucceeded = true;
         }
         fclose($fp);
-        $this->getLogger()->debug("Upload Completed");
+
+        if ($writeSucceeded) {
+            $this->getLogger()->debug("Upload completed");
+            $this->countBytesUploaded += filesize($filepath);
+        } else {
+            $this->getLogger()->warning("Upload failed");
+            return false;
+        }
+
+        $this->getLogger()->debug("Deleting local file '$filepath'");
+        if ($this->perform()) {
+            unlink($filepath);
+        }
+
         return true;
+    }
+
+
+    /**
+     * Find an upload any adjacent transcode files
+     *
+     * @param string $filepath
+     */
+    private function moveTranscodeFilesToS3(string $filepath): void
+    {
+        $fileName = basename($filepath);
+        $dirName  = dirname($filepath);
+        if (!is_dir($dirName)) {
+            // If file already in S3, then directoy may not exist locally any more.
+            return;
+        }
+        $handle = opendir($dirName);
+        while (false !== ($entry = readdir($handle))) {
+            if ($entry === "." || $entry === "..") {
+                // Ignore these
+                continue;
+            }
+            if (strpos($entry, "{$fileName}-") !== 0) {
+                // Not a transcode of the current file, ignore
+                continue;
+            }
+            $this->getLogger()->info("Transcode file '$entry' found, uploading...");
+            $transcodeFilePath = $dirName . DIRECTORY_SEPARATOR . $entry;
+            $transcodeFile     = new Flysystem\File($this->storageMapper->getManager()->getFilesystem(Storage\Manager::FS_STORAGE), $transcodeFilePath);
+            if ($this->moveFileToS3($transcodeFilePath, $transcodeFile)) {
+                $this->countTranscodeFilesUploaded++;
+            }
+        }
+        closedir($handle);
+    }
+
+
+    private function deleteEmptyDirectoryAncestors(string $filepath): void
+    {
+        if (!$this->perform()) {
+            return;
+        }
+
+        // Recursively delete empty folders we might have created since deleting the file
+        $directoryArray = array_filter(explode("/", chunk_split(basename($filepath), 5, '/')));
+        $filepath       = str_replace("/" . basename($filepath), "", $filepath);
+        for ($i = count($directoryArray) - 1; $i >= 0; $i--) {
+            if (!is_dir($filepath)) {
+                continue;
+            }
+            if (!$this->isDirectoryEmpty($filepath)) {
+                break;
+            }
+            $this->getLogger()->debug("Removing directory '$filepath'");
+            rmdir($filepath);
+            $filepath = str_replace("/" . $directoryArray[$i], "", $filepath);
+        }
     }
 
 
