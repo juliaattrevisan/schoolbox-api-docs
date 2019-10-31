@@ -70,7 +70,7 @@
             },
 
             getStartDate() {
-                return this.event.date ? this.toMoment(this.event.date).format('YYYY-MM-DD') : '';
+                return this.event?.date ? this.toMoment(this.event.date).format('YYYY-MM-DD') : '';
             }
         },
         computed: {
