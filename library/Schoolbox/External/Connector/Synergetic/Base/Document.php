@@ -223,6 +223,7 @@ class Document extends Base implements IDocument
     private function findDocumentsFromArchive(array $classificationCodes, string $externalId, ?string $documentSeq, ?Alaress_Date_Format $date)
     {
         // Get classification code for archive and check whether it's included in the classification codes
+        $includeArchive = false;
         if ($this->isTableAccessible('luDocumentClassification')) {
             $bindingsCC     = PredicateBuilder::getArrayBindings($classificationCodes, 'cc');
             $queryCC        = "
@@ -232,9 +233,9 @@ class Document extends Base implements IDocument
               AND   Code IN ({$bindingsCC['placeholders']})
         ";
             $includeArchive = $this->databaseExternal->executeQuery($queryCC, $bindingsCC['bindings'])->fetchColumn();
-            if (!$includeArchive) {
-                return [];
-            }
+        }
+        if (!$includeArchive) {
+            return [];
         }
 
         // If there's any DocMan classifications entered into the config - union docman docs on
