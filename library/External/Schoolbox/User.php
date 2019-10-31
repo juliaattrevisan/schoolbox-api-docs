@@ -125,6 +125,8 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        $ids = implode(',', $externalUserId);
+
         return $this->internalDatabase->executeQuery(
             "
                 SELECT      parent.external_id AS StudentContactID,
@@ -151,9 +153,8 @@ class External_Schoolbox_User implements External_UserInterface
                     JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
                     JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
                     JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-                WHERE       child.external_id = :externalUserId
-            ",
-            ['externalUserId' => $externalUserId]
+                WHERE       child.external_id IN ($ids)
+            "
         )->fetchAll();
     }
 

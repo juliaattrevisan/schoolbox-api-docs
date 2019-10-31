@@ -130,6 +130,8 @@ class External_Maze_Loreto_User extends External_Maze_User {
 	 */
     public function getStudentContactList(array $externalUserId): array
     {
+        $ids = implode(',', $externalUserId);
+
 		$query = "
 			SELECT
 				DFKEY AS StudentContactID,
@@ -160,7 +162,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			FROM DF
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
 			LEFT JOIN ST ON (DF.DFKEY = ST.FAMILY OR (ST.FAMB = DF.DFKEY AND ST.LIVING_B != 'N'))
-			WHERE ST.STKEY = '{$externalUserId}'
+			WHERE ST.STKEY IN ($ids)
 			ORDER BY primaryFamily DESC
 		";
 

@@ -677,6 +677,8 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        $ids = implode(',', $externalUserId);
+
         $query =
             "
             SELECT    c.ContactID AS StudentContactID,
@@ -763,7 +765,7 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype IN ('001','1') and ceh.primaryemail = 1
             LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype IN ('002','2') and cew.primaryemail = 1 
             
-            WHERE p.PupilID = '{$externalUserId}'
+            WHERE p.PupilID IN ($ids)
             ORDER BY pc.Priority
         ";
 

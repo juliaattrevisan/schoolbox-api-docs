@@ -197,6 +197,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        $ids = implode(',', $externalUserId);
+
         $caseSensitiveFields = array(
             'StudentContactID',
             'StudentContactTitle',
@@ -223,12 +225,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               P.SPOUSE_MOBILE AS STUDENTCONTACTSPOUSEMOBILEPHONE, P.COMBINED_EMAIL_ADDRESS AS STUDENTCONTACTSPOUSEDEFAULTEMAIL
             FROM SCHOOLBOX_PARENTS P
             INNER JOIN SCHOOLBOX_PARENT_STUDENT PS ON P.CARER_NUMBER = PS.CARER_NUMBER
-            WHERE PS.STUDENT_NUMBER = :id
+            WHERE PS.STUDENT_NUMBER IN ($ids)
         ");
 
-        $stmt->execute(array(
-            'id' => $externalUserId
-        ));
+        $stmt->execute();
 
         $parents = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

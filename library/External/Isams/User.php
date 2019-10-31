@@ -265,6 +265,8 @@ class External_Isams_User implements External_UserInterface
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        $ids = implode(',', $externalUserId);
+
         $query = "
             SELECT      
                         V_Parent.ParentID             AS StudentContactID,
@@ -286,10 +288,10 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
-            WHERE       V_Student.StudentID = :external_user_id
+            WHERE       V_Student.StudentID IN ($ids)
         ";
 
-        return $this->getConnector()->executeQuery($query , ['external_user_id' => $externalUserId])->fetchAll();
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**

@@ -733,7 +733,19 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentContactList(array $externalUserId): array
     {
-        if (!$this->isExternalIdValid($externalUserId)) {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
+        /**
+         * Return valid external ID's only and convert it into a string delimited by comma (,) to be used in the
+         * query below using an IN statement.
+         */
+        $validExternalIds = implode(',', array_filter($externalUserId, function ($externalUserId) {
+            return $this->isExternalIdValid($externalUserId);
+        }));
+
+        if (!$validExternalIds) {
             return [];
         }
 
@@ -770,7 +782,7 @@ class External_Synergetic_User implements External_UserInterface
                                 Semester.FileSemester = a.FileSemester AND
                                 Semester.FileYear = a.FileYear AND
                                 Semester.SystemCurrentFlag = 1
-            WHERE           StudentID IN ($externalUserId) AND
+            WHERE           StudentID IN ($validExternalIds) AND
                             StudentContactType IN ({$contactTypes['placeholders']})
         ";
 
@@ -791,6 +803,7 @@ class External_Synergetic_User implements External_UserInterface
                 $contactIdList[$contact['StudentContactSpouseID']] = true;
             }
         }
+
         return $contactReturn;
     }
 
