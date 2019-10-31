@@ -362,7 +362,6 @@
 
                 if (self.currentViewIsSemester()) {
                     self.redrawWeekNumbers();
-                    self.cleanupMonthHeaderInlineStyles();
 
                     // Add grouped events source if it's not there:
                     // remove standard source if it is
@@ -399,7 +398,6 @@
                     if (this.allTerms[termIndex+1]) {
                         api.gotoDate(this.allTerms[termIndex+1].start);
                         this.redrawWeekNumbers();
-                        this.cleanupMonthHeaderInlineStyles();
                     }
                 } else {
                     api.next();
@@ -418,7 +416,6 @@
                     if (this.allTerms[termIndex-1]) {
                         api.gotoDate(this.allTerms[termIndex-1].start);
                         this.redrawWeekNumbers();
-                        this.cleanupMonthHeaderInlineStyles();
                     }
                 } else {
                     api.prev();
@@ -500,7 +497,6 @@
                     if (this.allTerms[termIndex]) {
                         api.today();
                         this.redrawWeekNumbers();
-                        this.cleanupMonthHeaderInlineStyles();
                     }
                 } else {
                     api.today();
@@ -572,15 +568,6 @@
                 });
             },
 
-            redrawCalendar() {
-                var self = this;
-
-                if (self.currentViewIsSemester()) {
-                    self.redrawWeekNumbers();
-                    self.redrawEventRows();
-                }
-            },
-
             /**
              * Callback when a date is rendered (i.e. the view or viewed date
              * changes).
@@ -615,25 +602,6 @@
                     nextButton.disabled = false;
                     prevButton.disabled = false;
                 }
-            },
-
-            cleanupMonthHeaderInlineStyles() {
-                document.querySelectorAll('.fc-time-area .fc-content tr')[0].querySelectorAll('div').forEach(function (element) {
-                    element.removeAttribute('style');
-                    element.querySelector('span').removeAttribute('style');
-                });
-            },
-
-            redrawEventRows() {
-                document.querySelectorAll('.fc-resourceTimelineSemester-view .fc-time-area [data-resource-id]').forEach(function (element, index) {
-                    var resourceColHeight = document.querySelector('.fc-resourceTimelineSemester-view .fc-resource-area [data-resource-id="'+ element.getAttribute('data-resource-id') +'"]').offsetHeight;
-
-                    element.querySelector('div').style.height = resourceColHeight + 'px';
-
-                    element.querySelectorAll('div .placeholder').forEach(function (placeholders) {
-                        placeholders.style.height = (resourceColHeight - 3) + 'px';
-                    })
-                });
             },
 
             /**
@@ -935,8 +903,6 @@
             @loading="onLoading"
             @eventClick="onEventClick"
             @dateClick="onDateClick"
-            @eventPositioned="redrawCalendar"
-            @windowResize="redrawCalendar"
             :dates-render="datesRender"
         />
     </div>
@@ -993,18 +959,8 @@
         width: 100% !important;
     }
 
-    .fc-resourceTimelineSemester-view .fc-popover .fc-timeline-event .fc-title-wrap {
-        text-align: left !important;
-    }
-
     .fc-timeline-event-div {
         padding-bottom: 2px !important;
-    }
-
-    .fc-resourceTimelineSemester-view .fc-popover .fc-timeline-event {
-        padding: 0 !important;
-        position: relative;
-        width: 100% !important;
     }
 
     .fc-resourceTimelineSemester-view .fc-event-container > .fc-timeline-event {
