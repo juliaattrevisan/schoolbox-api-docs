@@ -10,7 +10,7 @@ declare(strict_types=1);
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-class External_Synergetic_Ths_User extends External_Synergetic_User
+class External_Synergetic_Hutchins_User extends External_Synergetic_User
 {
     /**
      * @inheritdoc
