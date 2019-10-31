@@ -7,7 +7,7 @@ use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new Storage\S3\Migration(), null, [
+$kernel = new CliTool\Kernel(new Storage\S3\Migration(), [
     CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO,
 ]);
 $kernel->runApp();
