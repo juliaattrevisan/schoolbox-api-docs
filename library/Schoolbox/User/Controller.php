@@ -145,7 +145,7 @@ class Controller extends Base
             try {
                 /** @var IConnector $db */
                 $db = $this->di->get('databaseInternal');
-                $userSearchService = new User\Search\Query($db);
+                $userSearchService = new User\Search\Query($db, $this->getConfigLoader());
                 $result = $userSearchService->fetchResults($keyword);
             } catch (\Exception $exception) {
                 // noop

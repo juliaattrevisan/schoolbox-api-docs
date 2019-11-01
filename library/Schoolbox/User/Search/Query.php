@@ -9,6 +9,7 @@ namespace Schoolbox\User\Search;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 
 class Query
@@ -26,13 +27,20 @@ class Query
     private $db;
 
     /**
+     * @var IConfigLoader
+     */
+    private $config;
+
+    /**
      * Query constructor.
      *
-     * @param IConnector $db
+     * @param IConnector    $db
+     * @param IConfigLoader $config
      */
-    public function __construct(IConnector $db)
+    public function __construct(IConnector $db, IConfigLoader $config)
     {
-        $this->db = $db;
+        $this->db     = $db;
+        $this->config = $config;
     }
 
     /**
@@ -71,7 +79,7 @@ class Query
         $result = [];
 
         $users = UserMapper::getInstance()->findByColumn('id', $userIds, ['order'=>['lastname'=>'ASC', 'firstname' => 'ASC']]);
-        
+
         foreach ($users as $key => $user) {
             $result[$key]['id']             = $user->getId();
             $result[$key]['externalId']     = $user->getExternalId();
@@ -146,7 +154,7 @@ class Query
          * When show_disabled_users flag is set to TRUE, disabled users will be shown in the result
          * Otherwise, only active users will be shown
          */
-        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+        if (!$this->config->get('show_disabled_users')) {
             $whereStatement .= ' AND user.enabled = 1';
         }
 
