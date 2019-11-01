@@ -6,7 +6,7 @@
     {% set nodes = [
     ['Learning', routeLookupIfAuthorized('learning.getClasses')],
     [assessment.context.folder.name, routeLookupIfAuthorized('learningMarkbook.getMarkbookForClass', {folderId: assessment.context.folder.id}) ],
-    [assessment.context.title, routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
+    [assessment.context.title, routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId: assessment.context.id, student: participant.user, studentId: response.submittedOnBehalfOf.id}) ],
     [assessment.title, routeLookupIfAuthorized('learningAssessment.getStatus', {assessment: assessment, assessmentId: assessment.id})],
     ['Inline Grader', routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
     ['Similarity Report', null]
