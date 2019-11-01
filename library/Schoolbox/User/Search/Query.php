@@ -66,7 +66,7 @@ class Query
             $searchString = '%' . $keyword . '%';
             $userIds = $this->getUserIdsByKeyword($searchString, $viewer);
             if ($userIds) {
-                $result['results'] = $this->getUserData($userIds);
+                $result['results']    = $this->getUserData($userIds);
                 $result['totalCount'] = $this->getTotalCount($searchString, $viewer);
             }
         }
@@ -99,6 +99,10 @@ class Query
     }
 
     /**
+     * Find IDs for users that match the given keyword.
+     *
+     * This list is subject to filtering in `getWhereStatement`.
+     *
      * @param string $keyword
      * @param User   $viewer
      *
@@ -124,6 +128,10 @@ class Query
     }
 
     /**
+     * Find a total count of users that match the given keyword.
+     *
+     * This count is subject to filtering in `getWhereStatement`.
+     *
      * @param string $keyword
      * @param User   $viewer
      *
@@ -148,6 +156,9 @@ class Query
     }
 
     /**
+     * Build the WHERE statement which filters the list and count of users
+     * found by the search.
+     *
      * @param User $viewer
      *
      * @return string
