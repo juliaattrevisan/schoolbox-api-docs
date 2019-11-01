@@ -222,7 +222,11 @@ module.exports = function(grunt) {
             datepickerFullCalendar: {
                 // This concats datepicker FullCalendar CSS, and is not just for develop
                 src: cssSrc.datepickerFullCalendar,
-                dest: cssDest.datepickerFullCalendar
+                dest: cssDest.datepickerFullCalendar,
+                options: {
+                    stripBanners: true,
+                    separator: "\n"
+                }
             }
         },
         uglify: {

@@ -528,6 +528,7 @@ grunt build.js;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
 /vagrant/tools/pkg-build-sass.sh --sass;
+grunt concat:datepickerFullCalendar;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
