@@ -10,6 +10,7 @@ namespace Schoolbox\User\Search;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -110,19 +111,15 @@ class Query
      */
     private function getUserIdsByKeyword(string $keyword, User $viewer): array
     {
+        [$where, $params] = $this->getQueryFilter($keyword, $viewer);
+
         $statement = $this->db->prepareQuery(
             'SELECT DISTINCT u.id FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
-            . $this->getWhereStatement($viewer)
+            . $where
             . ' ORDER BY u.lastname, u.firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
-        $statement->execute([
-            'firstAndLastName'  => $keyword,
-            'lastname'          => $keyword,
-            'username'          => $keyword,
-            'sfirstname'        => $keyword,
-            'slastname'         => $keyword,
-        ]);
+        $statement->execute($params);
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
@@ -139,31 +136,26 @@ class Query
      */
     private function getTotalCount(string $keyword, User $viewer): int
     {
+        [$where, $params] = $this->getQueryFilter($keyword, $viewer);
         $statement = $this->db->prepareQuery(
-            'SELECT COUNT(DISTINCT u.id) FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
-            . $this->getWhereStatement($viewer)
+            'SELECT COUNT(DISTINCT u.id) FROM user u INNER JOIN `groups` g ON u.group_id = g.id' . $where
         );
 
-        $statement->execute([
-            'firstAndLastName'  => $keyword,
-            'lastname'          => $keyword,
-            'username'          => $keyword,
-            'sfirstname'        => $keyword,
-            'slastname'         => $keyword,
-        ]);
+        $statement->execute($params);
 
         return (int) $statement->fetchColumn();
     }
 
     /**
-     * Build the WHERE statement which filters the list and count of users
-     * found by the search.
+     * Build the WHERE statement and query parameters which filter the list and
+     * count of users found by the search.
      *
-     * @param User $viewer
+     * @param string $keyword
+     * @param User   $viewer
      *
-     * @return string
+     * @return array [$where, $params]
      */
-    private function getWhereStatement(User $viewer): string
+    private function getQueryFilter(string $keyword, User $viewer): array
     {
         $whereParts = [
             '
@@ -174,6 +166,13 @@ class Query
                 OR soundex(u.lastname) = soundex(:slastname)
             ',
             'u.deleted_at IS NULL'
+        ];
+        $params = [
+            'firstAndLastName'  => $keyword,
+            'lastname'          => $keyword,
+            'username'          => $keyword,
+            'sfirstname'        => $keyword,
+            'slastname'         => $keyword,
         ];
 
         /**
@@ -200,12 +199,14 @@ class Query
         }
 
         if (!$findStudents) {
-            $whereParts[] = "g.group_type != 'student'";
+            $whereParts[]          = "g.group_type != :studentType";
+            $params['studentType'] = Role::STUDENT;
         }
         if (!$findParents) {
-            $whereParts[] = "g.group_type != 'parent'";
+            $whereParts[]         = "g.group_type != :parentType";
+            $params['parentType'] = Role::PARENT;
         }
 
-        return ' WHERE ' . implode(' AND ', $whereParts);
+        return [' WHERE ' . implode(' AND ', $whereParts), $params];
     }
 }
