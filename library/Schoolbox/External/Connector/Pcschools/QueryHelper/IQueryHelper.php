@@ -30,10 +30,10 @@ interface IQueryHelper
     public function processGetStudentResult(array $rows): array;
 
     /**
-     * @param string $studentExternalId
+     * @param array $studentExternalId
      * @return array
      */
-    public function getGetStudentContactListQuery($studentExternalId): array;
+    public function getGetStudentContactListQuery(array $studentExternalId): array;
 
     /**
      * @param array $studentExternalIds
