@@ -6,8 +6,8 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\Admin\Import\Photos\MigrateToStorage;
 use Schoolbox\Application\CliTool;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\Mapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -48,92 +48,15 @@ HELP;
             exit;
         }
 
-        $db = Database::getInstance();
-        $storageMapper = Mapper::getInstance();
-
-        /** @var IConfigLoader $conf */
-        $conf  = $this->getConfig();
-
-        /* Prepared statements
+        /* Migrate into storage
          */
-        $selectResult = $db->prepare('
-            SELECT id, synergy_id, firstname, lastname
-            FROM `user`
-            WHERE synergy_id = :externalId
-            LIMIT 1
-        ');
-
-        $updateResult = $db->prepare('
-            UPDATE `user`
-            SET portrait_hash = :hash
-            WHERE id = :id
-        ');
-
-        /* Schools upload pictures to this directory periodically
-         * This tool shoves them into storage
-         * This tool can be run repeatedly in cron to preserve schools' existing workflows
-         */
-        $portraitPath = $conf->get('portrait_dir');
-
-        $dirhandle = opendir($portraitPath);
-
-        while ($file = readdir($dirhandle)) {
-            if (('.' === $file) || ('..' === $file)) {
-                continue;
-            }
-
-            /* If it's an actual file, send it in
-             */
-            $info = pathinfo($file);
-
-            /* Naming convention in schoolbox instructions suggests this as the externalId
-             */
-            $externalId = $info['filename'];
-
-            /* Find them classically
-             */
-            $selectResult->execute([
-                'externalId' => $externalId,
-            ]);
-
-            $user = $selectResult->fetch(\PDO::FETCH_ASSOC);
-
-            /* If a user was found, try to assign image
-             */
-            if ($user) {
-
-                try {
-                    $path = "{$portraitPath}/{$file}";
-
-                    /* Save it into brownhole
-                     */
-                    $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
-
-                    /* Update user with latest version
-                     */
-                    $updateResult->execute([
-                        'hash' => $portrait->getHash(),
-                        'id' => $user['id']
-                    ]);
-
-                    $this->getLogger()->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
-
-                    /* Remove file when done
-                     */
-                    unlink($path);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-
-                    /* Something died in storage
-                     */
-                    $this->getLogger()->critical("External id {$externalId} not saved; Storage error");
-                }
-            } else {
-
-                /* User not found; noop
-                 */
-                $this->getLogger()->warning("External id {$externalId} not found; skipped");
-            }
-        }
+        (new MigrateToStorage(
+            $this->getConfig()->get('portrait_dir'),
+            Database::getInstance(),
+            Mapper::getInstance(),
+            $this->getLogger(),
+            $this->perform()
+        ))->migrate();
     }
 };
 
