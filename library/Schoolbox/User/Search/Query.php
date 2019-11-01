@@ -158,13 +158,13 @@ class Query
     private function getQueryFilter(string $keyword, User $viewer): array
     {
         $whereParts = [
-            '
+            '(
                 CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstAndLastName
                 OR CONCAT_WS(" ", u.title, u.lastname) LIKE :lastname
                 OR u.username LIKE :username
                 OR soundex(u.firstname) = soundex(:sfirstname)
                 OR soundex(u.lastname) = soundex(:slastname)
-            ',
+            )',
             'u.deleted_at IS NULL'
         ];
         $params = [
