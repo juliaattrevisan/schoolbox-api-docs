@@ -97,8 +97,15 @@
             $markInput.trigger("change");
         });
 
-        $status.find(markInputSelector).change(function () {
+        /* Detect enter keypress; initiate blur() which then initiates change()
+         */
+        $status.find(markInputSelector).on('keydown', function(event) {
+            if (event.keyCode == 13) {
+                $(this).trigger('blur');
+            }
+        });
 
+        $status.find(markInputSelector).on ('change', function(event) {
             var rubricSum = getRubricSum();
 
             // Mark entered in the overall mark field
