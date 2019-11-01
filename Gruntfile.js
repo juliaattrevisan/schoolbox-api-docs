@@ -171,14 +171,14 @@ var jsDest = {
 };
 
 let cssSrc = {
-    datepickerFullCalendar: [
+    fullcalendar: [
         'node_modules/@fullcalendar/core/main.css',
         'node_modules/@fullcalendar/list/main.css',
     ]
 };
 
 let cssDest = {
-    datepickerFullCalendar: 'www/css/core/fullcalendar/datepicker.css'
+    fullcalendar: 'www/css/core/fullcalendar/datepicker.css'
 };
 
 module.exports = function(grunt) {
@@ -219,10 +219,10 @@ module.exports = function(grunt) {
                 src: jsSrc.vue,
                 dest: jsDest.vue
             },
-            datepickerFullCalendar: {
+            fullcalendarCss: {
                 // This concats datepicker FullCalendar CSS, and is not just for develop
-                src: cssSrc.datepickerFullCalendar,
-                dest: cssDest.datepickerFullCalendar,
+                src: cssSrc.fullcalendar,
+                dest: cssDest.fullcalendar,
                 options: {
                     stripBanners: true,
                     separator: "\n"

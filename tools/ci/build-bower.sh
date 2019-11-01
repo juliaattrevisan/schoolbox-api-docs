@@ -47,7 +47,7 @@ then
 fi
 
 echo "Building FullCalendar CSS";
-grunt concat:datepickerFullCalendar;
+grunt concat:fullcalendarCss;
 
 echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
