@@ -56,7 +56,7 @@
                                 {% for id, criterion in criteria %}
                                     {% set mark = marks[participant.id][id] %}
                                     <td>
-                                        <p>{{ mark.descriptor.description }}</p>
+                                        <p>{{ mark.descriptor.description | nl2br }}</p>
                                         <p>{{ mark.value }}</p>
                                     </td>
                                 {% endfor %}
