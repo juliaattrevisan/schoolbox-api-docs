@@ -11,15 +11,41 @@
 {% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
 
 {% include '@learningMarkScheme/fragments/text-input.twig' with {
-participant: participant,
-feedback:    feedback,
-tabIndex:    tabIndex,
-placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ limit_decimal.limit(markScheme.totalMark, 2),
-limit:       limit_decimal.limit(markScheme.totalMark, 2),
-maxLength:   16,
-inputTitle:  'Maximum Mark: ' ~ limit_decimal.limit(markScheme.totalMark, 2),
-errors:      errors,
-readonly:    readonly,
-totalMark: 1,
+    participant: participant,
+    feedback:    feedback,
+    tabIndex:    tabIndex,
+    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ limit_decimal.limit(markScheme.totalMark, 2),
+    limit:       limit_decimal.limit(markScheme.totalMark, 2),
+    maxLength:   16,
+    inputTitle:  'Maximum Mark: ' ~ limit_decimal.limit(markScheme.totalMark, 2),
+    errors:      errors,
+    readonly:    readonly,
+    totalMark: 1,
 } only %}
 
+{% if not readonly %}
+
+    <script type="text/javascript">
+        $(function() {
+            $('#mark-{{ participant.user.id }}').combobox({{ errors | json_encode | raw }});
+
+            $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]').alaressValidate(
+                {
+                    rules: {
+                        mark: {
+                            withinRange: true
+                        }
+                    },
+                    messages: {
+                        mark: {
+                            withinRange: 'The grade must be between 0 and ' + $('input[name="mark"]').attr('data-validation-limit') + '.'
+                        }
+                    }
+                }
+            );
+
+            {# Always run upon load #}
+            $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]').valid();
+        });
+    </script>
+{% endif %}

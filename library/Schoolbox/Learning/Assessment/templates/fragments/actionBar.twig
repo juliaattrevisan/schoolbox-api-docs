@@ -4,6 +4,7 @@
   Usage:
     actionStyle   string        CSS styling to apply to action bar
     buttons       string        The buttons that should appear in the action bar
+    participant   Participant   The Participant
     attachedMsg   string        (optional) Extra meta text to display on action bar
     massActions   string        (optional) Any mass action data attributes to add to this action bar
     dataAttrs     string        (optional) Any other data attributes to add to action bar
@@ -11,7 +12,7 @@
 
 
 <div class="small-12 column no-pad">
-    <div class="component-action" data-action-bar {{ massActions ?? null }} {{ dataAttrs ?? null }} style="{{ actionStyle }}">
+    <div class="component-action" data-action-bar="{{ participant.user.id }}" {{ massActions ?? null }} {{ dataAttrs ?? null }} style="{{ actionStyle }}">
         <section>
 
             {% if attachedMsg is defined %}

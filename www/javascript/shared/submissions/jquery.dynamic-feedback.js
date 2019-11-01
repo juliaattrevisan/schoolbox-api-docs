@@ -208,9 +208,6 @@
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
-
-                    // Restore save actions nao
-                    timeoutUpdate();
                 });
             });
         }

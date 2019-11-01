@@ -42,6 +42,120 @@
         }
     };
 
+
+    /**
+     * Explode on the slash to determine numerator/denominator
+     * Unfortunately this replicates backend logic
+     * Both parts must be numeric
+     * Numerator must be at least 0 otherwise it's an illegal attribution
+     */
+    jQuery.validator.addMethod("withinRange", function(value, element) {
+
+        /* Null/empty setting is permitted
+         * Also, SA-1489 is a thing which might make this a bit deceiving
+         */
+        if (null == $(element).val() || '' === $(element).val()) {
+            return true;
+        }
+
+        /* Is it one of the Total Mark string format?
+         * If so, interpret it differently than a Submission State
+         */
+        var parts = $(element).val().split('/');
+
+        /* Trim perhaps-adjacent spaces to test for numeric representation
+         * This rule might also be used for percentage, so remove that symbol too
+         */
+        parts[0] = $.trim(parts[0].replace('%', ''));
+
+        if ($.isNumeric(parts[0])) {
+            var numerator = parseInt(parts[0]);
+            var denominator = $(element).attr('data-validation-limit');
+
+            return numerator >= 0 && numerator <= denominator;
+        }
+
+        /* Otherwise it could be one of the submission states like Absent or Not Submitted
+         * so test that it's one of the available customisable options
+         */
+        var val = $(element).val();
+
+        return $(element).parents('.combobox').find('.combobox_selector li').filter(function() {
+            return $(this).text() === val;
+        }).length > 0;
+    });
+
+
+    /**
+     * Explode on the slash to determine numerator/denominator
+     * Unfortunately this replicates backend logic
+     * Value must be at least 0 otherwise it's an illegal attribution
+     */
+    jQuery.validator.addMethod("withinPercentageRange", function(value, element) {
+
+        /* Null/empty setting is permitted
+         * Also, SA-1489 is a thing which might make this a bit deceiving
+         */
+        if (null == $(element).val() || '' === $(element).val()) {
+            return true;
+        }
+
+        /* Is it a Percentage string format?
+         * If so, interpret it differently than a Submission State
+         */
+        var val = $(element).val();
+
+        /* Trim perhaps-adjacent spaces to test for numeric representation
+         * This rule might also be used for percentage, so remove that symbol too
+         */
+        val = $.trim(val.replace('%', ''));
+
+        if ($.isNumeric(val)) {
+            var numerator = parseInt(val);
+            var denominator = $(element).attr('data-validation-limit');
+
+            return numerator >= 0 && numerator <= denominator;
+        }
+
+        /* Otherwise it could be one of the submission states like Absent or Not Submitted
+         * so test that it's one of the available customisable options
+         */
+        return $(element).parents('.combobox').find('.combobox_selector li').filter(function() {
+            return $(this).text() === val;
+        }).length > 0;
+    });
+
+
+    /**
+     * Unfortunately this replicates backend logic
+     * Letter Grades, though similar to other types, are distinct due to <option> structure in a select
+     * It's not just some random unordered list
+     */
+    jQuery.validator.addMethod("withinLetterGradeRange", function(value, element) {
+
+        /* Null/empty setting is permitted
+         */
+        if (null == $(element).val() || '' === $(element).val()) {
+            return true;
+        }
+
+        /* A previously-legal value that is no longer legal
+         */
+        if ($(element).val() == -1) {
+            return false;
+        }
+
+        /* Otherwise it could be one of the submission states like Absent or Not Submitted
+         * so test that it's one of the available customisable options
+         */
+        var val = $(element).val();
+
+        return $(element).find('option').filter(function() {
+            return $(this).val() === val;
+        }).length > 0;
+    });
+
+
     /**
      * Unified interface for form validation
      *

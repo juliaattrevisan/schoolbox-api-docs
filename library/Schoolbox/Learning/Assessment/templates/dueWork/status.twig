@@ -114,7 +114,7 @@
     <div class="small-12 column">
 
         {% if fbUrl %}
-        <form data-feedback-form method="post" action="{{ fbUrl }}">
+        <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ fbUrl }}">
             {% endif %}
 
             <input type="hidden" name="responseId" value="{{ response.id }}"/>
@@ -222,11 +222,12 @@
     {% endset %}
 
     {% include '@learningAssessment/fragments/actionBar.twig' with {
-    actionStyle:  actionStyle,
-    attachedMsg:  attachedMsg,
-    massActions:  massActions,
-    dataAttrs:    dataAttrs,
-    buttons:      buttons
+        actionStyle:  actionStyle,
+        attachedMsg:  attachedMsg,
+        massActions:  massActions,
+        dataAttrs:    dataAttrs,
+        buttons:      buttons,
+        participant:  participant
     } only %}
 
 {% endblock %}
@@ -237,7 +238,7 @@
         <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
              role="dialog">
             <h2>Publish Drafts</h2>
-            <p data-mass-unavailable>You have no unpublished drafts for this activity currently visible.</p>
+            <p data-mass-unavailable>There aren't any valid and unpublished drafts for this activity.</p>
             <p data-mass-available>The following drafts can be published:</p>
             <section class="checklist" id="mass-publish-list">
                 <div data-template>{# this will get detached from the DOM on pageload #}
@@ -299,15 +300,12 @@
         {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
-                    var $massPublishButton = $('[data-mass="publish"]');
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
                         reviewedText: '{{ labelReviewed }}',
-
                         onPreDraftCallback: function(){
-                            $massPublishButton.attr('disabled', 'disabled');
                         },
                         onDraftCallback: function (userId, isSuccess, message, feedbackId) {
                             var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -315,10 +313,8 @@
                             $publishButton.attr('data-draft-id', feedbackId);
                             $actionBar.attr('data-mass-publish', '');
                             $actionBar.removeAttr('data-mass-submit');
-                            $massPublishButton.removeAttr('disabled');
                         },
                         onPrePublishCallback: function(){
-                            $massPublishButton.attr('disabled', 'disabled');
                         },
                         onPublishCallback: function (userId) {
                             var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -332,7 +328,6 @@
                                     $ackButton.remove();
                                 }
                             });
-                            $massPublishButton.removeAttr('disabled');
                         }
                     });
 
@@ -344,13 +339,30 @@
                             if (!len) {
                                 return 'None Selected';
                             }
+
                             if (len == all) {
                                 return 'Publish All';
                             }
+
                             return 'Publish ' + len + ' Selected';
                         },
+
                         userSelector: '[data-mass-publish]',
                         userList: $userList,
+
+                        {# The people you want to publish must have currently-valid data
+                         # Otherwise you'll end up potentially publishing invalid data
+                         #}
+                        checkboxConditionality: function(id) {
+                            return $('[data-feedback-form="' + id + '"]').valid();
+                        },
+
+                        {# When you hit Publish All, it attempts to saves each draft feedback in the list
+                         # It gets those feedbacks' ids and publishes them in the back end
+                         #
+                         # This should take an intersect of the checkbox list that you saw in the modal
+                         # and the available drafts in the quickmark screen
+                         #}
                         onSubmit: function (toPublish) {
                             var draftFeedbackIds = [],
                                 $actionBars      = [],
@@ -373,7 +385,6 @@
                             $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
                                 'drafts': draftFeedbackIds
                             }).done(function (response) {
-
                                 var feedbackErrors = false;
 
                                 for (var feedbackId in response) {
@@ -388,7 +399,7 @@
                                         $publishButton.html('Publish');
                                         $publishButton.removeAttr('disabled');
 
-                                        if(isPublishSuccess){
+                                        if (isPublishSuccess) {
                                             draftPublishSuccess($actionBar, $publishButton);
                                         }
                                     }
@@ -400,9 +411,8 @@
                                 } else {
                                     $toast.toastTimeout({text: 'Published all drafts', css: 'success'});
                                 }
-                            })
-                            .fail(function () {
-                                {# Something went wrong, display an error toast#}
+                            }).fail(function () {
+                                {# Something went wrong, display an error toast #}
                                 $toast.toastTimeout({text: 'Unable to publish draft feedbacks.', css: 'alert'});
                             });
                         }

@@ -5,7 +5,6 @@
  * @link        https://schoolbox.com.au/
  */
 ;(function ($, window, document, undefined) {
-
     var pluginName = 'bulky';
 
     var currentlyOpenModal = null;
@@ -22,9 +21,23 @@
         availableTextSelector: '[data-mass-available]',
         participantSelector: '[data-participant]',
         actionBarSelector: '[data-action-bar]',
-        userSelector: null
+        userSelector: null,
+
+        /* A function to determine whether an element should be submittable
+         */
+        checkboxConditionality: function(id) {
+            return true;
+        }
     };
 
+
+    /**
+     * Bulk Checklist
+     *
+     * @param element
+     * @param options
+     * @constructor
+     */
     function Bulky(element, options) {
         var bulky = this;
 
@@ -47,12 +60,15 @@
             throw "Did not find matching list for data-list-id";
         }
 
-
+        /* A convenience var
+         */
         var opt = this.options;
 
-        // install listeners
-        this.element.on('change', opt.checkboxSelector, function () {
 
+        /**
+         * Determine how many items were selected and update the button text accordingly
+         */
+        function setupActionButton() {
             var $checks = bulky.element.find(opt.checkboxSelector);
 
             // see if the list has anything selected
@@ -63,23 +79,38 @@
 
             if (len) {
                 bulky.submitButton.removeAttr('disabled');
-
             } else {
                 bulky.submitButton.attr('disabled', 'disabled');
             }
+        }
+
+
+        /* Event listener to change button text
+         */
+        this.element.on('change', opt.checkboxSelector, function () {
+            setupActionButton();
         });
 
-        this.element.on('open.fndtn.reveal', function () {
 
+        /**
+         * When the modal opens
+         */
+        this.element.on('open.fndtn.reveal', function () {
             var $checks;
+
+            /* Number of invalid checkboxes
+             * If all checkboxes are invalid, hide the action button and display different text
+             */
+            var numInvalid = 0;
 
             // cache this value before we inject the contents
             $(this).data('fixedContentHeight', $(this).outerHeight());
 
+            /* Iterate through all these nodes and assign ids
+             * Then construct a html fragment to insert into the modal
+             */
             bulky.list.html(
-
-                opt.userList.find(opt.actionBarSelector + opt.userSelector).closest(opt.labelSelector).map(function () {
-
+                opt.userList.find(opt.actionBarSelector + opt.userSelector).closest(opt.labelSelector).map(function() {
                     var $item = bulky.template.clone(),
                         tag   = $item.prop("tagName").toLowerCase(),
                         $lbl  = $item.find(opt.labelSelector),
@@ -87,36 +118,62 @@
                         id    = $(this).closest(opt.participantSelector).data('participant'),
                         html;
 
+                    /* Assign ids
+                     */
                     $chk.attr('id', id);
                     $lbl.attr('for', id);
 
                     // apply the name
                     $lbl.text($(this).data('participantName'));
 
+                    /* Checkbox must pass this conditional to be provided
+                     */
+                    if (!opt.checkboxConditionality(id)) {
+                        $chk.prop('disabled', true).removeAttr('checked');
+                        $lbl.text($lbl.text() + ' (invalid)');
+
+                        numInvalid++;
+                    }
+
                     // because outerHtml doesn't exist as a thing -_-
                     html = ['<', tag, '>', $item.html(), '</', tag, '>' ].join('');
 
                     return html;
-
                 }).get().join('')
             );
 
+            /* All the checkboxes that have been ticked
+             * Change contents of modal accordingly
+             */
             $checks = bulky.element.find(opt.checkboxSelector);
 
-            if ($checks.length) {
+            if (!$checks.length || $checks.length === numInvalid) {
+
+                /* If they're all invalid, or there are no checkboxes
+                 */
+                bulky.submitButton.hide();
+                bulky.element.find(opt.unavailableTextSelector).show();
+                bulky.element.find(opt.availableTextSelector).hide();
+            } else {
+
+                /* There are some checkboxes to submit
+                 */
                 refreshSubmitText.call(bulky, $checks.length, $checks.length);
+
                 bulky.submitButton.show();
                 bulky.element.find(opt.unavailableTextSelector).hide();
                 bulky.element.find(opt.availableTextSelector).show();
 
-            } else {
-                bulky.submitButton.hide();
-                bulky.element.find(opt.unavailableTextSelector).show();
-                bulky.element.find(opt.availableTextSelector).hide();
+                /* Initial conditions of the submit button
+                 */
+                setupActionButton();
             }
-
         });
 
+
+        /**
+         * When the modal finishes opening
+         */
         this.element.on('opened.fndtn.reveal', function () {
             currentlyOpenModal = $(this);
             // start listening
@@ -124,6 +181,10 @@
             refreshModalHeight.call(window);
         });
 
+
+        /**
+         * When the modal finishes closing
+         */
         this.element.on('closed.fndtn.reveal', function () {
             currentlyOpenModal = null;
 
@@ -137,16 +198,31 @@
             bulky.submitButton.removeAttr('disabled');
         });
 
+
+        /**
+         * When a submit button has been clicked
+         */
         this.submitButton.on('click', function (e) {
             e.preventDefault();
-            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function () { return opt.userList.find('[data-participant='+this.id+'] [data-action-bar]').get(); }));
+
+            /* Find all the action bars that were in the checkbox list
+             */
+            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function() {
+                return opt.userList.find('[data-participant='+this.id+'] [data-action-bar]').get();
+            }));
         });
 
+
+        /**
+         * When any of the other component action buttons have been clicked
+         * Typically it's "Cancel" or the Action button itself, after which
+         * the modal can be dismissed
+         */
         this.element.on('click', '.button', function () {
             bulky.element.foundation('reveal', 'close');
         });
-
     }
+
 
     /**
      * Private method; expects to be applied to Bulky
@@ -157,9 +233,7 @@
         if (typeof text === 'string' && text.trim().length) {
             this.submitButton.text(text.trim());
         }
-
     }
-
 
 
     /**
