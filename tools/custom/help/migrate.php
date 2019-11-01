@@ -146,7 +146,9 @@ HELP;
         foreach ($assignation as $externalId => $stockFile) {
             $destination = "{$portraitDir}/{$externalId}.jpg";
 
-            unlink($destination);
+            if (file_exists($destination)) {
+                unlink($destination);
+            }
         }
 
         if (!$this->perform()) {
