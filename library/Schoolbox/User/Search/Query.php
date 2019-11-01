@@ -107,8 +107,9 @@ class Query
     private function getUserIdsByKeyword(string $keyword, User $viewer): array
     {
         $statement = $this->db->prepareQuery(
-            'SELECT id FROM user ' . $this->getWhereStatement($viewer) .
-            ' ORDER BY lastname, firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
+            'SELECT DISTINCT u.id FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
+            . $this->getWhereStatement($viewer)
+            . ' ORDER BY u.lastname, u.firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute([
@@ -131,7 +132,8 @@ class Query
     private function getTotalCount(string $keyword, User $viewer): int
     {
         $statement = $this->db->prepareQuery(
-            'SELECT COUNT(*) FROM user ' . $this->getWhereStatement($viewer)
+            'SELECT COUNT(DISTINCT u.id) FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
+            . $this->getWhereStatement($viewer)
         );
 
         $statement->execute([
@@ -152,21 +154,47 @@ class Query
      */
     private function getWhereStatement(User $viewer): string
     {
-        $whereStatement = ' WHERE CONCAT_WS(" ",title,firstname,lastname) LIKE :firstAndLastName 
-        OR CONCAT_WS(" ",title,lastname) LIKE :lastname 
-        OR username LIKE :username 
-        OR soundex(firstname) = soundex(:sfirstname) 
-        OR soundex(lastname) = soundex(:slastname) 
-        AND user.deleted_at IS NULL ';
+        $whereParts = [
+            '
+                CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstAndLastName
+                OR CONCAT_WS(" ", u.title, u.lastname) LIKE :lastname
+                OR u.username LIKE :username
+                OR soundex(u.firstname) = soundex(:sfirstname)
+                OR soundex(u.lastname) = soundex(:slastname)
+            ',
+            'u.deleted_at IS NULL'
+        ];
 
         /**
          * When show_disabled_users flag is set to TRUE, disabled users will be shown in the result
          * Otherwise, only active users will be shown
          */
         if (!$this->config->get('show_disabled_users')) {
-            $whereStatement .= ' AND user.enabled = 1';
+            $whereParts[] = 'u.enabled = 1';
         }
 
-        return $whereStatement;
+        // Staff may always view parents and students
+        // Guests may never view parents and students
+        // Parents and students may only view parents or students if the config
+        // allows it
+        if ($viewer->getRole()->isGuest()) {
+            $findStudents = false;
+            $findParents  = false;
+        } elseif ($viewer->getRole()->isStaff()) {
+            $findStudents = true;
+            $findParents  = true;
+        } else {
+            $findStudents = $this->config->get('student_search_enable');
+            $findParents  = $this->config->get('parent_search_enable');
+        }
+
+        if (!$findStudents) {
+            $whereParts[] = "g.group_type != 'student'";
+        }
+        if (!$findParents) {
+            $whereParts[] = "g.group_type != 'parent'";
+        }
+
+        return ' WHERE ' . implode(' AND ', $whereParts);
     }
 }
