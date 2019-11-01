@@ -126,56 +126,60 @@ class MigrateToStorage
                 'externalId' => $externalId,
             ]);
 
+            /* If a user was found, try to assign image
+             * Also accommodate scenario where multiple user accounts have the same external id
+             * (give them the same picture)
+             */
+            $found = false;
+
             while ($user = $selectResult->fetch(\PDO::FETCH_ASSOC)) {
+                $found = true;
 
-                /* If a user was found, try to assign image
+                /* If this user already has a portrait hash and we only want to backfill, skip
                  */
-                if ($user) {
-
-                    /* If this user already has a portrait hash and we only want to backfill, skip
-                     */
-                    if ($this->backfill && strlen((string)$user['portrait_hash'])) {
-                        $this->logger->warning("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) already has a portrait image {$user['portrait_hash']}; skipped");
-                        continue;
-                    }
-
-                    try {
-                        /* Perform only
-                         */
-                        if ($this->perform) {
-                            $path = "{$this->portraitPath}/{$file}";
-
-                            /* Save it into brownhole
-                             */
-                            $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
-
-                            /* Update user with latest version
-                             */
-                            $updateResult->execute([
-                                'hash' => $portrait->getHash(),
-                                'id'   => $user['id']
-                            ]);
-
-                            $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
-
-                            /* Remove file when done
-                             */
-                            unlink($path);
-                        } else {
-                            $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) would have new portrait image {$file}");
-                        }
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-
-                        /* Something died in storage
-                         */
-                        $this->logger->critical("External id {$externalId} not saved; Storage error");
-                    }
-                } else {
-
-                    /* User not found; noop
-                     */
-                    $this->logger->warning("External id {$externalId} not found; skipped");
+                if ($this->backfill && strlen((string)$user['portrait_hash'])) {
+                    $this->logger->warning("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) already has a portrait image {$user['portrait_hash']}; skipped");
+                    continue;
                 }
+
+                try {
+
+                    /* Perform only
+                     */
+                    if ($this->perform) {
+                        $path = "{$this->portraitPath}/{$file}";
+
+                        /* Save it into brownhole
+                         */
+                        $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
+
+                        /* Update user with latest version
+                         */
+                        $updateResult->execute([
+                            'hash' => $portrait->getHash(),
+                            'id'   => $user['id']
+                        ]);
+
+                        $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+
+                        /* Remove file when done
+                         */
+                        unlink($path);
+                    } else {
+                        $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) would have new portrait image {$file}");
+                    }
+                } catch (\Schoolbox\Mapper\Exception $e) {
+
+                    /* Something died in storage
+                     */
+                    $this->logger->critical("External id {$externalId} not saved; Storage error");
+                }
+            }
+
+            /* User not found; noop
+             */
+            if (!$found) {
+                $this->logger->warning("External id {$externalId} not found; skipped");
             }
         }
     }
