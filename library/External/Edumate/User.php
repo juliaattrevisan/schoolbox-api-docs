@@ -465,7 +465,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $emails = array();
         foreach ($externalUserIds as $externalUserId) {
             $userEmails = array();
-            foreach ($this->getStudentContactList($externalUserId) as $contact) {
+            foreach ($this->getStudentContactList([$externalUserId]) as $contact) {
                 $userEmails[] = $contact['StudentContactDefaultEmail'];
                 $userEmails[] = $contact['StudentContactSpouseDefaultEmail'];
             }

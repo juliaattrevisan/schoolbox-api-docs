@@ -246,7 +246,7 @@ HELP;
 
         if (is_array($students)) {
             foreach ($students as $student) {
-                $contactsCurrent = $externalUser->getStudentContactList($student['synergy_id']);
+                $contactsCurrent = $externalUser->getStudentContactList([$student['synergy_id']]);
 
                 foreach ($contactsCurrent as $contactCurrent) {
                     $contacts[$contactCurrent['StudentContactID']] = $contactCurrent;

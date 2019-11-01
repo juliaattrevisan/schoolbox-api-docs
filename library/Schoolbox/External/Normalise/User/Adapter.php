@@ -520,7 +520,7 @@ class Adapter {
     {
         $collection = new Collection();
 
-        $allResults = $this->handler->getStudentContactList($externalUserId);
+        $allResults = $this->handler->getStudentContactList([$externalUserId]);
 
         if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {

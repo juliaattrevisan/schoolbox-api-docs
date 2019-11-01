@@ -73,7 +73,7 @@ abstract class Leave_Mggs_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
      */
     public function send()
     {
-        $allParents = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
+        $allParents = $this->getExternalUser()->getStudentContactList([$this->getRequest()->getUser()->getExternalId()]);
 
         if (is_array($allParents)) {
             $emailList = Array();

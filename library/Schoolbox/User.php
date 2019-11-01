@@ -1140,7 +1140,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             return $this;
         }
         $DEPRECATED_EXTERNAL_USER = new \External_User();
-        $allParents               = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
+        $allParents               = $DEPRECATED_EXTERNAL_USER->getStudentContactList([$this->externalId]);
 
         foreach ($allParents as $currentParent) {
             /* Add parent

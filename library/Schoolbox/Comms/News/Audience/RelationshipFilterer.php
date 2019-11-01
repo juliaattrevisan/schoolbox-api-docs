@@ -109,7 +109,7 @@ class RelationshipFilterer
             return [];
         }
 
-        $userContacts = $this->externalUser->getStudentContactList(implode(',', $userExternalIds));
+        $userContacts = $this->externalUser->getStudentContactList($userExternalIds);
 
         foreach ($userContacts as $userContact) {
             if ($userContact['StudentContactID']) {
