@@ -412,7 +412,9 @@ class Controller extends Base
             'oauth_nonce'                            => uniqid('', true),
             'oauth_timestamp'                        => $now->getTimestamp(),
             'oauth_signature_method'                 => 'HMAC-SHA1',
-        ]);
+            'custom_canvas_user_id'                  => $this->user->getExternalId(),
+            'custom_canvas_user_login_id'            => $this->user->getUsername(),
+            ]);
 
         // Add picker specific option
 
