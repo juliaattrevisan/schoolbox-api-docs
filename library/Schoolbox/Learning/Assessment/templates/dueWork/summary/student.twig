@@ -101,6 +101,28 @@ Data:
         selfAssessmentFeedback: selfAssessmentFeedback,
     } %}
 {% endif %}
+{% if (currentFeedback.isSelfAssessment or participant.assessable.isFeedbackVisibleToUser(USER)) and selfAssessmentFeedback.comment|length %}
+    <div class="row">
+        <div class="small-12 island">
+            <legend class="subheader">
+                {% spaceless %}
+                    {% if selfAssessmentFeedback.isSelfGrading %}
+                        {{ locale.selfAssessment.proper }}
+                    {% else %}
+                        {{ locale.selfReflection.proper }}
+                    {% endif %}
+                {% endspaceless %}
+            </legend>
+            <div class="flex-grade">
+                <ul class="information-list threaded sibling">
+                    <li>
+                        <blockquote>{{ selfAssessmentFeedback.comment|nl2br }}</blockquote>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 {# Submit button: goes underneath history if it's empty, above history if not #}
 {% if timeline is not empty %}
