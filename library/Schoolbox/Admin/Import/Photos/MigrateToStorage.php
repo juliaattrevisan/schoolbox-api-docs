@@ -115,6 +115,7 @@ class MigrateToStorage
             /* If it's an actual file, send it in
              */
             $info = pathinfo($file);
+            $path = "{$this->portraitPath}/{$file}";
 
             /* Naming convention in schoolbox instructions suggests this as the externalId
              */
@@ -147,7 +148,6 @@ class MigrateToStorage
                     /* Perform only
                      */
                     if ($this->perform) {
-                        $path = "{$this->portraitPath}/{$file}";
 
                         /* Save it into brownhole
                          */
@@ -161,10 +161,6 @@ class MigrateToStorage
                         ]);
 
                         $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
-
-                        /* Remove file when done
-                         */
-                        unlink($path);
                     } else {
                         $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) would have new portrait image {$file}");
                     }
@@ -175,6 +171,10 @@ class MigrateToStorage
                     $this->logger->critical("External id {$externalId} not saved; Storage error");
                 }
             }
+
+            /* Remove file when done
+             */
+            unlink($path);
 
             /* User not found; noop
              */
