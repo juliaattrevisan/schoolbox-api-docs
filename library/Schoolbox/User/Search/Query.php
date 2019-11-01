@@ -10,6 +10,7 @@ namespace Schoolbox\User\Search;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Query
@@ -44,11 +45,15 @@ class Query
     }
 
     /**
-     * @param string $keyword
+     * Find the search results.
+     *
+     * @param string $keyword What's the keyword `$viewer` is searching for?
+     * @param User   $viewer  Who's viewing the results? This affects what they
+     *                        may see.
      *
      * @return array
      */
-    public function fetchResults(string $keyword): array
+    public function fetchResults(string $keyword, User $viewer): array
     {
         $keyword = trim($keyword);
 
@@ -59,10 +64,10 @@ class Query
 
         if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
             $searchString = '%' . $keyword . '%';
-            $userIds = $this->getUserIdsByKeyword($searchString);
+            $userIds = $this->getUserIdsByKeyword($searchString, $viewer);
             if ($userIds) {
                 $result['results'] = $this->getUserData($userIds);
-                $result['totalCount'] = $this->getTotalCount($searchString);
+                $result['totalCount'] = $this->getTotalCount($searchString, $viewer);
             }
         }
 
@@ -95,13 +100,14 @@ class Query
 
     /**
      * @param string $keyword
+     * @param User   $viewer
      *
      * @return array
      */
-    private function getUserIdsByKeyword(string $keyword): array
+    private function getUserIdsByKeyword(string $keyword, User $viewer): array
     {
         $statement = $this->db->prepareQuery(
-            'SELECT id FROM user ' . $this->getWhereStatement() .
+            'SELECT id FROM user ' . $this->getWhereStatement($viewer) .
             ' ORDER BY lastname, firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
@@ -118,13 +124,14 @@ class Query
 
     /**
      * @param string $keyword
+     * @param User   $viewer
      *
      * @return int
      */
-    private function getTotalCount(string $keyword): int
+    private function getTotalCount(string $keyword, User $viewer): int
     {
         $statement = $this->db->prepareQuery(
-            'SELECT COUNT(*) FROM user ' . $this->getWhereStatement()
+            'SELECT COUNT(*) FROM user ' . $this->getWhereStatement($viewer)
         );
 
         $statement->execute([
@@ -139,9 +146,11 @@ class Query
     }
 
     /**
+     * @param User $viewer
+     *
      * @return string
      */
-    private function getWhereStatement(): string
+    private function getWhereStatement(User $viewer): string
     {
         $whereStatement = ' WHERE CONCAT_WS(" ",title,firstname,lastname) LIKE :firstAndLastName 
         OR CONCAT_WS(" ",title,lastname) LIKE :lastname 
