@@ -1,31 +1,15 @@
 <?php
 /** @var SitePage $this */
 
+use Event\Attendance\CanModifyAttendance;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Calendar\Event\Access as EventAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 
 $attendanceController = new Event_Attendance_Controller($this, new EventAccess(new FolderAccess()) );
 
-/**
- * @param int $eventId
- * @throws Exception if event is not found
- * @throws Exception if user don't have permission
- */
-$assertEventWritable = static function (int $eventId) use ($attendanceController) {
-    $eventMapper = new EventMapper;
-    try {
-        $event = $eventMapper->findById($eventId);
-    } catch (MapperException $e) {
-        error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
-        exit;
-    }
-    if (!$attendanceController->isPermitted($_SESSION['user'], $event)) {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
-};
+$canModify   = new CanModifyAttendance($attendanceController, $eventMapper = new EventMapper, $_SESSION['user'], $errorMapper = new ErrorMapper());
 
 /**
  * @param $eventId
@@ -35,19 +19,19 @@ $assertEventWritable = static function (int $eventId) use ($attendanceController
 $method = $this->arg[0];
 
 if ($method == 'list' && is_numeric($this->arg[1])) {
-    $assertEventWritable($this->arg[1]);
+    $canModify->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeAttendeeList($this->arg[1]);
     $attendanceController->renderAttendeeList($data);
 
 } elseif ($method == 'processModifyAttendanceList' && !empty($_POST)) {
     $data = $_POST;
-    $assertEventWritable($data['event']['id']);
+    $canModify->isSatisfiedBy($data['event']['id']);
     $attendanceController->processModifyAttendanceList($data);
 
 } elseif ($method == 'processRemoveAttendance' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
     $eventId = $this->arg[1];
     $userId = $this->arg[2];
-    $assertEventWritable($eventId);
+    $canModify->isSatisfiedBy($eventId);
 
     EventMapper::getInstance()->removeAttendance($eventId, $userId);
 
@@ -56,7 +40,7 @@ if ($method == 'list' && is_numeric($this->arg[1])) {
 } /* Show all upcoming events with the number of attendees
  */
 else if ($method == 'upcomingEvents') {
-    $assertEventWritable($this->arg[1]);
+    $canModify->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeUpcomingEventAttendance();
 
     $attendanceController->renderUpcomingEventAttendance($data);
@@ -64,7 +48,7 @@ else if ($method == 'upcomingEvents') {
 } /* A csv export of all people pending for a particular event
  */
 elseif ($method == 'exportPending') {
-    $assertEventWritable($this->arg[1]);
+    $canModify->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executePending($this->arg[1]);
 
     $attendanceController->renderExportCSV($data);
@@ -72,7 +56,7 @@ elseif ($method == 'exportPending') {
 } /* A csv export of all people attending a particular event
  */
 elseif ($method == 'exportAttending') {
-    $assertEventWritable($this->arg[1]);
+    $canModify->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeAttending($this->arg[1]);
 
     $attendanceController->renderExportCSV($data);
@@ -80,7 +64,7 @@ elseif ($method == 'exportAttending') {
 } /* A csv export of all people rejected from a particular event
  */
 elseif ($method == 'exportRejected') {
-    $assertEventWritable($this->arg[1]);
+    $canModify->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeRejected($this->arg[1]);
 
     $attendanceController->renderExportCSV($data);
