@@ -254,48 +254,51 @@ class External_Schoolpro_User implements External_UserInterface
             return [];
         }
 
-        $vars = [
-            'sbGetStudentContact',
-            [
-                'pUserName' => 'alaress',
-                'pUserPass' => 'alaress',
-                'pSchoolNum' => $externalUserId,
-            ]
-        ];
+        $studentContactList = [];
 
-        $currentStudentContact = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
+        foreach ($externalUserId as $userId) {
 
-        if (!$currentStudentContact) {
-            return [];
+            $vars = [
+                'sbGetStudentContact',
+                [
+                    'pUserName' => 'alaress',
+                    'pUserPass' => 'alaress',
+                    'pSchoolNum' => $userId,
+                ]
+            ];
+
+            $currentStudentContact = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
+
+            if ($currentStudentContact) {
+                $studentContact = [
+
+                    /* This should be separated into constituent parts
+                     */
+                    'StudentContactPreferred'          => $currentStudentContact['FullName'],
+                    'StudentContactSpousePreferred'    => $currentStudentContact['SpouseName'],
+                    'StudentContactID'                 => $currentStudentContact['ID'],
+                    'StudentContactDefaultEmail'       => $currentStudentContact['email'],
+                    'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
+                    'StudentContactSilentPhoneFlag'    => 0,
+                    'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
+                    'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
+                    'StudentContactRelation'           => '',
+                    'StudentContactSpouseID'           => $currentStudentContact['SpouseID'],
+                    'StudentContactSpouseMobilePhone'  => $currentStudentContact['SpouseMobile'],
+                    'StudentContactSpouseOccupPhone'   => $currentStudentContact['SpouseBusinessPhone'],
+                    'StudentContactSpouseDefaultEmail' => '',
+                    'StudentContactType'               => '',
+                    'StudentContactSpouseRelation'     => '',
+                ];
+
+                // Ensure all values are strings to respect interface
+                $studentContactList[] = array_map(static function ($value) {
+                    return (string)$value;
+                }, $studentContact);
+            }
         }
 
-        $studentContact = [
-
-            /* This should be separated into constituent parts
-             */
-            'StudentContactPreferred'          => $currentStudentContact['FullName'],
-            'StudentContactSpousePreferred'    => $currentStudentContact['SpouseName'],
-            'StudentContactID'                 => $currentStudentContact['ID'],
-            'StudentContactDefaultEmail'       => $currentStudentContact['email'],
-            'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
-            'StudentContactSilentPhoneFlag'    => 0,
-            'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
-            'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
-            'StudentContactRelation'           => '',
-            'StudentContactSpouseID'           => $currentStudentContact['SpouseID'],
-            'StudentContactSpouseMobilePhone'  => $currentStudentContact['SpouseMobile'],
-            'StudentContactSpouseOccupPhone'   => $currentStudentContact['SpouseBusinessPhone'],
-            'StudentContactSpouseDefaultEmail' => '',
-            'StudentContactType'               => '',
-            'StudentContactSpouseRelation'     => '',
-        ];
-
-        // Ensure all values are strings to respect interface
-        $studentContact = array_map(static function ($value) {
-            return (string)$value;
-        }, $studentContact);
-
-        return [$studentContact];
+        return $studentContactList;
     }
 
 
