@@ -14,11 +14,16 @@ Data:
     data[folderId]['aasData']['data']                            array
     data[folderId]['aasData']['data'][unitSpecId]                array
     data[folderId]['aasData']['data'][unitSpecId]['comment']     string
+    data[folderId]['aasData']['data'][unitSpecId]['capabilityMarks'] string[]|null[]
     data[folderId]['ibGraphData'][idx]['showComponent']          bool
     data[folderId]['ibGraphData'][idx]['header']                 string
     data[folderId]['ibGraphData'][idx]['studentMark']            int
     data[folderId]['nesaGraphData'][idx]['showComponent']        string
     data[folderId]['nesaGraphData'][idx]['studentMark']          string
+    data[folderId]['unitspecs']                                  array   Sorted by most recent first
+    data[folderId]['unitspecs'][idx][id]                         int
+    data[folderId]['unitspecs'][idx][dueDate]                    ADF     Copied from a relevant dueWork inside the unit
+    data[folderId]['unitspecs'][idx][title]                      string
     reportDate                                                   null|string
 #}
 <style>
@@ -79,12 +84,31 @@ Data:
                         </div>
                         <div class="column small-12 medium-6 results">
                             <div class="result-group fal">
-                                {% for label, value in folderData.falData.data %}
-                                    <div class="result-item">
-                                        <span class="result-heading">{{ label | last }}</span><br>
-                                        <span class="result-value">{{ value|default('-') }}</span>
-                                    </div>
-                                {% endfor %}
+                                {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
+                                {% if folderData.falData.data %}
+                                    {# Explicit FAL data found, use that #}
+                                    {% for label, value in folderData.falData.data %}
+                                        <div class="result-item">
+                                            <span class="result-heading">{{ label | last }}</span><br>
+                                            <span class="result-value">{{ value|default('-') }}</span>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {# No explicit FAL data found, fall back to latest AAS assessment #}
+                                    {% set aasFound = false %}
+                                    {# These units are ordered from latest to oldest #}
+                                    {% for unitSpecId, unitSpecData in folderData.unitSpecs if not aasFound %}
+                                        {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                            {% set aasFound = true %}
+                                            {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                <div class="result-item">
+                                                    <span class="result-heading">{{ label | last }}</span><br>
+                                                    <span class="result-value">{{ value|default('-') }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
                             </div>
 
                             {% set ibGraphData = folderData.ibGraphData.data | default(null) %}
