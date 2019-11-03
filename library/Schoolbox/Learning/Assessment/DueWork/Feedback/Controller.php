@@ -272,7 +272,7 @@ class Controller extends Base
                  */
                 $plagscanMapper = $this->plagscanMapper;
 
-                if ($response->getId() && $assessment->getSimilarityCheckEnabled()) {
+                if ($assessment->getSimilarityCheckEnabled()) {
                     foreach ($response->getAllFiles() as $currentFile) {
                         if (!$currentFile->getEditableInline()) {
                             $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -285,7 +285,7 @@ class Controller extends Base
                     'data'   => [],
                     'postOutput' => [
                         function () use ($plagscanMapper, $response, $assessment) {
-                            if ($response->getId() && $assessment->getSimilarityCheckEnabled()) {
+                            if ($assessment->getSimilarityCheckEnabled()) {
                                 foreach ($response->getAllFiles() as $currentFile) {
                                     $filename = $plagscanMapper->plagscanFilename($currentFile);
 
