@@ -272,9 +272,11 @@ class Controller extends Base
                  */
                 $plagscanMapper = $this->plagscanMapper;
 
-                foreach ($response->getAllFiles() as $currentFile) {
-                    if (!$currentFile->getEditableInline()) {
-                        $plagscanMapper->saveNewPlagscanStub($currentFile);
+                if ($assessment->getSimilarityCheckEnabled()) {
+                    foreach ($response->getAllFiles() as $currentFile) {
+                        if (!$currentFile->getEditableInline()) {
+                            $plagscanMapper->saveNewPlagscanStub($currentFile);
+                        }
                     }
                 }
 
@@ -282,15 +284,15 @@ class Controller extends Base
                     'format' => 'json',
                     'data'   => [],
                     'postOutput' => [
-                        function() use ($plagscanMapper, $response) {
-                            if ($response->getId()) {
+                        function () use ($plagscanMapper, $response, $assessment) {
+                            if ($assessment->getSimilarityCheckEnabled()) {
                                 foreach ($response->getAllFiles() as $currentFile) {
                                     $filename = $plagscanMapper->plagscanFilename($currentFile);
 
                                     $plagscanMapper->saveNewPlagscan($currentFile, $filename);
                                 }
                             }
-                        }
+                        },
                     ],
                 ]);
             }
