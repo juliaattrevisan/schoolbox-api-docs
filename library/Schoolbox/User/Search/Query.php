@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\User\Search;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Role;
 use Schoolbox\User;
