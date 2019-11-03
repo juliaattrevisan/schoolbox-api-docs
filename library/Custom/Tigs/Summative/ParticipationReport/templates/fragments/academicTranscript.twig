@@ -128,19 +128,19 @@ Data:
                                     {% if folderData.hscRankData.assessmentMark is defined %}
                                         <div class="result-item hsc-rank-mark">
                                             <span class="result-heading">Mark</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentMark }}</span>
+                                            <span class="result-value">{{ folderData.hscRankData.assessmentMark|default('-') }}</span>
                                         </div>
                                     {% endif %}
                                     {% if folderData.hscRankData.assessmentAverage is defined %}
                                         <div class="result-item hsc-rank-average">
                                             <span class="result-heading">Average</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentAverage }}</span>
+                                            <span class="result-value">{{ folderData.hscRankData.assessmentAverage|default('-') }}</span>
                                         </div>
                                     {% endif %}
                                     {% if folderData.hscRankData.assessmentRank is defined %}
                                     <div class="result-item hsc-rank-rank">
                                         <span class="result-heading">Rank</span><br>
-                                        <span class="result-value">{{ folderData.hscRankData.assessmentRank }}</span>
+                                        <span class="result-value">{{ folderData.hscRankData.assessmentRank|default('-') }}</span>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -154,19 +154,19 @@ Data:
                                         {% if hscTaskMarkData.studentMark is defined %}
                                             <div class="result-item hsc-rank-mark">
                                                 <span class="result-heading">Mark*</span><br>
-                                                <span class="result-value">{{ hscTaskMarkData.studentMark }}</span>
+                                                <span class="result-value">{{ hscTaskMarkData.studentMark|default('-') }}</span>
                                             </div>
                                         {% endif %}
                                         {% if hscTaskMarkData.cohortAverage is defined %}
                                             <div class="result-item hsc-rank-average">
                                                 <span class="result-heading">Average*</span><br>
-                                                <span class="result-value">{{ hscTaskMarkData.cohortAverage }}</span>
+                                                <span class="result-value">{{ hscTaskMarkData.cohortAverage|default('-') }}</span>
                                             </div>
                                         {% endif %}
                                         {% if hscTaskMarkData.cohortRank is defined %}
                                             <div class="result-item hsc-rank-rank">
                                                 <span class="result-heading">Rank*</span><br>
-                                                <span class="result-value">{{ hscTaskMarkData.cohortRank }}</span>
+                                                <span class="result-value">{{ hscTaskMarkData.cohortRank|default('-') }}</span>
                                             </div>
                                         {% endif %}
                                     {% endif %}
