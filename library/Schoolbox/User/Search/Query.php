@@ -102,7 +102,7 @@ class Query
     /**
      * Find IDs for users that match the given keyword.
      *
-     * This list is subject to filtering in `getWhereStatement`.
+     * This list is subject to be filtered by `getQueryFilter`.
      *
      * @param string $keyword
      * @param User   $viewer
@@ -127,7 +127,7 @@ class Query
     /**
      * Find a total count of users that match the given keyword.
      *
-     * This count is subject to filtering in `getWhereStatement`.
+     * This count is subject to be filtered by `getQueryFilter`.
      *
      * @param string $keyword
      * @param User   $viewer
