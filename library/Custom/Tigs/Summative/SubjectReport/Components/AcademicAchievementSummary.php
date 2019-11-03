@@ -21,7 +21,6 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use UnexpectedValueException;
 use function array_key_exists;
 
 /**
