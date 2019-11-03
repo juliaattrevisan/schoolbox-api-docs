@@ -194,8 +194,8 @@ class DataSource
      * @param int|null   $typeId
      * @param int|null   $offset
      * @param int|null   $limit
-     * @param int|null   $linkedStudentId
-     * @param array|null $linkedRecordIds
+     * @param int|null   $linkedStudentId find records only linked to this student, if provided
+     * @param array|null $linkedRecordIds find records only linked to these records, if provided
      * @return GenericCollection
      */
     private function findRawRecords(User $viewer, ?int $studentId, ?int $typeId, ?int $offset, ?int $limit, ?int $linkedStudentId, ?array $linkedRecordIds): GenericCollection
