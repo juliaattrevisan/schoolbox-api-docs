@@ -9,7 +9,7 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
 
 $attendanceController = new Event_Attendance_Controller($this, new EventAccess(new FolderAccess()) );
 
-$canModify   = new CanModifyAttendance($attendanceController, $eventMapper = new EventMapper, $_SESSION['user'], $errorMapper = new ErrorMapper());
+$canModifyAttendance = new CanModifyAttendance($attendanceController, $eventMapper = new EventMapper, $_SESSION['user'], $errorMapper = new ErrorMapper());
 
 /**
  * @param $eventId
@@ -19,19 +19,19 @@ $canModify   = new CanModifyAttendance($attendanceController, $eventMapper = new
 $method = $this->arg[0];
 
 if ($method == 'list' && is_numeric($this->arg[1])) {
-    $canModify->isSatisfiedBy($this->arg[1]);
+    $canModifyAttendance->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeAttendeeList($this->arg[1]);
     $attendanceController->renderAttendeeList($data);
 
 } elseif ($method == 'processModifyAttendanceList' && !empty($_POST)) {
     $data = $_POST;
-    $canModify->isSatisfiedBy($data['event']['id']);
+    $canModifyAttendance->isSatisfiedBy($data['event']['id']);
     $attendanceController->processModifyAttendanceList($data);
 
 } elseif ($method == 'processRemoveAttendance' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
     $eventId = $this->arg[1];
     $userId = $this->arg[2];
-    $canModify->isSatisfiedBy($eventId);
+    $canModifyAttendance->isSatisfiedBy($eventId);
 
     EventMapper::getInstance()->removeAttendance($eventId, $userId);
 
@@ -40,7 +40,7 @@ if ($method == 'list' && is_numeric($this->arg[1])) {
 } /* Show all upcoming events with the number of attendees
  */
 else if ($method == 'upcomingEvents') {
-    $canModify->isSatisfiedBy($this->arg[1]);
+    $canModifyAttendance->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeUpcomingEventAttendance();
 
     $attendanceController->renderUpcomingEventAttendance($data);
@@ -48,7 +48,7 @@ else if ($method == 'upcomingEvents') {
 } /* A csv export of all people pending for a particular event
  */
 elseif ($method == 'exportPending') {
-    $canModify->isSatisfiedBy($this->arg[1]);
+    $canModifyAttendance->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executePending($this->arg[1]);
 
     $attendanceController->renderExportCSV($data);
@@ -56,7 +56,7 @@ elseif ($method == 'exportPending') {
 } /* A csv export of all people attending a particular event
  */
 elseif ($method == 'exportAttending') {
-    $canModify->isSatisfiedBy($this->arg[1]);
+    $canModifyAttendance->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeAttending($this->arg[1]);
 
     $attendanceController->renderExportCSV($data);
@@ -64,7 +64,7 @@ elseif ($method == 'exportAttending') {
 } /* A csv export of all people rejected from a particular event
  */
 elseif ($method == 'exportRejected') {
-    $canModify->isSatisfiedBy($this->arg[1]);
+    $canModifyAttendance->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeRejected($this->arg[1]);
 
     $attendanceController->renderExportCSV($data);

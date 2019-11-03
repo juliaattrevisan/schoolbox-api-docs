@@ -419,7 +419,7 @@ class Event_Attendance_Controller extends Controller
      * @param Event           $event
      * @return bool
      */
-    public function isPermitted(Schoolbox\User $user, Event $event)
+    public function isPermitted(Schoolbox\User $user, Event $event): bool
     {
         if ($this->eventAccess->checkExisting($user, $event)) {
             return true;
