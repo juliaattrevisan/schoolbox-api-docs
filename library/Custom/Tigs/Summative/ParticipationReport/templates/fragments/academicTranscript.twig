@@ -97,7 +97,7 @@ Data:
                                     {# No explicit FAL data found, fall back to latest AAS assessment #}
                                     {% set aasFound = false %}
                                     {# These units are ordered from latest to oldest #}
-                                    {% for unitSpecId, unitSpecData in folderData.unitSpecs if not aasFound %}
+                                    {% for unitSpecData in folderData.unitSpecs if not aasFound %}
                                         {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
                                             {% set aasFound = true %}
                                             {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
@@ -122,6 +122,7 @@ Data:
                                 </div>
                             {% endif %}
 
+                            {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
                             {% if folderData.hscRankData %}
                                 <div class="result-group hsc-rank">
                                     {% if folderData.hscRankData.assessmentMark is defined %}
@@ -142,6 +143,34 @@ Data:
                                         <span class="result-value">{{ folderData.hscRankData.assessmentRank }}</span>
                                     </div>
                                     {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="result-group hsc-rank">
+                                {% set hasTaskFound = false %}
+                                {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
+                                    {% if folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                        {% set hasTaskFound = true %}
+                                        {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                        {% if hscTaskMarkData.studentMark is defined %}
+                                            <div class="result-item hsc-rank-mark">
+                                                <span class="result-heading">Mark</span><br>
+                                                <span class="result-value">{{ hscTaskMarkData.studentMark }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if hscTaskMarkData.cohortAverage is defined %}
+                                            <div class="result-item hsc-rank-average">
+                                                <span class="result-heading">Average</span><br>
+                                                <span class="result-value">{{ hscTaskMarkData.cohortAverage }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if hscTaskMarkData.cohortRank is defined %}
+                                            <div class="result-item hsc-rank-rank">
+                                                <span class="result-heading">Rank</span><br>
+                                                <span class="result-value">{{ hscTaskMarkData.cohortRank }}</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                                 </div>
                             {% endif %}
 
