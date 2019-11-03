@@ -125,6 +125,10 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
         $ids = implode(',', $externalUserId);
 
         return $this->internalDatabase->executeQuery(
