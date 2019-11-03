@@ -15,6 +15,10 @@ class External_Isams_Cis_User extends External_Isams_User
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
         $ids = implode(',', $externalUserId);
 
         $query = "
