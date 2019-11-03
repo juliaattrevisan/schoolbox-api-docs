@@ -8,7 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\User\Search;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Query
@@ -26,21 +28,32 @@ class Query
     private $db;
 
     /**
+     * @var IConfigLoader
+     */
+    private $config;
+
+    /**
      * Query constructor.
      *
-     * @param IConnector $db
+     * @param IConnector    $db
+     * @param IConfigLoader $config
      */
-    public function __construct(IConnector $db)
+    public function __construct(IConnector $db, IConfigLoader $config)
     {
-        $this->db = $db;
+        $this->db     = $db;
+        $this->config = $config;
     }
 
     /**
-     * @param string $keyword
+     * Find the search results.
+     *
+     * @param string $keyword What's the keyword `$viewer` is searching for?
+     * @param User   $viewer  Who's viewing the results? This affects what they
+     *                        may see.
      *
      * @return array
      */
-    public function fetchResults(string $keyword): array
+    public function fetchResults(string $keyword, User $viewer): array
     {
         $keyword = trim($keyword);
 
@@ -51,10 +64,10 @@ class Query
 
         if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
             $searchString = '%' . $keyword . '%';
-            $userIds = $this->getUserIdsByKeyword($searchString);
+            $userIds = $this->getUserIdsByKeyword($searchString, $viewer);
             if ($userIds) {
-                $result['results'] = $this->getUserData($userIds);
-                $result['totalCount'] = $this->getTotalCount($searchString);
+                $result['results']    = $this->getUserData($userIds);
+                $result['totalCount'] = $this->getTotalCount($searchString, $viewer);
             }
         }
 
@@ -71,7 +84,7 @@ class Query
         $result = [];
 
         $users = UserMapper::getInstance()->findByColumn('id', $userIds, ['order'=>['lastname'=>'ASC', 'firstname' => 'ASC']]);
-        
+
         foreach ($users as $key => $user) {
             $result[$key]['id']             = $user->getId();
             $result[$key]['externalId']     = $user->getExternalId();
@@ -86,70 +99,113 @@ class Query
     }
 
     /**
+     * Find IDs for users that match the given keyword.
+     *
+     * This list is subject to be filtered by `getQueryFilter`.
+     *
      * @param string $keyword
+     * @param User   $viewer
      *
      * @return array
      */
-    private function getUserIdsByKeyword(string $keyword): array
+    private function getUserIdsByKeyword(string $keyword, User $viewer): array
     {
+        [$where, $params] = $this->getQueryFilter($keyword, $viewer);
+
         $statement = $this->db->prepareQuery(
-            'SELECT id FROM user ' . $this->getWhereStatement() .
-            ' ORDER BY lastname, firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
+            'SELECT DISTINCT u.id FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
+            . $where
+            . ' ORDER BY u.lastname, u.firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
-        $statement->execute([
-            'firstAndLastName'  => $keyword,
-            'lastname'          => $keyword,
-            'username'          => $keyword,
-            'sfirstname'        => $keyword,
-            'slastname'         => $keyword,
-        ]);
+        $statement->execute($params);
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     /**
+     * Find a total count of users that match the given keyword.
+     *
+     * This count is subject to be filtered by `getQueryFilter`.
+     *
      * @param string $keyword
+     * @param User   $viewer
      *
      * @return int
      */
-    private function getTotalCount(string $keyword): int
+    private function getTotalCount(string $keyword, User $viewer): int
     {
+        [$where, $params] = $this->getQueryFilter($keyword, $viewer);
         $statement = $this->db->prepareQuery(
-            'SELECT COUNT(*) FROM user ' . $this->getWhereStatement()
+            'SELECT COUNT(DISTINCT u.id) FROM user u INNER JOIN `groups` g ON u.group_id = g.id' . $where
         );
 
-        $statement->execute([
-            'firstAndLastName'  => $keyword,
-            'lastname'          => $keyword,
-            'username'          => $keyword,
-            'sfirstname'        => $keyword,
-            'slastname'         => $keyword,
-        ]);
+        $statement->execute($params);
 
         return (int) $statement->fetchColumn();
     }
 
     /**
-     * @return string
+     * Build the WHERE statement and query parameters which filter the list and
+     * count of users found by the search.
+     *
+     * @param string $keyword
+     * @param User   $viewer
+     *
+     * @return array [$where, $params]
      */
-    private function getWhereStatement(): string
+    private function getQueryFilter(string $keyword, User $viewer): array
     {
-        $whereStatement = ' WHERE CONCAT_WS(" ",title,firstname,lastname) LIKE :firstAndLastName 
-        OR CONCAT_WS(" ",title,lastname) LIKE :lastname 
-        OR username LIKE :username 
-        OR soundex(firstname) = soundex(:sfirstname) 
-        OR soundex(lastname) = soundex(:slastname) 
-        AND user.deleted_at IS NULL ';
+        $whereParts = [
+            '(
+                CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstAndLastName
+                OR CONCAT_WS(" ", u.title, u.lastname) LIKE :lastname
+                OR u.username LIKE :username
+                OR soundex(u.firstname) = soundex(:sfirstname)
+                OR soundex(u.lastname) = soundex(:slastname)
+            )',
+            'u.deleted_at IS NULL'
+        ];
+        $params = [
+            'firstAndLastName'  => $keyword,
+            'lastname'          => $keyword,
+            'username'          => $keyword,
+            'sfirstname'        => $keyword,
+            'slastname'         => $keyword,
+        ];
 
         /**
          * When show_disabled_users flag is set to TRUE, disabled users will be shown in the result
          * Otherwise, only active users will be shown
          */
-        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
-            $whereStatement .= ' AND user.enabled = 1';
+        if (!$this->config->get('show_disabled_users')) {
+            $whereParts[] = 'u.enabled = 1';
         }
 
-        return $whereStatement;
+        // Staff may always view parents and students
+        // Guests may never view parents and students
+        // Parents and students may only view parents or students if the config
+        // allows it
+        if ($viewer->getRole()->isGuest()) {
+            $findStudents = false;
+            $findParents  = false;
+        } elseif ($viewer->getRole()->isStaff()) {
+            $findStudents = true;
+            $findParents  = true;
+        } else {
+            $findStudents = $this->config->get('student_search_enable');
+            $findParents  = $this->config->get('parent_search_enable');
+        }
+
+        if (!$findStudents) {
+            $whereParts[]          = "g.group_type != :studentType";
+            $params['studentType'] = Role::STUDENT;
+        }
+        if (!$findParents) {
+            $whereParts[]         = "g.group_type != :parentType";
+            $params['parentType'] = Role::PARENT;
+        }
+
+        return [' WHERE ' . implode(' AND ', $whereParts), $params];
     }
 }
