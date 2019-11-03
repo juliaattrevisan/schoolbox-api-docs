@@ -409,6 +409,10 @@ class External_Maze_User implements External_UserInterface
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
         $ids = implode(',', $externalUserId);
 
         $query = "
