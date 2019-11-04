@@ -16,12 +16,6 @@
             finalSummarySelector    = '[data-final-summary]';
 
 
-        // Mark entered in the overall mark field
-        var currentMarkInput   = $status.find(markInputSelector).val();
-
-        // Disable the button if the rubric value is same as input value
-        $assignFromRubricButton.prop('disabled', getRubricSum() == currentMarkInput);
-
         // Dynamically insert the rubric mark into the button on page load
         var rubricSum = getRubricSum();
         var isValueCustomised = isCustomGrade(rubricSum);
