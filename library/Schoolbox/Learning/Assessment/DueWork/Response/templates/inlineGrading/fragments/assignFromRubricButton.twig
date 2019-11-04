@@ -42,21 +42,29 @@
         }
 
         function updateButtonMark() {
-            // Current calculated rubric total
             var rubricSum = getRubricSum();
+            var isValueCustomised = isCustomGrade(rubricSum);
 
             $("[data-rubric-sum]").text(rubricSum);
 
-            // Mark entered in the overall mark field
-            var currentMarkInput   = $status.find(markInputSelector).val();
-            // Disable the button if the rubric value is same as input value
-            var isValueCustomised = rubricSum !== '' && rubricSum !== currentMarkInput;
             $assignFromRubricButton.prop('disabled', !isValueCustomised);
+
             if (isValueCustomised) {
                 $status.find(markInputSelector).attr('data-customised', true);
             } else {
                 $status.find(markInputSelector).removeAttr('data-customised');
             }
+        }
+
+
+        /**
+         * If a human entered the Grade, it was "customised"
+         *
+         * @param rubricSum
+         * @return bool
+         */
+        function isCustomGrade(rubricSum) {
+            return rubricSum !== '' && rubricSum !== $status.find(markInputSelector).val();
         }
 
 
