@@ -46,11 +46,7 @@
             // Current calculated rubric total
             var rubricSum = getRubricSum();
 
-            if (markType === 'Percentage') {
-                $("[data-rubric-sum]").text(rubricSum + "%");
-            } else {
-                $("[data-rubric-sum]").text(rubricSum);
-            }
+            $("[data-rubric-sum]").text(rubricSum);
 
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
@@ -64,25 +60,17 @@
             }
         }
 
+
+        /**
+         * Calculate the sum of the selected descriptors in the rubric grid
+         * This is used to create a representation of the total in various ui elements
+         *
+         * @return string
+         */
         function getRubricSum() {
-            // Current calculated rubric total
-            var rubricTotalText = $rb.find(finalSummarySelector).text();
-            var rubricSum = $.trim(rubricTotalText);
-
-            // Extract the actual mark bit
-            switch(markType) {
-                case 'TotalMarkFractional':
-                    // Total mark is shown as x / y so extract the x
-                    rubricSum = rubricTotalText.replace(/\s*\/\s*\d*/, "");
-                    break;
-                case 'Percentage':
-                    // Remove the trailing whitespace and % symbol
-                    rubricSum = rubricTotalText.replace(/\s*%/, "");
-                    break;
-            }
-
-            return $.trim(rubricSum);
+            return $.trim($rb.find(finalSummarySelector).text());
         }
+
 
         // Update the input val when manually assigning grade from rubric
         $assignFromRubricButton.on('click', function(e) {
