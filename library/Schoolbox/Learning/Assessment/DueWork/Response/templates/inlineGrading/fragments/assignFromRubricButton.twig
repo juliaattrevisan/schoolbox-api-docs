@@ -49,10 +49,20 @@
 
             $assignFromRubricButton.prop('disabled', !isValueCustomised);
 
+            updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
+        }
+
+
+        /**
+         * Update the customisation status flag when a human enters a grade
+         *
+         * @return void
+         */
+        function updateCustomisationStatus(element, isValueCustomised) {
             if (isValueCustomised) {
-                $status.find(markInputSelector).attr('data-customised', true);
+                $(element).attr('data-customised', true);
             } else {
-                $status.find(markInputSelector).removeAttr('data-customised');
+                $(element).removeAttr('data-customised');
             }
         }
 
