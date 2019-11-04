@@ -136,6 +136,8 @@ class Mapper extends BaseMapper
          *
          * * We do not need to join to deleted subtypes as the system does not permit soft-deletion
          *   of subtypes if they are used by a non-soft deleted pastoral.
+         *
+         * * We do not need to join to deleted students as pastoral records for a deleted user should not exist.
          */
 
         return "
