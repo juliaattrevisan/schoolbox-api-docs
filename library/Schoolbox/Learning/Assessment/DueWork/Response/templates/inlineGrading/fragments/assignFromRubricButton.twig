@@ -10,7 +10,7 @@
 
         // cache this stuff, it doesn't change
         var $status                 = $('#assessment-status'),
-            markInputSelector      = '[data-mark-input]',
+            markInputSelector       = '[data-mark-input]',
             $assignFromRubricButton = $('#use-rubric-value'),
             $rb                     = $('#rb-{{ rubricId }}'),
             finalSummarySelector    = '[data-final-summary]';
@@ -23,6 +23,7 @@
         /**
          * Initialise button contents, customisation status based on current conditions
          *
+         * @param element the markInputSelector element containing the data-customised var
          * @return void
          */
         function init(element) {
@@ -37,8 +38,8 @@
         /**
          * Update text and properties of the Assign From Rubric button
          *
-         * @param rubricSum
-         * @param isValueCustomised
+         * @param rubricSum string
+         * @param isValueCustomised bool
          * @return void
          */
         function updateButtonMark(rubricSum, isValueCustomised) {
@@ -51,6 +52,8 @@
         /**
          * Update the customisation status flag when a human enters a grade
          *
+         * @param element the markInputSelector element containing the data-customised var
+         * @param isValueCustomised bool
          * @return void
          */
         function updateCustomisationStatus(element, isValueCustomised) {
@@ -69,7 +72,7 @@
          * Update the mark input field with current rubric total if the total is different from the input val
          * but ONLY if we haven't already customised the mark - don't clobber!
          *
-         * @param rubricSum
+         * @param rubricSum string
          * @return void
          */
         function updateGrade(rubricSum) {
@@ -97,7 +100,7 @@
             updateGrade(rubricSum);
 
             /* Sequential dependency with the "don't clobber" code above
-             * updateGrade() changes a value that is analysed in isCustomGrade(0
+             * updateGrade() changes a value that is analysed in isCustomGrade()
              */
             var isValueCustomised = isCustomGrade(rubricSum);
 
@@ -109,7 +112,7 @@
         /**
          * If a human entered the Grade, it was "customised"
          *
-         * @param rubricSum
+         * @param rubricSum string
          * @return bool
          */
         function isCustomGrade(rubricSum) {
@@ -123,8 +126,9 @@
          * This varies from isCustomGrade() in that it remembers historically that you've entered
          * a grade manually, rather than circumstantially based on grid summation
          *
+         * TODO: Verify
          * Prevents a clobbering when you cycle through the grid selections, whose summation
-         * just so happens to match a human-defined var. This flag explicitly statse that a custom
+         * just so happens to match a human-defined var. This flag explicitly states that a custom
          * grade was provided, even if it matches the current grid selection's summation it won't
          * be overridden by the next selection
          *
