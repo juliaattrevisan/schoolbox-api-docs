@@ -38,7 +38,8 @@
                 $status.find(markInputSelector).val(rubricSum); // Input val
             }
 
-            var rubricSum = getRubricSum();
+            /* Sequential dependency with the "don't clobber" code above
+             */
             var isValueCustomised = isCustomGrade(rubricSum);
 
             updateButtonMark(rubricSum, isValueCustomised);
