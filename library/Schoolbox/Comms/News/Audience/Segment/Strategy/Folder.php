@@ -242,7 +242,8 @@ class Folder extends SimpleStrategy
                 '{$entityType}' AS entity_type, null as entity_meta
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-            WHERE (
+            WHERE folder.name IS NOT NULL
+            AND (
                 folder.id IN (SELECT folder_id FROM folder_code WHERE deleted_at IS NULL)
                 OR
                 folder.id IN (SELECT cid FROM userGroups)
