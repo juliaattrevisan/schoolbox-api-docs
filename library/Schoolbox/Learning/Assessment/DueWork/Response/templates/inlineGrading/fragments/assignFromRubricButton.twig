@@ -40,7 +40,7 @@
          *
          * @return void
          */
-        function refreshAssignFromRubricInput() {
+        function updateAll() {
 
             // Current calculated rubric total
             var rubricSum = getRubricSum();
@@ -153,7 +153,7 @@
             $markInput.removeAttr('data-customised');
 
             e.preventDefault();
-            refreshAssignFromRubricInput();
+            updateAll();
 
             // Trigger change event manually, so that dynamic feedback JS is aware of the change
             $markInput.trigger("change");
@@ -177,12 +177,12 @@
         $("[data-use-descriptor-values]").on('click', function(e) {
             e.preventDefault();
             if (!$status.find(markInputSelector).attr('data-customised')) {
-                refreshAssignFromRubricInput();
+                updateAll();
             }
         });
 
         // Update the input val when any of these inputs change
-        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', refreshAssignFromRubricInput);
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', updateAll);
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign <span class="descriptor-sum" data-rubric-sum></span> from Rubric</button></p>
