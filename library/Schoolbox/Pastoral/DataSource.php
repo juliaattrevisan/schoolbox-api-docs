@@ -106,10 +106,10 @@ class DataSource
 
 
     /**
-     * Gets number of records for particular student visible to the given viewer
-     * @param User     $viewer
-     * @param int      $studentId
-     * @param int|null $typeId
+     * Finds a count of records for a particular student visible to the given viewer
+     * @param User     $viewer    Who is viewing this student's records
+     * @param int      $studentId Id of a student being viewed
+     * @param int|null $typeId    Filter the records with a pastoral type, if provided
      * @return int
      */
     public function countRecords(User $viewer, int $studentId, ?int $typeId): int
@@ -129,12 +129,12 @@ class DataSource
 
     /**
      * Gets records for a particular student visible to the given viewer
-     * @param User     $viewer
-     * @param int      $studentId
-     * @param int|null $typeId          filter the records with a pastoral type, if not null
+     * @param User     $viewer          Who is viewing this student's records
+     * @param int      $studentId       Id of a student being viewed
+     * @param int|null $typeId          Filter the records with a pastoral type, if not null
      * @param int      $offset
      * @param int      $limit
-     * @param int|null $linkedStudentId if not null, returns only records linked with this student
+     * @param int|null $linkedStudentId Returns the records linked to this student only, if provided
      * @return GenericCollection|Model[]
      */
     public function findRecords(User $viewer, int $studentId, ?int $typeId, int $offset, int $limit, ?int $linkedStudentId): GenericCollection
@@ -188,14 +188,14 @@ class DataSource
 
 
     /**
-     * Gets records without linked records
-     * @param User       $viewer
-     * @param int|null   $studentId
-     * @param int|null   $typeId
+     * Gets records with least hydration. This will not populate any linked records to the returning records.
+     * @param User       $viewer          Who is viewing this student's records
+     * @param int        $studentId       Id of a student being viewed
+     * @param int|null   $typeId          Filter the records with a pastoral type, if not null
      * @param int|null   $offset
      * @param int|null   $limit
-     * @param int|null   $linkedStudentId find records only linked to this student, if provided
-     * @param array|null $linkedRecordIds find records only linked to these records, if provided
+     * @param int|null   $linkedStudentId Find records linked to this student only, if provided
+     * @param array|null $linkedRecordIds Find records linked to these records only, if provided
      * @return GenericCollection
      */
     private function findRawRecords(User $viewer, ?int $studentId, ?int $typeId, ?int $offset, ?int $limit, ?int $linkedStudentId, ?array $linkedRecordIds): GenericCollection
@@ -260,8 +260,8 @@ class DataSource
     /**
      * Gets "where" string to find linked records
      * @param User       $viewer
-     * @param int|null   $linkedStudentId limit linked records to be only for the student
-     * @param array|null $recordIds       limit linked records in this ids
+     * @param int|null   $linkedStudentId Find records linked to this student only, if provided
+     * @param array|null $recordIds       Find records linked to these records only, if provided
      * @return array
      */
     private function getLinkedClause(User $viewer, ?int $linkedStudentId, ?array $recordIds): array
@@ -491,8 +491,9 @@ class DataSource
 
 
     /**
-     * @param User $viewer
-     * @param int  $studentId
+     * Finds a count of linked records grouped by linked student names for a particular student visible to the given viewer
+     * @param User $viewer    Who is viewing this student's records
+     * @param int  $studentId Id of a student being viewed
      * @return array
      */
     public function getLinkedStudentRecordCount(User $viewer, int $studentId): array

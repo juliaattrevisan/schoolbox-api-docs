@@ -84,8 +84,7 @@
                                                     {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
                                                     {% if getStudentRecord %}
                                                         Linked Record:
-                                                        <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (
-                                                        <a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)
+                                                        <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)
                                                         <br>
                                                     {% endif %}
                                                 {% endif %}
