@@ -102,10 +102,7 @@
             /* Sequential dependency with the "don't clobber" code above
              * updateGrade() changes a value that is analysed in isCustomGrade()
              */
-            var isValueCustomised = isCustomGrade(rubricSum);
-
-            updateButtonMark(rubricSum, isValueCustomised);
-            updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
+            init($status.find(markInputSelector));
         }
 
 
