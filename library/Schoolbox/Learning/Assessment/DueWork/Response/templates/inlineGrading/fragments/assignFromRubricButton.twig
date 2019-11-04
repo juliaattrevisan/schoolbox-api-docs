@@ -38,18 +38,25 @@
                 $status.find(markInputSelector).val(rubricSum); // Input val
             }
 
-            updateButtonMark();
-        }
-
-        function updateButtonMark() {
             var rubricSum = getRubricSum();
             var isValueCustomised = isCustomGrade(rubricSum);
 
+            updateButtonMark(rubricSum, isValueCustomised);
+            updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
+        }
+
+
+        /**
+         * Update text and properties of the Assign From Rubric button
+         *
+         * @param rubricSum
+         * @param isValueCustomised
+         * @return void
+         */
+        function updateButtonMark(rubricSum, isValueCustomised) {
             $("[data-rubric-sum]").text(rubricSum);
 
             $assignFromRubricButton.prop('disabled', !isValueCustomised);
-
-            updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
         }
 
 
