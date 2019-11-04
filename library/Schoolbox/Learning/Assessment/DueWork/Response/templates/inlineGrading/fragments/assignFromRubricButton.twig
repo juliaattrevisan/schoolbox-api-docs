@@ -177,7 +177,8 @@
         // Update the input val when manually assigning grades from descriptor vals
         $("[data-use-descriptor-values]").on('click', function(e) {
             e.preventDefault();
-            if (!$status.find(markInputSelector).attr('data-customised')) {
+
+            if (!wasCustomised()) {
                 updateAll();
             }
         });
