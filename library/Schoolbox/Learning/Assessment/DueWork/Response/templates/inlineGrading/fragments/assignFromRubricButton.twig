@@ -23,7 +23,10 @@
         $assignFromRubricButton.prop('disabled', getRubricSum() == currentMarkInput);
 
         // Dynamically insert the rubric mark into the button on page load
-        updateButtonMark();
+        var rubricSum = getRubricSum();
+        var isValueCustomised = isCustomGrade(rubricSum);
+
+        updateButtonMark(rubricSum, isValueCustomised);
 
         function refreshAssignFromRubricInput() {
             // Current calculated rubric total
