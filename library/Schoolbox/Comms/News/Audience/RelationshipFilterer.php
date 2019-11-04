@@ -98,11 +98,9 @@ class RelationshipFilterer
         $userExternalIds = [];
 
         foreach ($users as $user) {
-            if (!$user->getExternalId()) {
-                continue;
+            if ($user->getExternalId()) {
+                $userExternalIds[] = $user->getExternalId();
             }
-
-            $userExternalIds[] = $user->getExternalId();
         }
 
         if (!\count($userExternalIds)) {
