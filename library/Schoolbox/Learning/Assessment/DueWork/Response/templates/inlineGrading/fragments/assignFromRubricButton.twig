@@ -32,14 +32,9 @@
             // Current calculated rubric total
             var rubricSum = getRubricSum();
 
-            // Mark entered in the overall mark field
-            var currentMarkInput   = $status.find(markInputSelector).val();
-
-            // Update the mark input field with current rubric total if the total is different from the input val
-            // but ONLY if we haven't already customised the mark - don't clobber!
-            if ( rubricSum !== currentMarkInput && (!wasCustomised()) ) {
-                $status.find(markInputSelector).val(rubricSum); // Input val
-            }
+            /* Update Grade value if applicable
+             */
+            updateGrade(rubricSum);
 
             /* Sequential dependency with the "don't clobber" code above
              */
@@ -47,6 +42,25 @@
 
             updateButtonMark(rubricSum, isValueCustomised);
             updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
+        }
+
+
+        /**
+         * Update the Grade based on the grid summation and existence of a
+         * customised human-provided value
+         *
+         * Update the mark input field with current rubric total if the total is different from the input val
+         * but ONLY if we haven't already customised the mark - don't clobber!
+         *
+         * @param rubricSum
+         * @return void
+         */
+        function updateGrade(rubricSum) {
+            var currentMarkInput = $status.find(markInputSelector).val();
+
+            if (rubricSum !== currentMarkInput && (!wasCustomised()) ) {
+                $status.find(markInputSelector).val(rubricSum);
+            }
         }
 
 
