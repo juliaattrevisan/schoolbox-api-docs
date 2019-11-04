@@ -21,7 +21,7 @@
         var isValueCustomised = isCustomGrade(rubricSum);
 
         updateButtonMark(rubricSum, isValueCustomised);
-
+        updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
 
         /**
          * Update ui elements based on grid selection
