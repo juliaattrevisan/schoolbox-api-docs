@@ -23,6 +23,7 @@
         updateButtonMark(rubricSum, isValueCustomised);
         updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
 
+
         /**
          * Update ui elements based on grid selection
          * There are sequential dependencies here that I can't easily avoid atm
@@ -164,12 +165,9 @@
             // Disable the button if the rubric value is same as input value
             var isValueCustomised = rubricSum !== currentMarkInput;
             $assignFromRubricButton.prop('disabled', !isValueCustomised);
-            if (isValueCustomised) {
-                $(this).attr('data-customised', true);
-            } else {
-                $(this).removeAttr('data-customised');
-            }
-        })
+
+            updateCustomisationStatus($(this), isValueCustomised);
+        });
 
         // Update the input val when manually assigning grades from descriptor vals
         $("[data-use-descriptor-values]").on('click', function(e) {
