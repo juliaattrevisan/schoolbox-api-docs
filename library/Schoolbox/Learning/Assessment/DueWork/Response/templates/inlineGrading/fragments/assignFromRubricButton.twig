@@ -28,7 +28,15 @@
 
         updateButtonMark(rubricSum, isValueCustomised);
 
+
+        /**
+         * Update ui elements based on grid selection
+         * There are sequential dependencies here that I can't easily avoid atm
+         *
+         * @return void
+         */
         function refreshAssignFromRubricInput() {
+
             // Current calculated rubric total
             var rubricSum = getRubricSum();
 
