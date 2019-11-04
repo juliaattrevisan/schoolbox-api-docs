@@ -126,15 +126,19 @@ $app = new class extends CliTool\App
             $currentId = $pastoral->getId();
 
             try {
+                // link a random existing record
                 $link = $pastoralMapper->findById($currentId - rand(1, 4));
+                // if it's a record to the same student or already linked, do not link
                 if ($pastoral->getStudent()->getId() === $link->getStudent()->getId() || $link->getParent()) {
                     continue;
-                    }
+                }
+                // if the random record is already linked to another record of the same student, don't link
                 foreach ($link->getRelatedRecords() as $relatedRecord) {
                     if ($relatedRecord->getStudent()->getId() === $pastoral->getStudent()->getId()) {
                         continue 2;
                     }
                 }
+                // this random record is safe to link
                 $pastoral->setParent($link);
                 $pastoralMapper->save($pastoral);
             } catch (\Schoolbox\Mapper\Exception $e) {
