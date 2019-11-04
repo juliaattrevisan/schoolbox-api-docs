@@ -15,13 +15,23 @@
             $rb                     = $('#rb-{{ rubricId }}'),
             finalSummarySelector    = '[data-final-summary]';
 
+        /* Init on load
+         */
+        init($status.find(markInputSelector));
 
-        // Dynamically insert the rubric mark into the button on page load
-        var rubricSum = getRubricSum();
-        var isValueCustomised = isCustomGrade(rubricSum);
 
-        updateButtonMark(rubricSum, isValueCustomised);
-        updateCustomisationStatus($status.find(markInputSelector), isValueCustomised);
+        /**
+         * Initialise button contents, customisation status based on current conditions
+         *
+         * @return void
+         */
+        function init(element) {
+            var rubricSum = getRubricSum();
+            var isValueCustomised = isCustomGrade(rubricSum);
+
+            updateButtonMark(rubricSum, isValueCustomised);
+            updateCustomisationStatus(element, isValueCustomised);
+        }
 
 
         /**
@@ -157,12 +167,10 @@
             }
         });
 
-        $status.find(markInputSelector).on ('change', function(event) {
-            var rubricSum = getRubricSum();
-            var isValueCustomised = isCustomGrade(rubricSum);
-
-            updateButtonMark(rubricSum, isValueCustomised);
-            updateCustomisationStatus($(this), isValueCustomised);
+        /* Re-init button and customisation status upon change
+         */
+        $status.find(markInputSelector).on('change', function(event) {
+            init($(this));
         });
 
         // Update the input val when manually assigning grades from descriptor vals
