@@ -8,15 +8,18 @@
  */
 
 // sitepage context is required
-use Psr\Log\NullLogger;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
-
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     // go away
     error(2);
+}
+
+if (!isset($_POST['userId']) || empty($_POST['userId'])) {
+    error(ErrorMapper::ERROR_PROCESSING, 'No user selected.');
 }
 
 /** @var SitePage $this */
@@ -28,9 +31,8 @@ $userMapper = \Schoolbox\UserBulkMapper::getInstance();
 $modified = new \Schoolbox\Collection();
 
 $userIds = [];
-if (isset($_POST['userId'])) {
-    $userIds = array_filter(explode(',', $_POST['userId']));
-}
+$userIds = array_filter(explode(',', $_POST['userId']));
+
 if (isset($_POST['updateUsers'])) {
     if (count($userIds)) {
         $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
