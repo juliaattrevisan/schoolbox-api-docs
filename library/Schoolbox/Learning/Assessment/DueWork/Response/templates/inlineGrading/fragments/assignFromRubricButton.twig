@@ -159,13 +159,9 @@
 
         $status.find(markInputSelector).on ('change', function(event) {
             var rubricSum = getRubricSum();
+            var isValueCustomised = isCustomGrade(rubricSum);
 
-            // Mark entered in the overall mark field
-            var currentMarkInput   = $status.find(markInputSelector).val();
-            // Disable the button if the rubric value is same as input value
-            var isValueCustomised = rubricSum !== currentMarkInput;
-            $assignFromRubricButton.prop('disabled', !isValueCustomised);
-
+            updateButtonMark(rubricSum, isValueCustomised);
             updateCustomisationStatus($(this), isValueCustomised);
         });
 
