@@ -39,6 +39,7 @@
             updateGrade(rubricSum);
 
             /* Sequential dependency with the "don't clobber" code above
+             * updateGrade() changes a value that is analysed in isCustomGrade(0
              */
             var isValueCustomised = isCustomGrade(rubricSum);
 
