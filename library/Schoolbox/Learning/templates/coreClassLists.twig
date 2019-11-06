@@ -83,25 +83,25 @@ Data:
                             <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id">
                                 {% block data_dropdown_content %}
                                 <li>
-                                    <a :href="student.routes.duework" class="icon-due-work">${ linkTitle.dueWork }</a>
+                                    <a :href="student.routes.duework" class="icon-due-work">${ linkTitle.dueWork | capitalise }</a>
                                 </li>
                                 <li>
-                                    <a :href="student.routes.grades" class="icon-approve">${ linkTitle.grades }</a>
+                                    <a :href="student.routes.grades" class="icon-approve">${ linkTitle.grades | capitalise }</a>
                                 </li>
                                 <li v-if="student.ePortfolioIsEnabled">
                                     <a :href="'/eportfolio/' + student.id + '/profile'" class="icon-eportfolio">${ linkTitle.ePortfolio }</a>
                                 </li>
                                 <li v-if="student.routes.pastoral.length">
-                                    <a :href="student.routes.pastoral" class="icon-pastoral">${ linkTitle.pastoralCare }</a>
+                                    <a :href="student.routes.pastoral" class="icon-pastoral">${ linkTitle.pastoralCare | capitalise }</a>
                                 </li>
                                 <li>
-                                    <a :href="calendarPath + '/' + student.id" class="icon-calendar">${ linkTitle.calendar }</a>
+                                    <a :href="calendarPath + '/' + student.id" class="icon-calendar">${ linkTitle.calendar | capitalise }</a>
                                 </li>
                                 <li v-if="!student.timetableIsHidden">
-                                    <a :href="/timetable/+ student.id" class="icon-timetable">${ linkTitle.timetable }</a>
+                                    <a :href="/timetable/+ student.id" class="icon-timetable">${ linkTitle.timetable | capitalise }</a>
                                 </li>
                                 <li v-if="student.email && mailEnabled">
-                                    <a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${ linkTitle.email }</a>
+                                    <a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${ linkTitle.email | capitalise }</a>
                                 </li>
                                 {% endblock %}
                             </ul>
@@ -129,7 +129,7 @@ Data:
                 <template v-for="(group, index) in groups">
                     <li v-bind:class="index < 1 ? 'no-margin' : ''">
                         <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" v-model="group.isChecked" />
-                        <label :for="group.label">${ group.label }</label>
+                        <label :for="group.label">${ group.label | capitalise }</label>
                     </li>
                 </template>
             </ul>
@@ -396,6 +396,13 @@ Data:
         watch: {
             formIsReady: function(val) {
                 this.$refs.form.submit();
+            }
+        },
+        filters: {
+            capitalise: function (val) {
+                if (!val) return '';
+
+                return val.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
             }
         }
     });
