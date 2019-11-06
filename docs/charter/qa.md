@@ -1,20 +1,34 @@
 # Quality Assurance (QA)
-* [The Role of QA?](#the-role-of-qa)
+* [The Role of QA](#the-role-of-qa)
 * [Areas to QA](#areas-to-qa)
 * [QA Checklist](#qa-checklist)
 * [Tools that help](#tools-that-help)
 
 ## The Role of QA
-Quality assurance covers:
+
+The Role of QA is to reduce the amount of bugs introduced and currently present in the system. It is the official testing step of the process but catching defects and bugs should be done on every step. QA testing focuses on the Pull Request (Code that is being changed):
 * Functionality
-* Useability
+* Usability
+* Changes Impact
 
-There are many facets in these two sections but essentially you are making sure the system is 
-functional and useable. 
+**Functional**
 
-This is done on each point release through the QA of pull requests on code created by the previous 
-two steps in the developement process.
+When you use the code it runs and does what it is meant to do. You can achieve the tasks that are solved by the change. And other parts of the system that the introduced code can effect do not break. The key thing here is that no other functional parts of the system break by the addition or change introduced by the bit of code being tested.
+
+**Usable**
+
+The introduced code does not make the work flow confusing or over complicated. When using the system the change doesn't require the user to learn how to use the system. It just works the way they intuitively think it will work based on the easy to read and clear information that we present to them. The system correctly fits the needs of its target audience and the change helps to make the system better for the target audience when they use it. Subject matter experts can be consulted if you are worried about a particular work flow.
+
+Note, not all of the criteria in usability can always be met, some problems we try to solve are complicated by nature.
+
+Note 2, PO can over ride our ideas of usability.
+
+**Changes Impact**
+
+QA is required to be done on each Pull Request, each change in the code before it makes it to production or is even merged with code under development. It should be done with testing scope in mind, meaning that we should focus on what areas of the system are actually effected by the change. This may require consultation with other devs.
 Here is the process step mentioned in the [definition of done](./definition-of-done.md).
+
+
 
 ## Areas to QA
 
