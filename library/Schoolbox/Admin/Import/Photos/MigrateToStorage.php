@@ -138,7 +138,7 @@ class MigrateToStorage
 
                 /* If this user already has a portrait hash and we only want to backfill, skip
                  */
-                if ($this->backfill && strlen((string)$user['portrait_hash'])) {
+                if ($this->backfill && '' !== (string)$user['portrait_hash']) {
                     $this->logger->warning("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) already has a portrait image {$user['portrait_hash']}; skipped");
                     continue;
                 }
