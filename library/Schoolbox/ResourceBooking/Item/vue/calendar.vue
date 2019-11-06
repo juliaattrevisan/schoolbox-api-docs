@@ -173,12 +173,10 @@
                 // Just a proposal.
                 // If the user doesn't have the rights to create a booking, just don't show the modal.
                 if (this.config.bookingIsAuthorized) {
-                    this.newEvent = {
+                    this.$refs.createBooking.open({
                         date: dateClickInfo.date,
                         allDay: dateClickInfo.allDay,
-                    };
-
-                    this.$refs.createBooking.open();
+                    });
                 }
             },
 
@@ -256,7 +254,6 @@
                       @filterChanged="reloadEvents" />
 
         <create-booking-modal ref="createBooking"
-                              :event="newEvent"
                               :to-moment="toMoment"
                               :booking-path="config.createBookingPath"
                               :date-formats="formats"
