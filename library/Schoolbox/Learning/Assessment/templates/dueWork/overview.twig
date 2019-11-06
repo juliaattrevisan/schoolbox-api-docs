@@ -27,13 +27,13 @@
                     {% if dueWork.useRubric %}
                         <th rowspan="2"></th>
                         {% for group, criteria in headers %}
-                            <th colspan="{{ criteria | length }}">{{ group }}</th>
+                            <th colspan="{{ criteria | length }}">{{ group | nl2br }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
                         {% for criteria in headers %}
                             {% for criterion in criteria %}
-                                <th>{{ criterion }}</th>
+                                <th>{{ criterion | nl2br }}</th>
                             {% endfor %}
                         {% endfor %}
                     {% else %}
@@ -56,7 +56,7 @@
                                 {% for id, criterion in criteria %}
                                     {% set mark = marks[participant.id][id] %}
                                     <td>
-                                        <p>{{ mark.descriptor.description }}</p>
+                                        <p>{{ mark.descriptor.description | nl2br }}</p>
                                         <p>{{ mark.value }}</p>
                                     </td>
                                 {% endfor %}
