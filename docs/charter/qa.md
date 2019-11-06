@@ -26,7 +26,7 @@ Note 2, PO can over ride our ideas of usability.
 **Changes Impact**
 
 QA is required to be done on each Pull Request, each change in the code before it makes it to production or is even merged with code under development. It should be done with testing scope in mind, meaning that we should focus on what areas of the system are actually effected by the change. This may require consultation with other devs.
-Here is the process step mentioned in the [definition of done](./definition-of-done.md).
+There is an explination of the QA step as it relates to the definition of done [here](./definition-of-done.md).
 
 
 
