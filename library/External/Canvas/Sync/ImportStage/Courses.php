@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
 use InvalidArgumentException;
+use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -27,6 +28,7 @@ use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
 use function array_key_exists;
+use function array_map;
 use function count;
 
 /**
@@ -141,13 +143,14 @@ class Courses
      */
     public function synchronise(): void
     {
-        $this->log->info("Synchronising Canvas Courses + Assignments => Schoolbox CourseSpec, UnitSpec, SubmissionBoxSpec...");
+        $this->log->notice("Synchronising Canvas Courses + Assignments => Schoolbox CourseSpec, UnitSpec, SubmissionBoxSpec...");
         $this->resetCounts();
 
         // Fetch all relevant courses and their assignments
         // If multiple courses with same code over multiple years, split into timeless courseSpec + per-time unitSpec
 
-        $courseFilterPb    = $this->courseBridge->courseFilterPredicate();
+        $canvasCourseIds = $this->getCanvasCourseIdsToImport();
+        $courseFilterPb = (new Builder($this->canvasDb, ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql       = "
         SELECT 
@@ -164,19 +167,20 @@ class Courses
                assignment.submission_types 'assignment.submission_types',
                assignment.created_at       'assignment.created_at',
                assignment.updated_at       'assignment.updated_at',
-               assignment.muted            'assignment.muted',
-               assignment.position         'assignment.position'
+               assignment.muted            'assignment.muted'
         FROM course_dim course
         JOIN enrollment_term_dim enrollment_term ON enrollment_term.id = course.enrollment_term_id
         JOIN account_dim account ON course.account_id = account.id
-        LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state != 'deleted'
+        LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state = 'published'
+        LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
         WHERE $courseFilterWhere
-        ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment.id DESC
+        ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment_group.position, assignment.position
         ";
         $statement = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
 
         // Parse results into hierarchical structure
         $accountsData = [];
+        $assessmentSequence = 1; // TODO remove hard-coding in develop branch
         while ($row = $statement->fetch()) {
             $accountCanvasId    = (int)$row['account.canvas_id'];
             $courseCode         = $row['course.code'];
@@ -214,7 +218,7 @@ class Courses
                     'created_at'       => $row['assignment.created_at'],
                     'updated_at'       => $row['assignment.updated_at'],
                     'muted'            => $row['assignment.muted'] === 'true',
-                    'position'         => (int)$row['assignment.position'],
+                    'position'         => $assessmentSequence++,
                 ];
             }
         }
@@ -298,6 +302,36 @@ class Courses
         $this->deleteUnSynchronizedCourseGroups($synchronizedCourseGroupFolderIds);
 
         $this->printCounts();
+    }
+
+
+    /**
+     * Returns the canvas ids of the Canvas courses to import
+     *
+     * Course must:
+     *   * Have workflow_state 'available' or 'completed'
+     *   * Have 1+ CourseSections where the Sections:
+     *     * Has a SisSourceId LIKE 'Y2019C%NOT', ... where year is from 2019 to current calendar year + 1
+     *
+     * @return int[]
+     * @throws Database\Exception
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function getCanvasCourseIdsToImport(): array
+    {
+        $pb          = $this->courseBridge->getCanvasCoursesToImport();
+        $whereClause = $pb->getWhere()[0];
+        $sql         = "
+            SELECT DISTINCT c.canvas_id
+            FROM course_dim c
+            JOIN course_section_dim cs ON cs.course_id = c.id
+            WHERE {$whereClause}
+        ";
+        $canvasIds = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+        return array_map(static function (string $canvasId) {
+            return (int)$canvasId;
+        }, $canvasIds);
     }
 
 
@@ -1040,22 +1074,22 @@ class Courses
      */
     private function printCounts(): void
     {
-        $this->log->info($this->countCourseGroupsSynchronised . ' Canvas CourseGroups synchronised');
-        $this->log->info($this->countCourseGroupsCreated . ' Schoolbox CourseSpecs created');
-        $this->log->info($this->countCourseGroupsUpdated . ' Schoolbox CourseSpecs updated');
-        $this->log->info($this->countCourseGroupsMoved . ' Schoolbox CourseSpecs moved');
-        $this->log->info($this->countCourseGroupsDeleted . ' Schoolbox CourseSpecs deleted');
+        $this->log->notice($this->countCourseGroupsSynchronised . ' Canvas CourseGroups synchronised');
+        $this->log->notice($this->countCourseGroupsCreated . ' Schoolbox CourseSpecs created');
+        $this->log->notice($this->countCourseGroupsUpdated . ' Schoolbox CourseSpecs updated');
+        $this->log->notice($this->countCourseGroupsMoved . ' Schoolbox CourseSpecs moved');
+        $this->log->notice($this->countCourseGroupsDeleted . ' Schoolbox CourseSpecs deleted');
 
-        $this->log->info($this->countCoursesSynchronised . ' Canvas courses synchronised');
-        $this->log->info($this->countCoursesCreated . ' Schoolbox UnitSpecs created');
-        $this->log->info($this->countCoursesUpdated . ' Schoolbox UnitSpecs updated');
-        $this->log->info($this->countCoursesMoved . ' Schoolbox UnitSpecs moved');
-        $this->log->info($this->countCoursesDeleted . ' Schoolbox UnitSpecs deleted');
+        $this->log->notice($this->countCoursesSynchronised . ' Canvas courses synchronised');
+        $this->log->notice($this->countCoursesCreated . ' Schoolbox UnitSpecs created');
+        $this->log->notice($this->countCoursesUpdated . ' Schoolbox UnitSpecs updated');
+        $this->log->notice($this->countCoursesMoved . ' Schoolbox UnitSpecs moved');
+        $this->log->notice($this->countCoursesDeleted . ' Schoolbox UnitSpecs deleted');
 
-        $this->log->info($this->countAssignmentsSynchronised . ' Canvas assignments synchronised');
-        $this->log->info($this->countSubmissionBoxCreated . ' Schoolbox SubmissionBox Specs created');
-        $this->log->info($this->countSubmissionBoxUpdated . ' Schoolbox SubmissionBox Specs updated');
-        $this->log->info($this->countSubmissionBoxMoved . ' Schoolbox SubmissionBox Specs moved');
-        $this->log->info($this->countSubmissionBoxDeleted . ' Schoolbox SubmissionBox Specs deleted');
+        $this->log->notice($this->countAssignmentsSynchronised . ' Canvas assignments synchronised');
+        $this->log->notice($this->countSubmissionBoxCreated . ' Schoolbox SubmissionBox Specs created');
+        $this->log->notice($this->countSubmissionBoxUpdated . ' Schoolbox SubmissionBox Specs updated');
+        $this->log->notice($this->countSubmissionBoxMoved . ' Schoolbox SubmissionBox Specs moved');
+        $this->log->notice($this->countSubmissionBoxDeleted . ' Schoolbox SubmissionBox Specs deleted');
     }
 }

@@ -46,6 +46,10 @@ class Assignment
     /**
      * Returns a SubmissionBox mark visibility
      *
+     * 'Muted' canvas assignments can be submitted to, but grades are not visible to students, and they
+     * do not receive grading notifications.
+     *
+     * @see https://community.canvaslms.com/docs/DOC-12961
      * @param bool $muted
      * @return int
      */

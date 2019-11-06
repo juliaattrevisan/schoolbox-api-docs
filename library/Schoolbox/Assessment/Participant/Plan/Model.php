@@ -28,6 +28,7 @@ class Model implements ISoftDeletable
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
+    use ModelTrait\CreateCollection;
 
     /**
      * @var Assessment\Model

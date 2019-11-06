@@ -23,7 +23,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -35,7 +35,11 @@ use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
 use UnderflowException;
 use UnexpectedValueException;
+use function fclose;
+use function file_exists;
 use function floor;
+use function fopen;
+use function fwrite;
 use function json_decode;
 use function memory_get_peak_usage;
 use function microtime;
@@ -102,9 +106,9 @@ class CliImporter extends CliTool\App
         }
 
         if ($this->perform()) {
-            $this->getLogger()->info('Running in perform mode (-p): changes will be written to database');
+            $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
         } else {
-            $this->getLogger()->info('Running in dry-run mode: use -p to write changes to database');
+            $this->getLogger()->notice('Running in dry-run mode: use -p to write changes to database');
         }
 
         // Ensure we can connect to canvas API + staging DB prior to executing any actions.
@@ -177,13 +181,13 @@ class CliImporter extends CliTool\App
     private function fetchCanvasDataFilesFromApi(Connector $connector, string $tempDir, string $schemaFile): void
     {
         if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
-            $this->getLogger()->info("File download skipped");
+            $this->getLogger()->notice("File download skipped");
             return;
         }
         $dumpFile = $tempDir . '/dump.json';
 
         // Fetch latest dump
-        $this->getLogger()->info('Getting latest data urls.');
+        $this->getLogger()->notice('Getting latest data urls.');
         try {
             $dumpResponse = $connector->fetchLatestDump();
         } catch (External\Exception $e) {
@@ -192,7 +196,7 @@ class CliImporter extends CliTool\App
         }
 
         $dump = json_decode($dumpResponse, true);
-        $this->getLogger()->info("Getting schema version {$dump[$connector::SCHEMA_VERSION]}.");
+        $this->getLogger()->notice("Getting schema version {$dump[$connector::SCHEMA_VERSION]}.");
 
         try {
             $schemaResponse = $connector->fetchSchema($dump[$connector::SCHEMA_VERSION]);
@@ -201,13 +205,11 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        if ($this->perform()) {
-            $this->storeTempFile($dumpResponse, $dumpFile);
-            $this->storeTempFile($schemaResponse, $schemaFile);
-        }
+        $this->storeTempFile($dumpResponse, $dumpFile);
+        $this->storeTempFile($schemaResponse, $schemaFile);
 
         // Download data files
-        $this->getLogger()->info('Downloading latest data.');
+        $this->getLogger()->notice('Downloading latest data.');
         $this->downloadDataFiles($dump['artifactsByTable'], $tempDir);
     }
 
@@ -224,19 +226,19 @@ class CliImporter extends CliTool\App
     private function loadCanvasDataFilesToStagingDatabase(IConnector $canvasDb, string $tempDir, string $schemaFile): void
     {
         if ($this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
-            $this->getLogger()->info("File import to staging database skipped");
+            $this->getLogger()->notice("File import to staging database skipped");
             return;
         }
 
         // Create schema in the staging database
         $dataRestorer = new DataRestorer($canvasDb, $this->getLogger(), $this->getCanvasDbName(), $this->perform());
-        $this->getLogger()->info("Importing schema from json file: $schemaFile.");
+        $this->getLogger()->notice("Importing schema from json file: $schemaFile.");
         $schemaContainer = json_decode(file_get_contents($schemaFile), true);
         $schema          = $schemaContainer['schema'];
         $dataRestorer->restoreSchema($schema);
 
         // Store downloaded data to tables in the staging database
-        $this->getLogger()->info('Restoring data to tables.');
+        $this->getLogger()->notice('Restoring data to tables.');
         $tableGzFiles = scandir($tempDir);
         if (!$tableGzFiles || !count($tableGzFiles)) {
             $this->getLogger()->warning("Failed to open directory $tempDir.");
@@ -276,7 +278,7 @@ class CliImporter extends CliTool\App
     private function syncStagingDataWithSchoolbox(IConnector $canvasDb): void
     {
         if ($this->getOpt(self::OPT_LONG_SKIP_SYNC)) {
-            $this->getLogger()->info("Sync from staging to schoolbox database skipped");
+            $this->getLogger()->notice("Sync from staging to schoolbox database skipped");
             return;
         }
 
@@ -290,7 +292,8 @@ class CliImporter extends CliTool\App
         $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
         /** @var Assessment\Mapper */
         $assessmentMapper = $mapperFactory->get(Assessment\Mapper::class);
-        $planMapper = $mapperFactory->get(Plan\Mapper::class);
+        $planMapper = $mapperFactory->get(Participant\Plan\Mapper::class);
+        $participantMapper = $mapperFactory->get(Participant\Mapper::class);
         /** @var Folder\Mapper */
         $folderMapper = $mapperFactory->get(Folder\Mapper::class);
         /** @var UserMapper */
@@ -313,6 +316,7 @@ class CliImporter extends CliTool\App
             $submissionBoxMapper,
             $assessmentMapper,
             $planMapper,
+            $participantMapper,
             $folderMapper,
             $userMapper,
             $courseImplMapper,
@@ -365,12 +369,13 @@ class CliImporter extends CliTool\App
                 continue;
             }
             $tableFile     = $tableData['files'][0];
-            $tableDataFile = fopen($this->perform() ? "$tempDir/$tableName.gz" : '/dev/null', 'wb');
+            $fileName      = "$tempDir/$tableName.gz";
+            $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName  : '/dev/null', 'wb');
             try {
-                $this->getLogger()->debug("Downloading $tableName to $tempDir/$tableName.gz.");
+                $this->getLogger()->debug("Downloading $tableName to $fileName");
                 $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
             } catch (GuzzleException $e) {
-                $this->getLogger()->warning("Failed to download $tempDir/$tableName.gz: {$e->getMessage()}");
+                $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
             }
         }
     }
@@ -379,15 +384,19 @@ class CliImporter extends CliTool\App
     /**
      * Stores response to a file
      *
+     * Will only overwrite a previously saved file if tool running in 'perform' mode
+     *
      * @param string $response
      * @param string $path
      */
     public function storeTempFile(string $response, string $path): void
     {
         $this->getLogger()->debug("Saving temp file to path '$path'");
-        $fp = fopen($path, 'wb');
-        fwrite($fp, $response);
-        fclose($fp);
+        if ($this->perform() || !file_exists($path)) {
+            $fp = fopen($path, 'wb');
+            fwrite($fp, $response);
+            fclose($fp);
+        }
     }
 
 
@@ -446,8 +455,8 @@ OPTIONS:";
             $hours    = floor($duration / 3600);
             $minutes  = floor(($duration - $hours * 3600) / 60);
             $seconds  = $duration - $hours * 3600 - $minutes * 60;
-            $this->getLogger()->info(sprintf("Script duration: %02d:%02d:%02d", $hours, $minutes, $seconds));
+            $this->getLogger()->notice(sprintf("Script duration: %02d:%02d:%02d", $hours, $minutes, $seconds));
         }
-        $this->getLogger()->info("Script mem usage: " . Alaress_Byte_Format::bytesToString(memory_get_peak_usage(true)));
+        $this->getLogger()->notice("Script mem usage: " . Alaress_Byte_Format::bytesToString(memory_get_peak_usage(true)));
     }
 }

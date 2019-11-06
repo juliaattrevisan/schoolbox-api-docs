@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -57,8 +57,11 @@ class DataSync
     /** @var Assessment\Mapper */
     private $assessmentMapper;
 
-    /** @var Plan\Mapper */
+    /** @var Participant\Plan\Mapper */
     private $planMapper;
+
+    /** @var Participant\Mapper */
+    private $participantMapper;
 
     /** @var Folder\Mapper */
     private $folderMapper;
@@ -96,7 +99,8 @@ class DataSync
      * @param MarkTypeMapper          $markTypeMapper
      * @param SubmissionBoxMapper     $submissionBoxMapper
      * @param Assessment\Mapper       $assessmentMapper
-     * @param Plan\Mapper             $planMapper
+     * @param Participant\Plan\Mapper $planMapper
+     * @param Participant\Mapper      $participantMapper
      * @param Folder\Mapper           $folderMapper
      * @param UserMapper              $userMapper
      * @param CourseImpl\Mapper       $courseImplMapper
@@ -115,7 +119,8 @@ class DataSync
         MarkTypeMapper $markTypeMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
-        Plan\Mapper $planMapper,
+        Participant\Plan\Mapper $planMapper,
+        Participant\Mapper $participantMapper,
         Folder\Mapper $folderMapper,
         UserMapper $userMapper,
         CourseImpl\Mapper $courseImplMapper,
@@ -134,6 +139,7 @@ class DataSync
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->assessmentMapper    = $assessmentMapper;
         $this->planMapper          = $planMapper;
+        $this->participantMapper   = $participantMapper;
         $this->folderMapper        = $folderMapper;
         $this->userMapper          = $userMapper;
         $this->courseImplMapper    = $courseImplMapper;
@@ -167,10 +173,10 @@ class DataSync
             $this->schoolboxDb->beginTransaction();
         }
 
-        $this->log->info("Building data structures to map Canvas entities to Schoolbox entities...");
+        $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge     = new Bridge\Account($this->schoolboxDb);
         $assignmentBridge  = new Bridge\Assignment($this->markTypeMapper->findAll());
-        $courseBridge      = new Bridge\Course($this->schoolboxDb);
+        $courseBridge      = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
 
         // Import Canvas Accounts => Schoolbox Faculty folders
@@ -202,6 +208,7 @@ class DataSync
             $this->canvasDb,
             $this->schoolboxDb,
             $this->folderMapper,
+            $courseBridge,
             $this->log
         );
         $sectionBridge->execute();
@@ -219,6 +226,7 @@ class DataSync
             $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->planMapper,
+            $this->participantMapper,
             $this->folderMapper,
             $this->userMapper,
             $this->log,
@@ -226,7 +234,8 @@ class DataSync
             $courseBridge,
             $courseGroupBridge,
             $sectionBridge,
-            new Bridge\CourseSectionDates()
+            new Bridge\CourseSectionDates(),
+            new Bridge\AssignmentOverride($this->schoolboxDb)
         ))->synchronise();
 
         if (!$this->persist) {

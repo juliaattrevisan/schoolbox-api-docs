@@ -102,12 +102,15 @@ class Connector
 
     /**
      * Generates HMAC signature
-     * @param $timestamp
-     * @param $path
-     * @param array $queryParams
+     *
+     * @see https://portal.inshosteddata.com/docs/api
+     *
+     * @param string $timestamp
+     * @param string $path
+     * @param array  $queryParams
      * @return string
      */
-    private function getHmacSignature($timestamp, $path, $queryParams = []): string
+    private function getHmacSignature(string $timestamp, string $path, array $queryParams = []): string
     {
         ksort($queryParams);
         $parts = ['GET', self::API_HOST, '', '', $path, http_build_query($queryParams), $timestamp, $this->apiSecret];
