@@ -30,7 +30,7 @@ class AccessLevelCensor
      * Gets PastoralGroupMemberMapper
      * @return PastoralGroupMemberMapper
      */
-    private function getPastoralGroupMemberMapper(): PastoralGroupMemberMapper
+    public function getPastoralGroupMemberMapper(): PastoralGroupMemberMapper
     {
         if ($this->pastoralGroupMemberMapper === null) {
             $this->pastoralGroupMemberMapper = PastoralGroupMemberMapper::getInstance();

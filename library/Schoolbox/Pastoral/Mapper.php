@@ -11,7 +11,6 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -137,6 +136,8 @@ class Mapper extends BaseMapper
          *
          * * We do not need to join to deleted subtypes as the system does not permit soft-deletion
          *   of subtypes if they are used by a non-soft deleted pastoral.
+         *
+         * * We do not need to join to deleted students as pastoral records for a deleted user should not exist.
          */
 
         return "
@@ -148,7 +149,7 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('modifiedBy', 'mb')},
                         {$this->getJoinColumnString('subtype', 'c')}
             FROM        {$this->getTable()}
-            INNER JOIN   {$this->getJoinSql('student', '', 's', true)}
+            INNER JOIN   {$this->getJoinSql('student', '', 's')}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv')}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
@@ -305,65 +306,6 @@ class Mapper extends BaseMapper
         // Return hydrated objects- but don't hydrate their children or we'll end up in a recursive loop
 
         return $this->hydrateSelectInternal($statement, false);
-    }
-
-    /**
-     * Returns a collection of students who have pastoral records linked to this student
-     *
-     * @param User $student
-     *
-     * @return array
-     */
-    public function getLinkedStudents($student)
-    {
-        /** @noinspection SqlDialectInspection */
-        $statement = $this->database->prepare("
-            SELECT DISTINCT     `student_id`,
-                                COUNT(*)            AS `count`,
-                                `user`.`lastname`   AS `last_name`,
-                                `user`.`firstname`  AS `first_name`
-            FROM                `pastoral` p
-            JOIN                `user` ON `user`.`id` = `student_id`
-            WHERE               `p`.`deleted_at` IS NULL AND
-                                `user`.`deleted_at` IS NULL AND (
-                                    `p`.`parent_id` IN (
-                                        SELECT    `id`
-                                        FROM      `pastoral`
-                                        WHERE     `deleted_at` IS NULL AND 
-                                                  `student_id` = :student_id_0 OR 
-                                                  `pastoral`.`id` IN (
-                                                      SELECT    `parent_id`
-                                                      FROM      `pastoral`
-                                                      WHERE     `student_id` = :student_id_1 AND `deleted_at` IS NULL
-                                                  )
-                                    ) OR p.`id` IN (
-                                        SELECT    `id`
-                                        FROM      `pastoral`
-                                        WHERE     `deleted_at` IS NULL AND 
-                                                  `student_id` = :student_id_2 OR 
-                                                  `pastoral`.`id` IN (
-                                                      SELECT    `parent_id`
-                                                      FROM      `pastoral`
-                                                      WHERE     `student_id` = :student_id_3 AND `deleted_at` IS NULL
-                                                  )
-                                    )
-                                ) AND 
-                                `student_id` <> :student_id_4
-            GROUP BY            `student_id`
-            ORDER BY            `count` DESC, 
-                                `user`.`lastname`, 
-                                `user`.`firstname`            
-        ");
-
-        $statement->execute([
-            ':student_id_0' => $student->getId(),
-            ':student_id_1' => $student->getId(),
-            ':student_id_2' => $student->getId(),
-            ':student_id_3' => $student->getId(),
-            ':student_id_4' => $student->getId(),
-        ]);
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
 

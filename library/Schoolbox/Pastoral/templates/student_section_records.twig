@@ -11,7 +11,7 @@
             {% if user.role.isStaff %}
                 <h2 class="subheader">
                     {% if linkedStudent %}
-                        Linked Pastoral Records
+                        Linked {{ locale.pastoral.proper }} Records
                     {% else %}
                         {{ locale.pastoral.proper }} Records
                     {% endif %}
@@ -31,9 +31,14 @@
                                     </a>
 
                                     {% set studentId = student.id %}
+                                    {% set recordId = record.id %}
+
+                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
+                                        <h3>{{ record.heading }}</h3>
+                                    </a>
+                                    <p class="meta">
 
                                     {% if linkedStudent %}
-                                        <p class="meta">
 
                                         {% for linkedRecord in record.relatedRecords %}
 
@@ -48,15 +53,6 @@
 
                                             <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}"> {{ linkedRecord.student.fullName }} - {{ headingCurrent }}</a><br>
                                         {% endfor %}
-
-                                    {% else %}
-
-                                        {% set recordId = record.id %}
-
-                                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
-                                            <h3>{{ record.heading }}</h3>
-                                        </a>
-                                        <p class="meta">
 
                                     {% endif %}
 
@@ -80,17 +76,20 @@
                                     {% endif %}
 
 
-                                    {# Display linked students to staff #}
-                                    {% if user.role.isStaff and record.relatedRecords | length %}
-                                        {% for relatedRecord in record.relatedRecords %}
-                                            {% if relatedRecord.student.id != student.id and relatedRecord.student.id != linkedStudent.id %}
-                                                {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
-                                                {% if getStudentRecord %}
-                                                    Linked Record:
-                                                    <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)<br>
+                                    {% if not linkedStudent %}
+                                        {# Display linked students to staff #}
+                                        {% if user.role.isStaff and record.relatedRecords | length %}
+                                            {% for relatedRecord in record.relatedRecords %}
+                                                {% if relatedRecord.student.id != student.id and relatedRecord.student.id != linkedStudent.id %}
+                                                    {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
+                                                    {% if getStudentRecord %}
+                                                        Linked Record:
+                                                        <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)
+                                                        <br>
+                                                    {% endif %}
                                                 {% endif %}
-                                            {% endif %}
-                                        {% endfor %}
+                                            {% endfor %}
+                                        {% endif %}
                                     {% endif %}
                                     </p>
                                 </div>
