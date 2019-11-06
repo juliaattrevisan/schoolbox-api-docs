@@ -22,6 +22,9 @@ $f-dropdown-icon-align: 0.25rem;
 	li{
 		display: block;
 		width: 100%;
+        a {
+          text-transform: capitalize;
+        }
 		a:hover {
 			background-color: $content-ui-hover;
 			text-decoration: none;
@@ -49,4 +52,3 @@ $f-dropdown-icon-align: 0.25rem;
 		padding-right: .8125rem;
 	}
 }
-

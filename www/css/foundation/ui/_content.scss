@@ -1808,3 +1808,7 @@ li article ol {
 .border-none {
     border: none !important
 }
+
+#email-class-lists .checklist label {
+  text-transform: capitalize;
+}
