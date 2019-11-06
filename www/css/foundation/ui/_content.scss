@@ -1175,7 +1175,7 @@ $selector-width: 2.25rem;
       flex: 0 auto;
       padding: 0 1rem;
 
-      p, h4 {
+      p {
         margin-bottom: 0;
       }
     }
@@ -1186,17 +1186,32 @@ $selector-width: 2.25rem;
         margin-left: .75rem;
 
         span {
+            color: $white;
             line-height: 3.4rem;
+        }
+        &.review {
+            background-color: $warning-color;
+        }
+        &.in-progress {
+            background-color: $base;
         }
     }
     @media #{$small-only} {
         flex-wrap: wrap;
+        justify-content: center;
+
         .txt p {
-          margin-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
         }
         .grade {
             flex: 1 100%;
             margin-left: 0;
+            padding: 0 1rem;
+
+            span {
+                line-height: 3rem;
+                font-size: 1rem;
+            }
         }
     }
     ~ blockquote {
