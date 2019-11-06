@@ -174,7 +174,10 @@ class MigrateToStorage
 
             /* Remove file when done
              */
-            unlink($path);
+            if ($this->perform) {
+                $this->logger->info("Removing {$path}");
+                unlink($path);
+            }
 
             /* User not found; noop
              */
