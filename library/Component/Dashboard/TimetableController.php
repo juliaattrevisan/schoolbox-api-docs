@@ -234,6 +234,23 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
 
     /**
+     * Returns how the attendance link should be opened.
+     *
+     * @return string One of ['_self', '_blank']
+     */
+    private function getAttendanceLinkTarget(): string
+    {
+        switch ($this->getConfigMapper()->get('external_type')) {
+            case 'tass':
+                return '_blank';
+            case 'synergetic':
+            default:
+                return '_self';
+        }
+    }
+
+
+    /**
      * Builds twig context data for a single timetable
      *
      * @param Campus[]            $campusList
@@ -335,6 +352,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             $classContext['attendance'] = [
                 'link'    => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
                 'marked'  => (bool)$class['AttendanceMarked'],
+                'target'  => $this->getAttendanceLinkTarget(),
             ];
         }
         return $classContext;
