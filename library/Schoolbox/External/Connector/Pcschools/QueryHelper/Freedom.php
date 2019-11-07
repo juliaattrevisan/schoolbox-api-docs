@@ -117,6 +117,10 @@ class Freedom implements IQueryHelper
      */
     public function getGetStudentContactListQuery(array $studentExternalId): array
     {
+        if (empty($studentExternalId)) {
+            return [];
+        }
+
         $ids = implode(',', $studentExternalId);
 
         $sql = "

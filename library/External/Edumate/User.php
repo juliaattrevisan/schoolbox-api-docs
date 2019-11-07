@@ -197,6 +197,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
         $ids = implode(',', $externalUserId);
 
         $caseSensitiveFields = array(

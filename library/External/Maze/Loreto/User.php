@@ -130,6 +130,10 @@ class External_Maze_Loreto_User extends External_Maze_User {
 	 */
     public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
         $ids = implode(',', $externalUserId);
 
 		$query = "
