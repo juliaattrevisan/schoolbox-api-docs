@@ -55,7 +55,7 @@ HELP;
             Database::getInstance(),
             Mapper::getInstance(),
             $this->getLogger(),
-            $this->perform()
+            true
         ))->migrate();
     }
 };

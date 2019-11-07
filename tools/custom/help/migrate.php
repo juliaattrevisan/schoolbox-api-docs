@@ -21,18 +21,11 @@ $app = new class extends CliTool\App
     private const OPT_LONG_HELP = 'help';
 
 
-    /**
-     * Backfill only users who don't have a portrait_hash yet
-     */
-    private const OPT_BACKFILL = 'backfill';
-
-
     /** @inheritdoc */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_BACKFILL,
         ];
     }
 
@@ -47,14 +40,14 @@ $app = new class extends CliTool\App
 
 Migrate portraits from filesystem portrait_dir into Storage and associate them
 with schoolbox user accounts. Each profile picture is assumed to be a jpg and
-you can dump as many as you want into the stock_portrait folder. 
+you can dump as many as you want into the stock_portrait folder.
 
-The backfill flag allows you to only assign images to users who don't already
-have one. Omitting it allows you to update anyone's picture.
+Profile pictures are only assigned to users who don't have a portrait already. 
 
-Usage: migrate.php [--backfill]
-        --backfill  Only assign portrait to users who don't already have one
-
+Usage: migrate.php [-v] [-p]
+        -p Actually migrate portraits (otherwise, this will only show what would
+           happen)
+        -v Verbose mode (may be provided up to 3 times for increasing verbosity)
 
 HELP;
             exit;
@@ -122,24 +115,18 @@ HELP;
             }
         }
 
-        /* Migrate all images with --backfill arg
+        /* Migrate all images
          *
          * This should avoid a race condition where a user is manually assigned a picture
          * while this script is running
          */
-        $migrator = new MigrateToStorage(
+        (new MigrateToStorage(
             $portraitDir,
             $db,
             Mapper::getInstance(),
             $this->getLogger(),
             $this->perform()
-        );
-
-        if ($this->getOpt(self::OPT_BACKFILL)) {
-            $migrator->setBackfill(true);
-        }
-
-        $migrator->migrate();
+        ))->migrate();
 
         /* Clean up any remainder files
          */
