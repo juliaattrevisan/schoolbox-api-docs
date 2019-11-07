@@ -419,10 +419,22 @@ class ListController extends Web\Controller\Base
 
                 // delete existing participation
                 if ($existingParticipation) {
+                    $restoredCount             = 0;
+                    $keepExistingParticipation = false;
+
                     if ($existingParticipation->isExcluded()) {
-                        $participantMapper->restoreReturnsAndFeedback($existingParticipation);
+                        $restoredCount = $participantMapper->restoreResponsesAndFeedbacks($existingParticipation);
+                        // if new plan is dynamic and if recovered responses and feedbacks exist, keep the participant data
+                        if ($userPlan->isDynamic() && $restoredCount > 0) {
+                            $existingParticipation->setExcludedAt(null);
+                            $participantMapper->save($existingParticipation);
+                            $keepExistingParticipation = true;
+                        }
                     }
-                    $participantMapper->delete($existingParticipation);
+
+                    if (!$keepExistingParticipation) {
+                        $participantMapper->delete($existingParticipation);
+                    }
                 }
 
                 if (!$userPlan->isDynamic()) {
@@ -475,7 +487,7 @@ class ListController extends Web\Controller\Base
 
             $allExistingParticipation = $participantMapper->findByColumnList([
                 'participant_plan_id' => $planIds,
-            ]);
+            ], ['cache' => false]);
 
             // userId => plan (should only have one plan per user)
             $this->existingParticipationPerUser = $allExistingParticipation->groupByCallback(function (ParticipantModel $model) {

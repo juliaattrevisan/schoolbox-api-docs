@@ -99,7 +99,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Soft deletes all Teacher Returns related to the specified participant
+     * Soft deletes all responses and feedbacks for the specified participant
      *
      * @param Model $participant
      */
@@ -155,10 +155,11 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Restore soft-deleted returns and feedback
+     * Restore soft-deleted responses and feedbacks
      * @param Model $participant
+     * @return int a count of restored data
      */
-    public function restoreReturnsAndFeedback(Model $participant): void
+    public function restoreResponsesAndFeedbacks(Model $participant): int
     {
         $assessment = $participant->getPlan()->getAssessment();
         $excludedAt = $participant->getExcludedAt() instanceof Alaress_Date_NullDate ? null : $participant->getExcludedAt();
@@ -186,6 +187,8 @@ class Mapper extends BaseMapper
             $returnMapper->restoreSoftDeleted($returns);
             $returnMapper->restoreNotification();
 
+            return $submissions->count() + $returns->count();
+
         } elseif ($assessment->getTask() instanceof Task) {
 
             // restore completion
@@ -202,6 +205,8 @@ class Mapper extends BaseMapper
             $taskCompletionMapper->restoreSoftDeleted($completion);
             $taskCompletionMapper->restoreNotification();
 
+            return $completion->count();
+
         } elseif ($assessment->getQuiz() instanceof Quiz) {
             $attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
             $attemptMapper->suppressNotification();
@@ -215,7 +220,12 @@ class Mapper extends BaseMapper
             $attempts = $attemptMapper->findByColumnList($params, ['deleted' => true]);
             $attemptMapper->restoreSoftDeleted($attempts);
             $attemptMapper->restoreNotification();
+
+            return $attempts->count();
         }
+
+        // should not get here, but.
+        return 0;
     }
 
 

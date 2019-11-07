@@ -3702,10 +3702,10 @@ abstract class Mapper implements IMapper, Serializable
      * Set MockPropagator to suppress notification
      * @return $this
      */
-    protected function suppressNotification()
+    protected function suppressNotification(): self
     {
-        $this->propagatorSuppressed = $this->propagator;
-        $this->propagator    = new MockPropagator();
+        $this->propagatorSuppressed = $this->getEventPropagator();
+        $this->propagator           = new MockPropagator();
         return $this;
     }
 
@@ -3713,7 +3713,7 @@ abstract class Mapper implements IMapper, Serializable
      * Restore notification (Must call suppressNotification first)
      * @return $this
      */
-    protected function restoreNotification()
+    protected function restoreNotification(): self
     {
         if (!isset($this->propagatorSuppressed)) {
             return $this;
