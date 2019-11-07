@@ -294,6 +294,6 @@ module.exports = function(grunt) {
             grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
         }
     });
-    grunt.registerTask('build',      ['bower', 'build.js', 'build.sass', 'concat:datepickerFullCalendar']);
+    grunt.registerTask('build',      ['bower', 'build.js', 'build.sass', 'concat:fullcalendarCss']);
     grunt.registerTask('default',    'build');
 };
