@@ -79,7 +79,7 @@ Data:
                             </p>
                             {% endblock %}
 
-                            <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id">
+                            <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id && Object.keys(student.routes).length">
                                 {% block data_dropdown_content %}
                                 <li v-for="element in student.routes">
                                     <a :href="element.href" :class="element.class" :title="element.title">${ element.label }</a>
@@ -92,7 +92,7 @@ Data:
                         {% block core_group %}{% endblock %}
                         <td class="show-for-medium-up">${ student.lastAccessTime }</td>
                         <td class="no-pad">
-                            <div class="actions-small-1" v-if="student.id">
+                            <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                 <nav>
                                     <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
                                 </nav>
