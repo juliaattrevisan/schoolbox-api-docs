@@ -16,7 +16,7 @@ use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\UserMapper;
 use Schoolbox\Role;
 use Schoolbox\User as SchoolboxUser;
-use Schoolbox\Profile\Visibility;
+use Schoolbox\Profile\ValidDetailsVisible;
 
 /**
  * @param SitePage $page
@@ -71,7 +71,7 @@ function renderParent(
     } catch (MapperException $e) {
         $customButtons = [];
     }
-    $profileVisibility = new Visibility($synUserHandler, $config);
+    $showDetails = (new ValidDetailsVisible($synUserHandler, $config))->isSatisfiedBy($user, $sessionUser);
 
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
@@ -87,8 +87,7 @@ function renderParent(
                 'customButtons'  => $customButtons,
                 'eportfolioAuth' => $authenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
-                'showDetails'    => $profileVisibility->isDetailVisible($user, $sessionUser),
-                'showEmail'      => $profileVisibility->isEmailVisible($user, $sessionUser),
+                'showDetails'    => $showDetails,
             ]
         )
     );
@@ -125,7 +124,7 @@ function renderStaff(
         $customButtons = [];
     }
 
-    $profileVisibility = new Visibility($synUserHandler, $config);
+    $detailsVisible = new ValidDetailsVisible($synUserHandler, $config);
 
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
@@ -139,8 +138,7 @@ function renderStaff(
                 'eportfolioAuth' => $authenticator->canView(),
                 'customButtons'  => $customButtons,
                 'now'            => Alaress_Date_Format::now(),
-                'showDetails'    => $profileVisibility->isDetailVisible($user, $sessionUser),
-                'showEmail'      => $profileVisibility->isEmailVisible($user, $sessionUser),
+                'showDetails'    => $detailsVisible->isSatisfiedBy($user, $sessionUser),
             ]
         )
     );
@@ -456,7 +454,7 @@ function renderStudent(
 
     $user    = $userMapper->findById($user['uid']);
     $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
-    $profileVisibility = new Visibility($synUserHandler, $config);
+    $showDetails = (new ValidDetailsVisible($synUserHandler, $config))->isSatisfiedBy($user, $sessionUser);
 
     $page->setVar(
         'OUTPUT',
@@ -487,8 +485,8 @@ function renderStudent(
                 'pdStates'           => $pdMapper->getStates(),
                 'pd'                 => $pd,
                 'emailSeparator'     => AbstractMailer::implodeGlue(),
-                'showDetails'        => $profileVisibility->isDetailVisible($user, $sessionUser),
-                'showEmail'          => $profileVisibility->isEmailVisible($user, $sessionUser),
+                'showDetails'        => $showDetails,
+                'showEmail'          => $showDetails || $sessionUser->getRole()->isStudent(),
             ]
         )
     );

@@ -12,7 +12,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Profile\Visibility;
+use Schoolbox\Profile\ValidDetailsVisible;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
@@ -162,7 +162,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
 
             $emailObj = new Email();
-            $profileVisibility = new Visibility($this->getExternalUser(), $this->getConfigMapper());
+            $detailsVisible = new ValidDetailsVisible($this->getExternalUser(), $this->getConfigMapper());
             $emailall = [];
 
             $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
@@ -175,7 +175,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                     /* Member bulk email
                      */
-                    if ($profileVisibility->isEmailVisible($user, $viewer)) {
+                    if ($user->getAltEmail() &&
+                        (($user->getRole()->isStudent() && $viewer->getRole()->isStudent()) ||
+                            $detailsVisible->isSatisfiedBy($user, $viewer))) {
                         $emailall[] = Scrub::text($user->getFormattedEmailDisplay());
                     }
 
