@@ -1196,7 +1196,7 @@ $selector-width: 2.25rem;
             background-color: $base;
         }
     }
-    @media #{$small-only} {
+    @media #{$medium-down} {
         flex-wrap: wrap;
         justify-content: center;
 
