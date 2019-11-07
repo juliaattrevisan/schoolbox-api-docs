@@ -152,7 +152,7 @@ class StudentLists
                     $students[$key]['routes']['calendar'] = [
                         'label' => $this->rosettaStone->translate('calendar', false, true),
                         'href'  => $this->router->generate('calendar.getCalendar', [
-                            'selectedDate' => \Alaress_Date_Format::now()->getUsingFormat(\Alaress_Date_Format::URL_FORMAT),
+                            'selectedDate' => \Alaress_Date_Format::now()->getURLDate(),
                             'userId' => $user->getId()
                             ]
                         ),
@@ -179,7 +179,6 @@ class StudentLists
                                 'title' => 'Send Email',
                         ];
                     }
-
                 } catch (Exception $e) {
                     //no user found
                 }

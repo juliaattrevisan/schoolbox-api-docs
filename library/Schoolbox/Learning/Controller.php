@@ -412,8 +412,6 @@ class Controller extends Base
                 'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
                 'replyTo'           => $this->getUser()->getEmail(),
                 'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
-                'today'             => Alaress_Date_Format::now()->getURLDate(),
-                'mailHandle'        => $this->getSession()->get('mailhandle'),
                 'emailGroups'       => $this->getClassListsEmailGroups(),
                 'folder'            => $folder,
             ])->setTab('classes')->setTitle($folder->getName())
