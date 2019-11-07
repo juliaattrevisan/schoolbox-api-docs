@@ -113,14 +113,14 @@ class StudentLists
 
                     $students[$key]['routes'] = [
                         // Due work
-                        [
+                        'dueWork' => [
                             'label' => $this->rosettaStone->translate('dueWork', false, true),
                             'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
                             'class' => 'icon-due-work',
                             'title' => '',
                         ],
                         // Grades
-                        [
+                        'grades' => [
                             'label' => $this->rosettaStone->translate('grades', false, true),
                             'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
                             'class' => 'icon-approve',
@@ -130,64 +130,54 @@ class StudentLists
 
                     // ePortfolio
                     if ($user->getEportfolioEnable()) {
-                        array_push( $students[$key]['routes'],
-                            [
+                        $students[$key]['routes']['ePortfolio'] = [
                                 'label' => 'ePortfolio',
                                 'href'  => '/eportfolio/' . $user->getId() . '/profile',
                                 'class' => 'icon-eportfolio',
                                 'title' => '',
-                            ]
-                        );
+                        ];
                     }
 
                     // Pastoral
                     if ($this->pastoralIsEnabled) {
-                        array_push( $students[$key]['routes'],
-                            [
+                        $students[$key]['routes']['pastoral'] = [
                                 'label' => $this->rosettaStone->translate('pastoralCare', false, true),
                                 'href'  => $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
                                 'class' => 'icon-pastoral',
                                 'title' => '',
-                            ]
-                        );
+                        ];
                     }
 
                     // Calendar
-                    array_push( $students[$key]['routes'],
-                        [
-                            'label' => $this->rosettaStone->translate('calendar', false, true),
-                            'href'  => $this->router->generate('calendar.getCalendar', [
-                                    'selectedDate' => \Alaress_Date_Format::now()->getUsingFormat(\Alaress_Date_Format::URL_FORMAT),
-                                    'userId' => $user->getId()
-                                ]
-                            ),
-                            'class' => 'icon-calendar',
-                            'title' => '',
-                        ]
-                    );
+                    $students[$key]['routes']['calendar'] = [
+                        'label' => $this->rosettaStone->translate('calendar', false, true),
+                        'href'  => $this->router->generate('calendar.getCalendar', [
+                            'selectedDate' => \Alaress_Date_Format::now()->getUsingFormat(\Alaress_Date_Format::URL_FORMAT),
+                            'userId' => $user->getId()
+                            ]
+                        ),
+                        'class' => 'icon-calendar',
+                        'title' => '',
+                    ];
 
                     // Timetable
                     if (!$user->getHideTimetable()) {
-                        array_push( $students[$key]['routes'],
-                            [
+                        $students[$key]['routes']['timeTable'] = [
                                 'label' => 'Timetable',
                                 'href'  => '/timetable/' .  $user->getId(),
                                 'class' => 'icon-timetable',
                                 'title' => '',
-                            ]
-                        );
+                        ];
                     }
 
                     // Email
                     if ($user->getEmail() && $this->mailIsEnabled) {
-                        array_push( $students[$key]['routes'],
-                            [
+                        $students[$key]['routes']['email'] = [
                                 'label' => 'Email',
                                 'href'  => $this->mailHandle . $user->getEmail(),
                                 'class' => 'icon-email',
                                 'title' => 'Send Email',
-                            ]
-                        );
+                        ];
                     }
 
                 } catch (Exception $e) {
