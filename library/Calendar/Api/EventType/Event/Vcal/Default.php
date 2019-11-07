@@ -351,7 +351,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      * @param  string  $url
      * @return string
      */
-    private function tokenReplaceUrl($url)
+    private function tokenReplaceUrl(string $url): string
     {
         $urlTokens = [
             '[id]',

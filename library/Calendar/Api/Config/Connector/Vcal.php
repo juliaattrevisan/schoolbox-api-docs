@@ -55,7 +55,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     /**
      * Render configs into admin screen
      *
-     * @param $page
+     * @param SitePage $page
      *
      * @return mixed|void
      */
@@ -143,7 +143,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      *
      * @param string $authorization
      */
-    public function setAuthorization($authorization): void
+    public function setAuthorization(string $authorization): void
     {
         $this->authorization = $authorization;
     }
