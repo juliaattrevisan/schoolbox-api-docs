@@ -44,8 +44,10 @@ you can dump as many as you want into the stock_portrait folder.
 
 Profile pictures are only assigned to users who don't have a portrait already. 
 
-Usage: migrate.php 
-
+Usage: migrate.php [-v] [-p]
+        -p Actually migrate portraits (otherwise, this will only show what would
+           happen)
+        -v Verbose mode (may be provided up to 3 times for increasing verbosity)
 
 HELP;
             exit;
