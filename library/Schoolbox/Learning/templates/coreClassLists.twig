@@ -199,7 +199,6 @@ Data:
                     axios.get(self.getStudentListsEndpoint)
                         .then(function (response) {
                             self.studentLists = response.data;
-                            console.log(self.studentLists);
                             resolve();
                         })
                         .catch(function (error) {
