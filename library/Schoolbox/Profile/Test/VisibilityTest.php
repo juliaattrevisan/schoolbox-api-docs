@@ -62,7 +62,8 @@ class VisibilityTest extends TestCase
         $superUser1 = (new User())->setId(1)->setFirstname('Super user 1')->setSuperuser(true)->setRole($staffRole)->setAltEmail('-');
         $staff1     = (new User())->setId(2)->setFirstname('Test Staff 1')->setSuperuser(false)->setRole($staffRole)->setAltEmail('-');
         $student1   = (new User())->setId(3)->setFirstname('Test Student 1')->setSuperuser(false)->setRole($studentRole)->setAltEmail('-');
-        $parent1    = (new User())->setId(4)->setFirstname('Test Parent 1')->setSuperuser(false)->setRole($parentRole)->setAltEmail('-');
+        $parent1    = (new User())->setId(4)->setFirstname('Test Parent 1')->setSuperuser(false)->setRole($parentRole)->setAltEmail('-')
+                                  ->setExternalId('parent1');
         $guest1     = (new User())->setId(5)->setFirstname('Test Guest 1')->setSuperuser(false)->setRole($guestRole)->setAltEmail('-');
         $superUser2 = (new User())->setId(6)->setFirstname('Super user 2')->setSuperuser(true)->setRole($staffRole)->setAltEmail('-');
         $staff2     = (new User())->setId(7)->setFirstname('Test Staff 2')->setSuperuser(false)->setRole($staffRole)->setAltEmail('-');
@@ -100,6 +101,7 @@ class VisibilityTest extends TestCase
             [$parent1, $student2, true, false, false],
             [$parent1, $parent2, true, true, false],
             [$parent1, $parent2, true, false, false],
+            [$parent2, $parent1, true, false, true],
             [$parent1, $guest2, true, false, false],
 
             [$guest1, $superUser2, true, false, false],
@@ -128,6 +130,9 @@ class VisibilityTest extends TestCase
 
             public function getParent(string $externalUserId): array
             {
+                if ($externalUserId === 'parent1') {
+                    return ['DirectoryIncludeFlag' => true];
+                }
                 return [];
             }
         };

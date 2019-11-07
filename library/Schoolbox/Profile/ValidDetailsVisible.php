@@ -91,8 +91,7 @@ class ValidDetailsVisible
                 return false;
             }
             $exParent = $this->externalUser->getParent($viewee->getExternalId());
-//            return $exParent && $exParent['DirectoryIncludeFlag'];
-            return is_array($exParent);
+            return $exParent && $exParent['DirectoryIncludeFlag'];
         }
 
         // should not get here, but just in case
