@@ -11,11 +11,6 @@
 {# Does the information list require an extra CSS class ? eg 'expandable-card', 'sortable-card', 'card-selectable' etc #}
 {% set listClass = listClass ?: '' %}
 
-{# child templates to override with assessment-specific terms #}
-{% set labelIncomplete  = labelIncomplete ?: 'Incomplete' %}
-{% set labelPending     = labelPending    ?: 'Review Required' %}
-{% set labelReviewed    = labelReviewed   ?: 'Reviewed' %}
-
 {# child templates may override #}
 {% set routeModify = routeModify ?: routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
 {% set responseHistory = responseHistory ?: locale.submissionHistory.proper %}
@@ -88,6 +83,7 @@
             <ul class="information-list {{ listClass }}">
             {% for participant in assessment.allParticipants if not participant.isExcluded %}
 
+                {# Construct that represents a participant #}
                 {% set routeArgs = {
                     viewee: participant.user,
                     assessmentId: assessment.id,
@@ -96,51 +92,7 @@
                     studentId: participant.user.id
                 } %}
 
-                {% set pActionSummary   = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
-                {% set pActionResponses = '' %}
-                {% set pActionCount     = '' %}
-                {% set pStatusText      = '' %}
-                {% set pStatusClass     = '' %}
-                {% set pTooltip         = '' %}
-
-                {% block config %}
-                <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
-                    {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
-                    <div class="small-12 column">
-                        <div class="row actions-small-{{ pActionCount }}">
-                            <div class="list-item">
-                                {% include '@learningAssessment/fragments/participantStatus.twig' with {
-                                    participant: participant,
-                                    statusClass: pStatusClass,
-                                    statusText: pStatusText,
-                                    statusTip: pTooltip
-                                } only %}
-                            </div>
-                            {% if pActionCount %}
-                            <nav>
-                                <a class="icon-more" title="" data-dropdown="feedback-options-{{ participant.user.id }}"></a>
-                            </nav>
-                            <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
-                                {%- spaceless %}
-                                    {% if pActionResponses %}
-                                        <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
-                                    {% endif %}
-                                    {% if pActionSummary %}
-                                        <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
-                                    {% endif %}
-                                    {% block extra_nav_items %}{% endblock %}
-                                {% endspaceless -%}
-                            </ul>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    {# Child templates may populate #}
-                    {% block grading %}{% endblock %}
-                    {% block meta %}{% endblock %}
-                    {% block action_bar %}{% endblock %}
-                </li>
-                {% endblock %}
+                {% block participant %}{% endblock %}
             {% endfor %}
             </ul>
         </section>

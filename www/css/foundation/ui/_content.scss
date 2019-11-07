@@ -1165,24 +1165,53 @@ $selector-width: 2.25rem;
 
 // Grades that sit along side of other elements
 .flex-grade {
+    align-items: center;
     display: flex;
 
     .sibling {
-        flex: 1 1 auto;
+        flex: 1;
+    }
+    .txt {
+      flex: 0 auto;
+      padding: 0 1rem;
+
+      p {
+        margin-bottom: 0;
+      }
     }
     .grade {
-        align-items: center;
         display: flex;
         flex: 0 1 auto;
         justify-content: center;
         margin-left: .75rem;
-    }
-    @media #{$small-only} {
-        flex-wrap: wrap;
 
+        span {
+            color: $white;
+            line-height: 3.4rem;
+        }
+        &.review {
+            background-color: $warning-color;
+        }
+        &.in-progress {
+            background-color: $base;
+        }
+    }
+    @media #{$medium-down} {
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .txt p {
+            margin-bottom: 0.5rem;
+        }
         .grade {
-            flex: 1 1 auto;
+            flex: 1 100%;
             margin-left: 0;
+            padding: 0 1rem;
+
+            span {
+                line-height: 3rem;
+                font-size: 1rem;
+            }
         }
     }
     ~ blockquote {
