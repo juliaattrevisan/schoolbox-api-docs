@@ -1,16 +1,28 @@
 <?php
 
+/**
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
 
 namespace Event\Attendance;
 
 
+use Alaress\Specification\Base;
 use Event_Attendance_Controller;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
-class CanModifyAttendance
+/**
+ * CanModifyAttendance
+ *
+ * Check whether a user has permission to modify attendance for an event
+ *
+ * @package Event\Attendance
+ */
+class CanModifyAttendance extends Base
 {
     /**
      * @var Event_Attendance_Controller
@@ -32,6 +44,13 @@ class CanModifyAttendance
      */
     private $errorMapper;
 
+    /**
+     * CanModifyAttendance constructor
+     * @param Event_Attendance_Controller $attendanceController
+     * @param EventMapper                 $eventMapper
+     * @param User                        $user
+     * @param Mapper                      $errorMapper
+     */
     public function __construct(
         Event_Attendance_Controller $attendanceController,
         EventMapper $eventMapper,
@@ -44,8 +63,15 @@ class CanModifyAttendance
         $this->errorMapper          = $errorMapper;
     }
 
-
-    public function isSatisfiedBy(int $eventId): bool
+    /**
+     * Checks whether a user has permission to modify attendance for an event,
+     * Also will throw exception if the event is not exist
+     *
+     * @param  $eventId
+     * @return bool
+     * @throws \Exception
+     */
+    public function isSatisfiedBy($eventId): bool
     {
         try {
             $event = $this->eventMapper->findById($eventId);

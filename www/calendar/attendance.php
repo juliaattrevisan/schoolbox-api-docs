@@ -7,9 +7,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Calendar\Event\Access as EventAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 
-$attendanceController = new Event_Attendance_Controller($this, new EventAccess(new FolderAccess()) );
+$attendanceController = new Event_Attendance_Controller($this, new EventAccess(new FolderAccess()));
 
-$canModifyAttendance = new CanModifyAttendance($attendanceController, $eventMapper = new EventMapper, $_SESSION['user'], $errorMapper = new ErrorMapper());
+$canModifyAttendance = new CanModifyAttendance($attendanceController, $eventMapper = new EventMapper(), $_SESSION['user'], new ErrorMapper());
 
 /**
  * @param $eventId
@@ -33,7 +33,7 @@ if ($method == 'list' && is_numeric($this->arg[1])) {
     $userId = $this->arg[2];
     $canModifyAttendance->isSatisfiedBy($eventId);
 
-    EventMapper::getInstance()->removeAttendance($eventId, $userId);
+    $eventMapper->removeAttendance($eventId, $userId);
 
     header('Location: ' . "/calendar/attendance/list/" . $eventId);
     exit;
