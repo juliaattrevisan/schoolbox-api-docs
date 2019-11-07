@@ -6,7 +6,6 @@ Data:
     mailEnabled       bool      Config for whether mail is enabled
     pastoralEnabled   bool      Config for whether pastoral is enabled
     today             string    Today's date
-    mailHandle        string    Mail handler
     emailGroups       array     Data for mail group checkboxes
 #}
 
@@ -177,18 +176,6 @@ Data:
             classListsEndpointPrefix: '/subject/classList/ajax/',
             getStudentListsEndpoint: '{{ routeLookup('learning.getStudentListByClassId', {folderId: folder.getId, folder: folder}) }}',
             formIsReady: false,
-            linkTitle: {
-                'dueWork':      '{{ locale.dueWork }}',
-                'grades':       '{{ locale.grades.plural }}',
-                'pastoralCare': '{{ locale.pastoralCare.proper }}',
-                'calendar':     '{{ locale.calendar }}',
-                'ePortfolio':   'ePortfolio',
-                'timetable':    'Timetable',
-                'email':        'Email',
-            },
-            calendarPath: '{{ '/calendar/' ~ today }}',
-            pastoralIsEnabled: Boolean({{ pastoralEnabled }}),
-            mailHandle: '{{ mailHandle }}',
             actionsPlaceholder: true,
             loadingText: 'Please Wait...',
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
