@@ -21,10 +21,10 @@ abstract class Alaress_Cache_Abstract
     protected $url = '';
 
     /**
-     * Paramaters passed to the cache fetch, currently supports providing headers to the request
+     * The headers to be supplied when making a request
      * @var array
      */
-    protected $params = [];
+    protected $headers = [];
 
     /**
      * A prefix for cached filenames
@@ -114,12 +114,12 @@ abstract class Alaress_Cache_Abstract
      * Setup method
      *
      * @param string     $url
-     * @param null|array $params
+     * @param null|array $headers
      * @return self
      * @return self
      * @throws \InvalidArgumentException
      */
-    public function init(string $url, ?array $params = null): \Alaress_Cache_Abstract
+    public function init(string $url, ?array $headers = null): \Alaress_Cache_Abstract
     {
         if ('' === trim($url)) {
             throw new \InvalidArgumentException('Empty url provided');
@@ -127,7 +127,7 @@ abstract class Alaress_Cache_Abstract
 
         $this->url = $url;
 
-        $this->params = $params;
+        $this->headers = $headers ?? [];
 
         /* Logging class handles verbosity and any logging
          */
@@ -243,8 +243,8 @@ abstract class Alaress_Cache_Abstract
 
         try {
             $headers = ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'];
-            if(is_array($this->params['headers']) ) {
-                $headers = array_merge($this->params['headers'], $headers);
+            if (count($this->headers)) {
+                $headers = array_merge($this->headers, $headers);
             }
             $httpClient->get($url, ['headers' => $headers, 'save_to' => $this->cachedFile]);
         } catch (RequestException $e) {
@@ -489,27 +489,6 @@ abstract class Alaress_Cache_Abstract
         $this->remove($this->cachedFile);
     }
 
-    /**
-     * Get for parameters
-     *
-     * @return array
-     */
-    protected function getParameters(): array
-    {
-        return $this->parameters;
-    }
 
-    /**
-     * Setter for params
-     *
-     * @vars array
-     * @param array $params
-     * @return self
-     */
-    protected function setParameters(array $params): \Alaress_Twitter_Cache
-    {
-        $this->parameters = $params;
-        return $this;
-    }
 }
 

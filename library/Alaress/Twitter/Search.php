@@ -46,7 +46,7 @@ class Alaress_Twitter_Search
     /**
      * Generate query string params (this function generates them as an array)
      *
-     * @return string
+     * @return array
      */
     protected function generateParameters()
     {
