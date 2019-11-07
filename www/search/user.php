@@ -17,6 +17,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Role;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Profile\ValidDetailsVisible;
+use Schoolbox\Profile\ValidEmailVisible;
 
 /**
  * @param SitePage $page
@@ -455,6 +456,7 @@ function renderStudent(
     $user    = $userMapper->findById($user['uid']);
     $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
     $showDetails = (new ValidDetailsVisible($synUserHandler, $config))->isSatisfiedBy($user, $sessionUser);
+    $showEmails = (new ValidEmailVisible($synUserHandler, $config))->isSatisfiedBy($user, $sessionUser);
 
     $page->setVar(
         'OUTPUT',
@@ -486,7 +488,7 @@ function renderStudent(
                 'pd'                 => $pd,
                 'emailSeparator'     => AbstractMailer::implodeGlue(),
                 'showDetails'        => $showDetails,
-                'showEmail'          => $showDetails || $sessionUser->getRole()->isStudent(),
+                'showEmail'          => $showEmails,
             ]
         )
     );

@@ -71,45 +71,60 @@ class VisibilityTest extends TestCase
         $parent2    = (new User())->setId(9)->setFirstname('Test Parent 2')->setSuperuser(false)->setRole($parentRole)->setAltEmail('-');
         $guest2     = (new User())->setId(10)->setFirstname('Test Guest 2')->setSuperuser(false)->setRole($guestRole)->setAltEmail('-');
 
-        // viewer, viewee, allowStaffAccess, restrictParentEmail, expected
-        return [
-            [$superUser1, $superUser2, false, true, true],
-            [$superUser1, $staff2, false, true, true],
-            [$superUser1, $student2, false, true, true],
-            [$superUser1, $parent2, false, true, true],
-            [$superUser1, $guest2, false, true, true],
+        // viewer, viewee, reportStaffAccess, restrictParentEmail, expected
 
-            [$staff1, $superUser2, false, true, true],
-            [$staff1, $staff2, false, true, true],
-            [$staff1, $student2, false, true, true],
-            [$staff1, $parent2, false, true, true],
-            [$staff1, $guest2, false, true, false],
+        $testDataset = [];
+        // reportStaffAccess flag and restrictParentEmail flag should only affect parent -> parent or staff
+        foreach ([true, false] as $reportStaffAccess) {
+            foreach ([true, false] as $restrictParentEmail) {
+                $currentDataset =
+                    [
+                        [$superUser1, $superUser2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$superUser1, $staff2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$superUser1, $student2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$superUser1, $parent2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$superUser1, $guest2, $reportStaffAccess, $restrictParentEmail, true],
 
-            [$student1, $superUser2, false, true, true],
-            [$student1, $staff2, false, true, true],
-            [$student1, $student2, false, true, false],
-            [$student1, $parent2, false, true, false],
-            [$student1, $guest2, false, true, false],
+                        [$staff1, $superUser2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$staff1, $staff2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$staff1, $student2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$staff1, $parent2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$staff1, $guest2, $reportStaffAccess, $restrictParentEmail, false],
 
-            [$parent1, $superUser2, false, true, false],
-            [$parent1, $superUser2, true, true, true],
-            [$parent1, $superUser2, false, true, false],
-            [$parent1, $superUser2, true, true, true],
-            [$parent1, $staff2, false, true, false],
+                        [$student1, $superUser2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$student1, $staff2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$student1, $student2, $reportStaffAccess, $restrictParentEmail, false],
+                        [$student1, $parent2, $reportStaffAccess, $restrictParentEmail, false],
+                        [$student1, $guest2, $reportStaffAccess, $restrictParentEmail, false],
 
-            [$parent1, $staff2, true, true, true],
-            [$parent1, $student2, true, false, false],
-            [$parent1, $parent2, true, true, false],
-            [$parent1, $parent2, true, false, false],
-            [$parent2, $parent1, true, false, true],
-            [$parent1, $guest2, true, false, false],
+                        [$guest1, $superUser2, $reportStaffAccess, $restrictParentEmail, false],
+                        [$guest1, $staff2, $reportStaffAccess, $restrictParentEmail, false],
+                        [$guest1, $student2, $reportStaffAccess, $restrictParentEmail, false],
+                        [$guest1, $parent2, $reportStaffAccess, $restrictParentEmail, false],
+                        [$guest1, $guest2, $reportStaffAccess, $restrictParentEmail, false],
 
-            [$guest1, $superUser2, true, false, false],
-            [$guest1, $staff2, true, false, false],
-            [$guest1, $student2, true, false, false],
-            [$guest1, $parent2, true, false, false],
-            [$guest1, $guest2, true, false, false],
-        ];
+                        [$parent1, $student2, $reportStaffAccess, $restrictParentEmail, false],
+                        [$parent1, $guest2, $reportStaffAccess, $restrictParentEmail, false],
+                    ];
+
+                $testDataset = array_merge($testDataset, $currentDataset);
+            }
+        }
+
+        // visibility for parent should respect the flags
+        foreach ([true, false] as $reportStaffAccess) {
+            foreach ([true, false] as $restrictParentEmail) {
+                $parentDataset = [
+                    [$parent1, $superUser2, $reportStaffAccess, $restrictParentEmail, $reportStaffAccess],
+                    [$parent1, $staff2, $reportStaffAccess, $restrictParentEmail, $reportStaffAccess],
+                    [$parent2, $parent1, $reportStaffAccess, $restrictParentEmail, !$restrictParentEmail],
+                    // parent 2 is hiding his contact using SIS flag
+                    [$parent1, $parent2, $reportStaffAccess, $restrictParentEmail, false],
+                ];
+                $testDataset   = array_merge($testDataset, $parentDataset);
+            }
+        }
+        return $testDataset;
     }
 
     /**
