@@ -12,6 +12,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Profile\Visibility;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
@@ -161,12 +162,11 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
 
             $emailObj = new Email();
+            $profileVisibility = new Visibility($this->getExternalUser(), $this->getConfigMapper());
             $emailall = [];
 
             $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
             $studentPhotoHidden   = $this->getConfigMapper()->get('protect_student_photo');
-            $restrictParentEmails = $this->getConfigMapper()->get('restrict_parent_emails');
-            $reportStaffAccess    = $this->getConfigMapper()->get('report_staff_access');
             $viewer = $this->getUser();
 
             if ($userListCount > 0) {
@@ -175,7 +175,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                     /* Member bulk email
                      */
-                    if ($user->getEmail() && $this->isEmailVisible($user, $viewer, $restrictParentEmails, $reportStaffAccess)) {
+                    if ($profileVisibility->isEmailVisible($user, $viewer)) {
                         $emailall[] = Scrub::text($user->getFormattedEmailDisplay());
                     }
 
@@ -264,51 +264,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         }
 
         return true; // everything went according to plan
-    }
-
-    /**
-     * Checks email visibility
-     * @param \Schoolbox\User $viewee
-     * @param \Schoolbox\User $viewer
-     * @param bool            $restrictParentEmails
-     * @param bool            $reportStaffAccess
-     * @return bool
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    private function isEmailVisible(Schoolbox\User $viewee, Schoolbox\User $viewer, bool $restrictParentEmails, bool $reportStaffAccess)
-    {
-        // Super user and Staff can see all users' email address
-        if ($viewer->isSuperuser() || $viewer->getRole()->isStaff()) {
-            return true;
-        }
-
-        // Student can never see parents' email address
-        if ($viewer->getRole()->isStudent()) {
-            return !$viewee->getRole()->isParent();
-        }
-
-        // Current user is a parent
-        // a parent viewing a staff
-        if ($viewee->getRole()->isStaff()) {
-            return $reportStaffAccess;
-        }
-
-        // a parent viewing a student
-        if ($viewee->getRole()->isStudent()) {
-            // viewee is  viewer's enrolled student
-            $externalChildren = $this->getExternalUser()->getEnrolledStudents($viewer->getExternalId());
-            return in_array($viewee->getExternalId(), array_column($externalChildren, 'RelatedID'));
-        }
-
-        // a parent viewing a parent
-        if ($viewee->getRole()->isParent()) {
-            // 'restrict_parent_emails' config is off and viewer's SIS contact flag is on (externalUser.DirectoryIncludeFlag)
-            if ($restrictParentEmails) {
-                return false;
-            }
-            $exParent = $this->getExternalUser()->getParent($viewee->getExternalId());
-            return $exParent && $exParent['DirectoryIncludeFlag'];
-        }
     }
 
     /**

@@ -16,6 +16,7 @@ use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\UserMapper;
 use Schoolbox\Role;
 use Schoolbox\User as SchoolboxUser;
+use Schoolbox\Profile\Visibility;
 
 /**
  * @param SitePage $page
@@ -23,6 +24,7 @@ use Schoolbox\User as SchoolboxUser;
  * @param External_User $synUserHandler
  * @param UserMapper $userMapper
  * @param Eportfolio_Authenticator $authenticator
+ * @param IConfigLoader $config
  *
  * @throws Twig_Error_Loader
  * @throws Twig_Error_Runtime
@@ -33,7 +35,8 @@ function renderParent(
     $user,
     External_User $synUserHandler,
     UserMapper $userMapper,
-    Eportfolio_Authenticator $authenticator
+    Eportfolio_Authenticator $authenticator,
+    IConfigLoader $config
 ) {
     $externalUser = $user['synergy_id'] ? $synUserHandler->getParent($user['synergy_id']) : [];
     $students = new Collection();
@@ -68,6 +71,7 @@ function renderParent(
     } catch (MapperException $e) {
         $customButtons = [];
     }
+    $profileVisibility = new Visibility($synUserHandler, $config);
 
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
@@ -83,7 +87,8 @@ function renderParent(
                 'customButtons'  => $customButtons,
                 'eportfolioAuth' => $authenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
-                'isRestricted'   => ConfigMapper::getInstance()->get('restrict_parent_emails'),
+                'showDetails'    => $profileVisibility->isDetailVisible($user, $sessionUser),
+                'showEmail'      => $profileVisibility->isEmailVisible($user, $sessionUser),
             ]
         )
     );
@@ -95,6 +100,7 @@ function renderParent(
  * @param External_User $synUserHandler
  * @param UserMapper $userMapper
  * @param Eportfolio_Authenticator $authenticator
+ * @param IConfigLoader $config
  *
  * @throws Twig_Error_Loader
  * @throws Twig_Error_Runtime
@@ -105,7 +111,8 @@ function renderStaff(
     $user,
     External_User $synUserHandler,
     UserMapper $userMapper,
-    Eportfolio_Authenticator $authenticator
+    Eportfolio_Authenticator $authenticator,
+    IConfigLoader $config
 ) {
     $externalUser = $user['synergy_id'] ? $synUserHandler->getStaff($user['synergy_id']) : [];
     /** @var SchoolboxUser $sessionUser */
@@ -117,6 +124,8 @@ function renderStaff(
     } catch (MapperException $e) {
         $customButtons = [];
     }
+
+    $profileVisibility = new Visibility($synUserHandler, $config);
 
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
@@ -130,6 +139,8 @@ function renderStaff(
                 'eportfolioAuth' => $authenticator->canView(),
                 'customButtons'  => $customButtons,
                 'now'            => Alaress_Date_Format::now(),
+                'showDetails'    => $profileVisibility->isDetailVisible($user, $sessionUser),
+                'showEmail'      => $profileVisibility->isEmailVisible($user, $sessionUser),
             ]
         )
     );
@@ -199,7 +210,7 @@ function renderStudent(
             $subject['perms']  = $groupHandler->getPermission($subject['folder']->getId());
             $classCode = $subject['folder']->getCodeString();
         } else {
-            if (ConfigMapper::getInstance()->get('show_all_subjects')) {
+            if ($config->get('show_all_subjects')) {
                 $classCode = (($subject['campusCode'] ?? '') !== '') ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
                 $code = new FolderCode();
                 $code->setCode($classCode);
@@ -379,22 +390,8 @@ function renderStudent(
 
     $student->loadParents();
     $isParentOfStudent  = $sessionUser->isParentOf($student);
-    $isRelatedToStudent = false;
     $isPrimaryCarer     = false;
-    if (!$isParentOfStudent) {
-        if($sessionUser->getExternalId()) {
-            $studentList = $synUserHandler->getEnrolledStudents($sessionUser->getExternalId());
-            if (is_array($studentList)) {
-                foreach ($studentList as $enrolledStudentId) {
-                    if ($enrolledStudentId['RelatedID'] == $student->getExternalId()) {
-                        $isRelatedToStudent = true;
-                        break;
-                    }
-                }
-            }
-        }
-    } else {
-        $isRelatedToStudent = true;
+    if ($isParentOfStudent && isset($contactList)) {
         // Only the primary parent will see emergency contact information
         if ($contactList[0]['StudentContactID'] == $sessionUser->getExternalId() || $contactList[0]['StudentContactSpouseID'] == $sessionUser->getExternalId()) {
             $isPrimaryCarer = true;
@@ -403,12 +400,12 @@ function renderStudent(
 
     $page->setFile(TEMPLATE_content, 'output.html');
 
-    $showPastoral = ConfigMapper::getInstance()->get('pastoral_enabled');
+    $showPastoral = $config->get('pastoral_enabled');
 
-    if ($sessionUser->getRole()->isParent() && !ConfigMapper::getInstance()->get('pastoral_parent_access'))
+    if ($sessionUser->getRole()->isParent() && !$config->get('pastoral_parent_access'))
         $showPastoral = false;
 
-    $protectStudentContacts = ConfigMapper::getInstance()->get('protect_student_contacts');
+    $protectStudentContacts = $config->get('protect_student_contacts');
 
     $hideContacts = $student->getHideContacts() ? 1 : 0;
 
@@ -447,7 +444,7 @@ function renderStudent(
     $allTeacherEmails = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($emails)));
 
     $pd = null;
-    if (ConfigMapper::getInstance()->get('site_location') === 'help') {
+    if ($config->get('site_location') === 'help') {
         /* Load Professional Development details if they exist
          */
         try {
@@ -459,6 +456,7 @@ function renderStudent(
 
     $user    = $userMapper->findById($user['uid']);
     $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
+    $profileVisibility = new Visibility($synUserHandler, $config);
 
     $page->setVar(
         'OUTPUT',
@@ -484,12 +482,13 @@ function renderStudent(
                 'coordTeacher'       => $coordTeacher,
                 'studentCoach'       => $studentCoach,
                 'isParentOfStudent'  => $isParentOfStudent,
-                'isRelatedToStudent' => $isRelatedToStudent,
                 'isPrimaryCarer'     => $isPrimaryCarer,
                 'allTeacherEmails'   => $allTeacherEmails,
                 'pdStates'           => $pdMapper->getStates(),
                 'pd'                 => $pd,
                 'emailSeparator'     => AbstractMailer::implodeGlue(),
+                'showDetails'        => $profileVisibility->isDetailVisible($user, $sessionUser),
+                'showEmail'          => $profileVisibility->isEmailVisible($user, $sessionUser),
             ]
         )
     );
@@ -516,7 +515,8 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             new UserMapper(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
+            $config
         );
     } elseif ($groupHandler->isStudent($user['uid'])) {
         renderStudent(
@@ -537,7 +537,8 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             new UserMapper(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
+            $config
         );
     } else {
         $this->pageNotFound();
