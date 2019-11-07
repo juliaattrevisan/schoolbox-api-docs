@@ -1,7 +1,7 @@
 # Quality Assurance (QA)
 * [The Role of QA](#the-role-of-qa)
 * [Areas to QA](#areas-to-qa)
-* [QA Checklist](#qa-check-list)
+* [QA Check list](#qa-check-list)
 * [Tools that help](#tools-that-help)
 
 ## The Role of QA
@@ -25,8 +25,8 @@ Note 2, PO can over ride our ideas of usability.
 
 **Changes Impact**
 
-QA is required to be done on each Pull Request, each change in the code before it makes it to production or is even merged with code under development. It should be done with testing scope in mind, meaning that we should focus on what areas of the system are actually effected by the change. This may require consultation with other devs.
-There is an explination of the QA step as it relates to the definition of done [here](./definition-of-done.md).
+QA is required to be done on each Pull Request, each change in the code before it makes it to production. It is done directly after the Pull Request is merged. It should be done with testing scope in mind, meaning that we should focus on what areas of the system are actually effected by the change. This should be facilitated and provided by the Change Impact field in the ticket. This may require consultation with other devs.
+There is an explanation of the QA step as it relates to the definition of done [here](./definition-of-done.md).
 
 ## Areas to QA
 
@@ -138,7 +138,7 @@ Not maintained or documented. Can revive the tests as they are right now broken.
 ## Maintenance of Automation
   
 Automation for the process is progressing. Some of the tooling is in need of maintenance. Jira tickets to 
-clean up, create or fix tests in this area are welcome. To do, in progress and review steps need to take 
+clean up, create or fix tests in this area are welcome. TO DO, IN PROGRESS and REVIEW steps need to take 
 priority before these fixes and changes to not jeopardise sprint completion.
 
 So if you are looking to fix a test or to create one:
