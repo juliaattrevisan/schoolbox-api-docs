@@ -391,7 +391,10 @@ class Controller extends Base
             $folder,
             $this->logMapper,
             $this->getRouter(),
-            $this->getConfigLoader()->get('pastoral_enabled')
+            $this->getConfigLoader()->get('pastoral_enabled'),
+            $this->getConfigLoader()->get('mail_enable'),
+            $this->getSession()->get('mailhandle'),
+            $this->rosettaStone
         ))->getStudentLists();
 
         $this->getResponse()->content->set($this->buildJsonOutput($students));

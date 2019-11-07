@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Students;
 
 use Aura\Router\Router;
 use External_ClassInterface;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
@@ -37,9 +38,20 @@ class StudentLists
     /** @var Folder\Model */
     private $folder;
 
+    /** @var Router */
     private $router;
 
+    /** @var bool */
     private $pastoralIsEnabled;
+
+    /** @var bool */
+    private $mailIsEnabled;
+
+    /** @var string */
+    private $mailHandle;
+
+    /** @var RosettaStone */
+    private $rosettaStone;
 
     /**
      * StudentLists constructor.
@@ -50,6 +62,9 @@ class StudentLists
      * @param LogMapper               $logMapper
      * @param Router                  $router
      * @param bool                    $pastoralIsEnabled
+     * @param bool                    $mailIsEnabled
+     * @param string                  $mailHandle
+     * @param RosettaStone            $rosettaStone
      */
     public function __construct(
         External_ClassInterface $externalClass,
@@ -57,7 +72,10 @@ class StudentLists
         Model $folder,
         LogMapper $logMapper,
         Router $router,
-        bool $pastoralIsEnabled
+        bool $pastoralIsEnabled,
+        bool $mailIsEnabled,
+        string $mailHandle,
+        RosettaStone $rosettaStone
     ) {
 
         $this->externalClass        = $externalClass;
@@ -66,6 +84,9 @@ class StudentLists
         $this->folder               = $folder;
         $this->router               = $router;
         $this->pastoralIsEnabled    = $pastoralIsEnabled;
+        $this->mailIsEnabled        = $mailIsEnabled;
+        $this->mailHandle           = $mailHandle;
+        $this->rosettaStone         = $rosettaStone;
     }
 
     /**
@@ -89,11 +110,86 @@ class StudentLists
                     $students[$key]['ePortfolioIsEnabled'] = $user->getEportfolioEnable();
                     $students[$key]['lastAccessTime'] = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
                     $students[$key]['timetableIsHidden'] = $user->getHideTimetable();
+
                     $students[$key]['routes'] = [
-                        'pastoral' => $this->pastoralIsEnabled ? $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]) : '',
-                        'duework'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
-                        'grades'   => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
+                        // Due work
+                        [
+                            'label' => $this->rosettaStone->translate('dueWork', false, true),
+                            'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
+                            'class' => 'icon-due-work',
+                            'title' => '',
+                        ],
+                        // Grades
+                        [
+                            'label' => $this->rosettaStone->translate('grades', false, true),
+                            'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
+                            'class' => 'icon-approve',
+                            'title' => '',
+                        ],
                     ];
+
+                    // ePortfolio
+                    if ($user->getEportfolioEnable()) {
+                        array_push( $students[$key]['routes'],
+                            [
+                                'label' => 'ePortfolio',
+                                'href'  => '/eportfolio/' . $user->getId() . '/profile',
+                                'class' => 'icon-eportfolio',
+                                'title' => '',
+                            ]
+                        );
+                    }
+
+                    // Pastoral
+                    if ($this->pastoralIsEnabled) {
+                        array_push( $students[$key]['routes'],
+                            [
+                                'label' => $this->rosettaStone->translate('pastoralCare', false, true),
+                                'href'  => $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
+                                'class' => 'icon-pastoral',
+                                'title' => '',
+                            ]
+                        );
+                    }
+
+                    // Calendar
+                    array_push( $students[$key]['routes'],
+                        [
+                            'label' => $this->rosettaStone->translate('calendar', false, true),
+                            'href'  => $this->router->generate('calendar.getCalendar', [
+                                    'selectedDate' => \Alaress_Date_Format::now()->getUsingFormat(\Alaress_Date_Format::URL_FORMAT),
+                                    'userId' => $user->getId()
+                                ]
+                            ),
+                            'class' => 'icon-calendar',
+                            'title' => '',
+                        ]
+                    );
+
+                    // Timetable
+                    if (!$user->getHideTimetable()) {
+                        array_push( $students[$key]['routes'],
+                            [
+                                'label' => 'Timetable',
+                                'href'  => '/timetable/' .  $user->getId(),
+                                'class' => 'icon-timetable',
+                                'title' => '',
+                            ]
+                        );
+                    }
+
+                    // Email
+                    if ($user->getEmail() && $this->mailIsEnabled) {
+                        array_push( $students[$key]['routes'],
+                            [
+                                'label' => 'Email',
+                                'href'  => $this->mailHandle . $user->getEmail(),
+                                'class' => 'icon-email',
+                                'title' => 'Send Email',
+                            ]
+                        );
+                    }
+
                 } catch (Exception $e) {
                     //no user found
                 }
