@@ -10,53 +10,129 @@
 
         // cache this stuff, it doesn't change
         var $status                 = $('#assessment-status'),
-            markInputSelector      = '[data-mark-input]',
+            markInputSelector       = '[data-mark-input]',
             $assignFromRubricButton = $('#use-rubric-value'),
             $rb                     = $('#rb-{{ rubricId }}'),
             finalSummarySelector    = '[data-final-summary]';
 
+        /* Init on load
+         */
+        init($status.find(markInputSelector));
 
-        // Mark entered in the overall mark field
-        var currentMarkInput   = $status.find(markInputSelector).val();
 
-        // Disable the button if the rubric value is same as input value
-        $assignFromRubricButton.prop('disabled', getRubricSum() == currentMarkInput);
-
-        // Dynamically insert the rubric mark into the button on page load
-        updateButtonMark();
-
-        function refreshAssignFromRubricInput() {
-            // Current calculated rubric total
+        /**
+         * Initialise button contents, customisation status based on current conditions
+         *
+         * @param element the markInputSelector element containing the data-customised var
+         * @return void
+         */
+        function init(element) {
             var rubricSum = getRubricSum();
+            var isValueCustomised = isCustomGrade(rubricSum);
 
-            // Mark entered in the overall mark field
-            var currentMarkInput   = $status.find(markInputSelector).val();
-
-            // Update the mark input field with current rubric total if the total is different from the input val
-            // but ONLY if we haven't already customised the mark - don't clobber!
-            if ( rubricSum !== currentMarkInput && (!$status.find(markInputSelector).attr('data-customised')) ) {
-                $status.find(markInputSelector).val(rubricSum); // Input val
-            }
-
-            updateButtonMark();
+            updateButtonMark(rubricSum, isValueCustomised);
+            updateCustomisationStatus(element, isValueCustomised);
         }
 
-        function updateButtonMark() {
+
+        /**
+         * Update text and properties of the Assign From Rubric button
+         *
+         * @param rubricSum string
+         * @param isValueCustomised bool
+         * @return void
+         */
+        function updateButtonMark(rubricSum, isValueCustomised) {
+            $("[data-rubric-sum]").text(rubricSum);
+
+            $assignFromRubricButton.prop('disabled', !isValueCustomised);
+        }
+
+
+        /**
+         * Update the customisation status flag when a human enters a grade
+         *
+         * @param element the markInputSelector element containing the data-customised var
+         * @param isValueCustomised bool
+         * @return void
+         */
+        function updateCustomisationStatus(element, isValueCustomised) {
+            if (isValueCustomised) {
+                $(element).attr('data-customised', true);
+            } else {
+                $(element).removeAttr('data-customised');
+            }
+        }
+
+
+        /**
+         * Update the Grade based on the grid summation and existence of a
+         * customised human-provided value
+         *
+         * Update the mark input field with current rubric total if the total is different from the input val
+         * but ONLY if we haven't already customised the mark - don't clobber!
+         *
+         * @param rubricSum string
+         * @return void
+         */
+        function updateGrade(rubricSum) {
+            var currentMarkInput = $status.find(markInputSelector).val();
+
+            if (rubricSum !== currentMarkInput && (!wasCustomised()) ) {
+                $status.find(markInputSelector).val(rubricSum);
+            }
+        }
+
+
+        /**
+         * Update ui elements based on grid selection
+         * There are sequential dependencies here that I can't easily avoid atm
+         *
+         * @return void
+         */
+        function updateAll() {
+
             // Current calculated rubric total
             var rubricSum = getRubricSum();
 
-            $("[data-rubric-sum]").text(rubricSum);
+            /* Update Grade value if applicable
+             */
+            updateGrade(rubricSum);
 
-            // Mark entered in the overall mark field
-            var currentMarkInput   = $status.find(markInputSelector).val();
-            // Disable the button if the rubric value is same as input value
-            var isValueCustomised = rubricSum !== '' && rubricSum !== currentMarkInput;
-            $assignFromRubricButton.prop('disabled', !isValueCustomised);
-            if (isValueCustomised) {
-                $status.find(markInputSelector).attr('data-customised', true);
-            } else {
-                $status.find(markInputSelector).removeAttr('data-customised');
-            }
+            /* Sequential dependency with the "don't clobber" code above
+             * updateGrade() changes a value that is analysed in isCustomGrade()
+             */
+            init($status.find(markInputSelector));
+        }
+
+
+        /**
+         * If a human entered the Grade, it was "customised"
+         *
+         * @param rubricSum string
+         * @return bool
+         */
+        function isCustomGrade(rubricSum) {
+            return rubricSum !== '' && rubricSum !== $status.find(markInputSelector).val();
+        }
+
+
+        /**
+         * Find out if the grade was previously customised
+         *
+         * This varies from isCustomGrade() in that it remembers historically that you've entered
+         * a grade manually, rather than circumstantially based on grid summation
+         *
+         * TODO: Verify
+         * Prevents a clobbering when you cycle through the grid selections, whose summation
+         * just so happens to match a human-defined var. This flag explicitly states that a custom
+         * grade was provided, even if it matches the current grid selection's summation it won't
+         * be overridden by the next selection
+         *
+         * @return bool
+         */
+        function wasCustomised() {
+            return $status.find(markInputSelector).attr('data-customised')
         }
 
 
@@ -78,7 +154,7 @@
             $markInput.removeAttr('data-customised');
 
             e.preventDefault();
-            refreshAssignFromRubricInput();
+            updateAll();
 
             // Trigger change event manually, so that dynamic feedback JS is aware of the change
             $markInput.trigger("change");
@@ -92,31 +168,23 @@
             }
         });
 
-        $status.find(markInputSelector).on ('change', function(event) {
-            var rubricSum = getRubricSum();
-
-            // Mark entered in the overall mark field
-            var currentMarkInput   = $status.find(markInputSelector).val();
-            // Disable the button if the rubric value is same as input value
-            var isValueCustomised = rubricSum !== currentMarkInput;
-            $assignFromRubricButton.prop('disabled', !isValueCustomised);
-            if (isValueCustomised) {
-                $(this).attr('data-customised', true);
-            } else {
-                $(this).removeAttr('data-customised');
-            }
-        })
+        /* Re-init button and customisation status upon change
+         */
+        $status.find(markInputSelector).on('change', function(event) {
+            init($(this));
+        });
 
         // Update the input val when manually assigning grades from descriptor vals
         $("[data-use-descriptor-values]").on('click', function(e) {
             e.preventDefault();
-            if (!$status.find(markInputSelector).attr('data-customised')) {
-                refreshAssignFromRubricInput();
+
+            if (!wasCustomised()) {
+                updateAll();
             }
         });
 
         // Update the input val when any of these inputs change
-        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', refreshAssignFromRubricInput);
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', updateAll);
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign <span class="descriptor-sum" data-rubric-sum></span> from Rubric</button></p>
