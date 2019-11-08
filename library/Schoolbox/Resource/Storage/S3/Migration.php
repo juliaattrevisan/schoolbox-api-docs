@@ -297,6 +297,11 @@ class Migration extends CliTool\App
     }
 
 
+    /**
+     * Deletes empty ancestor directories between the specified file and root directory
+     *
+     * @param string $filepath
+     */
     private function deleteEmptyDirectoryAncestors(string $filepath): void
     {
         if (!$this->perform()) {
@@ -305,17 +310,17 @@ class Migration extends CliTool\App
 
         // Recursively delete empty folders we might have created since deleting the file
         $directoryArray = array_filter(explode("/", chunk_split(basename($filepath), 5, '/')));
-        $filepath       = str_replace("/" . basename($filepath), "", $filepath);
+        $dir            = str_replace("/" . basename($filepath), "", $filepath);
         for ($i = count($directoryArray) - 1; $i >= 0; $i--) {
-            if (!is_dir($filepath)) {
+            if (!is_dir($dir)) {
                 continue;
             }
-            if (!$this->isDirectoryEmpty($filepath)) {
+            if (!$this->isDirectoryEmpty($dir)) {
                 break;
             }
-            $this->getLogger()->debug("Removing directory '$filepath'");
-            rmdir($filepath);
-            $filepath = str_replace("/" . $directoryArray[$i], "", $filepath);
+            $this->getLogger()->debug("Removing directory '$dir'");
+            rmdir($dir);
+            $dir = str_replace("/" . $directoryArray[$i], "", $dir);
         }
     }
 
