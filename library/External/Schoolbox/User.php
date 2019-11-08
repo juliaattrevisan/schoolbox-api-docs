@@ -129,7 +129,7 @@ class External_Schoolbox_User implements External_UserInterface
             return [];
         }
 
-        $ids = implode(',', $externalUserId);
+        $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
 
         return $this->internalDatabase->executeQuery(
             "
@@ -157,8 +157,9 @@ class External_Schoolbox_User implements External_UserInterface
                     JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
                     JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
                     JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-                WHERE       child.external_id IN ($ids)
-            "
+                WHERE       child.external_id IN ({$predicate['placeholders']})
+            ",
+            $predicate['bindings']
         )->fetchAll();
     }
 
