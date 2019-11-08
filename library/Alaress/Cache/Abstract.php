@@ -114,12 +114,12 @@ abstract class Alaress_Cache_Abstract
      * Setup method
      *
      * @param string     $url
-     * @param null|array $headers
+     * @param string[]  $headers
      * @return self
      * @return self
      * @throws \InvalidArgumentException
      */
-    public function init(string $url, ?array $headers = null): \Alaress_Cache_Abstract
+    public function init(string $url, array $headers = []): \Alaress_Cache_Abstract
     {
         if ('' === trim($url)) {
             throw new \InvalidArgumentException('Empty url provided');
@@ -127,7 +127,7 @@ abstract class Alaress_Cache_Abstract
 
         $this->url = $url;
 
-        $this->headers = $headers ?? [];
+        $this->headers = $headers;
 
         /* Logging class handles verbosity and any logging
          */
