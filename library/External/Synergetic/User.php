@@ -6,7 +6,6 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -746,7 +745,7 @@ class External_Synergetic_User implements External_UserInterface
             return $this->isExternalIdValid($externalUserId);
         });
 
-        $predicate = PredicateBuilder::getArrayBindings($validExternalIds, 'studentIds');
+        $predicate = Builder::getArrayBindings($validExternalIds, 'studentIds');
 
         if (!$validExternalIds) {
             return [];
