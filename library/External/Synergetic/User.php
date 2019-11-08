@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -741,9 +742,11 @@ class External_Synergetic_User implements External_UserInterface
          * Return valid external ID's only and convert it into a string delimited by comma (,) to be used in the
          * query below using an IN statement.
          */
-        $validExternalIds = implode(',', array_filter($externalUserId, function ($externalUserId) {
+        $validExternalIds = array_filter($externalUserId, function ($externalUserId) {
             return $this->isExternalIdValid($externalUserId);
-        }));
+        });
+
+        $predicate = PredicateBuilder::getArrayBindings($validExternalIds, 'studentIds');
 
         if (!$validExternalIds) {
             return [];
@@ -782,11 +785,18 @@ class External_Synergetic_User implements External_UserInterface
                                 Semester.FileSemester = a.FileSemester AND
                                 Semester.FileYear = a.FileYear AND
                                 Semester.SystemCurrentFlag = 1
-            WHERE           StudentID IN ($validExternalIds) AND
+            WHERE           StudentID IN ({$predicate['placeholders']}) AND
                             StudentContactType IN ({$contactTypes['placeholders']})
         ";
 
-        $statement = $this->getConnector()->executeQuery($query, $contactTypes['bindings']);
+        $statement = $this->getConnector()->executeQuery(
+            $query,
+            array_merge(
+                $contactTypes['bindings'],
+                $predicate['bindings']
+            )
+        );
+
         $contacts = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
         $contactReturn = [];
