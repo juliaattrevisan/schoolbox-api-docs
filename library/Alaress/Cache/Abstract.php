@@ -24,7 +24,7 @@ abstract class Alaress_Cache_Abstract
      * The headers to be supplied when making a request
      * @var array
      */
-    protected $headers = [];
+    private $headers = [];
 
     /**
      * A prefix for cached filenames
