@@ -44,6 +44,12 @@ class ValidDetailsVisible
      */
     public function isSatisfiedBy(User $viewee, User $viewer): bool
     {
+        /* Superusers see everything
+         */
+        if ($viewer->isSuperuser()) {
+            return true;
+        }
+
         // Guest should never be able to see any other user's detail
         if ($viewer->getRole()->isGuest()) {
             return false;
