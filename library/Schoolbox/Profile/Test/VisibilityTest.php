@@ -197,7 +197,7 @@ class VisibilityTest extends TestCase
             [$student1, $student2, true, false, false],
             [$student1, $student2, false, false, false],
 
-            /* Parents cannot see students' details
+            /* Students cannot see parents' details
              */
             [$student1, $parent1, true, true, false],
             [$student1, $parent1, false, true, false],
@@ -208,7 +208,7 @@ class VisibilityTest extends TestCase
             [$student1, $parent2, true, false, false],
             [$student1, $parent2, false, false, false],
 
-            /* Superusers can see students' details
+            /* Students can see superusers' details
              */
             [$student1, $superUser1, true, true, true],
             [$student1, $superUser1, false, true, true],
@@ -219,7 +219,7 @@ class VisibilityTest extends TestCase
             [$student1, $superUser2, true, false, true],
             [$student1, $superUser2, false, false, true],
 
-            /* Staff can see students' details
+            /* Students can see staff's details
              */
             [$student1, $staff1, true, true, true],
             [$student1, $staff1, false, true, true],
@@ -230,7 +230,7 @@ class VisibilityTest extends TestCase
             [$student1, $staff2, true, false, true],
             [$student1, $staff2, false, false, true],
 
-            /* Guests cannot see students' details
+            /* Students can see guests' details
              */
             [$student1, $guest1, true, true, false],
             [$student1, $guest1, false, true, false],
@@ -252,7 +252,7 @@ class VisibilityTest extends TestCase
             [$student2, $student2, true, false, true],
             [$student2, $student2, false, false, true],
 
-            /* Parents cannot see students' details
+            /* Students cannot see parents' details
              */
             [$student2, $parent1, true, true, false],
             [$student2, $parent1, false, true, false],
@@ -263,7 +263,7 @@ class VisibilityTest extends TestCase
             [$student2, $parent2, true, false, false],
             [$student2, $parent2, false, false, false],
 
-            /* Superusers can see students' details
+            /* Students can see superuser's details
              */
             [$student2, $superUser1, true, true, true],
             [$student2, $superUser1, false, true, true],
@@ -274,7 +274,7 @@ class VisibilityTest extends TestCase
             [$student2, $superUser2, true, false, true],
             [$student2, $superUser2, false, false, true],
 
-            /* Staff can see students' details
+            /* Students can see staff details
              */
             [$student2, $staff1, true, true, true],
             [$student2, $staff1, false, true, true],
@@ -285,7 +285,7 @@ class VisibilityTest extends TestCase
             [$student2, $staff2, true, false, true],
             [$student2, $staff2, false, false, true],
 
-            /* Guests cannot see students' details
+            /* Students cannot see guest's details
              */
             [$student2, $guest1, true, true, false],
             [$student2, $guest1, false, true, false],
@@ -296,7 +296,7 @@ class VisibilityTest extends TestCase
             [$student2, $guest2, true, false, false],
             [$student2, $guest2, false, false, false],
 
-            /* Students cannot see parents' details
+            /* Parents cannot see students' details
              */
             [$parent1, $student1, true, true, false],
             [$parent1, $student1, false, true, false],
@@ -321,26 +321,27 @@ class VisibilityTest extends TestCase
             [$parent1, $parent2, true, false, false],
             [$parent1, $parent2, false, false, false],
 
-            /* Superusers can see parents' details
+            /* Parents can see superuser's details
+             * But only if ReportStaffAccess is true
              */
             [$parent1, $superUser1, true, true, true],
-//            [$parent1, $superUser1, false, true, true],
+            [$parent1, $superUser1, false, true, false],
             [$parent1, $superUser1, true, false, true],
-//            [$parent1, $superUser1, false, false, true],
+            [$parent1, $superUser1, false, false, false],
             [$parent1, $superUser2, true, true, true],
-//            [$parent1, $superUser2, false, true, true],
+            [$parent1, $superUser2, false, true, false],
             [$parent1, $superUser2, true, false, true],
-//            [$parent1, $superUser2, false, false, true],
+            [$parent1, $superUser2, false, false, false],
 
             /* Staff can see parents' details
-             * but only if restrictParentEmails is false
+             * but only if RestrictParentEmails is false
              */
-//            [$parent1, $staff1, true, true, false],
-//            [$parent1, $staff1, false, true, false],
-//            [$parent1, $staff1, true, false, true],
+            [$parent1, $staff1, true, true, true],
+            [$parent1, $staff1, false, true, false],
+//            [$parent1, $staff1, true, false, false],
 //            [$parent1, $staff1, false, false, true],
-//            [$parent1, $staff2, true, true, false],
-//            [$parent1, $staff2, false, true, false],
+//            [$parent1, $staff2, true, true, true],
+//            [$parent1, $staff2, false, true, true],
 //            [$parent1, $staff2, true, false, true],
 //            [$parent1, $staff2, false, false, true],
 
