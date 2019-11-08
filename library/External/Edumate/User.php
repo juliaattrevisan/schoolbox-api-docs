@@ -9,6 +9,7 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -201,7 +202,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             return [];
         }
 
-        $ids = implode(',', $externalUserId);
+        $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
 
         $caseSensitiveFields = array(
             'StudentContactID',
@@ -229,10 +230,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               P.SPOUSE_MOBILE AS STUDENTCONTACTSPOUSEMOBILEPHONE, P.COMBINED_EMAIL_ADDRESS AS STUDENTCONTACTSPOUSEDEFAULTEMAIL
             FROM SCHOOLBOX_PARENTS P
             INNER JOIN SCHOOLBOX_PARENT_STUDENT PS ON P.CARER_NUMBER = PS.CARER_NUMBER
-            WHERE PS.STUDENT_NUMBER IN ($ids)
+            WHERE PS.STUDENT_NUMBER IN ({$predicate['placeholders']})
         ");
 
-        $stmt->execute();
+        $stmt->execute($predicate['bindings']);
 
         $parents = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
