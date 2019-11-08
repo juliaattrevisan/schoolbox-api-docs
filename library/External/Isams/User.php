@@ -5,6 +5,7 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -269,7 +270,7 @@ class External_Isams_User implements External_UserInterface
             return [];
         }
 
-        $ids = implode(',', $externalUserId);
+        $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
 
         $query = "
             SELECT      
@@ -292,10 +293,10 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
-            WHERE       V_Student.StudentID IN ($ids)
+            WHERE       V_Student.StudentID IN ({$predicate['placeholders']})
         ";
 
-        return $this->getConnector()->executeQuery($query)->fetchAll();
+        return $this->getConnector()->executeQuery($query, $predicate['bindings'])->fetchAll();
     }
 
     /**
