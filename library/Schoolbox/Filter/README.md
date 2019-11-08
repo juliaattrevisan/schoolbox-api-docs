@@ -117,8 +117,8 @@ As with the Definition, it has a core abstract implementation
 and adds further interface requirements:
 * Convert selections to a one-dimensional list of item keys (`getSelectedItems`)
 * Get a list of all possible item keys (`getAllPossibleItems`)
-* Get the item referenced by an keys (`getItem`)
-* Assert whether a provided keys is valid (`assertValidKey`)
+* Get the item referenced by a single key (`getItem`)
+* Assert whether a provided key is valid (`assertValidKey`)
 
 
 ### Filter Consumers
