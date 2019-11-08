@@ -187,26 +187,6 @@ HELP;
                 if ($outputCode !== 0) {
                     $logger->warning("Something went wrong building editor CSS (exit code: {$outputCode})");
                 }
-
-                // Move all of the CSS files to S3
-
-                $logger->info("Copying output to FS_STORAGE");
-
-                $cssFiles = glob(SITE_root . "/www/css/{$siteLocation}/*");
-
-                $factory = new \Schoolbox\Resource\FilesystemFactory();
-                $mgr = $factory->build(\Config::get('storage_dir'));
-                $fsStorage = $mgr->getFilesystem(\Schoolbox\Resource\Storage\Manager::FS_STORAGE);
-
-                foreach ($cssFiles as $file) {
-                    $basename = basename($file);
-
-                    if ($fsStorage->has("/css/{$siteLocation}/{$basename}")) {
-                        $fsStorage->delete("/css/{$siteLocation}/{$basename}");
-                    }
-
-                    $fsStorage->write("/css/{$siteLocation}/{$basename}", file_get_contents($file));
-                }
             } else {
                 // something went wrong
                 $logger->error("Something went wrong during SASS build process! (exit code: {$outputCode})");
