@@ -541,13 +541,13 @@ class VisibilityTest extends TestCase
             /* Parents can see staff details
              * if reportStaffAccess is true
              */
-//            [$staff1, $parent1, true, true, true],
+            [$staff1, $parent1, true, true, true],
 //            [$staff1, $parent1, false, true, false],
-//            [$staff1, $parent1, true, false, true],
+            [$staff1, $parent1, true, false, true],
 //            [$staff1, $parent1, false, false, false],
-//            [$staff1, $parent2, true, true, true],
+            [$staff1, $parent2, true, true, true],
 //            [$staff1, $parent2, false, true, false],
-//            [$staff1, $parent2, true, false, true],
+            [$staff1, $parent2, true, false, true],
 //            [$staff1, $parent2, false, false, false],
 
             /* Superusers can see staff details
