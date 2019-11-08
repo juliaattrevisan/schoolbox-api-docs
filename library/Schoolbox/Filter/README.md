@@ -143,7 +143,8 @@ list of selected filters into a list of IDs of items that match the filters.
 An ID Finder operates _before_ results are retrieved: it's intended to add a
 further filter (in the form of a list of IDs) to a search query, so that the
 query returns less data and runs more quickly.
-(In practise, the list of IDs is to a mapper's `findByColumn` method.)
+(In practise, the list of IDs is passed to a mapper's `findByColumn` method, so
+that the set of models for these IDs is retrieved.)
 
 ID Finder implementations must implement:
 * a method for fetching a static instance, as ID Finders are intended to be
@@ -194,6 +195,26 @@ of developing for filters.
 * Add this constant to the `params` parameter for the `page` column mappings in
   `\Schoolbox\Filter\Page\Mapper::mapping` and
   `\Schoolbox\Filter\Selection\Mapper::mapping`
+  * The mapping will look something like:
+    ```php
+    $this->uses(
+        'page',
+        self::TYPE_STRING,
+        self::COLUMN_ENUM,
+        'page',
+        [
+            Model::PAGE_PENDING_ASSESSMENTS,
+            Model::PAGE_GRADES,
+            Model::PAGE_CLASS_MARK_BOOK,
+            Model::PAGE_COURSE_MARK_BOOK,
+            Model::PAGE_RUBRIC_MARK_BOOK,
+            Model::PAGE_LEARNING_ANALYTICS,
+            Model::PAGE_UPCOMING_ASSESSMENTS,
+            Model::PAGE_ASSESSMENT_CALENDAR,
+            // Add the constant to the end of this array
+        ]
+    );
+    ```
 * Update these methods with cases for the new constant:
   * `\Schoolbox\Filter\Controller::buildFilteredPageLabels`
   * `\Schoolbox\Filter\Module::registerRoutes`
