@@ -328,7 +328,7 @@ class External_Denbigh_User implements External_UserInterface
             return [];
         }
 
-        $ids = implode(',', $externalUserId);
+        $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
 
         /** @noinspection SqlDialectInspection */
         $contactIterator = $this->externalDatabase->getQueryIterator(
@@ -347,10 +347,11 @@ class External_Denbigh_User implements External_UserInterface
                               pa_p.type != 'Non Resident'
                 LEFT JOIN     People pe_p ON pe_p.denbighID = pa_p.peopleDenbighID
                 LEFT JOIN     Addresses a ON a.familyDenbighID = s.familyDenbighID
-                WHERE         pe_s.denbighID IN ($ids) AND
+                WHERE         pe_s.denbighID IN ({$predicate['placeholders']}) AND
                               pe_p.id IS NOT NULL -- check the row actually exists in `People` table
                 GROUP BY      pe_p.denbighID
-            "
+            ",
+            $predicate['bindings']
         );
 
         $contactAdaptionList = [];
