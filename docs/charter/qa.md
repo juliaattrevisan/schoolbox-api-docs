@@ -2,16 +2,17 @@
 * [The Role of QA](#the-role-of-qa)
 * [Areas to QA](#areas-to-qa)
 * [QA Check list](#qa-check-list)
+* [QA transition to done response](#qa-transition-to-done-response)
 * [Tools that help](#tools-that-help)
 
 ## The Role of QA
 
-The Role of QA is to reduce the amount of bugs introduced and currently present in the system. It is the official testing step of the process but catching defects and bugs should be done on every step. QA testing focuses on the Pull Request (Code that is being changed):
+The Role of QA is to reduce the amount of bugs introduced and currently present in the system. It is the official testing step of the process but catching defects and bugs should be done on every step. QA testing focuses on the code that was changed and its:
 * Functionality
 * Usability
 * Changes Impact
 
-**Functional**
+**Functionality**
 
 When you use the code it runs and does what it is meant to do. You can achieve the tasks that are solved by the change. And other parts of the system that the introduced code can effect do not break. The key thing here is that no other functional parts of the system break by the addition or change introduced by the bit of code being tested.
 
@@ -25,7 +26,7 @@ Note 2, PO can over ride our ideas of usability.
 
 **Changes Impact**
 
-QA is required to be done on each Pull Request, each change in the code before it makes it to production. It is done directly after the Pull Request is merged. It should be done with testing scope in mind, meaning that we should focus on what areas of the system are actually effected by the change. This should be facilitated and provided by the Change Impact field in the ticket. This may require consultation with other devs.
+QA is required to be done on each change in the code before it makes it to production. It is done directly after the code change has been merged into development codebase. It should be done with testing scope in mind, meaning that we should focus on what areas of the system are actually effected by the change. This should be facilitated and provided by the Change Impact field in the ticket. This may require consultation with other devs.
 There is an explanation of the QA step as it relates to the definition of done [here](./definition-of-done.md).
 
 ## Areas to QA
@@ -39,7 +40,7 @@ Test Types:
 
 **Functional**
 
-Does the Pull Request code meet all the Acceptance criteria?
+Does the code that was changed meet all the Acceptance criteria?
 
 This should be really covered by the review but it is a step that I still do, but can be skipped if our 
 review process is robust enough.
@@ -95,11 +96,56 @@ Has any data been compromised by the change in the code, can a user see somethin
     * Null values, incorrect input.
     * Incorrect work flow. eg. Setting a mark as one type in assessment, 
     submitting a draft, then changing the mark type.
-* Impact of Change field have any other areas effected? Do they work?
+* Impact of Change field have any other areas been effected? Do they work?
     * If Impact of Change is empty, does the PR owner know of the impact of their code?
     * If not then does the code show the impact of change?
     * Can the user see things they shouldn't see due to the change?
     * Can the user do things they shouldn't be able to do due to the change?
+
+## QA transition to done response
+
+Its best to communicate what has been tested during QA. More detail is better than less in that regard. This is mainly so that other developers who notice their ticket going into the Done state can pull it back into QA if they believe a combination is missing from what has been tested.
+
+With that in mind currently it would be good if we saw testing reported to be shown in the following format:
+
+**QA Pass and failure response format**
+
+Page or Area of system that was QA'ed
+* Functionality or action validated in testing.
+     * Variations of that action tested.
+     
+**Example**
+
+Admin settings, weather API config.
+* Can set a valid key.
+     * Weather Component can be seen on staff, student and admin dash.
+* Can set an invalid key.
+     * Weather Component is seen as unavailable for staff, student and admin users on dash.
+
+Each test case should state if its passed or failed. Grouping similar test cases if fine as long as its clear what has failed if only 1 out of the group has failed.
+
+When noting a failure it should happen after the main tested section and should remark STR so that the dev can replicate the bug quickly. Output of stack trace if there is one is helpful too.
+
+**Example of failure notes**
+
+Tested section
+
+Failure 1. Can input all character types and save them on a news articles.
+
+STR
+
+* On vagrant, sales data set
+* Login as alaress
+* Go to: https://vagrant.dev.schoolbox.cloud/news
+* Create a news article.
+* In body place in some text in Russian using Google translate.
+* Save the news article.
+
+Expected: Works fine
+
+Actual: Stack trace
+
+Note it is also fine to place what failed directly under the test that failed. As long as its obvious how to replicate the issue.
 
 ## Tools that help
 
