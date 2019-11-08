@@ -272,7 +272,7 @@ class Migration extends CliTool\App
         $fileName = basename($filepath);
         $dirName  = dirname($filepath);
         if (!is_dir($dirName)) {
-            // If file already in S3, then directoy may not exist locally any more.
+            // If file already in S3, then directory may not exist locally any more.
             return;
         }
         $handle = opendir($dirName);
