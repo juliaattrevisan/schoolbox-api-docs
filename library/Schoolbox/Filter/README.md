@@ -304,6 +304,7 @@ of developing for filters.
     );
     ```
 * Create a Factory implementation for the new filter
+  * In practise, this will extend `\Schoolbox\Filter\AbstractFactory`
   * Depending on how closely related the new filter is to existing ones, its
     `buildComponent` and `buildKeyConverter` might be able to create instances
     of already existing classes. `buildDefinition` will have to create a new

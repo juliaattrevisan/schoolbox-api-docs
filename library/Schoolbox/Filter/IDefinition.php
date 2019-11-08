@@ -81,7 +81,7 @@ interface IDefinition
     /**
      * Return an ordered list of pages where this filter is available
      *
-     * @see FilterOption::PAGE_* constants
+     * @see Page\Model::PAGE_* constants
      * @return string[]
      */
     public static function getPages(): array;
