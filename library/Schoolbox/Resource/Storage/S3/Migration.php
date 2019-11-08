@@ -287,7 +287,8 @@ class Migration extends CliTool\App
             }
             $this->getLogger()->info("Transcode file '$entry' found, uploading...");
             $transcodeFilePath = $dirName . DIRECTORY_SEPARATOR . $entry;
-            $transcodeFile     = new Flysystem\File($this->storageMapper->getManager()->getFilesystem(Storage\Manager::FS_STORAGE), $transcodeFilePath);
+            $filepath          = str_replace($this->storageDir . DIRECTORY_SEPARATOR, '', $transcodeFilePath);
+            $transcodeFile     = new Flysystem\File($this->storageMapper->getManager()->getFilesystem(Storage\Manager::FS_STORAGE), $filepath);
             if ($this->moveFileToS3($transcodeFilePath, $transcodeFile)) {
                 $this->countTranscodeFilesUploaded++;
             }
