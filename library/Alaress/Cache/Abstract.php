@@ -95,7 +95,7 @@ abstract class Alaress_Cache_Abstract
      * This is deliberately empty so you can instantiate an instance and set custom options
      * such as expiry durations, urls, etc
      */
-    final public function __construct()
+    public function __construct()
     {
         /* Allow subclasses to specify their own settings
          */
