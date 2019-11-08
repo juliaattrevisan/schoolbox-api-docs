@@ -295,7 +295,14 @@ of developing for filters.
   * the `class` column is the fully-qualified class name of the new filter's
     Definition class
   * leave the leading `\` character off both values
-    * note that `\` is escaped by another `\` in MySQL/MariaDB queries
+    * note that `\` is escaped by another `\` in MySQL/MariaDB queries:
+    ```sql
+    INSERT INTO filter (entity, class)
+    VALUES (
+        'Schoolbox\\Learning\\Assessment\\DataModel\\Mapper',
+        'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\CourseImportSpec\\Definition'
+    );
+    ```
 * Create a Factory implementation for the new filter
   * Depending on how closely related the new filter is to existing ones, its
     `buildComponent` and `buildKeyConverter` might be able to create instances
