@@ -21,9 +21,9 @@ fi
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
-    echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => http://$eth/";
-    echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => http://$eth:8881/";
+    echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => https://$eth/";
+    echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL  => https://$eth:8882/";
 done
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => https://vagrant.dev.schoolbox.cloud";
-echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => https://vagrant.dev.schoolbox.cloud:8882/";
+echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL  => https://vagrant.dev.schoolbox.cloud:8882/";
