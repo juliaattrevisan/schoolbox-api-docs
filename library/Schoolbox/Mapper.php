@@ -253,6 +253,9 @@ abstract class Mapper implements IMapper, Serializable
     /** @var Propagator */
     protected $propagator;
 
+    /** @var Propagator */
+    private $propagatorSuppressed;
+
     /** @var bool */
     private $localBodyCacheBypass = false;
 
@@ -2006,10 +2009,6 @@ abstract class Mapper implements IMapper, Serializable
      *                                           * order:         a set of key-value pairs:
      *                                           key: column name, value: ASC or DESC
      *
-     * @throws Exception if for some reason the limit or offset parameters
-     *                   cannot be created (this should never happen in practise
-     *                   as columnList would have to contain a field named
-     *                   'limit' or 'offset')
      * @return GenericCollection
      */
     public function findByColumnList($columnList, $options = array())
@@ -3699,6 +3698,30 @@ abstract class Mapper implements IMapper, Serializable
         return true;
     }
 
+    /**
+     * Set MockPropagator to suppress notification
+     * @return $this
+     */
+    protected function suppressNotification(): self
+    {
+        $this->propagatorSuppressed = $this->getEventPropagator();
+        $this->propagator           = new MockPropagator();
+        return $this;
+    }
+
+    /**
+     * Restore notification (Must call suppressNotification first)
+     * @return $this
+     */
+    protected function restoreNotification(): self
+    {
+        if (!isset($this->propagatorSuppressed)) {
+            return $this;
+        }
+        $this->propagator = $this->propagatorSuppressed;
+        unset($this->propagatorSuppressed);
+        return $this;
+    }
 
     /**
      * Compares two objects mapped by this mapper and returns an array of the differences between.
