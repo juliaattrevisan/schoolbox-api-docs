@@ -65,13 +65,12 @@ if (!$section) {
 
 // getListByAssessAndAttempt gets a rowset for some reason!
 $attemptList = $attemptHandler->getListByAssessAndAttempt($quizId, $attemptId);
-$attempt     = array_pop($attemptList);
 
-if (!$attempt) {
+if (!$attemptList) {
     error(Error\Mapper::ERROR_ATTEMPT_NOT_FOUND_2);
-} else {
-    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($quizId, $attemptId);
 }
+$attempt                        = array_pop($attemptList);
+$attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($quizId, $attemptId);
 
 /* Check the folder and user exists meaningfully
  */
