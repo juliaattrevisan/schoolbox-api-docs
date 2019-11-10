@@ -4,7 +4,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-class External_Synergetic_Ths_Pastoral extends External_Synergetic_Pastoral
+class External_Synergetic_Hutchins_Pastoral extends External_Synergetic_Pastoral
 {
 
     /** @inheritDoc */
