@@ -107,7 +107,6 @@ class StudentLists
 
                     $students[$key]['id'] = $user->getId();
                     $students[$key]['email'] = $user->getEmail();
-                    $students[$key]['ePortfolioIsEnabled'] = $user->getEportfolioEnable();
                     $students[$key]['lastAccessTime'] = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
 
                     $students[$key]['routes'] = [
