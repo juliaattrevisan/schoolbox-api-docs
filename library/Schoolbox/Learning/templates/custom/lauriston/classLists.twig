@@ -1,19 +1,7 @@
 {% extends '@learning/coreClassLists.twig' %}
 
 {% block data_dropdown_content %}
-    <li v-if="student.ePortfolioIsEnabled">
-        <a :href="'/eportfolio/' + student.id + '/profile'" class="icon-eportfolio">${ linkTitle.ePortfolio }</a>
-    </li>
-    <li v-if="student.routes.pastoral.length">
-        <a :href="student.routes.pastoral" class="icon-pastoral">${ linkTitle.pastoralCare.capitalise() }</a>
-    </li>
-    <li>
-        <a :href="calendarPath + '/' + student.id" class="icon-calendar">${ linkTitle.calendar.capitalise() }</a>
-    </li>
-    <li v-if="!student.timetableIsHidden">
-        <a :href="/timetable/+ student.id" class="icon-timetable">${ linkTitle.timetable.capitalise() }</a>
-    </li>
-    <li v-if="student.email && mailEnabled">
-        <a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${ linkTitle.email.capitalise() }</a>
+    <li v-for="(element, index) in student.routes" v-if="!index.match(/(dueWork|grades)/)">
+        <a :href="element.href" :class="element.class" :title="element.title">${ element.label }</a>
     </li>
 {% endblock %}

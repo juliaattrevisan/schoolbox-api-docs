@@ -4,9 +4,6 @@ Data:
     specialNeeds      string    A localised label for Special Needs
     replyTo           string    Current user's email address
     mailEnabled       bool      Config for whether mail is enabled
-    pastoralEnabled   bool      Config for whether pastoral is enabled
-    today             string    Today's date
-    mailHandle        string    Mail handler
     emailGroups       array     Data for mail group checkboxes
 #}
 
@@ -80,28 +77,10 @@ Data:
                             </p>
                             {% endblock %}
 
-                            <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id">
+                            <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id && Object.keys(student.routes).length">
                                 {% block data_dropdown_content %}
-                                <li>
-                                    <a :href="student.routes.duework" class="icon-due-work">${ linkTitle.dueWork.capitalise() }</a>
-                                </li>
-                                <li>
-                                    <a :href="student.routes.grades" class="icon-approve">${ linkTitle.grades.capitalise() }</a>
-                                </li>
-                                <li v-if="student.ePortfolioIsEnabled">
-                                    <a :href="'/eportfolio/' + student.id + '/profile'" class="icon-eportfolio">${ linkTitle.ePortfolio }</a>
-                                </li>
-                                <li v-if="student.routes.pastoral.length">
-                                    <a :href="student.routes.pastoral" class="icon-pastoral">${ linkTitle.pastoralCare.capitalise() }</a>
-                                </li>
-                                <li>
-                                    <a :href="calendarPath + '/' + student.id" class="icon-calendar">${ linkTitle.calendar.capitalise() }</a>
-                                </li>
-                                <li v-if="!student.timetableIsHidden">
-                                    <a :href="/timetable/+ student.id" class="icon-timetable">${ linkTitle.timetable.capitalise() }</a>
-                                </li>
-                                <li v-if="student.email && mailEnabled">
-                                    <a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${ linkTitle.email.capitalise() }</a>
+                                <li v-for="element in student.routes">
+                                    <a :href="element.href" :class="element.class" :title="element.title">${ element.label }</a>
                                 </li>
                                 {% endblock %}
                             </ul>
@@ -111,7 +90,7 @@ Data:
                         {% block core_group %}{% endblock %}
                         <td class="show-for-medium-up">${ student.lastAccessTime }</td>
                         <td class="no-pad">
-                            <div class="actions-small-1" v-if="student.id">
+                            <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                 <nav>
                                     <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
                                 </nav>
@@ -129,7 +108,7 @@ Data:
                 <template v-for="(group, index) in groups">
                     <li v-bind:class="index < 1 ? 'no-margin' : ''">
                         <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" v-model="group.isChecked" />
-                        <label :for="group.label">${ group.label.capitalise() }</label>
+                        <label :for="group.label">${ group.label | capitalise }</label>
                     </li>
                 </template>
             </ul>
@@ -195,18 +174,6 @@ Data:
             classListsEndpointPrefix: '/subject/classList/ajax/',
             getStudentListsEndpoint: '{{ routeLookup('learning.getStudentListByClassId', {folderId: folder.getId, folder: folder}) }}',
             formIsReady: false,
-            linkTitle: {
-                'dueWork':      '{{ locale.dueWork }}',
-                'grades':       '{{ locale.grades.plural }}',
-                'pastoralCare': '{{ locale.pastoralCare.proper }}',
-                'calendar':     '{{ locale.calendar }}',
-                'ePortfolio':   'ePortfolio',
-                'timetable':    'Timetable',
-                'email':        'Email',
-            },
-            calendarPath: '{{ '/calendar/' ~ today }}',
-            pastoralIsEnabled: Boolean({{ pastoralEnabled }}),
-            mailHandle: '{{ mailHandle }}',
             actionsPlaceholder: true,
             loadingText: 'Please Wait...',
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
@@ -396,6 +363,15 @@ Data:
         watch: {
             formIsReady: function(val) {
                 this.$refs.form.submit();
+            }
+        },
+        filters: {
+            capitalise: function (val) {
+                if (!val) {
+                    return '';
+                }
+
+                return val.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
             }
         }
     });
