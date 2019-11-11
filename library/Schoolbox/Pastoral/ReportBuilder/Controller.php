@@ -394,6 +394,9 @@ class Controller extends Base
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
+
+        /****** TODO this bit *****/
+
         if (!empty($post['before'])) {
             $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
         } else {
@@ -405,6 +408,8 @@ class Controller extends Base
         } else {
             $pastoralReport->setAfterDate(null);
         }
+
+        /****************************/
 
         if (is_array($post['types'])) {
             $pastoralReport->setTypesCsv(implode(',', $post['types']));

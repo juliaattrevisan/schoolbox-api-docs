@@ -78,6 +78,8 @@
                             </label>
                         {% endif %}
                     </div>
+
+                    {# TODO this bit ################  #}
                     <div class="small-12 large-6 columns">
                         <label for="datetime_after">
                             Published On Or After
@@ -94,7 +96,10 @@
                                    data-datepicker data-datesync-startdate="#datetime_after"/>
                         </label>
                     </div>
+                    {# ############################# #}
+
                     <div class="small-12 columns">
+                        {# TODO label below is wrong? #}
                         <label for="item_datetime_published">
                             Filter By Tags
                             <select id="filterTags" name="tags[]" multiple data-placeholder="Select Tags"></select>
@@ -568,7 +573,7 @@
                             return $(this).data('order');
                         })
                 );
-                
+
                 $('#order').val(order.join(','));
                 form.submit();
             }
