@@ -21,6 +21,12 @@ abstract class Alaress_Cache_Abstract
     protected $url = '';
 
     /**
+     * The headers to be supplied when making a request
+     * @var array
+     */
+    private $headers = [];
+
+    /**
      * A prefix for cached filenames
      *
      * @var string
@@ -89,7 +95,7 @@ abstract class Alaress_Cache_Abstract
      * This is deliberately empty so you can instantiate an instance and set custom options
      * such as expiry durations, urls, etc
      */
-    final public function __construct()
+    public function __construct()
     {
         /* Allow subclasses to specify their own settings
          */
@@ -108,18 +114,20 @@ abstract class Alaress_Cache_Abstract
      * Setup method
      *
      * @param string     $url
-     * @param null|array $params
+     * @param string[]  $headers
      * @return self
      * @return self
      * @throws \InvalidArgumentException
      */
-    public function init(string $url, ?array $params = null): \Alaress_Cache_Abstract
+    public function init(string $url, array $headers = []): \Alaress_Cache_Abstract
     {
         if ('' === trim($url)) {
             throw new \InvalidArgumentException('Empty url provided');
         }
 
         $this->url = $url;
+
+        $this->headers = $headers;
 
         /* Logging class handles verbosity and any logging
          */
@@ -234,7 +242,11 @@ abstract class Alaress_Cache_Abstract
         $httpClient = new GuzzleClient(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
 
         try {
-            $httpClient->get($url, ['headers' => ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'], 'save_to' => $this->cachedFile]);
+            $headers = ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'];
+            if (count($this->headers)) {
+                $headers = array_merge($this->headers, $headers);
+            }
+            $httpClient->get($url, ['headers' => $headers, 'save_to' => $this->cachedFile]);
         } catch (RequestException $e) {
             return false;
         }
@@ -476,5 +488,7 @@ abstract class Alaress_Cache_Abstract
     {
         $this->remove($this->cachedFile);
     }
+
+
 }
 

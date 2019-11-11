@@ -145,6 +145,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             return new Collection();
         }
 
+        $url = $this->tokenReplaceUrl($decodedConfig->getUrl());
+
         /* Check permissions - if you can view these events according to the Permissions
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
@@ -163,14 +165,19 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 * Cache step 1: cache load of VCAL file from URL
                 */
                 $cache  = new Calendar_Api_Cache();
-                $source = $cache->init($decodedConfig->getUrl())->getStreamContents();
+                $headers = [];
+
+                if($decodedConfig->getAuthorization()) {
+                    $headers = ['Authorization' => 'Bearer '.$decodedConfig->getAuthorization()];
+                }
+                $source = $cache->init($url, $headers)->getStreamContents();
 
                 // Cache step 2: Expand VCAL into event collection.
                 // The expanded events depend on the start and end time, not
                 // just the VCAL file.
                 /** @var \Sabre\VObject\Document $allEvents */
                 $allEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
-                    'vcal.' . $decodedConfig->getUrl(),
+                    'vcal.' . $url,
                     function ($params) {
                         [$source, $startTimestamp, $endTimestamp] = $params;
                         // You provided UTF-16? Proceed to UTF-8
@@ -337,5 +344,29 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $event->setConnectorId($this->getConnectorId());
 
         return $event;
+    }
+
+    /**
+     * This function replaces tokens in the URL with user parameters, to allow personalisation of VCAL URL
+     * @param  string  $url
+     * @return string
+     */
+    private function tokenReplaceUrl(string $url): string
+    {
+        $urlTokens = [
+            '[id]',
+            '[externalId]',
+            '[username]' ,
+            '[email]' ,
+        ];
+
+        $urlReplacement = [
+            $this->getUser()->getId(),
+            $this->getUser()->getExternalId(),
+            $this->getUser()->getUsername(),
+            $this->getUser()->getEmail()
+        ];
+
+        return str_ireplace($urlTokens, $urlReplacement, $url);
     }
 }

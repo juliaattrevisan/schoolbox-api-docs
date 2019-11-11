@@ -32,6 +32,13 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     private $url = '';
 
     /**
+     * The authorization token to send to the vcal stream
+     *
+     * @var string
+     */
+    private $authorization = '';
+
+    /**
      * Campus visibility for this stream
      *
      * @var array
@@ -48,7 +55,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     /**
      * Render configs into admin screen
      *
-     * @param $page
+     * @param SitePage $page
      *
      * @return mixed|void
      */
@@ -59,7 +66,8 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
                 'CONNECTOR_ID'    => $this->getId(),
                 'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
                 'CONNECTOR_CLASS' => Scrub::text($this->getConnectorClass()),
-                'URL'             => $this->getUrl()
+                'URL'             => $this->getUrl(),
+                'AUTHORIZATION'   => $this->getAuthorization(),
             )
         );
 
@@ -129,6 +137,27 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     {
         return $this->url;
     }
+
+    /**
+     * Set authorization
+     *
+     * @param string $authorization
+     */
+    public function setAuthorization(string $authorization): void
+    {
+        $this->authorization = $authorization;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getAuthorization(): string
+    {
+        return $this->authorization;
+    }
+
+
 
     /**
      * Set campus
