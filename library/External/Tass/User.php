@@ -220,6 +220,19 @@ class External_Tass_User implements External_UserInterface
             return [];
         }
 
+        $charIndexQuery = [];
+
+        $ids = implode(',', array_map(static function($val) {
+                return sprintf("'%s'", $val);
+            }, $externalUserId)
+        );
+
+        foreach ($externalUserId as $externalId) {
+            $charIndexQuery[] = "(CHARINDEX(','+ '$externalId' +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
+        }
+
+        $charIndexQueryString = implode(' OR ', $charIndexQuery);
+
         /* students profile should provide all parents, but only show contact info if not in a split family
          */
         $addnum_mother = $this->helper->getAddNumMother();
@@ -246,7 +259,7 @@ class External_Tass_User implements External_UserInterface
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_father,'1')
-            WHERE stud_code = '$externalUserId[0]'
+            WHERE stud_code IN ($ids)
 
             UNION
 
@@ -271,7 +284,7 @@ class External_Tass_User implements External_UserInterface
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_mother,'1')
-            WHERE stud_code = '$externalUserId[0]'
+            WHERE stud_code IN ($ids)
 
             UNION
 
@@ -298,7 +311,7 @@ class External_Tass_User implements External_UserInterface
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_father,'1')
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-            WHERE (CHARINDEX(','+ '$externalUserId[0]' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
+            WHERE $charIndexQueryString
 
             UNION
 
@@ -325,7 +338,7 @@ class External_Tass_User implements External_UserInterface
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_mother,'1')
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-            WHERE (CHARINDEX(','+ '$externalUserId[0]' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
+            WHERE $charIndexQueryString
         ";
         $parents = $this->database->trimAll($this->database->getAll($query));
 
