@@ -13,15 +13,15 @@ interface External_ClassInterface extends External\IConnector
     /**
      * Get a list of students in a particular $classCode
      *
-     * lastname,
-     * firstname,
-     * yearlevel,
-     * house,
-     * StudentMedicalAlert,
-     * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
-     * StudentSpecialNeedsFlag,
-     * StudentTutorDescription,
-     * synergy_id
+     * string      $return[]['lastname']
+     * string      $return[]['firstname']
+     * string      $return[]['yearlevel']
+     * null|string $return[]['house']                     The name of the student's house. NULL if unknown.
+     * string      $return[]['StudentMedicalAlert']
+     * string      $return[]['EnglishSecondFlag']         '0' => false, '1' => true, '' => unknown
+     * string      $return[]['StudentSpecialNeedsFlag']
+     * string      $return[]['StudentTutorDescription']
+     * string      $return[]['synergy_id']
      *
      * @param string $classCode  CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
      * @return string[][]
