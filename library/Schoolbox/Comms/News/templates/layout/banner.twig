@@ -198,7 +198,6 @@
             errorAddingCommentText: 'Unable to post comment',
             postCommentButtonIsEnabled: true,
             createThreadEndpoint: "{{ routeLookup('commsDiscussionThreads.createThread', {contextId: article.id}) }}",
-            associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {articleId: article.id}) }}",
             showCommentsSection: false,
             initialLoad: true,
         },
