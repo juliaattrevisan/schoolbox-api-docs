@@ -24,7 +24,7 @@ abstract class Alaress_Cache_Abstract
      * The headers to be supplied when making a request
      * @var array
      */
-    protected $headers = [];
+    private $headers = [];
 
     /**
      * A prefix for cached filenames
@@ -95,7 +95,7 @@ abstract class Alaress_Cache_Abstract
      * This is deliberately empty so you can instantiate an instance and set custom options
      * such as expiry durations, urls, etc
      */
-    final public function __construct()
+    public function __construct()
     {
         /* Allow subclasses to specify their own settings
          */
@@ -114,12 +114,12 @@ abstract class Alaress_Cache_Abstract
      * Setup method
      *
      * @param string     $url
-     * @param null|array $headers
+     * @param string[]  $headers
      * @return self
      * @return self
      * @throws \InvalidArgumentException
      */
-    public function init(string $url, ?array $headers = null): \Alaress_Cache_Abstract
+    public function init(string $url, array $headers = []): \Alaress_Cache_Abstract
     {
         if ('' === trim($url)) {
             throw new \InvalidArgumentException('Empty url provided');
@@ -127,7 +127,7 @@ abstract class Alaress_Cache_Abstract
 
         $this->url = $url;
 
-        $this->headers = $headers ?? [];
+        $this->headers = $headers;
 
         /* Logging class handles verbosity and any logging
          */

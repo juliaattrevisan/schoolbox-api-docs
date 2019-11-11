@@ -165,12 +165,12 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 * Cache step 1: cache load of VCAL file from URL
                 */
                 $cache  = new Calendar_Api_Cache();
-                $params = [];
+                $headers = [];
 
                 if($decodedConfig->getAuthorization()) {
-                    $params['headers'] = ['Authorization' => 'Bearer '.$decodedConfig->getAuthorization()];
+                    $headers = ['Authorization' => 'Bearer '.$decodedConfig->getAuthorization()];
                 }
-                $source = $cache->init($url,$params)->getStreamContents();
+                $source = $cache->init($url, $headers)->getStreamContents();
 
                 // Cache step 2: Expand VCAL into event collection.
                 // The expanded events depend on the start and end time, not

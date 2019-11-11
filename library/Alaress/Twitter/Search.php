@@ -70,8 +70,8 @@ class Alaress_Twitter_Search
         $params = $this->generateParameters();
 
         if (!empty($params)) {
-            $cache = new Alaress_Twitter_Cache();
-            $cache->init($this->apiUrl, $params);
+            $cache = new Alaress_Twitter_Cache($params);
+            $cache->init($this->apiUrl);
             $all_tweets = $cache->load();
 
             if (is_array($all_tweets)) {
