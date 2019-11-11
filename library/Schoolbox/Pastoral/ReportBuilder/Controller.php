@@ -72,6 +72,16 @@ class Controller extends Base
     private const PAST_WEEK = '7 days ago';
     private const TODAY = 'today';
 
+    private const RELATIVE_DATE_PRESETS = [
+        'This year' => self::THIS_YEAR,
+        'Past 6 months' => self::PAST_6_MONTHS,
+        'Past 3 months' => self::PAST_3_MONTHS,
+        'Past month' => self::PAST_MONTH,
+        'Past fortnight' => self::PAST_FORTNIGHT,
+        'Past week' => self::PAST_WEEK,
+        'Today' => self::TODAY
+    ];
+
     /**
      * Constructor
      *
@@ -241,15 +251,6 @@ class Controller extends Base
             $report->setDashboard(false);
         }
 
-        $relativeDatePresets = [
-            'This year' => self::THIS_YEAR,
-            'Past 6 months' => self::PAST_6_MONTHS,
-            'Past 3 months' => self::PAST_3_MONTHS,
-            'Past month' => self::PAST_MONTH,
-            'Past fortnight' => self::PAST_FORTNIGHT,
-            'Past week' => self::PAST_WEEK,
-            'Today' => self::TODAY
-        ];
 
         // And render this thing out
         $this->getResponse()->content->set(
@@ -271,7 +272,7 @@ class Controller extends Base
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
-                    'datePresets'      => $relativeDatePresets
+                    'datePresets'      => self::RELATIVE_DATE_PRESETS
                 ],
                 'title' => 'Pastoral Report',
             ]
@@ -414,21 +415,44 @@ class Controller extends Base
         }
 
 
-        /****** TODO this bit *****/
+        // If the user opted for the relative date input, use that.
+        if (!empty($post['date-option'] && $post['date-option'] === 'relative')) {
+            $relativeDate = $post['relative-dates-dropdown'];
 
-        if (!empty($post['before'])) {
-            $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
+            // Only use the user's input if the selected option matches one of our preset strtotime-able options
+            if (!empty($relativeDate) && in_array($relativeDate, array_values(self::RELATIVE_DATE_PRESETS), true)) {
+                $timestamp = strtotime($relativeDate);
+
+                switch ($relativeDate) {
+                    case self::THIS_YEAR:
+                        $startOfDateRange = Alaress_Date_Format::now()->startOfYear();
+                        break;
+                    case self::TODAY:
+                        $startOfDateRange = Alaress_Date_Format::now()->startOfDay();
+                        break;
+                    default:
+                        $startOfDateRange = Alaress_Date_Format::newFromTimestamp($timestamp);
+                }
+
+                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($startOfDateRange));
+                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort(Alaress_Date_Format::now()));
+            }
         } else {
-            $pastoralReport->setBeforeDate(null);
+            // No relative date data, or the user opted for absolute dates?
+
+            if (!empty($post['before'])) {
+                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
+            } else {
+                $pastoralReport->setBeforeDate(null);
+            }
+
+            if (!empty($post['after'])) {
+                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
+            } else {
+                $pastoralReport->setAfterDate(null);
+            }
         }
 
-        if (!empty($post['after'])) {
-            $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
-        } else {
-            $pastoralReport->setAfterDate(null);
-        }
-
-        /****************************/
 
         if (is_array($post['types'])) {
             $pastoralReport->setTypesCsv(implode(',', $post['types']));

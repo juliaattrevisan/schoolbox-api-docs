@@ -105,7 +105,7 @@
                         <p class="meta">Include reports published within the selected time period</p>
 
                         <label for="relative-dates-dropdown">Time period</label>
-                        <select id="relative-dates-dropdown">
+                        <select id="relative-dates-dropdown" name="relative-dates-dropdown">
                             {% for label,value in datePresets %}
                                 <option value="{{value}}">{{label}}</option>
                             {% endfor %}
