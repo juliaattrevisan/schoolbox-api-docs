@@ -241,14 +241,14 @@ class Controller extends Base
             $report->setDashboard(false);
         }
 
-        $relativeDates = [
-            self::THIS_YEAR,
-            self::PAST_6_MONTHS,
-            self::PAST_3_MONTHS,
-            self::PAST_MONTH,
-            self::PAST_FORTNIGHT,
-            self::PAST_WEEK,
-            self::TODAY
+        $relativeDatePresets = [
+            'This year' => self::THIS_YEAR,
+            'Past 6 months' => self::PAST_6_MONTHS,
+            'Past 3 months' => self::PAST_3_MONTHS,
+            'Past month' => self::PAST_MONTH,
+            'Past fortnight' => self::PAST_FORTNIGHT,
+            'Past week' => self::PAST_WEEK,
+            'Today' => self::TODAY
         ];
 
         // And render this thing out
@@ -271,7 +271,7 @@ class Controller extends Base
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
-                    'relativeDates'    => $relativeDates
+                    'datePresets'      => $relativeDatePresets
                 ],
                 'title' => 'Pastoral Report',
             ]
