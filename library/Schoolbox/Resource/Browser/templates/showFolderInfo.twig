@@ -6,6 +6,7 @@
         style="border-bottom: solid 0.25rem {{ folder.colour }};"
     {%- endset %}
 
+{% if tree|length %}
 <ul class="breadcrumb">
     {% for node in tree %}
         <li>
@@ -17,6 +18,7 @@
         </li>
     {% endfor %}
 </ul>
+{% endif %}
 
 <div class="row">
     <div class="card small-12 column meta-preview">
@@ -24,7 +26,7 @@
             <a title="View Homepage" href="/homepage/{{ folder.id }}">
         {% endif %}
         {% if folder.hasCoverImage %}
-            <img class="icon" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square128" alt="{{ folder.name }}" {{ colouring }} />
+            <img src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
         {% else %}
             <div class="{{ nodeIcon.icon(nodeType) }} size-32" alt="{{ folder.name }}"></div>
         {% endif %}
