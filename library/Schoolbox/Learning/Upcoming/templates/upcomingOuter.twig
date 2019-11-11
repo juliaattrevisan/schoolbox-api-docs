@@ -1,6 +1,7 @@
 {#
     Data:
         filterIdSlugMap        string[]     Maps filter ids to semantic slugs
+        subjects               array        Classes/Groups the student is enrolled/member
         ...
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -77,93 +78,92 @@
 
 <script type="text/javascript" src="/javascript/components/upcomingDueworkCalendar.bundle.js"></script>
 
-{% if subjects|length %}
-    <div class="row">
-        <div class="small-12 medium-6 columns island">
-            <h2 class="subheader">Upcoming Due Work</h2>
-            <div id="{{ reportContentId }}"></div>
-        </div>
+<div class="row">
+    <div class="small-12 medium-6 columns island">
+        <h2 class="subheader">Upcoming Due Work</h2>
+        <div id="{{ reportContentId }}"></div>
+    </div>
 
-        <div class="small-12 medium-6 columns">
-            <h2 class="subheader">{{ locale.subject.properPlural }}</h2>
-            {% if subjects|length %}
-                <div class="row">
-                    <div class="small-12 island">
-                        {% for subject in subjects %}
-                            <section>
-                                <ul class="information-list">
-                                    <li>
-                                        <div class="list-item">
-                                            {% set gradePath = routeLookupIfAuthorized('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: currentTerm, termCode: currentTerm.code, subject: subject, subjectId: subject.folder.id}) %}
-                                            <div class="small-{{ subject.grade ? 8 : 12 }} card">
-                                                {% if gradePath %}
-                                                    <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}">
-                                                        <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
-                                                        <p>{{ subject.folder.title }}</p>
-                                                    </a>
-                                                {% else %}
+    <div class="small-12 medium-6 columns">
+        <h2 class="subheader">{{ locale.subject.properPlural }}</h2>
+        {% if subjects|length %}
+            <div class="row">
+                <div class="small-12 island">
+                    {% for subject in subjects %}
+                        <section>
+                            <ul class="information-list">
+                                <li>
+                                    <div class="list-item">
+                                        {% set gradePath = routeLookupIfAuthorized('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: currentTerm, termCode: currentTerm.code, subject: subject, subjectId: subject.folder.id}) %}
+                                        <div class="small-{{ subject.grade ? 8 : 12 }} card">
+                                            {% if gradePath %}
+                                                <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}">
                                                     <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
                                                     <p>{{ subject.folder.title }}</p>
-                                                {% endif %}
-                                                <p class="meta">{{ subject.folder.codeString }}</p>
-                                            </div>
+                                                </a>
+                                            {% else %}
+                                                <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
+                                                <p>{{ subject.folder.title }}</p>
+                                            {% endif %}
+                                            <p class="meta">{{ subject.folder.codeString }}</p>
+                                        </div>
 
-                                            {% if subject.grade %}
-                                                <div class="small-4 columns no-pad">
-                                                    <div class="grade content">
-                                                        {% if gradePath  %}
-                                                            <a href="{{ gradePath }}">
-                                                        <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
-                                                            {{ subject.grade.weightedMean }}
-                                                        </span>
-                                                            </a>
-                                                        {% else %}
-                                                            <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                        {% if subject.grade %}
+                                            <div class="small-4 columns no-pad">
+                                                <div class="grade content">
+                                                    {% if gradePath  %}
+                                                        <a href="{{ gradePath }}">
+                                                    <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
                                                         {{ subject.grade.weightedMean }}
                                                     </span>
-                                                        {% endif %}
-                                                    </div>
+                                                        </a>
+                                                    {% else %}
+                                                        <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                                    {{ subject.grade.weightedMean }}
+                                                </span>
+                                                    {% endif %}
                                                 </div>
-                                            {% endif %}
-                                        </div>
-                                    </li>
-
-                                    {% for teacher in subject.teachers %}
-                                        <li class="actions-small-1">
-                                            <div class="list-item">
-                                                <div class="small-12 card">
-                                                    <a href="/search/user/{{ teacher.id }}" title="">
-                                                        <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}" />
-                                                        <p>{{ teacher.formatName }}</p>
-                                                    </a>
-                                                    <p class="meta">{{ teacher.role.name }}</p>
-                                                </div>
-
                                             </div>
-                                            <nav>
-                                                <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
-                                            </nav>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </section>
-                        {% endfor %}
-                    </div>
+                                        {% endif %}
+                                    </div>
+                                </li>
+
+                                {% for teacher in subject.teachers %}
+                                    <li class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="small-12 card">
+                                                <a href="/search/user/{{ teacher.id }}" title="">
+                                                    <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}" />
+                                                    <p>{{ teacher.formatName }}</p>
+                                                </a>
+                                                <p class="meta">{{ teacher.role.name }}</p>
+                                            </div>
+
+                                        </div>
+                                        <nav>
+                                            <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
+                                        </nav>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endfor %}
                 </div>
-            {% else %}
-                <section>
-                    <div class="empty-state">
-                        <i class="icon-due-work"></i>
-                        <p>
-                            {% if USER.id == student.id %}
-                                You are not currently enrolled in any classes.
-                            {% else %}
-                                {{ student.formatName }} is not currently enrolled in any classes.
-                            {% endif %}
-                        </p>
-                    </div>
-                </section>
-            {% endif %}
-        </div>
+            </div>
+        {% else %}
+            <section>
+                <div class="empty-state">
+                    <i class="icon-due-work"></i>
+                    <p>
+                        {% if USER.id == student.id %}
+                            You are not currently enrolled in any classes.
+                        {% else %}
+                            {{ student.formatName }} is not currently enrolled in any classes.
+                        {% endif %}
+                    </p>
+                </div>
+            </section>
+        {% endif %}
     </div>
-{% endif %}
+</div>
+
