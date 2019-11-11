@@ -441,7 +441,4 @@ class Controller extends Base
 
         return json_encode($result);
     }
-
-    /* Getters/Setters
-     */
 }
