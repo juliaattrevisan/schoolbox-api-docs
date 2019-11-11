@@ -64,6 +64,14 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
+    private const THIS_YEAR = 'this year';
+    private const PAST_6_MONTHS = '6 months ago';
+    private const PAST_3_MONTHS = '3 months ago';
+    private const PAST_MONTH = '1 month ago';
+    private const PAST_FORTNIGHT = '14 days ago';
+    private const PAST_WEEK = '7 days ago';
+    private const TODAY = 'today';
+
     /**
      * Constructor
      *
@@ -233,6 +241,16 @@ class Controller extends Base
             $report->setDashboard(false);
         }
 
+        $relativeDates = [
+            self::THIS_YEAR,
+            self::PAST_6_MONTHS,
+            self::PAST_3_MONTHS,
+            self::PAST_MONTH,
+            self::PAST_FORTNIGHT,
+            self::PAST_WEEK,
+            self::TODAY
+        ];
+
         // And render this thing out
         $this->getResponse()->content->set(
             [
@@ -253,6 +271,7 @@ class Controller extends Base
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
+                    'relativeDates'    => $relativeDates
                 ],
                 'title' => 'Pastoral Report',
             ]
