@@ -156,9 +156,9 @@
                     <i class="icon-due-work"></i>
                     <p>
                         {% if USER.id == student.id %}
-                            You are not currently enrolled in any classes.
+                            You are not currently enrolled in any classes nor a member of any groups.
                         {% else %}
-                            {{ student.formatName }} is not currently enrolled in any classes.
+                            {{ student.formatName }} is not currently enrolled in any classes nor a member of any groups.
                         {% endif %}
                     </p>
                 </div>
