@@ -11,6 +11,14 @@ use External_UserInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 
+/**
+ * Class ValidEmailVisible
+ *
+ * Spec pattern to determine email visibility; whether $viewer can see $viewee's email address
+ * While it is similar to Detail Visibility, they're not entirely the same
+ *
+ * @package Schoolbox\Profile
+ */
 class ValidEmailVisible
 {
     /**
@@ -36,21 +44,30 @@ class ValidEmailVisible
     }
 
     /**
-     * Checks whether is viewee's detail is visible to viewer
+     * Checks whether is viewee's email is visible to viewer
+     *
      * @param User $viewee
      * @param User $viewer
      * @return bool
      */
     public function isSatisfiedBy(User $viewee, User $viewer): bool
     {
+        /* If the viewee hasn't got an email address, you can't see it
+         * and role types don't affect the outcome
+         */
         if (!$viewee->getEmail()) {
             return false;
         }
 
+        /* Students can always see other students' email addresses, specifically
+         */
         if ($viewer->getRole()->isStudent() && $viewee->getRole()->isStudent()) {
             return true;
         }
 
+        /* Everybody else is subjected to the same rules as detail visibility
+         * based on role types and other settings
+         */
         return (new ValidDetailsVisible($this->externalUser, $this->config))->isSatisfiedBy($viewee, $viewer);
     }
 }

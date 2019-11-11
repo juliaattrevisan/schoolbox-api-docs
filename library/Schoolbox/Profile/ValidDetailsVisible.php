@@ -11,6 +11,15 @@ use External_UserInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 
+/**
+ * Class ValidDetailsVisible
+ *
+ * Spec pattern to determine Detail visibility; whether $viewer can see $viewee's details
+ * on the profile screen such as Tutors, Houses, etc. based on role type, config settings
+ * and other settings in the SIS.
+ *
+ * @package Schoolbox\Profile
+ */
 class ValidDetailsVisible
 {
 
@@ -97,10 +106,16 @@ class ValidDetailsVisible
             if ($this->config->get('restrict_parent_emails')) {
                 return false;
             }
+
             if (!$viewee->getExternalId()) {
                 return false;
             }
+
+            /* Otherwise this is dependent on the DirectoryIncludeFlag value in the SIS
+             * which determines "public-ness" of a parent's information
+             */
             $exParent = $this->externalUser->getParent($viewee->getExternalId());
+
             return $exParent && $exParent['DirectoryIncludeFlag'];
         }
 
