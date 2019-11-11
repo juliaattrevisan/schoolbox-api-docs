@@ -49,7 +49,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
         $query = "
             SELECT DISTINCT
                 sf.sfa_num,
-                'P' + RTRIM(p.par_code) AS student_contact_id,
+                RTRIM(p.par_code) AS student_contact_id,
                 RTRIM(p.par_code) AS student_contact_network_login,
                 ''               AS student_contact_title,
                 RTRIM(p.m_name)  AS student_contact_given_name,
