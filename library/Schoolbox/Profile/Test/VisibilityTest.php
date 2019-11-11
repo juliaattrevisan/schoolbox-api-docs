@@ -31,9 +31,9 @@ class VisibilityTest extends TestCase
      * @param bool $reportStaffAccess
      * @param bool $restrictParentEmails
      * @param bool $expected
-     * @dataProvider provider_isVisible
+     * @dataProvider provider_isDetailsVisible
      */
-    public function test_isVisible(
+    public function test_isDetailsVisible(
         User $viewer,
         User $viewee,
         bool $reportStaffAccess,
@@ -50,7 +50,7 @@ class VisibilityTest extends TestCase
     /**
      * @return array
      */
-    public function provider_isVisible(): array
+    public function provider_isDetailsVisible(): array
     {
 
         // viewer, viewee, visibility
