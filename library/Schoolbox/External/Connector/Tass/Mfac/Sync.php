@@ -54,11 +54,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                 ''               AS student_contact_title,
                 RTRIM(p.m_name)  AS student_contact_given_name,
                 LEFT(p.m_name, CHARINDEX(' ', p.m_name)) AS student_contact_preferred,
-                CASE
-                    WHEN LEN(RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.m_name), 255))) > 0
-                    THEN RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.m_name), 255))
-                    ELSE RTRIM(p.surname)
-                END              AS student_contact_surname,
+                p.surname        AS student_contact_surname,
                 ''               AS student_contact_home_email,
                 RTRIM(pa.e_mail) AS student_contact_default_email,
                 ''               AS student_contact_work_email,
@@ -92,14 +88,10 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                     THEN RTRIM(p.par_code)
                     ELSE RTRIM(SUBSTRING(p.par_code, 4, 3)) + RTRIM(SUBSTRING(p.par_code, 1, 3))
                 END              AS student_contact_network_login,
-                ''                AS student_contact_title,
-                RTRIM(p.f_name)   AS student_contact_given_name,
+                ''               AS student_contact_title,
+                RTRIM(p.f_name)  AS student_contact_given_name,
                 LEFT(p.f_name, CHARINDEX(' ', p.f_name)) AS student_contact_preferred,
-                CASE
-                    WHEN LEN(RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))) > 0
-                    THEN RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))
-                    ELSE RTRIM(p.surname)
-                END              AS student_contact_surname,
+                p.surname        AS student_contact_surname,
                 ''               AS student_contact_home_email,
                 CASE
                     WHEN sf.sfa_num IS NULL
