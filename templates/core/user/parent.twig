@@ -1,3 +1,10 @@
+{##
+ # Parent Profile
+ #
+ # showEmails   bool    Spec pattern to decide whether email address is visible
+ # showDetails  bool    Spec patternt to decide whether details are visible
+ #}
+
 {# Permissions #}
 {% set isSuperuser = session.user.isSuperUser() %}
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
