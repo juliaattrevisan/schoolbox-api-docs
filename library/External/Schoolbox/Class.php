@@ -53,12 +53,12 @@ class External_Schoolbox_Class implements External_ClassInterface
                     'synergy_id'              => $studentExternalId,
                     'lastname'                => $student['lastname'],
                     'firstname'               => $student['firstname'],
-                    'yearlevel'               => $student['year'],
-                    'house'                   => $student['house'],
-                    'StudentMedicalAlert'     => '',
-                    'StudentSpecialNeedsFlag' => '',
-                    'EnglishSecondFlag'       => $student['esl_flag'] ?? '',
-                    'StudentTutorDescription' => '',
+                    'yearlevel'               => $student['year_level'],
+                    'house'                   => $student['house_name'],
+                    'StudentMedicalAlert'     => $student['alert_medical'] ?? '',
+                    'StudentSpecialNeedsFlag' => $student['special_needs'] ?? '',
+                    'EnglishSecondFlag'       => $student['esl'] ?? '',
+                    'StudentTutorDescription' => $student['tutor_group'] ?? '',
                 ];
 
                 $found[$studentExternalId] = true;
@@ -92,15 +92,18 @@ class External_Schoolbox_Class implements External_ClassInterface
                               u.title, 
                               u.firstname,
                               u.lastname,
-                              u.year,
-                              h.house,
-                              up.esl_flag
+                              sups.year_level,
+                              sups.house_name,
+                              sups.esl,
+                              sups.alert_medical,
+                              sups.special_needs,
+                              sups.tutor_group
                 FROM          class c
-                LEFT JOIN     class_user cu ON cu.class_id = c.id
-                LEFT JOIN     user u ON u.id = cu.user_id
-                LEFT JOIN     user_profile up ON u.id = up.user_id
-                LEFT JOIN     groups g ON g.id = u.group_id
-                LEFT JOIN     house h ON u.house = h.id
+                    JOIN               class_user cu ON cu.class_id = c.id
+                    JOIN               user u ON u.id = cu.user_id
+                    JOIN               groups g ON g.id = u.group_id
+                    LEFT JOIN          sis_user_profile up ON u.synergy_id = up.external_id
+                    LEFT JOIN          sis_user_profile_student sups ON up.id = sups.sis_user_profile_id
                 WHERE         c.code IN ({$predicate["placeholders"]}) AND
                               g.group_type = :type AND
                               u.deleted_at IS NULL
@@ -164,12 +167,7 @@ class External_Schoolbox_Class implements External_ClassInterface
         return $this->internalDatabase->prepareQuery(
             "
                 SELECT      u.id,
-                            u.synergy_id,
-                            u.title,
-                            u.firstname,
-                            u.lastname,
-                            u.year,
-                            u.house
+                            u.synergy_id
                 FROM        class c
                 LEFT JOIN   class_period cp ON c.id = cp.class_id
                 INNER JOIN  user u ON u.id = cp.teacher_id
