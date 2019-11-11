@@ -10,6 +10,7 @@ namespace Schoolbox\Profile\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Profile\ValidDetailsVisible;
+use Schoolbox\Profile\ValidEmailVisible;
 use Schoolbox\Role;
 use Schoolbox\User;
 use External_UserInterface;
@@ -674,6 +675,80 @@ class VisibilityTest extends TestCase
             [$guest2, $guest2, false, true, false],
             [$guest2, $guest2, true, false, false],
             [$guest2, $guest2, false, false, false],
+        ];
+    }
+
+
+    /**
+     * Email and Detail visibility, though often similar, aren't always the same
+     * Students viewing other students allows them to see each other's email, but not details
+     *
+     * @param User $viewer
+     * @param User $viewee
+     * @param bool $reportStaffAccess
+     * @param bool $restrictParentEmails
+     * @param bool $expected
+     * @dataProvider provider_isEmailVisible
+     */
+    public function test_isEmailVisible(
+        User $viewer,
+        User $viewee,
+        bool $reportStaffAccess,
+        bool $restrictParentEmails,
+        bool $expected
+    ): void {
+        $config = $this->getMockConfigLoader();
+        $config->setReportStaffAccess($reportStaffAccess);
+        $config->setRestrictParentEmails($restrictParentEmails);
+        $emailVisible = new ValidEmailVisible($this->getMockExternalUser(), $config);
+        $this->assertEquals($emailVisible->isSatisfiedBy($viewee, $viewer), $expected);
+    }
+
+
+    /**
+     * @return array
+     */
+    public function provider_isEmailVisible(): array
+    {
+        // viewer, viewee, visibility
+        $studentRole = (new Role())->setType(Role::STUDENT);
+
+        $student1   = (new User())->setId(3)->setFirstname('Test Student 1')->setSuperuser(false)->setRole($studentRole)->setAltEmail('-');
+        $student1a   = (new User())->setId(3)->setFirstname('Test Student 1a')->setSuperuser(false)->setRole($studentRole)->setAltEmail('');
+        $student2   = (new User())->setId(8)->setFirstname('Test Student 2')->setSuperuser(false)->setRole($studentRole)->setAltEmail('-');
+        $student2a   = (new User())->setId(8)->setFirstname('Test Student 2a')->setSuperuser(false)->setRole($studentRole)->setAltEmail('');
+
+        return [
+
+            /* Exit early when no email
+             */
+            [$student1a, $student2a, true, true, false],
+            [$student1a, $student2a, true, false, false],
+            [$student1a, $student2a, false, true, false],
+            [$student1a, $student2a, false, false, false],
+            [$student1a, $student1a, true, true, false],
+            [$student1a, $student1a, true, false, false],
+            [$student1a, $student1a, false, true, false],
+            [$student1a, $student1a, false, false, false],
+            [$student2a, $student1a, true, true, false],
+            [$student2a, $student1a, true, false, false],
+            [$student2a, $student1a, false, true, false],
+            [$student2a, $student1a, false, false, false],
+            [$student2a, $student2a, true, true, false],
+            [$student2a, $student2a, true, false, false],
+            [$student2a, $student2a, false, true, false],
+            [$student2a, $student2a, false, false, false],
+
+            /* Students viewing other students
+             */
+            [$student1, $student2, true, true, true],
+            [$student1, $student2, true, false, true],
+            [$student1, $student2, false, true, true],
+            [$student1, $student2, false, false, true],
+            [$student2, $student1, true, true, true],
+            [$student2, $student1, true, false, true],
+            [$student2, $student1, false, true, true],
+            [$student2, $student1, false, false, true],
         ];
     }
 
