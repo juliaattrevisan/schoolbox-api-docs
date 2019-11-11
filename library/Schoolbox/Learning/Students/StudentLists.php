@@ -168,7 +168,7 @@ class StudentLists
                     }
 
                     // Email
-                    if ($user->getEmail() && $this->mailIsEnabled) {
+                    if ($this->mailIsEnabled && $user->getEmail()) {
                         $students[$key]['routes']['email'] = [
                             'label' => 'Email',
                             'href'  => $this->mailHandle . $user->getEmail(),
