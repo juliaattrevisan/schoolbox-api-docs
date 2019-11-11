@@ -134,7 +134,10 @@ class External_Maze_Loreto_User extends External_Maze_User {
             return [];
         }
 
-        $ids = implode(',', array_map(function($val){ return sprintf("'%s'", $val); }, $externalUserId));
+        $ids = implode(',', array_map(static function($val ){
+                return sprintf("'%s'", $val);
+            }, $externalUserId)
+        );
 
 		$query = "
 			SELECT
