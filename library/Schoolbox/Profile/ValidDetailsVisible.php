@@ -79,10 +79,14 @@ class ValidDetailsVisible
 
         // a parent viewing a student
         if ($viewee->getRole()->isStudent()) {
-            // viewee is  viewer's enrolled student
+
+            /* Without an external id we can't really tell who you are
+             */
             if (!$viewer->getExternalId()) {
                 return false;
             }
+
+            // viewee is viewer's enrolled student
             $externalChildren = $this->externalUser->getEnrolledStudents($viewer->getExternalId());
             return in_array($viewee->getExternalId(), array_column($externalChildren, 'RelatedID'));
         }
