@@ -172,26 +172,14 @@ class Controller extends Base
         }
 
 
-        // Query the API for the events in this time span
-        $api = new Calendar_Api_Composite();
+        // Query the API for the events in this time span.
+        // First, load campus events.
+        $campusEventsApi = new Calendar_Api_Composite();
 
 
-        // Assessments
-        $api->add(
-            new Api(
-                $user,
-                $this->assessmentDataSource,
-                $this->visibility,
-                $this->assessmentIdFinder,
-                $filters
-            )
-        );
-
-
-        // Calendar events: need events from all campuses
-        // (not just the logged-in user's)
+        // Need events from all campuses (not just the logged-in user's)
         foreach ($this->campusMapper->findAll() as $campus) {
-            $api->add(
+            $campusEventsApi->add(
                 new Calendar_Api_EventType_Event_Schoolbox_Campus(
                     $this->calendarConfig->getId(),
                     $user,
@@ -200,15 +188,36 @@ class Controller extends Base
                 )
             );
         }
-        $calendar = $this->buildRenderer($api, $start, $end, $user);
-        $calendar->getAllEvents()->filter(new EventFilters\Matcher($filters));
+        $events = $this->buildRenderer($campusEventsApi, $start, $end, $user);
 
 
         // The same event can exist in multiple campuses at once.
         // Remove any duplicates.
-        $collection = new GenericCollection(EventInterface::class, $calendar->getAllEvents()->getStack());
+        $collection = new GenericCollection(EventInterface::class, $events->getAllEvents()->getStack());
         $collection = $collection->getUnique('eventId');
-        $calendar->getAllEvents()->setStack($collection->getAll());
+        $events->getAllEvents()->setStack($collection->getAll());
+
+
+        // Add assessment events to the event renderer
+        // (These should not be deduped: the event's ID could match the ID of a
+        //  campus-level event.)
+        $assessmentEvents = $this->buildRenderer(
+            new Api(
+                $user,
+                $this->assessmentDataSource,
+                $this->visibility,
+                $this->assessmentIdFinder,
+                $filters
+            ),
+            $start,
+            $end,
+            $user
+        );
+        $events->getAllEvents()->merge($assessmentEvents->getAllEvents());
+
+
+        // Filter out any events which don't match the filters
+        $events->getAllEvents()->filter(new EventFilters\Matcher($filters));
 
 
         // The API's renderAll returns a list of json-encoded events.
@@ -217,7 +226,7 @@ class Controller extends Base
             static function ($v) {
                 return json_decode($v, true);
             },
-            $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)
+            $events->renderAll(EventBase::RENDER_FORMAT_JSON)
         );
     }
 
