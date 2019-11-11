@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
 use Calendar_Api_Config_Record;
 use Calendar_Api_EventType_Event_Schoolbox_Campus;
@@ -22,6 +23,7 @@ use Schoolbox\Filter\Filters\Event as EventFilters;
 use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -205,6 +207,13 @@ class Controller extends Base
             $user
         );
         $calendar->getAllEvents()->filter(new EventFilters\Matcher($filters));
+
+
+        // The same event can exist in multiple campuses at once.
+        // Remove any duplicates.
+        $collection = new GenericCollection(EventInterface::class, $calendar->getAllEvents()->getStack());
+        $collection = $collection->getUnique('eventId');
+        $calendar->getAllEvents()->setStack($collection->getAll());
 
 
         // The API's renderAll returns a list of json-encoded events.
