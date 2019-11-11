@@ -112,7 +112,7 @@
                         </select>
                     </div>
 
-                    <div id="absolute-dates">
+                    <div id="absolute-dates" class="hide">
                         <div class="small-12 columns">
                             <p class="meta">Include reports published between these dates</p>
                         </div>
@@ -498,6 +498,17 @@
                 }
             });
         })
+
+        // Hide/show the relevant date range picker based on the user's radio button selection
+        $("input[type='radio'][name='date-option']").change(function(e) {
+           if ($("#relative-dates-option").is(":checked")) {
+               $("#relative-dates").removeClass("hide");
+               $("#absolute-dates").addClass("hide");
+           } else {
+               $("#absolute-dates").removeClass("hide");
+               $("#relative-dates").addClass("hide");
+           }
+        });
 
 
         $('#sort-order').sortable({handle: '.grip', axis: 'y'});
