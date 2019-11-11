@@ -175,6 +175,7 @@ class Controller extends Base
         // Query the API for the events in this time span.
         // First, load campus events.
         $campusEventsApi = new Calendar_Api_Composite();
+        $eventFilter     = new EventFilters\Matcher($filters);
 
 
         // Need events from all campuses (not just the logged-in user's)
@@ -192,15 +193,16 @@ class Controller extends Base
 
 
         // The same event can exist in multiple campuses at once.
-        // Remove any duplicates.
+        // Filter, then remove any duplicates that remain.
+        $events->getAllEvents()->filter($eventFilter);
         $collection = new GenericCollection(EventInterface::class, $events->getAllEvents()->getStack());
         $collection = $collection->getUnique('eventId');
         $events->getAllEvents()->setStack($collection->getAll());
 
 
         // Add assessment events to the event renderer
-        // (These should not be deduped: the event's ID could match the ID of a
-        //  campus-level event.)
+        // (These should be filtered, but no deduped. The event's ID could match
+        //  the ID of a campus-level event.)
         $assessmentEvents = $this->buildRenderer(
             new Api(
                 $user,
@@ -213,11 +215,8 @@ class Controller extends Base
             $end,
             $user
         );
+        $assessmentEvents->getAllEvents()->filter($eventFilter);
         $events->getAllEvents()->merge($assessmentEvents->getAllEvents());
-
-
-        // Filter out any events which don't match the filters
-        $events->getAllEvents()->filter(new EventFilters\Matcher($filters));
 
 
         // The API's renderAll returns a list of json-encoded events.
