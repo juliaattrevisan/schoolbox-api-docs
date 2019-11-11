@@ -185,16 +185,17 @@ class Controller extends Base
 
 
         // Calendar events: need events from all campuses
-        // (not just the logged-in user's), so create a clone in all campuses
-        $dummyUser = clone $user;
-        $dummyUser->setCampusCollection($this->campusMapper->findAll());
-        $api->add(
-            new Calendar_Api_EventType_Event_Schoolbox_Campus(
-                $this->calendarConfig->getId(),
-                $dummyUser,
-                $user
-            )
-        );
+        // (not just the logged-in user's)
+        foreach ($this->campusMapper->findAll() as $campus) {
+            $api->add(
+                new Calendar_Api_EventType_Event_Schoolbox_Campus(
+                    $this->calendarConfig->getId(),
+                    $user,
+                    $user,
+                    $campus->getId()
+                )
+            );
+        }
         $calendar = new Renderer(
             $api,
             $start,
