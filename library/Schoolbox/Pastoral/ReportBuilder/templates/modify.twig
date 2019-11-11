@@ -89,7 +89,7 @@
                         </label>
                     </div>
                     <div class="small-12 large-6 columns">
-                        <label for="item_datetime_published">
+                        <label for="datetime_before">
                             Published On Or Before
                             <input type="text" name="before" id="datetime_before"
                                    value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
@@ -99,8 +99,7 @@
                     {# ############################# #}
 
                     <div class="small-12 columns">
-                        {# TODO label below is wrong? #}
-                        <label for="item_datetime_published">
+                        <label for="filterTags">
                             Filter By Tags
                             <select id="filterTags" name="tags[]" multiple data-placeholder="Select Tags"></select>
                         </label>
