@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning;
 
 use Alaress\Mail\AbstractMailer;
@@ -36,6 +35,11 @@ use Schoolbox\Resource\Folder;
 use UnexpectedValueException;
 use Schoolbox\L10n\RosettaStone;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Learning
+ */
 class Controller extends Base
 {
     /**
@@ -74,6 +78,11 @@ class Controller extends Base
     /** @var External_ClassInterface */
     private $externalClass;
 
+    /**
+     * For translating Terminology
+     *
+     * @var RosettaStone
+     */
     private $rosettaStone;
 
     private const LABEL_KEY = 'label';
@@ -92,7 +101,8 @@ class Controller extends Base
      * @param Folder\ClassListFactory    $classListFactory
      * @param UserMapper                 $userMapper
      * @param Folder\Log\Mapper          $logMapper
-     * @param External_ClassInterface   $externalClass
+     * @param External_ClassInterface    $externalClass
+     * @param RosettaStone               $rosettaStone
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -227,8 +237,8 @@ class Controller extends Base
      * Generate a pending assessment report as HTML string
      *
      * @param Filter\IFactoryFactory $filterFactoryFactory
-     * @param User                             $viewee
-     * @param string[][]                       $request - Indexed by filter.id, then concrete key
+     * @param User                   $viewee
+     * @param string[][]             $request - Indexed by filter.id, then concrete key
      * @return string
      * @throws \InvalidArgumentException
      * @throws \DomainException
@@ -237,6 +247,7 @@ class Controller extends Base
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws UnexpectedValueException
      */
     protected function generatePendingAssessmentReport(Filter\IFactoryFactory $filterFactoryFactory, User $viewee, array $request)
     {
@@ -377,6 +388,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData)->setTab('classes'));
     }
 
+
     /**
      * @param Folder\Model $folder
      *
@@ -400,6 +412,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($students));
     }
 
+
     /**
      * @param Folder\Model $folder
      *
@@ -417,6 +430,7 @@ class Controller extends Base
             ])->setTab('classes')->setTitle($folder->getName())
         );
     }
+
 
     /**
      * @return string
