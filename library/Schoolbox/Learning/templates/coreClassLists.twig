@@ -367,7 +367,9 @@ Data:
         },
         filters: {
             capitalise: function (val) {
-                if (!val) return '';
+                if (!val) {
+                    return '';
+                }
 
                 return val.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
             }
