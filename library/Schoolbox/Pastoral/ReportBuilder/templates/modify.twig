@@ -79,31 +79,66 @@
                         {% endif %}
                     </div>
 
-                    {# TODO this bit ################  #}
-                    <div class="small-12 large-6 columns">
-                        <label for="datetime_after">
-                            Published On Or After
-                            <input type="text" name="after" id="datetime_after"
-                                   value="{{ report.afterDate.usingFormat('d/m/Y') }}"
-                                   data-datepicker data-datesync-enddate="#datetime_before"/>
-                        </label>
-                    </div>
-                    <div class="small-12 large-6 columns">
-                        <label for="datetime_before">
-                            Published On Or Before
-                            <input type="text" name="before" id="datetime_before"
-                                   value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
-                                   data-datepicker data-datesync-startdate="#datetime_after"/>
-                        </label>
-                    </div>
-                    {# ############################# #}
-
                     <div class="small-12 columns">
                         <label for="filterTags">
                             Filter By Tags
                             <select id="filterTags" name="tags[]" multiple data-placeholder="Select Tags"></select>
                         </label>
                     </div>
+                </fieldset>
+            </section>
+
+            <h2 class="subheader">Date Range</h2>
+            <section>
+                <fieldset class="radiolist content">
+                    <div class="small-12 columns">
+                        <input type="radio" name="date-option" id="relative-dates-option" value="relative" checked/>
+                        <label for="relative-dates-option">Use relative dates</label>
+
+                        <input type="radio" name="date-option" id="absolute-dates-option" value="absolute"/>
+                        <label for="absolute-dates-option">Use absolute dates</label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div id="relative-dates" class="small-12 columns">
+                        <p class="meta">Include reports published within the selected time period</p>
+
+                        <label for="relative-dates-dropdown">Time period</label>
+                        <select id="relative-dates-dropdown">
+                            <option value="start of this year">This year</option>
+                            <option value="6 months ago">Past 6 months</option>
+                            <option value="3 months ago">Past 3 months</option>
+                            <option value="1 month ago">Past month</option>
+                            <option value="14 days ago">Past fortnight</option>
+                            <option value="7 days ago">Past week</option>
+                            <option value="start of today">Today</option>
+                        </select>
+                    </div>
+
+                    <div id="absolute-dates">
+                        <div class="small-12 columns">
+                            <p class="meta">Include reports published between these dates</p>
+                        </div>
+
+                        <div class="small-12 large-6 columns">
+                            <label for="datetime_after">
+                                From
+                                <input type="text" name="after" id="datetime_after"
+                                       value="{{ report.afterDate.usingFormat('d/m/Y') }}"
+                                       data-datepicker data-datesync-enddate="#datetime_before"/>
+                            </label>
+                        </div>
+                        <div class="small-12 large-6 columns">
+                            <label for="datetime_before">
+                                To
+                                <input type="text" name="before" id="datetime_before"
+                                       value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
+                                       data-datepicker data-datesync-startdate="#datetime_after"/>
+                            </label>
+                        </div>
+                    </div>
+
                 </fieldset>
             </section>
 
