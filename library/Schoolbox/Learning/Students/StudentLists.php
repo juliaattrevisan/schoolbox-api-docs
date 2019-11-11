@@ -119,7 +119,7 @@ class StudentLists
                         ],
                         // Grades
                         'grades' => [
-                            'label' => $this->rosettaStone->translate('grades', false, true),
+                            'label' => $this->rosettaStone->translate('grades', true, true),
                             'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
                             'class' => 'icon-approve',
                             'title' => '',
