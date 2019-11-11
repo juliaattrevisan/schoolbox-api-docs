@@ -1,12 +1,15 @@
+{##
+ # Staff Profile
+ #
+ # showEmails   bool    Spec pattern to decide whether email address is visible
+ # showDetails  bool    Spec patternt to decide whether details are visible
+ #}
+
 {# Permissions #}
 {% set isSuperuser = session.user.isSuperUser() %}
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
 
-{# details: su, staff, self or parent if config accesss enabled #}
-{% set showDetails = isStaff or isSelf or session.user.getRole().isStudent() or (config.report_staff_access and session.user.getRole().isParent()) %}
-{# emails: students may view other student's emails #}
-{% set showEmail = showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 {% set showButtons = isStaff or isSelf %}
 
@@ -41,7 +44,7 @@
                                 </dd>
                             {% endif %}
 
-                            {% if showEmail %}
+                            {% if showDetails %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}
                                         <dt class="small-12 medium-3">Email</dt>

@@ -1,3 +1,10 @@
+{##
+ # Student Profile
+ #
+ # showEmails   bool    Spec pattern to decide whether email address is visible
+ # showDetails  bool    Spec patternt to decide whether details are visible
+ #}
+
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
 {% set isStaff = isSuperuser or session.user.role.staff %}
@@ -7,10 +14,6 @@
 {% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
 {% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaff %}
 {% set showComments = config.synergetic_student_comment and isStaff %}
-{# details: su, staff, self, parent or relation #}
-{% set showDetails = isStaff or isSelf or isParentOfStudent or isRelatedToStudent %}
-{# emails: students may view other student's emails #}
-{% set showEmail = showDetails or session.user.role.student %}
 
 {% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
@@ -315,7 +318,7 @@
                             {% endif %}
 
                             {% block buttons_boarderLeave %}
-                                {% if config.boarder_leave_enabled and user.residentialHouse.id %}
+                                {% if config.boarder_leave_enabled and user.residentialHouse %}
                                     <li>
                                         <a href="/modules/leave/student/{{ user.id }}"
                                            class="icon-boarder-leave">Boarder Leave</a>
@@ -718,7 +721,7 @@
                                         </div>
                                     </div>
                                 </li>
-                                {% if group.owners %}
+                                {% if group.owners is defined %}
                                     {% for owner in group.owners %}
                                         <li class="actions-small-1">
                                             <div class="list-item">

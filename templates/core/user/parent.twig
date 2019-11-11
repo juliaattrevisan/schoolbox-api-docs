@@ -1,13 +1,16 @@
+{##
+ # Parent Profile
+ #
+ # showEmails   bool    Spec pattern to decide whether email address is visible
+ # showDetails  bool    Spec patternt to decide whether details are visible
+ #}
+
 {# Permissions #}
 {% set isSuperuser = session.user.isSuperUser() %}
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
 {% set isParent = session.user.getRole().isParent() %}
 
-{# details: show to SU + staff + self, or other parents if externalUser.DirectoryIncludeFlag #}
-{% set showDetails = isSuperuser or isStaff or isSelf or (isParent and externalUser.DirectoryIncludeFlag and not isRestricted) %}
-{# emails: staff may view emails #}
-{% set showEmail = showDetails or isStaff %}
 {% set showButtons = isStaff or isSelf %}
 {% set showTitle = user.hasPositionTitle() %}
 
@@ -42,7 +45,7 @@
                                 </dd>
                             {% endif %}
 
-                            {% if showEmail %}
+                            {% if showDetails %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}
                                         <dt class="small-12 medium-3">Email:</dt>
@@ -87,12 +90,10 @@
                                                 <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
                                             {% endif %}
 
-                                            {% if showEmail %}
-                                                {% if externalUser.SpouseEmail %}
-                                                    <p class="meta">
-                                                        <a href="{{ session.mailhandle }}{{ externalUser.SpouseEmail }}">{{ externalUser.SpouseEmail }}</a>
-                                                    </p>
-                                                {% endif %}
+                                            {% if externalUser.SpouseEmail %}
+                                                <p class="meta">
+                                                    <a href="{{ session.mailhandle }}{{ externalUser.SpouseEmail }}">{{ externalUser.SpouseEmail }}</a>
+                                                </p>
                                             {% endif %}
 
                                             {% if externalUser.SpouseMobilePhone %}

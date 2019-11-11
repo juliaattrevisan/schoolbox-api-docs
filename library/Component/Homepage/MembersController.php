@@ -12,6 +12,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Profile\ValidEmailVisible;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
@@ -29,12 +30,16 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      */
     const TYPE_NAME = 'members';
 
+    /** @var External_UserInterface $externalUser */
+    private $externalUser;
 
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
-     * @return boolean
+     * @return bool
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function renderTemplate($templateHandle)
     {
@@ -157,14 +162,12 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
 
             $emailObj = new Email();
+            $emailVisible = new ValidEmailVisible($this->getExternalUser(), $this->getConfigMapper());
             $emailall = [];
 
             $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
-            $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
+            $studentPhotoHidden   = $this->getConfigMapper()->get('protect_student_photo');
             $viewer = $this->getUser();
-
-            $isParent = $_SESSION['user']->getRole()->isParent();
-            $restrictParentEmails = $this->getConfigMapper()->get('restrict_parent_emails');
 
             if ($userListCount > 0) {
                 $i = 0;
@@ -172,10 +175,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                     /* Member bulk email
                      */
-                    if ($user->getEmail()) {
-                        if ($restrictParentEmails && $isParent && $user->getRole()->isParent()){
-                            continue;
-                        }
+                    if ($emailVisible->isSatisfiedBy($user, $viewer)) {
                         $emailall[] = Scrub::text($user->getFormattedEmailDisplay());
                     }
 
@@ -264,5 +264,18 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         }
 
         return true; // everything went according to plan
+    }
+
+    /**
+     * Gets external user interface
+     * @return External_UserInterface
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function getExternalUser(): External_UserInterface
+    {
+        if (!$this->externalUser) {
+            $this->externalUser = $this->getSitePage()->getDi()->get('externalUser');
+        }
+        return $this->externalUser;
     }
 }

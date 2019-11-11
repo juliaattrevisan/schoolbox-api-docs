@@ -4,10 +4,6 @@
 {% set isSelf = session.user.getId() == user.getId() %}
 {% set isParent = session.user.getRole().isParent() %}
 
-{# details: show to SU + staff + self, or other parents if externalUser.DirectoryIncludeFlag #}
-{% set showDetails = isSuperuser or isStaff or isSelf or(isParent and externalUser.DirectoryIncludeFlag) %}
-{# emails: staff may view emails #}
-{% set showEmail = showDetails or isStaff %}
 {% set showButtons = isStaff or isSelf %}
 {% set showTitle = user.hasPositionTitle() %}
 
