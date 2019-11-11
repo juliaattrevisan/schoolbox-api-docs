@@ -263,7 +263,7 @@ class Migration extends CliTool\App
 
 
     /**
-     * Find an upload any adjacent transcode files
+     * Find and upload any adjacent transcode files
      *
      * @param string $filepath
      */
@@ -285,10 +285,18 @@ class Migration extends CliTool\App
                 // Not a transcode of the current file, ignore
                 continue;
             }
-            $this->getLogger()->info("Transcode file '$entry' found, uploading...");
+            $this->getLogger()->info("Transcode file '$entry' found");
             $transcodeFilePath = $dirName . DIRECTORY_SEPARATOR . $entry;
             $filepath          = str_replace($this->storageDir . DIRECTORY_SEPARATOR, '', $transcodeFilePath);
             $transcodeFile     = new Flysystem\File($this->storageMapper->getManager()->getFilesystem(Storage\Manager::FS_STORAGE), $filepath);
+            if ($transcodeFile->exists()) {
+                $this->getLogger()->debug("Transcode file already in S3, deleting local copy");
+                if ($this->perform()) {
+                    unlink($transcodeFilePath);
+                }
+                continue;
+            }
+            $this->getLogger()->debug("Transcode file not in S3, uploading...");
             if ($this->moveFileToS3($transcodeFilePath, $transcodeFile)) {
                 $this->countTranscodeFilesUploaded++;
             }
