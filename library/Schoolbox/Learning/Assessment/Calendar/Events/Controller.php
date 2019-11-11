@@ -15,6 +15,7 @@ use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
 use Calendar_Api_Config_Record;
 use Calendar_Api_EventType_Event_Schoolbox_Campus;
+use Calendar_Api_EventType_Interface;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -27,6 +28,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 /**
  * Controller for retrieving calendar events for the assessment calendar.
@@ -198,14 +200,7 @@ class Controller extends Base
                 )
             );
         }
-        $calendar = new Renderer(
-            $api,
-            $start,
-            $end,
-            $user,
-            $this->getDi(),
-            $user
-        );
+        $calendar = $this->buildRenderer($api, $start, $end, $user);
         $calendar->getAllEvents()->filter(new EventFilters\Matcher($filters));
 
 
@@ -305,5 +300,20 @@ class Controller extends Base
         }
 
         return $carry;
+    }
+
+
+    /**
+     * Build a renderer for calendar events.
+     *
+     * @param Calendar_Api_EventType_Interface $api   The calendar events API
+     * @param int                              $start Events from this timestamp
+     * @param int                              $end   Events to this timestamp
+     * @param User                             $user  User to show events for
+     * @return Renderer
+     */
+    private function buildRenderer(Calendar_Api_EventType_Interface $api, int $start, int $end, User $user): Renderer
+    {
+        return new Renderer($api, $start, $end, $user, $this->getDi(), $user);
     }
 }
