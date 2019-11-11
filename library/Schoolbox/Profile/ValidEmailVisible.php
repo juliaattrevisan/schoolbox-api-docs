@@ -43,7 +43,7 @@ class ValidEmailVisible
      */
     public function isSatisfiedBy(User $viewee, User $viewer): bool
     {
-        if (!$viewer->getEmail()) {
+        if (!$viewee->getEmail()) {
             return false;
         }
 
