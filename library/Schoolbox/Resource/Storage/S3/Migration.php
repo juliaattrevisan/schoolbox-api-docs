@@ -51,7 +51,7 @@ class Migration extends CliTool\App
     private $storageMapper;
 
     /**
-     * Configured local storage directory
+     * Configured local storage directory. No trailing slash.
      *
      * @var string
      */
@@ -74,12 +74,14 @@ class Migration extends CliTool\App
 
     /**
      * Should we delete files from local storage?
+     *
      * @var bool
      */
     private $deleteLocalCopy;
 
     /**
      * Indexed by filepath
+     *
      * @var bool[]
      */
     private $filesInS3;
@@ -103,7 +105,6 @@ class Migration extends CliTool\App
      * @inheritDoc
      * @throws ServiceNotFound
      * @throws InvalidArgumentException
-     * @throws Flysystem\FileNotFoundException
      */
     public function run(): void
     {
@@ -120,7 +121,7 @@ class Migration extends CliTool\App
         /** @var MapperFactory $mapperFactory */
         $mapperFactory       = $this->getDi()->get('mapperFactory');
         $this->storageMapper = $mapperFactory->get(Storage\Mapper::class);
-        $this->storageDir    = $this->getConfig()->get('storage_dir');
+        $this->storageDir    = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
         $this->byteFormat    = new Alaress_Byte_Format();
 
         $this->checkUsingS3FileSystem();
@@ -144,8 +145,6 @@ class Migration extends CliTool\App
 
     /**
      * Retrieves and migrates all local storage files to S3
-     *
-     * @throws Flysystem\FileNotFoundException
      */
     private function migrateFiles(): void
     {
@@ -165,9 +164,18 @@ class Migration extends CliTool\App
             }
         }
 
+        $remainingFiles = $this->getRemainingFiles();
         if ($this->deleteLocalCopy && !$this->perform()) {
-            // If deleting local files, but doing a dry-run, we will need to estimate what the value would be when performing.
-            $storageAfterTransfer = $storageBeforeTransfer - $this->countBytesDeleted;
+            $storageAfterTransfer = 0;
+            // Directories also take up storage space
+            $directories = [];
+            foreach ($remainingFiles as $remainingFile) {
+                $storageAfterTransfer += filesize($remainingFile);
+                $directories          = $this->addFileDirectoryAncestors($directories, $remainingFile);
+            }
+            foreach ($directories as $directory => $_) {
+                $storageAfterTransfer += shell_exec("stat -c%s $directory");
+            }
         } else {
             $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
         }
@@ -179,15 +187,33 @@ class Migration extends CliTool\App
         $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
         $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
         $countNotInS3 = $countAll - $countFilesInS3;
-        $level        = $countNotInS3 ? Logger::WARNING : Logger::NOTICE;
-        $this->getLogger()->log($level, sprintf("Storage files not in S3:    %d", $countNotInS3));
-
-        $remainingFiles = $this->getRemainingFiles();
-        $level          = count($remainingFiles) ? Logger::WARNING : Logger::NOTICE;
-        $this->getLogger()->log($level, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
+        $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
+        $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
         foreach ($remainingFiles as $remainingFile) {
             $this->getLogger()->debug($remainingFile);
         }
+    }
+
+
+    /**
+     * Adds all directories between storage root and specified file path
+     *
+     * @param bool[] $directories Indexed by directory name
+     * @param string $filepath
+     * @return bool[]
+     */
+    private function addFileDirectoryAncestors(array $directories, string $filepath): array
+    {
+        $levels = 1;
+        while (true) {
+            $dirname               = dirname($filepath, $levels);
+            $directories[$dirname] = true;
+            if ($dirname === $this->storageDir) {
+                break;
+            }
+            $levels++;
+        }
+        return $directories;
     }
 
 
@@ -219,7 +245,7 @@ class Migration extends CliTool\App
      */
     private function getDirectorySize(string $dirName): int
     {
-        return (int)shell_exec("du -s -B 1 {$dirName} | cut -f 1");
+        return (int)shell_exec("du -sb {$dirName} | cut -f 1");
     }
 
 
@@ -228,7 +254,6 @@ class Migration extends CliTool\App
      *
      * @param Storage\Model $file
      * @return bool Whether the file is now in S3 (either previously or newly uploaded)
-     * @throws Flysystem\FileNotFoundException
      */
     private function migrateFile(Storage\Model $file): bool
     {
@@ -249,14 +274,16 @@ class Migration extends CliTool\App
         } elseif (!$foundInS3) {
             $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
             if ($this->moveFileToS3($filepath, $file)) {
-                $foundInS3               = true;
+                $foundInS3 = true;
                 $this->countStorageFilesUploaded++;
             }
         } else {
-            $this->countBytesDeleted += filesize($filepath);
             $this->getLogger()->info('File both on local disk and in S3' . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
-            if ($this->deleteLocalCopy && $this->perform()) {
-                unlink($filepath);
+            if ($this->deleteLocalCopy) {
+                $this->countBytesDeleted += filesize($filepath);
+                if ($this->perform()) {
+                    unlink($filepath);
+                }
             }
         }
 
@@ -344,9 +371,12 @@ class Migration extends CliTool\App
             if ($transcodeFile->exists()) {
                 $this->filesInS3[$transcodeFilePath] = true;
                 $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
-                $this->countBytesDeleted += filesize($transcodeFilePath);
-                if ($this->deleteLocalCopy && $this->perform()) {
-                    unlink($transcodeFilePath);
+
+                if ($this->deleteLocalCopy) {
+                    $this->countBytesDeleted += filesize($transcodeFilePath);
+                    if ($this->perform()) {
+                        unlink($transcodeFilePath);
+                    }
                 }
                 continue;
             }
@@ -372,8 +402,8 @@ class Migration extends CliTool\App
         }
 
         // Recursively delete empty folders we might have created since deleting the file
-        $directoryArray = array_filter(explode("/", chunk_split(basename($filepath), 5, '/')));
-        $dir            = str_replace("/" . basename($filepath), "", $filepath);
+        $directoryArray = array_filter(explode(DIRECTORY_SEPARATOR, chunk_split(basename($filepath), 5, DIRECTORY_SEPARATOR)));
+        $dir            = str_replace(DIRECTORY_SEPARATOR . basename($filepath), "", $filepath);
         for ($i = count($directoryArray) - 1; $i >= 0; $i--) {
             if (!is_dir($dir)) {
                 continue;
@@ -383,7 +413,7 @@ class Migration extends CliTool\App
             }
             $this->getLogger()->debug("Removing directory '$dir'");
             rmdir($dir);
-            $dir = str_replace("/" . $directoryArray[$i], "", $dir);
+            $dir = str_replace(DIRECTORY_SEPARATOR . $directoryArray[$i], "", $dir);
         }
     }
 
