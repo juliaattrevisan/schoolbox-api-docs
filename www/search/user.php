@@ -238,7 +238,13 @@ function renderStudent(
             $classCodeString = implode(",", $classCodesRetained);
         }
 
-        $teacherCodes = $classHandler->getTeachers($classCodeString ?: $subject['code']);
+        if ($classCodeString) {
+            $teacherCodes = $classHandler->getTeachers($classCodeString);
+        } else {
+            $campusCode   = $subject['campusCode'] ?? '';
+            $classCode    = $campusCode !== '' ? "$campusCode/{$subject['code']}" : $subject['code'];
+            $teacherCodes = $classHandler->getTeachers($classCode);
+        }
 
         if (is_array($teacherCodes) && count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([

@@ -1097,7 +1097,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             {
                 foreach ($subjects as $subject)
                 {
-                    $teachers = $externalClass->getTeachers($subject['code']);
+                    $campusCode = $subject['campusCode'] ?? '';
+                    $classCode  = $campusCode !== '' ? "$campusCode/{$subject['code']}" : $subject['code'];
+                    $teachers   = $externalClass->getTeachers($classCode);
 
                     foreach ($teachers as $teacher)
                     {
