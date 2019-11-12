@@ -801,15 +801,14 @@ class External_Synergetic_User implements External_UserInterface
         $contactReturn = [];
         //Dedupe contacts when mother and father are both contacts
         foreach ($contacts as $contact) {
-            if (isset($contactIdList[$contact['StudentContactID']]) || isset($contactIdList[$contact['StudentContactSpouseID']])) {
+            if (isset($contactIdList[$contact['StudentContactID']])) {
                 continue;
             }
+
             $contactReturn[] = $contact;
-            if (!empty($contact['StudentContactID'])) {
+
+            if ($contact['StudentContactID']) {
                 $contactIdList[$contact['StudentContactID']] = true;
-            }
-            if (!empty($contact['StudentContactSpouseID'])) {
-                $contactIdList[$contact['StudentContactSpouseID']] = true;
             }
         }
 
