@@ -16,10 +16,8 @@ use Monolog\Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage;
-use function array_filter;
 use function array_key_exists;
 use function basename;
-use function chunk_split;
 use function closedir;
 use function count;
 use function dirname;
@@ -391,7 +389,7 @@ class Migration extends CliTool\App
 
 
     /**
-     * Deletes empty ancestor directories between the specified file and root directory
+     * Deletes empty ancestor directories of the specified file
      *
      * @param string $filepath
      */
@@ -402,18 +400,23 @@ class Migration extends CliTool\App
         }
 
         // Recursively delete empty folders we might have created since deleting the file
-        $directoryArray = array_filter(explode(DIRECTORY_SEPARATOR, chunk_split(basename($filepath), 5, DIRECTORY_SEPARATOR)));
-        $dir            = str_replace(DIRECTORY_SEPARATOR . basename($filepath), "", $filepath);
-        for ($i = count($directoryArray) - 1; $i >= 0; $i--) {
-            if (!is_dir($dir)) {
-                continue;
-            }
-            if (!$this->isDirectoryEmpty($dir)) {
+        $levels = 1;
+        while (true) {
+            $dirname = dirname($filepath, $levels);
+            if (!is_dir($dirname)) {
                 break;
             }
-            $this->getLogger()->debug("Removing directory '$dir'");
-            rmdir($dir);
-            $dir = str_replace(DIRECTORY_SEPARATOR . $directoryArray[$i], "", $dir);
+            if (!$this->isDirectoryEmpty($dirname)) {
+                break;
+            }
+            $this->getLogger()->debug("Removing directory '$dirname'");
+            rmdir($dirname);
+            if ($dirname === $this->storageDir) {
+                // We can remove the storage directory, but no higher, as it's possible to configure Schoolbox
+                // to use the storage dir's parent as a configured directory, and it may just happen to be empty.
+                break;
+            }
+            $levels++;
         }
     }
 
