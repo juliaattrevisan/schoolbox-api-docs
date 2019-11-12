@@ -413,8 +413,8 @@ class External_Maze_User implements External_UserInterface
             return [];
         }
 
-        $ids = implode(',', array_map(static function($val) {
-                return sprintf("'%s'", $val);
+        $ids = implode(',', array_map(static function ($val) {
+            return sprintf("'%s'", $val);
             }, $externalUserId)
         );
 
