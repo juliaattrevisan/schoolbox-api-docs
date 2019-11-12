@@ -17,6 +17,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage;
 use function array_filter;
+use function array_key_exists;
 use function basename;
 use function chunk_split;
 use function closedir;
@@ -73,6 +74,12 @@ class Migration extends CliTool\App
      * @var bool
      */
     private $deleteLocalCopy;
+
+    /**
+     * Indexed by filepath
+     * @var bool[]
+     */
+    private $filesTransferred;
 
 
     /** @inheritDoc */
@@ -139,6 +146,7 @@ class Migration extends CliTool\App
         // Reset counts for logging
         $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = 0;
         $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
+        $this->filesTransferred = [];
 
         // Retrieve and iterate all files referenced by `storage` table in database
         $files    = $this->storageMapper->findAll();
@@ -151,7 +159,7 @@ class Migration extends CliTool\App
             }
         }
 
-        if ($this->perform()) {
+        if (!$this->deleteLocalCopy || $this->perform()) {
             $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
         } else {
             $storageAfterTransfer = $storageBeforeTransfer - $this->countBytesUploaded;
@@ -167,14 +175,32 @@ class Migration extends CliTool\App
         $level        = $countNotInS3 ? Logger::WARNING : Logger::NOTICE;
         $this->getLogger()->log($level, sprintf("Storage files not in S3:    %d", $countNotInS3));
 
-        if ($this->perform()) {
-            $remainingFiles = explode(PHP_EOL, shell_exec("find {$this->storageDir} -type f") ?? '');
-            $level = count($remainingFiles) ? Logger::WARNING : Logger::NOTICE;
-            $this->getLogger()->log($level, sprintf("Files in local storage dir: %d", count($remainingFiles)));
-            foreach ($remainingFiles as $remainingFile) {
-                $this->getLogger()->debug($remainingFile);
-            }
+        $remainingFiles = $this->getRemainingFiles();
+        $level          = count($remainingFiles) ? Logger::WARNING : Logger::NOTICE;
+        $this->getLogger()->log($level, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
+        foreach ($remainingFiles as $remainingFile) {
+            $this->getLogger()->debug($remainingFile);
         }
+    }
+
+
+    /**
+     * Returns the set of files remaining in the storage directory after running the tool.
+     * Assumes that uploaded files will be deleted from local storage.
+     *
+     * @return string[]
+     */
+    private function getRemainingFiles(): array
+    {
+        $remainingFiles      = [];
+        $filesInLocalStorage = explode(PHP_EOL, shell_exec("find {$this->storageDir} -type f") ?? '');
+        foreach ($filesInLocalStorage as $fileInLocalStorage) {
+            if (array_key_exists($fileInLocalStorage, $this->filesTransferred) || $fileInLocalStorage === '') {
+                continue;
+            }
+            $remainingFiles[] = $fileInLocalStorage;
+        }
+        return $remainingFiles;
     }
 
 
@@ -257,6 +283,7 @@ class Migration extends CliTool\App
         if ($writeSucceeded) {
             $this->getLogger()->debug("Upload completed");
             $this->countBytesUploaded += filesize($filepath);
+            $this->filesTransferred[$filepath] = true;
         } else {
             $this->getLogger()->warning("Upload failed");
             return false;
