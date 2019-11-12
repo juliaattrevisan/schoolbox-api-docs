@@ -11,9 +11,11 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
 use Calendar_Api_Config_Record;
 use Calendar_Api_EventType_Event_Schoolbox_Campus;
+use Calendar_Api_EventType_Interface;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -22,9 +24,11 @@ use Schoolbox\Filter\Filters\Event as EventFilters;
 use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 /**
  * Controller for retrieving calendar events for the assessment calendar.
@@ -168,42 +172,51 @@ class Controller extends Base
         }
 
 
-        // Query the API for the events in this time span
-        $api = new Calendar_Api_Composite();
+        // Query the API for the events in this time span.
+        // First, load campus events.
+        $campusEventsApi = new Calendar_Api_Composite();
+        $eventFilter     = new EventFilters\Matcher($filters);
 
 
-        // Assessments
-        $api->add(
+        // Need events from all campuses (not just the logged-in user's)
+        foreach ($this->campusMapper->findAll() as $campus) {
+            $campusEventsApi->add(
+                new Calendar_Api_EventType_Event_Schoolbox_Campus(
+                    $this->calendarConfig->getId(),
+                    $user,
+                    $user,
+                    $campus->getId()
+                )
+            );
+        }
+        $events = $this->buildRenderer($campusEventsApi, $start, $end, $user);
+
+
+        // The same event can exist in multiple campuses at once.
+        // Filter, then remove any duplicates that remain.
+        $events->getAllEvents()->filter($eventFilter);
+        $collection = new GenericCollection(EventInterface::class, $events->getAllEvents()->getStack());
+        $collection = $collection->getUnique('eventId');
+        $events->getAllEvents()->setStack($collection->getAll());
+
+
+        // Add assessment events to the event renderer
+        // (These should be filtered, but no deduped. The event's ID could match
+        //  the ID of a campus-level event.)
+        $assessmentEvents = $this->buildRenderer(
             new Api(
                 $user,
                 $this->assessmentDataSource,
                 null,
                 $this->assessmentIdFinder,
                 $filters
-            )
-        );
-
-
-        // Calendar events: need events from all campuses
-        // (not just the logged-in user's), so create a clone in all campuses
-        $dummyUser = clone $user;
-        $dummyUser->setCampusCollection($this->campusMapper->findAll());
-        $api->add(
-            new Calendar_Api_EventType_Event_Schoolbox_Campus(
-                $this->calendarConfig->getId(),
-                $dummyUser,
-                $user
-            )
-        );
-        $calendar = new Renderer(
-            $api,
+            ),
             $start,
             $end,
-            $user,
-            $this->getDi(),
             $user
         );
-        $calendar->getAllEvents()->filter(new EventFilters\Matcher($filters));
+        $assessmentEvents->getAllEvents()->filter($eventFilter);
+        $events->getAllEvents()->merge($assessmentEvents->getAllEvents());
 
 
         // The API's renderAll returns a list of json-encoded events.
@@ -212,7 +225,7 @@ class Controller extends Base
             static function ($v) {
                 return json_decode($v, true);
             },
-            $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)
+            $events->renderAll(EventBase::RENDER_FORMAT_JSON)
         );
     }
 
@@ -295,5 +308,20 @@ class Controller extends Base
         }
 
         return $carry;
+    }
+
+
+    /**
+     * Build a renderer for calendar events.
+     *
+     * @param Calendar_Api_EventType_Interface $api   The calendar events API
+     * @param int                              $start Events from this timestamp
+     * @param int                              $end   Events to this timestamp
+     * @param User                             $user  User to show events for
+     * @return Renderer
+     */
+    private function buildRenderer(Calendar_Api_EventType_Interface $api, int $start, int $end, User $user): Renderer
+    {
+        return new Renderer($api, $start, $end, $user, $this->getDi(), $user);
     }
 }
