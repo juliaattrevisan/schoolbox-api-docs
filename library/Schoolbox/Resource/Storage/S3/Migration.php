@@ -67,9 +67,6 @@ class Migration extends CliTool\App
     /** @var int */
     private $countBytesUploaded;
 
-    /** @var int */
-    private $countBytesDeleted;
-
     /**
      * Should we delete files from local storage?
      *
@@ -147,7 +144,7 @@ class Migration extends CliTool\App
     private function migrateFiles(): void
     {
         // Reset counts for logging
-        $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = $this->countBytesDeleted = 0;
+        $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded;
         $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
         $this->filesInS3       = [];
 
@@ -277,11 +274,8 @@ class Migration extends CliTool\App
             }
         } else {
             $this->getLogger()->info('File both on local disk and in S3' . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
-            if ($this->deleteLocalCopy) {
-                $this->countBytesDeleted += filesize($filepath);
-                if ($this->perform()) {
-                    unlink($filepath);
-                }
+            if ($this->deleteLocalCopy && $this->perform()) {
+                unlink($filepath);
             }
         }
 
@@ -328,7 +322,6 @@ class Migration extends CliTool\App
 
         if ($this->deleteLocalCopy) {
             $this->getLogger()->debug("Deleting local file '$filepath'");
-            $this->countBytesDeleted += filesize($filepath);
             if ($this->perform()) {
                 unlink($filepath);
             }
@@ -370,11 +363,8 @@ class Migration extends CliTool\App
                 $this->filesInS3[$transcodeFilePath] = true;
                 $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
 
-                if ($this->deleteLocalCopy) {
-                    $this->countBytesDeleted += filesize($transcodeFilePath);
-                    if ($this->perform()) {
-                        unlink($transcodeFilePath);
-                    }
+                if ($this->deleteLocalCopy && $this->perform()) {
+                    unlink($transcodeFilePath);
                 }
                 continue;
             }
