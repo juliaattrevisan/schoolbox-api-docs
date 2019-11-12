@@ -144,10 +144,14 @@ div.jstree-default, ul.jstree-default {
 
         .meta-preview {
             @extend %browser-icon-colors;
+        }
 
-            img {
-                margin: 0 1rem 0.75rem  0;
-            }
+        .card {
+            margin-bottom: .75rem;
+        }
+
+        .folder-cover {
+            margin: 0 1rem 0 0;
         }
     }
 
