@@ -32,7 +32,7 @@ class Api implements Calendar_Api_EventType_Interface
     private $assessmentDataSource;
 
     /**
-     * @var Visibility
+     * @var null|Visibility
      */
     private $visibility;
 
@@ -56,14 +56,14 @@ class Api implements Calendar_Api_EventType_Interface
      *
      * @param User                 $user
      * @param AssessmentDataSource $assessmentDataSource
-     * @param Visibility           $visibility
+     * @param null|Visibility      $visibility
      * @param IdFinder             $assessmentIdFinder
      * @param array                $filters
      */
     public function __construct(
         User $user,
         AssessmentDataSource $assessmentDataSource,
-        Visibility $visibility,
+        ?Visibility $visibility,
         IdFinder $assessmentIdFinder,
         array $filters
     ) {
