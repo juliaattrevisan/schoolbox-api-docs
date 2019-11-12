@@ -40,7 +40,6 @@ if ($method == 'list' && is_numeric($this->arg[1])) {
 } /* Show all upcoming events with the number of attendees
  */
 else if ($method == 'upcomingEvents') {
-    $canModifyAttendance->isSatisfiedBy($this->arg[1]);
     $data = $attendanceController->executeUpcomingEventAttendance();
 
     $attendanceController->renderUpcomingEventAttendance($data);
