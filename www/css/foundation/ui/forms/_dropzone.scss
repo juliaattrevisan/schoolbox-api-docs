@@ -40,6 +40,10 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
             padding: 1rem 0 1rem 1rem;
         }
     }
+
+  p[data-dz-status] {
+    white-space: inherit;
+  }
 }
 
 section > .dropzone-wrap {
