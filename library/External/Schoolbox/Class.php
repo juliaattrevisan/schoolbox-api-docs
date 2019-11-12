@@ -59,6 +59,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                     'StudentSpecialNeedsFlag' => $student['special_needs'] ?? '',
                     'EnglishSecondFlag'       => $student['esl'] ?? '',
                     'StudentTutorDescription' => $student['tutor_group'] ?? '',
+                    'StudentForm'             => $student['form_name'] ?? '',
                 ];
 
                 $found[$studentExternalId] = true;
@@ -97,7 +98,8 @@ class External_Schoolbox_Class implements External_ClassInterface
                               sups.esl,
                               sups.alert_medical,
                               sups.special_needs,
-                              sups.tutor_group
+                              sups.tutor_group,
+                              sups.form_name
                 FROM          class c
                     JOIN               class_user cu ON cu.class_id = c.id
                     JOIN               user u ON u.id = cu.user_id
