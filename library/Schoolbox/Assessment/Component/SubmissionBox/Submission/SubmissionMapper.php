@@ -250,6 +250,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function softDeleteSubmissionFiles(Submission $submission)
     {
+        /** @var SingleFile\Mapper $submissionFileMapper */
         $submissionFileMapper = $this->getJoinMapper('files');
         $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
         $submissionFileMapper->delete($files);

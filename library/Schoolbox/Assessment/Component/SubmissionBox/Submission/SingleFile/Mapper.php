@@ -57,6 +57,7 @@ class Mapper extends BaseMapper
      */
     public function softDeletePlagScan(Model $file)
     {
+        /** @var Plagscan\Mapper $plagScanMapper */
         $plagScanMapper = $this->getJoinMapper('plagscan');
         $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $plagScanMapper->delete($plagScans);
@@ -73,6 +74,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteKami(Model $file): bool
     {
+        /** @var Kami\Mapper $kamiMapper */
         $kamiMapper = $this->getJoinMapper('kami');
         $kamiFiles = $kamiMapper->findByColumn('student_submission_file_id', $file->getId());
         $kamiMapper->delete($kamiFiles);

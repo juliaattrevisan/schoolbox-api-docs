@@ -125,6 +125,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteAnswers(Model $attempt)
     {
+        /** @var Answer\Mapper $quizAnswerMapper */
         $quizAnswerMapper = $this->getJoinMapper('answers');
         // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
         $quizAnswerMapper->deleteByColumn('attempt_id', $attempt->getId());
