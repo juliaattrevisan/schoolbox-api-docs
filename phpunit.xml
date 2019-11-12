@@ -19,6 +19,7 @@
       <directory suffix=".php">library/Schoolbox/</directory>
       <exclude>library/Alaress/Database/Test</exclude>
       <exclude>library/Schoolbox/Database/Test</exclude>
+      <exclude>library/Schoolbox/Profile/Test/Generator.php</exclude>
     </testsuite>
     <testsuite name="databaseTest">
       <directory suffix=".php">library/Alaress/Database/Test</directory>
