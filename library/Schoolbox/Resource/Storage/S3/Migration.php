@@ -68,18 +68,24 @@ class Migration extends CliTool\App
     /** @var int */
     private $countBytesUploaded;
 
+    /**
+     * Should we delete files from local storage?
+     * @var bool
+     */
+    private $deleteLocalCopy;
+
 
     /** @inheritDoc */
     public function getShortOpts(): array
     {
-        return ['h'];
+        return ['h', 'd'];
     }
 
 
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help'];
+        return ['help', 'delete'];
     }
 
 
@@ -96,6 +102,9 @@ class Migration extends CliTool\App
             $this->printHelp();
             exit(CliTool\Kernel::EXIT_STATUS_OK);
         }
+        $this->deleteLocalCopy = $this->getOpt('d') || $this->getOpt('delete');
+        $level                 = $this->deleteLocalCopy ? Logger::WARNING : Logger::NOTICE;
+        $this->getLogger()->log($level, ($this->deleteLocalCopy ? 'Deleting' : 'Keeping') . ' local storage files');
 
         /** @var MapperFactory $mapperFactory */
         $mapperFactory       = $this->getDi()->get('mapperFactory');
@@ -211,7 +220,7 @@ class Migration extends CliTool\App
             }
         } else {
             $this->getLogger()->info("File both on local disk and in S3, deleting local copy");
-            if ($this->perform()) {
+            if ($this->deleteLocalCopy && $this->perform()) {
                 unlink($filepath);
             }
         }
@@ -254,7 +263,7 @@ class Migration extends CliTool\App
         }
 
         $this->getLogger()->debug("Deleting local file '$filepath'");
-        if ($this->perform()) {
+        if ($this->deleteLocalCopy && $this->perform()) {
             unlink($filepath);
         }
 
@@ -362,6 +371,8 @@ class Migration extends CliTool\App
 Options:
     -h, --help
         Print help message and exit.
+    -d, --delete
+        If present, delete files from local storage
     -p, --perform
         Without this flag, tool will not persist files to S3 or delete from local storage
 ";
