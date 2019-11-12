@@ -149,6 +149,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     public function softDeleteReturnedWorkFiles(ReturnedWork $return)
     {
+        /** @var ReturnedWork\SingleFile\Mapper $returnedWorkFileMapper */
         $returnedWorkFileMapper = $this->getJoinMapper('files');
         $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
         $returnedWorkFileMapper->delete($files);
