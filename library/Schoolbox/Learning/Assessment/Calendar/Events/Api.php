@@ -86,8 +86,15 @@ class Api implements Calendar_Api_EventType_Interface
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
+        if ($this->visibility) {
+            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->user, true);
+        }
+
         $stack = new Collection();
         foreach ($assessments as $assessment) {
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, false)) {
+                continue;
+            }
 
             $event = $this->transformAssessmentToEvent($assessment);
             if ($event) {
@@ -107,6 +114,9 @@ class Api implements Calendar_Api_EventType_Interface
 
         try {
             $assessment = $this->assessmentDataSource->findById($eventId);
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, false)) {
+                return $stack;
+            }
             $event      = $this->transformAssessmentToEvent($assessment);
             if ($event) {
                 $stack->add($event);

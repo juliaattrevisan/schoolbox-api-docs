@@ -177,7 +177,7 @@ class Controller extends Base
             new Api(
                 $user,
                 $this->assessmentDataSource,
-                $this->visibility,
+                null,
                 $this->assessmentIdFinder,
                 $filters
             )
