@@ -681,7 +681,7 @@ class External_Doublefirst_User implements External_UserInterface
             return [];
         }
 
-        $ids = implode(',', $externalUserId);
+        $ids = implode(',', array_map([$this->database, 'smartQuote'], $externalUserId));
 
         $query =
             "
