@@ -69,6 +69,9 @@ class Migration extends CliTool\App
     /** @var int */
     private $countBytesUploaded;
 
+    /** @var int */
+    private $countBytesDeleted;
+
     /**
      * Should we delete files from local storage?
      * @var bool
@@ -79,7 +82,7 @@ class Migration extends CliTool\App
      * Indexed by filepath
      * @var bool[]
      */
-    private $filesTransferred;
+    private $filesInS3;
 
 
     /** @inheritDoc */
@@ -100,6 +103,7 @@ class Migration extends CliTool\App
      * @inheritDoc
      * @throws ServiceNotFound
      * @throws InvalidArgumentException
+     * @throws Flysystem\FileNotFoundException
      */
     public function run(): void
     {
@@ -140,13 +144,15 @@ class Migration extends CliTool\App
 
     /**
      * Retrieves and migrates all local storage files to S3
+     *
+     * @throws Flysystem\FileNotFoundException
      */
     private function migrateFiles(): void
     {
         // Reset counts for logging
-        $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = 0;
+        $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = $this->countBytesDeleted = 0;
         $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
-        $this->filesTransferred = [];
+        $this->filesInS3       = [];
 
         // Retrieve and iterate all files referenced by `storage` table in database
         $files    = $this->storageMapper->findAll();
@@ -159,10 +165,11 @@ class Migration extends CliTool\App
             }
         }
 
-        if (!$this->deleteLocalCopy || $this->perform()) {
-            $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
+        if ($this->deleteLocalCopy && !$this->perform()) {
+            // If deleting local files, but doing a dry-run, we will need to estimate what the value would be when performing.
+            $storageAfterTransfer = $storageBeforeTransfer - $this->countBytesDeleted;
         } else {
-            $storageAfterTransfer = $storageBeforeTransfer - $this->countBytesUploaded;
+            $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
         }
         $this->getLogger()->notice(sprintf("Files in storage table:     %d", $countAll));
         $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
@@ -195,7 +202,7 @@ class Migration extends CliTool\App
         $remainingFiles      = [];
         $filesInLocalStorage = explode(PHP_EOL, shell_exec("find {$this->storageDir} -type f") ?? '');
         foreach ($filesInLocalStorage as $fileInLocalStorage) {
-            if (array_key_exists($fileInLocalStorage, $this->filesTransferred) || $fileInLocalStorage === '') {
+            if (array_key_exists($fileInLocalStorage, $this->filesInS3) || $fileInLocalStorage === '') {
                 continue;
             }
             $remainingFiles[] = $fileInLocalStorage;
@@ -221,6 +228,7 @@ class Migration extends CliTool\App
      *
      * @param Storage\Model $file
      * @return bool Whether the file is now in S3 (either previously or newly uploaded)
+     * @throws Flysystem\FileNotFoundException
      */
     private function migrateFile(Storage\Model $file): bool
     {
@@ -241,14 +249,19 @@ class Migration extends CliTool\App
         } elseif (!$foundInS3) {
             $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
             if ($this->moveFileToS3($filepath, $file)) {
-                $foundInS3 = true;
+                $foundInS3               = true;
                 $this->countStorageFilesUploaded++;
             }
         } else {
-            $this->getLogger()->info("File both on local disk and in S3, deleting local copy");
+            $this->countBytesDeleted += filesize($filepath);
+            $this->getLogger()->info('File both on local disk and in S3' . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
             if ($this->deleteLocalCopy && $this->perform()) {
                 unlink($filepath);
             }
+        }
+
+        if ($foundInS3) {
+            $this->filesInS3[$filepath] = true;
         }
 
         $this->moveTranscodeFilesToS3($filepath);
@@ -283,15 +296,17 @@ class Migration extends CliTool\App
         if ($writeSucceeded) {
             $this->getLogger()->debug("Upload completed");
             $this->countBytesUploaded += filesize($filepath);
-            $this->filesTransferred[$filepath] = true;
         } else {
             $this->getLogger()->warning("Upload failed");
             return false;
         }
 
-        $this->getLogger()->debug("Deleting local file '$filepath'");
-        if ($this->deleteLocalCopy && $this->perform()) {
-            unlink($filepath);
+        if ($this->deleteLocalCopy) {
+            $this->getLogger()->debug("Deleting local file '$filepath'");
+            $this->countBytesDeleted += filesize($filepath);
+            if ($this->perform()) {
+                unlink($filepath);
+            }
         }
 
         return true;
@@ -321,19 +336,23 @@ class Migration extends CliTool\App
                 // Not a transcode of the current file, ignore
                 continue;
             }
-            $this->getLogger()->info("Transcode file '$entry' found");
+
             $transcodeFilePath = $dirName . DIRECTORY_SEPARATOR . $entry;
             $filepath          = str_replace($this->storageDir . DIRECTORY_SEPARATOR, '', $transcodeFilePath);
             $transcodeFile     = new Flysystem\File($this->storageMapper->getManager()->getFilesystem(Storage\Manager::FS_STORAGE), $filepath);
+
             if ($transcodeFile->exists()) {
-                $this->getLogger()->debug("Transcode file already in S3, deleting local copy");
-                if ($this->perform()) {
+                $this->filesInS3[$transcodeFilePath] = true;
+                $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
+                $this->countBytesDeleted += filesize($transcodeFilePath);
+                if ($this->deleteLocalCopy && $this->perform()) {
                     unlink($transcodeFilePath);
                 }
                 continue;
             }
-            $this->getLogger()->debug("Transcode file not in S3, uploading...");
+            $this->getLogger()->info("Transcode file '$entry' found locally but not in S3, uploading...");
             if ($this->moveFileToS3($transcodeFilePath, $transcodeFile)) {
+                $this->filesInS3[$transcodeFilePath] = true;
                 $this->countTranscodeFilesUploaded++;
             }
         }
