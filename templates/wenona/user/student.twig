@@ -47,10 +47,6 @@
 
 {# Buttons - add intranet at start of list #}
 {% block buttons %}
-    <li>
-        <a href="https://intranet.wenona.nsw.edu.au/contentpages/studentprofile/default.aspx?studentID={{ user.getExternalId() }}"
-           class="icon-synergetic">Intranet</a>
-    </li>
     {{ parent() }}
     {# Change of information request can go here #}
     <li>
