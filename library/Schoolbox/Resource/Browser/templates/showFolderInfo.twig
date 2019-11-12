@@ -26,7 +26,7 @@
             <a title="View Homepage" href="/homepage/{{ folder.id }}">
         {% endif %}
         {% if folder.hasCoverImage %}
-            <img src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
+            <img class="folder-cover" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
         {% else %}
             <div class="{{ nodeIcon.icon(nodeType) }} size-32" alt="{{ folder.name }}"></div>
         {% endif %}
