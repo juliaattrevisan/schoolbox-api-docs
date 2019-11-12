@@ -13,7 +13,24 @@ use ArrayAccess;
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 
-class Loader implements IConfigLoader, ArrayAccess {
+class Loader implements IConfigLoader, ArrayAccess
+{
+    /**
+     * Cached config values.
+     *
+     * @var array
+     */
+    private $cache = [];
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        // TODO inject DB access class here
+    }
+
 
     /**
      * Get a config variable
@@ -32,7 +49,7 @@ class Loader implements IConfigLoader, ArrayAccess {
      * Currently it is impossible to tell from Cfg::get() if a config option is
      * blank or it does not exist, so this always returns true.
      *
-     * @param  mixed $offset
+     * @param mixed $offset
      * @return bool
      */
     public function offsetExists($offset)
@@ -43,7 +60,7 @@ class Loader implements IConfigLoader, ArrayAccess {
     /**
      * Gets this config option.
      *
-     * @param  mixed $offset
+     * @param mixed $offset
      * @return mixed
      */
     public function offsetGet($offset)
