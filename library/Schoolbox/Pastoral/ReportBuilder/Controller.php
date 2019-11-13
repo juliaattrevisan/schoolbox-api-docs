@@ -434,8 +434,8 @@ class Controller extends Base
                         $startOfDateRange = Alaress_Date_Format::newFromTimestamp($timestamp);
                 }
 
-                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($startOfDateRange));
-                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort(Alaress_Date_Format::now()));
+                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort(Alaress_Date_Format::now()));
+                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($startOfDateRange));
             }
         } else {
             // No relative date data, or the user opted for absolute dates?
