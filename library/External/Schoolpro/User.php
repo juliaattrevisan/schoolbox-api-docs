@@ -348,7 +348,9 @@ class External_Schoolpro_User implements External_UserInterface
             foreach ($result as $currentSubject) {
                 $subject = array(
                     'code' => $currentSubject['ClassID'],
-                    'name' => $currentSubject['ItemName']
+                    'name' => $currentSubject['ItemName'],
+                    'classType'  => '',
+                    'campusCode' => '',
                 );
 
                 $subjectList[] = $subject;
@@ -375,7 +377,9 @@ class External_Schoolpro_User implements External_UserInterface
             foreach ($result as $currentSubject) {
                 $subject = array(
                     'code' => $currentSubject['ID'],
-                    'name' => $currentSubject['ItemName']
+                    'name' => $currentSubject['ItemName'],
+                    'classType'  => '',
+                    'campusCode' => '',
                 );
 
                 $subjectList[] = $subject;

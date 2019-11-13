@@ -408,7 +408,12 @@ class External_Tass_User implements External_UserInterface
             if (Cfg::get('external_tass_year_in_class_code') == '0') {
                 $subject['year_grp'] = '';
             }
-            $subjectList[] = array('code'=>$subject['year_grp'].'-'.$subject['sub_code'].'-'.$subject['class'], 'name'=>trim($subject['sub_desc']));
+            $subjectList[] = [
+                'code'       => $subject['year_grp'] . '-' . $subject['sub_code'] . '-' . $subject['class'],
+                'name'       => trim($subject['sub_desc']),
+                'classType'  => '',
+                'campusCode' => '',
+            ];
         }
 
         if (is_array($subjectList)) {
