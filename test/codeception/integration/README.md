@@ -26,10 +26,10 @@ Found in documentation here: [Acceptance Tests](./test/codeception/acceptance/RE
 
 ### What is covered by the smoke tests
 
-Currently at the moment (13/11/2019) this is what is covered by the tests. For this list to be relavent we will need to keep it up to date.
+Currently at the moment (13/11/2019) this is what is covered by the tests. For this list to be relevant we will need to keep it up to date.
 
 * Get requests
-    * full list of urls being tested and combinations are in this csv: ./test/codeception/_data/SmokeTests/GetSmokeTestList.csv
+    * full list of URLs being tested and combinations are in this csv: ./test/codeception/_data/SmokeTests/GetSmokeTestList.csv
 * Group and Homepage Assessment
     * Create assessment with no self reflection, no online submission, published, weight >0, use rubric true 
        * Create
@@ -53,7 +53,7 @@ Currently at the moment (13/11/2019) this is what is covered by the tests. For t
 * Course
     * Course with a project with a due work and a due work
        * Create course
-       * Import coure into group page
+       * Import course into group page
     * Course with empty unit
        * Create course
 * Home Page
