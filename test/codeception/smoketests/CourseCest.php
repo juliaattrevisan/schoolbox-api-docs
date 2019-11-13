@@ -8,7 +8,7 @@
 /** @noinspection PhpUnused */
 declare(strict_types=1);
 
-namespace SmokeTests;
+namespace smoketests;
 
 use IntegrationTester;
 use Payload;

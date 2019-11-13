@@ -39,6 +39,18 @@ suites:
                 - \Helper\SchoolboxCli:
                 - Asserts:
 
+    smoketests:
+        actor: IntegrationTester
+        path: smoketests
+        modules:
+            enabled:
+                - \Helper\Integration:
+                    depends: PhpBrowser
+                    url: 'https://vagrant.dev.schoolbox.cloud'
+                    xdebug: false
+                - \Helper\SchoolboxCli:
+                - Asserts:
+
 extensions:
     enabled:
         - Codeception\Extension\Logger
