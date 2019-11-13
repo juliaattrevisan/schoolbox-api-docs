@@ -23,6 +23,73 @@ This is to increase the speed of tests.
 Same as acceptance tests as they are all based on the same framework. 
 Found in documentation here: [Acceptance Tests](./test/codeception/acceptance/README.md).
 
+
+### What is covered by the smoke tests
+
+Currently at the moment (13/11/2019) this is what is covered by the tests. For this list to be relavent we will need to keep it up to date.
+
+* Get requests
+    * full list of urls being tested and combinations are in this csv: ./test/codeception/_data/SmokeTests/GetSmokeTestList.csv
+* Group and Homepage Assessment
+    * Create assessment with no self reflection, no online submission, published, weight >0, use rubric true 
+       * Create
+       * Update
+       * Submit on behalf of student
+       * Mark
+    * Create assessment with no self reflection, no online submission, published, weight >0, use rubric false 
+       * Create
+       * Update
+       * Submit on behalf of student
+       * Mark
+* Calendar
+    * On full calendar month view create event set to happen today
+       * Personal event (through modal)
+       * Personal event
+       * Group event
+       * Campus event
+    * Modify personal event
+    * RSVP to campus event
+    * Approve attendees of campus event
+* Course
+    * Course with a project with a due work and a due work
+       * Create course
+       * Import coure into group page
+    * Course with empty unit
+       * Create course
+* Home Page
+    * Create folder
+    * Create folder with curriculum tagging off
+    * Drag drop file
+       * Homepage upload file
+       * Resource upload file
+       * Storage upload
+    * Post file upload file form
+    * Homepage
+       * Set up users
+       * Set up text component
+* Login Page
+    * Login Local User
+    * Forgot password form
+* News
+    * Draft News
+       * Create
+       * Update
+       * Submit to moderation
+       * Publish
+    * Moderation news
+       * Accept news
+       * Reject news
+    * Published news
+       * Saves news for later
+       * Delete news
+* Pastoral
+    * Pastoral record
+       * Create
+       * Modify
+       * Duplicate
+       * Comment Private
+       * Comment Public 
+
 ### Codeception test
 
 To run integration tests, like acceptance tests, you call codeception, 
@@ -50,8 +117,7 @@ None as of yet.
 
 #### Smoke Tests
 
-See `test/codeception/integration/LoginCest.php` for an example - it shows an example of a simple creation
-of a payload and then firing it off at the schoolbox endpoint.
+See `test/codeception/integration/SmokeTests/LoginCest.php` for an example - it shows an example of a simple creation of a payload and then firing it off at the schoolbox endpoint.
 
 ### Guidelines
 
