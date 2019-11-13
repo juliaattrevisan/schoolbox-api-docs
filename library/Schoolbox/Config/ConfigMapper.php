@@ -8,7 +8,6 @@
 namespace Schoolbox\Config;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 
 /**
@@ -18,7 +17,7 @@ use Schoolbox\Mapper;
  * @method Config findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Config[] findByColumn($columnName, $columnValue, $options = array())
  */
-class ConfigMapper extends Mapper implements IConfigLoader
+class ConfigMapper extends Mapper
 {
 
     // Table definition
@@ -106,44 +105,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _CANVAS_DATA_API_KEY               = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
 
-    /** @var array */
-    protected $cache = array();
-
-    /** @var array */
-    protected $consts;
-
-    /**
-     * This mapper has no database by default.
-     * (It can be installed later?)
-     */
-    protected function setupDatabase()
-    {
-    }
-
-    /**
-     * This object IS a config loader, so the method for building it returns itself.
-     *
-     * @return $this
-     */
-    protected function buildConfigLoader()
-    {
-        // this line will possibly blow up in the Doctor's face
-        return $this;
-    }
-
-    /**
-     * Set up required constants.
-     */
-    protected function setup()
-    {
-        $w = realpath(__DIR__ . "/../../..");
-        $this->consts = array(
-            'siteRoot' => $w,
-            'webRoot'  => "$w/www",
-            'webBase'  => ''
-        );
-    }
-
 
     /**
      * @throws \InvalidArgumentException
@@ -176,56 +137,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
 
 
     /**
-     * Get a config variable
-     *
-     * @param string $var
-     * @return mixed
-     */
-    public function get($var)
-    {
-        if (isset($this->consts[$var])) {
-            return $this->consts[$var];
-        } elseif (defined($var)) {
-            return constant($var);
-        }
-        if (empty($this->cache)) {
-            $this->loadCache();
-        }
-        if (isset($this->cache[$var])) {
-            return $this->cache[$var];
-        }
-        return null;
-    }
-
-    /**
-     * Load entire cache at once, not just one result at a time
-     */
-    protected function loadCache()
-    {
-        // Load database on request only
-        if (!($this->database instanceof \Database)) {
-            $this->database = \Database::getInstance();
-        }
-
-        // Perform this common action without the overhead of hydration
-        foreach ($this->database->query("SELECT `name`, `value`, field_id FROM `{$this->getTable()}`") as $row) {
-            $this->cache[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
-        }
-    }
-
-
-    /**
-     * Drop any cached config
-     *
-     * @return void
-     */
-    public function dropCache()
-    {
-        $this->cache = array();
-    }
-
-
-    /**
      * Post save callback to ensure cache is updated
      *
      * @param Config $model
@@ -233,7 +144,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
      */
     protected function updateCache(Config $model): bool
     {
-        $this->cache[$model->getName()] = $this->hydrateValue($model->getFieldId(), $model->getValue());
+        // TODO consider updating cache of ConfigLoader?
         return true;
     }
 
@@ -246,25 +157,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
           INNER JOIN lu_config_field lcf on config.field_id = lcf.id
           LEFT  JOIN lu_config_type  lct on config.type_id  = lct.id
         ";
-    }
-
-
-    /**
-     * Light-weight hydration to respect boolean fields
-     *
-     * @param int   $fieldId
-     * @param mixed $value
-     * @return mixed
-     */
-    private function hydrateValue(int $fieldId, $value)
-    {
-        switch ($fieldId) {
-            case self::FIELD_BOOLEAN:
-            case self::FIELD_CHECKBOX:
-                return $value === null ? null : (bool)$value;
-            default:
-        }
-        return $value;
     }
 
 
