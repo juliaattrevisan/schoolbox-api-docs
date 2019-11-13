@@ -93,7 +93,9 @@ class External_Pcschools_User implements External_UserInterface
             return [];
         }
 
-        [ $sql, $params ] = $this->queryHelper->getGetStudentContactListQuery($externalUserId);
+        [ $sql, $params ] = $this->queryHelper->getGetStudentContactListQuery(
+            array_map([$this->database, 'smartQuote'], $externalUserId)
+        );
 
         // Split contacts into separate father/mother/guardian/carer records
         // (at this stage, all with the same contact ID)
