@@ -41,6 +41,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRelations;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
+// TODO inject instance of this wherever it's used
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;

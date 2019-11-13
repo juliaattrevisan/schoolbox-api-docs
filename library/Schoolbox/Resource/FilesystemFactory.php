@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -41,6 +41,7 @@ class FilesystemFactory
      */
     public function buildSpecific($storageDir, $tempDir)
     {
+        // TODO inject this
         $config = new \Schoolbox\Config\Loader();
 
         // Enable S3 only if all of the variables have been set in the config

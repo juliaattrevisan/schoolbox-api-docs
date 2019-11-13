@@ -112,6 +112,7 @@ class GDriveFetcher implements FetcherInterface
             ));
         }
 
+        // TODO inject (config setting only)
         $this->configLoader = new ConfigLoader();
     }
 
@@ -358,4 +359,4 @@ class GDriveFetcher implements FetcherInterface
 
         return $ch;
     }
-} 
+}

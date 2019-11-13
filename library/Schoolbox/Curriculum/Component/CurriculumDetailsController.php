@@ -49,6 +49,7 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
         /**
          * Check if curriculum tagging has been turnt on
          */
+        // TODO use config loader in components?
         $config = new ConfigLoader();
         $this->curriculumTagging = $config->get('curriculum_tagging_enabled');
 

@@ -40,6 +40,7 @@ class MyFile extends Resource\My\File\Model implements FileInterface {
 	public function __construct() {
 		//
 		// Don't really want to load a mapper here, but meh.
+        // TODO make this go away
 		$this->config_loader = new Config\Loader();
 	}
 

@@ -61,6 +61,7 @@ class CollectorFactory
         $this->storage = Storage\Mapper::getInstance();
         $this->file    = File\Mapper::getInstance();
         $this->myFile  = MyFile\Mapper::getInstance();
+        // TODO inject this
         $this->conf    = new Loader();
     }
 

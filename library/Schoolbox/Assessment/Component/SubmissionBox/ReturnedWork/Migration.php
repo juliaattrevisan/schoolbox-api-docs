@@ -34,6 +34,7 @@ class Migration implements MigrationPattern
     function __construct()
     {
         $this->db       = Database::getInstance();
+        // TODO determine if this class is still even needed
         $this->conf     = new Loader();
         $this->stmtHash = $this->db->prepare("UPDATE submission_return SET hash = :hash, filename = :name WHERE id = :id");
         $this->stmtFlag = $this->db->prepare("UPDATE submission_return SET deleted = TRUE WHERE id = ?");

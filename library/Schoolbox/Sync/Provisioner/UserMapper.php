@@ -59,6 +59,7 @@ class UserMapper extends SchoolboxMapper
          * Otherwise leave it unchanged from whatever it was
          */
 
+        // TODO inject this
         $config = new ConfigLoader();
 
         if ($config->get('ups_groups_enabled')) {

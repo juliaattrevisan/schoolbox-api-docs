@@ -27,6 +27,7 @@ class DAV_ExceptionPlugin extends ServerPlugin {
 	 * @param Server $server
 	 */
 	public function initialize(Server $server) {
+        // TODO remove this entire class
 		$this->setConfigLoader(new ConfigLoader());
 		$server->on('exception', array($this, 'onException'), 10);
 		set_error_handler([$this, 'onError'], error_reporting());

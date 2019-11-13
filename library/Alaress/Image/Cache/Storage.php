@@ -33,6 +33,7 @@ class Storage extends Flysystem
     public function __construct(Resource\Storage\Model $resource, $key)
     {
         // these should *probably* be some sort of DI
+        // TODO inject storage_dir only
         $conf = new Loader();
         $factory = new Resource\FilesystemFactory();
 

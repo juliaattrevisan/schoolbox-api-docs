@@ -246,6 +246,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function __construct()
     {
         $this->role = new Role();
+        // TODO destroy this
         $this->config_loader = new ConfigLoader();  // TODO. Remove global dependency
     }
 
@@ -1321,6 +1322,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function __wakeup()
     {
         if ($this->getConfigLoader() instanceof \__PHP_Incomplete_Class) {
+            // TODO destroy this dependency
             $this->setConfigLoader(new ConfigLoader());
         }
         if (!$this->children) {

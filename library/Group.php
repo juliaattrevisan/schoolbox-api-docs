@@ -51,6 +51,7 @@ class Group extends DeprecatedModel
     {
         // only load this if you *actually* need it
         if (empty($this->userNotifier)) {
+            // TODO audit all places this could be used: replace with mapper
             $this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
         }
         return $this->userNotifier;

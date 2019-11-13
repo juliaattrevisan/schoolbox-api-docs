@@ -48,6 +48,7 @@ class Zip
      */
     public function __construct($filename = null)
     {
+        // TODO inject this
         $this->configLoader = new ConfigLoader();
         $this->storageMapper = StorageMapper::getInstance();
         $this->errorMapper = ErrorMapper::getInstance();

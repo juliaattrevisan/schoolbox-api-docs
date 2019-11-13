@@ -59,6 +59,7 @@ class Server
      */
     public function __construct($conf)
     {
+        // TODO typedef and don't accept null?
         if (!$conf instanceof IConfigLoader) {
             $conf = new ConfigLoader();
         }

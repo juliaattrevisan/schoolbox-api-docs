@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -40,6 +40,7 @@ class Migrator
     {
         $this->log        = $log;
 
+        // TODO remove this entire class
         $conf             = new Loader();
         $this->storageDir = $conf->get('storage_dir');
         $this->queueDir   = $conf->get('video_dir');

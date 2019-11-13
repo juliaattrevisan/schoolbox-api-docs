@@ -41,6 +41,7 @@ class Portrait extends Storage
      */
     public function __construct(User $user, string $key, User $sessionUser)
     {
+        // TODO inject (maybe settings only?)
         $this->config      = new Loader();
         $this->sessionUser = $sessionUser;
         $this->userMapper  = UserMapper::getInstance();

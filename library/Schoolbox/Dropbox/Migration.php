@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -29,6 +29,7 @@ class Migration implements MigrationPattern
     public function __construct()
     {
         $this->db = Database::getInstance();
+        // TODO this should no longer be needed
         $this->conf = new Loader();
 
         $this->stmtHash = $this->db->prepare("UPDATE dropbox SET hash = :hash, realname = :name WHERE id = :id");
@@ -110,4 +111,4 @@ class Migration implements MigrationPattern
     {
         return null;
     }
-} 
+}

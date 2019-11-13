@@ -73,6 +73,7 @@ class Controller extends Base
         $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setTimetableHandler(new External_Timetable());
+        // TODO inject this
         $this->setConfigLoader(new ConfigLoader());
     }
 

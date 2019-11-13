@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -18,6 +18,7 @@ class Migration implements MigrationPattern
     public function __construct()
     {
         $this->db = Database::getInstance();
+        // TODO remove this entire class
         $this->conf = new Loader();
 
         $this->stmtFlag = $this->db->prepare("UPDATE `storage` SET expired_at = '1999-12-31 23:59:59' WHERE storage_id = ?");
@@ -94,4 +95,4 @@ class Migration implements MigrationPattern
     {
         return null;
     }
-} 
+}

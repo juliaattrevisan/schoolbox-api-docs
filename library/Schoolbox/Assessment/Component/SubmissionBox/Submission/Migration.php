@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -32,6 +32,7 @@ class Migration implements MigrationPattern
     function __construct()
     {
         $this->db   = Database::getInstance();
+        // TODO determine if this class is still even needed
         $this->conf = new Loader();
 
         $this->stmtHash = $this->db->prepare("UPDATE student_submission SET hash = :hash, realname = :name WHERE id = :id");
@@ -122,4 +123,4 @@ class Migration implements MigrationPattern
     public function getQueueType() {
         return QueueMapper::FILE_TYPE_SUBMISSION;
     }
-} 
+}
