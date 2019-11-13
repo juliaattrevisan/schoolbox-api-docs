@@ -24,11 +24,32 @@ class Loader implements IConfigLoader, ArrayAccess
 
 
     /**
+     * @var self
+     */
+    private static $instance;
+
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         // TODO inject DB access class here
+    }
+
+
+    /**
+     * Temporary getInstance method, for replacing
+     * `\Schoolbox\Config\ConfigMapper::getInstance`.
+     *
+     * @return static
+     */
+    public static function getInstance(): self
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
 
