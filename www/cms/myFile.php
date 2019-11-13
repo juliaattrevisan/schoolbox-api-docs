@@ -2,8 +2,8 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
-use Schoolbox\MyFileMapper;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
