@@ -124,6 +124,44 @@ class Controller extends Base
     }
 
     /**
+     * Helper method to convert a plain english relative date to an ADF object
+     *
+     * @param string $relativeDateString
+     * @return Alaress_Date_Format
+     */
+    private function relativeDateStringToADF(string $relativeDateString) : Alaress_Date_Format
+    {
+        $adf = Alaress_Date_Format::newFromTimestamp(strtotime($relativeDateString));
+
+        if ($relativeDateString === self::THIS_YEAR) {
+            return $adf->startOfYear();
+        }
+
+        return $adf->startOfDay();
+    }
+
+    /**
+     * Helper method to find the relative date that was selected from the dropdown, for purposes of pre-selecting it on modify
+     *
+     * @param PastoralReport $report
+     * @return string|null
+     */
+    private function retrieveSelectedRelativeDate(PastoralReport $report) : ?string
+    {
+        if ($report && $report->getAfterDate()) {
+            foreach (self::RELATIVE_DATE_PRESETS as $label => $value) {
+                $reportDate = $report->getAfterDate()->startOfDay()->getUnixTimeStamp();
+                $datePreset = $this->relativeDateStringToADF($value)->getUnixTimeStamp();
+                if ($datePreset === $reportDate) {
+                    return $value;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Display report builder saved reports
      */
     public function getIndex()
@@ -251,7 +289,6 @@ class Controller extends Base
             $report->setDashboard(false);
         }
 
-
         // And render this thing out
         $this->getResponse()->content->set(
             [
@@ -272,7 +309,8 @@ class Controller extends Base
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
-                    'datePresets'      => self::RELATIVE_DATE_PRESETS
+                    'datePresets'      => self::RELATIVE_DATE_PRESETS,
+                    'selectedRelativeDate' => $this->retrieveSelectedRelativeDate($report)
                 ],
                 'title' => 'Pastoral Report',
             ]
@@ -417,25 +455,12 @@ class Controller extends Base
 
         // If the user opted for the relative date input, use that.
         if (!empty($post['date-option'] && $post['date-option'] === 'relative')) {
-            $relativeDate = $post['relative-dates-dropdown'];
+            $relativeDateString = $post['relative-dates-dropdown'];
 
             // Only use the user's input if the selected option matches one of our preset strtotime-able options
-            if (!empty($relativeDate) && in_array($relativeDate, array_values(self::RELATIVE_DATE_PRESETS), true)) {
-                $timestamp = strtotime($relativeDate);
-
-                switch ($relativeDate) {
-                    case self::THIS_YEAR:
-                        $startOfDateRange = Alaress_Date_Format::now()->startOfYear();
-                        break;
-                    case self::TODAY:
-                        $startOfDateRange = Alaress_Date_Format::now()->startOfDay();
-                        break;
-                    default:
-                        $startOfDateRange = Alaress_Date_Format::newFromTimestamp($timestamp)->startOfDay();
-                }
-
+            if (!empty($relativeDateString) && in_array($relativeDateString, array_values(self::RELATIVE_DATE_PRESETS), true)) {
                 $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort(Alaress_Date_Format::now()));
-                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($startOfDateRange));
+                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($this->relativeDateStringToADF($relativeDateString)));
             }
         } else {
             // No relative date data, or the user opted for absolute dates?

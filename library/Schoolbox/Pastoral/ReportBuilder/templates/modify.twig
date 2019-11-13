@@ -108,7 +108,7 @@
                         <label for="relative-dates-dropdown">Time period</label>
                         <select id="relative-dates-dropdown" name="relative-dates-dropdown">
                             {% for label,value in datePresets %}
-                                <option value="{{value}}">{{label}}</option>
+                                <option value="{{value}}" {% if selectedRelativeDate == value %}selected{% endif %}>{{label}}</option>
                             {% endfor %}
                         </select>
                     </div>
