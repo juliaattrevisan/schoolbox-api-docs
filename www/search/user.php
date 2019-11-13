@@ -206,45 +206,30 @@ function renderStudent(
         $folder = $folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
         if ($folder) {
             $subject['folder'] = $folder;
-            $subject['perms']  = $groupHandler->getPermission($subject['folder']->getId());
-            $classCode = $subject['folder']->getCodeString();
-        } else {
-            if ($config->get('show_all_subjects')) {
-                $classCode = (($subject['campusCode'] ?? '') !== '') ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
-                $code = new FolderCode();
-                $code->setCode($classCode);
-                $subject['folder'] = (new Folder())->setCodes(new GenericCollection(FolderCode::class));
-                $subject['folder']->setName($subject['name'])->addCode($code);
-            } else {
-                continue;
-            }
-        }
+            $subject['perms']  = $groupHandler->getPermission($folder->getId());
 
-        // If the config flag is enabled, restrict to seeing only the teacher(s) of the class the student is
-        // actually enrolled in.
-
-        $classCodeString = $subject['folder']->getCodeString();
-
-        if ($config->get('student_teacher_class_visibility')) {
-            $classCodesRetained = [];
-            $classCodesComplete = explode(",", $classCodeString);
-
-            foreach ($sessionUser->getSubjectCollection() as $subjectCurrent) {
-                if (in_array($subjectCurrent['code'], $classCodesComplete)) {
-                    $classCodesRetained[] = $subjectCurrent['code'];
+            // If the config flag is enabled, restrict to seeing only the teacher(s) of the class the student is
+            // actually enrolled in.
+            $classCode = $folder->getCodeString();
+            if ($config->get('student_teacher_class_visibility')) {
+                $classCodesComplete = explode(',', $classCode);
+                $classCodesRetained = [];
+                foreach ($sessionUser->getSubjectCollection() as $subjectCurrent) {
+                    if (in_array($subjectCurrent['code'], $classCodesComplete, true)) {
+                        $classCodesRetained[] = $subjectCurrent['code'];
+                    }
                 }
+                $classCode = implode(",", $classCodesRetained);
             }
-
-            $classCodeString = implode(",", $classCodesRetained);
-        }
-
-        if ($classCodeString) {
-            $teacherCodes = $classHandler->getTeachers($classCodeString);
+        } elseif ($config->get('show_all_subjects')) {
+            $classCode         = (($subject['campusCode'] ?? '') !== '') ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
+            $subject['folder'] = (new Folder())->setCodes(new GenericCollection(FolderCode::class));
+            $subject['folder']->setName($subject['name'])->addCode((new FolderCode())->setCode($classCode));
         } else {
-            $campusCode   = $subject['campusCode'] ?? '';
-            $classCode    = $campusCode !== '' ? "$campusCode/{$subject['code']}" : $subject['code'];
-            $teacherCodes = $classHandler->getTeachers($classCode);
+            continue;
         }
+
+        $teacherCodes = $classHandler->getTeachers($classCode);
 
         if (is_array($teacherCodes) && count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([
