@@ -169,7 +169,7 @@ class Loader implements IConfigLoader
         $database = Factory::getInstanceInternal();
         $query    = $database->prepareQuery("SELECT name, value, field_id FROM config");
         $query->execute();
-        foreach ($query as $row) {
+        foreach ($query->getIterator() as $row) {
             $this->cache[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
         }
     }
