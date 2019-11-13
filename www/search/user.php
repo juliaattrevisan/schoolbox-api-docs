@@ -3,13 +3,13 @@
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Mail\AbstractMailer;
-use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
+use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
@@ -199,43 +199,43 @@ function renderStudent(
     $subjects      = [];
     $splitSubjects = $config->get('mysubjects_split');
     $teacherRoles  = $groupHandler->getStaffGroupTypeIds();
-    foreach ($synUserHandler->getSubjectList($student) as $subject) {
+    $codeMatcher   = (new SubjectCodeMatchFactory())->build($config->get('external_type'));
+    $subjectList   = $synUserHandler->getSubjectList($student);
+    foreach ($subjectList as $subject) {
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
-
         // Load a bunch of category and teacher info too
         $folder = $folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
         if ($folder) {
             $subject['folder'] = $folder;
             $subject['perms']  = $groupHandler->getPermission($folder->getId());
 
-            // If the config flag is enabled, restrict to seeing only the teacher(s) of the class the student is
-            // actually enrolled in.
-            $folderCodesString = $folder->getCodeString();
+            // If config flag enabled, only fetch teacher(s) for folder's codes which map to an enrolled subject
+            $taughtFolderCodes = $folder->getCodeString();
             if ($config->get('student_teacher_class_visibility')) {
-                $classCodesComplete = explode(',', $folderCodesString);
-                $classCodesRetained = [];
-                foreach ($sessionUser->getSubjectCollection() as $subjectCurrent) {
-                    if (in_array($subjectCurrent['code'], $classCodesComplete, true)) {
-                        $classCodesRetained[] = $subjectCurrent['code'];
+                $folderCodesRetained = [];
+                foreach (explode(',', $taughtFolderCodes) as $folderCode) {
+                    foreach ($subjectList as $enrolledSubject) {
+                        if ($codeMatcher->isMatch($folderCode, $enrolledSubject['campusCode'], $enrolledSubject['code'])) {
+                            $folderCodesRetained[] = $folderCode;
+                            break;
+                        }
                     }
                 }
-                $folderCodesString = implode(",", $classCodesRetained);
+                $taughtFolderCodes = implode(',', $folderCodesRetained);
             }
         } elseif ($config->get('show_all_subjects')) {
-            $subjectCode       = $subject['campusCode'] !== '' ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
             $subject['folder'] = (new Folder())
                 ->setName($subject['name'])
-                ->setCodes(new GenericCollection(FolderCode::class))
-                ->addCode((new FolderCode())->setCode($subjectCode));
+                ->setCodes(FolderCode::createCollection())
+                ->addCode((new FolderCode())->setCode($codeMatcher->generateFolderCode($subject['campusCode'], $subject['code'])));
             $subject['perms']  = UserAccess::ACCESS_DENY;
-            $folderCodesString = $subject['folder']->getCodeString();
+            $taughtFolderCodes = $subject['folder']->getCodeString();
         } else {
             continue;
         }
 
-        $teacherCodes = $classHandler->getTeachers($folderCodesString);
-
-        if (is_array($teacherCodes) && count($teacherCodes) > 0) {
+        $teacherCodes = $classHandler->getTeachers($taughtFolderCodes);
+        if (count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([
                 'synergy_id' => $teacherCodes,
                 'group_id'   => $teacherRoles,

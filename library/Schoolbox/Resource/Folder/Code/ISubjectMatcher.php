@@ -25,4 +25,16 @@ interface ISubjectMatcher
      * @return bool
      */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool;
+
+    /**
+     * Consistently generate a Schoolbox folder code from a SIS subject's campus+class codes
+     *
+     * TODO, consider a synergetic-specific implementation of this that uses a config flag to determine
+     *       whether the campusCode is prefixed.
+     *
+     * @param string|null $sisCampus
+     * @param string      $sisClass
+     * @return string
+     */
+    public function generateFolderCode(?string $sisCampus, string $sisClass): string;
 }

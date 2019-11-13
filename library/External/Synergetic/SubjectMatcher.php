@@ -7,23 +7,14 @@ declare(strict_types=1);
 
 namespace External\Synergetic;
 
-use Schoolbox\Resource\Folder\Code\ISubjectMatcher;
+use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
 use function in_array;
 
-class SubjectMatcher implements ISubjectMatcher
+class SubjectMatcher extends SubjectMatcherBase
 {
 
     /**
-     * Returns whether a Schoolbox folder code is an exact match for a subject's campus+class codes
-     *
-     * eg
-     *  (Synergetic) 'X/ABC' exactly matches ['X','ABC'] or ['','X/ABC']
-     *  (TASS) TODO
-     *
-     * @param string      $sbFolderCode A folder's folder code
-     * @param string|null $sisCampus    A subject's campus code
-     * @param string      $sisClass     A subject's class code
-     * @return bool
+     * @inheritDoc
      */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool
     {
