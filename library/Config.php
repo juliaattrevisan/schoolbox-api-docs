@@ -1,6 +1,6 @@
 <?php
 
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
 
@@ -39,7 +39,7 @@ class Config extends DeprecatedModel {
 
         static public function get($configName)
         {
-            return \Schoolbox\Config\ConfigMapper::getInstance()->get($configName);
+            return ConfigLoader::getInstance()->get($configName);
         }
 
         static public function set($configName, $configValue) {
@@ -54,7 +54,7 @@ class Config extends DeprecatedModel {
                         FROM `config`
                         INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
                         WHERE 1=1 ";
-                
+
                 /* filter out references to leave module if not enabled */
                 if (!self::get('boarder_leave_enabled')) {
                         $query .= "AND `config`.`type_id` != '".ConfigMapper::TYPE_BOARD."'";

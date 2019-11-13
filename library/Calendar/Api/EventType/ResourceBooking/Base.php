@@ -8,9 +8,9 @@
  */
 
 use Schoolbox\Calendar\EventType;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Calendar\Event\Collection;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatus;
@@ -54,9 +54,9 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
         parent::__construct($connectorId, $user, $viewer);
         // Ensure ResourceBooking module is enabled
 
-        $configMapper = ConfigMapper::getInstance();
+        $config = ConfigLoader::getInstance();
 
-        if (0 == $configMapper->get('resource_booking_enabled')) {
+        if (0 == $config->get('resource_booking_enabled')) {
             throw new DomainException('Resource Booking Module is disabled');
         }
 

@@ -11,6 +11,7 @@ use Alaress\Database\Connector\Base as Connector;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
@@ -87,7 +88,7 @@ class MSSQL
     public function __construct($db = false, $optionalConfig = false)
     {
         $this->connector = DatabaseFactory::getInstanceExternal();
-        $this->config = ConfigMapper::getInstance();
+        $this->config    = ConfigLoader::getInstance();
 
         /* If the external db is disabled, this is null
          */

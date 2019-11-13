@@ -8,8 +8,9 @@
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus as Campus;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
@@ -24,8 +25,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     /** @var IConnector $externalDatabase */
     private $externalDatabase;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
+    /** @var IConfigLoader $config */
+    private $config;
 
     /** @var UserMapper $userMapper */
     private $userMapper;
@@ -38,8 +39,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->userMapper   = UserMapper::getInstance();
-        $this->configMapper = ConfigMapper::getInstance();
+        $this->userMapper = UserMapper::getInstance();
+        $this->config     = ConfigLoader::getInstance();
 
         /** @noinspection PhpDeprecationInspection */
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
@@ -134,12 +135,12 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             $periodList[$period]['periodStart'] =
                 $lesson['startTime'] == ''
                     ? ''
-                    : date($this->configMapper->get('date_time'), strtotime($lesson['startTime']));
+                    : date($this->config->get('date_time'), strtotime($lesson['startTime']));
 
             $periodList[$period]['periodEnd'] =
                 $lesson['endTime'] == ''
                     ? ''
-                    : date($this->configMapper->get('date_time'), strtotime($lesson['endTime']));
+                    : date($this->config->get('date_time'), strtotime($lesson['endTime']));
 
             if (isset($periodList[$period]['day'][$day]) &&
                 !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
@@ -268,12 +269,12 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             $periodList[$period]['periodStart'] =
                 $lesson['startTime'] == ''
                     ? ''
-                    : date($this->configMapper->get('date_time'), strtotime($lesson['startTime']));
+                    : date($this->config->get('date_time'), strtotime($lesson['startTime']));
 
             $periodList[$period]['periodEnd'] =
                 $lesson['endTime'] == ''
                     ? ''
-                    : date($this->configMapper->get('date_time'), strtotime($lesson['endTime']));
+                    : date($this->config->get('date_time'), strtotime($lesson['endTime']));
 
             if (isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['ClassCode']])
             ) {

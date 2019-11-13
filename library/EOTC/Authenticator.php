@@ -8,7 +8,7 @@
  */
 namespace EOTC;
 
-use Schoolbox\Config\ConfigMapper as SchoolboxConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
@@ -42,7 +42,7 @@ class Authenticator
     public function __construct(\SitePage $page)
     {
         // Return 404 if EOTC is not enabled
-        if (0 == SchoolboxConfigMapper::getInstance()->get('eotc_enabled')) {
+        if (0 == ConfigLoader::getInstance()->get('eotc_enabled')) {
             $page->pageNotFound();
         }
 

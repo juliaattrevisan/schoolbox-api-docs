@@ -9,7 +9,7 @@
 
 use Alaress\Database\Connector\Base as Connector;
 use Alaress\Database\Factory as DatabaseFactory;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 
 class External_Edumate_Connection
@@ -35,7 +35,7 @@ class External_Edumate_Connection
     public function __construct()
     {
         $this->databaseFactory = new DatabaseFactory();
-        $this->config          = ConfigMapper::getInstance();
+        $this->config          = ConfigLoader::getInstance();
         $this->connect();
         $this->groupHandler = new Group();
         $this->userHandler  = new User();

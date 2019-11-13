@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,9 +13,8 @@ use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
-use InvalidArgumentException;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 
 class Connector extends AMQPConnector
@@ -49,7 +48,7 @@ class Connector extends AMQPConnector
 	public function __construct($settings = [])
     {
 		parent::__construct($settings);
-		$this->conf = ConfigMapper::getInstance();
+		$this->conf = ConfigLoader::getInstance();
 		$this->connect();
 	}
 

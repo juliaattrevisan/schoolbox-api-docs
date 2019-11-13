@@ -9,11 +9,7 @@
 namespace Schoolbox\Realtime;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Database;
 use InvalidArgumentException;
-use PDO;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NS;
@@ -282,7 +278,7 @@ class Controller extends BaseController
      */
     public function configure()
     {
-        $c = new Cronterpreter(ConfigMapper::getInstance()->get('date_time'));
+        $c = new Cronterpreter($this->getConfigLoader()->get('date_time'));
 
         // TODO lookup on mobile registry table
         $mobile = true;

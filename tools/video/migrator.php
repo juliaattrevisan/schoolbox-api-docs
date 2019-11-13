@@ -10,7 +10,7 @@
 
 use Aura\Di\Exception\ServiceNotFound;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -38,8 +38,8 @@ $app = new class extends CliTool\App{
             exit;
         }
 
-        /** @var ConfigMapper $configMapper */
-        $configMapper = $mapperFactory->get(ConfigMapper::class);
+        /** @var IConfigLoader $config */
+        $config = $this->getConfig();
 
         /** @var StorageMapper $storageMapper */
         $storageMapper = $mapperFactory->get(StorageMapper::class);
@@ -58,19 +58,19 @@ $app = new class extends CliTool\App{
         // Get transcoded files from local storage that we need to move
         // ------------------------------------------------------------------------------------------------------------
 
-        $globVideos = "{$configMapper->get("video_dir")}/*.mp4";
+        $globVideos = "{$config->get("video_dir")}/*.mp4";
         $log->info("Scanning '{$globVideos}'...");
         $videos = glob($globVideos);
 
-        $globAudios = "{$configMapper->get("video_dir")}/*.mp3";
+        $globAudios = "{$config->get("video_dir")}/*.mp3";
         $log->info("Scanning '{$globAudios}'...");
         $audios = glob($globAudios);
 
-        $globPosters = "{$configMapper->get("video_dir")}/*-poster.jpg";
+        $globPosters = "{$config->get("video_dir")}/*-poster.jpg";
         $log->info("Scanning '{$globPosters}'...");
         $posters = glob($globPosters);
 
-        $globThumbnails = "{$configMapper->get("video_dir")}/*-64.jpg";
+        $globThumbnails = "{$config->get("video_dir")}/*-64.jpg";
         $log->info("Scanning '{$globThumbnails}/*-64.jpg'...");
         $thumbnails = glob($globThumbnails);
 
@@ -102,7 +102,7 @@ $app = new class extends CliTool\App{
         $log->info("");
 
         // Obtain the destination
-        $storageDir = $configMapper->get("storage_dir");
+        $storageDir = $config->get("storage_dir");
 
         // ------------------------------------------------------------------------------------------------------------
         // Migrate videos

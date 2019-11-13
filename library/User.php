@@ -1,6 +1,6 @@
 <?php
 
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 
 
@@ -238,7 +238,7 @@ class User extends DeprecatedModel
 
         /* Show disabled users only if ticked (hide when unticked)
          */
-        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+        if (!ConfigLoader::getInstance()->get('show_disabled_users')) {
             $wherePart .= ' AND `user`.enabled = 1';
         }
 
@@ -289,7 +289,7 @@ class User extends DeprecatedModel
 
         /* Show disabled users only if ticked (hide when unticked)
          */
-        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+        if (!ConfigLoader::getInstance()->get('show_disabled_users')) {
             $wherePart .= ' AND `user`.enabled = 1';
         }
 

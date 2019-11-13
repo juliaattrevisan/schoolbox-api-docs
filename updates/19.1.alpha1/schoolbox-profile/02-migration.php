@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 use Alaress\Database;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -24,7 +24,7 @@ $app = new class extends CliTool\App
         $this->getDatabaseInternal()->beginTransaction();
         try {
             // sis_* tables are only used if using the schoolbox connector; don't bother migrating otherwise
-            if ('schoolbox' === ConfigMapper::getInstance()->get('external_type')) {
+            if ('schoolbox' === ConfigLoader::getInstance()->get('external_type')) {
                 $this->migrate();
             }
 

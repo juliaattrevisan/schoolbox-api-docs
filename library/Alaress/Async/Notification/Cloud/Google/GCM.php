@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,7 +13,7 @@ use GuzzleHttp\Client;
 use Monolog\Logger;
 use OverflowException;
 use RuntimeException;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 
@@ -77,7 +77,7 @@ class GCM extends AbstractService
     {
         $data = [
             'id'           => $id,
-            'title'        => ConfigMapper::getInstance()->get('title'),
+            'title'        => ConfigLoader::getInstance()->get('title'),
             'body'         => $title,
             'vibrate'      => true,
             'click_action' => 'MainActivity',
