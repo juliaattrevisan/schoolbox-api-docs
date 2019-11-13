@@ -1,6 +1,7 @@
 <?php
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Message\NSMapper;
 
 /**
@@ -27,10 +28,11 @@ if (empty($this->arg[0])) {
     $this->localRedir('/adminv2/messages/preview/digest');
 }
 
-$bob       = new \Alaress\Async\Notification\Instance\Builder(false);
-$decorator = new \Schoolbox\Realtime\Notification\Decorator();
-
-$coreContext = new \Schoolbox\Mail\CoreContext($this->getDi()->get('config'));
+/** @var IConfigLoader $config */
+$config      = $this->getDi()->get('config');
+$bob         = new \Alaress\Async\Notification\Instance\Builder(false);
+$decorator   = new \Schoolbox\Realtime\Notification\Decorator();
+$coreContext = new \Schoolbox\Mail\CoreContext($config);
 
 switch ($this->arg[0]) {
     case 'instant':
@@ -210,7 +212,7 @@ switch ($this->arg[0]) {
         break;
 }
 
-$direction = ConfigMapper::getInstance()->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
+$direction = $config->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
 
 $email->setContext($decorator->renderAsTwigContext($cctx, 0, $direction));
 

@@ -1,7 +1,7 @@
 <?php
 
 use Alaress\Mail\AbstractMailer;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
@@ -12,6 +12,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
 $this->setBlock('groupOwner', 'msg_enabled_followadmin', 'msg_enabled_followadmin_block');
@@ -125,8 +126,9 @@ if (is_numeric($this->arg[0])) {
 
     /* Messaging Enabled
      */
-    $messagingEnabled = ConfigMapper::getInstance()
-                                    ->get('messaging_enabled');
+    /** @var IConfigLoader $config */
+    $config           = $this->getDi()->get('config');
+    $messagingEnabled = $config->get('messaging_enabled');
 
     if ($messagingEnabled) {
         $this->parse('msg_enabled_block', 'msg_enabled');

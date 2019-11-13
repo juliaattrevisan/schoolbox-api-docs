@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
 
 if(!isset($this)) {
@@ -41,9 +41,10 @@ $this->setBlock('digest_online', 'role_digest', 'role_digest_block');
 $this->setBlock('role_digest', 'day_check', 'day_check_block');
 
 // global setting
-
-$enabled = ConfigMapper::getInstance()->get('messaging_enabled');
-$pushing = ConfigMapper::getInstance()->get('push_notifications_enabled');
+/** @var IConfigLoader $config */
+$config  = $this->getDi()->get('config');
+$enabled = $config->get('messaging_enabled');
+$pushing = $config->get('push_notifications_enabled');
 
 if($enabled) {
     $this->setVar(array(
