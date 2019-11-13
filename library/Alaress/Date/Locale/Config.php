@@ -15,7 +15,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use \Schoolbox\IConfigLoader;
 
 class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
@@ -32,7 +32,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
     public function getConfig(): IConfigLoader
     {
         if (!$this->config instanceof IConfigLoader) {
-            $this->setConfig(ConfigMapper::getInstance());
+            $this->setConfig(ConfigLoader::getInstance());
         }
 
         return $this->config;

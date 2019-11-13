@@ -29,8 +29,12 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        $conf = \Schoolbox\Config\ConfigMapper::getInstance();
-        $this->feed = new StandardFeed($conf, $this->getContext()->getId(), $this->getUser(), $this->getConfig('size'));
+        $this->feed = new StandardFeed(
+            $this->getConfigLoader(),
+            $this->getContext()->getId(),
+            $this->getUser(),
+            $this->getConfig('size')
+        );
         return true;
     }
 

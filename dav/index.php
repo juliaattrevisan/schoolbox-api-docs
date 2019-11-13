@@ -7,6 +7,7 @@
  */
 
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
 use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
@@ -46,7 +47,8 @@ $lockBackend = new Sabre\DAV\Locks\Backend\File(sys_get_temp_dir() . '/webdavloc
 $lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
 $server->addPlugin($lockPlugin);
 
-$config = \Schoolbox\Config\ConfigMapper::getInstance();
+/** @var IConfigLoader $config */
+$config = $kernel->get('config');
 $authBackendFactory = new DAV_Auth_Factory($config);
 $authPlugin = new Sabre\DAV\Auth\Plugin($authBackendFactory->build());
 $server->addPlugin($authPlugin);

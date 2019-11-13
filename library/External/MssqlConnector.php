@@ -9,8 +9,8 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as DatabaseFactory;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 trait External_MssqlConnector
@@ -27,7 +27,7 @@ trait External_MssqlConnector
     protected function setupDatabase()
     {
         $this->connector = DatabaseFactory::getInstanceExternal();
-        $this->config = ConfigMapper::getInstance();
+        $this->config    = ConfigLoader::getInstance();
     }
 
     /**
