@@ -18,7 +18,6 @@ use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
 use Schoolbox\Pastoral\Log\Model as PastoralLog;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -30,9 +29,6 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
-
-    /** @var ConfigMapper */
-    protected $configMapper;
 
     /** @var PastoralLogMapper */
     protected $pastoralLogMapper;
@@ -57,7 +53,6 @@ class Controller extends Base
      */
     public function __construct(IConfigLoader $configLoader)
     {
-        $this->setConfigMapper(ConfigMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setPastoralLogMapper(PastoralLogMapper::getInstance());
@@ -76,7 +71,7 @@ class Controller extends Base
                 'data'     => [
                     'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                     'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
-                    'externalEnabled' => $this->getConfigMapper()->get("external_pastoral"),
+                    'externalEnabled' => $this->getConfigLoader()->get("external_pastoral"),
                 ],
             ]
         );
@@ -197,26 +192,6 @@ class Controller extends Base
     public function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
-
-        return $this;
-    }
-
-    /***
-     * @return ConfigMapper
-     */
-    public function getConfigMapper()
-    {
-        return $this->configMapper;
-    }
-
-    /**
-     * @param ConfigMapper $configMapper
-     *
-     * @return self|$this
-     */
-    public function setConfigMapper($configMapper)
-    {
-        $this->configMapper = $configMapper;
 
         return $this;
     }

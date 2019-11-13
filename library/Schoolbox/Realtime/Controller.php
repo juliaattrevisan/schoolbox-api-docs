@@ -313,12 +313,12 @@ class Controller extends BaseController
             'fixtures'          => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT]
         );
 
-        $configMapper = ConfigMapper::getInstance();
+        $config = $this->getConfigLoader();
 
         foreach ($ns as $i=>$namespace) {
             foreach ($checkEnabled as $notifType=>$notifs) {
                 if(in_array($namespace->getSlug(), $notifs)){
-                    if(0 == $configMapper->get($notifType.'_enabled')){
+                    if(0 == $config->get($notifType.'_enabled')){
                         unset($ns[$i]);
                     }
                 }

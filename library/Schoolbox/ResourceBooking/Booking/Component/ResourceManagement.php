@@ -13,7 +13,6 @@ namespace Schoolbox\ResourceBooking\Booking\Component;
 
 use Component_Dashboard_ControllerAbstract;
 use Calendar_Api_EventType_ResourceBooking_Moderation_Default;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\ResourceBooking\Booking;
 use Twig_Environment;
 use Calendar_Api_Config_Mapper;
@@ -44,8 +43,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
     public function execute()
     {
         //Ensure ResourceBooking module is enabled
-        $configMapper = ConfigMapper::getInstance();
-        if(0 == $configMapper->get('resource_booking_enabled')){
+        if(0 == $this->getConfigMapper()->get('resource_booking_enabled')){
             return false;
         }
 

@@ -317,12 +317,12 @@ class Controller extends BaseController
             'fixtures'          => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT]
         );
 
-        $configMapper = ConfigMapper::getInstance();
+        $config = $this->getConfigLoader();
 
         foreach ($ns as $i=>$namespace) {
             foreach ($checkEnabled as $notifType=>$notifs) {
                 if(in_array($namespace->getSlug(), $notifs)){
-                    if(0 == $configMapper->get($notifType.'_enabled')){
+                    if(0 == $config->get($notifType.'_enabled')){
                         unset($ns[$i]);
                     }
                 }
@@ -333,8 +333,6 @@ class Controller extends BaseController
                                ->findAll()
                                ->indexBy('id')
                                ->getAll();
-
-        $config = $this->getConfig()->find($rolec->getColumnValues('id'));
 
         //Filtering out $config display further in Twig. Is there a more elegant solution?
 
@@ -347,7 +345,7 @@ class Controller extends BaseController
                 'ns'      => $ns,
                 'sources' => $sources,
                 'perms'   => $this->getConfig()->getPermissionList(),
-                'config'  => $config,
+                'config'  => $this->getConfig()->find($rolec->getColumnValues('id')),
             ]
         ]);
     }

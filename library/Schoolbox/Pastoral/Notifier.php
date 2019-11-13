@@ -37,9 +37,6 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
 
-    /** @var ConfigMapper $configMapper */
-    protected $configMapper;
-
     /** @var Mapper */
     protected $mapper;
 
@@ -63,10 +60,6 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        if (empty($dependencies["configMapper"])) {
-            $dependencies["configMapper"] = ConfigMapper::getInstance();
-        }
-
         if (empty($dependencies["l10n"])) {
             $stoneFactory = new RosettaStoneFactory();
             $dependencies["l10n"] = $stoneFactory->build(L10nMapper::getInstance());
@@ -135,7 +128,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
-        $parentAccessEnabled = $this->configMapper->get('pastoral_parent_access') == '1';
+        $parentAccessEnabled = $this->conf->get('pastoral_parent_access') == '1';
 
         /** @var Collection|PastoralAccess[] $accessRecords */
         $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
@@ -283,18 +276,6 @@ class Notifier extends AbstractModuleNotifier
     public function setPastoralAccessMapper(PastoralAccessMapper $pastoralAccessMapper)
     {
         $this->pastoralAccessMapper = $pastoralAccessMapper;
-
-        return $this;
-    }
-
-    /**
-     * @param ConfigMapper $configMapper
-     *
-     * @return self|$this
-     */
-    public function setConfigMapper(ConfigMapper $configMapper)
-    {
-        $this->configMapper = $configMapper;
 
         return $this;
     }

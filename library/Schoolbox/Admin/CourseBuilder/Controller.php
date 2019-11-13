@@ -10,9 +10,6 @@
 namespace Schoolbox\Admin\CourseBuilder;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\User;
-use Schoolbox\Resource\Storage;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -42,13 +39,6 @@ class Controller extends Base
     private $roleMapper;
 
     /**
-     * A ConfigMapper instance
-     *
-     * @var ConfigMapper
-     */
-    private $configMapper;
-
-    /**
      * A FolderMapper instance
      *
      * @var
@@ -63,7 +53,6 @@ class Controller extends Base
         $this->setCourseConfigMapper(CourseConfigMapper::getInstance());
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setRoleMapper(RoleMapper::getInstance());
-        $this->setConfigMapper(ConfigMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
     }
 
@@ -106,10 +95,10 @@ class Controller extends Base
                     'roles' => $this->getRoleMapper()->findAll(),
                     'permissions' => $permissions,
                     'templates' => $this->getHomepageTemplateMapper()->findAll()->sortBy("name", "asc"),
-                    'courseTemplate' => $this->getConfigMapper()->get('course_builder_default_course_page_template'),
-                    'unitTemplate' => $this->getConfigMapper()->get('course_builder_default_unit_page_template'),
-                    'courseInherit' => $this->getConfigMapper()->get('course_builder_default_course_page_inherit'),
-                    'unitInherit' => $this->getConfigMapper()->get('course_builder_default_unit_page_inherit')
+                    'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
+                    'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                    'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                    'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
                 ),
             )
         );
@@ -188,7 +177,7 @@ class Controller extends Base
 
     /**
      * Set course config mapper
-     * 
+     *
      * @param CourseConfigMapper $courseConfigMapper
      */
     private function setCourseConfigMapper($courseConfigMapper)
@@ -234,26 +223,6 @@ class Controller extends Base
     private function setRoleMapper($roleMapper)
     {
         $this->roleMapper = $roleMapper;
-    }
-
-    /**
-     * Get Config Mapper
-     *
-     * @return ConfigMapper
-     */
-    private function getConfigMapper()
-    {
-        return $this->configMapper;
-    }
-
-    /**
-     * Set Config Mapper
-     *
-     * @param ConfigMapper $configMapper
-     */
-    private function setConfigMapper($configMapper)
-    {
-        $this->configMapper = $configMapper;
     }
 
     /**
