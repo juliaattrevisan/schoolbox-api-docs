@@ -9,12 +9,11 @@
 
 namespace Schoolbox\Config;
 
-use ArrayAccess;
 use OutOfRangeException;
 use Schoolbox\Database\Factory;
 use Schoolbox\IConfigLoader;
 
-class Loader implements IConfigLoader, ArrayAccess
+class Loader implements IConfigLoader
 {
     /**
      * Cached config values.
@@ -80,6 +79,17 @@ class Loader implements IConfigLoader, ArrayAccess
             $this->loadCache();
         }
         return $this->cache[$var] ?? null;
+    }
+
+
+    /**
+     * Drop any cached config
+     *
+     * @return void
+     */
+    public function dropCache()
+    {
+        $this->cache = [];
     }
 
 
@@ -161,62 +171,5 @@ class Loader implements IConfigLoader, ArrayAccess
             default:
         }
         return $value;
-    }
-
-
-
-    /**
-     * Does this offset exist or not?
-     *
-     * Currently it is impossible to tell from Cfg::get() if a config option is
-     * blank or it does not exist, so this always returns true.
-     *
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return true;
-    }
-
-    /**
-     * Gets this config option.
-     *
-     * @param mixed $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * Config options are not writable from this class.
-     *
-     * @throws OutOfRangeException
-     */
-    public function offsetSet($offset, $value)
-    {
-        throw new OutOfRangeException('Schoolbox\\Config\\Loader is read-only');
-    }
-
-    /**
-     * Config options are not writable from this class.
-     *
-     * @throws OutOfRangeException
-     */
-    public function offsetUnset($offset)
-    {
-        throw new OutOfRangeException('Schoolbox\\Config\\Loader is read-only');
-    }
-
-    /**
-     * Drop any cached config
-     *
-     * @return void
-     */
-    public function dropCache()
-    {
-        $this->cache = [];
     }
 }
