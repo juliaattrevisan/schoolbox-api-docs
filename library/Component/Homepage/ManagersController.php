@@ -154,8 +154,8 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $userAccessMapper = new UserAccessMapper();
             $admins = $userAccessMapper->findAdminsInCategory($this->getContext());
 
-            $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
-            $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
+            $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
+            $studentPhotoHidden  = $this->getConfigLoader()->get('protect_student_photo');
             $viewer = $this->getUser();
 
             $i = 0;
@@ -167,7 +167,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     $emailall[] = Scrub::text($manager->getFormattedEmailDisplay());
                 }
 
-                if ($this->getUser()->getRole()->isStaff() && isset($emailall) && $this->getConfigMapper()->get('mail_enable')) {
+                if ($this->getUser()->getRole()->isStaff() && isset($emailall) && $this->getConfigLoader()->get('mail_enable')) {
                     $this->setVar([
                         "REPLYTO" => $this->getUser()->getEmail(),
                         "EMAILALL" => implode(AbstractMailer::implodeGlue(), array_unique($emailall)),

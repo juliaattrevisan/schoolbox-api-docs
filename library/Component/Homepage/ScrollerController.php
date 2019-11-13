@@ -27,7 +27,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->parseConfig();
 
         // Load images for the current homepage
-        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigMapper()->get('image_slideshow_max'));
+        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigLoader()->get('image_slideshow_max'));
 
         // Sort in a human way
         $allFiles = $allFiles->sortByCallback( function (Model $a, Model $b) {return strnatcasecmp($a->getTitle(), $b->getTitle());} );

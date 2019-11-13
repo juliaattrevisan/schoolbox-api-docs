@@ -135,8 +135,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $allStudentEmails = [];
             $synergyIds       = [];
 
-            $studentPhotoHidden   = $this->getConfigMapper()->get('protect_student_photo');
-            $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
+            $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
+            $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
 
             $viewer = $this->getUser();
 
@@ -207,7 +207,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
             /* Student bulk email
              */
-            if ($this->getContentPermission() > UserAccess::ACCESS_READ && $this->getConfigMapper()->get('mail_enable')) {
+            if ($this->getContentPermission() > UserAccess::ACCESS_READ && $this->getConfigLoader()->get('mail_enable')) {
                 $this->setVar([
                     'REPLY_TO' => $this->getUser()->getEmail(),
                     'EMAIL_ALL_STUDENTS' => implode(AbstractMailer::implodeGlue(), $allStudentEmails),
@@ -222,8 +222,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
              */
             if (count($synergyIds)
                 && $this->getContentPermission() > UserAccess::ACCESS_READ
-                && $this->getConfigMapper()->get('email_all_parents')
-                && $this->getConfigMapper()->get('mail_enable')
+                && $this->getConfigLoader()->get('email_all_parents')
+                && $this->getConfigLoader()->get('mail_enable')
             ) {
                 $externalHandler = new External_User();
                 $allParents      = $externalHandler->getParentEmails($synergyIds);

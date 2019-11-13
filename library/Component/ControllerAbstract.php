@@ -6,8 +6,8 @@
  */
 
 use Aura\Router\Router;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -61,8 +61,8 @@ abstract class Component_ControllerAbstract
     /** @var ErrorMapper $errorMapper */
     private $errorMapper;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
+    /** @var IConfigLoader $configLoader */
+    private $configLoader;
 
     /** @var int $maximumPermission The maximum permission allowed for this component */
     private $maximumPermission = UserAccess::ACCESS_FULL;
@@ -111,8 +111,8 @@ abstract class Component_ControllerAbstract
         /** @var ErrorMapper $errorMapper */
         $errorMapper = $mapperFactory->get(ErrorMapper::class);
 
-        /** @var ConfigMapper $configMapper */
-        $configMapper = $mapperFactory->get(ConfigMapper::class);
+        /** @var IConfigLoader $configLoader */
+        $configLoader = $sitepage->getDi()->get('config');
 
         $this
             ->setInstance($instance)
@@ -122,7 +122,7 @@ abstract class Component_ControllerAbstract
             ->setMapperFactory($mapperFactory)
             ->setFolderMapper($folderMapper)
             ->setErrorMapper($errorMapper)
-            ->setConfigMapper($configMapper);
+            ->setConfigLoader($configLoader);
     }
 
 
@@ -998,8 +998,8 @@ abstract class Component_ControllerAbstract
 
         $return = [];
 
-        foreach ($this->config as $key => $item) {
-            $return[$key] = $item['value'];
+        foreach ($this->config as $k => $v) {
+            $return[$k] = $v['value'];
         }
 
         return $return;
@@ -1252,20 +1252,20 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @return ConfigMapper
+     * @return IConfigLoader
      */
-    public function getConfigMapper()
+    public function getConfigLoader(): IConfigLoader
     {
-        return $this->configMapper;
+        return $this->configLoader;
     }
 
     /**
-     * @param ConfigMapper $configMapper
+     * @param IConfigLoader $configLoader
      * @return static
      */
-    public function setConfigMapper(ConfigMapper $configMapper)
+    public function setConfigLoader(IConfigLoader $configLoader): self
     {
-        $this->configMapper = $configMapper;
+        $this->configLoader = $configLoader;
         return $this;
     }
 }

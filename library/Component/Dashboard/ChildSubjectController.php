@@ -61,7 +61,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 continue;
             }
 
-            if ($this->getConfigMapper()->get('site_location') === 'wenona' && $child['gid'] == 3) {
+            if ($this->getConfigLoader()->get('site_location') === 'wenona' && $child['gid'] == 3) {
                 continue;
             }
 
@@ -73,9 +73,9 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar("STUDENT_YEAR", $userChild->getYear());
 
 
-            if ($this->getConfigMapper()->get('pastoral_enabled') &&
+            if ($this->getConfigLoader()->get('pastoral_enabled') &&
                 $this->getUser()->isParentOf($userChild) &&
-                $this->getConfigMapper()->get('pastoral_parent_access')) {
+                $this->getConfigLoader()->get('pastoral_parent_access')) {
                 $this->parse('pastoral_block', 'pastoral');
             } else {
                 $this->setVar('pastoral_block', '');
@@ -103,7 +103,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Diocesan Junior School Students don't have links to subjects
              */
-            if ($this->getConfigMapper()->get('site_location') === 'diocesan') {
+            if ($this->getConfigLoader()->get('site_location') === 'diocesan') {
                 if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)) {
                     $this->setVar([
                         'subject_item' => ''
@@ -117,13 +117,13 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Hide Due Work link from parents, if Due Work access is restricted
              */
-            if ($isParent && $this->getConfigMapper()->get('restrict_parent_duework_access')) {
+            if ($isParent && $this->getConfigLoader()->get('restrict_parent_duework_access')) {
                 $this->setVar('due_work_block', '');
             } else {
                 $this->parse('due_work_block', 'due_work');
             }
 
-            if ($isParent && $this->getConfigMapper()->get('restrict_parent_grades')) {
+            if ($isParent && $this->getConfigLoader()->get('restrict_parent_grades')) {
                 $this->setVar('grades_button_block', '');
             } else {
                 $this->parse('grades_button_block', 'grades_button');
@@ -147,7 +147,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Academic report link
             */
-            if ($this->getConfigMapper()->get('external_document_report_enabled')
+            if ($this->getConfigLoader()->get('external_document_report_enabled')
                 && $this->getConfigMapper()->get('external_document_button_enable')) {
                 $this->parse('reports_block', 'reports');
             } else {
@@ -175,7 +175,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             // School-specific buttons
-            if ('tigs' === $this->getConfigMapper()->get('site_location')) {
+            if ('tigs' === $this->getConfigLoader()->get('site_location')) {
                 $this->setBlock('student_block', 'continuous_report', 'continuous_report_block');
                 $route  = 'tigsParticipationReport.getReport';
                 $params = ['userId' => $userChild->getId(), 'user' => $userChild,];

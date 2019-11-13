@@ -43,7 +43,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
     public function execute()
     {
         //Ensure ResourceBooking module is enabled
-        if(0 == $this->getConfigMapper()->get('resource_booking_enabled')){
+        if(0 == $this->getConfigLoader()->get('resource_booking_enabled')){
             return false;
         }
 

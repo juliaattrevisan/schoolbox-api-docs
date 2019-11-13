@@ -163,11 +163,11 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
 
             $emailObj = new Email();
-            $emailVisible = new ValidEmailVisible($this->getExternalUser(), $this->getConfigMapper());
+            $emailVisible = new ValidEmailVisible($this->getExternalUser(), $this->getConfigLoader());
             $emailall = [];
 
-            $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
-            $studentPhotoHidden   = $this->getConfigMapper()->get('protect_student_photo');
+            $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
+            $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
             $viewer = $this->getUser();
 
             if ($userListCount > 0) {
@@ -250,7 +250,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                 $this->setVar("EMAILALL", implode(AbstractMailer::implodeGlue(), array_unique($emailall)));
 
-                if ($this->getConfigMapper()->get('mail_enable')) {
+                if ($this->getConfigLoader()->get('mail_enable')) {
                     $this->parse("member_email_block", "member_email");
                 } else {
                     $this->setVar([

@@ -82,7 +82,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigMapper()->get('image_slideshow_max'));
+        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigLoader()->get('image_slideshow_max'));
 
         if ($this->getConfig('randomStartingSlide')) {
             $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
