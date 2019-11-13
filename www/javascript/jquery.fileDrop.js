@@ -180,10 +180,7 @@
                             $.post(
                                 self.options.refreshUrl,
                                 self.options.refreshData
-                            )
-                                .done(function(data) {
-                                    $(self.options.refreshSelector).empty().append($(data).children());
-                                });
+                            );
                         }, self.options.refreshTimeout);
                     }
 
