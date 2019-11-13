@@ -59,7 +59,7 @@ if (count($this->arg) < 3) {
 }
 
 // Finagle path parameters
-[$classCampus, $classCode, $date, $attendancePeriods, $timetableGroup] = $this->arg;
+[$classCampus, $classCode, $date, $attendancePeriods, $timetableGroup, $fileType] = $this->arg;
 $classCode         = urldecode(urldecode(urldecode($classCode)));
 $attendancePeriods = explode(',', $attendancePeriods);
 
@@ -82,11 +82,13 @@ $externalClass = new External_Synergetic_Class();
 $externalTimetable = new External_Timetable();
 $externalUserHandler = new External_User();
 
-if ($classCampus) {
-    $class = $externalClass->getClass($classCampus . '/' . $classCode, $_SESSION['user']);
-} else {
-    $class = $externalClass->getClass($classCode, $_SESSION['user']);
-}
+/* Manufacture a specific class construct
+ */
+$class= [
+    'FileType' => $fileType,
+    'ClassCampus' => $classCampus,
+    'ClassCode' => $classCode,
+];
 
 if (!$class) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
