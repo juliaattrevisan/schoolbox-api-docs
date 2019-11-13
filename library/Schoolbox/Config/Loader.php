@@ -20,7 +20,7 @@ class Loader implements IConfigLoader
      *
      * @var array
      */
-    private $cache = [];
+    private $cache;
 
 
     /**
@@ -28,7 +28,7 @@ class Loader implements IConfigLoader
      *
      * @var array
      */
-    private $consts = [];
+    private $pathConstants;
 
 
     /**
@@ -69,13 +69,16 @@ class Loader implements IConfigLoader
      */
     public function get($var)
     {
-        if (isset($this->consts[$var])) {
-            return $this->consts[$var];
+        if (!isset($this->pathConstants)) {
+            $this->loadPathConstants();
+        }
+        if (isset($this->pathConstants[$var])) {
+            return $this->pathConstants[$var];
         }
         if (defined($var)) {
             return constant($var);
         }
-        if (empty($this->cache)) {
+        if (!isset($this->cache)) {
             $this->loadCache();
         }
         return $this->cache[$var] ?? null;
@@ -126,7 +129,10 @@ class Loader implements IConfigLoader
      */
     public function __isset($name): bool
     {
-        if (isset($this->consts[$name])) {
+        if (!isset($this->pathConstants)) {
+            $this->loadPathConstants();
+        }
+        if (isset($this->pathConstants[$name])) {
             return true;
         }
         if (defined($name)) {
@@ -136,6 +142,20 @@ class Loader implements IConfigLoader
             $this->loadCache();
         }
         return isset($this->cache[$name]);
+    }
+
+
+    /**
+     * Load path-related constants
+     */
+    private function loadPathConstants(): void
+    {
+        $w                   = SITE_root;
+        $this->pathConstants = array(
+            'siteRoot' => $w,
+            'webRoot'  => "$w/www",
+            'webBase'  => ''
+        );
     }
 
 
