@@ -304,7 +304,7 @@ class Controller extends Assessment\Controller
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
         $dateNow = \Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
 
-        $zip = new Zip("{$titleSanitized}-{$dateNow}.zip");
+        $zip = new Zip($this->getConfigLoader(), "{$titleSanitized}-{$dateNow}.zip");
 
         // Iterate participants and get their responses
 
