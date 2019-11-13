@@ -484,6 +484,10 @@ class User extends DeprecatedModel
     /**
      * Update an existing user's details
      *
+     * TODO remove this and update/remove everywhere which uses it:
+     * * sync scripts
+     * * bulk user modify
+     *
      * @param array $user
      * @return bool
      */
@@ -548,6 +552,10 @@ class User extends DeprecatedModel
 
     /**
      * Create a new user record
+     *
+     * TODO remove this and update/remove everywhere which uses it:
+     * * sync scripts
+     * * bulk user modify
      *
      * @param array $user
      *

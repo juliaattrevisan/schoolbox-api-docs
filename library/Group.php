@@ -246,36 +246,6 @@ class Group extends DeprecatedModel
         $this->update($data);
     }
 
-    /**
-     * Update service types for a user.
-     *
-     * @param <type> $sid
-     * @param <type> $uid
-     * @param <type> $type
-     */
-    function setUserGroupType($sid, $uid, $type)
-    {
-        $query = "UPDATE userAccess SET type = '$type' WHERE uid = '$uid' AND service = '" . $this->_service . "' AND sid = '$sid'";
-        if ($this->db->query($query)) {
-            $this->getUserNotifier()->manualNotifyUpdated($uid, $_SESSION['user']);
-        }
-    }
-
-    /**
-     * Update sid value for a user.
-     *
-     * @param <type> $sid
-     * @param <type> $uid
-     * @param <type> $type
-     */
-    function setSID($previousSid, $sid, $uid)
-    {
-        $query = "UPDATE userAccess SET sid = '$sid' WHERE uid = '$uid' AND service = '" . $this->_service . "' AND sid = '$previousSid'";
-        if ($this->db->query($query)) {
-            $this->getUserNotifier()->manualNotifyUpdated($uid, $_SESSION['user']);
-        }
-    }
-
     function getOwner($relationID)
     {
 
@@ -346,6 +316,16 @@ class Group extends DeprecatedModel
         }
     }
 
+    /**
+     * TODO remove this and update/remove everywhere which uses it:
+     * * sync scripts
+     * * add users to group
+     *
+     * @param     $relationID
+     * @param     $userID
+     * @param int $type
+     * @return bool
+     */
     function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
     {
         if (!$this->isUser($relationID, $userID)) {
@@ -365,6 +345,9 @@ class Group extends DeprecatedModel
 
     /**
      * Deletes a uid also can optionally delete a user based on its permission
+     *
+     * TODO remove this and update/remove everywhere which uses it:
+     * * group delete
      *
      * @param $relationID
      * @param $userID
@@ -407,12 +390,6 @@ class Group extends DeprecatedModel
         return $this->getPermission($category_id, $user_id) >= UserAccess::ACCESS_READ
         && $this->isParent($user_id)
         && !$this->involvedInGroup($user_id, $category_id);
-    }
-
-    function setUserPermission($relationID, $userID, $type = UserAccess::ACCESS_READ)
-    {
-        $this->deleteUser($relationID, $userID);
-        return $this->addUser($relationID, $userID, $type);
     }
 
     /**
