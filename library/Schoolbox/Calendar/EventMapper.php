@@ -597,14 +597,57 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
     /**
      * Removes all events from this folder ID
-     *
      * @param int $cid
+     * @throws Exception
+     * @throws Exception\Deleted
      */
-    public function homepageClean($cid)
+    public function homepageClean($cid): void
     {
+        // Get ids of all events which do not belong to
+        // any other folder other than the current one
+        $folderSpecificEventIds = $this->getFolderSpecificEventIds($cid);
+
         // deleteByColumn doesn't work as expected when querying a join column,
         // because the delete string doesn't contain the joins the select does.
         // Fortunately delete(findByColumn()) works.
         $this->getJoinMapper('category')->deleteByColumn('category_id', $cid);
+
+        if (!empty($folderSpecificEventIds)) {
+            // soft delete events do not belong to any folder; if there is any
+            $this->deleteFolderSpecificEvents($folderSpecificEventIds);
+        }
+    }
+
+    /**
+     * Returns ids of events which only belong to the
+     * folder and not any other ones if there is any.
+     *
+     * @param int $cid
+     * @return array
+     */
+    private function getFolderSpecificEventIds($cid): array
+    {
+        $folderSpecificEventIds = [];
+
+        foreach ($this->getJoinMapper('category')->findByColumn('category_id', $cid)->getAll() as $eventCat) {
+            $belongsToOtherFolders = $this->getJoinMapper('category')->findByColumn('event_id', $eventCat->getEventId())->getAll();
+            if (count($belongsToOtherFolders) < 2) {
+                $folderSpecificEventIds[] = $eventCat->getEventId();
+            }
+        }
+
+        return $folderSpecificEventIds;
+    }
+
+    /**
+     * @param array $folderEventIds
+     * @throws Exception
+     * @throws Exception\Deleted
+     */
+    private function deleteFolderSpecificEvents(array $folderEventIds): void
+    {
+        foreach ($folderEventIds as $eventId) {
+            $this->softDelete($this->findById($eventId));
+        }
     }
 }
