@@ -64,7 +64,7 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
-    private const THIS_YEAR = 'this year';
+    private const THIS_YEAR = 'this year'; // TODO first day of year
     private const PAST_6_MONTHS = '6 months ago';
     private const PAST_3_MONTHS = '3 months ago';
     private const PAST_MONTH = '1 month ago';
