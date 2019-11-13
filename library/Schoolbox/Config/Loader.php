@@ -84,6 +84,52 @@ class Loader implements IConfigLoader, ArrayAccess
 
 
     /**
+     * Get a config variable
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->get($name);
+    }
+
+
+    /**
+     * Config options are not writable here.
+     *
+     * @param string $name
+     * @param mixed  $value
+     * @throws OutOfRangeException
+     */
+    public function __set($name, $value)
+    {
+        throw new OutOfRangeException(sprintf('"%s" is read-only', __CLASS__));
+    }
+
+
+    /**
+     * Does this config setting exist or not?
+     *
+     * @param  mixed $name
+     * @return bool
+     */
+    public function __isset($name): bool
+    {
+        if (isset($this->consts[$name])) {
+            return true;
+        }
+        if (defined($name)) {
+            return true;
+        }
+        if (empty($this->cache)) {
+            $this->loadCache();
+        }
+        return isset($this->cache[$name]);
+    }
+
+
+    /**
      * Load cached config values
      */
     private function loadCache(): void
