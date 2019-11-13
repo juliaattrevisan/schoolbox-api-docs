@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Database;
 use Schoolbox\Resource\LogMapper;
-use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;

@@ -15,7 +15,6 @@ use Database;
 use Mailer;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Swift_Transport;

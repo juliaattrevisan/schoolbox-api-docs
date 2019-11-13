@@ -8,7 +8,6 @@
  */
 namespace Schoolbox\Comms\News\Search;
 use Alaress\Database\Connector\IConnector;
-use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment;

@@ -9,7 +9,6 @@
  */
 
 use Alaress\Async\AMQP\Bunny\BunnyControl;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';

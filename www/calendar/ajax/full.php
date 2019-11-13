@@ -8,7 +8,7 @@
  */
 
 use Calendar\Api\ModuleChecker;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /** @var SitePage $this */
 $user_mapper = new \Schoolbox\UserMapper();
@@ -30,6 +30,6 @@ $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $this->arg[0],
     $viewer,
     $factory,
-    new ModuleChecker(ConfigMapper::getInstance())
+    new ModuleChecker(ConfigLoader::getInstance())
 );
 $calendar->render();

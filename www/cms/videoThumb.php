@@ -10,11 +10,8 @@
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
-use Schoolbox\Video\Queue as VideoQueue;
 use Schoolbox\Video\QueueMapper;
 
 $type = $_GET['type'];

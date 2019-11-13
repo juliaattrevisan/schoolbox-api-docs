@@ -28,7 +28,6 @@ use Schoolbox\RoleMapper;
 use Alaress\Redis;
 use Schoolbox\MobileApp;
 use Schoolbox\UserMapper;
-use Schoolbox\Config\ConfigMapper;
 
 class Controller extends BaseController
 {

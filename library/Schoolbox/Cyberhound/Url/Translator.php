@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Cyberhound\Url;
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Zend\Uri\Uri;

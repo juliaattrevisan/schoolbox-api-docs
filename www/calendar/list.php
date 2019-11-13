@@ -7,12 +7,11 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Database\Exception as AlaressDatabaseException;
 use Calendar\Api\ModuleChecker;
 use Calendar\Event\Collection\Lister;
 use Calendar\Event\Type\EventBase;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 $userMapper = new \Schoolbox\UserMapper();
 
@@ -151,7 +150,7 @@ $campus_list = $calendarHandler->getFilterCampusList($user->getId());
 
 // Load sources
 
-$moduleChecker = new ModuleChecker(ConfigMapper::getInstance());
+$moduleChecker = new ModuleChecker(ConfigLoader::getInstance());
 
 // This will be broken now getSourceListForCalendar returns ids as a list.
 // Doesn't matter, this is going away.

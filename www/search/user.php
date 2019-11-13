@@ -1,8 +1,8 @@
 <?php
 
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 use Alaress\Mail\AbstractMailer;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
@@ -495,7 +495,7 @@ if (is_numeric($this->arg[0])) {
 
     $userHandler  = new User();
     $groupHandler = new Group();
-    $config       = ConfigMapper::getInstance();
+    $config       = ConfigLoader::getInstance();
 
     $user = $userHandler->getByID($this->arg[0]);
 

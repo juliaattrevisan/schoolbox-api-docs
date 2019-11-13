@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\SelectKey;
 
-use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Admin\Settings\FieldType\Select;
 

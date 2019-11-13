@@ -1,6 +1,5 @@
 <?php
 use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Message\NSMapper;
 
