@@ -29,7 +29,7 @@
 </label>
 
 {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-{% if descriptorHasMarkRange %}
+{% if descriptorHasMarkRange and not studentView %}
     {# Render a dropdown to select a value from the range #}
 
     <select id="rangeDropdown-{{ descriptor.id }}"
