@@ -15,6 +15,7 @@ use Alaress\Json\SerializeTrait;
 use Alaress\Json\Serializable;
 use House;
 use HouseResidential;
+use Schoolbox\Config\Config;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
@@ -25,6 +26,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
@@ -1092,14 +1094,13 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             $subjects = $externalUser->getSubjectList($this);
 
             // Iterate and find teachers associated with each subject
+            $codeMatcher = (new SubjectCodeMatchFactory())->build(\Config::get('external_type'));
 
             if (is_array($subjects))
             {
                 foreach ($subjects as $subject)
                 {
-                    $campusCode = $subject['campusCode'] ?? '';
-                    $classCode  = $campusCode !== '' ? "$campusCode/{$subject['code']}" : $subject['code'];
-                    $teachers   = $externalClass->getTeachers($classCode);
+                    $teachers = $externalClass->getTeachers($codeMatcher->generateFolderCode($subject['campusCode'], $subject['code']));
 
                     foreach ($teachers as $teacher)
                     {
