@@ -11,7 +11,6 @@ namespace Alaress\File\Remote;
 
 use DomainException;
 use OutOfBoundsException;
-use \Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -68,9 +67,9 @@ class GDriveFetcher implements FetcherInterface
     ];
 
     /**
-     * @var ConfigLoader
+     * @var bool
      */
-    private $configLoader;
+    private $allowPdfExport;
 
     /**
      * @var false|resource
@@ -95,13 +94,21 @@ class GDriveFetcher implements FetcherInterface
 
 
     /**
-     * @param ExtensionMapper $extensionMapper
-     * @param string          $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
-     * @param resource        $curl       - a custom curl handle if a default won't suffice
-     * @param string          $httpAuth   - an authorization header if not using an anonymous connection
+     * Constructor
+     *
+     * @param ExtensionMapper $extensionMapper a mapper for loading extensions from
+     * @param string          $storageDir      the target storage directory: typically `sys_get_temp_dir()`
+     * @param resource        $curl            a custom curl handle if a default won't suffice
+     * @param string          $httpAuth        an authorization header if not using an anonymous connection
+     * @param bool            $allowPdfExport  Can this export PDFs?
      */
-    public function __construct(ExtensionMapper $extensionMapper, string $storageDir, $curl = null, string $httpAuth = '')
-    {
+    public function __construct(
+        ExtensionMapper $extensionMapper,
+        string $storageDir,
+        $curl = null,
+        string $httpAuth = '',
+        bool $allowPdfExport = true
+    ) {
         $this->extensionMapper = $extensionMapper;
         $this->dir = $storageDir;
         $this->ch  = $curl ?: curl_init();
@@ -112,8 +119,7 @@ class GDriveFetcher implements FetcherInterface
             ));
         }
 
-        // TODO inject (config setting only)
-        $this->configLoader = new ConfigLoader();
+        $this->allowPdfExport = $allowPdfExport;
     }
 
     /**
@@ -132,7 +138,7 @@ class GDriveFetcher implements FetcherInterface
      */
     private function isPdfExportEnabled(array $metadata): bool
     {
-        return $this->configLoader->get('googledrive_export_pdf') && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
+        return $this->allowPdfExport && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
     }
 
     /**
