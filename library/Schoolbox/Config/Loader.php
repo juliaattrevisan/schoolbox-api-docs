@@ -11,6 +11,7 @@ namespace Schoolbox\Config;
 
 use ArrayAccess;
 use OutOfRangeException;
+use Schoolbox\Database\Factory;
 use Schoolbox\IConfigLoader;
 
 class Loader implements IConfigLoader, ArrayAccess
@@ -21,6 +22,14 @@ class Loader implements IConfigLoader, ArrayAccess
      * @var array
      */
     private $cache = [];
+
+
+    /**
+     * Constants
+     *
+     * @var array
+     */
+    private $consts = [];
 
 
     /**
@@ -61,8 +70,54 @@ class Loader implements IConfigLoader, ArrayAccess
      */
     public function get($var)
     {
-        return ConfigMapper::getInstance()->get($var);
+        if (isset($this->consts[$var])) {
+            return $this->consts[$var];
+        }
+        if (defined($var)) {
+            return constant($var);
+        }
+        if (empty($this->cache)) {
+            $this->loadCache();
+        }
+        return $this->cache[$var] ?? null;
     }
+
+
+    /**
+     * Load cached config values
+     */
+    private function loadCache(): void
+    {
+        // Sorry, I know this should be injected but the amount of configs
+        // strewn everywhere make that impossible
+        $database = Factory::getInstanceInternal();
+        $query    = $database->prepareQuery("SELECT name, value, field_id FROM config");
+        $query->execute();
+        foreach ($query as $row) {
+            $this->cache[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
+        }
+    }
+
+
+    /**
+     * Light-weight hydration to respect boolean fields
+     *
+     * @param int   $fieldId
+     * @param mixed $value
+     * @return mixed
+     */
+    private function hydrateValue(int $fieldId, $value)
+    {
+        switch ($fieldId) {
+            case ConfigMapper::FIELD_BOOLEAN:
+            case ConfigMapper::FIELD_CHECKBOX:
+                return $value === null ? null : (bool)$value;
+            default:
+        }
+        return $value;
+    }
+
+
 
     /**
      * Does this offset exist or not?
@@ -116,6 +171,6 @@ class Loader implements IConfigLoader, ArrayAccess
      */
     public function dropCache()
     {
-        ConfigMapper::getInstance()->dropCache();
+        $this->cache = [];
     }
 }
