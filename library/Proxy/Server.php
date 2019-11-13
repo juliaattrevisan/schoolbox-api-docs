@@ -31,6 +31,8 @@ class Server
     /**
      * Return the Singleton ProxyServer instance.
      *
+     * TODO replace this with a DI'd proxy, or even a DI'd CURL client
+     *
      * @return Server
      */
     public static function getInstance()
