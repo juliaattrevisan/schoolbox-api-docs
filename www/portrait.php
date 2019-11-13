@@ -12,9 +12,13 @@
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
+use Schoolbox\IConfigLoader;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+
+/** @var IConfigLoader $config */
+$config = $kernel->getDependencyInjector()->get('config');
 
 /* If current user is not available return permission denied */
 if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
@@ -37,7 +41,14 @@ try {
 
 try {
     $image = new Image\Processor\Standard(
-        new Image\Cache\Portrait($user, $_GET['size'], $_SESSION['user']),
+        new Image\Cache\Portrait(
+            $user,
+            $_GET['size'],
+            $_SESSION['user'],
+            (bool)$config->get('photo_sis_import'),
+            (bool)$config->get('protect_student_photo'),
+            (int)$config->get('protect_teacher_photo')
+        ),
         new Image\Transformation\Portrait(),
         new Imagine\Filetype\Factory(),
         new Imagine\Processor\Strategy\Factory()
