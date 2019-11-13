@@ -44,7 +44,8 @@ class Instance {
      * @return bool
      */
     public static function isEnabled() {
-        return Config::get('debug_mode');
+        return false;
+//        return Config::get('debug_mode');
     }
 
 }
