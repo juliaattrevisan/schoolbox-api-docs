@@ -159,6 +159,8 @@ abstract class Base implements IBroker
             $this->pdo->exec($sql);
         }
 
+        // Don't do this until after connecting
+        // (probably on whatever the first query is?)
         if (DebugBar::isEnabled()) {
             $this->installCollector();
 
