@@ -6,7 +6,7 @@ All Codeception integration tests go in this folder. Smoke tests also live here 
 ## Structure
 
 Same as the structure in acceptance tests, you can see it here: 
-[Acceptance Tests](./test/codeception/acceptance/README.md).
+[Acceptance Tests](../acceptance/README.md).
 
 Smoke tests currently live in SmokeTests/
 
@@ -21,7 +21,7 @@ This is to increase the speed of tests.
 ### Configuration
 
 Same as acceptance tests as they are all based on the same framework. 
-Found in documentation here: [Acceptance Tests](./test/codeception/acceptance/README.md).
+Found in documentation here: [Acceptance Tests](../acceptance/README.md).
 
 
 ### What is covered by the smoke tests
@@ -29,7 +29,7 @@ Found in documentation here: [Acceptance Tests](./test/codeception/acceptance/RE
 Currently at the moment (13/11/2019) this is what is covered by the tests. For this list to be relevant we will need to keep it up to date.
 
 * Get requests
-    * full list of URLs being tested and combinations are in this csv: ./test/codeception/_data/SmokeTests/GetSmokeTestList.csv
+    * full list of URLs being tested and combinations are in this csv: [./_data/SmokeTests/GetSmokeTestList.csv](../_data/SmokeTests/GetSmokeTestList.csv)
 * Group and Homepage Assessment
     * Create assessment with no self reflection, no online submission, published, weight >0, use rubric true 
        * Create
@@ -117,7 +117,7 @@ None as of yet.
 
 #### Smoke Tests
 
-See `test/codeception/integration/SmokeTests/LoginCest.php` for an example - it shows an example of a simple creation of a payload and then firing it off at the schoolbox endpoint.
+See [test/codeception/integration/SmokeTests/LoginCest.php](SmokeTests/LoginCest.php) for an example - it shows an example of a simple creation of a payload and then firing it off at the schoolbox endpoint.
 
 ### Guidelines
 
