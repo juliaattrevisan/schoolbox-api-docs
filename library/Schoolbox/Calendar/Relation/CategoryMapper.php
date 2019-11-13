@@ -24,7 +24,7 @@ class CategoryMapper extends Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('event_category');
+        $this->hasTable('event_folder');
         $this->hasModel(Category::class);
 
         $this->hasMap(
