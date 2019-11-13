@@ -188,7 +188,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $encodedClass = urlencode(urlencode(urlencode($class['code'])));
                 $periodLink   = implode(',', $class['AttendancePeriods']);
                 $classLink    = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
-                return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$periodLink}/{$campusList[$campusId]->getExtTimetableCode()}";
+                return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$periodLink}/{$campusList[$campusId]->getExtTimetableCode()}/{$class['FileType']}";
             case 'tass':
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 [$year, $subject, $class] = explode('-', $class['code']);
