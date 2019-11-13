@@ -431,7 +431,7 @@ class Controller extends Base
                         $startOfDateRange = Alaress_Date_Format::now()->startOfDay();
                         break;
                     default:
-                        $startOfDateRange = Alaress_Date_Format::newFromTimestamp($timestamp);
+                        $startOfDateRange = Alaress_Date_Format::newFromTimestamp($timestamp)->startOfDay();
                 }
 
                 $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort(Alaress_Date_Format::now()));
