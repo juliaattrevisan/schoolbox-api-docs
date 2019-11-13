@@ -41,8 +41,6 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRelations;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
-// TODO inject instance of this wherever it's used
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -50,6 +48,7 @@ use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -59,6 +58,11 @@ use Alaress\Database\Connector\IConnector;
 
 class External_Liss_Server
 {
+    /**
+     * @var IConfigLoader
+     */
+    private $config;
+
     /** @var IConnector */
     private $externalDb;
 
@@ -70,11 +74,12 @@ class External_Liss_Server
      *
      * @param IConnector|null $externalDb
      */
-    public function __construct(IConnector $externalDb = null)
+    public function __construct(IConfigLoader $config, IConnector $externalDb = null)
     {
+        $this->config     = $config;
         $this->externalDb = $externalDb;
 
-        $logFile = fopen(Cfg::get('logs_dir') . '/liss.log', 'a');
+        $logFile = fopen($config->get('logs_dir') . '/liss.log', 'a');
         $this->log = new Logger($logFile, $logFile, Monolog\Logger::INFO, [], true);
     }
     /**
@@ -255,7 +260,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info("publishClassMemberships: processing request");
@@ -318,7 +323,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -350,7 +355,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -382,7 +387,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -416,7 +421,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -453,7 +458,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
 
@@ -508,7 +513,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
 
@@ -609,7 +614,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info("publishBellTimes: processing request");
@@ -688,7 +693,7 @@ class External_Liss_Server
      */
     public function publishDailyData(xmlrpcmsg $message): \xmlrpcresp
     {
-        $configLoader = new ConfigLoader();
+        $configLoader = $this->config;
         $helper = new PublishDailyDataHelper($configLoader);
         $eventMapper = EventMapper::getInstance();
         $eventTypeMapper = EventTypeMapper::getInstance();
@@ -944,17 +949,15 @@ class External_Liss_Server
      */
     private function isSchoolboxConnector(): bool
     {
-        $config = new ConfigLoader();
-
         /* External must be enabled
          */
-        if (!$config->get('external_enable')) {
+        if (!$this->config->get('external_enable')) {
             return false;
         }
 
         /* External must also be schoolbox connector
          */
-        return $config->get('external_type') === 'schoolbox';
+        return $this->config->get('external_type') === 'schoolbox';
     }
 
     /**

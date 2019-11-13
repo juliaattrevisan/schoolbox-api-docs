@@ -2,7 +2,7 @@
 
 use Alaress\Lumberjack\Logger;
 
-use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\IConfigLoader;
 
 /**
  * Authenticator
@@ -49,18 +49,18 @@ class External_Liss_Authenticator
     private $log;
 
     /**
-     * @var ConfigLoader
+     * @var IConfigLoader
      */
     private $configLoader;
 
     /**
      * External_Liss_Authenticator constructor.
      *
-     * @param xmlrpcval    $dataObject
-     * @param Logger       $log
-     * @param ConfigLoader $configLoader
+     * @param xmlrpcval     $dataObject
+     * @param Logger        $log
+     * @param IConfigLoader $configLoader
      */
-    public function __construct(xmlrpcval $dataObject, Logger $log, ConfigLoader $configLoader)
+    public function __construct(xmlrpcval $dataObject, Logger $log, IConfigLoader $configLoader)
     {
         $this->setDataObject($dataObject);
         $this->setLog($log);
@@ -208,7 +208,7 @@ class External_Liss_Authenticator
     }
 
     /**
-     * @return ConfigLoader
+     * @return IConfigLoader
      */
     public function getConfigLoader()
     {
@@ -216,7 +216,7 @@ class External_Liss_Authenticator
     }
 
     /**
-     * @param ConfigLoader $configLoader
+     * @param IConfigLoader $configLoader
      * @return $this
      */
     public function setConfigLoader($configLoader)

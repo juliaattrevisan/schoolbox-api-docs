@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $externalDb = $kernel->get('databaseExternal');
-$liss = new External_Liss_Server($externalDb);
+$liss = new External_Liss_Server($kernel->get('config'), $externalDb);
 
 $log = $liss->log();
 

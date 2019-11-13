@@ -14,8 +14,8 @@ namespace External\Liss\Helper;
 
 use Event\Source\Model as EventSource;
 use Event\Source\Mapper as EventSourceMapper;
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Calendar\Event;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use xmlrpcval;
 
@@ -27,15 +27,15 @@ class PublishDailyData
     const EVENT_SOURCE_NAME = 'liss';
 
     /**
-     * @var ConfigLoader
+     * @var IConfigLoader
      */
     private $configLoader;
 
     /**
      * Helper constructor.
-     * @param ConfigLoader $configLoader
+     * @param IConfigLoader $configLoader
      */
-    public function __construct(ConfigLoader $configLoader)
+    public function __construct(IConfigLoader $configLoader)
     {
         $this->setConfigLoader($configLoader);
     }
@@ -144,7 +144,7 @@ class PublishDailyData
      */
 
     /**
-     * @return ConfigLoader
+     * @return IConfigLoader
      */
     public function getConfigLoader()
     {
@@ -152,7 +152,7 @@ class PublishDailyData
     }
 
     /**
-     * @param ConfigLoader $configLoader
+     * @param IConfigLoader $configLoader
      * @return $this
      */
     public function setConfigLoader($configLoader)
