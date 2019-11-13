@@ -144,7 +144,7 @@ class Migration extends CliTool\App
     private function migrateFiles(): void
     {
         // Reset counts for logging
-        $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded;
+        $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = 0;
         $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
         $this->filesInS3       = [];
 
