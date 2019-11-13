@@ -10,8 +10,8 @@
  */
 namespace Schoolbox\PTO;
 
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 class Loader
 {
@@ -34,10 +34,10 @@ class Loader
     /**
      * Loader constructor
      *
-     * @param ConfigLoader $configLoader
+     * @param IConfigLoader $configLoader
      * @param User $user
      */
-    public function __construct(ConfigLoader $configLoader, User $user)
+    public function __construct(IConfigLoader $configLoader, User $user)
     {
         $this->setPtoKey($configLoader->get('pto_key'));
         $this->setSchool($configLoader->get('pto_school'));

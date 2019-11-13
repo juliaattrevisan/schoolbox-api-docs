@@ -30,7 +30,7 @@ if (empty($this->arg[0])) {
 $bob       = new \Alaress\Async\Notification\Instance\Builder(false);
 $decorator = new \Schoolbox\Realtime\Notification\Decorator();
 
-$coreContext = new \Schoolbox\Mail\CoreContext(new \Schoolbox\Config\Loader());
+$coreContext = new \Schoolbox\Mail\CoreContext($this->getDi()->get('config'));
 
 switch ($this->arg[0]) {
     case 'instant':

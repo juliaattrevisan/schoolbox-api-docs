@@ -1,13 +1,11 @@
 <?php
 use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\Loader;
 use Schoolbox\Resource\Browser\Office365\Tenant;
 use Schoolbox\Resource\Browser\Resources\Node;
 
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -53,7 +51,7 @@ try {
     $factory  = new \Schoolbox\Resource\Browser\NodeFactory();
 
     if ($oAuthToken = $_SESSION['azureAccessToken']) {
-        $conf       = new Loader();
+        $conf       = $this->getDi()->get('config');
         $tenant     = new Tenant($conf->get('office365_tenant'), $conf->get('sharepoint_sitepath') ?: null);
         $browser    = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);
 

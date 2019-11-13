@@ -370,7 +370,7 @@ try {
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
             $factory          = new ExternalConnectorFactory();
             $externalEvents   = $factory->build(
-                new \Schoolbox\Config\Loader(),
+                $kernel->getDependencyInjector()->get('config'),
                 $databaseExternal,
                 ExternalConnectorFactory::EXTERNAL_EVENTS
             );

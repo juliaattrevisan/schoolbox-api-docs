@@ -12,6 +12,7 @@ use Schoolbox\Campus;
 use Schoolbox\Config\Loader as Config;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
@@ -36,10 +37,18 @@ function parseDateTimeString($input)
     error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
+// Redir if $this doesn't exist (a.k.a this was accessed with a .php extension)
+if (!isset($this)) {
+    require_once __DIR__ . '/../../../conf/core/require.php';
+    $kernel = new \Schoolbox\Application\WebRequest\Kernel();
+    SitePage::localRedir('/modules/attendance/modify');
+}
+
 /** @var SitePage $this */
 
 // Ensure online attendance is enabled.
-$configLoader = new Config();
+/** @var IConfigLoader $configLoader */
+$configLoader = $this->getDi()->get('config');
 if (!$configLoader->get('external_attendance')) {
     $this->pageNotFound();
 }
