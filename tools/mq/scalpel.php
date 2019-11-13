@@ -125,7 +125,7 @@ $app = new class extends CliTool\App{
         // stop the socket daemon
         shell_exec('service schoolbox-socketd stop');
 
-        $conf = ConfigMapper::getInstance();
+        $conf = $this->getConfig();
 
         // get a list of all available amqp queues
         $ctrl = new BunnyControl([
