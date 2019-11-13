@@ -225,6 +225,7 @@ function renderStudent(
             $classCode         = (($subject['campusCode'] ?? '') !== '') ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
             $subject['folder'] = (new Folder())->setCodes(new GenericCollection(FolderCode::class));
             $subject['folder']->setName($subject['name'])->addCode((new FolderCode())->setCode($classCode));
+            $subject['perms'] = UserAccess::ACCESS_DENY;
         } else {
             continue;
         }
