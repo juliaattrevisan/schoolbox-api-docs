@@ -11,8 +11,8 @@ namespace Schoolbox\Picker\DateTime;
 
 use Alaress\Web\Controller\Base;
 use Calendar_Api_Factory;
-use External_Timetable;
 use Alaress_Date_Format;
+use External_TimetableInterface;
 use InvalidArgumentException;
 use Calendar\Event\Type\EventBase;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -20,7 +20,6 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -41,10 +40,7 @@ class Controller extends Base
     /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var ConfigLoader */
-    private $configLoader;
-
-    /** @var External_Timetable */
+    /** @var External_TimetableInterface */
     private $timetableHandler;
 
     /**
@@ -55,26 +51,26 @@ class Controller extends Base
      */
 
     /**
-     * Controller constructor.
+     * Constructor
      *
-     * @param UserMapper $userMapper
-     * @param TermMapper $termMapper
-     * @param UserAccessMapper $userAccessMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param UserMapper                  $userMapper
+     * @param TermMapper                  $termMapper
+     * @param UserAccessMapper            $userAccessMapper
+     * @param AssessmentMapperProxy       $assessmentMapperProxy
+     * @param External_TimetableInterface $timetableHandler
      */
     public function __construct(
         UserMapper $userMapper,
         TermMapper $termMapper,
         UserAccessMapper $userAccessMapper,
-        AssessmentMapperProxy $assessmentMapperProxy
+        AssessmentMapperProxy $assessmentMapperProxy,
+        External_TimetableInterface $timetableHandler
     ) {
-        $this->setUserMapper($userMapper);
-        $this->setTermMapper($termMapper);
-        $this->setUserAccessMapper($userAccessMapper);
-        $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setTimetableHandler(new External_Timetable());
-        // TODO inject this
-        $this->setConfigLoader(new ConfigLoader());
+        $this->userMapper            = $userMapper;
+        $this->termMapper            = $termMapper;
+        $this->userAccessMapper      = $userAccessMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->timetableHandler      = $timetableHandler;
     }
 
     /**
@@ -264,7 +260,7 @@ class Controller extends Base
 
         foreach ($user->getCampusCollection() as $campus) {
 
-            $campusTimetable = $this->getTimetableHandler()->getTimetableDefinition(null, $campus);
+            $campusTimetable = $this->timetableHandler->getTimetableDefinition(null, $campus);
 
             if ($campusTimetable) {
                 $campusInfo['campusId']   = $campus->getId();
@@ -289,7 +285,7 @@ class Controller extends Base
      */
     public function getTerms()
     {
-        return $this->getTermMapper()->findAll([ 'order' => [ 'start' => 'desc' ] ]);
+        return $this->termMapper->findAll([ 'order' => [ 'start' => 'desc' ] ]);
     }
 
     /**
@@ -319,7 +315,7 @@ class Controller extends Base
             }
         }
 
-        $timetableDay = $this->getTimetableHandler()->getDayNumber($campus, $date->addDays($dateOffset)->getUnixTimeStamp());
+        $timetableDay = $this->timetableHandler->getDayNumber($campus, $date->addDays($dateOffset)->getUnixTimeStamp());
         $termActualStart['date'] = $date;
         $termActualStart['day'] = $timetableDay;
 
@@ -418,7 +414,7 @@ class Controller extends Base
     {
         // Get all students for the class or the group
 
-            $externalStudents = $this->getUserAccessMapper()->findUsersInCategory(
+            $externalStudents = $this->userAccessMapper->findUsersInCategory(
                 $folder,
                 Role::STUDENT,
                 UserAccess::ACCESS_READ,
@@ -433,7 +429,7 @@ class Controller extends Base
             $externalIds[] = $studentCurrent->getExternalId();
         }
 
-        $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
+        $studentList = $this->userMapper->findByColumn('synergy_id', $externalIds);
         // Iterate each student in the class
 
         $students = [];
@@ -441,7 +437,7 @@ class Controller extends Base
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
-            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, true, $start, $end);
+            $assessments = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, true, $start, $end);
             // Count how many assessments are due on the specified date
             $assessmentsDue = \count($assessments);
             $assessmentList = [];
@@ -478,124 +474,5 @@ class Controller extends Base
         $students = array_slice($students, 0, 5);
 
         return $students;
-    }
-
-    /**
-     * Getters/setters below here
-     */
-
-    /**
-     * @param UserMapper $mapper
-     * @return mixed $this
-     */
-    public function setUserMapper($mapper)
-    {
-        $this->userMapper = $mapper;
-        return $this;
-    }
-
-
-    /**
-     * @return UserMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-
-    /**
-     * @param TermMapper $mapper
-     * @return mixed $this
-     */
-    public function setTermMapper($mapper)
-    {
-        $this->termMapper = $mapper;
-        return $this;
-    }
-
-
-    /**
-     * @return TermMapper
-     */
-    public function getTermMapper()
-    {
-        return $this->termMapper;
-    }
-
-    /**
-     * @param UserAccessMapper $mapper
-     * @return mixed $this
-     */
-    public function setUserAccessMapper($mapper)
-    {
-        $this->userAccessMapper = $mapper;
-        return $this;
-    }
-
-
-    /**
-     * @return UserAccessMapper
-     */
-    public function getUserAccessMapper()
-    {
-        return $this->userAccessMapper;
-    }
-
-
-    /**
-     * @param AssessmentMapperProxy $mapper
-     * @return mixed $this
-     */
-    public function setAssessmentMapperProxy($mapper)
-    {
-        $this->assessmentMapperProxy = $mapper;
-        return $this;
-    }
-
-
-    /**
-     * @return AssessmentMapperProxy
-     */
-    public function getAssessmentMapperProxy()
-    {
-        return $this->assessmentMapperProxy;
-    }
-
-    /**
-     * @return External_Timetable
-     */
-    public function getTimetableHandler()
-    {
-        return $this->timetableHandler;
-    }
-
-    /**
-     * @param External_Timetable $timetableHandler
-     * @return $this
-     */
-    public function setTimetableHandler($timetableHandler)
-    {
-        $this->timetableHandler = $timetableHandler;
-        return $this;
-    }
-
-
-    /**
-     * @return ConfigLoader
-     */
-    public function getConfigLoader()
-    {
-        return $this->configLoader;
-    }
-
-    /**
-     * @param ConfigLoader $configLoader
-     * @return $this
-     */
-    public function setConfigLoader($configLoader)
-    {
-        $this->configLoader = $configLoader;
-        return $this;
     }
 }
