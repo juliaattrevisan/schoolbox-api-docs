@@ -9,51 +9,43 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-
             <!-- BEGIN empty_state -->
-            <div class="row">
-                <div class="small-12 island">
-                    <section>
-                        <ul class="information-list" data-dz-container></ul>
-                    </section>
-                </div>
-            </div>
+            <section>
+                <article data-dz-wrap class="dropzone-wrap">
+                    <ul class="action-list" data-dz-container></ul>
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
 
-            <div data-dz-wrap class="dropzone-wrap">
-                <div data-dz-container="">
-                </div>
-                <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
-
-                <ul class="hide" data-dz-template>
-                    <li>
-                        <div class="card small-12">
-                            <button class="close-button hide" aria-label="Close alert" type="button" data-close>
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
-                            <h3 data-dz-name></h3>
-                            <p class="meta" data-dz-status>Uploading...</p>
-                            <div class="progress dz-progress">
-                                <span class="meter dz-upload" style="width:0;"></span>
+                    <ul class="hide" data-dz-template>
+                        <li>
+                            <div class="card small-12">
+                                <button class="close-button hide" aria-label="Close alert" type="button" data-close>
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
+                                <p data-dz-name></p>
+                                <p class="meta" data-dz-status>Uploading...</p>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                </ul>
+                        </li>
+                    </ul>
 
-                <div class="empty-state">
-                    <i class="icon-files"></i>
+                    <div class="empty-state">
+                        <i class="icon-files"></i>
 
-                    <!-- BEGIN empty_read -->
-                    <p>There are no files to access at this time.</p>
-                    <!-- END empty_read -->
+                        <!-- BEGIN empty_read -->
+                        <p>There are no files to access at this time.</p>
+                        <!-- END empty_read -->
 
-                    <!-- BEGIN empty_write -->
-                    <p>
-                        <a href="/cms/file/new/{FILE_CAT_ID}">Upload a file</a> or drag and drop multiple files onto this component to share resources.
-                    </p>
-                    <!-- END empty_write -->
-                </div>
-            </div>
+                        <!-- BEGIN empty_write -->
+                        <p>
+                            <a href="/cms/file/new/{FILE_CAT_ID}">Upload a file</a> or drag and drop multiple files onto this component to share resources.
+                        </p>
+                        <!-- END empty_write -->
+                    </div>
+                </article>
+            </section>
             <!-- END empty_state -->
 
             <!-- BEGIN has_file -->
