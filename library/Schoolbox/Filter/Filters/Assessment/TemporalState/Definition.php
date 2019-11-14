@@ -8,9 +8,10 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 
 use InvalidArgumentException;
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use function array_merge;
+use function in_array;
 
 
 /**
@@ -50,24 +51,26 @@ class Definition extends Filter\AbstractDefinition
     public const KEY_CUSTOM_CLOSED = 'cap_closed';
 
 
-    /** @var Collection|string[] */
-    private $temporalStates;
+    public static function getTemporalStates(): array
+    {
+        return [
+            self::KEY_UNPUBLISHED,
+            self::KEY_UPCOMING,
+            self::KEY_OPEN,
+            self::KEY_OVERDUE,
+            self::KEY_CLOSED,
+        ];
+    }
 
-
-    /**
-     * @param Filter\Model                       $filter
-     * @param Filter\Page\Option\Mapper          $filterOptionMapper
-     * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
-     * @param Collection                         $temporalStates
-     */
-    public function __construct(
-        Filter\Model $filter,
-        Filter\Page\Option\Mapper $filterOptionMapper,
-        Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
-        Collection $temporalStates
-    ) {
-        parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->temporalStates = $temporalStates->shallowClone();
+    public static function getCapTemporalStates(): array
+    {
+        return [
+            self::KEY_CUSTOM_UNPUBLISHED,
+            self::KEY_CUSTOM_UPCOMING,
+            self::KEY_CUSTOM_OPEN,
+            self::KEY_CUSTOM_OVERDUE,
+            self::KEY_CUSTOM_CLOSED,
+        ];
     }
 
 
@@ -76,7 +79,7 @@ class Definition extends Filter\AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return $this->temporalStates->getAll();
+        return array_merge(self::getTemporalStates(), self::getCapTemporalStates());
     }
 
 
@@ -90,6 +93,7 @@ class Definition extends Filter\AbstractDefinition
             Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
             Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
             Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK,
+            Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
 //            Filter\Page\Model::PAGE_GRADES,
         ];
     }
@@ -100,23 +104,20 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        if (self::KEY_UNPUBLISHED === $key) {
+        if (in_array($key, [self::KEY_UNPUBLISHED, self::KEY_CUSTOM_UNPUBLISHED], true)) {
             return 'Unpublished';
         }
-        if (self::KEY_UPCOMING === $key) {
+        if (in_array($key, [self::KEY_UPCOMING, self::KEY_CUSTOM_UPCOMING], true)) {
             return 'Upcoming';
         }
-        if (self::KEY_OPEN === $key) {
+        if (in_array($key, [self::KEY_OPEN, self::KEY_CUSTOM_OPEN], true)) {
             return 'Open';
         }
-        if (self::KEY_OVERDUE === $key) {
+        if (in_array($key, [self::KEY_OVERDUE, self::KEY_CUSTOM_OVERDUE], true)) {
             return 'Overdue';
         }
-        if (self::KEY_CLOSED === $key) {
+        if (in_array($key, [self::KEY_CLOSED, self::KEY_CUSTOM_CLOSED], true)) {
             return 'Closed';
-        }
-        if (self::KEY_CUSTOM_UNPUBLISHED === $key) {
-            return 'Custom Plan Publish Date';
         }
         throw new InvalidArgumentException("Unknown TemporalState key: $key");
     }
@@ -130,9 +131,30 @@ class Definition extends Filter\AbstractDefinition
         $cleanedPageOptions = parent::unsetInvalidOptions($pageFilter);
 
         foreach ($cleanedPageOptions as $idx => $option) {
-            // Do not permit 'upcoming' on the 'grades' page
-            if (self::KEY_UNPUBLISHED === $option->getKey() && Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()) {
-                $cleanedPageOptions->offsetUnset($idx);
+            $key = $option->getKey();
+            switch ($pageFilter->getPage()) {
+
+                case Filter\Page\Model::PAGE_GRADES:
+                    // Do not permit 'upcoming' on the 'grades' page
+                    if ($key === self::KEY_UNPUBLISHED || !in_array($key, self::getTemporalStates(), true)) {
+                        $cleanedPageOptions->offsetUnset($idx);
+                    }
+                    break;
+                case Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS:
+                    // 'Upcoming Assessments' only supports these 3 options
+                    if (!in_array($key, [
+                        self::KEY_CUSTOM_UPCOMING,
+                        self::KEY_CUSTOM_OPEN,
+                        self::KEY_CUSTOM_OVERDUE,
+                    ], true)) {
+                        $cleanedPageOptions->offsetUnset($idx);
+                    }
+                    break;
+                default:
+                    // All other pages, just support the non-cap version
+                    if (!in_array($key, self::getTemporalStates(), true)) {
+                        $cleanedPageOptions->offsetUnset($idx);
+                    }
             }
         }
         return $cleanedPageOptions;

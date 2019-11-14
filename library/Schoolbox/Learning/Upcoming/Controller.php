@@ -314,14 +314,8 @@ class Controller extends Base
 
         // Only fetch assessments that are:
         // * assessment impls
-        // * upcoming, open or overdue (ie not unpublished or closed)
         $filters = \array_merge($filters, [
             Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-            Filters\Assessment\TemporalState\Definition::class            => [
-                Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_UPCOMING,
-                Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_OPEN,
-                Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_OVERDUE,
-            ],
         ]);
 
         $allWork = $this->assessmentDataSource
