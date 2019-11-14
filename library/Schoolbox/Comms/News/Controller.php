@@ -530,34 +530,6 @@ class Controller extends Base
 
 
     /**
-     * Associate this article with a discussion thread (passed in $post['discussionThreadId']).
-     *
-     * @api POST /news/{articleId}/associateWithThread/{discussionThreadId}
-     * @since 19.0
-     *
-     * @param Model $article
-     * @throws MapperException                            if save, or retrieval of the thread, failed
-     * @throws MapperException\Deleted                    if the thread was deleted
-     * @throws \Aura\Web\Exception\InvalidStatusCode      if somehow 204 becomes invalid?
-     * @throws \Schoolbox\Application\Exception\Exception if an error gets raised
-     */
-    public function postAssociateWithDiscussionThread(Model $article): void
-    {
-        /** @var Thread\Model $thread */
-        $thread  = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
-        $context = new ThreadLocator($this->threadMapper, $this->newsMapper);
-        try {
-            $context->associate($thread, $article);
-        } catch (\UnexpectedValueException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED, $e);
-        }
-
-        // No point responding with any content
-        $this->response->status->setCode(204);
-    }
-
-
-    /**
      * Get a list of available news topics that can be assigned to an article
      *
      * @api GET /news/topics
