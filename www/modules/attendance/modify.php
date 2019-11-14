@@ -166,19 +166,18 @@ if ($class) {
 
     // Cosmetic makeup for the masses
 
-    $this->setVar(
-        array(
-            'CLASS_CODE' => $class['ClassCampus'] . '/' . $class['ClassCode'],
-            'ATTENDANCE_START' => $startTime,
-            'ATTENDANCE_END' => $endTime,
-            'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
-            'ATTENDANCE_DAY' => $timetableDay,
-            'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
-            'ATTENDANCE_PERIOD_LONG' => Scrub::text(implode(' to ', $periodNames)),
-            'TIMETABLE_GROUP' => $timetableGroup,
-            'attendance_period_block' => '',
-        )
-    );
+    $this->setVar([
+        'FILETYPE' => $fileType,
+        'CLASS_CODE' => $class['ClassCampus'] . '/' . $class['ClassCode'],
+        'ATTENDANCE_START' => $startTime,
+        'ATTENDANCE_END' => $endTime,
+        'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
+        'ATTENDANCE_DAY' => $timetableDay,
+        'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
+        'ATTENDANCE_PERIOD_LONG' => Scrub::text(implode(' to ', $periodNames)),
+        'TIMETABLE_GROUP' => $timetableGroup,
+        'attendance_period_block' => '',
+    ]);
 
     foreach ($attendancePeriods as $attendancePeriod) {
         $this->setVar('ATTENDANCE_PERIOD', $attendancePeriod);
