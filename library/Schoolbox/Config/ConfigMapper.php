@@ -137,6 +137,33 @@ class ConfigMapper extends Mapper
 
 
     /**
+     * Find all available config types, as a scalar list.
+     *
+     * @param bool $includeBoarderLeave
+     * @return array|string[]
+     */
+    public function findTypeList(bool $includeBoarderLeave): array
+    {
+        $query = "
+            SELECT DISTINCT lu_config_type.type
+            FROM {$this->getTable()}
+            INNER JOIN lu_config_type ON config.type_id  = lu_config_type.id
+        ";
+        $params = [];
+        if (!$includeBoarderLeave) {
+            $query .= 'WHERE config.type_id != ?';
+            $params[] = self::TYPE_BOARD;
+        }
+        $statement = $this->getDatabase()->query($query, $params);
+        $result    = [];
+        foreach ($statement as $row) {
+            $result[] = $row['type'];
+        }
+        return $result;
+    }
+
+
+    /**
      * Post save callback to ensure cache is updated
      *
      * @param Config $model
