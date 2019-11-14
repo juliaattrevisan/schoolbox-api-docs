@@ -27,6 +27,9 @@
                 <ul class="hide" data-dz-template>
                     <li>
                         <div class="card small-12">
+                            <button class="close-button hide" aria-label="Close alert" type="button" data-close>
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                             <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
                             <h3 data-dz-name></h3>
                             <p class="meta" data-dz-status>Uploading...</p>
@@ -79,6 +82,7 @@
                                     el.find('[data-dz-status]').text('Success');
                                 },
                                 error: function (file, response) {
+                                    console.log($(file.previewElement));
                                     $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
                                 }
                             });
@@ -101,6 +105,9 @@
                     <ul data-dz-template class="hide">
                         <li>
                             <div class="card small-12">
+                                <button class="close-button hide" aria-label="Close alert" type="button" data-close>
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                                 <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
                                 <p data-dz-name></p>
                                 <p class="meta" data-dz-status>Uploading...</p>
@@ -188,6 +195,7 @@
                                         el.find('[data-dz-status]').text('Success');
                                     },
                                     error: function (file, response) {
+                                        $('.dz-error [data-close]').removeClass('hide');
                                         $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
                                     }
                                 });

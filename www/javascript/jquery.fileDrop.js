@@ -134,6 +134,10 @@
             }
         }
 
+        $(document).on("click", ".dz-error [data-close]", function() {
+            $(this).parents('li').fadeOut('slow');
+        });
+
         $(this.element).dropzone({
             clickable: this.options.clickable,
             previewsContainer: this.options.previewsContainer,
