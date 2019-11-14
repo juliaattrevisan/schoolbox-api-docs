@@ -49,45 +49,8 @@
 
                     <!-- BEGIN empty_write -->
                     <p>
-                        <a href="/cms/file/new/{FILE_CAT_ID}">Upload a file</a> or drag and drop multiple files onto this component to share resources.</p>
-
-                    <script type="text/javascript">
-                        $(function () {
-                            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                                wrapClass: 'dragging',
-                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                                tplWrap: '<li class="dz-preview" />',
-                                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                                refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
-                                dictDefaultMessage: 'You can drag files into this space.',
-                                showIfEmpty: false,
-                                sending: function (file, xhr, formData) {
-                                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                    formData.append('category', {FILE_CAT_ID});
-                                    formData.append('comment', '');
-                                    formData.append('hidden', 0);
-                                },
-                                complete: function (file) {
-                                    $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
-                                },
-                                success: function (file, response) {
-                                    var el = $(file.previewElement);
-
-                                    el.attr('data-file', response.id)
-                                            .removeClass('dz-processing')
-                                            .find('span.dz-upload')
-                                            .addClass('complete');
-
-                                    el.find('[data-dz-status]').text('Success');
-                                },
-                                error: function (file, response) {
-                                    console.log($(file.previewElement));
-                                    $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
-                                }
-                            });
-                        });
-                    </script>
+                        <a href="/cms/file/new/{FILE_CAT_ID}">Upload a file</a> or drag and drop multiple files onto this component to share resources.
+                    </p>
                     <!-- END empty_write -->
                 </div>
             </div>
@@ -159,48 +122,6 @@
                     <section>
                         <!-- BEGIN submit_file -->
                         <p><a href="/cms/file/new/{FILE_CAT_ID}">Select a file</a> or drag and drop multiple onto this component</p>
-                        <script type="text/javascript">
-                            $(function () {
-                                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                                    wrapClass: 'dragging',
-                                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                                    tplWrap: '<li class="dz-preview" />',
-                                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                                    refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
-                                    dictDefaultMessage: 'You can drag files into this space.',
-                                    sending: function (file, xhr, formData) {
-                                        var desc = file.name.substr(0, file.name.lastIndexOf('.'));
-                                        if(desc.length > 0){
-                                            formData.append('description', desc);
-                                        }
-                                        else {
-                                            formData.append('description', file.name);
-                                        }
-                                        formData.append('category', {FILE_CAT_ID});
-                                        formData.append('comment', '');
-                                        formData.append('hidden', 0);
-                                    },
-                                    complete: function (file) {
-                                        $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
-                                    },
-                                    success: function (file, response) {
-                                        var el = $(file.previewElement);
-
-                                        el.attr('data-file', response.id)
-                                                .removeClass('dz-processing')
-                                                .find('span.dz-upload')
-                                                .addClass('complete');
-
-                                        el.find('[data-dz-status]').text('Success');
-                                    },
-                                    error: function (file, response) {
-                                        $('.dz-error [data-close]').removeClass('hide');
-                                        $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
-                                    }
-                                });
-                            });
-                        </script>
                         <!-- END submit_file -->
                         <a href="/resources/{FILE_CAT_ID}" class="button">View All Files</a>
                     </section>
@@ -209,6 +130,49 @@
             </section>
             <!-- END has_file -->
 
+            <script type="text/javascript">
+                $(function () {
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                        tplWrap: '<li class="dz-preview" />',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
+                        dictDefaultMessage: 'You can drag files into this space.',
+                        showIfEmpty: false,
+                        sending: function (file, xhr, formData) {
+                            var desc = file.name.substr(0, file.name.lastIndexOf('.'));
+                            if(desc.length > 0){
+                                formData.append('description', desc);
+                            }
+                            else {
+                                formData.append('description', file.name);
+                            }
+                            formData.append('category', {FILE_CAT_ID});
+                            formData.append('comment', '');
+                            formData.append('hidden', 0);
+                        },
+                        complete: function (file) {
+                            $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
+                        },
+                        success: function (file, response) {
+                            var el = $(file.previewElement);
+
+                            el.attr('data-file', response.id)
+                                .removeClass('dz-processing')
+                                .find('span.dz-upload')
+                                .addClass('complete');
+
+                            el.find('[data-dz-status]').text('Success');
+                        },
+                        error: function (file, response) {
+                            $('.dz-error [data-close]').removeClass('hide');
+                            $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
+                        }
+                    });
+                });
+            </script>
         </div>
     </div>
 </div>
