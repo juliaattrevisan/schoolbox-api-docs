@@ -61,10 +61,6 @@ class Loader implements IConfigLoader
      */
     public function get($var)
     {
-        // TODO figure out why this is even used?
-        if (defined($var)) {
-            return constant($var);
-        }
         if (!isset($this->cache)) {
             $this->loadCache();
         }
@@ -116,9 +112,6 @@ class Loader implements IConfigLoader
      */
     public function __isset($name): bool
     {
-        if (defined($name)) {
-            return true;
-        }
         if (empty($this->cache)) {
             $this->loadCache();
         }
