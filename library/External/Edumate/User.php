@@ -467,17 +467,25 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getParentEmails(array $externalUserIds): array
     {
-        $emails = array();
-        foreach ($externalUserIds as $externalUserId) {
-            $userEmails = array();
-            foreach ($this->getStudentContactList([$externalUserId]) as $contact) {
-                $userEmails[] = $contact['StudentContactDefaultEmail'];
-                $userEmails[] = $contact['StudentContactSpouseDefaultEmail'];
-            }
-            foreach ($userEmails as $i => $email) {
-                $emails[$externalUserId . '-' . $i] = $email;
-            }
+        $emails = [];
+        $userEmails = [];
+        $contacts = $this->getStudentContactList($externalUserIds);
+
+        foreach ($contacts as $contact) {
+            $userEmails[] = [
+                'externalId' => $contact['StudentContactID'],
+                'email' => $contact['StudentContactDefaultEmail']
+            ];
+            $userEmails[] = [
+                'externalId' => $contact['StudentContactID'],
+                'email' => $contact['StudentContactSpouseDefaultEmail']
+            ];
         }
+
+        foreach ($userEmails as $i => $email) {
+            $emails[$email['externalId'] . '-' . $i] = $email['email'];
+        }
+
         return array_filter(array_unique($emails));
     }
 
