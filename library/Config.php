@@ -38,7 +38,7 @@ class Config extends DeprecatedModel {
                 return self::$instance;
         }
 
-        static public function get($configName)
+        public static function get($configName)
         {
             return ConfigLoader::getInstance()->get($configName);
         }
