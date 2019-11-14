@@ -24,14 +24,6 @@ class Loader implements IConfigLoader
 
 
     /**
-     * Constants
-     *
-     * @var array
-     */
-    private $pathConstants;
-
-
-    /**
      * @var self
      */
     private static $instance;
@@ -69,12 +61,7 @@ class Loader implements IConfigLoader
      */
     public function get($var)
     {
-        if (!isset($this->pathConstants)) {
-            $this->loadPathConstants();
-        }
-        if (isset($this->pathConstants[$var])) {
-            return $this->pathConstants[$var];
-        }
+        // TODO figure out why this is even used?
         if (defined($var)) {
             return constant($var);
         }
@@ -129,12 +116,6 @@ class Loader implements IConfigLoader
      */
     public function __isset($name): bool
     {
-        if (!isset($this->pathConstants)) {
-            $this->loadPathConstants();
-        }
-        if (isset($this->pathConstants[$name])) {
-            return true;
-        }
         if (defined($name)) {
             return true;
         }
@@ -142,20 +123,6 @@ class Loader implements IConfigLoader
             $this->loadCache();
         }
         return isset($this->cache[$name]);
-    }
-
-
-    /**
-     * Load path-related constants
-     */
-    private function loadPathConstants(): void
-    {
-        $w                   = SITE_root;
-        $this->pathConstants = array(
-            'siteRoot' => $w,
-            'webRoot'  => "$w/www",
-            'webBase'  => ''
-        );
     }
 
 

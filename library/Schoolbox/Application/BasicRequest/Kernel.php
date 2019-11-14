@@ -342,7 +342,7 @@ class Kernel extends WebKernelAbstract
                     $config      = $di->get('config');
                     $baseLoader  = new Twig_Loader_Filesystem(array());
                     // Paths: prefer templates/{site_location} over templates/core
-                    $basePath     = $config->get('siteRoot').'/templates/';
+                    $basePath     = SITE_root.'/templates/';
                     $overridePath = $basePath.$config->get('site_location');
                     $corePath     = $basePath.'core';
                     if (is_dir($overridePath)) {
