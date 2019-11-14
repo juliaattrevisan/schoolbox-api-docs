@@ -89,6 +89,6 @@ This is to follow the standard packaging process linux distributions use for web
   * [Outside Aura modules](./docs/custom/custom-templates-outside-aura-modules.md)
 * Testing:
   * [Acceptance Tests](./test/codeception/acceptance/README.md)
-  * [Smoke Tests](./test/codeception/integration/README.md)
+  * [Smoke Tests](./test/codeception/smoketests/README.md)
   * [Behaviour Tests](./test/behavior/README.md)
   * [Unit Tests](./docs/unit-test.md)
