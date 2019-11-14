@@ -3,6 +3,7 @@
 use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
@@ -43,7 +44,7 @@ class SitePage extends Page
     /** @var User $user */
     private $user;
 
-    /** @var Config */
+    /** @var ConfigLoader */
     private $config;
 
     /**
@@ -56,12 +57,12 @@ class SitePage extends Page
     {
         parent::__construct();
 
-        // TODO remove this, always use config loader from DI
-        $this->config = \Config::getInstance();
-
         // TODO ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
         if ($di) {
             $this->di = $di;
+            $this->config = $di->get('config');
+        } else {
+            $this->config = ConfigLoader::getInstance();
         }
 
         if(isset($_SESSION['user'])) {
