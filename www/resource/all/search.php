@@ -34,7 +34,7 @@ require_once __DIR__ . '/../../resource/searchClean.php';
  */
 foreach ($handle as $typeName => $config) {
     if ($typeName != 'all') {
-        $result[$typeName] = $config['handler']->search($keyword, 0, Cfg::get('search_all_limit'), $count[$typeName]);
+        $result[$typeName] = $config['handler']->search($keyword, 0, Config::get('search_all_limit'), $count[$typeName]);
     }
 }
 
@@ -45,7 +45,7 @@ $count['all'] = array_sum($count);
 $articleResolver = $this->getDi()->get('commsNewsArticleResolver');
 
 $mapper = new \Schoolbox\Resource\Search\Results($page, $type);
-$mapper->search($articleResolver, $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'), 'score', 'desc');
+$mapper->search($articleResolver, $_SESSION['user'], $keyword, 0, Config::get('search_all_limit'), 'score', 'desc');
 
 /* Omaha Beach
  *
@@ -97,7 +97,7 @@ if (!$count['all']) {
          */
         if ($type != 'all') {
             // perform search for individual category (without formatting for ajax call)
-            $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+            $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Config::get('search_type_limit'), Config::get('search_type_limit'), $count[$type]);
         }
     }
 

@@ -72,7 +72,7 @@ class Spawnpoint {
 
 			/* Create a new group pad
 			 */
-			$client = new \EtherpadLite\Client(\Cfg::get('etherpad_api_token'));
+			$client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'));
 
 			/* Create a new pad, get group id
 			 * Create a group pad
@@ -164,7 +164,7 @@ class Spawnpoint {
 
 			/* Create a new group pad
 			 */
-			$client = new \EtherpadLite\Client(\Cfg::get('etherpad_api_token'));
+			$client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'));
 
 			/* Create a new pad, get group id
 			 * Create a group pad

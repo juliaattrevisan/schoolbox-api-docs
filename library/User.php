@@ -186,12 +186,12 @@ class User extends DeprecatedModel
     {
         $searchFilter = '';
         if ($user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
+            (!$user->getRole()->isStaff() && Config::get('parent_search_enable') != 1)
         ) {
             $searchFilter =  " `groups`.`group_type` != 'parent' AND ";
         }
         if ($user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Cfg::get('student_search_enable') != 1)
+            (!$user->getRole()->isStaff() && Config::get('student_search_enable') != 1)
         ) {
             $searchFilter .= " `groups`.`group_type` != 'student' AND ";
         }
@@ -690,7 +690,7 @@ class User extends DeprecatedModel
     {
         // Check for custom format
         if (empty($format)) {
-            $format = Cfg::get('name_format');
+            $format = Config::get('name_format');
         }
         /* Replace tags */
         preg_match_all('|{\w+}|', $format, $tags);

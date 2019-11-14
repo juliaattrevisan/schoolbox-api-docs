@@ -125,8 +125,8 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $paths = [];
         $settings = null;
 
-        $siteLocation = Cfg::get('site_location');
-        $fallbackEnabled = Cfg::get('webdav_fallback_enabled');
+        $siteLocation = Config::get('site_location');
+        $fallbackEnabled = Config::get('webdav_fallback_enabled');
 
         /** @var Collection $davs */
         $davs = WebDavMapper::getInstance()->findByColumn('enabled', 1);

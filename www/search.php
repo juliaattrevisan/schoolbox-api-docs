@@ -14,7 +14,7 @@ if ($type == '') {
  */
 foreach ($handle as $typeName => $config) {
     if ($typeName != 'all') {
-        $result[$typeName] = $config['handler']->search($keyword, 0, Cfg::get('search_all_limit'), $count[$typeName]);
+        $result[$typeName] = $config['handler']->search($keyword, 0, Config::get('search_all_limit'), $count[$typeName]);
     }
 }
 
@@ -25,7 +25,7 @@ $count['all'] = array_sum($count);
 $articleResolver = $this->getDi()->get('commsNewsArticleResolver');
 
 $mapper = new \Schoolbox\Resource\Search\Results($this, $type);
-$mapper->search($articleResolver, $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'), 'score');
+$mapper->search($articleResolver, $_SESSION['user'], $keyword, 0, Config::get('search_all_limit'), 'score');
 
 /* Omaha Beach
  *

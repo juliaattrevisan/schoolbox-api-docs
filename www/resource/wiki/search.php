@@ -27,7 +27,7 @@ $type = 'wiki';
 
 /* search() calls access a global counter array, $count
  */
-$result[$type] = $wikiHandler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type]);
+$result[$type] = $wikiHandler->search($keyword, 0, Config::get('search_all_limit'), $count[$type]);
 
 $count['all'] = array_sum($count);
 
@@ -35,7 +35,7 @@ $count['all'] = array_sum($count);
  * traversing to $currentPage-1 manually in php, manually constructing
  * the page's contents
  */
-$result[$type] = $wikiHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+$result[$type] = $wikiHandler->search($keyword, ($current_page - 1) * Config::get('search_type_limit'), Config::get('search_type_limit'), $count[$type]);
 
 // render wiki
 $renderer = new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, $current_page);

@@ -50,14 +50,14 @@ if (is_numeric($this->arg[0])) {
                 array(
                     'THUMBNAIL_ID'          => $currentImage->getId(),
                     'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
-                    'THUMBNAIL_SIZE'        => Cfg::get('thumbnail_size'),
+                    'THUMBNAIL_SIZE'        => Config::get('thumbnail_size'),
                 )
             );
             $this->parse('image_gallery_block', 'image_gallery', true);
         }
         $this->setVar(
             array(
-                'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+                'IMAGE_HEIGHT' => Config::get('thumbnail_size'),
             )
         );
     } else {

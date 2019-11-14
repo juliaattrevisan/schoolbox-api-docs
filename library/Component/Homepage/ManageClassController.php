@@ -45,7 +45,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     {
         $this->userAccessMapper  = $this->getMapperFactory()->get(UserAccessMapper::class);
         $this->termMapper        = $this->getMapperFactory()->get(Term\Mapper::class);
-        $this->externalDbEnabled = (bool)Cfg::get('external_enable');
+        $this->externalDbEnabled = (bool)Config::get('external_enable');
 
         // This component is always present on homepages (embedded in page tot menu)
         return true;

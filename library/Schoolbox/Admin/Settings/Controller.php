@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings;
 
 use Alaress\Web\Controller\ConfigController;
-use Cfg;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;

@@ -200,14 +200,14 @@ class Controller extends Alaress\Web\Controller\Base
      */
     private function getSsoCode(): string
     {
-        if ($this->getUser()->getRole()->isParent() && \Cfg::get('external_tass_sso_parent_code') === "TASS ID") {
+        if ($this->getUser()->getRole()->isParent() && \Config::get('external_tass_sso_parent_code') === "TASS ID") {
             // remove any non-numeric characters so it's the proper TASS id
             return preg_replace('/\D/', '', $this->getUser()->getExternalId());
         }
-        if ($this->getUser()->getRole()->isStaff() && \Cfg::get('external_tass_sso_staff_code') === "TASS ID") {
+        if ($this->getUser()->getRole()->isStaff() && \Config::get('external_tass_sso_staff_code') === "TASS ID") {
             return $this->getUser()->getExternalId();
         }
-        if ($this->getUser()->getRole()->isStudent() && \Cfg::get('external_tass_sso_student_code') === "TASS ID") {
+        if ($this->getUser()->getRole()->isStudent() && \Config::get('external_tass_sso_student_code') === "TASS ID") {
             return $this->getUser()->getExternalId();
         }
         return $this->getUser()->getUsername();

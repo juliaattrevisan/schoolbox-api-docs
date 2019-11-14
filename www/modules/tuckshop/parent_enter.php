@@ -14,7 +14,7 @@ if(!isset($this)) {
 }
 
 // mask this from all installs but Cathedral
-if(Cfg::get('site_location') != 'cathedral') {
+if(Config::get('site_location') != 'cathedral') {
     $this->pageNotFound();
 }
 

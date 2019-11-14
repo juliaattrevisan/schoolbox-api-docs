@@ -175,7 +175,7 @@ abstract class Handler
         // render pagination
         $this->getPage()->setBlock('RESULT', 'pagination', 'pagination_block');
 
-        $number_pages = ceil($this->getCount($this->getType()) / \Cfg::get('search_type_limit'));
+        $number_pages = ceil($this->getCount($this->getType()) / \Config::get('search_type_limit'));
 
         if ($number_pages > 1) {
             if (($this->getCurrentPage() - 5) <= 1) {
@@ -236,7 +236,7 @@ abstract class Handler
     {
         $this->getPage()->setBlock($this->getType() . '_t', 'see_more', 'see_more_block');
 
-        if ($this->getUseSeymourLinks() && ($this->getCount($this->getType()) > \Cfg::get('search_all_limit'))) {
+        if ($this->getUseSeymourLinks() && ($this->getCount($this->getType()) > \Config::get('search_all_limit'))) {
             $this->getPage()->setVar(array(
                 'MORE_COUNT' => $this->getCount($this->getType())
             ));

@@ -40,7 +40,7 @@ class Widgets {
      */
     public static function getAvailableOptions() {
         $options = self::getOptions();
-        switch (\Cfg::get('submission_visibility_max')) {
+        switch (\Config::get('submission_visibility_max')) {
             case IAssessable::MARK_VISIBILITY_PRIVATE:
                 // drop MARK_VISIBILITY_PARENT_STUDENT, MARK_VISIBILITY_STUDENT
                 array_pop($options);

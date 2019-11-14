@@ -95,7 +95,7 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
     return $user;
 };
 
-if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
+if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
     $response = "<?xml version='1.0' standalone='yes'?>
                  <response>
                     <code>401</code>

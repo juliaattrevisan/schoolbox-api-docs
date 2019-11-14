@@ -70,7 +70,7 @@ class Email {
 	 */
 	public function formatEmailFromArray($user) {
 		if ($user['local_email'] && isset($user['username']) && $user['username']) {
-			return $user['username'] . '@' . Cfg::get('mail_address');
+			return $user['username'] . '@' . Config::get('mail_address');
 		}
 		else if ($user['alt_email']) {
 			return $user['alt_email'];

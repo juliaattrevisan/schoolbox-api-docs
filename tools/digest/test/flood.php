@@ -21,8 +21,8 @@ $count   = intval($argv[2]);
 Database::getInstance()->exec("UPDATE news_items SET item_deleted = 1");
 
 
-$rss = new Alaress_Rss_Stream(Cfg::get('welcome_rss_url'));
-$size = $count ?: Cfg::get('welcome_rss_limit');
+$rss = new Alaress_Rss_Stream(Config::get('welcome_rss_url'));
+$size = $count ?: Config::get('welcome_rss_limit');
 $rss->setLimit($size);
 $rss->stream();
 
@@ -31,7 +31,7 @@ $allRss = $rss->getOutput();
 foreach($allRss as $item) {
 	$title = Scrub::text($item['title']);
 	$body = Scrub::html($item['content'] ? $item['content'] : $item['description']);
-	$url = 'http://' . Cfg::get('site_hostname') . '.' . Cfg::get('site_domain') . '/news/modifyForm.php';
+	$url = 'http://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . '/news/modifyForm.php';
 
 	$aurl = parse_url($url);
 	$host = $aurl['host'];

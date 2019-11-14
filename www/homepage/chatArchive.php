@@ -139,7 +139,7 @@ if ($occupiedDateList) {
 
 
 // setup pagination for display
-$chatPerPage = Cfg::get('search_type_limit');
+$chatPerPage = Config::get('search_type_limit');
 $totalPages = ceil(count($visibleListSubset) / $chatPerPage);
 $chatIndex = $chatPerPage * ($filter['page'] - 1);
 

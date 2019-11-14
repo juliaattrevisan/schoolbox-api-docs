@@ -325,8 +325,8 @@ class Calendar extends DeprecatedModel
 			SELECT
 				e.id, e.series_id, e.owner, e.author_id, e.access, e.type, e.title, e.start_datetime, e.end_datetime,
 				e.location, e.attendance, e.detail, e.publish_date, e.allday,
-				DATE_FORMAT(e.start_datetime, '" . Cfg::get('calendar_time_format') . "') startTime,
-				DATE_FORMAT(e.end_datetime, '" . Cfg::get('calendar_time_format') . "') endTime,
+				DATE_FORMAT(e.start_datetime, '" . Config::get('calendar_time_format') . "') startTime,
+				DATE_FORMAT(e.end_datetime, '" . Config::get('calendar_time_format') . "') endTime,
 				u.title AS userTitle, u.firstname, u.lastname
 			FROM {$this->_table} e
 			LEFT JOIN user u ON u.id = e.owner
@@ -387,8 +387,8 @@ class Calendar extends DeprecatedModel
 
         $event_query = "SELECT DISTINCT event.id, owner,
                             GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-                            TIME_FORMAT(start_datetime, '" . Cfg::get('calendar_time_format') . "') as startTime,
-                            TIME_FORMAT(end_datetime, '" . Cfg::get('calendar_time_format') . "') as endTime,
+                            TIME_FORMAT(start_datetime, '" . Config::get('calendar_time_format') . "') as startTime,
+                            TIME_FORMAT(end_datetime, '" . Config::get('calendar_time_format') . "') as endTime,
                             TIME_TO_SEC(start_datetime) as startTimestamp,
                             TIME_TO_SEC(end_datetime) as endTimestamp,
                             start_datetime, end_datetime,
@@ -705,8 +705,8 @@ class Calendar extends DeprecatedModel
     {
 
         $query = "SELECT DISTINCT id, owner,
-							TIME_FORMAT(start_datetime, '" . Cfg::get('calendar_time_format') . "') as startTime,
-							TIME_FORMAT(end_datetime, '" . Cfg::get('calendar_time_format') . "') as endTime,
+							TIME_FORMAT(start_datetime, '" . Config::get('calendar_time_format') . "') as startTime,
+							TIME_FORMAT(end_datetime, '" . Config::get('calendar_time_format') . "') as endTime,
 							type, title, location, detail, access, event_campus.campus_id as sid
 						FROM event
 						LEFT JOIN event_campus ON event.id = event_campus.event_id

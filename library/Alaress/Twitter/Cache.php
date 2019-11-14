@@ -37,7 +37,7 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      * @return mixed|void
      */
     protected function setup() {
-        $this->cachedTime = Cfg::get('twitter_api_caching');
+        $this->cachedTime = Config::get('twitter_api_caching');
         $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 
@@ -47,10 +47,10 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      */
     protected function saveStreamContents(): bool {
         $twitterCon = new Alaress_Twitter_Loader_OAuth(
-            Cfg::get('twitter_api_consumer_key'),
-            Cfg::get('twitter_api_consumer_secret'),
-            Cfg::get('twitter_api_oauth_token'),
-            Cfg::get('twitter_api_oauth_token_secret')
+            Config::get('twitter_api_consumer_key'),
+            Config::get('twitter_api_consumer_secret'),
+            Config::get('twitter_api_oauth_token'),
+            Config::get('twitter_api_oauth_token_secret')
         );
 
         $result = $twitterCon->load($this->url, $this->parameters);
@@ -76,7 +76,7 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      */
     protected function generateCachedFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url.serialize($this->parameters)) . '.txt';
+        return Config::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url.serialize($this->parameters)) . '.txt';
     }
 
     /**
@@ -86,6 +86,6 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      */
     protected function generateLockFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url.serialize($this->parameters)) . '_lock.txt';
+        return Config::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url.serialize($this->parameters)) . '_lock.txt';
     }
 }

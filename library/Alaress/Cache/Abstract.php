@@ -317,7 +317,7 @@ abstract class Alaress_Cache_Abstract
      */
     protected function generateCachedFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url) . '.txt';
+        return Config::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url) . '.txt';
     }
 
     /**
@@ -327,7 +327,7 @@ abstract class Alaress_Cache_Abstract
      */
     protected function generateLockFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url) . '_lock.txt';
+        return Config::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url) . '_lock.txt';
     }
 
     /**

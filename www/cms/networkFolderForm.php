@@ -4,7 +4,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 
-if (!Cfg::get('webdav_enable')) {
+if (!Config::get('webdav_enable')) {
     error(2);
 }
 

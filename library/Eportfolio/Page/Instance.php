@@ -288,7 +288,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 }
             } catch (\Throwable $e) {
                 // if a component explodes for any reason, we only want it to explode the page if we're in debug mode
-                if (Cfg::get('debug_mode')) {
+                if (Config::get('debug_mode')) {
                     throw $e;
                 }
 

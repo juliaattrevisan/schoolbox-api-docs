@@ -58,7 +58,7 @@ if ($this->arg[0] == 'new') {
         'ACTION' => 'Add',
         'FILE_ID' => '',
         'DESCRIPTION' => '',
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+        'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $parent['id'],
         "COMPONENT_INSTANCE_ID" => $publishComponent,
         "USER_ID" => $userId
@@ -107,7 +107,7 @@ if ($this->arg[0] == 'new') {
         'ACTION' => 'Modify',
         'FILE_ID' => $file['id'],
         'DESCRIPTION' => Scrub::text($file['description']),
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+        'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $file['parent'],
     );
     $this->setVar($output);

@@ -36,7 +36,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     );
     $this->setVar($output);
 
-    if (Cfg::get('webdav_enable')) {
+    if (Config::get('webdav_enable')) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
 
@@ -108,7 +108,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $this->setVar($output);
 
 
-    if (Cfg::get('webdav_enable')) {
+    if (Config::get('webdav_enable')) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
 

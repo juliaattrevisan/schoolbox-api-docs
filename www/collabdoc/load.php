@@ -43,7 +43,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 
 	/* Find the author id
 	 */
-	$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
+	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'));
 
 	$createResult = $client->createAuthorIfNotExistsFor($_SESSION['user']->getId(), $_SESSION['user']->getFullName());
 	$response = $createResult->getResponse();

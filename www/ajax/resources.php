@@ -23,7 +23,7 @@ $multi    = $this->arg[2] == 'multi';
 $mime     = $_GET['mime'];
 
 $this->setVar([
-    'SITE_VERSION'  => Cfg::get('site_version'),
+    'SITE_VERSION'  => Config::get('site_version'),
     'SITE_LOCATION' => $this->site,
 ]);
 

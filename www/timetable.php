@@ -15,7 +15,7 @@ if (!isset($this)) {
 }
 
 // If External_DB not enabled do not display page
-if (!Cfg::get('external_enable')) {
+if (!Config::get('external_enable')) {
     error(19);
 }
 
@@ -230,8 +230,8 @@ foreach ($userList as $user) {
                                     $period_staff = '';
 
                                     // if not staff and external db is enabled
-                                    if (!$staffFlag && Cfg::get('external_enable')) {
-                                        switch (Cfg::get('external_type')) {
+                                    if (!$staffFlag && Config::get('external_enable')) {
+                                        switch (Config::get('external_type')) {
                                             case 'maze':
                                             case 'synergetic':
                                             case 'isams':

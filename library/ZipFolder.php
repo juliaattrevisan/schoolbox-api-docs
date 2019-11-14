@@ -15,7 +15,7 @@ class ZipFolder
     {
         $this->db = DeprecatedDatabase::getInstance();
         $this->folder = $folder;
-        $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
+        $this->tmpName = tempnam(Config::get('zip_dir'), 'zip');
         $this->tmpFolder = $this->tmpName . 'dir';
         $this->tmpZip = $this->tmpName . '.zip';
         $this->allowedChars = "[^0-9a-zA-Z()_-]";

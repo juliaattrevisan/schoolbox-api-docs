@@ -6,7 +6,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 $isSuperuser = $_SESSION['user']->isSuperuser();
-$isAllowedTeacher = ($_SESSION['user']->getRole()->isStaff() && \Cfg::get('enable_teacher_zip_upload'));
+$isAllowedTeacher = ($_SESSION['user']->getRole()->isStaff() && \Config::get('enable_teacher_zip_upload'));
 
 if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     $this->setFile(TEMPLATE_content, 'cms/zipFile.html');

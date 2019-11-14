@@ -21,6 +21,6 @@ class Filesystem extends \Alaress\Image\Cache\BrokenFS {
 	 * @param $key
 	 */
 	public function __construct($filename, $key) {
-        parent::__construct(\Cfg::get('stream_dir') . '/socialstream/thumbnails', $filename, $key);
+        parent::__construct(\Config::get('stream_dir') . '/socialstream/thumbnails', $filename, $key);
 	}
 }

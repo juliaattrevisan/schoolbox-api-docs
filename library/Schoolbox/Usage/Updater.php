@@ -15,14 +15,14 @@ class Updater {
 	 * Insert filesizes of all existing submissions
 	 */
 	public function updateSubmissions() {
-		$dirhandle = opendir(\Cfg::get('submission_dir'));
+		$dirhandle = opendir(\Config::get('submission_dir'));
 
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper();
 		$mimeMapper = new \Schoolbox\File\MimetypeMapper();
 
 		while ($filepointer = readdir($dirhandle)) {
 			if (($filepointer != '.') && ($filepointer != '..')) {
-				$size = filesize(\Cfg::get('submission_dir') . '/' . $filepointer);
+				$size = filesize(\Config::get('submission_dir') . '/' . $filepointer);
 
 				try {
 					$file = $mapper->findById(str_replace('.dat', '', $filepointer));
@@ -40,14 +40,14 @@ class Updater {
 	 * Insert filesizes of all existing returns
 	 */
 	public function updateReturns() {
-		$dirhandle = opendir(\Cfg::get('returns_dir'));
+		$dirhandle = opendir(\Config::get('returns_dir'));
 
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 		$mimeMapper = new \Schoolbox\File\MimetypeMapper();
 
 		while ($filepointer = readdir($dirhandle)) {
 			if (($filepointer != '.') && ($filepointer != '..')) {
-				$size = filesize(\Cfg::get('returns_dir') . '/' . $filepointer);
+				$size = filesize(\Config::get('returns_dir') . '/' . $filepointer);
 
 				try {
 					$file = $mapper->findById(str_replace('.dat', '', $filepointer));

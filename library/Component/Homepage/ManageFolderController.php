@@ -56,7 +56,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, "addmylinks", "addmylinks_block");
 
         // My links button
-        $url = 'http://' . Cfg::get('site_hostname') . '.' . Cfg::get('site_domain') . '/homepage/' . $this->getContext()->getId();
+        $url = 'http://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . '/homepage/' . $this->getContext()->getId();
 
         if ($this->myLinkHandler->linkExists($_SESSION['id'], $url)) {
             $this->setVar('addmylinks_block', '');

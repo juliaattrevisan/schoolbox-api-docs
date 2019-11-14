@@ -150,7 +150,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
 $hasRecipient = (isset($_POST['to']) && $_POST['to']) || (isset($_POST['bcc']) && $_POST['bcc']) || (isset($_POST['cc']) && $_POST['cc']);
 
 //if form has been submitted
-if($hasRecipient && Cfg::get('mail_enable'))
+if($hasRecipient && Config::get('mail_enable'))
 {
     $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
 

@@ -4,7 +4,7 @@
 require_once '../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-if (Cfg::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
+if (Config::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
     // Initiate SLO
     header('Location: /saml/logout.php');
     exit;
@@ -19,12 +19,12 @@ $redis = \Alaress\Redis::getClientInstance();
 $username = $redis->executeCommand($redis->createCommand('del',array($_COOKIE['remember'])));
 setcookie('remember', '', 1, '/');
 
-$samlLogoutUrl = trim(Cfg::get('saml_logout_url'));
+$samlLogoutUrl = trim(Config::get('saml_logout_url'));
 
 // Replace some dynamic variables in the logout URL if set
 $samlLogoutUrl = str_replace('{SCHOOLBOX_ADDRESS}',$_SERVER['SERVER_NAME'],$samlLogoutUrl);
 
-if (Cfg::get('saml_enabled') && strlen($samlLogoutUrl) > 0) {
+if (Config::get('saml_enabled') && strlen($samlLogoutUrl) > 0) {
     // Redirect to logout location
     header('Location: ' . $samlLogoutUrl);
     exit;

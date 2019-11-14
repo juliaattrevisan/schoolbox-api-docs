@@ -423,7 +423,7 @@ class External_Tass_User implements External_UserInterface
         $statement = $this->database->query($sql);
         $subjectList = array();
         while ($subject = $this->database->trimRow($statement->fetch())) {
-            if (Cfg::get('external_tass_year_in_class_code') == '0') {
+            if (Config::get('external_tass_year_in_class_code') == '0') {
                 $subject['year_grp'] = '';
             }
             $subjectList[] = [

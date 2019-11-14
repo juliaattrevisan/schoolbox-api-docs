@@ -11,7 +11,7 @@ $page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group();
 
 $isSuperuser = $groupHandler->isSuperuser();
-$isAllowedTeacher = ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload'));
+$isAllowedTeacher = ($groupHandler->isStaff() && \Config::get('enable_teacher_zip_upload'));
 
 /* Superusers and allowed teachers (via config option) are the only
  * permitted user types to upload zip folder hierarchies

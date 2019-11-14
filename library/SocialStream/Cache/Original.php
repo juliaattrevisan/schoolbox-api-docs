@@ -50,7 +50,7 @@ class Original extends \Alaress_Cache_Abstract
      */
     protected function setup()
     {
-        $this->cachedTime = \Cfg::get('xml_cache_timeout');
+        $this->cachedTime = \Config::get('xml_cache_timeout');
         $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 
@@ -92,10 +92,10 @@ class Original extends \Alaress_Cache_Abstract
          * so it reads directly from the original's location.
          */
         if ($urlDetection->isResourceUrl()) {
-            return \Cfg::get('file_dir') . '/' . $urlDetection->getId() . '.dat';
+            return \Config::get('file_dir') . '/' . $urlDetection->getId() . '.dat';
         }
 
-        return \Cfg::get('stream_dir') . '/socialstream/' . $this->cacheFilePrefix . '_' . $this->encode($this->url);
+        return \Config::get('stream_dir') . '/socialstream/' . $this->cacheFilePrefix . '_' . $this->encode($this->url);
     }
 
 

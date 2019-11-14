@@ -20,7 +20,7 @@ class Leave_Report_House_Factory {
 	public function __construct($page, $data) {
 		$this->setPage($page);
 		$this->setData($data);
-		$this->setClassname(ucwords(Cfg::get('site_location')));
+		$this->setClassname(ucwords(Config::get('site_location')));
 	}
 
 	/**

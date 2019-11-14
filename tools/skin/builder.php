@@ -118,7 +118,7 @@ HELP;
             /* Output custom css */
             if ($cfp = fopen(CUSTOM_CSS_FILE, 'w')) {
                 fputs($cfp, "// Do not edit, automatically created by tools/skin/builder.php\n");
-                fputs($cfp, Cfg::get('skin_custom_css'));
+                fputs($cfp, Config::get('skin_custom_css'));
                 fclose($cfp);
             }
 

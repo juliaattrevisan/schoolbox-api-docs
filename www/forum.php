@@ -52,7 +52,7 @@ if (($perm = $groupHandler->getPermission($category->getId())) < UserAccess::ACC
 // not write.
 $is_post_allowed = !$groupHandler->hasChildAccessOnly($category->getId());
 
-if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
+if (!$is_post_allowed && Config::get('restrict_parent_forum_access')) {
     error(19);
 }
 

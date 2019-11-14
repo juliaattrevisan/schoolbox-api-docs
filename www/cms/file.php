@@ -48,7 +48,7 @@ if (is_numeric($this->arg[0])) {
         'DESCRIPTION'      => Scrub::text($file->getTitle()),
         'COMMENT'          => Scrub::text($file->getDescription()),
         'VISIBLE_SELECTED' => $file->getHidden() > 0 ? '' : 'checked',
-        'MAX_FILE_SIZE'    => Cfg::get('max_file_size'),
+        'MAX_FILE_SIZE'    => Config::get('max_file_size'),
         'CATEGORY_ID'      => $folder->getId(),
         'CATEGORY_NAME'    => Scrub::text($folder->getName()),
         'DUE_DAY'          => '',
@@ -107,8 +107,8 @@ if (is_numeric($this->arg[0])) {
         'FILE_ID'          => '',
         'DESCRIPTION'      => '',
         'COMMENT'          => '',
-        'VISIBLE_SELECTED' => (Cfg::get('file_default_to_hidden') ? '' : 'checked'),
-        'MAX_FILE_SIZE'    => Cfg::get('max_file_size'),
+        'VISIBLE_SELECTED' => (Config::get('file_default_to_hidden') ? '' : 'checked'),
+        'MAX_FILE_SIZE'    => Config::get('max_file_size'),
         'CATEGORY_NAME'    => Scrub::text($folder->getName()),
         'CATEGORY_ID'      => $folder->getId(),
         'COMPONENT_ID'     => isset($this->arg[2]) ? $this->arg[2] : '',
@@ -147,8 +147,8 @@ if (is_numeric($this->arg[0])) {
     $this->setTab('resources');
 
     $output = array(
-        'MAX_FILE_SIZE'    => Cfg::get('max_file_size'),
-        'VISIBLE_SELECTED' => (Cfg::get('file_default_to_hidden') ? '' : 'checked'),
+        'MAX_FILE_SIZE'    => Config::get('max_file_size'),
+        'VISIBLE_SELECTED' => (Config::get('file_default_to_hidden') ? '' : 'checked'),
     );
 
     $this->setVar($output);

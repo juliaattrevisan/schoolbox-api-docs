@@ -528,14 +528,14 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			$date = Alaress_Date_Format::newLocalShort($date);
 		}
 
-		$breakfastStart = new Alaress_Date_Format(strtotime( $date->getDatabaseDate() .' '. Cfg::get('boarder_breakfast_start')), 'U');
-		$breakfastEnd = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_breakfast_end')), 'U');
+		$breakfastStart = new Alaress_Date_Format(strtotime( $date->getDatabaseDate() .' '. Config::get('boarder_breakfast_start')), 'U');
+		$breakfastEnd = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Config::get('boarder_breakfast_end')), 'U');
 
-		$lunchStart = new Alaress_Date_Format( strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_lunch_start')), 'U');
-		$lunchEnd = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_lunch_end')), 'U');
+		$lunchStart = new Alaress_Date_Format( strtotime($date->getDatabaseDate() .' '.  Config::get('boarder_lunch_start')), 'U');
+		$lunchEnd = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Config::get('boarder_lunch_end')), 'U');
 
-		$dinnerStart = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_dinner_start')), 'U');
-		$dinnerEnd = new Alaress_Date_Format( strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_dinner_end')), 'U');
+		$dinnerStart = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Config::get('boarder_dinner_start')), 'U');
+		$dinnerEnd = new Alaress_Date_Format( strtotime($date->getDatabaseDate() .' '.  Config::get('boarder_dinner_end')), 'U');
 
 		/* Mega query
 		   */

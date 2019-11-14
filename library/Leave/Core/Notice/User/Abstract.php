@@ -38,7 +38,7 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
 			'LEAVE_HOST_NAME' => $this->getRequest()->getHostName(),
 			'LEAVE_HOST_PHONE' => $this->getRequest()->getHostPhone(),
 			'LEAVE_STUDENT_PHONE' => $this->getRequest()->getUserPhone(),
-			'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
+			'TERMS_AND_CONDITIONS' => Config::get('terms_and_conditions'),
 		));
 
 		$this->setEmail($email);

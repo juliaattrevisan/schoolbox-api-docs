@@ -265,7 +265,7 @@ class Group extends DeprecatedModel
     function allowOwner($userID)
     {
         //checks if the user can become the owner of group
-        if (Cfg::get('group_staff_only')) {
+        if (Config::get('group_staff_only')) {
             return $this->isStaff($userID);
         } else {
             return true;
@@ -483,7 +483,7 @@ class Group extends DeprecatedModel
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
         if ($user->getRole()->isStaff()
-            && (Cfg::get('news_staff_post_enabled') == '1')
+            && (Config::get('news_staff_post_enabled') == '1')
             && ($this->_service == UserAccess::SERVICE_NEWS)
             && ($permission < UserAccess::ACCESS_WRITE)
         ) {
@@ -707,7 +707,7 @@ class Group extends DeprecatedModel
 
         $catList = array();
 
-        if ($includeSubjectList == true && Cfg::get('external_enable')) {
+        if ($includeSubjectList == true && Config::get('external_enable')) {
             foreach ($this->involvedInSubjects($userID) as $subject) {
                 // Subjects must still respect $accessType
                 if ($this->getPermission($subject['id'], $userID) >= $accessType) {

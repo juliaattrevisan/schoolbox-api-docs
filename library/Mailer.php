@@ -44,8 +44,8 @@ class Mailer extends \Alaress\Mail\AbstractMailer {
     function getTemplate ($template) {
         $root = defined('MAIL_templates') ? MAIL_templates : SITE_root . '/templates';
 
-        if ( is_file($root . '/' . Cfg::get('site_location') . '/email/' . $template) ) {
-            return Cfg::get('site_location') . '/email/' . $template;
+        if ( is_file($root . '/' . Config::get('site_location') . '/email/' . $template) ) {
+            return Config::get('site_location') . '/email/' . $template;
         }
         else {
             return 'core/email/' . $template;
@@ -96,9 +96,9 @@ class Mailer extends \Alaress\Mail\AbstractMailer {
      * @return string
      */
     public static function translateTemplatePathToMailPath($template) {
-        $schoolTemplate  = strtolower(Cfg::get('site_location')).'/'.$template;
+        $schoolTemplate  = strtolower(Config::get('site_location')).'/'.$template;
         $genericTemplate = 'core/'.$template;
-        if (file_exists(Cfg::get('template_dir').'/'.$schoolTemplate)) {
+        if (file_exists(Config::get('template_dir').'/'.$schoolTemplate)) {
             return '../../'.$schoolTemplate;
         }
         return '../../'.$genericTemplate;

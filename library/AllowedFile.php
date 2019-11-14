@@ -18,7 +18,7 @@ class AllowedFile extends DeprecatedModel {
 			case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
 				return array('code' => 10);
 					break;
-			case 2: //uploaded file exceeds the Cfg::get('max_file_size') directive that was specified in the html form
+			case 2: //uploaded file exceeds the Config::get('max_file_size') directive that was specified in the html form
 				return array('code' => 10);
 				break;
 			case 3: //uploaded file was only partially uploaded

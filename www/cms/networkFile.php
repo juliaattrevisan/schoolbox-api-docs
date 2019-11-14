@@ -3,7 +3,7 @@
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Attachment\Zone;
 
-if (!Cfg::get('webdav_enable')) {
+if (!Config::get('webdav_enable')) {
     error(2);
 }
 
@@ -42,7 +42,7 @@ if (is_numeric($this->arg[0])) {
         'ACTION' => 'Modify',
         'FILE_ID' => $file['id'],
         'DESCRIPTION' => Scrub::text($file['description']),
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+        'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $file['parent'],
     );
     $this->setVar($output);
@@ -83,7 +83,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'ACTION' => 'Post',
         'FILE_ID' => '',
         'DESCRIPTION' => '',
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+        'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $parent['id'],
     );
 

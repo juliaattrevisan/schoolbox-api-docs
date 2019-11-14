@@ -126,8 +126,8 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
                     $this->setVar([
                         'THUMBNAIL_ID' => $currentImage->getId(),
                         'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
-                        'THUMBNAIL_SIZE' => Cfg::get('thumbnail_size'),
-                        'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+                        'THUMBNAIL_SIZE' => Config::get('thumbnail_size'),
+                        'IMAGE_HEIGHT' => Config::get('thumbnail_size'),
                     ]);
 
                     $this->parse('image_gallery_block', 'image_gallery', true);
