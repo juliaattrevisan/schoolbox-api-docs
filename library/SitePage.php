@@ -56,7 +56,10 @@ class SitePage extends Page
     {
         parent::__construct();
 
+        // TODO remove this, always use config loader from DI
         $this->config = \Config::getInstance();
+
+        // TODO ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
         if ($di) {
             $this->di = $di;
         }

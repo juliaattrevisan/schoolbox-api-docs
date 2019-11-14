@@ -33,6 +33,8 @@ class Controller extends ConfigController
     public function getSettings(string $typeLabel = null): void
     {
         $typeLabel  = $typeLabel ? urldecode($typeLabel) : 'Site';
+
+        // TODO replace typelist with something from config mapper
         $typeLabels = array_column(Cfg::getTypeList() ?: [], 'type');
 
         if (!\in_array($typeLabel, $typeLabels, true)) {
