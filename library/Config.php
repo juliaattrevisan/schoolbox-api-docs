@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
