@@ -43,10 +43,6 @@ class Config extends DeprecatedModel {
             return ConfigLoader::getInstance()->get($configName);
         }
 
-        static public function set($configName, $configValue) {
-                return self::getInstance()->update(array('name' => $configName, 'value' => $configValue));
-        }
-
         public static function getTypeList() {
                 self::getInstance();
 
