@@ -801,3 +801,11 @@ ul.az-error-list {
     padding: 0.5rem 1rem;
   }
 }
+
+.dropzone-wrap {
+  .close-button {
+    float: right;
+    background-color: transparent;
+    color: $attachzone-error-color;
+  }
+}
