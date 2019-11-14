@@ -42,23 +42,4 @@ class Config extends DeprecatedModel {
         {
             return ConfigLoader::getInstance()->get($configName);
         }
-
-        public static function getTypeList() {
-                self::getInstance();
-
-                $query = "
-                        SELECT DISTINCT `lu_config_type`.`type`
-                        FROM `config`
-                        INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
-                        WHERE 1=1 ";
-
-                /* filter out references to leave module if not enabled */
-                if (!self::get('boarder_leave_enabled')) {
-                        $query .= "AND `config`.`type_id` != '".ConfigMapper::TYPE_BOARD."'";
-                }
-
-                $query .= "ORDER BY `config`.`configID` ASC";
-
-                return DeprecatedDatabase::getInstance()->getAll($query);
-        }
 }
