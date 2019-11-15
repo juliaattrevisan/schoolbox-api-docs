@@ -49,6 +49,12 @@ class Model implements ISoftDeletable
      */
     private $involved;
 
+    /** @var bool $usesRelativeDate */
+    private $usesRelativeDate;
+
+    /** @var string $relativeDate */
+    private $relativeDate;
+
     /**
      * Optional. Can be Null.
      *
@@ -380,6 +386,41 @@ class Model implements ISoftDeletable
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * @param bool $usesRelativeDate
+     * @return self
+     */
+    public function setUsesRelativeDate(bool $usesRelativeDate) : self
+    {
+        $this->usesRelativeDate = $usesRelativeDate;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUsesRelativeDate() : bool
+    {
+        return $this->usesRelativeDate;
+    }
+
+    /**
+     * @param string $relativeDate
+     * @return self
+     */
+    public function setRelativeDate(string $relativeDate) : self
+    {
+        $this->relativeDate = $relativeDate;
+
+        return $this;
+    }
+
+    public function getRelativeDate() : string
+    {
+        return $this->relativeDate;
     }
 
     /**
