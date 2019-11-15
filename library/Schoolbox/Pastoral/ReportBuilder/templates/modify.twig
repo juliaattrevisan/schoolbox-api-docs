@@ -94,17 +94,17 @@
             <section>
                 <fieldset class="radiolist content">
                     <div class="small-12 large-6 columns">
-                        <input type="radio" name="date-option" id="relative-dates-option" value="relative" checked/>
+                        <input type="radio" name="date-option" id="relative-dates-option" value="relative" {% if report.usesRelativeDate %}checked{% endif %}/>
                         <label for="relative-dates-option">Use relative date range</label>
                     </div>
                     <div class="small-12 large-6 columns">
-                        <input type="radio" name="date-option" id="absolute-dates-option" value="absolute"/>
+                        <input type="radio" name="date-option" id="absolute-dates-option" value="absolute" {% if not report.usesRelativeDate %}checked{% endif %}/>
                         <label for="absolute-dates-option">Use absolute date range</label>
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
-                    <div id="relative-dates" class="small-12 columns">
+                    <div id="relative-dates" class="small-12 columns{% if not report.usesRelativeDate %} hide{% endif %}">
                         <label for="relative-dates-dropdown">Time period</label>
                         <select id="relative-dates-dropdown" name="relative-dates-dropdown">
                             {% for label,value in datePresets %}
@@ -113,7 +113,7 @@
                         </select>
                     </div>
 
-                    <div id="absolute-dates" class="hide">
+                    <div id="absolute-dates" {% if report.usesRelativeDate %}class="hide"{% endif %}>
                         <div class="small-12 large-6 columns">
                             <label for="datetime_after">
                                 From
