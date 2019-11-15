@@ -41,7 +41,8 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
-        $this->uses('uses')
+        $this->uses('usesRelativeDate', self::TYPE_BOOLEAN);
+        $this->uses('relativeDate', self::TYPE_BOOL_ENUM);
         $this->uses('before_date', self::TYPE_DATETIME);
         $this->uses('after_date', self::TYPE_DATETIME);
         $this->uses('involved', self::TYPE_BOOLEAN);
