@@ -425,9 +425,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return bool
+     * @return null|bool
      */
-    public function getUsesRelativeDate() : bool
+    public function getUsesRelativeDate() : ?bool
     {
         return $this->usesRelativeDate;
     }
