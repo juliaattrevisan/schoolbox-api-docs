@@ -42,8 +42,7 @@ class Mapper extends BaseMapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('uses_relative_date', self::TYPE_BOOLEAN);
-        // TODO getting column not found error on relative_date_string
-        $this->uses('relative_date_string', self::TYPE_STRING, self::COLUMN_ENUM, Model::getAllRelativeDateStrings());
+        $this->uses('relative_date_string', self::TYPE_STRING, self::COLUMN_ENUM, 'relative_date_string', Model::getAllRelativeDateStrings());
         $this->uses('before_date', self::TYPE_DATETIME);
         $this->uses('after_date', self::TYPE_DATETIME);
         $this->uses('involved', self::TYPE_BOOLEAN);
