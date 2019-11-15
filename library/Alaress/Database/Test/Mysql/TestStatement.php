@@ -231,27 +231,12 @@ class TestStatement extends TestCase
      */
     public function testFunctionCall()
     {
-        // create and drop test function here, instead of in updates
-        // This can't be done in a transaction.
-        $this->schoolbox->executeQuery("
-            CREATE FUNCTION IF NOT EXISTS testFunction (`input` VARCHAR(255))
-                RETURNS VARCHAR(500)
-                DETERMINISTIC NO SQL
-                BEGIN
-                    DECLARE `concatenated` VARCHAR(500);
-                    SET `concatenated` = CONCAT('testFunctionDidThis:', `input`);
-                    RETURN `concatenated`;
-                END;
-        ");
-
         $this->schoolbox->transact(function () {
-            $function = $this->schoolbox->executeFunctionCall('testFunction', [
-                'input' => 'Got Milk?',
+            $function = $this->schoolbox->executeFunctionCall('REVERSE', [
+                'input' => '12345',
             ]);
 
-            $this->assertSame($function->fetchColumn(), 'testFunctionDidThis:Got Milk?');
+            $this->assertSame($function->fetchColumn(), '54321');
         });
-
-        $this->schoolbox->executeQuery("DROP FUNCTION IF EXISTS testFunction;");
     }
 }

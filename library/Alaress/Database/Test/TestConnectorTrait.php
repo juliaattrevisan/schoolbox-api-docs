@@ -77,10 +77,10 @@ trait TestConnectorTrait
 
         $this->schoolbox = $factory->createMysql();
         return $this->schoolbox->connect(
-            '192.168.36.10',
+            'localhost',
             'schoolbox',
-            'root',
-            'tnp879'
+            'schoolboxvagrant',
+            'abc123'
         );
     }
 

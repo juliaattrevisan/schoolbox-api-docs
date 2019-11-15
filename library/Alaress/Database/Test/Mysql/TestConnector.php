@@ -34,10 +34,10 @@ class TestConnector extends TestCase
 
         $schoolbox = $factory->createMysql();
         $result = $schoolbox->connect(
-            '192.168.36.10',
+            'localhost',
             'schoolbox',
-            'root',
-            'tnp879'
+            'schoolboxvagrant',
+            'abc123'
         );
 
         $this->assertTrue($result, "Failed to connect to Schoolbox database");
@@ -60,10 +60,10 @@ class TestConnector extends TestCase
 
         $connectorOriginal = $factory->createMysql();
         $connectorOriginal->connect(
-            '192.168.36.10',
+            'localhost',
             'schoolbox',
-            'root',
-            'tnp879'
+            'schoolboxvagrant',
+            'abc123'
         );
 
         $connectorSerialized = serialize($connectorOriginal);
