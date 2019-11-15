@@ -50,7 +50,7 @@ class TestPostProcessor extends TestCase
 
         $schoolbox = $factory->createMysql();
         $schoolbox->connect(
-            '192.168.36.10',
+            'localhost',
             'schoolbox',
             'schoolboxvagrant',
             'abc123'

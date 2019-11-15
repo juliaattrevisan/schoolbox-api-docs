@@ -34,7 +34,7 @@ class TestConnector extends TestCase
 
         $schoolbox = $factory->createMysql();
         $result = $schoolbox->connect(
-            '192.168.36.10',
+            'localhost',
             'schoolbox',
             'schoolboxvagrant',
             'abc123'
@@ -60,7 +60,7 @@ class TestConnector extends TestCase
 
         $connectorOriginal = $factory->createMysql();
         $connectorOriginal->connect(
-            '192.168.36.10',
+            'localhost',
             'schoolbox',
             'schoolboxvagrant',
             'abc123'
