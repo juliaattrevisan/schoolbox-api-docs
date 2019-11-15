@@ -65,7 +65,8 @@ class Controller extends Base
     private $houseMapper;
 
     // TODO this is an enum in the DB; don't repeat it here??
-    // TODO do we even need these constants any more now that YEAR doesn't have to be special cased?
+    // TODO do we even need these constants any more now that YEAR doesn't have to be special cased? (for now, yes, to set the default)
+    // These are enums in DB, you will need to update column definition if you add to this list
     private const THIS_YEAR = 'first day of january';
     private const PAST_6_MONTHS = '6 months ago';
     private const PAST_3_MONTHS = '3 months ago';
@@ -74,6 +75,7 @@ class Controller extends Base
     private const PAST_WEEK = '7 days ago';
     private const TODAY = 'today';
 
+    // Mappings of labels to values for the dropdown in the form
     private const RELATIVE_DATE_PRESETS = [
         'This year' => self::THIS_YEAR,
         'Past 6 months' => self::PAST_6_MONTHS,
