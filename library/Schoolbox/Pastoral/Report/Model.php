@@ -135,6 +135,15 @@ class Model implements ISoftDeletable
     /** @var Collection|PastoralGroup\Model[] $groups */
     private $groups;
 
+    // These are enums in DB, you will need to update column definition if you add to this list
+    private const THIS_YEAR = 'first day of january';
+    private const PAST_6_MONTHS = '6 months ago';
+    private const PAST_3_MONTHS = '3 months ago';
+    private const PAST_MONTH = '1 month ago';
+    private const PAST_FORTNIGHT = '14 days ago';
+    private const PAST_WEEK = '7 days ago';
+    private const TODAY = 'today';
+
     /**
      * Model constructor
      */
@@ -150,6 +159,22 @@ class Model implements ISoftDeletable
 
         // This is a collection of groups that have access to this report
         $this->groups = new GenericCollection(PastoralGroup\Model::class);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getAllRelativeDateStrings() : array
+    {
+        return [
+            self::THIS_YEAR,
+            self::PAST_6_MONTHS,
+            self::PAST_3_MONTHS,
+            self::PAST_MONTH,
+            self::PAST_FORTNIGHT,
+            self::PAST_WEEK,
+            self::TODAY
+        ];
     }
 
     /**
@@ -418,7 +443,10 @@ class Model implements ISoftDeletable
         return $this;
     }
 
-    public function getRelativeDate() : string
+    /**
+     * @return string|null
+     */
+    public function getRelativeDate() : ?string
     {
         return $this->relativeDate;
     }

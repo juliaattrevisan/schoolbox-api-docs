@@ -64,26 +64,14 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
-    // TODO this is an enum in the DB; don't repeat it here??
-    // TODO do we even need these constants any more now that YEAR doesn't have to be special cased? (for now, yes, to set the default)
-    // These are enums in DB, you will need to update column definition if you add to this list
-    private const THIS_YEAR = 'first day of january';
-    private const PAST_6_MONTHS = '6 months ago';
-    private const PAST_3_MONTHS = '3 months ago';
-    private const PAST_MONTH = '1 month ago';
-    private const PAST_FORTNIGHT = '14 days ago';
-    private const PAST_WEEK = '7 days ago';
-    private const TODAY = 'today';
-
-    // Mappings of labels to values for the dropdown in the form
-    private const RELATIVE_DATE_PRESETS = [
-        'This year' => self::THIS_YEAR,
-        'Past 6 months' => self::PAST_6_MONTHS,
-        'Past 3 months' => self::PAST_3_MONTHS,
-        'Past month' => self::PAST_MONTH,
-        'Past fortnight' => self::PAST_FORTNIGHT,
-        'Past week' => self::PAST_WEEK,
-        'Today' => self::TODAY
+    private const RELATIVE_DATE_LABELS = [
+        'This year',
+        'Past 6 months',
+        'Past 3 months',
+        'Past month',
+        'Past fortnight',
+        'Past week',
+        'Today'
     ];
 
     /**
@@ -275,12 +263,20 @@ class Controller extends Base
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
-                    'datePresets'      => self::RELATIVE_DATE_PRESETS,
+                    'datePresets'      => $this->retrieveRelativeDateLabels(),
                     'selectedRelativeDate' => $report->getRelativeDate()
                 ],
                 'title' => 'Pastoral Report',
             ]
         );
+    }
+
+    /**
+     * Mappings of labels to values for the dropdown in the form
+     * @return array|false
+     */
+    private function retrieveRelativeDateLabels() {
+        return array_combine(self::RELATIVE_DATE_LABELS, PastoralReport::getAllRelativeDateStrings());
     }
 
     /**
@@ -425,8 +421,8 @@ class Controller extends Base
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
-        // TODO can we get this default from the DB somehow?
-        $pastoralReport->setRelativeDate(self::THIS_YEAR);
+        // Relative date defaults to This Year
+        $pastoralReport->setRelativeDate($this->retrieveRelativeDateLabels()['This year']);
 
         if (!empty($post['date-option'] && $post['date-option'] === 'absolute')) {
             $pastoralReport->setUsesRelativeDate(false);
@@ -449,7 +445,7 @@ class Controller extends Base
 
             // Update with POSTed relative date if it's valid
             $relativeDateString = $post['relative-dates-dropdown'];
-            if (!empty($relativeDateString) && in_array($relativeDateString, array_values(self::RELATIVE_DATE_PRESETS), true)) {
+            if (!empty($relativeDateString) && in_array($relativeDateString, PastoralReport::getAllRelativeDateStrings(), true)) {
                 $pastoralReport->setRelativeDate($relativeDateString);
             }
         }
