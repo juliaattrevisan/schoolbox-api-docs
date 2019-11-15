@@ -64,7 +64,9 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
-    private const THIS_YEAR = 'this year'; // TODO first day of year
+    // TODO this is an enum in the DB; don't repeat it here??
+    // TODO do we even need these constants any more now that YEAR doesn't have to be special cased?
+    private const THIS_YEAR = 'first day of january';
     private const PAST_6_MONTHS = '6 months ago';
     private const PAST_3_MONTHS = '3 months ago';
     private const PAST_MONTH = '1 month ago';
@@ -121,44 +123,6 @@ class Controller extends Base
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
-    }
-
-    /**
-     * Helper method to convert a plain english relative date to an ADF object
-     *
-     * @param string $relativeDateString
-     * @return Alaress_Date_Format
-     */
-    private function relativeDateStringToADF(string $relativeDateString) : Alaress_Date_Format
-    {
-        $adf = Alaress_Date_Format::newFromTimestamp(strtotime($relativeDateString));
-
-        if ($relativeDateString === self::THIS_YEAR) {
-            return $adf->startOfYear();
-        }
-
-        return $adf->startOfDay();
-    }
-
-    /**
-     * Helper method to find the relative date that was selected from the dropdown, for purposes of pre-selecting it on modify
-     *
-     * @param PastoralReport $report
-     * @return string|null
-     */
-    private function retrieveSelectedRelativeDate(PastoralReport $report) : ?string
-    {
-        if ($report && $report->getAfterDate()) {
-            foreach (self::RELATIVE_DATE_PRESETS as $label => $value) {
-                $reportDate = $report->getAfterDate()->startOfDay()->getUnixTimeStamp();
-                $datePreset = $this->relativeDateStringToADF($value)->getUnixTimeStamp();
-                if ($datePreset === $reportDate) {
-                    return $value;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -310,7 +274,7 @@ class Controller extends Base
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
                     'datePresets'      => self::RELATIVE_DATE_PRESETS,
-                    'selectedRelativeDate' => $this->retrieveSelectedRelativeDate($report)
+                    'selectedRelativeDate' => $report->getRelativeDate()
                 ],
                 'title' => 'Pastoral Report',
             ]
@@ -392,10 +356,17 @@ class Controller extends Base
     {
         // Get matching records
 
+        $beforeDate = Alaress_Date_Format::now();
+        $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDate()));
+        if (!$report->getUsesRelativeDate()) {
+            $beforeDate = $report->getBeforeDate();
+            $afterDate = $report->getAfterDate();
+        }
+
         return $this->pastoralDataSource->getReportData(
             $this->getUser(),
-            $report->getBeforeDate(),
-            $report->getAfterDate(),
+            $beforeDate,
+            $afterDate,
             $report->getSeverity(),
             $report->getTypes(),
             $report->getSubTypes(),
@@ -452,18 +423,11 @@ class Controller extends Base
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
+        // TODO can we get this default from the DB somehow?
+        $pastoralReport->setRelativeDate(self::THIS_YEAR);
 
-        // If the user opted for the relative date input, use that.
-        if (!empty($post['date-option'] && $post['date-option'] === 'relative')) {
-            $relativeDateString = $post['relative-dates-dropdown'];
-
-            // Only use the user's input if the selected option matches one of our preset strtotime-able options
-            if (!empty($relativeDateString) && in_array($relativeDateString, array_values(self::RELATIVE_DATE_PRESETS), true)) {
-                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort(Alaress_Date_Format::now()));
-                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($this->relativeDateStringToADF($relativeDateString)));
-            }
-        } else {
-            // No relative date data, or the user opted for absolute dates?
+        if (!empty($post['date-option'] && $post['date-option'] === 'absolute')) {
+            $pastoralReport->setUsesRelativeDate(false);
 
             if (!empty($post['before'])) {
                 $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
@@ -475,6 +439,16 @@ class Controller extends Base
                 $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
             } else {
                 $pastoralReport->setAfterDate(null);
+            }
+        } else {
+            $pastoralReport->setUsesRelativeDate(true);
+            $pastoralReport->setBeforeDate(null);
+            $pastoralReport->setAfterDate(null);
+
+            // Update with POSTed relative date if it's valid
+            $relativeDateString = $post['relative-dates-dropdown'];
+            if (!empty($relativeDateString) && in_array($relativeDateString, array_values(self::RELATIVE_DATE_PRESETS), true)) {
+                $pastoralReport->setRelativeDate($relativeDateString);
             }
         }
 
