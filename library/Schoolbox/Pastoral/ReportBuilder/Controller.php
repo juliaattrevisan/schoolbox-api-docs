@@ -243,6 +243,11 @@ class Controller extends Base
             $report->setDashboard(false);
         }
 
+        // Default to using relative date
+        $report->setUsesRelativeDate(true);
+        // Relative date defaults to This Year
+        $report->setRelativeDateString($this->retrieveRelativeDateLabels()['This year']);
+
         // And render this thing out
         $this->getResponse()->content->set(
             [
