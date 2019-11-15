@@ -95,20 +95,29 @@ class RelationshipFilterer
                                               ->in($this->userMapper->getIdentifierColumn(), $userIds);
         $users             = $this->userMapper->findByPredicates($pb);
         $parentExternalIds = [];
+        $userExternalIds = [];
+
         foreach ($users as $user) {
-            if (!$user->getExternalId()) {
-                continue;
-            }
-            $userContacts = $this->externalUser->getStudentContactList($user->getExternalId());
-            foreach ($userContacts as $userContact) {
-                if ($userContact['StudentContactID']) {
-                    $parentExternalIds[] = "'{$userContact['StudentContactID']}'";
-                }
-                if ($userContact['StudentContactSpouseID']) {
-                    $parentExternalIds[] = "'{$userContact['StudentContactSpouseID']}'";
-                }
+            if ($user->getExternalId()) {
+                $userExternalIds[] = $user->getExternalId();
             }
         }
+
+        if (!\count($userExternalIds)) {
+            return [];
+        }
+
+        $userContacts = $this->externalUser->getStudentContactList($userExternalIds);
+
+        foreach ($userContacts as $userContact) {
+            if ($userContact['StudentContactID']) {
+                $parentExternalIds[] = "'{$userContact['StudentContactID']}'";
+            }
+            if ($userContact['StudentContactSpouseID']) {
+                $parentExternalIds[] = "'{$userContact['StudentContactSpouseID']}'";
+            }
+        }
+
         if (!\count($parentExternalIds)) {
             return [];
         }

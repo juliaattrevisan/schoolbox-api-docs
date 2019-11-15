@@ -218,8 +218,14 @@ class External_Schooledge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
+        $ids = implode(',', array_map([$this->database, 'smartQuote'], $externalUserId));
+
         $query = "
             SELECT
                 c.Code AS StudentContactID,
@@ -249,7 +255,7 @@ class External_Schooledge_User implements External_UserInterface
             -- LEFT JOIN Family f ON cf.FamilyID = f.ID
             LEFT JOIN vw_Contact_Addresses ca ON c.ID = ca.ContactID
             {$this->buildStudentContactAdhocJoins()}
-            WHERE s.Code = {$this->database->smartQuote($externalUserId)}
+            WHERE s.Code IN ($ids)
             AND
             (
               sc.ResidentialGuardian = 'Y' OR

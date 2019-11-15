@@ -112,11 +112,17 @@ class Freedom implements IQueryHelper
 
 
     /**
-     * @param string $studentExternalId
+     * @param array $studentExternalId
      * @return array
      */
-    public function getGetStudentContactListQuery($studentExternalId): array
+    public function getGetStudentContactListQuery(array $studentExternalId): array
     {
+        if (empty($studentExternalId)) {
+            return [];
+        }
+
+        $ids = implode(',', $studentExternalId);
+
         $sql = "
             SELECT
             CONVERT(varchar(10), I.MEMBER#)     AS StudentContactID,
@@ -145,14 +151,13 @@ class Freedom implements IQueryHelper
             WHERE (A.RELATION_STAT = :relationStatus)
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
-            AND (S.STUDKEY = :studentId)
+            AND (S.STUDKEY IN ($ids))
             ORDER BY I.MEMBER# ASC;
         ";
 
         $params = [
             'relationStatus' => self::RELATION_CHILD,
             'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'studentId'      => $studentExternalId
         ];
 
         return [ $sql, $params ];

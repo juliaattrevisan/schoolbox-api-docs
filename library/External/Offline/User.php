@@ -63,7 +63,7 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
         return [];
     }

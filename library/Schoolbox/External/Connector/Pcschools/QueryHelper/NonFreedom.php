@@ -231,11 +231,17 @@ class NonFreedom implements IQueryHelper
 
 
     /**
-     * @param string $studentExternalId
+     * @param array $studentExternalId
      * @return array
      */
-    public function getGetStudentContactListQuery($studentExternalId): array
+    public function getGetStudentContactListQuery(array $studentExternalId): array
     {
+        if (empty($studentExternalId)) {
+            return [];
+        }
+
+        $ids = implode(',', $studentExternalId);
+
         $sql = '
             SELECT
                 F.IDENTITY_ID#,
@@ -281,14 +287,10 @@ class NonFreedom implements IQueryHelper
                 F.CGIVE_STATUS
             FROM FAMILY AS F
             INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE S.STUDKEY = :studentId
+            WHERE S.STUDKEY IN ('. $ids .')
         ';
 
-        $params = [
-            'studentId' => $studentExternalId
-        ];
-
-        return [ $sql, $params ];
+        return [ $sql, [] ];
     }
 
 

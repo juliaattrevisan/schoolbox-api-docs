@@ -9,6 +9,7 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -195,8 +196,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
+        $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
+
         $caseSensitiveFields = array(
             'StudentContactID',
             'StudentContactTitle',
@@ -223,12 +230,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               P.SPOUSE_MOBILE AS STUDENTCONTACTSPOUSEMOBILEPHONE, P.COMBINED_EMAIL_ADDRESS AS STUDENTCONTACTSPOUSEDEFAULTEMAIL
             FROM SCHOOLBOX_PARENTS P
             INNER JOIN SCHOOLBOX_PARENT_STUDENT PS ON P.CARER_NUMBER = PS.CARER_NUMBER
-            WHERE PS.STUDENT_NUMBER = :id
+            WHERE PS.STUDENT_NUMBER IN ({$predicate['placeholders']})
         ");
 
-        $stmt->execute(array(
-            'id' => $externalUserId
-        ));
+        $stmt->execute($predicate['bindings']);
 
         $parents = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -462,17 +467,25 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getParentEmails(array $externalUserIds): array
     {
-        $emails = array();
-        foreach ($externalUserIds as $externalUserId) {
-            $userEmails = array();
-            foreach ($this->getStudentContactList($externalUserId) as $contact) {
-                $userEmails[] = $contact['StudentContactDefaultEmail'];
-                $userEmails[] = $contact['StudentContactSpouseDefaultEmail'];
-            }
-            foreach ($userEmails as $i => $email) {
-                $emails[$externalUserId . '-' . $i] = $email;
-            }
+        $emails = [];
+        $userEmails = [];
+        $contacts = $this->getStudentContactList($externalUserIds);
+
+        foreach ($contacts as $contact) {
+            $userEmails[] = [
+                'externalId' => $contact['StudentContactID'],
+                'email' => $contact['StudentContactDefaultEmail']
+            ];
+            $userEmails[] = [
+                'externalId' => $contact['StudentContactID'],
+                'email' => $contact['StudentContactSpouseDefaultEmail']
+            ];
         }
+
+        foreach ($userEmails as $i => $email) {
+            $emails[$email['externalId'] . '-' . $i] = $email['email'];
+        }
+
         return array_filter(array_unique($emails));
     }
 

@@ -356,7 +356,7 @@ function renderStudent(
     // Load contact's user IDs
     $contacts    = [];
     if ($user['synergy_id']) {
-        $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
+        $contactList = $synUserHandler->getStudentContactList([$user['synergy_id']]);
         foreach ($contactList as $contact) {
             $main = null;
             try {

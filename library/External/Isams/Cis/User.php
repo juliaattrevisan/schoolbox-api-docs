@@ -7,14 +7,22 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+
 
 class External_Isams_Cis_User extends External_Isams_User
 {
     /**
      * @inheritdoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
+        $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
+
         $query = "
             SELECT      
                         V_Parent.ParentID             AS StudentContactID,
@@ -43,9 +51,9 @@ class External_Isams_Cis_User extends External_Isams_User
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
-            WHERE       V_Student.StudentID = :external_user_id
+            WHERE       V_Student.StudentID IN ({$predicate['placeholders']})
         ";
 
-        return $this->getConnector()->executeQuery($query , ['external_user_id' => $externalUserId])->fetchAll();
+        return $this->getConnector()->executeQuery($query, $predicate['bindings'])->fetchAll();
     }
 }

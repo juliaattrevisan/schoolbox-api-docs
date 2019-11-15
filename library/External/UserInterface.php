@@ -94,10 +94,10 @@ interface External_UserInterface extends External\IConnector
      *
      * @importance high - used on student profile page, and the report card.
      *
-     * @param string $externalUserId
+     * @param array $externalUserId
      * @return array
      */
-    public function getStudentContactList(string $externalUserId): array;
+    public function getStudentContactList(array $externalUserId): array;
 
     /**
      * Gets a list of Contacts for all Students in a particular year level.

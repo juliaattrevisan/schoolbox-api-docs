@@ -731,9 +731,23 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getStudentContactList(string $externalUserId): array
+    public function getStudentContactList(array $externalUserId): array
     {
-        if (!$this->isExternalIdValid($externalUserId)) {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
+        /**
+         * Return valid external ID's only and convert it into a string delimited by comma (,) to be used in the
+         * query below using an IN statement.
+         */
+        $validExternalIds = array_filter($externalUserId, function ($externalUserId) {
+            return $this->isExternalIdValid($externalUserId);
+        });
+
+        $predicate = Builder::getArrayBindings($validExternalIds, 'studentIds');
+
+        if (!$validExternalIds) {
             return [];
         }
 
@@ -770,27 +784,34 @@ class External_Synergetic_User implements External_UserInterface
                                 Semester.FileSemester = a.FileSemester AND
                                 Semester.FileYear = a.FileYear AND
                                 Semester.SystemCurrentFlag = 1
-            WHERE           StudentID = :externalId AND
+            WHERE           StudentID IN ({$predicate['placeholders']}) AND
                             StudentContactType IN ({$contactTypes['placeholders']})
         ";
 
-        $statement = $this->getConnector()->executeQuery($query, array_merge($contactTypes['bindings'], ['externalId' => $externalUserId]));
+        $statement = $this->getConnector()->executeQuery(
+            $query,
+            array_merge(
+                $contactTypes['bindings'],
+                $predicate['bindings']
+            )
+        );
+
         $contacts = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
         $contactReturn = [];
         //Dedupe contacts when mother and father are both contacts
         foreach ($contacts as $contact) {
-            if (isset($contactIdList[$contact['StudentContactID']]) || isset($contactIdList[$contact['StudentContactSpouseID']])) {
+            if (isset($contactIdList[$contact['StudentContactID']])) {
                 continue;
             }
+
             $contactReturn[] = $contact;
-            if (!empty($contact['StudentContactID'])) {
+
+            if ($contact['StudentContactID']) {
                 $contactIdList[$contact['StudentContactID']] = true;
             }
-            if (!empty($contact['StudentContactSpouseID'])) {
-                $contactIdList[$contact['StudentContactSpouseID']] = true;
-            }
         }
+
         return $contactReturn;
     }
 
