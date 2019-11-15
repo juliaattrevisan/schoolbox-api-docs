@@ -52,8 +52,8 @@ class Model implements ISoftDeletable
     /** @var bool $usesRelativeDate */
     private $usesRelativeDate;
 
-    /** @var string $relativeDate */
-    private $relativeDate;
+    /** @var string $relativeDateString */
+    private $relativeDateString;
 
     /**
      * Optional. Can be Null.
@@ -433,12 +433,12 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $relativeDate
+     * @param string $relativeDateString
      * @return self
      */
-    public function setRelativeDate(string $relativeDate) : self
+    public function setRelativeDateString(string $relativeDateString) : self
     {
-        $this->relativeDate = $relativeDate;
+        $this->relativeDateString = $relativeDateString;
 
         return $this;
     }
@@ -446,9 +446,9 @@ class Model implements ISoftDeletable
     /**
      * @return string|null
      */
-    public function getRelativeDate() : ?string
+    public function getRelativeDateString() : ?string
     {
-        return $this->relativeDate;
+        return $this->relativeDateString;
     }
 
     /**

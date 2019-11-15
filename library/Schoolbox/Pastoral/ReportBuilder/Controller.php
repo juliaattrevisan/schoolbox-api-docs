@@ -264,7 +264,7 @@ class Controller extends Base
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
                     'datePresets'      => $this->retrieveRelativeDateLabels(),
-                    'selectedRelativeDate' => $report->getRelativeDate()
+                    'selectedRelativeDate' => $report->getRelativeDateString()
                 ],
                 'title' => 'Pastoral Report',
             ]
@@ -355,7 +355,7 @@ class Controller extends Base
         // Get matching records
 
         $beforeDate = Alaress_Date_Format::now();
-        $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDate()));
+        $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
         if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
             $afterDate = $report->getAfterDate();
@@ -422,7 +422,7 @@ class Controller extends Base
         }
 
         // Relative date defaults to This Year
-        $pastoralReport->setRelativeDate($this->retrieveRelativeDateLabels()['This year']);
+        $pastoralReport->setRelativeDateString($this->retrieveRelativeDateLabels()['This year']);
 
         if (!empty($post['date-option'] && $post['date-option'] === 'absolute')) {
             $pastoralReport->setUsesRelativeDate(false);
@@ -446,7 +446,7 @@ class Controller extends Base
             // Update with POSTed relative date if it's valid
             $relativeDateString = $post['relative-dates-dropdown'];
             if (!empty($relativeDateString) && in_array($relativeDateString, PastoralReport::getAllRelativeDateStrings(), true)) {
-                $pastoralReport->setRelativeDate($relativeDateString);
+                $pastoralReport->setRelativeDateString($relativeDateString);
             }
         }
 
