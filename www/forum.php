@@ -2,6 +2,7 @@
 
 use \Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -11,6 +12,8 @@ $this->setBlock(TEMPLATE_content, 'thread', 'thread_block');
 $this->setBlock('thread', 'last_post', 'last_post_block');
 $this->setBlock('thread', 'modify_thread', 'modify_thread_block');
 $this->setBlock('thread', 'modified', 'modified_block');
+$this->setBlock('thread', 'thread_author', 'thread_author_block');
+$this->setBlock('thread', 'deleted_thread_author', 'deleted_thread_author_block');
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 $this->setBlock(TEMPLATE_content, 'no_thread', 'no_thread_block');
@@ -134,14 +137,22 @@ $threadList = $forumHandler->getThreadList($category->getId(), $threadIndex, $th
 
 if (is_array($threadList)) {
     $userHandler = new User();
+    $userMapper = UserMapper::getInstance();
     $j = 0;
 
     foreach ($threadList as $thread) {
-        $user = array(
-            'title' => $thread['userTitle'],
+        $user   = [
+            'title'     => $thread['userTitle'],
             'firstname' => $thread['userFirstname'],
-            'lastname' => $thread['userLastname'],
-        );
+            'lastname'  => $thread['userLastname'],
+        ];
+
+        try {
+            $author = $userMapper->findById($thread['userID']);
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            $author = null;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+        }
 
         $last_post_user = array(
             'title' => $thread['last_post_title'],
@@ -185,6 +196,14 @@ if (is_array($threadList)) {
 
         if ($thread['replies'] > 0) {
             $this->parse('last_post_block', 'last_post', true);
+        }
+
+        if ($author) {
+            $this->setVar('deleted_thread_author_block', '');
+            $this->parse('thread_author_block', 'thread_author');
+        } else {
+            $this->setVar('thread_author_block', '');
+            $this->parse('deleted_thread_author_block', 'deleted_thread_author');
         }
 
         $this->parse('thread_block', 'thread', true);
