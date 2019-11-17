@@ -20,6 +20,7 @@ Data:
     campusTimetables[]['periods'][]['classes'][]['attendance']            array
     campusTimetables[]['periods'][]['classes'][]['attendance']['link']    null|string Will be null if attendance not available
     campusTimetables[]['periods'][]['classes'][]['attendance']['marked']  bool
+    campusTimetables[]['periods'][]['classes'][]['attendance']['target']  one of ['_blank', '_self']
 #}
 {% import 'sub/attendanceIcon.twig' as attendanceIcon %}
 
@@ -81,7 +82,7 @@ Data:
                                     {% if class.attendance.link %}
                                         <br />
                                         <span class="{{ attendanceIcon.icon(externalType, class.attendance.marked) }}">
-                                            <a href="{{ class.attendance.link }}" title="Mark Attendance">Mark Attendance</a>
+                                            <a href="{{ class.attendance.link }}" title="Mark Attendance" target="{{ class.attendance.target }}">Mark Attendance</a>
                                         </span>
                                     {% endif %}
                                 </div>
