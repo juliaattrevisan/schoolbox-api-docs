@@ -25,6 +25,6 @@ class SubjectMatcherBase implements ISubjectMatcher
     {
         // This is the canonical implementation (even for Synergetic which has an alternative fuzzy match fallback)
         $sisCampus = trim($sisCampus ?? '');
-        return ($sisCampus === '' ? '' : "$sisClass/") . trim($sisClass);
+        return ($sisCampus === '' ? '' : "$sisCampus/") . trim($sisClass);
     }
 }
