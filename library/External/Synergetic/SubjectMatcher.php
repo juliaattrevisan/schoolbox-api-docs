@@ -19,7 +19,7 @@ class SubjectMatcher extends SubjectMatcherBase
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool
     {
         $sisCampus = trim($sisCampus ?? '');
-        if ($this->isExactMatch($sbFolderCode, $sisCampus, $sisClass)) {
+        if (parent::isMatch($sbFolderCode, $sisCampus, $sisClass)) {
             // If an exact match, then return true
             return true;
         }
@@ -27,7 +27,7 @@ class SubjectMatcher extends SubjectMatcherBase
             // Not an exact or fuzzy match, return false
             return false;
         }
-        // We are a fuzzy match, eg 'ABC' ~= ['X','ABC'].
+        // We have a fuzzy match, eg 'ABC' ~= ['X','ABC'].
         // Due to validation rules, we should not have a folder code that is an exact match, eg 'X/ABC'.
         // However, there may be a better match in Synergetic, eg 'ABC' === ['','ABC'].
         // For now, we will let this case be unhandled, and return a potential false positive.
@@ -36,18 +36,6 @@ class SubjectMatcher extends SubjectMatcherBase
         return true;
     }
 
-    /**
-     * Returns whether the SB folder code is a match for the canonical folder code expected for the campus+class codes
-     *
-     * @param string $sbFolderCode
-     * @param string $sisCampus
-     * @param string $sisClass
-     * @return bool
-     */
-    private function isExactMatch(string $sbFolderCode, string $sisCampus, string $sisClass): bool
-    {
-        return $sbFolderCode === $this->generateFolderCode($sisCampus, $sisClass);
-    }
 
     /**
      * Returns whether the folder code matches the campus+class codes using the fuzzy/fallback mechanism
