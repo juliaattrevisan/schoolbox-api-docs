@@ -2,7 +2,6 @@
 
 use \Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -137,7 +136,6 @@ $threadList = $forumHandler->getThreadList($category->getId(), $threadIndex, $th
 
 if (is_array($threadList)) {
     $userHandler = new User();
-    $userMapper = UserMapper::getInstance();
     $j = 0;
 
     foreach ($threadList as $thread) {
@@ -146,13 +144,6 @@ if (is_array($threadList)) {
             'firstname' => $thread['userFirstname'],
             'lastname'  => $thread['userLastname'],
         ];
-
-        try {
-            $author = $userMapper->findById($thread['userID']);
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-            $author = null;
-        } catch (\Schoolbox\Mapper\Exception $e) {
-        }
 
         $last_post_user = array(
             'title' => $thread['last_post_title'],
@@ -198,7 +189,7 @@ if (is_array($threadList)) {
             $this->parse('last_post_block', 'last_post', true);
         }
 
-        if ($author) {
+        if (!$thread['authorDeletedAt']) {
             $this->setVar('deleted_thread_author_block', '');
             $this->parse('thread_author_block', 'thread_author');
         } else {
