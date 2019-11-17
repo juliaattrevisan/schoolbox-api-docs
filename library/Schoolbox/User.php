@@ -15,7 +15,6 @@ use Alaress\Json\SerializeTrait;
 use Alaress\Json\Serializable;
 use House;
 use HouseResidential;
-use Schoolbox\Config\Config;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
