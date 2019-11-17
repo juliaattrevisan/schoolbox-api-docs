@@ -23,6 +23,8 @@ interface ISubjectMatcher
      * @param string|null $sisCampus    A SIS subject's campus code
      * @param string      $sisClass     A SIS subject's class code
      * @return bool
+     * @TODO WARNING, this can return false positives for Synergetic
+     * @see  \External\Synergetic\SubjectMatcher for details
      */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool;
 
