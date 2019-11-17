@@ -48,7 +48,7 @@ class ResourceVideo
      */
     public function __construct()
     {
-        // TODO remove this: Queue should not extend this class
+        // TODO SA-8354: remove this: Queue should not extend this class
         $this->setConfig(new ConfigLoader());
     }
 

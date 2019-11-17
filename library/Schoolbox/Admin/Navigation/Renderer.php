@@ -41,7 +41,7 @@ class Renderer extends \Twig_Extension
     public function renderAdminNavigation(\Twig_Environment $twig, $pageCurrent): string
     {
         // Grab navigation items from old admin class
-        // TODO figure out if this class is even needed: either way, inject this
+        // TODO SA-8354: inject this
         $nav = new \AdminV2_Nav(new Loader());
 
         // Render this thing out

@@ -28,7 +28,7 @@ abstract class WorkNotifier implements Serializable {
      * @param LoggerInterface $log
      */
     public function __construct($configLoader = null, $log = null) {
-        // TODO inject this always
+        // TODO SA-8354: inject this always
         $this->conf = $configLoader ?: new Loader();
 
         if ($log) {

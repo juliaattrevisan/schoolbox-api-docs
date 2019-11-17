@@ -57,7 +57,7 @@ class SitePage extends Page
     {
         parent::__construct();
 
-        // TODO ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
+        // TODO SA-8354: ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
         if ($di) {
             $this->di = $di;
             $this->config = $di->get('config');

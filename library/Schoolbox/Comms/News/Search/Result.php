@@ -161,7 +161,7 @@ class Result extends Base
      */
     private function prepareSearchDependencies(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): array
     {
-        // TODO inject this?
+        // TODO SA-8354: inject this?
         $config = new \Schoolbox\Config\Loader();
 
         $strategyFactory = new Segment\StrategyFactory(

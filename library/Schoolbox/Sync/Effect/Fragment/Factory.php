@@ -109,7 +109,7 @@ class Factory {
 
         /* Determine if Groups perms are enabled before making them accessible
          */
-        // TODO inject this
+        // TODO SA-8354: inject this
         $config = new ConfigLoader();
 
         /* Rename these if enabled

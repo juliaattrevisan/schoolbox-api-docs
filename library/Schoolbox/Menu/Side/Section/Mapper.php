@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
      */
     public static function getSectionNameDefaults() {
 
-        // TODO figure out if this class is even needed: either way, inject this
+        // TODO SA-8354: inject this
         $config = new \Schoolbox\Config\Loader();
 
         return [
