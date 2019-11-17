@@ -46,27 +46,34 @@ class Access
      */
     static protected $instance;
 
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
     /**
      * Retrieves the singleton instance of this class.
      *
+     * The UserAccessMapper *SHOULD* be injected, but not enforced to enable backwards compatibility
+     *
+     * @param UserAccessMapper|null $userAccessMapper
      * @return static
      */
-    public static function getInstance()
+    public static function getInstance(UserAccessMapper $userAccessMapper = null)
     {
-        $class_name = get_called_class();
-
-        if (!isset(self::$instance[$class_name])) {
-            self::$instance[$class_name] = new static();
+        if (!self::$instance) {
+            self::$instance = new static($userAccessMapper ?: UserAccessMapper::getInstance());
         }
-        return self::$instance[$class_name];
+        return self::$instance;
     }
 
 
     /**
      * Private constructor to enforce singleton pattern
+     *
+     * @param UserAccessMapper $userAccessMapper
      */
-    private function __construct()
+    private function __construct(UserAccessMapper $userAccessMapper)
     {
+        $this->userAccessMapper = $userAccessMapper;
     }
 
 
@@ -166,13 +173,12 @@ class Access
         }
 
         // Check CMS service access level
-        $userAccessMapper = UserAccessMapper::getInstance();
 
         /* Note there is no folderId specified for the CMS service. The effect of this is that if the user
          * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
          * We don't need to cache the value locally, we can rely on the Query Cache to do it for us.
          */
-        $groupAccessLevel = $userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_CMS);
+        $groupAccessLevel = $this->userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_CMS);
         $accessLevels[] = $groupAccessLevel;
 
         // Short-circuit if full access
@@ -182,7 +188,7 @@ class Access
         }
 
         // Check Group access level
-        $groupAccessLevel = $userAccessMapper->getAccessLevel($user, $folderId, UserAccess::SERVICE_HOMEPAGE);
+        $groupAccessLevel = $this->userAccessMapper->getAccessLevel($user, $folderId, UserAccess::SERVICE_HOMEPAGE);
         $accessLevels[] = $groupAccessLevel;
 
         // Short-circuit if full access
