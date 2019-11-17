@@ -28,7 +28,6 @@ $userMapper = \Schoolbox\UserBulkMapper::getInstance();
 
 $modified = new \Schoolbox\Collection();
 
-$userIds = [];
 $userIds = array_filter(explode(',', $_POST['userId']));
 if (count($userIds) === 0) {
     error(ErrorMapper::ERROR_PROCESSING, 'No user selected.');
