@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,6 +11,14 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 
+/**
+ * Responsible for the application of various permission (aka access level) business rules and concepts.
+ *
+ * Business rules should be implemented here, rather than in the models and mappers to ensure:
+ * 1. Cohesive responsibility sets
+ * 2. Consistent architecture
+ * 3. Testability
+ */
 class Access
 {
 
