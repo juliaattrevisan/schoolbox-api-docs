@@ -15,9 +15,7 @@ class SubjectMatcherBase implements ISubjectMatcher
     /** @inheritDoc */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool
     {
-        // Default case is that if a campus is present, it must be included in folder code
-        $exactFolderCode = ($sisCampus ?? '') === '' ? $sisClass : "$sisCampus/$sisClass";
-        return $sbFolderCode === $exactFolderCode;
+        return $sbFolderCode === $this->generateFolderCode($sisCampus, $sisClass);
     }
 
     /** @inheritDoc */
