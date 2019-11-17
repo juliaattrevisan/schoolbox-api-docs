@@ -28,7 +28,7 @@ switch($_POST['module']) {
     case 'users':
         /** @var IConnector $config */
         $config        = $kernel->get('config');
-        $login         = new Login(Database\Factory::getInstanceInternal(), $config->get('session_length'));
+        $login         = new Login($this->getDi()->get('databaseInternal'), $config->get('session_length'));
         $summary       = $login->userSummary($now);
         $totalUser     = 0;
         $totalLogin    = 0;

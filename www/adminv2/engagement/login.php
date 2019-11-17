@@ -29,7 +29,7 @@ $currentMonth = clone $start;
  */
 $mapperFactory = $this->getDi()->get('mapperFactory');
 $config        = $this->getDi()->get('config');
-$loginReport   = new Login(Database\Factory::getInstanceInternal(), $config->get('session_length'));
+$loginReport   = new Login($this->getDi()->get('databaseInternal'), $config->get('session_length'));
 $roleMapper    = $mapperFactory->get(RoleMapper::class);
 $roleList      = $roleMapper->findAll();
 
