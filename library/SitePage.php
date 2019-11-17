@@ -314,8 +314,8 @@ class SitePage extends Page
         $templateVar = [
             'USER_ID'      => $this->user->getId(),
             'USER_ROLE'    => $this->user->getRole()->getName(),
-            'SITE_NAME'    => $this->config::get('school_name'),
-            'SITE_VERSION' => $this->config::get('site_version'),
+            'SITE_NAME'    => $this->config->get('school_name'),
+            'SITE_VERSION' => $this->config->get('site_version'),
         ];
         $this->setVar($templateVar);
         $this->localise();
@@ -409,7 +409,7 @@ class SitePage extends Page
 
         // Resend session cookie
         $cookieParams  = session_get_cookie_params();
-        $sessionLength = \Config::get('session_length');
+        $sessionLength = $this->config->get('session_length');
         $sessionExpiry = ($sessionLength > 0)
             ? $_SERVER['REQUEST_TIME'] + $sessionLength
             : 0;
