@@ -20,7 +20,7 @@ $calendarHandler = new Calendar();
 $page            = new SitePage();
 $userMapper      = new UserMapper();
 $eventMapper     = new EventMapper();
-$eventAccess     = new Access(new FolderAccess());
+$eventAccess     = new Access(FolderAccess::getInstance());
 
 switch ($_REQUEST['action']) {
     case 'Add':

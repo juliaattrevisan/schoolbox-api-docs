@@ -55,7 +55,7 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Check user has permission to modify this event
      */
-    $eventAccess = new Access(new FolderAccess());
+    $eventAccess = new Access(FolderAccess::getInstance());
 
     if ($eventAccess->checkExisting($currentUser, $event) == false) {
         error(34);

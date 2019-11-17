@@ -7,7 +7,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Calendar\Event\Access as EventAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 
-$attendanceController = new Event_Attendance_Controller($this, new EventAccess(new FolderAccess()));
+$attendanceController = new Event_Attendance_Controller($this, new EventAccess(FolderAccess::getInstance()));
 
 $canModifyAttendance = new CanModifyAttendance($attendanceController, $eventMapper = new EventMapper(), $_SESSION['user'], new ErrorMapper());
 

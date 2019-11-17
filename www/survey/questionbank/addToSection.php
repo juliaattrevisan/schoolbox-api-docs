@@ -40,7 +40,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id'])) {
     /* Only write-accessors can do this action
      */
     $folder = (new Mapper())->findById($survey['category_id']);
-    $isInstructor = (new Access())->isInstructor($_SESSION['user'], $folder);
+    $isInstructor = (Access::getInstance())->isInstructor($_SESSION['user'], $folder);
 
     /* Not an instructor? You can't continue
      */

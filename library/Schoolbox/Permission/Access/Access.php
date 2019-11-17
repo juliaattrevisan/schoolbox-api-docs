@@ -63,6 +63,14 @@ class Access
 
 
     /**
+     * Private constructor to enforce singleton pattern
+     */
+    private function __construct()
+    {
+    }
+
+
+    /**
      * Is the specified user an instructor for the specified folder ?
      *
      * An instructor is any user with WRITE+ permission to a folder
