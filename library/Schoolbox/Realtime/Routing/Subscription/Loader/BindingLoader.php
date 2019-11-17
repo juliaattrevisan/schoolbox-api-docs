@@ -10,11 +10,13 @@ namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 
 use Alaress\Routing\IRouter;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Traversable;
+use PDO;
 
 
 class BindingLoader implements ILoader
@@ -69,7 +71,12 @@ class BindingLoader implements ILoader
         $a = microtime(true);
 
         foreach ($userIds as $i => $userId) {
-            $user       = $this->userMapper->findById($userId);
+            try {
+                $user = $this->userMapper->findById($userId);
+            } catch (Exception $e) {
+                // should not happen, but just in case
+                continue;
+            }
             $routeCount = 0;
             foreach (array_keys($this->getUserSubscriptions($userId)) as $userSub) {
                 $router->add($userSub, $userId, true);
@@ -79,8 +86,6 @@ class BindingLoader implements ILoader
             $this->log->debug(
                 sprintf(
                     "$progressPattern %3d routes loaded for user %5d (%s)",
-                    $i + 1,
-                    $userCount,
                     $routeCount,
                     $userId,
                     $user->getUsername()
@@ -118,7 +123,12 @@ class BindingLoader implements ILoader
             "*.instant.user.$userId.#" => true,
         ];
 
-        $bindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
+        try {
+            $bindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
+        } catch (Exception $e) {
+            // returning empty array to remove its subscription
+            return [];
+        }
 
         foreach ($bindings as $prefix => $data) {
             foreach ($data as $target) {
@@ -138,7 +148,7 @@ class BindingLoader implements ILoader
     {
         $stmt = $this->userMapper->getDatabase()->query('SELECT `from`, `to` FROM msg_redirect');
 
-        while (list ($from, $to) = $stmt->fetch(\PDO::FETCH_NUM)) {
+        while (list ($from, $to) = $stmt->fetch(PDO::FETCH_NUM)) {
             yield $from => $to;
         }
 
@@ -157,5 +167,4 @@ class BindingLoader implements ILoader
             }
         }
     }
-
 }

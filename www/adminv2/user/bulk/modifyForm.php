@@ -61,13 +61,6 @@ if (isset($_POST['updateUsers'])) {
 
         $modified->add($user);
     }
-    try {
-        /** @var WritableCache $cache */
-        $cache = $this->getDi()->get('subscriptionCache');
-        $cache->cacheUsers(INSTANCE_ID, $userIds);
-    } catch (\RuntimeException|\Aura\Di\Exception $e) {
-        $userMapper->log($e->getMessage());
-    }
 } else {
     if (isset($_POST['deleteUsers'])) {
         $userCollection = $userMapper->findByColumn('id', $userIds);
@@ -75,6 +68,15 @@ if (isset($_POST['updateUsers'])) {
 
         $modified = $userCollection;
     }
+}
+
+// refresh subscription cache
+try {
+    /** @var WritableCache $cache */
+    $cache = $this->getDi()->get('subscriptionCache');
+    $cache->cacheUsers(INSTANCE_ID, $userIds);
+} catch (\RuntimeException|\Aura\Di\Exception $e) {
+    $userMapper->log($e->getMessage());
 }
 
 /* Show some confirmation stuff

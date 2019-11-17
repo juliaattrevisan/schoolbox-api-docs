@@ -40,6 +40,9 @@ class ByUserRouter implements IRouter
      */
     public function get($userId)
     {
+        if (!key_exists($userId, $this->routes)) {
+            return [];
+        }
         return array_keys($this->routes[$userId]);
     }
 
