@@ -10,6 +10,7 @@ namespace Schoolbox\Permission\Access;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use InvalidArgumentException;
@@ -292,13 +293,27 @@ class Access
             return UserAccess::ACCESS_DENY;
         }
         if ($this->involvedInSubject($user, \implode(',', $folderCodeList->getAll()))) {
-            if ($role->isStaff()) {
-                return UserAccess::ACCESS_WRITE;
-            }
-            if ($role->isStudent()) {
-                return $this->config->get('allow_student_class_access') ? UserAccess::ACCESS_READ : UserAccess::ACCESS_DENY;
-            }
+            return $this->getRoleTypeAccess($role);
         }
+        return UserAccess::ACCESS_DENY;
+    }
+
+
+    /**
+     * Returns the access level a roleType is given when involved with a folder via SIS membership
+     *
+     * @param string $roleType
+     * @return int
+     */
+    public function getRoleTypeAccess(string $roleType): int
+    {
+        if (Role::STAFF === $roleType) {
+            return UserAccess::ACCESS_WRITE;
+        }
+        if (Role::STUDENT === $roleType) {
+            return $this->config->get('allow_student_class_access') ? UserAccess::ACCESS_READ : UserAccess::ACCESS_DENY;
+        }
+        // Guests and Parents are given no access
         return UserAccess::ACCESS_DENY;
     }
 
