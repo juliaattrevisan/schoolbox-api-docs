@@ -85,6 +85,8 @@ class BindingLoader implements ILoader
             $this->log->debug(
                 sprintf(
                     "$progressPattern %3d routes loaded for user %5d (%s)",
+                    $i + 1,
+                    $userCount,
                     $routeCount,
                     $userId,
                     $user->getUsername()
