@@ -33,6 +33,6 @@ class ValidNewsModerator
      */
     public function isSatisfiedBy(User $user): bool
     {
-        return $user->isSuperuser() || ($this->access->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_WRITE);
+        return $user->isSuperuser() || ($this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_WRITE);
     }
 }
