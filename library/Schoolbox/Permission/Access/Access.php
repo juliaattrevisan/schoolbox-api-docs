@@ -151,7 +151,7 @@ class Access
      * @param Folder\Model $folder
      * @return bool
      */
-    public function isInstructor(User $user, Folder\Model $folder)
+    public function isInstructor(User $user, Folder\Model $folder): bool
     {
         return $this->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_WRITE;
     }
@@ -165,9 +165,9 @@ class Access
      * @param Folder\Model $folder
      * @return bool
      */
-    public function isLearner(User $user, Folder\Model $folder)
+    public function isLearner(User $user, Folder\Model $folder): bool
     {
-        return $this->getFolderAccess($user, $folder->getId()) == UserAccess::ACCESS_READ;
+        return $this->getFolderAccess($user, $folder->getId()) === UserAccess::ACCESS_READ;
     }
 
 
@@ -182,7 +182,7 @@ class Access
      * @param bool  $cache
      * @return int
      */
-    public function getMinFolderAccess(User $user, array $folderIds, $cache = true)
+    public function getMinFolderAccess(User $user, array $folderIds, $cache = true): int
     {
         if (0 === count($folderIds)) {
             // Technically could throw an InvalidArgException, but this simplifies callers' code.
@@ -391,7 +391,7 @@ class Access
      * @param bool $cache Whether to use cached results or get them from DB again
      * @return int
      */
-    public function getFolderAccess(User $user, $folderId, $cache = true)
+    public function getFolderAccess(User $user, $folderId, $cache = true): int
     {
         // Superusers always have full access
         if ($user->isSuperuser()) {
