@@ -18,7 +18,6 @@ use Schoolbox\UserMapper;
 use Traversable;
 use PDO;
 
-
 class BindingLoader implements ILoader
 {
     /** @var LoggerInterface */
