@@ -633,25 +633,6 @@ class UserAccessMapper extends Mapper
 
 
     /**
-     * Returns the user's access level to the specified service, with optional service identifier
-     *
-     * @param User     $user
-     * @param null|int $serviceIdentifier
-     * @param int      $service
-     * @param bool     $cache
-     * @return int
-     */
-    public function getAccessLevel(User $user, ?int $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true): int
-    {
-        try {
-            return $this->getAccess($user, $serviceIdentifier, $service, $cache)->getAccessLevel();
-        } catch (Mapper\Exception $e) {
-            return UserAccess::ACCESS_DENY;
-        }
-    }
-
-
-    /**
      * @param User     $user
      * @param null|int $serviceIdentifier
      * @param int      $service

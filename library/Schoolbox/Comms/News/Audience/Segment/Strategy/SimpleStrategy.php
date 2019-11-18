@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -21,6 +22,9 @@ abstract class SimpleStrategy implements ISimpleStrategy
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
+    /** @var Access */
+    private $access;
+
     /** @var bool */
     private $staffCanPost;
 
@@ -30,12 +34,14 @@ abstract class SimpleStrategy implements ISimpleStrategy
 
     /**
      * @param UserAccessMapper $userAccessMapper
+     * @param Access           $access
      * @param bool             $staffCanPost
      * @param bool             $moderationRequired
      */
-    public function __construct(UserAccessMapper $userAccessMapper, bool $staffCanPost, bool $moderationRequired)
+    public function __construct(UserAccessMapper $userAccessMapper, Access $access, bool $staffCanPost, bool $moderationRequired)
     {
         $this->userAccessMapper   = $userAccessMapper;
+        $this->access             = $access;
         $this->staffCanPost       = $staffCanPost;
         $this->moderationRequired = $moderationRequired;
     }
@@ -73,7 +79,7 @@ abstract class SimpleStrategy implements ISimpleStrategy
      */
     protected function hasNewsServicePerm(User $user, int $accessLevel): bool
     {
-        return $this->userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= $accessLevel;
+        return $this->access->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= $accessLevel;
     }
 
 
@@ -131,5 +137,14 @@ abstract class SimpleStrategy implements ISimpleStrategy
     protected function getUserAccessMapper(): UserAccessMapper
     {
         return $this->userAccessMapper;
+    }
+
+
+    /**
+     * @return Access
+     */
+    protected function getAccess(): Access
+    {
+        return $this->access;
     }
 }

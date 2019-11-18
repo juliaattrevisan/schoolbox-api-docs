@@ -153,6 +153,26 @@ class Access
         return $minAccess;
     }
 
+
+    /**
+     * Returns the user's access level to the specified service, with optional service identifier
+     *
+     * @param User     $user
+     * @param null|int $serviceIdentifier
+     * @param int      $service
+     * @param bool     $cache
+     * @return int
+     */
+    public function getAccessLevel(User $user, ?int $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true): int
+    {
+        try {
+            return $this->userAccessMapper->getAccess($user, $serviceIdentifier, $service, $cache)->getAccessLevel();
+        } catch (Mapper\Exception $e) {
+            return UserAccess::ACCESS_DENY;
+        }
+    }
+
+
     /**
      * Return the specified user's access level for the given folder, respects permissions:
      * * CMS
@@ -185,7 +205,7 @@ class Access
          * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
          * We don't need to cache the value locally, we can rely on the Query Cache to do it for us.
          */
-        $groupAccessLevel = $this->userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_CMS);
+        $groupAccessLevel = $this->getAccessLevel($user, null, UserAccess::SERVICE_CMS);
         $accessLevels[] = $groupAccessLevel;
 
         // Short-circuit if full access
@@ -195,7 +215,7 @@ class Access
         }
 
         // Check Group access level
-        $groupAccessLevel = $this->userAccessMapper->getAccessLevel($user, $folderId, UserAccess::SERVICE_HOMEPAGE);
+        $groupAccessLevel = $this->getAccessLevel($user, $folderId, UserAccess::SERVICE_HOMEPAGE);
         $accessLevels[] = $groupAccessLevel;
 
         // Short-circuit if full access

@@ -32,9 +32,6 @@ class Folder extends SimpleStrategy
     /** @var RoleAccessMapper */
     private $roleAccessMapper;
 
-    /** @var Access */
-    private $access;
-
     /** @var External_UserInterface */
     private $externalUser;
 
@@ -71,31 +68,30 @@ class Folder extends SimpleStrategy
 
     /**
      * @param UserAccessMapper       $userAccessMapper
+     * @param Access                 $access
      * @param bool                   $staffCanPost
      * @param bool                   $moderationRequired
      * @param bool                   $canTargetTeachersOfUsersInFolder
      * @param FolderMapper           $folderMapper
      * @param RoleAccessMapper       $roleAccessMapper
-     * @param Access                 $access
      * @param External_UserInterface $externalUser
      * @param mixed[][][]            $knownUserSubjects
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
+        Access $access,
         bool $staffCanPost,
         bool $moderationRequired,
         bool $canTargetTeachersOfUsersInFolder,
         FolderMapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
-        Access $access,
         External_UserInterface $externalUser,
         array $knownUserSubjects
     ) {
-        parent::__construct($userAccessMapper, $staffCanPost, $moderationRequired);
+        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired);
         $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
         $this->folderMapper                     = $folderMapper;
         $this->roleAccessMapper                 = $roleAccessMapper;
-        $this->access                           = $access;
         $this->externalUser                     = $externalUser;
         $this->knownUserSubjects                = $knownUserSubjects;
     }
@@ -180,7 +176,7 @@ class Folder extends SimpleStrategy
         if (null === $entityValue) {
             return false;
         }
-        return $this->access->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
+        return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
     }
 
 
@@ -193,7 +189,7 @@ class Folder extends SimpleStrategy
      */
     private function hasCmsServicePerm(User $user, int $level): bool
     {
-        return $this->getUserAccessMapper()->getAccessLevel($user, null, UserAccess::SERVICE_CMS) >= $level;
+        return $this->getAccess()->getAccessLevel($user, null, UserAccess::SERVICE_CMS) >= $level;
     }
 
 
@@ -267,7 +263,7 @@ class Folder extends SimpleStrategy
             return false;
         }
         // Note we don't care about teacher/parent modifier. The user must still have READ perm to the page
-        return $this->access->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
+        return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
     }
 
     /**
@@ -280,7 +276,7 @@ class Folder extends SimpleStrategy
             $user->isSuperuser() ||
             $this->hasCmsServicePerm($user, UserAccess::ACCESS_WRITE) ||
             $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
-            (null !== $entityValue && $this->access->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE);
+            (null !== $entityValue && $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE);
     }
 
 
