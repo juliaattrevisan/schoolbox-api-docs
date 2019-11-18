@@ -292,7 +292,7 @@ class Access
         if (!$folderCodeList->count()) {
             return UserAccess::ACCESS_DENY;
         }
-        if ($this->involvedInSubject($user, \implode(',', $folderCodeList->getAll()))) {
+        if ($this->involvedInSubject($user, \implode(',', $folderCodeList->getPropertyValues('code')))) {
             return $this->getRoleTypeAccess($role);
         }
         return UserAccess::ACCESS_DENY;
