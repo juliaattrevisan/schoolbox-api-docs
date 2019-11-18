@@ -12,8 +12,8 @@ class CalendarInitialCest
         $i->amOnPage('/calendar/full');
         sleep(5);
         $i->clickWithLeftButton('td.fc-day');
-        $i->waitForElementVisible('div#calendar-create', 5);
-        $i->fillField('div#calendar-create input[name=title]', 'My Test Event');
+        $i->waitForElementVisible('div#createEventPanel', 5);
+        $i->fillField('div#createEventPanel input[name=title]', 'My Test Event');
         $i->click('input[type=submit][value=Create\ Event]');
         sleep(5);
         $i->canSee('My Test Event');
@@ -26,7 +26,7 @@ class CalendarInitialCest
         $i->amOnPage('/calendar/full');
         sleep(5);
         $i->canSee('My Test Event');
-        $i->impersonate('David Rhodes');
+        $i->impersonate('Eden Reed');
         $i->amOnPage('/calendar/full');
         sleep(5);
         $i->cantSee('My Test Event');
@@ -40,10 +40,11 @@ class CalendarInitialCest
         sleep(5);
         $element = Locator::contains('a.fc-day-grid-event', 'My Test Event');
         $i->clickWithLeftButton($element);
-        $i->waitForElementVisible('div#calendar-bubble', 5);
-        $i->click('div#calendar-bubble a.button.icon-delete');
-        $i->waitForElementVisible('div.reveal-modal.open', 5);
-        $i->click('div.reveal-modal.open a.button.submit');
+        $i->waitForElementVisible('div#reveal-modal-4', 5);
+        $element = Locator::contains('div#reveal-modal-4 a.button', 'Delete');
+        $i->clickWithLeftButton($element);
+        $i->waitForElementVisible('div#reveal-modal-5', 5);
+        $i->click('div#reveal-modal-5 a.button.submit');
         sleep(5);
         $i->cantSee('My Test Event');
     }

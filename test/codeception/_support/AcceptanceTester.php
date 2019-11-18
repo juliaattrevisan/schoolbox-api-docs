@@ -97,8 +97,8 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $i = $this;
         $i->amOnPage('/user/recoverSession');
-        $i->click('Alaress Admin');
-        $i->click($fullname, '#account-menu');
+        $i->click('a#profile-drop');
+        $i->click($fullname, '#account-content');
     }
 
 
