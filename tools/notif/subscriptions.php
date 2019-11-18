@@ -106,6 +106,11 @@ try {
 
             $output = [];
 
+            if (empty($router->get($userId))) {
+                $this->log->notice("Subscription does not exist for user {$userId}");
+                return 0;
+            }
+
             foreach ($router->get($userId) as $route) {
                 $output[] = NestTestResolver::trim($route);
             }

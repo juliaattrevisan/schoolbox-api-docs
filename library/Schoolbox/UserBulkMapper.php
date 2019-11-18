@@ -288,6 +288,18 @@ class UserBulkMapper extends UserMapper
     }
 
     /**
+     * @inheritDoc
+     */
+    public function delete($userCollection)
+    {
+        $result = parent::delete($userCollection);
+        foreach ($userCollection as $user) {
+            $this->log("{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) deleted user {$user->getFullName()} ({$user->getId()})");
+        }
+        return $result;
+    }
+
+    /**
      * Log to file
      *
      * @param string $message

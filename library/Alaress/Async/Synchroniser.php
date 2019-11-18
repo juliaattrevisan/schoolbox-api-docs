@@ -54,12 +54,17 @@ class Synchroniser
         $this->flush($callback, $done);
     }
 
+
+    /**
+     * @param callable $callback
+     * @param callable $done
+     */
     public function flush(callable $callback, callable $done)
     {
         while ($data = $this->redis->rpop($this->key)) {
             $callback($data);
         }
+        $this->redis->del([$this->key]);
         $done();
     }
-
 }

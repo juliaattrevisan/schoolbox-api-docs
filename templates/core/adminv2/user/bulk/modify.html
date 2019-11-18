@@ -2,16 +2,17 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript">
     $(function() {
-//        $('table[data-users="true"]').selectAll({
-//            key: 'selectall',
-//            checkboxName: 'userId[]'
-//        });
-
         /* Count number of things selected
          */
-        $('[data-select-all-for-group="users"], [data-select-all-group="users"]').change(function() {
+        $('[data-select-all-for-group="users"], [data-select-all-group="users"]').change(function () {
             var num = $('[data-select-all-group="users"]:checked').length;
             $('span[data-selected="true"]').text(num);
+            var userCount = $('input[name="userCount"]');
+            userCount.val(num);
+            if (userCount.hasClass('error') && num > 0) {
+                userCount.removeClass('error');
+                $('#userCount-error').remove();
+            }
         });
 
         var updateForm = $('form[data-action="userUpdate"]');
@@ -52,16 +53,19 @@
             }
         });
 
-        var updateForm = $('form[data-action="userUpdate"]');
         updateForm.alaressValidate({
             rules: {
                 'apply_campus[]': {
                     minlength: 1,
                     required: true
+                },
+                'userCount': {
+                    greaterThanZero: true
                 }
             },
             messages: {
-                'apply_campus[]': "Please select a campus"
+                'apply_campus[]': "Please select a campus",
+                'userCount': 'Please select at least one user below'
             },
             submitHandler: function (form) {
                 // Smoosh the magnitude of userIds into a single POST var
@@ -186,6 +190,7 @@
     <div class="small-12 island">
         <form data-action="userUpdate" id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
             <input type="hidden" name="userId" />
+            <input type="hidden" name="userCount" value="0"/>
             <div class="scrollable">
                 <table data-users="true">
                     <thead>
