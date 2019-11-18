@@ -79,7 +79,7 @@ abstract class SimpleStrategy implements ISimpleStrategy
      */
     protected function hasNewsServicePerm(User $user, int $accessLevel): bool
     {
-        return $this->access->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= $accessLevel;
+        return $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= $accessLevel;
     }
 
 

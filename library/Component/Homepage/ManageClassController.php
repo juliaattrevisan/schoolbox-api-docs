@@ -153,12 +153,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             ]);
         }
 
-        $involvedInGroup = $isGroupPage && $this->userAccessMapper->involvedInGroup(
+        $involvedInGroup = $isGroupPage && $this->getAccess()->involvedInGroup(
                 $this->getUser(),
                 $this->getContext()->getId()
             );
 
-        $involvedInClass = $isClassPage && $this->userAccessMapper->involvedInSubject(
+        $involvedInClass = $isClassPage && $this->getAccess()->involvedInSubject(
                 $this->getUser(),
                 $this->getContext()->getCodeString()
             );
