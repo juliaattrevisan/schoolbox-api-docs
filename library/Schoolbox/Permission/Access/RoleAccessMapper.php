@@ -14,20 +14,13 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\User;
 
 /**
  * @method GenericCollection|RoleAccess[] findByColumn($columnName, $columnValue, $options = [])
+ * @method RoleAccess findOneByColumnList($columnList, array $options = [])
  */
 class RoleAccessMapper extends Mapper
 {
-
-    /**
-     * Cached permissions
-     * Nested array structure $cachedPermissions[role][cid]
-     * @var RoleAccess[][]
-     */
-    private $cachedPermissions = [];
 
     /**
     * @return void
@@ -164,62 +157,6 @@ class RoleAccessMapper extends Mapper
     {
         // noop
         return false;
-    }
-
-
-    /**
-     * @param User $user
-     * @param int  $folderId
-     * @param bool $cache
-     * @return RoleAccess
-     * @throws Mapper\Exception
-     */
-    public function getAccess(User $user, $folderId, $cache = true)
-    {
-        // let's avoid fatal errors in the face of unexpected failure
-        if (!$user->getRole() instanceof Role) {
-            $ra = new RoleAccess();
-            $ra->setType(UserAccess::ACCESS_DENY);
-            return $ra;
-        }
-
-        // Ensure we take role-permission from NNIAN
-        if ($folderId != 0)
-        {
-            $folderMapper = Folder\Mapper::getInstance();
-            $folder = $folderMapper->findCheaplyById($folderId, ['deleted' => true]);
-
-            if ($folder->getInherit())
-            {
-                // Folder inherits, find its NNIAN
-                $permissionFolder = $folderMapper->findNearestNonInheritingAncestralNode($folder);
-                $folderId         = $permissionFolder->getId();
-            }
-        }
-
-        // Setup cache array for this user's role and folder if it doesn't already exist)
-
-        if (!isset($this->cachedPermissions[$user->getRole()->getId()])) {
-            $this->cachedPermissions[$user->getRole()->getId()] = [];
-        }
-
-
-        // Permission check #1 - Cached results
-
-        if ($cache && isset($this->cachedPermissions[$user->getRole()->getId()][$folderId])) {
-            // Found cached result, return it
-            return $this->cachedPermissions[$user->getRole()->getId()][$folderId];
-        }
-
-        /** @var RoleAccess $roleAccess */
-        $roleAccess = $this->findOneByColumnList([
-            'cid' => $folderId,
-            'gid' => $user->getRole()->getId(),
-        ]);
-        if($cache) {
-            $this->cachedPermissions[$user->getRole()->getId()][$folderId] = $roleAccess;
-        }
-        return $roleAccess;
     }
 
 

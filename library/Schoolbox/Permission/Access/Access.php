@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use External_UserInterface;
 use External_User;
 use LogicException;
+use function max;
 
 /**
  * Responsible for the application of various permission (aka access level) business rules and concepts.
@@ -38,27 +39,26 @@ class Access
     const VISIBILITY_STAFF_PARENT = 2;             // Accessible by staff & parents only
 
     /**
-     * Cached permissions
-     * Nested array structure $cachedPermissions[uid][service][sid]
+     * Cached user service permissions
+     * Nested array structure $cachedUserPermissions[uid][service][sid]
      * @var int[][][]
      */
-    private $cachedPermissions = [];
+    private $cachedUserServicePermissions = [];
 
     /**
-     * Cache folder access calls
+     * Cached role folder permissions
      *
-     * Indexed by user.id, then folder.id
-     *
+     * Nested array structure $cachedRolePermissions[roleId][folderId]
      * @var int[][]
      */
-    protected $cachedFolderAccess = [];
+    private $cachedRoleFolderPermissions = [];
 
     /**
      * Stores the singleton instance
      *
-     * @var array[AccessMapper]
+     * @var self
      */
-    static protected $instance;
+    static private $instance;
 
     /** @var UserAccessMapper */
     private $userAccessMapper;
@@ -100,14 +100,14 @@ class Access
         Folder\Code\Mapper $folderCodeMapper = null,
         External_UserInterface $externalUser = null,
         IConfigLoader $config = null
-    ) {
+    ): Access {
         if (!self::$instance) {
             self::$instance = new static(
-                $userAccessMapper ?: UserAccessMapper::getInstance(),
-                $roleAccessMapper ?: RoleAccessMapper::getInstance(),
-                $folderMapper ?: Folder\Mapper::getInstance(),
-                $folderCodeMapper ?: Folder\Code\Mapper::getInstance(),
-                $externalUser ?: new External_User(),
+                $userAccessMapper ?? UserAccessMapper::getInstance(),
+                $roleAccessMapper ?? RoleAccessMapper::getInstance(),
+                $folderMapper ?? Folder\Mapper::getInstance(),
+                $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
+                $externalUser ?? new External_User(),
                 $config ?: ConfigMapper::getInstance()
             );
         }
@@ -147,9 +147,11 @@ class Access
      *
      * An instructor is any user with WRITE+ permission to a folder
      *
-     * @param User   $user
+     * @param User         $user
      * @param Folder\Model $folder
      * @return bool
+     * @throws InvalidArgumentException
+     * @throws Mapper\Exception
      */
     public function isInstructor(User $user, Folder\Model $folder): bool
     {
@@ -161,9 +163,11 @@ class Access
      *
      * A learner is any user with READ permission to a folder
      *
-     * @param User   $user
+     * @param User         $user
      * @param Folder\Model $folder
      * @return bool
+     * @throws InvalidArgumentException
+     * @throws Mapper\Exception
      */
     public function isLearner(User $user, Folder\Model $folder): bool
     {
@@ -173,25 +177,24 @@ class Access
 
     /**
      * Returns the minimum access level across the collection of specified folders. Checks perms from:
-     * * CMS
-     * * GROUP
-     * * ROLE
+     * 1. User.SU status
+     * 2. Group membership via `userAccess` table
+     * 3. CMS read/write/full
+     * 4. Folder Role perms
+     * 5. SIS enrollment perms
      *
      * @param User  $user
      * @param int[] $folderIds
      * @param bool  $cache
      * @return int
+     * @throws InvalidArgumentException
+     * @throws Mapper\Exception
      */
     public function getMinFolderAccess(User $user, array $folderIds, $cache = true): int
     {
         if (0 === count($folderIds)) {
-            // Technically could throw an InvalidArgException, but this simplifies callers' code.
+            // Technically should throw an InvalidArgException, but this simplifies callers' code.
             return UserAccess::ACCESS_DENY;
-        }
-
-        // Intentionally ordered after the empty array check. Not even SU's have an access level to the void.
-        if ($user->isSuperuser()) {
-            return UserAccess::ACCESS_FULL;
         }
 
         // We must iterate all, rather than from index 1+ (ie fencepost alg.) to robustly account for different indexing
@@ -215,12 +218,14 @@ class Access
     /**
      * Returns the user's access level to the specified service, with optional service identifier.
      *
-     * Does not consider SuperUser status.
-     *
-     * If checking the SERVICE_HOMEPAGE, and the user has different access levels due to their GROUP and SIS permissions,
-     * this will return the higher of the two.
-     *
-     * eg if Zane for some folder has a userAccess.level of READ, but a SIS level of WRITE, then this will return WRITE
+     * If checking the SERVICE_HOMEPAGE, system will check:
+     *   1. User.SU status
+     *   2. Group membership via `userAccess` table
+     *   3. CMS read/write/full
+     *   4. Folder Role perms
+     *   5. SIS enrollment perms
+     * Else not SERVICE_HOMEPAGE
+     *   1. `userAccess` table only
      *
      * @param User     $user
      * @param null|int $serviceIdentifier
@@ -234,70 +239,18 @@ class Access
      */
     public function getAccessLevel(User $user, int $service, int $serviceIdentifier = UserAccess::SID_NONE, bool $cache = true): int
     {
-        // First check the cache
-        if ($cache && isset($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier])) {
-            return $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier];
+        // Check cache
+        if ($cache && isset($this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier])) {
+            return $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier];
         }
-        // Validate the requested combination of $service and $serviceIdentifier
-        if ($serviceIdentifier === UserAccess::SID_NONE) {
-            if (\in_array($service, UserAccess::requiresServiceIdentifier(), true)) {
-                throw new InvalidArgumentException("Service {$service} requires a service identifier to be provided");
-            }
-        } elseif (\in_array($service, UserAccess::doesNotRequireServiceIdentifier(), true)) {
-            throw new InvalidArgumentException("Service {$service} does not use service identifiers. Found: {$serviceIdentifier}");
-        }
-        // Default permission unless something higher is found.
-        $accessLevel = UserAccess::ACCESS_DENY;
-        // If we are getting the permission for a homepage, we need to take into account inheritance
-        if ($service === UserAccess::SERVICE_HOMEPAGE) {
-            // Find the NNIAN for the folder
-            $folder            = $this->folderMapper->findCheaplyById($serviceIdentifier, ['deleted' => true]);
-            $folderNnian       = $this->folderMapper->findNearestNonInheritingAncestralNode($folder);
-            $serviceIdentifier = (int)$folderNnian->getId();
-        }
-        // Check UserAccess table (there will be 0:1 results due to unique constraint)
-        $userAccess = $this->userAccessMapper->findByColumnList([
-            'uid'     => $user->getId(),
-            'service' => $service,
-            'sid'     => $serviceIdentifier,
-        ])->first();
-        if ($userAccess) {
-            /** @var UserAccess $userAccess */
-            $accessLevel = $userAccess->getAccessLevel();
-        }
-        // Is checking homepage service, also check SIS-derived permissions
-        if ($service === UserAccess::SERVICE_HOMEPAGE) {
-            $accessLevel = \max($accessLevel, $this->getSisAccessLevel($user, $serviceIdentifier));
-        }
-        $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = $accessLevel;
+
+        // Homepage service is a special case due to inheritance, otherwise just check `userAccess` table
+        $accessLevel = $service === UserAccess::SERVICE_HOMEPAGE
+            ? $this->getFolderAccess($user, $serviceIdentifier, $cache)
+            : $this->getUserAccessLevel($user, $service, $serviceIdentifier, $cache);
+
+        $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier] = $accessLevel;
         return $accessLevel;
-    }
-
-
-    /**
-     * Returns the user's access level to a folder as defined by SIS enrollment and SB config
-     *
-     * @param User $user
-     * @param int  $folderId
-     * @return int
-     */
-    private function getSisAccessLevel(User $user, int $folderId): int
-    {
-        // Only staff and students can have access via SIS involvement
-        $role = $user->getRole();
-        if (!$role->isStudent() && !$role->isStaff()) {
-            return UserAccess::ACCESS_DENY;
-        }
-
-        $folderCodeList = $this->folderCodeMapper->findForCategory($folderId);
-        // Not involved in any folders? Then no access.
-        if (!$folderCodeList->count()) {
-            return UserAccess::ACCESS_DENY;
-        }
-        if ($this->involvedInSubject($user, \implode(',', $folderCodeList->getPropertyValues('code')))) {
-            return $this->getRoleTypeAccess($role);
-        }
-        return UserAccess::ACCESS_DENY;
     }
 
 
@@ -307,7 +260,7 @@ class Access
      * @param string $roleType
      * @return int
      */
-    public function getRoleTypeAccess(string $roleType): int
+    public function getSisClassRoleTypeAccess(string $roleType): int
     {
         if (Role::STAFF === $roleType) {
             return UserAccess::ACCESS_WRITE;
@@ -382,64 +335,173 @@ class Access
 
     /**
      * Return the specified user's access level for the given folder, respects permissions:
-     * * CMS
-     * * GROUP
-     * * ROLE
+     * 1. User.SU status
+     * 2. Group membership via `userAccess` table
+     * 3. CMS read/write/full
+     * 4. Folder Role perms
+     * 5. SIS enrollment perms
      *
      * @param User $user
      * @param int  $folderId
      * @param bool $cache Whether to use cached results or get them from DB again
      * @return int
+     * @throws InvalidArgumentException TODO implement better annotation/handling for impossible logic exceptions
+     * @throws Mapper\Exception         If folder does not exist.
      */
     public function getFolderAccess(User $user, $folderId, $cache = true): int
     {
-        // Superusers always have full access
+        /* check cache before we proceed for shortcuts */
+        if($cache && isset($this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId])){
+            return $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId];
+        }
+
+        // Find the NNIAN for the folder
+        $folder   = $this->folderMapper->findCheaplyById($folderId, ['deleted' => true]);
+        $folderId = $this->folderMapper->findNearestNonInheritingAncestralNode($folder)->getId();
+
+        // 1. Superusers always have full access if folder exists
         if ($user->isSuperuser()) {
+            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
             return UserAccess::ACCESS_FULL;
         }
 
-        /** @var int[] $accessLevels Derived from different permission systems */
-        $accessLevels = [];
-
-        /* check cache before we proceed for shortcuts */
-        if($cache && isset($this->cachedFolderAccess[$user->getId()][$folderId])){
-            return $this->cachedFolderAccess[$user->getId()][$folderId];
+        // 2. Check `userAccess` table. (Short-circuit if full access detected)
+        $accessLevel = $this->getUserAccessLevel($user, UserAccess::SERVICE_HOMEPAGE, $folderId, $cache);
+        if($accessLevel === UserAccess::ACCESS_FULL){
+            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
+            return UserAccess::ACCESS_FULL;
         }
 
-        // Check CMS service access level
-
+        // 3. Check CMS service access level.  (Short-circuit if full access detected)
         /* Note there is no folderId specified for the CMS service. The effect of this is that if the user
          * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
-         * We don't need to cache the value locally, we can rely on the Query Cache to do it for us.
          */
-        $groupAccessLevel = $this->getAccessLevel($user, UserAccess::SERVICE_CMS);
-        $accessLevels[] = $groupAccessLevel;
-
-        // Short-circuit if full access
-        if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
-            $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
+        $accessLevel = max($accessLevel, $this->getAccessLevel($user, UserAccess::SERVICE_CMS));
+        if($accessLevel === UserAccess::ACCESS_FULL){
+            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
             return UserAccess::ACCESS_FULL;
         }
 
-        // Check Group access level
-        $groupAccessLevel = $this->getAccessLevel($user, UserAccess::SERVICE_HOMEPAGE, (int)$folderId);
-        $accessLevels[] = $groupAccessLevel;
-
-        // Short-circuit if full access
-        if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
-            $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
+        // 4. Folder role permission. (Short-circuit if full access detected)
+        $accessLevel = max($accessLevel, $this->getFolderAccessForRole($user->getRole()->getId(), $folderId, $cache));
+        if($accessLevel === UserAccess::ACCESS_FULL){
+            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
             return UserAccess::ACCESS_FULL;
         }
 
-        // Check role access level
-        try {
-            $roleAccessLevel = $this->roleAccessMapper->getAccess($user, $folderId, $cache)->getType();
-            $accessLevels[] = $roleAccessLevel;
-        } catch (Mapper\Exception $e) {
-            $accessLevels[] = UserAccess::ACCESS_DENY;
+        // 5. Sis Class enrollment access
+        $accessLevel = max($accessLevel, $this->getSisAccessLevel($user, $folderId));
+
+        $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = $accessLevel;
+
+        return $accessLevel;
+    }
+
+
+    /**
+     * Returns a role's access to a folder
+     *
+     * @param int  $roleId
+     * @param int  $folderId
+     * @param bool $cache
+     * @return int
+     * @throws Mapper\Exception If no folder found for specified folder id
+     */
+    public function getFolderAccessForRole(int $roleId, int $folderId, bool $cache = true): int
+    {
+        // Ensure we take role-permission from NNIAN
+        $folder   = $this->folderMapper->findCheaplyById($folderId, ['deleted' => true]);
+        $folderId = $this->folderMapper->findNearestNonInheritingAncestralNode($folder)->getId();
+
+        if ($folderId === Folder\IFolder::ROOT_ID) {
+            // All roles implicitly have no access the root pseudo folder
+            return UserAccess::ACCESS_DENY;
         }
 
-        $maxLevel = max($accessLevels);
-        return $this->cachedFolderAccess[$user->getId()][$folderId] = $maxLevel;
+        // Permission check #1 - Cached results
+        if ($cache && isset($this->cachedRoleFolderPermissions[$roleId][$folderId])) {
+            return $this->cachedRoleFolderPermissions[$roleId][$folderId];
+        }
+
+        // Permission check #2 - Query the DB (unique constraints ensure 0:1 results)
+        // (it is possible to have a folder that does not inherit that lacks role perms, eg 'Lost & Found' folder)
+        /** @var null|RoleAccess $roleAccess */
+        $roleAccess = $this->roleAccessMapper->findByColumnList([
+            'cid' => $folderId,
+            'gid' => $roleId,
+        ])->first();
+        $this->cachedRoleFolderPermissions[$roleId][$folderId] = $roleAccess ? $roleAccess->getType() : UserAccess::ACCESS_DENY;
+
+        return $this->cachedRoleFolderPermissions[$roleId][$folderId];
+    }
+
+
+    /**
+     * Returns a user's 'userAccess' permission to a service
+     *
+     * Checks:
+     * 1. `userAccess` table
+     *
+     * @param User $user
+     * @param int  $service
+     * @param int  $serviceIdentifier
+     * @param bool $cache
+     * @return int
+     * @throws InvalidArgumentException If called with a service identifier for a service that does not use them, or vice versa
+     */
+    private function getUserAccessLevel(User $user, int $service, int $serviceIdentifier = UserAccess::SID_NONE, bool $cache = true): int
+    {
+        // Check cache
+        if ($cache && isset($this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier])) {
+            return $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier];
+        }
+
+        // Validate the requested combination of $service and $serviceIdentifier
+        if ($serviceIdentifier === UserAccess::SID_NONE) {
+            if (\in_array($service, UserAccess::requiresServiceIdentifier(), true)) {
+                throw new InvalidArgumentException("Service {$service} requires a service identifier to be provided");
+            }
+        } elseif (\in_array($service, UserAccess::doesNotRequireServiceIdentifier(), true)) {
+            throw new InvalidArgumentException("Service {$service} does not use service identifiers. Found: {$serviceIdentifier}");
+        }
+
+        // Check UserAccess table (there will be 0:1 results due to unique constraint)
+        /** @var null|UserAccess $userAccess */
+        $userAccess  = $this->userAccessMapper->findByColumnList([
+            'uid'     => $user->getId(),
+            'service' => $service,
+            'sid'     => $serviceIdentifier,
+        ])->first();
+        $accessLevel = $userAccess ? $userAccess->getAccessLevel() : UserAccess::ACCESS_DENY;
+
+        $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier] = $accessLevel;
+        return $accessLevel;
+    }
+
+
+    /**
+     * Returns the user's access level to a folder as defined by SIS enrollment and SB config
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @return int
+     */
+    private function getSisAccessLevel(User $user, int $folderId): int
+    {
+        // Only staff and students can have access via SIS involvement
+        $role = $user->getRole();
+        if (!$role->isStudent() && !$role->isStaff()) {
+            return UserAccess::ACCESS_DENY;
+        }
+
+        $folderCodeList = $this->folderCodeMapper->findForCategory($folderId);
+        // Not involved in any folders? Then no access.
+        if (!$folderCodeList->count()) {
+            return UserAccess::ACCESS_DENY;
+        }
+        if ($this->involvedInSubject($user, \implode(',', $folderCodeList->getPropertyValues('code')))) {
+            return $this->getSisClassRoleTypeAccess($role);
+        }
+        return UserAccess::ACCESS_DENY;
     }
 }

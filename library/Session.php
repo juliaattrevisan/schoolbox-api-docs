@@ -574,7 +574,7 @@ class Session
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
-                                $subject['perm'] = $this->access->getRoleTypeAccess($user->getRole()->getType());
+                                $subject['perm'] = $this->access->getSisClassRoleTypeAccess($user->getRole()->getType());
                                 $subject['code'] = $result->getMatchedCode();
                                 $_SESSION['subjects'][] = $subject;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,7 +17,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage\IStorage;
@@ -155,9 +155,11 @@ class Submission implements IStorage, ISoftDeletable
             }
 
             // Role permissions
-            $roleAccessMapper = RoleAccessMapper::getInstance();
-            $roleAccess = $roleAccessMapper->getAccess($user, $this->getSubmissionBox()->getCategory()->getId());
-            if($roleAccess->getType() >= UserAccess::ACCESS_WRITE){
+            $roleAccessLevel = Access::getInstance()->getFolderAccessForRole(
+                $user->getRole()->getId(),
+                $this->getSubmissionBox()->getCategory()->getId()
+            );
+            if($roleAccessLevel >= UserAccess::ACCESS_WRITE){
                 return true;
             }
         }
