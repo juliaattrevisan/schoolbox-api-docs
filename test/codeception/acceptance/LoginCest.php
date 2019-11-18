@@ -16,7 +16,7 @@ class LoginCest
      */
     public function _before(AcceptanceTester $i)
     {
-        $i->runShellCommand('./test/acceptance/_support/BashScripts/disable_ssl_SAML.sh');
+        $i->runShellCommand('./test/codeception/_support/BashScripts/disable_ssl_SAML.sh');
         $i->changeDBConfig('saml_sso_url', 'https://ad.dev.schoolbox.cloud/adfs/ls');
         $i->changeDBConfig('saml_logout_url', 'https://ad.dev.schoolbox.cloud/adfs/ls/IdpInitiatedSignon.aspx');
         $i->changeDBConfig('saml_idp_metadata_url', 'https://ad.dev.schoolbox.cloud/FederationMetadata/2007-06/FederationMetadata.xml');
@@ -30,7 +30,7 @@ class LoginCest
      */
     public function _after(AcceptanceTester $i)
     {
-        $i->runShellCommand('./test/acceptance/_support/BashScripts/enable_ssl_SAML.sh');
+        $i->runShellCommand('./test/codeception/_support/BashScripts/enable_ssl_SAML.sh');
         $i->changeDBConfig('saml_sso_url', '');
         $i->changeDBConfig('saml_logout_url', '');
         $i->changeDBConfig('saml_idp_metadata_url', '');
