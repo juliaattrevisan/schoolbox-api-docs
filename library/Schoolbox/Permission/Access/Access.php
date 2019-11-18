@@ -228,7 +228,9 @@ class Access
      * @param bool     $cache
      * @return int
      * @throws InvalidArgumentException If called with a service identifier for a service that does not use them, or vice versa
-     * @throws Mapper\Exception
+     * @throws Mapper\Exception         If cannot find an entity for the service identifier (eg, folder not found).
+     *                                  Note that we intentionally don't return DENY here, rather, the caller needs to be
+     *                                  informed that their call could not be processed for some reason.
      */
     public function getAccessLevel(User $user, int $service, int $serviceIdentifier = UserAccess::SID_NONE, bool $cache = true): int
     {
@@ -253,15 +255,14 @@ class Access
             $folderNnian       = $this->folderMapper->findNearestNonInheritingAncestralNode($folder);
             $serviceIdentifier = (int)$folderNnian->getId();
         }
-        // Check UserAccess table
-        $userAccessLevels = $this->userAccessMapper->findByColumnList([
+        // Check UserAccess table (there will be 0:1 results due to unique constraint)
+        $userAccess = $this->userAccessMapper->findByColumnList([
             'uid'     => $user->getId(),
             'service' => $service,
             'sid'     => $serviceIdentifier,
-        ]);
-        if ($userAccessLevels->count()) {
+        ])->first();
+        if ($userAccess) {
             /** @var UserAccess $userAccess */
-            $userAccess  = $userAccessLevels->first();
             $accessLevel = $userAccess->getAccessLevel();
         }
         // Is checking homepage service, also check SIS-derived permissions
@@ -368,7 +369,6 @@ class Access
      * @param User $user
      * @param int  $serviceIdentifier
      * @return bool
-     * @throws Mapper\Exception
      */
     public function involvedInGroup(User $user, int $serviceIdentifier): bool
     {

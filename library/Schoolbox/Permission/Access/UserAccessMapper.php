@@ -26,7 +26,6 @@ use Alaress\Database\Predicate;
 use PDOException;
 use UnderflowException;
 use InvalidArgumentException;
-use UnexpectedValueException;
 
 /**
  * Class UserAccessMapper
