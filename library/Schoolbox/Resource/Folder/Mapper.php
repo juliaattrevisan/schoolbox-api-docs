@@ -1678,7 +1678,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return $this->createModel()
                 ->setId(0)
                 ->setName('Top Level')
-                ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
+                ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID))
+                ->setInherit(false);
         }
 
         $query = "
