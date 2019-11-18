@@ -24,20 +24,22 @@
             // Use datatables to do fixed headers and left column
             // Only do this on small up
             var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
+            var options = {
+                scrollY: '34em', // Fairly arbitrary height, catered to a 1080p screen
+                scrollX: true,
+                scrollCollapse: true,
+                paging: false,
+                bFilter: false,
+                bInfo: false,
+                ordering: false
+            };
+
+            // Use fixed columns on small
             if ($windowWidthRems >= 40) {
-                $('[data-mark-sheet]').DataTable({
-                    scrollY: '34em', // Fairly arbitrary height, catered to a 1080p screen
-                    scrollX: true,
-                    scrollCollapse: true,
-                    paging: false,
-                    bFilter: false,
-                    bInfo: false,
-                    ordering: false,
-                    fixedColumns: {
-                        leftColumns: 1
-                    }
-                });
+                options.fixedColumns = { leftColumns: 1 };
             }
+
+            $('[data-mark-sheet]').DataTable(options);
 
             /* Controls for Averages and Dynamic updates for input fields
              */
