@@ -13,7 +13,7 @@ use Predis\ClientInterface;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * Populate new lu_year_level with distinct values from user.year
+ * Deletes all user sessions from Redis.
  */
 $app = new class extends CliTool\App
 {
