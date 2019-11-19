@@ -288,11 +288,15 @@ class UserBulkMapper extends UserMapper
     }
 
     /**
-     * @inheritDoc
+     * Mass-delete of a collection of users, plus logging.
+     *
+     * @param  User[] $userCollection
+     * @return bool
+     * @throws MapperException
      */
-    public function delete($userCollection)
+    public function bulkDelete($userCollection)
     {
-        $result = parent::delete($userCollection);
+        $result = $this->delete($userCollection);
         foreach ($userCollection as $user) {
             $this->log("{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) deleted user {$user->getFullName()} ({$user->getId()})");
         }

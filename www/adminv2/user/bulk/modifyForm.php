@@ -63,7 +63,7 @@ if (isset($_POST['updateUsers'])) {
 } else {
     if (isset($_POST['deleteUsers'])) {
         $userCollection = $userMapper->findByColumn('id', $userIds);
-        $userMapper->delete($userCollection);
+        $userMapper->bulkDelete($userCollection);
 
         $modified = $userCollection;
     }
