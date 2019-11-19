@@ -330,7 +330,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             $classes[$class['CODE']] = array(
                 'code' => $class['CODE'],
                 'name' => $class['NAME'],
-                'classType' => $class['CLASSTYPE']
+                'classType' => $class['CLASSTYPE'],
+                'campusCode' => '',
             );
         }
 

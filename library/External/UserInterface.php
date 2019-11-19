@@ -402,10 +402,10 @@ interface External_UserInterface extends External\IConnector
      *
      * returns array(
      *     array(
-     *         'code' => class category code
-     *         'name' => class name
-     *         'classType' => a string e.g. academic, music, maths
-     *         'campusCode' => the campus this class is in
+     *         'code'       => string - class category code
+     *         'name'       => string - class name
+     *         'classType'  => string - e.g. academic, music, maths
+     *         'campusCode' => string - the campus this class is in
      *     )
      *     ...
      * )

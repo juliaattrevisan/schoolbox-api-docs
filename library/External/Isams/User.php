@@ -337,7 +337,8 @@ class External_Isams_User implements External_UserInterface
             $subjectList[] = array(
                 'code' => $currentRow['code'],
                 'name' => $currentRow['code'],
-                'classType' => ''
+                'classType' => '',
+                'campusCode' => '',
             );
         }
 

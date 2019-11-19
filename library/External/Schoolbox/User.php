@@ -181,7 +181,9 @@ class External_Schoolbox_User implements External_UserInterface
         $classQuery = $this->internalDatabase->executeQuery(
             "
                 SELECT      c.name, 
-                            c.code
+                            c.code,
+                            '' AS classType,
+                            '' AS campusCode
                 FROM        user u
                 INNER JOIN  class_user cu ON cu.user_id = u.id
                 INNER JOIN  class c ON c.id = cu.class_id
@@ -197,7 +199,9 @@ class External_Schoolbox_User implements External_UserInterface
         $subjectQuery = $this->internalDatabase->executeQuery(
             "
                 SELECT      c.name,
-                            c.code
+                            c.code,
+                            '' AS classType,
+                            '' AS campusCode
                 FROM        user u
                 INNER JOIN  class_period cp ON cp.teacher_id = u.id
                 INNER JOIN  class c ON c.id = cp.class_id

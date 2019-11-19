@@ -414,7 +414,9 @@ class External_Denbigh_User implements External_UserInterface
             return $this->externalDatabase->executeQuery(
                 "
                     SELECT      cl.classCode AS code,
-                                co.subjectName AS name
+                                co.subjectName AS name,
+                                '' AS classType,
+                                '' AS campusCode
                     FROM        People p
                     RIGHT JOIN  Staff s ON s.peopleDenbighID = p.denbighID
                     RIGHT JOIN  Classes cl ON cl.staffCode = s.staffCode
@@ -431,7 +433,9 @@ class External_Denbigh_User implements External_UserInterface
             return $this->externalDatabase->executeQuery(
                 "
                         SELECT      cl.classCode AS code,
-                                    co.subjectName AS name
+                                    co.subjectName AS name,
+                                    '' AS classType,
+                                    '' AS campusCode
                         FROM        People p
                         RIGHT JOIN  Enrolments e ON e.studentID = p.denbighID
                         RIGHT JOIN  Classes cl ON cl.classCode = e.classCode
