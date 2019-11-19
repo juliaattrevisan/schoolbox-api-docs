@@ -124,7 +124,7 @@ class Access
                 $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
                 $externalUser,
                 $config,
-                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::_EXTERNAL_TYPE))
+                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE))
             );
         }
         return self::$instance;
@@ -138,7 +138,7 @@ class Access
      * @param RoleAccessMapper            $roleAccessMapper
      * @param Folder\Mapper               $folderMapper
      * @param Folder\Code\Mapper          $folderCodeMapper
-     * @param External_UserInterface      $externalUser
+     * @param null|External_UserInterface $externalUser
      * @param IConfigLoader               $config
      * @param Folder\Code\ISubjectMatcher $subjectMatcher
      */

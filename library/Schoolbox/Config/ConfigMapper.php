@@ -96,8 +96,8 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
     public const _EXTERNAL_MS_SQL_SERVER_DRIVER = 'external_ms_sql_server_driver';
     public const COMMS_COMMENTS_ENABLED = 'comms_comments_enabled';
-    public const _EXTERNAL_TYPE         = 'external_type';
-    public const _ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
+    public const NAME_EXTERNAL_TYPE              = 'external_type';
+    public const NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
 
     public const PREFIX_CLOUDWORK_OAUTH             = 'cloudwork_oauth_';
     public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';

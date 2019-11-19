@@ -55,8 +55,8 @@ class AccessTest extends TestCase
 {
     // Default hard-coded system state for this test. Individual tests can override.
     private const CONFIG = [
-        ConfigMapper::_ALLOW_STUDENT_CLASS_ACCESS => true,
-        ConfigMapper::_EXTERNAL_TYPE              => 'synergetic',
+        ConfigMapper::NAME_ALLOW_STUDENT_CLASS_ACCESS => true,
+        ConfigMapper::NAME_EXTERNAL_TYPE              => 'synergetic',
     ];
 
     private const FOLDER_1_ID = 1;
