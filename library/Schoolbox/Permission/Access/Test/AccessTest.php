@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use ReflectionClass;
 use ReflectionException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
@@ -54,8 +55,8 @@ class AccessTest extends TestCase
 {
     // Default hard-coded system state for this test. Individual tests can override.
     private const CONFIG = [
-        'allow_student_class_access' => true,
-        'externalType'               => 'synergetic',
+        ConfigMapper::_ALLOW_STUDENT_CLASS_ACCESS => true,
+        ConfigMapper::_EXTERNAL_TYPE              => 'synergetic',
     ];
 
     private const FOLDER_1_ID = 1;
