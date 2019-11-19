@@ -9,10 +9,7 @@
             $('span[data-selected="true"]').text(num);
             var userCount = $('input[name="userCount"]');
             userCount.val(num);
-            if (userCount.hasClass('error') && num > 0) {
-                userCount.removeClass('error');
-                $('#userCount-error').remove();
-            }
+            updateForm.valid();
         });
 
         var updateForm = $('form[data-action="userUpdate"]');
