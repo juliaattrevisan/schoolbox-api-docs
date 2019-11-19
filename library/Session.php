@@ -1,6 +1,5 @@
 <?php
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -9,9 +8,7 @@ use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedExcepti
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 

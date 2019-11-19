@@ -4,6 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Permission\Access;
 
@@ -239,10 +240,10 @@ class Access
      * Else not SERVICE_HOMEPAGE
      *   1. `userAccess` table only
      *
-     * @param User     $user
-     * @param int      $service
-     * @param null|int $serviceIdentifier
-     * @param bool     $cache
+     * @param User $user
+     * @param int  $service
+     * @param int  $serviceIdentifier
+     * @param bool $cache
      * @return int
      * @throws InvalidArgumentException If called with a service identifier for a service that does not use them, or vice versa
      * @throws Mapper\Exception         If cannot find an entity for the service identifier (eg, folder not found).
@@ -329,12 +330,12 @@ class Access
     public function involvedInGroup(User $user, int $folderId): bool
     {
         return $this->userAccessMapper->findByPredicates(
-                $this->userAccessMapper->getPredicateBuilder()
-                                       ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                                       ->equals('sid', $folderId)
-                                       ->equals('uid', $user->getId())
-                                       ->notEquals('type', UserAccess::ACCESS_DENY)
-            )->count() > 0;
+            $this->userAccessMapper->getPredicateBuilder()
+                                   ->equals('service', UserAccess::SERVICE_HOMEPAGE)
+                                   ->equals('sid', $folderId)
+                                   ->equals('uid', $user->getId())
+                                   ->notEquals('type', UserAccess::ACCESS_DENY)
+        )->count() > 0;
     }
 
 

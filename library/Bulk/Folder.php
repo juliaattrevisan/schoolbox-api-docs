@@ -203,7 +203,7 @@ class Bulk_Folder
         $this->saveHomepageConfig($newFolder->getHomepage());
         $this->saveRolePermissions($newFolder);
 
-        return $this->buildRowResult($newFolder->getId(), $newFolder->getNameWithCodes(), 'Added', 'OK');
+        return $this->buildRowResult((string)$newFolder->getId(), $newFolder->getNameWithCodes(), 'Added', 'OK');
     }
 
 
