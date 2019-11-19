@@ -82,19 +82,19 @@ class SubjectMatcherTest extends TestCase
     {
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
         return [
-            ['X/ABC', 'X', 'ABC', true],
-            ['X/ABC', 'X', 'X/ABC', true],  // fuzzy
-            ['X/ABC', '', 'X/ABC', true],
-            ['X/ABC', null, 'X/ABC', true],
+            ['D/ABC', 'D', 'ABC', true],
+            ['D/ABC', 'D', 'D/ABC', true],  // fuzzy
+            ['D/ABC', '', 'D/ABC', true],
+            ['D/ABC', null, 'D/ABC', true],
             ['ABC', '', 'ABC', true],
-            ['ABC', 'X', 'X/ABC', false],
-            ['ABC', '', 'X/ABC', false],
-            ['ABC', null, 'X/ABC', false],
-            ['X/Y/ABC', null, 'X/Y/ABC', true],
-            ['X/Y/ABC', '', 'X/Y/ABC', true],
-            ['X/Y/ABC', 'X', 'X/Y/ABC', true],  // fuzzy
-            ['X/Y/ABC', 'X', 'Y/ABC', true],
-            ['X/Y/ABC', 'X', 'ABC', false],
+            ['ABC', 'D', 'D/ABC', false],
+            ['ABC', '', 'D/ABC', false],
+            ['ABC', null, 'D/ABC', false],
+            ['D/Y/ABC', null, 'D/Y/ABC', true],
+            ['D/Y/ABC', '', 'D/Y/ABC', true],
+            ['D/Y/ABC', 'D', 'D/Y/ABC', true],  // fuzzy
+            ['D/Y/ABC', 'D', 'Y/ABC', true],
+            ['D/Y/ABC', 'D', 'ABC', false],
         ];
     }
 }
