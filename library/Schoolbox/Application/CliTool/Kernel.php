@@ -49,7 +49,7 @@ class Kernel extends CliKernelAbstract
      *
      * @var bool[]|string[]|array[]
      */
-    private $kernelOpts;
+    private $kernelOpts = [];
 
     /**
      * These are passed back to the CLI app
@@ -293,7 +293,6 @@ class Kernel extends CliKernelAbstract
         );
 
         // Extract the kernel options
-        $this->kernelOpts = [];
         foreach (\array_merge($kernelShortOpts, $kernelLongOpts) as $kernelOption) {
             $trimmedKernelOption = \rtrim($kernelOption, ':');
             if (\array_key_exists($trimmedKernelOption, $allOpts)) {
