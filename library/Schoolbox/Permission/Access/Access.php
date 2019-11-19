@@ -20,6 +20,9 @@ use External_UserInterface;
 use External_User;
 use LogicException;
 use function count;
+use function explode;
+use function implode;
+use function in_array;
 use function max;
 
 /**
@@ -37,8 +40,8 @@ class Access
      * Permission/access level constants
      */
     // TODO Move these somewhere more appropriate in the config sub-system.
-    const VISIBILITY_EVERYONE     = 0;                 // Accessible by everyone
-    const VISIBILITY_STAFF        = 1;                    // Accessible by staff only
+    const VISIBILITY_EVERYONE     = 0;             // Accessible by everyone
+    const VISIBILITY_STAFF        = 1;             // Accessible by staff only
     const VISIBILITY_STAFF_PARENT = 2;             // Accessible by staff & parents only
 
     /**
@@ -75,7 +78,11 @@ class Access
     /** @var Folder\Code\Mapper */
     private $folderCodeMapper;
 
-    /** @var External_UserInterface */
+    /**
+     * If not injected, lazy load this to avoid creating a DB connection on instantiation of this class
+     *
+     * @var null|External_UserInterface
+     */
     private $externalUser;
 
     /** @var IConfigLoader */
@@ -98,8 +105,6 @@ class Access
      * @param IConfigLoader|null               $config
      * @param Folder\Code\ISubjectMatcher|null $subjectMatcher
      * @return static
-     * @throws InvalidArgumentException
-     * @throws LogicException If unable to build either an online or offline user connector
      */
     public static function getInstance(
         UserAccessMapper $userAccessMapper = null,
@@ -117,9 +122,9 @@ class Access
                 $roleAccessMapper ?? RoleAccessMapper::getInstance(),
                 $folderMapper ?? Folder\Mapper::getInstance(),
                 $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
-                $externalUser ?? new External_User(),
+                $externalUser,
                 $config,
-                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get('externalType'))
+                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::_EXTERNAL_TYPE))
             );
         }
         return self::$instance;
@@ -142,7 +147,7 @@ class Access
         RoleAccessMapper $roleAccessMapper,
         Folder\Mapper $folderMapper,
         Folder\Code\Mapper $folderCodeMapper,
-        External_UserInterface $externalUser,
+        ?External_UserInterface $externalUser,
         IConfigLoader $config,
         Folder\Code\ISubjectMatcher $subjectMatcher
     ) {
@@ -166,6 +171,7 @@ class Access
      * @return bool
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function isInstructor(User $user, Folder\Model $folder): bool
     {
@@ -182,6 +188,7 @@ class Access
      * @return bool
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function isLearner(User $user, Folder\Model $folder): bool
     {
@@ -203,6 +210,7 @@ class Access
      * @return int
      * @throws InvalidArgumentException If folder array is empty
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function getMinFolderAccess(User $user, array $folderIds, $cache = true): int
     {
@@ -249,6 +257,7 @@ class Access
      * @throws Mapper\Exception         If cannot find an entity for the service identifier (eg, folder not found).
      *                                  Note that we intentionally don't return DENY here, rather, the caller needs to be
      *                                  informed that their call could not be processed for some reason.
+     * @throws LogicException
      */
     public function getAccessLevel(User $user, int $service, int $serviceIdentifier = UserAccess::SID_NONE, bool $cache = true): int
     {
@@ -293,18 +302,20 @@ class Access
      * @param User   $user
      * @param string $folderCodeString Comma-separated codes, eg 'abc123,xyz456'
      * @return bool
+     * @throws InvalidArgumentException
+     * @throws LogicException If unable to build either an online or offline user connector
      */
     public function involvedInSubject(User $user, string $folderCodeString): bool
     {
         if (!$user->getExternalId()) {
             return false;
         }
-        $externalSubjectList = $this->externalUser->getSubjectList($user);
+        $externalSubjectList = $this->getExternalUser()->getSubjectList($user);
         if (!count($externalSubjectList)) {
             return false;
         }
 
-        $codes = \explode(',', $folderCodeString);
+        $codes = explode(',', $folderCodeString);
         foreach ($externalSubjectList as $subject) {
             foreach ($codes as $code) {
                 if ($this->subjectMatcher->isMatch($code, $subject['campusCode'], $subject['code'])) {
@@ -353,6 +364,7 @@ class Access
      * @return int
      * @throws InvalidArgumentException TODO implement better annotation/handling for impossible logic exceptions
      * @throws Mapper\Exception         If folder does not exist.
+     * @throws LogicException           If unable to build an ExternalUser instance
      */
     public function getFolderAccess(User $user, $folderId, $cache = true): int
     {
@@ -467,10 +479,10 @@ class Access
         if ($serviceIdentifier === UserAccess::SID_NONE) {
             // Even though homepage service requires an id, an id of 0 is valid in this case,
             // and means the root folder. That is a valid invocation of this method.
-            if ($service !== UserAccess::SERVICE_HOMEPAGE && \in_array($service, UserAccess::requiresServiceIdentifier(), true)) {
+            if ($service !== UserAccess::SERVICE_HOMEPAGE && in_array($service, UserAccess::requiresServiceIdentifier(), true)) {
                 throw new InvalidArgumentException("Service {$service} requires a service identifier to be provided");
             }
-        } elseif (\in_array($service, UserAccess::doesNotRequireServiceIdentifier(), true)) {
+        } elseif (in_array($service, UserAccess::doesNotRequireServiceIdentifier(), true)) {
             throw new InvalidArgumentException("Service {$service} does not use service identifiers. Found: {$serviceIdentifier}");
         }
 
@@ -494,6 +506,8 @@ class Access
      * @param User $user
      * @param int  $folderId
      * @return int
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
     private function getSisAccessLevel(User $user, int $folderId): int
     {
@@ -508,9 +522,25 @@ class Access
         if (!$folderCodeList->count()) {
             return UserAccess::ACCESS_DENY;
         }
-        if ($this->involvedInSubject($user, \implode(',', $folderCodeList->getPropertyValues('code')))) {
+        if ($this->involvedInSubject($user, implode(',', $folderCodeList->getPropertyValues('code')))) {
             return $this->getSisClassRoleTypeAccess($role->getType());
         }
         return UserAccess::ACCESS_DENY;
+    }
+
+
+    /**
+     * Lazy loading wrapper around the external user interface to avoid unnecessary external connection
+     *
+     * @return External_UserInterface
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     */
+    private function getExternalUser(): External_UserInterface
+    {
+        if (!$this->externalUser) {
+            $this->externalUser = new External_User();
+        }
+        return $this->externalUser;
     }
 }

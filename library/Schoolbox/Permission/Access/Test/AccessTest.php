@@ -182,6 +182,7 @@ class AccessTest extends TestCase
      * @param bool         $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function testIsInstructor(Access $access, User $user, Folder\Model $folder, bool $expected): void
     {
@@ -197,6 +198,7 @@ class AccessTest extends TestCase
      * @param bool         $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function testIsLearner(Access $access, User $user, Folder\Model $folder, bool $expected): void
     {
@@ -213,6 +215,7 @@ class AccessTest extends TestCase
      * @param int    $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function testGetAccessLevel(Access $access, User $user, int $service, int $serviceIdentifier, int $expected): void
     {
@@ -258,6 +261,7 @@ class AccessTest extends TestCase
      * @param int    $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function testGetMinFolderAccess(Access $access, User $user, array $folderIds, int $expected): void
     {
@@ -286,6 +290,8 @@ class AccessTest extends TestCase
      * @param User   $user
      * @param string $codeString
      * @param bool   $expected
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
     public function testInvolvedInSubject(Access $access, User $user, string $codeString, bool $expected): void
     {
@@ -330,6 +336,7 @@ class AccessTest extends TestCase
      * @param int    $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws LogicException
      */
     public function testGetFolderAccess(Access $access, User $user, int $folderId, int $expected): void
     {
@@ -378,7 +385,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -468,7 +474,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -558,7 +563,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -699,7 +703,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -722,7 +725,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -761,7 +763,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -813,7 +814,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -895,7 +895,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -988,7 +987,6 @@ class AccessTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
@@ -1052,7 +1050,6 @@ class AccessTest extends TestCase
      * @param array|null $externalUserData
      * @return Access
      * @throws Framework\Exception
-     * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
