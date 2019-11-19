@@ -7,7 +7,8 @@
 
 namespace Schoolbox\Permission\Access;
 
-use Schoolbox\Config\ConfigMapper;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Schoolbox\Config;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
@@ -17,6 +18,7 @@ use InvalidArgumentException;
 use External_UserInterface;
 use External_User;
 use LogicException;
+use function count;
 use function max;
 
 /**
@@ -78,19 +80,24 @@ class Access
     /** @var IConfigLoader */
     private $config;
 
+    /** @var Folder\Code\ISubjectMatcher */
+    private $subjectMatcher;
+
 
     /**
      * Retrieves the singleton instance of this class.
      *
-     * The Mappers *SHOULD* be injected, but not enforced yet to enable backwards compatibility
+     * The dependencies *SHOULD* be injected, but not enforced yet to enable backwards compatibility
      *
-     * @param UserAccessMapper|null       $userAccessMapper
-     * @param RoleAccessMapper|null       $roleAccessMapper
-     * @param Folder\Mapper|null          $folderMapper
-     * @param Folder\Code\Mapper|null     $folderCodeMapper
-     * @param External_UserInterface|null $externalUser
-     * @param IConfigLoader|null          $config
+     * @param UserAccessMapper|null            $userAccessMapper
+     * @param RoleAccessMapper|null            $roleAccessMapper
+     * @param Folder\Mapper|null               $folderMapper
+     * @param Folder\Code\Mapper|null          $folderCodeMapper
+     * @param External_UserInterface|null      $externalUser
+     * @param IConfigLoader|null               $config
+     * @param Folder\Code\ISubjectMatcher|null $subjectMatcher
      * @return static
+     * @throws InvalidArgumentException
      * @throws LogicException If unable to build either an online or offline user connector
      */
     public static function getInstance(
@@ -99,16 +106,19 @@ class Access
         Folder\Mapper $folderMapper = null,
         Folder\Code\Mapper $folderCodeMapper = null,
         External_UserInterface $externalUser = null,
-        IConfigLoader $config = null
+        IConfigLoader $config = null,
+        Folder\Code\ISubjectMatcher $subjectMatcher = null
     ): Access {
         if (!self::$instance) {
+            $config = $config ?? new Config\Loader();
             self::$instance = new static(
                 $userAccessMapper ?? UserAccessMapper::getInstance(),
                 $roleAccessMapper ?? RoleAccessMapper::getInstance(),
                 $folderMapper ?? Folder\Mapper::getInstance(),
                 $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
                 $externalUser ?? new External_User(),
-                $config ?: ConfigMapper::getInstance()
+                $config,
+                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get('externalType'))
             );
         }
         return self::$instance;
@@ -118,12 +128,13 @@ class Access
     /**
      * Private constructor to enforce singleton pattern
      *
-     * @param UserAccessMapper       $userAccessMapper
-     * @param RoleAccessMapper       $roleAccessMapper
-     * @param Folder\Mapper          $folderMapper
-     * @param Folder\Code\Mapper     $folderCodeMapper
-     * @param External_UserInterface $externalUser
-     * @param IConfigLoader          $config
+     * @param UserAccessMapper            $userAccessMapper
+     * @param RoleAccessMapper            $roleAccessMapper
+     * @param Folder\Mapper               $folderMapper
+     * @param Folder\Code\Mapper          $folderCodeMapper
+     * @param External_UserInterface      $externalUser
+     * @param IConfigLoader               $config
+     * @param Folder\Code\ISubjectMatcher $subjectMatcher
      */
     private function __construct(
         UserAccessMapper $userAccessMapper,
@@ -131,7 +142,8 @@ class Access
         Folder\Mapper $folderMapper,
         Folder\Code\Mapper $folderCodeMapper,
         External_UserInterface $externalUser,
-        IConfigLoader $config
+        IConfigLoader $config,
+        Folder\Code\ISubjectMatcher $subjectMatcher
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->roleAccessMapper = $roleAccessMapper;
@@ -139,6 +151,7 @@ class Access
         $this->folderCodeMapper = $folderCodeMapper;
         $this->externalUser     = $externalUser;
         $this->config           = $config;
+        $this->subjectMatcher   = $subjectMatcher;
     }
 
 
@@ -187,14 +200,13 @@ class Access
      * @param int[] $folderIds
      * @param bool  $cache
      * @return int
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException If folder array is empty
      * @throws Mapper\Exception
      */
     public function getMinFolderAccess(User $user, array $folderIds, $cache = true): int
     {
         if (0 === count($folderIds)) {
-            // Technically should throw an InvalidArgException, but this simplifies callers' code.
-            return UserAccess::ACCESS_DENY;
+            throw new InvalidArgumentException("Cannot determine minimum value in empty set");
         }
 
         // We must iterate all, rather than from index 1+ (ie fencepost alg.) to robustly account for different indexing
@@ -274,40 +286,28 @@ class Access
 
 
     /**
-     * When passed a schoolbox user ID and subject code (eg. 'CH123') returns true/false to indicate the users
+     * When passed a schoolbox user ID and folder code (eg. 'X/CH123') returns true/false to indicate the users
      * involvement in the class
      *
      * @param User   $user
-     * @param string $codeString Comma-separated codes, eg 'abc123,xyz456'
+     * @param string $folderCodeString Comma-separated codes, eg 'abc123,xyz456'
      * @return bool
      */
-    public function involvedInSubject(User $user, string $codeString): bool
+    public function involvedInSubject(User $user, string $folderCodeString): bool
     {
         if (!$user->getExternalId()) {
             return false;
         }
         $externalSubjectList = $this->externalUser->getSubjectList($user);
-        if (!\is_array($externalSubjectList) || !\count($externalSubjectList)) {
+        if (!count($externalSubjectList)) {
             return false;
         }
 
-        // Take into account class codes with commas
-        $codes = \explode(",", $codeString);
-        foreach ($externalSubjectList as $currentSubject) {
+        $codes = \explode(',', $folderCodeString);
+        foreach ($externalSubjectList as $subject) {
             foreach ($codes as $code) {
-                // If the code has a '/' it might not contain a campus
-                // The class code itself may have a '/' in it. Check for exact match first
-                if (\strtolower($currentSubject["code"]) === \strtolower($code)) {
+                if ($this->subjectMatcher->isMatch($code, $subject['campusCode'], $subject['code'])) {
                     return true;
-                }
-                // Then check if there is a campus mangled in the class code
-                if (\strpos($code, '/') !== false) {
-                    $codeArray = explode('/', $code, 2);
-                    if (\strtolower($currentSubject["code"]) === \strtolower($codeArray[1]) &&
-                        \strtolower($currentSubject["campusCode"]) === \strtolower($codeArray[0])
-                    ) {
-                        return true;
-                    }
                 }
             }
         }
@@ -317,19 +317,25 @@ class Access
 
 
     /**
-     * Check if user is involved in a group
+     * Returns whether the user is involved with a group.
+     *
+     * An explicit DENY permission does not constitute involvement.
      *
      * @param User $user
-     * @param int  $serviceIdentifier
+     * @param int  $folderId
      * @return bool
+     * @throws InvalidColumnException
      */
-    public function involvedInGroup(User $user, int $serviceIdentifier): bool
+    public function involvedInGroup(User $user, int $folderId): bool
     {
-        return $this->userAccessMapper->findByColumnList([
-                'service' => UserAccess::SERVICE_HOMEPAGE,
-                'sid'     => $serviceIdentifier,
-                'uid'     => $user->getId(),
-            ])->count() > 0;
+        $pb =             $this->userAccessMapper->getPredicateBuilder()
+                                                 ->equals('service', UserAccess::SERVICE_HOMEPAGE)
+                                                 ->equals('sid', $folderId)
+                                                 ->equals('uid', $user->getId())
+                                                 ->notEquals('type', UserAccess::ACCESS_DENY);
+        $results = $this->userAccessMapper->findByPredicates($pb);
+
+        return $results->count() > 0;
     }
 
 
@@ -385,6 +391,7 @@ class Access
         // 4. Folder role permission. (Short-circuit if full access detected)
         $accessLevel = max($accessLevel, $this->getFolderAccessForRole($user->getRole()->getId(), $folderId, $cache));
         if($accessLevel === UserAccess::ACCESS_FULL){
+            // Technically this block should never execute as the UI does not support FULL role perms.
             $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
             return UserAccess::ACCESS_FULL;
         }
@@ -458,7 +465,9 @@ class Access
 
         // Validate the requested combination of $service and $serviceIdentifier
         if ($serviceIdentifier === UserAccess::SID_NONE) {
-            if (\in_array($service, UserAccess::requiresServiceIdentifier(), true)) {
+            // Even though homepage service requires an id, an id of 0 is valid in this case,
+            // and means the root folder. That is a valid invocation of this method.
+            if ($service !== UserAccess::SERVICE_HOMEPAGE && \in_array($service, UserAccess::requiresServiceIdentifier(), true)) {
                 throw new InvalidArgumentException("Service {$service} requires a service identifier to be provided");
             }
         } elseif (\in_array($service, UserAccess::doesNotRequireServiceIdentifier(), true)) {
@@ -500,7 +509,7 @@ class Access
             return UserAccess::ACCESS_DENY;
         }
         if ($this->involvedInSubject($user, \implode(',', $folderCodeList->getPropertyValues('code')))) {
-            return $this->getSisClassRoleTypeAccess($role);
+            return $this->getSisClassRoleTypeAccess($role->getType());
         }
         return UserAccess::ACCESS_DENY;
     }
