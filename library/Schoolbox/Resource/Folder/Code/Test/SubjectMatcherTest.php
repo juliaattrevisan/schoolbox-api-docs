@@ -60,6 +60,7 @@ class SubjectMatcherTest extends TestCase
 
     public function providerDefault(): array
     {
+        /** @noinspection DuplicatedCode */
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
         return [
             ['D/ABC', 'D', 'ABC', true],
@@ -80,6 +81,7 @@ class SubjectMatcherTest extends TestCase
 
     public function providerSynergetic(): array
     {
+        /** @noinspection DuplicatedCode */
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
         return [
             ['D/ABC', 'D', 'ABC', true],
