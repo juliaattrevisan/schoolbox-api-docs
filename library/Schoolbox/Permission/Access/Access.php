@@ -35,7 +35,7 @@ class Access
     /**
      * Permission/access level constants
      */
-
+    // TODO Move these somewhere more appropriate in the config sub-system.
     const VISIBILITY_EVERYONE = 0;                 // Accessible by everyone
     const VISIBILITY_STAFF = 1;                    // Accessible by staff only
     const VISIBILITY_STAFF_PARENT = 2;             // Accessible by staff & parents only
