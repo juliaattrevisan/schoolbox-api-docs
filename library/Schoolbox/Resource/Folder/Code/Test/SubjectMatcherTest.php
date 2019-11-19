@@ -67,6 +67,7 @@ class SubjectMatcherTest extends TestCase
             'folder code w/ campus: sisClass matches, sisCampus redundant'           => ['D/ABC', 'D', 'D/ABC', false],
             'folder code w/ campus: sisClass matches, sisCampus empty'               => ['D/ABC', '', 'D/ABC', true],
             'folder code w/ campus: sisClass matches, sisCampus null'                => ['D/ABC', null, 'D/ABC', true],
+            'folder code w/o campus: sisClass matches, sisCampus null'               => ['ABC', null, 'ABC', true],
             'folder code w/o campus: sisClass matches, sisCampus empty'              => ['ABC', '', 'ABC', true],
             'folder code w/o campus: sisClass has campus, sisCampus not empty'       => ['ABC', 'D', 'D/ABC', false],
             'folder code w/o campus: sisClass has campus, sisCampus empty'           => ['ABC', '', 'D/ABC', false],
