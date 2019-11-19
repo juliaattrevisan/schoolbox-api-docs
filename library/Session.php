@@ -637,24 +637,4 @@ class Session
     {
         return $this->useLoginLog;
     }
-
-
-    /**
-     * Returns the level of access granted in Schoolbox when a roleType has SIS involvement
-     * with a folder.
-     *
-     * @param string $roleType
-     * @return int
-     * @deprecated This doesn't belong here. Please don't use this method.
-     */
-    private function getSisFolderAccess(string $roleType): int
-    {
-        if ($roleType === Role::STAFF) {
-            return UserAccess::ACCESS_WRITE;
-        }
-        if ($roleType === Role::STUDENT && ConfigMapper::getInstance()->get('allow_student_class_access')) {
-            return UserAccess::ACCESS_READ;
-        }
-        return UserAccess::ACCESS_DENY;
-    }
 }
