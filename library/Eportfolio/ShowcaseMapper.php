@@ -135,7 +135,6 @@ class ShowcaseMapper extends Schoolbox\Mapper
      * @param int             $limit
      * @return Schoolbox\GenericCollection|Showcase[]
      * @throws Schoolbox\Mapper\DefinitionException
-     * @throws Schoolbox\Mapper\Exception
      */
     public function getRecentShowcasedSubmissionBoxes(User $user, $limit = 5)
     {
