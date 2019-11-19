@@ -68,7 +68,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         $allFolders = FolderMapper::getInstance()->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true);
         $filteredFolders = new Collection();
         foreach($allFolders as $folder) {
-            $muted = RerouteOverrideMapper::getInstance()->isRouteMuted($folder->getId(), $this->getUser()->getId());
+            $muted = RerouteOverrideMapper::getInstance()->isRouteMuted((string)$folder->getId(), $this->getUser()->getId());
             if (!$muted) {
                 $filteredFolders->add($folder);
             }

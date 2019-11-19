@@ -36,8 +36,8 @@ class Access
      * Permission/access level constants
      */
     // TODO Move these somewhere more appropriate in the config sub-system.
-    const VISIBILITY_EVERYONE = 0;                 // Accessible by everyone
-    const VISIBILITY_STAFF = 1;                    // Accessible by staff only
+    const VISIBILITY_EVERYONE     = 0;                 // Accessible by everyone
+    const VISIBILITY_STAFF        = 1;                    // Accessible by staff only
     const VISIBILITY_STAFF_PARENT = 2;             // Accessible by staff & parents only
 
     /**
@@ -110,7 +110,7 @@ class Access
         Folder\Code\ISubjectMatcher $subjectMatcher = null
     ): Access {
         if (!self::$instance) {
-            $config = $config ?? new Config\Loader();
+            $config         = $config ?? new Config\Loader();
             self::$instance = new static(
                 $userAccessMapper ?? UserAccessMapper::getInstance(),
                 $roleAccessMapper ?? RoleAccessMapper::getInstance(),
@@ -215,7 +215,7 @@ class Access
             $accessLevel = $this->getFolderAccess($user, $folderId, $cache);
 
             // Short-circuit if any level is DENY. Cannot get less than this.
-            if(UserAccess::ACCESS_DENY === $accessLevel) {
+            if (UserAccess::ACCESS_DENY === $accessLevel) {
                 return UserAccess::ACCESS_DENY;
             }
 
@@ -240,8 +240,8 @@ class Access
      *   1. `userAccess` table only
      *
      * @param User     $user
-     * @param null|int $serviceIdentifier
      * @param int      $service
+     * @param null|int $serviceIdentifier
      * @param bool     $cache
      * @return int
      * @throws InvalidArgumentException If called with a service identifier for a service that does not use them, or vice versa
@@ -356,7 +356,7 @@ class Access
     public function getFolderAccess(User $user, $folderId, $cache = true): int
     {
         /* check cache before we proceed for shortcuts */
-        if($cache && isset($this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId])){
+        if ($cache && isset($this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId])) {
             return $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId];
         }
 
@@ -372,7 +372,7 @@ class Access
 
         // 2. Check `userAccess` table. (Short-circuit if full access detected)
         $accessLevel = $this->getUserAccessLevel($user, UserAccess::SERVICE_HOMEPAGE, $folderId, $cache);
-        if($accessLevel === UserAccess::ACCESS_FULL){
+        if ($accessLevel === UserAccess::ACCESS_FULL) {
             $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
             return UserAccess::ACCESS_FULL;
         }
@@ -382,14 +382,14 @@ class Access
          * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
          */
         $accessLevel = max($accessLevel, $this->getAccessLevel($user, UserAccess::SERVICE_CMS));
-        if($accessLevel === UserAccess::ACCESS_FULL){
+        if ($accessLevel === UserAccess::ACCESS_FULL) {
             $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
             return UserAccess::ACCESS_FULL;
         }
 
         // 4. Folder role permission. (Short-circuit if full access detected)
         $accessLevel = max($accessLevel, $this->getFolderAccessForRole($user->getRole()->getId(), $folderId, $cache));
-        if($accessLevel === UserAccess::ACCESS_FULL){
+        if ($accessLevel === UserAccess::ACCESS_FULL) {
             // Technically this block should never execute as the UI does not support FULL role perms.
             $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
             return UserAccess::ACCESS_FULL;
@@ -432,7 +432,7 @@ class Access
         // Permission check #2 - Query the DB (unique constraints ensure 0:1 results)
         // (it is possible to have a folder that does not inherit that lacks role perms, eg 'Lost & Found' folder)
         /** @var null|RoleAccess $roleAccess */
-        $roleAccess = $this->roleAccessMapper->findByColumnList([
+        $roleAccess                                            = $this->roleAccessMapper->findByColumnList([
             'cid' => $folderId,
             'gid' => $roleId,
         ])->first();

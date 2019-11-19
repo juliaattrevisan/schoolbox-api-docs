@@ -230,7 +230,7 @@ class Session extends BaseSession {
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed  $value
      * @param string $namespace
      * @return void
      */

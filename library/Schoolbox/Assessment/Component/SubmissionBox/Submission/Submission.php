@@ -159,7 +159,7 @@ class Submission implements IStorage, ISoftDeletable
                 $user->getRole()->getId(),
                 $this->getSubmissionBox()->getCategory()->getId()
             );
-            if($roleAccessLevel >= UserAccess::ACCESS_WRITE){
+            if ($roleAccessLevel >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
         }
