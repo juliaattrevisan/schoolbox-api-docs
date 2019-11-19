@@ -62,9 +62,11 @@ class SubjectMatcherTest extends TestCase
     {
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
         return [
+            ['D/ABC', 'D', 'ABC', true],
             ['D/ABC', 'D', 'D/ABC', false],
             ['D/ABC', '', 'D/ABC', true],
             ['D/ABC', null, 'D/ABC', true],
+            ['ABC', '', 'ABC', true],
             ['ABC', 'D', 'D/ABC', false],
             ['ABC', '', 'D/ABC', false],
             ['ABC', null, 'D/ABC', false],
@@ -80,9 +82,11 @@ class SubjectMatcherTest extends TestCase
     {
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
         return [
+            ['X/ABC', 'X', 'ABC', true],
             ['X/ABC', 'X', 'X/ABC', true],  // fuzzy
             ['X/ABC', '', 'X/ABC', true],
             ['X/ABC', null, 'X/ABC', true],
+            ['ABC', '', 'ABC', true],
             ['ABC', 'X', 'X/ABC', false],
             ['ABC', '', 'X/ABC', false],
             ['ABC', null, 'X/ABC', false],
