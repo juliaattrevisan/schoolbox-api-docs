@@ -64,8 +64,10 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
+    private const DEFAULT_RELATIVE_DATE = 'This year';
+
     private const RELATIVE_DATE_LABELS = [
-        'This year',
+        self::DEFAULT_RELATIVE_DATE,
         'Past 6 months',
         'Past 3 months',
         'Past month',
@@ -245,8 +247,7 @@ class Controller extends Base
 
         // Default to using relative date
         $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
-        // Relative date defaults to This Year
-        $report->setRelativeDateString($report->getRelativeDateString() ?? $this->retrieveRelativeDateLabels()['This year']);
+        $report->setRelativeDateString($report->getRelativeDateString() ?? $this->retrieveRelativeDateLabels()[self::DEFAULT_RELATIVE_DATE]);
 
         // And render this thing out
         $this->getResponse()->content->set(
@@ -426,8 +427,7 @@ class Controller extends Base
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
-        // Relative date defaults to This Year
-        $pastoralReport->setRelativeDateString($this->retrieveRelativeDateLabels()['This year']);
+        $pastoralReport->setRelativeDateString($this->retrieveRelativeDateLabels()[self::DEFAULT_RELATIVE_DATE]);
 
         if (!empty($post['date-option'] && $post['date-option'] === 'absolute')) {
             $pastoralReport->setUsesRelativeDate(false);
