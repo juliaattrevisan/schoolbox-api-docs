@@ -829,6 +829,7 @@ class External_Doublefirst_User implements External_UserInterface
               SELECT DISTINCT     ssb.BlockName + ' - ' + ssbr.RoomName AS Room, 
                                   sm.Name AS name, 
                                   ygsd.SubjectDivisionName AS ClassCode, 
+                                  '' AS ClassCampus,
                                   '' AS StaffID, 
                                   '' AS StaffTitle, 
                                   '' AS StaffPreferredName, 
