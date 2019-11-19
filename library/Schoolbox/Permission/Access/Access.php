@@ -328,14 +328,13 @@ class Access
      */
     public function involvedInGroup(User $user, int $folderId): bool
     {
-        $pb =             $this->userAccessMapper->getPredicateBuilder()
-                                                 ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                                                 ->equals('sid', $folderId)
-                                                 ->equals('uid', $user->getId())
-                                                 ->notEquals('type', UserAccess::ACCESS_DENY);
-        $results = $this->userAccessMapper->findByPredicates($pb);
-
-        return $results->count() > 0;
+        return $this->userAccessMapper->findByPredicates(
+                $this->userAccessMapper->getPredicateBuilder()
+                                       ->equals('service', UserAccess::SERVICE_HOMEPAGE)
+                                       ->equals('sid', $folderId)
+                                       ->equals('uid', $user->getId())
+                                       ->notEquals('type', UserAccess::ACCESS_DENY)
+            )->count() > 0;
     }
 
 
