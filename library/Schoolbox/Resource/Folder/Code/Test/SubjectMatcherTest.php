@@ -64,24 +64,26 @@ class SubjectMatcherTest extends TestCase
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
         return [
             // No campus in folder code
-            'folder code w/o campus: sisClass matches, sisCampus null'               => ['ABC', null, 'ABC', true],
-            'folder code w/o campus: sisClass matches, sisCampus empty'              => ['ABC', '', 'ABC', true],
-            'folder code w/o campus: sisClass has campus, sisCampus not empty'       => ['ABC', 'D', 'D/ABC', false],
-            'folder code w/o campus: sisClass has campus, sisCampus empty'           => ['ABC', '', 'D/ABC', false],
-            'folder code w/o campus: sisClass has campus, sisCampus null'            => ['ABC', null, 'D/ABC', false],
+            'folder code w/o campus: sisClass matches, sisCampus null'                => ['ABC', null, 'ABC', true],
+            'folder code w/o campus: sisClass matches, sisCampus empty'               => ['ABC', '', 'ABC', true],
+            'folder code w/o campus: sisClass has campus, sisCampus not empty'        => ['ABC', 'D', 'D/ABC', false],
+            'folder code w/o campus: sisClass has campus, sisCampus empty'            => ['ABC', '', 'D/ABC', false],
+            'folder code w/o campus: sisClass has campus, sisCampus null'             => ['ABC', null, 'D/ABC', false],
 
             // Campus in folder code
-            'folder code w/ campus: sisCampus/sisClass matches'                      => ['D/ABC', 'D', 'ABC', true],
-            'folder code w/ campus: sisClass matches, sisCampus redundant'           => ['D/ABC', 'D', 'D/ABC', false],
-            'folder code w/ campus: sisClass matches, sisCampus empty'               => ['D/ABC', '', 'D/ABC', true],
-            'folder code w/ campus: sisClass matches, sisCampus null'                => ['D/ABC', null, 'D/ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus null'                 => ['D/ABC', null, 'D/ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus empty'                => ['D/ABC', '', 'D/ABC', true],
+            'folder code w/ campus: sisClass has other campus, sisCampus empty'       => ['D/ABC', '', 'E/ABC', false],
+            'folder code w/ campus: sisCampus/sisClass matches'                       => ['D/ABC', 'D', 'ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus redundant'            => ['D/ABC', 'D', 'D/ABC', false],
 
             // Campus in folder code, multiple separators
-            'folder code w/ / and campus: sisClass matches, sisCampus null'          => ['D/Y/ABC', null, 'D/Y/ABC', true],
-            'folder code w/ / and campus: sisClass matches, sisCampus empty'         => ['D/Y/ABC', '', 'D/Y/ABC', true],
-            'folder code w/ / and campus: sisClass matches, sisCampus redundant'     => ['D/Y/ABC', 'D', 'D/Y/ABC', false],
-            'folder code w/ / and campus: sisCampus/sisClass matches'                => ['D/Y/ABC', 'D', 'Y/ABC', true],
-            'folder code w/ / and campus: sisClass matches, sisCampus incomplete'    => ['D/Y/ABC', 'D', 'ABC', false],
+            'folder code w/ / and campus: sisClass matches, sisCampus null'           => ['D/Y/ABC', null, 'D/Y/ABC', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus empty'          => ['D/Y/ABC', '', 'D/Y/ABC', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches'                 => ['D/Y/ABC', 'D', 'Y/ABC', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches, sisClass has /' => ['D/Y/ABC', 'D/Y', 'ABC', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus redundant'      => ['D/Y/ABC', 'D', 'D/Y/ABC', false],
+            'folder code w/ / and campus: sisClass matches, sisCampus incomplete'     => ['D/Y/ABC', 'D', 'ABC', false],
         ];
     }
 
@@ -91,24 +93,26 @@ class SubjectMatcherTest extends TestCase
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
         return [
             // No campus in folder code
-            'folder code w/o campus: sisClass matches, sisCampus null'               => ['ABC', null, 'ABC', true],
-            'folder code w/o campus: sisClass matches, sisCampus empty'              => ['ABC', '', 'ABC', true],
-            'folder code w/o campus: sisClass has campus, sisCampus not empty'       => ['ABC', 'D', 'D/ABC', false],
-            'folder code w/o campus: sisClass has campus, sisCampus empty'           => ['ABC', '', 'D/ABC', false],
-            'folder code w/o campus: sisClass has campus, sisCampus null'            => ['ABC', null, 'D/ABC', false],
+            'folder code w/o campus: sisClass matches, sisCampus null'                => ['ABC', null, 'ABC', true],
+            'folder code w/o campus: sisClass matches, sisCampus empty'               => ['ABC', '', 'ABC', true],
+            'folder code w/o campus: sisClass has campus, sisCampus not empty'        => ['ABC', 'D', 'D/ABC', false],
+            'folder code w/o campus: sisClass has campus, sisCampus empty'            => ['ABC', '', 'D/ABC', false],
+            'folder code w/o campus: sisClass has campus, sisCampus null'             => ['ABC', null, 'D/ABC', false],
 
             // Campus in folder code
-            'folder code w/ campus: sisCampus/sisClass matches'                      => ['D/ABC', 'D', 'ABC', true],
-            'folder code w/ campus: sisClass matches, sisCampus redundant'           => ['D/ABC', 'D', 'D/ABC', true],  // fuzzy
-            'folder code w/ campus: sisClass matches, sisCampus empty'               => ['D/ABC', '', 'D/ABC', true],
-            'folder code w/ campus: sisClass matches, sisCampus null'                => ['D/ABC', null, 'D/ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus null'                 => ['D/ABC', null, 'D/ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus empty'                => ['D/ABC', '', 'D/ABC', true],
+            'folder code w/ campus: sisClass has other campus, sisCampus empty'       => ['D/ABC', '', 'E/ABC', false],
+            'folder code w/ campus: sisCampus/sisClass matches'                       => ['D/ABC', 'D', 'ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus redundant'            => ['D/ABC', 'D', 'D/ABC', true],  // fuzzy
 
             // Campus in folder code, multiple separators
-            'folder code w/ / and campus: sisClass matches, sisCampus null'          => ['D/Y/ABC', null, 'D/Y/ABC', true],
-            'folder code w/ / and campus: sisClass matches, sisCampus empty'         => ['D/Y/ABC', '', 'D/Y/ABC', true],
-            'folder code w/ / and campus: sisClass matches, sisCampus redundant'     => ['D/Y/ABC', 'D', 'D/Y/ABC', true],  // fuzzy
-            'folder code w/ / and campus: sisCampus/sisClass matches'                => ['D/Y/ABC', 'D', 'Y/ABC', true],
-            'folder code w/ / and campus: sisClass matches, sisCampus incomplete'    => ['D/Y/ABC', 'D', 'ABC', false],
+            'folder code w/ / and campus: sisClass matches, sisCampus null'           => ['D/Y/ABC', null, 'D/Y/ABC', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus empty'          => ['D/Y/ABC', '', 'D/Y/ABC', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches'                 => ['D/Y/ABC', 'D', 'Y/ABC', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches, sisClass has /' => ['D/Y/ABC', 'D/Y', 'ABC', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus redundant'      => ['D/Y/ABC', 'D', 'D/Y/ABC', true],  // fuzzy
+            'folder code w/ / and campus: sisClass matches, sisCampus incomplete'     => ['D/Y/ABC', 'D', 'ABC', false],
         ];
     }
 }
