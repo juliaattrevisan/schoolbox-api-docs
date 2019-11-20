@@ -26,6 +26,12 @@
       <directory suffix=".php">library/Schoolbox/Database/Test</directory>
     </testsuite>
   </testsuites>
+    <listeners>
+        <!-- TODO - This is a temporary hack to compensate for a bug in paratest/phpunit when using code-coverage -->
+        <!--        The correct solution is to upgrade paratest/phpunit -->
+        <!--        See https://github.com/paratestphp/paratest/issues/282 -->
+        <listener class="Alaress\Test\MakeWarningErrorAgainTestListener"></listener>
+    </listeners>
   <filter>
       <whitelist>
           <directory suffix=".php">./library/</directory>
