@@ -157,6 +157,12 @@ class DataSource
             }
         }
 
+        // TODO: SA-9641
+        // Hiding linked records from student pastoral page for now to prevent performance issue.
+        if (null === $linkedStudentId) {
+            return $studentRecords;
+        }
+
         // get linked records to the student records found
         $linkedRecords = $this->findRawRecords($viewer, null, $typeId, null, null, null, $studentRecords->keys());
 
