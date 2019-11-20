@@ -138,7 +138,7 @@ class Controller extends Base
             ->setModalTitle('Select CSV Files')
             ->setAttachmentsLabel('')
             ->setAttachPrompt($prompt)
-            ->setMimeFilter('text/csv')
+            ->setMimeFilter('*/*')
             ->setReadOnly(false)
             ->setMulti(false)
             ->getTwigContext();
