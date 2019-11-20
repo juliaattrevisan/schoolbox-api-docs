@@ -14,6 +14,7 @@ use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
 /**
  * Test that the ISubjectMatcher implementations behave as expected
  * @see ISubjectMatcher
+ * @codeCoverageIgnore
  */
 class SubjectMatcherTest extends TestCase
 {
@@ -26,7 +27,7 @@ class SubjectMatcherTest extends TestCase
     }
 
     /**
-     * @covers       SubjectMatcher::isMatch
+     * @covers       \Schoolbox\Resource\Folder\Code\SubjectMatcherBase::isMatch
      * @dataProvider providerDefault
      * @param string      $folderCode
      * @param string|null $sisCampus
