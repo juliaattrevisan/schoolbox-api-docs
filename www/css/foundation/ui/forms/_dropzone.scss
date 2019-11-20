@@ -165,7 +165,7 @@ ul.az-error-list {
         overflow: hidden;
 
         .list-item {
-          padding-top: 0;
+          padding-top: 0.5rem;
         }
     }
 }
@@ -802,11 +802,11 @@ ul.az-error-list {
     padding: 0.5rem 1rem;
   }
 }
-
-.dropzone-wrap {
-  .close-button {
-    top: 0;
-    position: absolute;
-    right: 0;
-  }
-}
+//
+//.dropzone-wrap {
+//  .close-button {
+//    top: 0;
+//    position: absolute;
+//    right: 0;
+//  }
+//}

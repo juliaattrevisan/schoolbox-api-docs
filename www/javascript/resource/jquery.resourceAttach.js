@@ -292,6 +292,9 @@ if(typeof window.location.origin == 'undefined') {
         t = element.find('[data-dz-name]').text();
         element.find('[data-dz-name]').text(t + ' failed: ' + data).attr('title', data);
 
+        // Replace bin icon with x
+        errList.find('nav .icon-delete').removeClass('icon-delete').addClass('close').html('&times;');
+
         if (this.dropzone) {
             this.dropzone.removeFile(file);
         }
