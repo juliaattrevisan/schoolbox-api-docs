@@ -64,16 +64,23 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
-    private const DEFAULT_RELATIVE_DATE = 'This year';
+    private const THIS_YEAR = 'first day of january';
+    private const PAST_6_MONTHS = '6 months ago';
+    private const PAST_3_MONTHS = '3 months ago';
+    private const PAST_MONTH = '1 month ago';
+    private const PAST_FORTNIGHT = '14 days ago';
+    private const PAST_WEEK = '7 days ago';
+    private const TODAY = 'today';
 
-    private const RELATIVE_DATE_LABELS = [
-        self::DEFAULT_RELATIVE_DATE,
-        'Past 6 months',
-        'Past 3 months',
-        'Past month',
-        'Past fortnight',
-        'Past week',
-        'Today'
+    // Mappings of strtotime-able strings to labels that will be shown in the UI
+    private const RELATIVE_DATE_PRESETS = [
+        self::THIS_YEAR => 'This year',
+        self::PAST_6_MONTHS => 'Past 6 months',
+        self::PAST_3_MONTHS => 'Past 3 months',
+        self::PAST_MONTH => 'Past month',
+        self::PAST_FORTNIGHT => 'Past fortnight',
+        self::PAST_WEEK => 'Past week',
+        self::TODAY => 'Today'
     ];
 
     /**
@@ -247,7 +254,7 @@ class Controller extends Base
 
         // Default to using relative date
         $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
-        $report->setRelativeDateString($report->getRelativeDateString() ?? $this->retrieveRelativeDateLabels()[self::DEFAULT_RELATIVE_DATE]);
+        $report->setRelativeDateString($report->getRelativeDateString() ?? self::THIS_YEAR);
 
         // And render this thing out
         $this->getResponse()->content->set(
@@ -269,20 +276,12 @@ class Controller extends Base
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
-                    'datePresets'      => $this->retrieveRelativeDateLabels(),
+                    'datePresets'      => self::RELATIVE_DATE_PRESETS,
                     'selectedRelativeDate' => $report->getRelativeDateString()
                 ],
                 'title' => 'Pastoral Report',
             ]
         );
-    }
-
-    /**
-     * Mappings of labels to values for the dropdown in the form
-     * @return array|false
-     */
-    private function retrieveRelativeDateLabels() {
-        return array_combine(self::RELATIVE_DATE_LABELS, PastoralReport::getAllRelativeDateStrings());
     }
 
     /**
@@ -427,30 +426,23 @@ class Controller extends Base
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
-        $pastoralReport->setRelativeDateString($this->retrieveRelativeDateLabels()[self::DEFAULT_RELATIVE_DATE]);
-
         if (!empty($post['date-option'] && $post['date-option'] === 'absolute')) {
             $pastoralReport->setUsesRelativeDate(false);
 
             if (!empty($post['before'])) {
                 $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
-            } else {
-                $pastoralReport->setBeforeDate(null);
             }
 
             if (!empty($post['after'])) {
                 $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
-            } else {
-                $pastoralReport->setAfterDate(null);
             }
         } else {
             $pastoralReport->setUsesRelativeDate(true);
-            $pastoralReport->setBeforeDate(null);
-            $pastoralReport->setAfterDate(null);
+            $pastoralReport->setRelativeDateString(self::THIS_YEAR);
 
             // Update with POSTed relative date if it's valid
             $relativeDateString = $post['relative-dates-dropdown'];
-            if (!empty($relativeDateString) && in_array($relativeDateString, PastoralReport::getAllRelativeDateStrings(), true)) {
+            if (!empty($relativeDateString) && array_key_exists($relativeDateString,self::RELATIVE_DATE_PRESETS)) {
                 $pastoralReport->setRelativeDateString($relativeDateString);
             }
         }

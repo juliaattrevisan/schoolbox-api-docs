@@ -134,7 +134,7 @@ class Model implements ISoftDeletable
 
     /** @var Collection|PastoralGroup\Model[] $groups */
     private $groups;
-    
+
 
     /**
      * Model constructor
@@ -409,10 +409,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $relativeDateString
+     * @param null|string $relativeDateString
      * @return self
      */
-    public function setRelativeDateString(string $relativeDateString) : self
+    public function setRelativeDateString(string $relativeDateString = null) : self
     {
         $this->relativeDateString = $relativeDateString;
 
