@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql;
 use Alaress\DataStructures\ObjectTree;
+use Error;
 use External_UserInterface;
 use InvalidArgumentException;
 use LogicException;
@@ -377,6 +378,30 @@ class AccessTest extends TestCase
     public function testGetFolderAccessForRole(Access $access, int $roleId, int $folderId, int $expected): void
     {
         $this->assertSame($expected, $access->getFolderAccessForRole($roleId, $folderId));
+    }
+
+
+    /**
+     * Tests that if we attempt to connect to ExternalUser at run-time in tests, that it fails
+     * (ie, no connection to external DB in unit tests)
+     *
+     * @throws Framework\Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws ReflectionException
+     * @throws UnexpectedValueException
+     * @expectedException Error
+     */
+    public function testCannotConnectToExternalUser(): void
+    {
+        $access = $this->newAccess();
+        $reflection = new ReflectionClass($access);
+        $instance   = $reflection->getProperty('externalUser');
+        $instance->setAccessible(true);
+        $instance->setValue($access, null);
+        $instance->setAccessible(false);
+
+        $access->involvedInSubject((new User())->setExternalId('abc'), 'xyz');
     }
 
 
