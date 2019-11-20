@@ -17,6 +17,8 @@ $attachzone-error-color: $alert-color;
 $attachzone-overlay-duration: 800ms;
 $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
+$alert-close-font-size: rem-calc(($base-font-size + 14));
+
 .dragging {
     .dropzone.overlay {
         opacity: 1;
@@ -807,5 +809,6 @@ ul.az-error-list {
     float: right;
     background-color: transparent;
     color: $attachzone-error-color;
+    font-size: $alert-close-font-size;
   }
 }
