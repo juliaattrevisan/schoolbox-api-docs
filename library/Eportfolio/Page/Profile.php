@@ -204,7 +204,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Show submitted work information (if available)
                  */
-                if ($latestSubmission && $latestSubmission->getFiles() && $latestSubmission->getFiles()->count()) {
+                if ($latestSubmission && $latestSubmission->getFiles()->count()) {
                     foreach($latestSubmission->getFiles() as $currentFile) {
                         $this->getPage()->setVar([
                             'SHOWCASED_WORK_SUBMISSION_ID'        => $currentFile->getId(),
