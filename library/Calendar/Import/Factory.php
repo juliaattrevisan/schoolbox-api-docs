@@ -29,7 +29,7 @@ class Factory
     protected $author;
 
     /**
-     * A list of selected event_category relations
+     * A list of selected event_folder relations
      *
      * @var array
      */

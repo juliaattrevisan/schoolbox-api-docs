@@ -11,6 +11,8 @@ namespace Schoolbox\Calendar;
 use Alaress_Date_Format;
 use PDO;
 use Schoolbox;
+use Schoolbox\Calendar\Relation\Category;
+use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\Relation\Campus as RelationCampus;
@@ -597,14 +599,72 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
     /**
      * Removes all events from this folder ID
-     *
      * @param int $cid
+     * @throws Exception
+     * @throws Exception\Deleted
      */
     public function homepageClean($cid)
     {
+        // Get ids of all events which do not belong to
+        // any other folder other than the current one
+        $folderSpecificEventIds = $this->getFolderSpecificEventIds($cid);
+
         // deleteByColumn doesn't work as expected when querying a join column,
         // because the delete string doesn't contain the joins the select does.
         // Fortunately delete(findByColumn()) works.
         $this->getJoinMapper('category')->deleteByColumn('category_id', $cid);
+
+        if (!empty($folderSpecificEventIds)) {
+            // soft delete events do not belong to any folder; if there is any
+            $this->deleteEvents($folderSpecificEventIds);
+        }
+    }
+
+    /**
+     * Returns ids of events which only belong to the
+     * folder and not any other ones (if there is any).
+     *
+     * @param int $folderId
+     * @return array
+     */
+    private function getFolderSpecificEventIds(int $folderId): array
+    {
+        $folderSpecificEventIds = [];
+        $eventIds               = [];
+
+        /** @var CategoryMapper $folderEventMapper */
+        $folderEventMapper = $this->getJoinMapper('category');
+
+        $folderEventsForFolder = $folderEventMapper->findByColumn('category_id', $folderId);
+        foreach ($folderEventsForFolder as $folderEvent) {
+            /** @var Category $folderEvent */
+            $eventIds[] = $folderEvent->getEventId();
+        }
+
+        $folderEvents = $folderEventMapper->findByColumn('event_id', $eventIds);
+
+        $folderEventsPerFolder = $folderEvents->groupByCallback(static function (Category $folderEvent) {
+            return $folderEvent->getEventId();
+        });
+
+        foreach ($folderEventsPerFolder as $eventId => $folderEventsForFolder) {
+            if ($folderEventsForFolder->count() === 1) {
+                $folderSpecificEventIds[] = $eventId;
+            }
+        }
+
+        return $folderSpecificEventIds;
+    }
+
+    /**
+     * @param array $eventIds
+     * @throws Exception
+     * @throws Exception\Deleted
+     */
+    private function deleteEvents(array $eventIds): void
+    {
+        foreach ($eventIds as $eventId) {
+            $this->softDelete($this->findById($eventId));
+        }
     }
 }
