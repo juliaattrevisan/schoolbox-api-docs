@@ -72,7 +72,7 @@ class External_Liss_Server
     /**
      * External_Liss_Server constructor.
      *
-     * @param IConnector|null $externalDb
+     * @param IConnector $externalDb
      */
     public function __construct(IConfigLoader $config, IConnector $externalDb = null)
     {
