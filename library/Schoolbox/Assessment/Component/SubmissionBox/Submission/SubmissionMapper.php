@@ -168,16 +168,16 @@ class SubmissionMapper extends BaseMapper
         }
 
         // Fetch and hydrate files
-        $files = $this->getJoinMapper('files')
+        /** @var SubmissionFileMapper $submissionFileMapper */
+        $submissionFileMapper = $this->getJoinMapper('files');
+        $files                = $submissionFileMapper
             ->findByColumn('student_submission_id', $ids)
-            ->groupByCallback(function($f) {
+            ->groupByCallback(function ($f) {
                 /** @var SingleFile\Model $f */
                 return $f->getSubmission()->getId();
             });
         foreach ($resultSet as $result) {
-            if (isset($files[$result->getId()])) {
-                $result->setFiles($files[$result->getId()]);
-            }
+            $result->setFiles($files[$result->getId()] ?? $submissionFileMapper->createCollection());
         }
         return $resultSet;
     }

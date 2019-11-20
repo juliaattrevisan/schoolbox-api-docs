@@ -157,7 +157,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show submitted work information (if available)
                          */
-                        if ($submission && $submission->getFiles() && $submission->getFiles()->count()) {
+                        if ($submission && $submission->getFiles()->count()) {
                             foreach($submission->getFiles() as $currentFile) {
                                 $this->getPage()->setVar(
                                     array(
