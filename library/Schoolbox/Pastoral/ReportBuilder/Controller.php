@@ -28,6 +28,7 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use HouseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term;
 
 class Controller extends Base
 {
@@ -64,7 +65,12 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
+    /** @var Term\Mapper $termMapper */
+    private $termMapper;
+
+    // Strings that can be converted to actual dates using strtotime
     private const THIS_YEAR = 'first day of january';
+    private const THIS_TERM = 'this term'; // this is the only one that isn't a strtotime string
     private const PAST_6_MONTHS = '6 months ago';
     private const PAST_3_MONTHS = '3 months ago';
     private const PAST_MONTH = '1 month ago';
@@ -72,9 +78,10 @@ class Controller extends Base
     private const PAST_WEEK = '7 days ago';
     private const TODAY = 'today';
 
-    // Mappings of strtotime-able strings to labels that will be shown in the UI
+    // Mappings of strings to labels that will be shown in the UI
     private const RELATIVE_DATE_PRESETS = [
         self::THIS_YEAR => 'This year',
+        self::THIS_TERM => 'This term',
         self::PAST_6_MONTHS => 'Past 6 months',
         self::PAST_3_MONTHS => 'Past 3 months',
         self::PAST_MONTH => 'Past month',
@@ -97,6 +104,7 @@ class Controller extends Base
      * @param PastoralGroupMapper           $pastoralGroupMapper
      * @param PastoralReportMapper          $pastoralReportMapper
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
+     * @param Term\Mapper                   $termMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -109,7 +117,8 @@ class Controller extends Base
         HouseMapper $houseMapper,
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralReportMapper $pastoralReportMapper,
-        PastoralReportDashboardMapper $pastoralReportDashboardMapper
+        PastoralReportDashboardMapper $pastoralReportDashboardMapper,
+        Term\Mapper $termMapper
     ) {
         $this->errorMapper               = $errorMapper;
         $this->pastoralDataSource        = $pastoralDataSource;
@@ -122,6 +131,7 @@ class Controller extends Base
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
+        $this->termMapper                    = $termMapper;
     }
 
     /**
@@ -360,7 +370,13 @@ class Controller extends Base
         // Get matching records
 
         $beforeDate = Alaress_Date_Format::now();
-        $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
+        // Special case for the current term relative date, which is not a strtotime-able thingy
+        if ($report->getRelativeDateString() === self::THIS_TERM) {
+            $afterDate = $this->termMapper->findForToday();
+        } else {
+            $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
+        }
+
         if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
             $afterDate = $report->getAfterDate();
