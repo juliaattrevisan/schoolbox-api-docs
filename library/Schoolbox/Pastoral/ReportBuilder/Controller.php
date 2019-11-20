@@ -372,7 +372,7 @@ class Controller extends Base
         $beforeDate = Alaress_Date_Format::now();
         // Special case for the current term relative date, which is not a strtotime-able thingy
         if ($report->getRelativeDateString() === self::THIS_TERM) {
-            $afterDate = $this->termMapper->findForToday();
+            $afterDate = $this->termMapper->findForToday()->getStart();
         } else {
             $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
         }
