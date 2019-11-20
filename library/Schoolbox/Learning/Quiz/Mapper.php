@@ -288,7 +288,7 @@ class Mapper extends BaseMapper
 				{$user_mapper->getColumnString('u')}
 			FROM {$this->getTable()} a
 			LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
-			LEFT JOIN {$this->getJoinSql('user',     'a', 'u')}
+			LEFT JOIN {$this->getJoinSql('user',     'a', 'u', true)}
 			WHERE a.category_id IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND a.finish BETWEEN :from_date AND :to_date
 			AND a.deleted_at IS NULL

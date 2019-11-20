@@ -443,7 +443,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
             FROM {$this->getTable()} sb
             INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
             LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-            LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
+            LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u', true)}
             WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
             AND sb.date BETWEEN :from_date AND :to_date
             AND a.deleted_at IS NULL
