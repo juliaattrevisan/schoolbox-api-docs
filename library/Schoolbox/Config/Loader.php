@@ -85,7 +85,7 @@ class Loader implements IConfigLoader
      * @param string $name
      * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         return $this->get($name);
     }
@@ -98,7 +98,7 @@ class Loader implements IConfigLoader
      * @param mixed  $value
      * @throws OutOfRangeException
      */
-    public function __set($name, $value)
+    public function __set(string $name, $value)
     {
         throw new OutOfRangeException(sprintf('"%s" is read-only', __CLASS__));
     }
@@ -110,7 +110,7 @@ class Loader implements IConfigLoader
      * @param  mixed $name
      * @return bool
      */
-    public function __isset($name): bool
+    public function __isset(string $name): bool
     {
         if (empty($this->cache)) {
             $this->loadCache();
