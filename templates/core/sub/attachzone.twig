@@ -34,7 +34,9 @@ $data = {
             </div>
             {% if not attachzone.readonly %}
             <nav>
-                <a href="#" data-dz-remove title="Remove" class="icon-delete"></a>
+                <button data-dz-remove class="close-button" aria-label="Close" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
                 <input type="hidden" name="{{ attachzone.fileVar }}" value="{{ attachment.hash }}" data-az-attachment />
             </nav>
             {% endif %}
@@ -52,7 +54,9 @@ $data = {
                     </div>
                 </div>
                 <nav>
-                    <a href="#" data-dz-remove title="Remove" class="icon-delete"></a>
+                    <button data-dz-remove class="close-button" aria-label="Close" type="button">
+                        <span aria-hidden="true">×</span>
+                    </button>
                     <input type="hidden" data-az-attachment name="{{ attachzone.fileVar }}" value="" />
                 </nav>
                 <div class="progress"><span class="meter" style="width:0;" data-dz-uploadprogress></span></div>

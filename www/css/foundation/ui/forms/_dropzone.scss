@@ -17,8 +17,6 @@ $attachzone-error-color: $alert-color;
 $attachzone-overlay-duration: 800ms;
 $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
-$alert-close-font-size: rem-calc(($base-font-size + 14));
-
 .dragging {
     .dropzone.overlay {
         opacity: 1;
@@ -145,17 +143,14 @@ ul.az-error-list {
     .filename {
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
     }
 }
 
 ul.az-error-list {
     background: $attachzone-error-background;
-    .dz-error {
-        height: rem-calc($base-font-size * 3 + 1);
-    }
+
     .filename {
-        line-height: 2rem;
+        line-height: 1.5rem;
         font-style: italic;
         cursor: pointer;
     }
@@ -168,6 +163,10 @@ ul.az-error-list {
 
     > li {
         overflow: hidden;
+
+        .list-item {
+          padding-top: 0;
+        }
     }
 }
 
@@ -366,7 +365,7 @@ ul.az-error-list {
         }
     }
     .filename {
-        opacity: 0.4;
+        opacity: 1;
         @include easy-transition(opacity 0.15s $attachzone-overlay-timing);
     }
 }
@@ -806,9 +805,8 @@ ul.az-error-list {
 
 .dropzone-wrap {
   .close-button {
-    float: right;
-    background-color: transparent;
-    color: $attachzone-error-color;
-    font-size: $alert-close-font-size;
+    top: 0;
+    position: absolute;
+    right: 0;
   }
 }
