@@ -37,7 +37,7 @@ class PublishDailyData
      */
     public function __construct(IConfigLoader $configLoader)
     {
-        $this->setConfigLoader($configLoader);
+        $this->configLoader = $configLoader;
     }
 
     /**
@@ -117,7 +117,7 @@ class PublishDailyData
      */
     public function generateSourceName()
     {
-        return self::EVENT_SOURCE_NAME . '_' . $this->getConfigLoader()->get('external_liss_schoolcode');
+        return self::EVENT_SOURCE_NAME . '_' . $this->configLoader->get('external_liss_schoolcode');
     }
 
     /**
@@ -138,26 +138,5 @@ class PublishDailyData
         $eventSource->setSourceName($this->generateSourceName());
         $eventSource->setGuid($guid);
         $eventSourceMapper->save($eventSource);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return IConfigLoader
-     */
-    public function getConfigLoader()
-    {
-        return $this->configLoader;
-    }
-
-    /**
-     * @param IConfigLoader $configLoader
-     * @return $this
-     */
-    public function setConfigLoader($configLoader)
-    {
-        $this->configLoader = $configLoader;
-        return $this;
     }
 }
