@@ -624,31 +624,31 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * Returns ids of events which only belong to the
      * folder and not any other ones (if there is any).
      *
-     * @param int $cid
+     * @param int $folderId
      * @return array
      */
-    private function getFolderSpecificEventIds(int $cid): array
+    private function getFolderSpecificEventIds(int $folderId): array
     {
         $folderSpecificEventIds = [];
-        $eventIds = [];
+        $eventIds               = [];
 
         /** @var CategoryMapper $folderEventMapper */
         $folderEventMapper = $this->getJoinMapper('category');
 
-        $folderEventsForFolder = $folderEventMapper->findByColumn('category_id', $cid);
-        foreach ($folderEventsForFolder as $folderEvent){
+        $folderEventsForFolder = $folderEventMapper->findByColumn('category_id', $folderId);
+        foreach ($folderEventsForFolder as $folderEvent) {
             /** @var Category $folderEvent */
             $eventIds[] = $folderEvent->getEventId();
         }
 
         $folderEvents = $folderEventMapper->findByColumn('event_id', $eventIds);
 
-        $folderEventsPerFolder = $folderEvents->groupByCallback(static function(Category $folderEvent){
+        $folderEventsPerFolder = $folderEvents->groupByCallback(static function (Category $folderEvent) {
             return $folderEvent->getEventId();
         });
 
-        foreach($folderEventsPerFolder as $eventId => $folderEventsForFolder){
-            if($folderEventsForFolder->count() === 1){
+        foreach ($folderEventsPerFolder as $eventId => $folderEventsForFolder) {
+            if ($folderEventsForFolder->count() === 1) {
                 $folderSpecificEventIds[] = $eventId;
             }
         }
