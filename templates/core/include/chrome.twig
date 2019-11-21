@@ -226,7 +226,7 @@
                                     <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square72"/>
                                 </a>
                                 <div id="account-content" class="account-drop">
-                                    {% include 'include/accountMenu.twig' with {user: user} only %}
+                                    {% include 'include/accountMenu.twig' with {user: user, mobile: false} only %}
                                 </div>
                             {% endif %}
                         {% endblock accountMenu %}
@@ -271,8 +271,10 @@
                 {{ config.site_analytics | replace({'{USER_ROLE}':user_role}) | raw }}
             {% endblock %}
 
-            {{ debugBar.head | raw }}
-            {{ debugBar.body | raw }}
+            {% if debugBar is defined %}
+                {{ debugBar.head | raw }}
+                {{ debugBar.body | raw }}
+            {% endif %}
         </section>
         <!-- END CONTAINER -->
 
