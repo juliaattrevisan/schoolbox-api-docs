@@ -35,7 +35,7 @@
                                 <li>
                                     <div class="column small-1"><pre>#{{ loop.index }} </pre></div>
                                     <div class="column small-11">
-                                        <pre>{{ frame.class }}{{ frame.type }}{{ frame.function }}({% for arg in frame.args %}<span>{{ arg|json_encode }}</span>{% if not loop.last %}, {% endif %}{% endfor %});</pre>
+                                        <pre>{% if frame.class is defined %}{{  frame.class }}{% endif %}{%  if frame.type is defined %}{{  frame.type }}{% endif %}{{ frame.function }}({% for arg in frame.args %}<span>{{ arg|json_encode }}</span>{% if not loop.last %}, {% endif %}{% endfor %});</pre>
                                         <pre class="meta">called from {{ frame.file }}:{{ frame.line }}</pre>
                                     </div>
                                 </li>
