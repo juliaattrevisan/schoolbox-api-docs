@@ -1,7 +1,7 @@
 parameters:
     autoload_directories:
         - %rootDir%/../../../conf
-        - %rootDir%/../../../test/acceptance
+        - %rootDir%/../../../test/codeception
         - %rootDir%/../../../test/behavior/bootstrap
         - %rootDir%/../../../test/notif/tests
     bootstrap: %rootDir%/../../../conf/core/require.php
