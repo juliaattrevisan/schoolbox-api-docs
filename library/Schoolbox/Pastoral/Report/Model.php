@@ -30,6 +30,13 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
+
+    /**
+     * Key to represent Absolute Dates being used to generate a pastoral report
+     */
+    public const ABSOLUTE_DATE = 'absolute';
+
+
     /** @var bool $dashboard */
     protected $dashboard;
 

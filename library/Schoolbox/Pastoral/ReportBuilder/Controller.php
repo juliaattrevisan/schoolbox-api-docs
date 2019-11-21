@@ -442,7 +442,7 @@ class Controller extends Base
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
-        if (!empty($post['date-option'] && $post['date-option'] === 'absolute')) {
+        if (!empty($post['date-option']) && $post['date-option'] === PastoralReport::ABSOLUTE_DATE) {
             $pastoralReport->setUsesRelativeDate(false);
 
             if (!empty($post['before'])) {
