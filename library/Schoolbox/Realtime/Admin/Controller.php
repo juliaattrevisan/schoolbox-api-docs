@@ -320,10 +320,10 @@ class Controller extends BaseController
 
         foreach ($ns as $i => $namespace) {
             foreach ($checkEnabled as $notifType => $notifs) {
-                if (in_array($namespace->getSlug(), $notifs)) {
-                    if (0 == $config->get($notifType . '_enabled')) {
-                        unset($ns[$i]);
-                    }
+                if (in_array($namespace->getSlug(), $notifs, true)
+                    && !$config->get($notifType . '_enabled')
+                ) {
+                    unset($ns[$i]);
                 }
             }
         }
