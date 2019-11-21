@@ -189,12 +189,12 @@ if (is_array($threadList)) {
             $this->parse('last_post_block', 'last_post', true);
         }
 
-        if (!$thread['authorDeletedAt']) {
-            $this->setVar('deleted_thread_author_block', '');
-            $this->parse('thread_author_block', 'thread_author');
-        } else {
+        $this->setVar('deleted_thread_author_block', '');
+        $this->parse('thread_author_block', 'thread_author', true);
+
+        if ($thread['authorDeletedAt']) {
             $this->setVar('thread_author_block', '');
-            $this->parse('deleted_thread_author_block', 'deleted_thread_author');
+            $this->parse('deleted_thread_author_block', 'deleted_thread_author', true);
         }
 
         $this->parse('thread_block', 'thread', true);
