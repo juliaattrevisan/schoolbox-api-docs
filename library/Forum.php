@@ -41,7 +41,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     }
 
     function getThreadList($categoryID, $index = 0, $limit = 0) {
-        $query = "SELECT t.*,u.id userID, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id userSynID,
+        $query = "SELECT t.*,u.id userID, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id userSynID, u.deleted_at authorDeletedAt,
                       u2.title last_post_title, u2.firstname last_post_firstname, u2.lastname last_post_surname, u2.synergy_id last_post_external_id,
                     COUNT(DISTINCT p.postID) - 1 replies
                   FROM forumThread t
@@ -116,7 +116,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
             $_SESSION['threads_viewed'][$threadID] = true;
         }
-        
+
         return;
     }
 

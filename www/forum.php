@@ -11,6 +11,8 @@ $this->setBlock(TEMPLATE_content, 'thread', 'thread_block');
 $this->setBlock('thread', 'last_post', 'last_post_block');
 $this->setBlock('thread', 'modify_thread', 'modify_thread_block');
 $this->setBlock('thread', 'modified', 'modified_block');
+$this->setBlock('thread', 'thread_author', 'thread_author_block');
+$this->setBlock('thread', 'deleted_thread_author', 'deleted_thread_author_block');
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 $this->setBlock(TEMPLATE_content, 'no_thread', 'no_thread_block');
@@ -137,11 +139,11 @@ if (is_array($threadList)) {
     $j = 0;
 
     foreach ($threadList as $thread) {
-        $user = array(
-            'title' => $thread['userTitle'],
+        $user   = [
+            'title'     => $thread['userTitle'],
             'firstname' => $thread['userFirstname'],
-            'lastname' => $thread['userLastname'],
-        );
+            'lastname'  => $thread['userLastname'],
+        ];
 
         $last_post_user = array(
             'title' => $thread['last_post_title'],
@@ -185,6 +187,14 @@ if (is_array($threadList)) {
 
         if ($thread['replies'] > 0) {
             $this->parse('last_post_block', 'last_post', true);
+        }
+
+        $this->setVar('deleted_thread_author_block', '');
+        $this->parse('thread_author_block', 'thread_author', true);
+
+        if ($thread['authorDeletedAt']) {
+            $this->setVar('thread_author_block', '');
+            $this->parse('deleted_thread_author_block', 'deleted_thread_author', true);
         }
 
         $this->parse('thread_block', 'thread', true);

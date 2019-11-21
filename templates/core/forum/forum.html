@@ -57,9 +57,14 @@
                             <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a>
                         </td>
                         <td>
+                            <!-- BEGIN thread_author -->
                             <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
                                 {THREAD_AUTHOR}
                             </a>
+                            <!-- END thread_author -->
+                            <!-- BEGIN deleted_thread_author -->
+                                {THREAD_AUTHOR}
+                            <!-- END deleted_thread_author -->
                             <p class="meta">Posted {THREAD_TIME}</p>
                         </td>
                         <td>{THREAD_REPLIES}</td>
