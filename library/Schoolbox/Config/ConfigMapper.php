@@ -139,11 +139,13 @@ class ConfigMapper extends Mapper
     /**
      * Find all available config types, as a scalar list.
      *
-     * @param bool $includeBoarderLeave
      * @return array|string[]
      */
-    public function findTypeList(bool $includeBoarderLeave): array
+    public function findTypeList(): array
     {
+        $includeBoarderLeave = $this->getDatabase()
+                                    ->query("SELECT value FROM {$this->getTable()} WHERE name='boarder_leave_enabled'")
+                                    ->fetchColumn();
         $query = "
             SELECT DISTINCT lu_config_type.type
             FROM {$this->getTable()}

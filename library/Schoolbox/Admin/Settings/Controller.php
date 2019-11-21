@@ -33,7 +33,7 @@ class Controller extends ConfigController
     {
         $typeLabel  = $typeLabel ? urldecode($typeLabel) : 'Site';
 
-        $typeLabels = $this->getConfigMapper()->findTypeList($this->getConfigLoader()->get('boarder_leave_enabled'));
+        $typeLabels = $this->getConfigMapper()->findTypeList();
 
         if (!\in_array($typeLabel, $typeLabels, true)) {
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);
