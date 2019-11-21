@@ -65,6 +65,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
             'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
+            'topic' => 'all',
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $limit,
             'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD,

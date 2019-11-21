@@ -75,6 +75,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
                 array(
                     'component'   => $this,
                     'showButtons' => false,
+                    'writeAccess' => false,
                 ),
                 !$this->getConfig('compactMode'),
                 false
