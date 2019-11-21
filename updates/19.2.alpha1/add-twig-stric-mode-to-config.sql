@@ -3,7 +3,7 @@ VALUES (
             'strict_templates',
             '0',
             'Enable Strict Templates',
-            'Let developers to enable strict mode in Twig to test for bugs and issues.',
+            'This will cause Twig to display errors if variables are accessed that are undefined',
             (
                 SELECT id
                 FROM lu_config_field
