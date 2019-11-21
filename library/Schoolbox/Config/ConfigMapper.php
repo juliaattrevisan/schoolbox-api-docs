@@ -143,20 +143,18 @@ class ConfigMapper extends Mapper
      */
     public function findTypeList(): array
     {
-        $includeBoarderLeave = $this->getDatabase()
-                                    ->query("SELECT value FROM {$this->getTable()} WHERE name='boarder_leave_enabled'")
-                                    ->fetchColumn();
+        // Don't include boarder leave configs if boarder leave is off
         $query = "
             SELECT DISTINCT lu_config_type.type
             FROM {$this->getTable()}
             INNER JOIN lu_config_type ON config.type_id  = lu_config_type.id
+            WHERE NOT (
+                config.type_id = ?
+                AND
+                (SELECT c2.value FROM {$this->getTable()} c2 WHERE c2.name='boarder_leave_enabled') IS FALSE
+            )
         ";
-        $params = [];
-        if (!$includeBoarderLeave) {
-            $query .= 'WHERE config.type_id != ?';
-            $params[] = self::TYPE_BOARD;
-        }
-        $statement = $this->getDatabase()->query($query, $params);
+        $statement = $this->getDatabase()->query($query, [self::TYPE_BOARD]);
         $result    = [];
         foreach ($statement as $row) {
             $result[] = $row['type'];
