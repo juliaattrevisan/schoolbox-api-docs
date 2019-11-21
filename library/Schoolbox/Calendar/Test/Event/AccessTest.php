@@ -21,6 +21,9 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Calendar\Relation\Category as CategoryRelation;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AccessTest extends TestCase
 {
     /** @var Role[] */
