@@ -361,6 +361,24 @@ of developing for filters.
     );
     ```
 
+#### Frontend development for new filters
+
+The Filter's Twig template is a `templates/component.twig` in the same folder as
+its Definition class.
+
+This template must extend `library/Schoolbox/Filter/templates/_component.twig`
+(alias: `@filters/_component.twig`).
+* The `filterName` block will alwys be extended, and will contain a label for
+the component
+* the `userOptions` block may be extended if you wish to render the list of
+  available options differently
+  * most implementations use the default, which uses
+    `library/Schoolbox/Filter/templates/_selectionCheckbox.twig` (alias
+    `@filters/_selectionCheckbox.twig`) to render a set of checkboxes
+
+The base Panel's Twig template (including JavaScript) may be found in
+`library/Schoolbox/Filter/templates/panel.twig`.
+
 
 ### Adding an existing filter to a page which already supports filters
 
