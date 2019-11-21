@@ -1,6 +1,7 @@
 $dropdown-button-pip-color: $content-ui-foreground;
 $dropdown-button-padding-med: 2.5rem;
 $dropdown-button-pip-opposite-med: 1rem;
+$alert-close-font-size: rem-calc(($base-font-size + 14));
 
 a[disabled], a.disabled {
     // Make disabled links not clickable
@@ -178,4 +179,31 @@ button.submit {
     button {
         width: 100%;
     }
+}
+
+.close,
+.close-button {
+  background-color: transparent;
+  color: inherit;
+  font-size: $alert-close-font-size;
+  line-height: 0;
+  position: absolute;
+
+    &:hover {
+      background-color: transparent;
+      color: inherit;
+    }
+}
+
+// Used in dropzone when an error has occurred on upload
+.close {
+  right: 0.5rem;
+  top: 1rem;
+}
+
+// Used in file components when an error has occurred during upload
+.close-button {
+  right: 0;
+  top: 0;
+  padding-top: 0;
 }

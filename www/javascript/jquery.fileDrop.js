@@ -65,8 +65,10 @@
 
             // dropzone dictionary
             dictDefaultMessage: '',
-            dictFallbackMessage: ''
+            dictFallbackMessage: '',
 
+            // Reload component content on file upload. Set the default to `true` for now as file component is the only one that's using this as of the moment.
+            reloadContent: true
         };
 
     function FileDrop(element, options) {
@@ -134,6 +136,10 @@
             }
         }
 
+        $(document).on("click", ".dz-error [data-close]", function() {
+            $(this).parents('li').fadeOut('slow');
+        });
+
         $(this.element).dropzone({
             clickable: this.options.clickable,
             previewsContainer: this.options.previewsContainer,
@@ -180,10 +186,17 @@
                             $.post(
                                 self.options.refreshUrl,
                                 self.options.refreshData
-                            )
-                                .done(function(data) {
+                            ).done(function(data) {
+                                /**
+                                 * Everytime a file is being uploaded, the component gets refreshed.
+                                 * With that when there's an error, the message gets automatically dismissed as well.
+                                 *
+                                 * With [SA-5443] for file components, we'll make the error messages is dismissible by the user.
+                                 */
+                                if (self.options.reloadContent) {
                                     $(self.options.refreshSelector).empty().append($(data).children());
-                                });
+                                }
+                            });
                         }, self.options.refreshTimeout);
                     }
 

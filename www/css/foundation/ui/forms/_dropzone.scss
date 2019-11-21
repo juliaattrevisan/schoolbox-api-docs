@@ -40,6 +40,10 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
             padding: 1rem 0 1rem 1rem;
         }
     }
+
+  p[data-dz-status] {
+    white-space: inherit;
+  }
 }
 
 section > .dropzone-wrap {
@@ -139,17 +143,14 @@ ul.az-error-list {
     .filename {
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
     }
 }
 
 ul.az-error-list {
     background: $attachzone-error-background;
-    .dz-error {
-        height: rem-calc($base-font-size * 3 + 1);
-    }
+
     .filename {
-        line-height: 2rem;
+        line-height: 1.5rem;
         font-style: italic;
         cursor: pointer;
     }
@@ -162,6 +163,10 @@ ul.az-error-list {
 
     > li {
         overflow: hidden;
+
+        .list-item {
+          padding-top: 0.5rem;
+        }
     }
 }
 
@@ -360,7 +365,7 @@ ul.az-error-list {
         }
     }
     .filename {
-        opacity: 0.4;
+        opacity: 1;
         @include easy-transition(opacity 0.15s $attachzone-overlay-timing);
     }
 }
@@ -791,3 +796,17 @@ ul.az-error-list {
     width: 0%;
     height: 100%;
 }
+
+.dz-error {
+  .card {
+    padding: 0.5rem 1rem;
+  }
+
+  // All error messages are in this colour
+  // component drag and drop uses data-dz-status as a second line of info
+  // but other attachzones use data-dz-name in one line of info
+  [data-dz-name], [data-dz-status] {
+    color: $alert-color;
+  }
+}
+
