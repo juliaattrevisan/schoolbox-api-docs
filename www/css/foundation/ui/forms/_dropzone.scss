@@ -801,12 +801,12 @@ ul.az-error-list {
   .card {
     padding: 0.5rem 1rem;
   }
+
+  // All error messages are in this colour
+  // component drag and drop uses data-dz-status as a second line of info
+  // but other attachzones use data-dz-name in one line of info
+  [data-dz-name], [data-dz-status] {
+    color: $alert-color;
+  }
 }
-//
-//.dropzone-wrap {
-//  .close-button {
-//    top: 0;
-//    position: absolute;
-//    right: 0;
-//  }
-//}
+
