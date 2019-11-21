@@ -21,7 +21,7 @@ use Schoolbox\Application\Daemon;
 
 $errors  = [];
 $opts    = getopt('pvn:');
-$limit   = isset($opts['n']) ? $opts['n'] : 1000;
+$limit   = isset($opts['n']) ? (int)$opts['n'] : 1000;
 $perform = isset($opts['p']);
 
 require_once __DIR__ . '/../conf/core/require.php';

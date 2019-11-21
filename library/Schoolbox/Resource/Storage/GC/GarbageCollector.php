@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,7 +14,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
-class GarbageCollector 
+class GarbageCollector
 {
 
     /** @var Check[] */
@@ -43,7 +43,7 @@ class GarbageCollector
      * @param int             $limit
      * @param bool            $perform
      */
-    public function __construct(array $checks, StorageMapper $mapper, LoggerInterface $log, $limit = 200, $perform = false)
+    public function __construct(array $checks, StorageMapper $mapper, LoggerInterface $log, int $limit = 200, $perform = false)
     {
         foreach ($checks as $c) {
             $this->addCheck($c);
