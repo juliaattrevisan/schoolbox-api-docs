@@ -339,6 +339,11 @@ of developing for filters.
     to create an instance of the new filter
 * Add a case to the Filter Consumer for this entity
   * ID Finders will need their `findIdsByFilters` method updated
+    * `\Schoolbox\Filter\AbstractIdFinder` already implements this method:
+      however, it requires that these abstract methods be implemented:
+      * `buildQuery`
+      * `doFiltersGuaranteeEmptySet`
+      * `simplifyFilters`
   * Matchers are more freeform, but somehow their filter method must recognise
     the new filter, and accept/reject the entity
 * Insert a new row into the `filter` database table for the new filter
