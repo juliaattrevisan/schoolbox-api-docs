@@ -5,6 +5,12 @@
         definition:         IFilterDefinition
         roleSelections:     Filter\Selection\Model[] - Default filter selections for current user's role, indexed by selection.key
         userSelections:     Filter\Selection\Model[] - A set of filter selections made by the current user, indexed by selection.key
+
+    Blocks:
+        scripts: any custom scripts an extending template requires
+        filterComponent: all visible content of the component
+        filterName: the label for the component in the panel
+        userOptions: how is each available option in the component rendered?
 #}
 {% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
 {% set isEmpty    = (isUserConfigurable and 0 == roleSelections | length) %}

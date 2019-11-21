@@ -19,8 +19,10 @@ namespace Schoolbox\Filter;
  */
 interface IComponent
 {
-
     /**
+     * Returns the definition that would have been created by the same
+     * `IFactory` which created this object.
+     *
      * @return IDefinition
      */
     public function getDefinition(): IDefinition;

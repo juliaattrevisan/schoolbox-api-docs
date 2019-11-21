@@ -32,9 +32,15 @@ interface IFactoryFactory
 
 
     /**
+     * Build a codec for this entity.
+     *
+     * It is the responsibility of the codec to translate between a query string
+     * and a collection of `Selection\Model` instances.
+     *
      * @return ICodec
      */
     public function buildCodec(): ICodec;
+
 
     /**
      * Build a set of key converters for filters configured as enabled for the specified page
@@ -73,12 +79,15 @@ interface IFactoryFactory
     /**
      * Builds a filter panel for the specified user and page, which submits selections to the specified route
      *
-     * @param User        $user
-     * @param string      $page
-     * @param null|string $route
-     * @param null|User   $viewee
-     * @param array       $routeArgs  Any route params, as received by the controller method
-     * @param array       $request
+     * @param User        $user       The user who is viewing the page
+     * @param string      $page       The page which the filter is on: one of the `Filter\Page\Model::PAGE_*` constants
+     * @param null|string $route      Where to post to when the Apply Filters button is clicked.
+     *                                If null, don't post.
+     * @param null|User   $viewee     The user whose page you're viewing (if this page belongs to a particular user)
+     * @param array       $routeArgs  Any route params, as received by the controller method.
+     *                                These will be used to create a URL with `$route`.
+     *                                (If called from a controller, this is generally `func_get_args`)
+     * @param array       $request    If set, the query string parameters for the current request.
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \DomainException If this class has not defined the entity it is filtering
@@ -92,6 +101,7 @@ interface IFactoryFactory
      * and groups.
      *
      * TODO this shouldn't be here: it's only added so the composite may use it
+     * TODO this should be removed, and its responsibilities moved to `convertSelectionsToFilters`
      *
      * @param null[]|Collection[] $filters
      * @param User                $viewee

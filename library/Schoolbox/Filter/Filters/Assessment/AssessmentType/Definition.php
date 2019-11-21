@@ -97,6 +97,7 @@ class Definition extends Filter\AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
+        // TODO this is a dynamic set of options: should this not be defined in `insertDynamicOptions`?
         return $this->assessmentTypes->getAll();
     }
 
