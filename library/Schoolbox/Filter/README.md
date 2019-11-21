@@ -306,9 +306,12 @@ of developing for filters.
 * Create a Factory implementation for the new filter
   * In practise, this will extend `\Schoolbox\Filter\AbstractFactory`
   * Depending on how closely related the new filter is to existing ones, its
-    `buildComponent` and `buildKeyConverter` might be able to create instances
-    of already existing classes. `buildDefinition` will have to create a new
-    class though
+    `buildComponent` might be able to create instances of already existing
+    classes. `buildDefinition` and `buildKeyConverter` will have to create new
+    classes though.
+    * if your component needs to pass any variables to its Twig template beyond
+      that the base component does, you need a custom `buildComponent` method.
+      which builds a component instance specific to this filter
     * `buildDefinition`'s mapper parameters are properties of the Factory
       itself:
       ```php
