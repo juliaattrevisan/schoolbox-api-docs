@@ -30,6 +30,13 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
+
+    /**
+     * Key to represent Absolute Dates being used to generate a pastoral report
+     */
+    public const ABSOLUTE_DATE = 'absolute';
+
+
     /** @var bool $dashboard */
     protected $dashboard;
 
@@ -48,6 +55,12 @@ class Model implements ISoftDeletable
      * @var bool $involved
      */
     private $involved;
+
+    /** @var bool $usesRelativeDate */
+    private $usesRelativeDate;
+
+    /** @var string $relativeDateString */
+    private $relativeDateString;
 
     /**
      * Optional. Can be Null.
@@ -128,6 +141,7 @@ class Model implements ISoftDeletable
 
     /** @var Collection|PastoralGroup\Model[] $groups */
     private $groups;
+
 
     /**
      * Model constructor
@@ -380,6 +394,44 @@ class Model implements ISoftDeletable
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * @param bool $usesRelativeDate
+     * @return self
+     */
+    public function setUsesRelativeDate(bool $usesRelativeDate) : self
+    {
+        $this->usesRelativeDate = $usesRelativeDate;
+
+        return $this;
+    }
+
+    /**
+     * @return null|bool
+     */
+    public function getUsesRelativeDate() : ?bool
+    {
+        return $this->usesRelativeDate;
+    }
+
+    /**
+     * @param null|string $relativeDateString
+     * @return self
+     */
+    public function setRelativeDateString(string $relativeDateString = null) : self
+    {
+        $this->relativeDateString = $relativeDateString;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRelativeDateString() : ?string
+    {
+        return $this->relativeDateString;
     }
 
     /**

@@ -72,6 +72,7 @@ class Module extends BaseModule
             'errorMapper'                   => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'pastoralGroupMapper'           => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Group\Mapper::class),
             'pastoralReportDashboardMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Report\Dashboard\Mapper::class),
+            'termMapper'                    => $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Term\Mapper::class)
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

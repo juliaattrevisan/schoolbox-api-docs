@@ -78,28 +78,60 @@
                             </label>
                         {% endif %}
                     </div>
-                    <div class="small-12 large-6 columns">
-                        <label for="datetime_after">
-                            Published On Or After
-                            <input type="text" name="after" id="datetime_after"
-                                   value="{{ report.afterDate.usingFormat('d/m/Y') }}"
-                                   data-datepicker data-datesync-enddate="#datetime_before"/>
-                        </label>
-                    </div>
-                    <div class="small-12 large-6 columns">
-                        <label for="item_datetime_published">
-                            Published On Or Before
-                            <input type="text" name="before" id="datetime_before"
-                                   value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
-                                   data-datepicker data-datesync-startdate="#datetime_after"/>
-                        </label>
-                    </div>
+
                     <div class="small-12 columns">
-                        <label for="item_datetime_published">
+                        <label for="filterTags">
                             Filter By Tags
                             <select id="filterTags" name="tags[]" multiple data-placeholder="Select Tags"></select>
                         </label>
                     </div>
+                </fieldset>
+            </section>
+
+            <h2 class="subheader">Date Range</h2>
+            <p class="meta">Include reports published within the selected time period</p>
+
+            <section>
+                <fieldset class="radiolist content">
+                    <div class="small-12 large-6 columns">
+                        <input type="radio" name="date-option" id="relative-dates-option" value="relative" {% if report.usesRelativeDate %}checked{% endif %}/>
+                        <label for="relative-dates-option">Use relative date range</label>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <input type="radio" name="date-option" id="absolute-dates-option" value="absolute" {% if not report.usesRelativeDate %}checked{% endif %}/>
+                        <label for="absolute-dates-option">Use fixed date range</label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div id="relative-dates" class="small-12 columns{% if not report.usesRelativeDate %} hide{% endif %}">
+                        <label for="relative-dates-dropdown">Time period</label>
+                        <select id="relative-dates-dropdown" name="relative-dates-dropdown">
+                            {% for value,label in datePresets %}
+                                <option value="{{value}}" {% if selectedRelativeDate == value %}selected{% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div id="absolute-dates" {% if report.usesRelativeDate %}class="hide"{% endif %}>
+                        <div class="small-12 large-6 columns">
+                            <label for="datetime_after">
+                                From
+                                <input type="text" name="after" id="datetime_after"
+                                       value="{{ report.afterDate.usingFormat('d/m/Y') }}"
+                                       data-datepicker data-datesync-enddate="#datetime_before"/>
+                            </label>
+                        </div>
+                        <div class="small-12 large-6 columns">
+                            <label for="datetime_before">
+                                To
+                                <input type="text" name="before" id="datetime_before"
+                                       value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
+                                       data-datepicker data-datesync-startdate="#datetime_after"/>
+                            </label>
+                        </div>
+                    </div>
+
                 </fieldset>
             </section>
 
@@ -464,6 +496,17 @@
             });
         })
 
+        // Hide/show the relevant date range picker based on the user's radio button selection
+        $("input[type='radio'][name='date-option']").change(function(e) {
+           if ($("#relative-dates-option").is(":checked")) {
+               $("#relative-dates").removeClass("hide");
+               $("#absolute-dates").addClass("hide");
+           } else {
+               $("#absolute-dates").removeClass("hide");
+               $("#relative-dates").addClass("hide");
+           }
+        });
+
 
         $('#sort-order').sortable({handle: '.grip', axis: 'y'});
 
@@ -568,7 +611,7 @@
                             return $(this).data('order');
                         })
                 );
-                
+
                 $('#order').val(order.join(','));
                 form.submit();
             }

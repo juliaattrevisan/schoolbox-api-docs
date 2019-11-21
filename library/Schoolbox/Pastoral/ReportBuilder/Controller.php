@@ -28,6 +28,7 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use HouseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term;
 
 class Controller extends Base
 {
@@ -64,6 +65,31 @@ class Controller extends Base
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
 
+    /** @var Term\Mapper $termMapper */
+    private $termMapper;
+
+    // Strings that can be converted to actual dates using strtotime
+    private const THIS_YEAR = 'first day of january';
+    private const THIS_TERM = 'this term'; // this is the only one that isn't a strtotime string
+    private const PAST_6_MONTHS = '6 months ago';
+    private const PAST_3_MONTHS = '3 months ago';
+    private const PAST_MONTH = '1 month ago';
+    private const PAST_FORTNIGHT = '14 days ago';
+    private const PAST_WEEK = '7 days ago';
+    private const TODAY = 'today';
+
+    // Mappings of strings to labels that will be shown in the UI
+    private const RELATIVE_DATE_PRESETS = [
+        self::THIS_YEAR => 'This year',
+        self::THIS_TERM => 'This term',
+        self::PAST_6_MONTHS => 'Past 6 months',
+        self::PAST_3_MONTHS => 'Past 3 months',
+        self::PAST_MONTH => 'Past month',
+        self::PAST_FORTNIGHT => 'Past fortnight',
+        self::PAST_WEEK => 'Past week',
+        self::TODAY => 'Today'
+    ];
+
     /**
      * Constructor
      *
@@ -78,6 +104,7 @@ class Controller extends Base
      * @param PastoralGroupMapper           $pastoralGroupMapper
      * @param PastoralReportMapper          $pastoralReportMapper
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
+     * @param Term\Mapper                   $termMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -90,7 +117,8 @@ class Controller extends Base
         HouseMapper $houseMapper,
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralReportMapper $pastoralReportMapper,
-        PastoralReportDashboardMapper $pastoralReportDashboardMapper
+        PastoralReportDashboardMapper $pastoralReportDashboardMapper,
+        Term\Mapper $termMapper
     ) {
         $this->errorMapper               = $errorMapper;
         $this->pastoralDataSource        = $pastoralDataSource;
@@ -103,6 +131,7 @@ class Controller extends Base
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
+        $this->termMapper                    = $termMapper;
     }
 
     /**
@@ -233,6 +262,10 @@ class Controller extends Base
             $report->setDashboard(false);
         }
 
+        // Default to using relative date
+        $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
+        $report->setRelativeDateString($report->getRelativeDateString() ?? self::THIS_YEAR);
+
         // And render this thing out
         $this->getResponse()->content->set(
             [
@@ -253,6 +286,8 @@ class Controller extends Base
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
+                    'datePresets'      => self::RELATIVE_DATE_PRESETS,
+                    'selectedRelativeDate' => $report->getRelativeDateString()
                 ],
                 'title' => 'Pastoral Report',
             ]
@@ -334,10 +369,23 @@ class Controller extends Base
     {
         // Get matching records
 
+        $beforeDate = Alaress_Date_Format::now();
+        // Special case for the current term relative date, which is not a strtotime-able thingy
+        if ($report->getRelativeDateString() === self::THIS_TERM) {
+            $afterDate = $this->termMapper->findForToday()->getStart();
+        } else {
+            $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
+        }
+
+        if (!$report->getUsesRelativeDate()) {
+            $beforeDate = $report->getBeforeDate();
+            $afterDate = $report->getAfterDate();
+        }
+
         return $this->pastoralDataSource->getReportData(
             $this->getUser(),
-            $report->getBeforeDate(),
-            $report->getAfterDate(),
+            $beforeDate,
+            $afterDate,
             $report->getSeverity(),
             $report->getTypes(),
             $report->getSubTypes(),
@@ -394,17 +442,27 @@ class Controller extends Base
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
-        if (!empty($post['before'])) {
-            $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
+        if (!empty($post['date-option']) && $post['date-option'] === PastoralReport::ABSOLUTE_DATE) {
+            $pastoralReport->setUsesRelativeDate(false);
+
+            if (!empty($post['before'])) {
+                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
+            }
+
+            if (!empty($post['after'])) {
+                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
+            }
         } else {
-            $pastoralReport->setBeforeDate(null);
+            $pastoralReport->setUsesRelativeDate(true);
+            $pastoralReport->setRelativeDateString(self::THIS_YEAR);
+
+            // Update with POSTed relative date if it's valid
+            $relativeDateString = $post['relative-dates-dropdown'];
+            if (!empty($relativeDateString) && array_key_exists($relativeDateString, self::RELATIVE_DATE_PRESETS)) {
+                $pastoralReport->setRelativeDateString($relativeDateString);
+            }
         }
 
-        if (!empty($post['after'])) {
-            $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
-        } else {
-            $pastoralReport->setAfterDate(null);
-        }
 
         if (is_array($post['types'])) {
             $pastoralReport->setTypesCsv(implode(',', $post['types']));
