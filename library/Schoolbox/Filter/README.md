@@ -121,6 +121,20 @@ and adds further interface requirements:
 * Assert whether a provided key is valid (`assertValidKey`)
 
 
+### Panel (`\Schoolbox\Filter\Panel`)
+
+The Panel class contains a set of Filter Components for rendering onto a page,
+as well as the route to which any AJAX requests to update the filtered contents
+will be sent.
+
+In practise: it is built using the Factory Factory's `buildPanel` method, and
+passed directly to a Twig template for rendering in a specific sub-template that
+the template includes.
+
+> You can see more on how to pass the Panel object around in the
+> "Enabling filters on a page" practical guide.
+
+
 ### Filter Consumers
 
 Filter Consumers are able to take a list of selected filters, and do something
@@ -309,6 +323,19 @@ of developing for filters.
     `buildComponent` and `buildKeyConverter` might be able to create instances
     of already existing classes. `buildDefinition` will have to create a new
     class though
+    * `buildDefinition`'s mapper parameters are properties of the Factory
+      itself:
+      ```php
+      public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+      {
+          return new Definition(
+              $filter,
+              $this->getOptionMapper(),
+              $this->getDefaultsMapper(),
+              $this->getAssessmentTypes()
+          );
+      }
+      ```
 * Create a Definition implementation for the new filter
   * In practise, this will extend `\Schoolbox\Filter\AbstractDefinition`
 * Create a Component implementation (if a custom implementation is required)
