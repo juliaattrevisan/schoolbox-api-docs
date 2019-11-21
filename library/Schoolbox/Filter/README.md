@@ -328,7 +328,8 @@ of developing for filters.
 * Create a Definition implementation for the new filter
   * In practise, this will extend `\Schoolbox\Filter\AbstractDefinition`
 * Create a Component implementation (if a custom implementation is required)
-* Create a Key Converter implementation (if a custom implementation is required)
+* Create a Key Converter implementation
+  * In practise, this will extend `\Schoolbox\Filter\AbstractKeyConverter`
 * Find the Factory Factory implementation which creates filters for the entity
   that is being filtered
   * Each Factory Factory has an `ENTITY` class constant: find the one that
