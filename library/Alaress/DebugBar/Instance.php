@@ -9,10 +9,11 @@
 
 namespace Alaress\DebugBar;
 
-use Config;
+//use Config;
 use DebugBar\StandardDebugBar;
 
-class Instance {
+class Instance
+{
 
     /**
      * @return StandardDebugBar
@@ -22,7 +23,8 @@ class Instance {
     /**
      * Sets up the debug bar.
      */
-    public static function init() {
+    public static function init()
+    {
         self::getInstance();
     }
 
@@ -31,7 +33,8 @@ class Instance {
      *
      * @return StandardDebugBar
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!isset(self::$debug_bar)) {
             self::$debug_bar = new StandardDebugBar();
         }
@@ -43,9 +46,9 @@ class Instance {
      *
      * @return bool
      */
-    public static function isEnabled() {
+    public static function isEnabled()
+    {
         return false;
 //        return Config::get('debug_mode');
     }
-
 }

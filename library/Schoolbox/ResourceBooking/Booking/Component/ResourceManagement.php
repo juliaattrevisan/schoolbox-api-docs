@@ -43,7 +43,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
     public function execute()
     {
         //Ensure ResourceBooking module is enabled
-        if(0 == $this->getConfigLoader()->get('resource_booking_enabled')){
+        if (0 == $this->getConfigLoader()->get('resource_booking_enabled')) {
             return false;
         }
 
@@ -59,16 +59,16 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         $startTime = strtotime("00:00", $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
-        $config = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_ResourceBooking_Moderation_Default::class);
+        $config     = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_ResourceBooking_Moderation_Default::class);
         $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
             $config->getId(),
             $this->getUser(),
             $this->getUser()
         );
         $bookingApi->setStatus(
-            array(
+            [
                 Booking\Status\Model::STATUS_PENDING,
-            )
+            ]
         );
 
         // Still need to check if user actually has any bookable items.
@@ -80,18 +80,18 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
 
         // Group bookings by their item, and order within that list by date
         // (They should be date-ordered already)
-        $groupedBookings = array();
+        $groupedBookings = [];
         foreach ($bookingEvents as $event) {
             $itemId = $event->getBooking()->getResource()->getId();
             if (empty($groupedBookings[$itemId])) {
-                $groupedBookings[$itemId] = array(
+                $groupedBookings[$itemId] = [
                     'resource'      => $event->getBooking()->getResource(),
-                    'bookingEvents' => array(),
-                );
+                    'bookingEvents' => [],
+                ];
             }
             $groupedBookings[$itemId]['bookingEvents'][] = $event;
         }
-        usort($groupedBookings, function($a, $b) {
+        usort($groupedBookings, function ($a, $b) {
             return strcmp($a['resource']->getName(), $b['resource']->getName());
         });
         $this->bookings = $groupedBookings;
@@ -109,10 +109,10 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         $this->renderTwigTemplate(
             $templateHandle,
             '@resourceBooking/component/resourceManagement.twig',
-            array(
+            [
                 'bookingsByResource' => $this->bookings,
                 'component'          => $this,
-            ),
+            ],
             true,
             false
         );

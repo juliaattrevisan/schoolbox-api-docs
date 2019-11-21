@@ -20,7 +20,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var MapperFactory $mapperFactory */
 $mapperFactory = $kernel->get('mapperFactory');
 $userSource    = $kernel->getDependencyInjector()->lazyGet('user');
-$publicdir = (new WebDavFolder(
+$publicdir     = (new WebDavFolder(
     '',
     $userSource,
     $mapperFactory->get(\Schoolbox\Resource\Folder\Mapper::class),
@@ -44,13 +44,13 @@ $plugin = new Sabre\DAV\Browser\Plugin();
 $server->addPlugin($plugin);
 
 $lockBackend = new Sabre\DAV\Locks\Backend\File(sys_get_temp_dir() . '/webdavlocks.dat');
-$lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
+$lockPlugin  = new Sabre\DAV\Locks\Plugin($lockBackend);
 $server->addPlugin($lockPlugin);
 
 /** @var IConfigLoader $config */
-$config = $kernel->get('config');
+$config             = $kernel->get('config');
 $authBackendFactory = new DAV_Auth_Factory($config);
-$authPlugin = new Sabre\DAV\Auth\Plugin($authBackendFactory->build());
+$authPlugin         = new Sabre\DAV\Auth\Plugin($authBackendFactory->build());
 $server->addPlugin($authPlugin);
 $server->setBaseUri('/');
 $server->exec();

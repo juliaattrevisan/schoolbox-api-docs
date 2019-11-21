@@ -212,32 +212,32 @@ class Controller extends BaseController
     protected function calculateFollowment()
     {
         // as much as we'd like get this as cached in session, we can't include subjects here
-        $accesses  = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());
+        $accesses = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());
 
         $folderIds = $accesses->getColumnValues('serviceIdentifier');
 
         /** @var \Schoolbox\Collection|Folder\Model[] $folders */
-        $folders   = $this->getFolderMapper()->findByColumn('id', $folderIds)->sortBy('name', 'asc');
-        $service   = UserAccess::SERVICE_HOMEPAGE;
+        $folders = $this->getFolderMapper()->findByColumn('id', $folderIds)->sortBy('name', 'asc');
+        $service = UserAccess::SERVICE_HOMEPAGE;
 
-        $muted = array(
+        $muted = [
             'unfollow' => $this->getUser()->getId(),
-            'disabled' => 0
-        );
+            'disabled' => 0,
+        ];
 
         $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
         foreach ($muted as $k => $id) {
             $muted[$k] = $this->getRerouteOverrideMapper()
-                ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                ->map(
-                    function ($override) use ($routeKeyRegex) {
-                        /** @var RerouteOverride $override */
-                        preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                        return is_array($matches) ? $matches[1] : null;
-                    },
-                    false
-                )
-                ->getAll();
+                              ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
+                              ->map(
+                                  function ($override) use ($routeKeyRegex) {
+                                      /** @var RerouteOverride $override */
+                                      preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
+                                      return is_array($matches) ? $matches[1] : null;
+                                  },
+                                  false
+                              )
+                              ->getAll();
         }
 
         $followment = [];
@@ -302,19 +302,19 @@ class Controller extends BaseController
 
         //Filtering out disabled modules
         //   Modules            => Related Notifications
-        $checkEnabled = Array(
-            'eotc'              => [NSMapper::NS_EOTC],
-            'resource_booking'  => [NSMapper::NS_RESOURCE_BOOKING],
-            'pastoral'          => [NSMapper::NS_PASTORAL, NSMapper::NS_PASTORAL_LOG, NSMapper::NS_PASTORAL_COMMENT],
-            'fixtures'          => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT]
-        );
+        $checkEnabled = [
+            'eotc'             => [NSMapper::NS_EOTC],
+            'resource_booking' => [NSMapper::NS_RESOURCE_BOOKING],
+            'pastoral'         => [NSMapper::NS_PASTORAL, NSMapper::NS_PASTORAL_LOG, NSMapper::NS_PASTORAL_COMMENT],
+            'fixtures'         => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT],
+        ];
 
         $config = $this->getConfigLoader();
 
-        foreach ($ns as $i=>$namespace) {
-            foreach ($checkEnabled as $notifType=>$notifs) {
-                if(in_array($namespace->getSlug(), $notifs)){
-                    if(0 == $config->get($notifType.'_enabled')){
+        foreach ($ns as $i => $namespace) {
+            foreach ($checkEnabled as $notifType => $notifs) {
+                if (in_array($namespace->getSlug(), $notifs)) {
+                    if (0 == $config->get($notifType . '_enabled')) {
                         unset($ns[$i]);
                     }
                 }
@@ -330,14 +330,14 @@ class Controller extends BaseController
             'title'    => 'Message Settings',
             'template' => '@messages/settings.twig',
             'data'     => [
-                'ns'        => $ns,
-                'sources'   => $sources,
-                'perms'     => $this->getConfig()->getPermissionList($digest, $mobile),
-                'digest'    => $digest,
-                'mobile'    => $mobile,
-                'groups'    => $this->calculateFollowment(),
-                'config'    => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
-            ]
+                'ns'      => $ns,
+                'sources' => $sources,
+                'perms'   => $this->getConfig()->getPermissionList($digest, $mobile),
+                'digest'  => $digest,
+                'mobile'  => $mobile,
+                'groups'  => $this->calculateFollowment(),
+                'config'  => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
+            ],
         ]);
     }
 
@@ -372,7 +372,7 @@ class Controller extends BaseController
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set([
                 'data'   => $conf,
-                'format' => 'json'
+                'format' => 'json',
             ]);
         } else {
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('messages.configure'));

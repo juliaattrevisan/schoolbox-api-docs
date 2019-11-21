@@ -94,7 +94,7 @@ class External_Liss_Authenticator
             return true;
         }
 
-        $this->log->error(sprintf('User \'%s\' at school \'%s\' has failed to authenticate',  (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
+        $this->log->error(sprintf('User \'%s\' at school \'%s\' has failed to authenticate', (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
 
         return false;
     }
