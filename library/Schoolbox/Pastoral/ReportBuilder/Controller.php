@@ -458,7 +458,7 @@ class Controller extends Base
 
             // Update with POSTed relative date if it's valid
             $relativeDateString = $post['relative-dates-dropdown'];
-            if (!empty($relativeDateString) && array_key_exists($relativeDateString,self::RELATIVE_DATE_PRESETS)) {
+            if (!empty($relativeDateString) && array_key_exists($relativeDateString, self::RELATIVE_DATE_PRESETS)) {
                 $pastoralReport->setRelativeDateString($relativeDateString);
             }
         }
