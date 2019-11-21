@@ -303,20 +303,6 @@ of developing for filters.
     * create a Filter Consumer
       * an ID Finder should be appropriate if the filtering will take place at a
         query level, otherwise a Matcher will be required
-* Insert a new row into the `filter` database table for the new filter
-  * the `entity` column value needs to be the fully-qualified class name of the
-    entity the filter will operate on
-  * the `class` column is the fully-qualified class name of the new filter's
-    Definition class
-  * leave the leading `\` character off both values
-    * note that `\` is escaped by another `\` in MySQL/MariaDB queries:
-    ```sql
-    INSERT INTO filter (entity, class)
-    VALUES (
-        'Schoolbox\\Learning\\Assessment\\DataModel\\Mapper',
-        'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\CourseImportSpec\\Definition'
-    );
-    ```
 * Create a Factory implementation for the new filter
   * In practise, this will extend `\Schoolbox\Filter\AbstractFactory`
   * Depending on how closely related the new filter is to existing ones, its
@@ -351,6 +337,20 @@ of developing for filters.
   * ID Finders will need their `findIdsByFilters` method updated
   * Matchers are more freeform, but somehow their filter method must recognise
     the new filter, and accept/reject the entity
+* Insert a new row into the `filter` database table for the new filter
+  * the `entity` column value needs to be the fully-qualified class name of the
+    entity the filter will operate on
+  * the `class` column is the fully-qualified class name of the new filter's
+    Definition class
+  * leave the leading `\` character off both values
+    * note that `\` is escaped by another `\` in MySQL/MariaDB queries:
+    ```sql
+    INSERT INTO filter (entity, class)
+    VALUES (
+        'Schoolbox\\Learning\\Assessment\\DataModel\\Mapper',
+        'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\CourseImportSpec\\Definition'
+    );
+    ```
 
 
 ### Adding an existing filter to a page which already supports filters
