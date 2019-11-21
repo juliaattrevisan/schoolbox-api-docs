@@ -71,6 +71,7 @@ This is to follow the standard packaging process linux distributions use for web
   * [Issue Types](./docs/charter/issue-types.md)
   * [Logging Time](./docs/charter/logging-time.md)
   * [BAU](./docs/charter/bau.md)
+  * [QA](./docs/charter/qa.md)
   * [Glossary](./docs/charter/glossary.md)
 * Core Modules:
   * [Bell Daemon](./tools/notif/bell/README.md)
