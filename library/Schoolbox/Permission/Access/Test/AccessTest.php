@@ -946,7 +946,7 @@ class AccessTest extends TestCase
             // User1 is SU. Has FULL access to all folders
             // Intentionally repeats the first scenario to test the cache
             [$access, $users->getOffset(self::USER_1_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_1_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_FULL],
+            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
             [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
             [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
             [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_3_ID, UserAccess::ACCESS_FULL],

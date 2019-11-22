@@ -165,6 +165,7 @@ class Access
      * @param IConfigLoader               $config
      * @param Folder\Code\ISubjectMatcher $subjectMatcher
      * @param bool                        $enableCache
+     * @param Folder\NNIAN                $nnian
      */
     private function __construct(
         UserAccessMapper $userAccessMapper,
