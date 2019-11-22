@@ -1850,9 +1850,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if ($node->getParent()->getParent() && $node->getParent()->getParent()->getId() !== null) {
                 // Has this folder's parent already been sufficiently hydrated?
                 $node = $node->getParent();
-            } elseif ($node->getParent()->getId() && $this->localBodyCache->contains($node->getParent()->getId())) {
-                // Else does the parent exist in the local body cache?
-                $node = $this->localBodyCache->get($node->getParent()->getId());
             } else {
                 // Else load it cheaply
                 $node = $this->findCheaplyById($node->getParent()->getId());
