@@ -104,6 +104,9 @@ class Access
      */
     private $enableCache;
 
+    /** @var Folder\NNIAN */
+    private $nnian;
+
 
     /**
      * Retrieves the singleton instance of this class.
@@ -118,6 +121,7 @@ class Access
      * @param IConfigLoader|null               $config
      * @param Folder\Code\ISubjectMatcher|null $subjectMatcher
      * @param bool|null                        $enableCache
+     * @param Folder\NNIAN|null                $nnian
      * @return static
      */
     public static function getInstance(
@@ -128,19 +132,22 @@ class Access
         External_UserInterface $externalUser = null,
         IConfigLoader $config = null,
         Folder\Code\ISubjectMatcher $subjectMatcher = null,
-        bool $enableCache = null
+        bool $enableCache = null,
+        Folder\NNIAN $nnian = null
     ): Access {
         if (!self::$instance) {
             $config         = $config ?? new Config\Loader();
+            $folderMapper   = $folderMapper ?? Folder\Mapper::getInstance();
             self::$instance = new static(
                 $userAccessMapper ?? UserAccessMapper::getInstance(),
                 $roleAccessMapper ?? RoleAccessMapper::getInstance(),
-                $folderMapper ?? Folder\Mapper::getInstance(),
+                $folderMapper,
                 $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
                 $externalUser,
                 $config,
                 $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE)),
-                $enableCache ?? PHP_SAPI !== 'cli'
+                $enableCache ?? PHP_SAPI !== 'cli',
+                $nnian ?? Folder\NNIAN::getInstance($folderMapper)
             );
         }
         return self::$instance;
@@ -167,7 +174,8 @@ class Access
         ?External_UserInterface $externalUser,
         IConfigLoader $config,
         Folder\Code\ISubjectMatcher $subjectMatcher,
-        bool $enableCache
+        bool $enableCache,
+        Folder\NNIAN $nnian
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->roleAccessMapper = $roleAccessMapper;
@@ -177,6 +185,7 @@ class Access
         $this->config           = $config;
         $this->subjectMatcher   = $subjectMatcher;
         $this->enableCache      = $enableCache;
+        $this->nnian            = $nnian;
     }
 
 
@@ -406,7 +415,7 @@ class Access
         // Find the NNIAN ancestors for the folder
         /** @var Folder\Model $nnian */
         $folder         = $this->folderMapper->findCheaplyById($folderId);
-        $nnianAncestors = $this->folderMapper->getNnianAncestors($folder);
+        $nnianAncestors = $this->nnian->getNnianAncestors($folder);
         $nnian          = $nnianAncestors->last();
         $nnianId        = $nnian->getId();
 
@@ -474,7 +483,7 @@ class Access
         // Ensure we take role-permission from NNIAN
         /** @var Folder\Model $nnian */
         $folder         = $this->folderMapper->findCheaplyById($folderId);
-        $nnianAncestors = $this->folderMapper->getNnianAncestors($folder);
+        $nnianAncestors = $this->nnian->getNnianAncestors($folder);
         $nnian          = $nnianAncestors->last();
         $nnianId        = $nnian->getId();
 

@@ -1114,15 +1114,17 @@ class AccessTest extends TestCase
         $users      = $this->buildUsers($roles, $userData ?? self::USER_DATA);
 
         // Create and return new singleton instance
+        $mockFolderMapper = $this->getMockFolderMapper($folderTree);
         return Access::getInstance(
             $this->getMockUserAccessMapper($users, $userAccessData ?? self::USER_ACCESS_DATA),
             $this->getMockRoleAccessMapper($folderTree, $roles, $roleAccessData ?? self::ROLE_ACCESS_DATA),
-            $this->getMockFolderMapper($folderTree),
+            $mockFolderMapper,
             $this->getMockFolderCodeMapper($folderTree, $folderCodeData ?? self::FOLDER_CODE_DATA),
             $this->getMockExternalUserInterface($externalUserData ?? self::EXTERNAL_USER_DATA),
             $this->getMockIConfigLoader($config ?? self::CONFIG),
             (new Folder\Code\SubjectCodeMatchFactory())->build('synergetic'),
-            $enableCache
+            $enableCache,
+            Folder\NNIAN::getInstance($mockFolderMapper)
         );
     }
 
@@ -1293,25 +1295,13 @@ class AccessTest extends TestCase
                          /** @noinspection PhpIncompatibleReturnTypeInspection */
                          return $folderTree->getElementByHash($folderId);
                      });
-        /** @see \Schoolbox\Resource\Folder\Mapper::findNearestNonInheritingAncestralNode */
-        $folderMapper->method('findNearestNonInheritingAncestralNode')
-                     ->willReturnCallback(static function (Folder\Model $folder) use ($folderTree): Folder\Model {
-                         while ($folder->getInherit()) {
-                             $folder = $folderTree->getElementByHash($folder->getParent()->getId());
-                         }
-                         return $folder;
+
+        /** @see \Schoolbox\Resource\Folder\Mapper::createCollection */
+        $folderMapper->method('createCollection')
+                     ->willReturnCallback(static function (array $contents = []): GenericCollection {
+                         return new GenericCollection(Folder\Model::class, $contents);
                      });
-        /** @see  \Schoolbox\Resource\Folder\Mapper::getNnianAncestors */
-        $folderMapper->method('getNnianAncestors')
-                     ->willReturnCallback(static function (Folder\Model $folder) use ($folderTree): GenericCollection {
-                         $ancestors = new GenericCollection(Folder\Model::class, [$folder->getId() => $folder]);
-                         while ($folder->getInherit()) {
-                             /** @var Folder\Model $folder */
-                             $folder = $folderTree->getElementByHash($folder->getParent()->getId());
-                             $ancestors->setOffset($folder->getId(), $folder);
-                         }
-                         return $ancestors;
-                     });
+
         return $folderMapper;
     }
 

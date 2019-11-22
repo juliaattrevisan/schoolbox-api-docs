@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,6 +15,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 
@@ -253,7 +254,7 @@ class RoutePermissionMapper extends Mapper {
         $folderMapper = Folder\Mapper::getInstance();
         $folder = $folderMapper->findCheaplyById($folderId);
         if ($folder->getInherit()) {
-            $nearestParent = $folderMapper->findNearestNonInheritingAncestralNode($folder);
+            $nearestParent = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($folder);
             if ($nearestParent) {
                 $folderId = $nearestParent->getId();
             }

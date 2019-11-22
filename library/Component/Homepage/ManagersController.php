@@ -8,6 +8,7 @@
  */
 
 use Alaress\Mail\AbstractMailer;
+use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -50,7 +51,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         if($this->getContext()->getInherit()) {
             // Find nearest nian folder
             $folderMapper = FolderMapper::getInstance();
-            $nianFolder = $folderMapper->findNearestNonInheritingAncestralNode($this->getContext());
+            $nianFolder = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
             $managerList   = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_WRITE,

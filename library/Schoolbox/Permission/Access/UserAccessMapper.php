@@ -8,6 +8,7 @@
 namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Resource\Folder\NNIAN;
 use function count;
 use External_Class;
 use function implode;
@@ -530,7 +531,7 @@ class UserAccessMapper extends Mapper
         foreach ($serviceIds as $key => $serviceIdentifier) {
             if ($serviceIdentifier != 0) {
                 $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier);
-                $folderNnian = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+                $folderNnian = NNIAN::getInstance(FolderMapper::getInstance())->findNearestNonInheritingAncestralNode($folder);
                 $serviceIds[$key] = $folderNnian->getId();
             }
         }

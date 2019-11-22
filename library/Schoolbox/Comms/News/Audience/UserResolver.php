@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use External_ClassInterface;
 use PDO;
 use Schoolbox\Realtime\Message\RoutePermission;
+use Schoolbox\Resource\Folder\NNIAN;
 use UnexpectedValueException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
@@ -120,7 +121,7 @@ class UserResolver implements IUserResolver
                 try {
                     $folder = $this->folderMapper->findCheaplyById($entityValue);
                     if ($folder->getInherit()) {
-                        $entityValue = (string)$this->folderMapper->findNearestNonInheritingAncestralNode($folder)->getId();
+                        $entityValue = (string)NNIAN::getInstance($this->folderMapper)->findNearestNonInheritingAncestralNode($folder)->getId();
                     }
                 } catch (Exception $e) {
                     return [];
