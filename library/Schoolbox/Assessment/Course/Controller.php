@@ -11,6 +11,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use PDOException;
 use RangeException;
+use Schoolbox\Resource\Folder\Ancestry;
 use UnexpectedValueException;
 use Schoolbox\Application;
 use Schoolbox\Application\Exception\NotFound;
@@ -1018,7 +1019,7 @@ class Controller extends Base\Base
      */
     protected function getLineage(Folder $course): Collection
     {
-        return $this->folderMapper->getAncestry()->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
+        return Ancestry::getInstance($this->folderMapper)->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
     }
 
 

@@ -82,16 +82,6 @@ use function strnatcasecmp;
  */
 class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {
-    const INHERIT_ON = 1;
-    const INHERIT_OFF = 0;
-    const FOLDER_ROOT = 0;
-
-    /**
-     * Maximum number of recursion iterations to execute before dying
-     *
-     * @var int
-     */
-    protected $maxRecursionDepth = 100;
 
     /**
      * Interface with external user database.
@@ -99,15 +89,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @var External_UserInterface
      */
     protected $external_user;
-
-    /**
-     * A cache of ancestral Folder instances, to save
-     * on re-querying the same Folder from the db over
-     * and over again
-     *
-     * @var Ancestry
-     */
-    protected $ancestry;
 
 
     /**
@@ -225,8 +206,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
-
-        $this->ancestry = new Ancestry($this);
     }
 
     /**
@@ -533,17 +512,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return false;
     }
 
-    /**
-     * Is $possibleAncestor an ancestor of $possibleDescendant?
-     *
-     * @param Model $possibleAncestor The folder that may be an ancestor of $possibleDescendant
-     * @param Model $possibleDescendant
-     * @return bool
-     */
-    public function isAncestor(Model $possibleAncestor, Model $possibleDescendant)
-    {
-        return $this->isDescendant($possibleDescendant, $possibleAncestor);
-    }
 
     /**
      * PostSave callback to clear User- + Role-based permissions if they are now being inherited
@@ -1282,7 +1250,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @throws \Schoolbox\Mapper\Exception
      * @throws DefinitionException
      */
-    public function findById($id)
+    public function findById($id): Model
     {
         // special case: 0 === root, but not in db
         // TODO localise setName()
@@ -1531,17 +1499,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $this->external_user;
     }
 
-    /**
-     * Find ancestry cheaply
-     *
-     * @param Model $folder
-     * @param Model $stopFolder
-     * @return Collection
-     */
-    public function findParentsCheaply(Model $folder, Model $stopFolder)
-    {
-        return $this->findParents($folder, $stopFolder, true);
-    }
 
     /**
      * Gets a collection of parents for the given category, starting from the
@@ -1763,44 +1720,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
 
-    /**
-     * Decide whether inheritance value we provided activates
-     * Folder Inheritance
-     *
-     * @param $value
-     * @return int
-     */
-    public function decideInheritance($value)
-    {
-        if ($value == 1) {
-            return self::INHERIT_ON;
-        }
-
-        return self::INHERIT_OFF;
-    }
-
     /* Getters/Setters
      */
 
-    /**
-     * Get max recursion depth
-     *
-     * @return int
-     */
-    protected function getMaxRecursionDepth()
-    {
-        return $this->maxRecursionDepth;
-    }
-
-    /**
-     * Set max recursion depth
-     *
-     * @param int $maxRecursionDepth
-     */
-    protected function setMaxRecursionDepth($maxRecursionDepth)
-    {
-        $this->maxRecursionDepth = $maxRecursionDepth;
-    }
 
     /**
      * Delete folder and children
@@ -2130,46 +2052,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $folders;
     }
 
-
-    /**
-     * Apply inherited permissions checkbox DOWN the tree
-     *
-     * @param Model $model
-     * @return array
-     * @throws \Exception
-     */
-    public function recurseInheritance(Model $model): array
-    {
-        $folders = $this->findAllChildren($model->getId(), true);
-
-        $deleteFolderMemberships = [];
-
-        foreach ($folders as $folder)
-        {
-            /* Remember the folders that were inheriting as we traversed the tree
-             */
-            if ($model->getInherit()) {
-                $deleteFolderMemberships[$folder->getId()] = $folder->getId();
-            }
-
-            $folder->setInherit($model->getInherit());
-            $this->save($folder);
-
-            /* Collate all the inheriting folders that are deeper in the recursion
-             */
-            $deleteFolderMemberships += $this->recurseInheritance($folder);
-        }
-
-        return $deleteFolderMemberships;
-    }
-
-    /**
-     * @return Ancestry
-     */
-    public function getAncestry()
-    {
-        return $this->ancestry;
-    }
 
     /** @inheritDoc */
     protected function getDefaultOrderByParams(): array
