@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use External_UserInterface;
 use External_User;
 use LogicException;
+use UnexpectedValueException;
 use function count;
 use function explode;
 use function implode;
@@ -116,6 +117,7 @@ class Access
      * @param External_UserInterface|null      $externalUser
      * @param IConfigLoader|null               $config
      * @param Folder\Code\ISubjectMatcher|null $subjectMatcher
+     * @param bool|null                        $enableCache
      * @return static
      */
     public static function getInstance(
@@ -189,6 +191,7 @@ class Access
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws LogicException
+     * @throws UnexpectedValueException
      */
     public function isInstructor(User $user, Folder\Model $folder): bool
     {
@@ -206,6 +209,7 @@ class Access
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws LogicException
+     * @throws UnexpectedValueException
      */
     public function isLearner(User $user, Folder\Model $folder): bool
     {
@@ -228,6 +232,7 @@ class Access
      * @throws InvalidArgumentException If folder array is empty
      * @throws Mapper\Exception
      * @throws LogicException
+     * @throws UnexpectedValueException
      */
     public function getMinFolderAccess(User $user, array $folderIds, $cache = true): int
     {
@@ -275,6 +280,7 @@ class Access
      *                                  Note that we intentionally don't return DENY here, rather, the caller needs to be
      *                                  informed that their call could not be processed for some reason.
      * @throws LogicException
+     * @throws UnexpectedValueException
      */
     public function getAccessLevel(User $user, int $service, int $serviceIdentifier = UserAccess::SID_NONE, bool $cache = true): int
     {
@@ -382,53 +388,59 @@ class Access
      * @throws InvalidArgumentException TODO implement better annotation/handling for impossible logic exceptions
      * @throws Mapper\Exception         If folder does not exist.
      * @throws LogicException           If unable to build an ExternalUser instance
+     * @throws UnexpectedValueException
      */
     public function getFolderAccess(User $user, $folderId, $cache = true): int
     {
-        /* check cache before we proceed for shortcuts */
+        // Special case for root folder
+        if ($folderId === Folder\Model::ROOT_ID) {
+            // Superusers have FULL access, other users have DENY
+            return $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_DENY;
+        }
+
+        // check cache before we proceed for shortcuts
         if ($cache && $this->enableCache && isset($this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId])) {
             return $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId];
         }
 
-        // Find the NNIAN for the folder
-        $folder   = $this->folderMapper->findCheaplyById($folderId, ['deleted' => true]);
-        $folderId = $this->folderMapper->findNearestNonInheritingAncestralNode($folder)->getId();
+        // Find the NNIAN ancestors for the folder
+        /** @var Folder\Model $nnian */
+        $folder         = $this->folderMapper->findCheaplyById($folderId);
+        $nnianAncestors = $this->folderMapper->getNnianAncestors($folder);
+        $nnian          = $nnianAncestors->last();
+        $nnianId        = $nnian->getId();
 
         // 1. Superusers always have full access if folder exists
-        if ($user->isSuperuser()) {
-            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
-            return UserAccess::ACCESS_FULL;
+        $accessLevel = $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_DENY;
+
+        // 2. Check `userAccess` table. (if not already full access)
+        if ($accessLevel !== UserAccess::ACCESS_FULL) {
+            $accessLevel = max($accessLevel, $this->getUserAccessLevel($user, UserAccess::SERVICE_HOMEPAGE, $nnianId, $cache));
         }
 
-        // 2. Check `userAccess` table. (Short-circuit if full access detected)
-        $accessLevel = $this->getUserAccessLevel($user, UserAccess::SERVICE_HOMEPAGE, $folderId, $cache);
-        if ($accessLevel === UserAccess::ACCESS_FULL) {
-            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
-            return UserAccess::ACCESS_FULL;
-        }
-
-        // 3. Check CMS service access level.  (Short-circuit if full access detected)
+        // 3. Check CMS service access level.  (if not already full access)
         /* Note there is no folderId specified for the CMS service. The effect of this is that if the user
          * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
          */
         $accessLevel = max($accessLevel, $this->getAccessLevel($user, UserAccess::SERVICE_CMS));
-        if ($accessLevel === UserAccess::ACCESS_FULL) {
-            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
-            return UserAccess::ACCESS_FULL;
+        if ($accessLevel !== UserAccess::ACCESS_FULL) {
+            $accessLevel = max($accessLevel, $this->getAccessLevel($user, UserAccess::SERVICE_CMS));
         }
 
-        // 4. Folder role permission. (Short-circuit if full access detected)
-        $accessLevel = max($accessLevel, $this->getFolderAccessForRole($user->getRole()->getId(), $folderId, $cache));
-        if ($accessLevel === UserAccess::ACCESS_FULL) {
-            // Technically this block should never execute as the UI does not support FULL role perms.
-            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = UserAccess::ACCESS_FULL;
-            return UserAccess::ACCESS_FULL;
+        // 4. Folder role permission. (if not already full access)
+        if ($accessLevel !== UserAccess::ACCESS_FULL) {
+            // Technically this should never increase the permission, as the UI does not support FULL role perms.
+            $accessLevel = max($accessLevel, $this->getFolderAccessForRole($user->getRole()->getId(), $folderId, $cache));
         }
 
-        // 5. Sis Class enrollment access
-        $accessLevel = max($accessLevel, $this->getSisAccessLevel($user, $folderId));
+        // 5. Sis Class enrollment access. (If not already full access)
+        if ($accessLevel !== UserAccess::ACCESS_FULL) {
+            $accessLevel = max($accessLevel, $this->getSisAccessLevel($user, $folderId));
+        }
 
-        $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId] = $accessLevel;
+        foreach ($nnianAncestors as $ancestor) {
+            $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$ancestor->getId()] = $accessLevel;
+        }
 
         return $accessLevel;
     }
@@ -441,15 +453,15 @@ class Access
      * @param int  $folderId
      * @param bool $cache
      * @return int
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception If no folder found for specified folder id
+     * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws UnexpectedValueException
      */
     public function getFolderAccessForRole(int $roleId, int $folderId, bool $cache = true): int
     {
-        // Ensure we take role-permission from NNIAN
-        $folder   = $this->folderMapper->findCheaplyById($folderId, ['deleted' => true]);
-        $folderId = $this->folderMapper->findNearestNonInheritingAncestralNode($folder)->getId();
-
-        if ($folderId === Folder\IFolder::ROOT_ID) {
+        if ($folderId === Folder\Model::ROOT_ID) {
             // All roles implicitly have no access the root pseudo folder
             return UserAccess::ACCESS_DENY;
         }
@@ -459,15 +471,25 @@ class Access
             return $this->cachedRoleFolderPermissions[$roleId][$folderId];
         }
 
+        // Ensure we take role-permission from NNIAN
+        /** @var Folder\Model $nnian */
+        $folder         = $this->folderMapper->findCheaplyById($folderId);
+        $nnianAncestors = $this->folderMapper->getNnianAncestors($folder);
+        $nnian          = $nnianAncestors->last();
+        $nnianId        = $nnian->getId();
+
         // Permission check #2 - Query the DB (unique constraints ensure 0:1 results)
         // (it is possible to have a folder that does not inherit that lacks role perms, eg 'Lost & Found' folder)
         /** @var null|RoleAccess $roleAccess */
-        $roleAccess                                            = $this->roleAccessMapper->findByColumnList([
-            'cid' => $folderId,
+        $roleAccess      = $this->roleAccessMapper->findByColumnList([
+            'cid' => $nnianId,
             'gid' => $roleId,
         ])->first();
-        $roleAccessLevel                                       = $roleAccess ? $roleAccess->getType() : UserAccess::ACCESS_DENY;
-        $this->cachedRoleFolderPermissions[$roleId][$folderId] = $roleAccessLevel;
+        $roleAccessLevel = $roleAccess ? $roleAccess->getType() : UserAccess::ACCESS_DENY;
+
+        foreach ($nnianAncestors as $nnianAncestor) {
+            $this->cachedRoleFolderPermissions[$roleId][$nnianAncestor->getId()] = $roleAccessLevel;
+        }
 
         return $roleAccessLevel;
     }
