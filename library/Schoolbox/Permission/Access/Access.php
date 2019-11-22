@@ -24,6 +24,7 @@ use function explode;
 use function implode;
 use function in_array;
 use function max;
+use const PHP_SAPI;
 
 /**
  * Responsible for the application of various permission (aka access level) business rules and concepts.
@@ -32,6 +33,9 @@ use function max;
  * 1. Cohesive responsibility sets
  * 2. Consistent architecture
  * 3. Testability
+ *
+ * Note that the caches are disabled in CLI/Daemon contexts to ensure long-running processes
+ * respect changes occurring in database
  */
 class Access
 {
@@ -91,6 +95,14 @@ class Access
     /** @var Folder\Code\ISubjectMatcher */
     private $subjectMatcher;
 
+    /**
+     * Returns whether results may be returned from cache
+     * Does not affect whether most recent results are stored in cache
+     *
+     * @var bool
+     */
+    private $enableCache;
+
 
     /**
      * Retrieves the singleton instance of this class.
@@ -113,7 +125,8 @@ class Access
         Folder\Code\Mapper $folderCodeMapper = null,
         External_UserInterface $externalUser = null,
         IConfigLoader $config = null,
-        Folder\Code\ISubjectMatcher $subjectMatcher = null
+        Folder\Code\ISubjectMatcher $subjectMatcher = null,
+        bool $enableCache = null
     ): Access {
         if (!self::$instance) {
             $config         = $config ?? new Config\Loader();
@@ -124,7 +137,8 @@ class Access
                 $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
                 $externalUser,
                 $config,
-                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE))
+                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE)),
+                $enableCache ?? PHP_SAPI !== 'cli'
             );
         }
         return self::$instance;
@@ -141,6 +155,7 @@ class Access
      * @param null|External_UserInterface $externalUser
      * @param IConfigLoader               $config
      * @param Folder\Code\ISubjectMatcher $subjectMatcher
+     * @param bool                        $enableCache
      */
     private function __construct(
         UserAccessMapper $userAccessMapper,
@@ -149,7 +164,8 @@ class Access
         Folder\Code\Mapper $folderCodeMapper,
         ?External_UserInterface $externalUser,
         IConfigLoader $config,
-        Folder\Code\ISubjectMatcher $subjectMatcher
+        Folder\Code\ISubjectMatcher $subjectMatcher,
+        bool $enableCache
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->roleAccessMapper = $roleAccessMapper;
@@ -158,6 +174,7 @@ class Access
         $this->externalUser     = $externalUser;
         $this->config           = $config;
         $this->subjectMatcher   = $subjectMatcher;
+        $this->enableCache      = $enableCache;
     }
 
 
@@ -262,7 +279,7 @@ class Access
     public function getAccessLevel(User $user, int $service, int $serviceIdentifier = UserAccess::SID_NONE, bool $cache = true): int
     {
         // Check cache
-        if ($cache && isset($this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier])) {
+        if ($cache && $this->enableCache && isset($this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier])) {
             return $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier];
         }
 
@@ -369,7 +386,7 @@ class Access
     public function getFolderAccess(User $user, $folderId, $cache = true): int
     {
         /* check cache before we proceed for shortcuts */
-        if ($cache && isset($this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId])) {
+        if ($cache && $this->enableCache && isset($this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId])) {
             return $this->cachedUserServicePermissions[$user->getId()][UserAccess::SERVICE_HOMEPAGE][$folderId];
         }
 
@@ -438,7 +455,7 @@ class Access
         }
 
         // Permission check #1 - Cached results
-        if ($cache && isset($this->cachedRoleFolderPermissions[$roleId][$folderId])) {
+        if ($cache && $this->enableCache && isset($this->cachedRoleFolderPermissions[$roleId][$folderId])) {
             return $this->cachedRoleFolderPermissions[$roleId][$folderId];
         }
 
@@ -449,9 +466,10 @@ class Access
             'cid' => $folderId,
             'gid' => $roleId,
         ])->first();
-        $this->cachedRoleFolderPermissions[$roleId][$folderId] = $roleAccess ? $roleAccess->getType() : UserAccess::ACCESS_DENY;
+        $roleAccessLevel                                       = $roleAccess ? $roleAccess->getType() : UserAccess::ACCESS_DENY;
+        $this->cachedRoleFolderPermissions[$roleId][$folderId] = $roleAccessLevel;
 
-        return $this->cachedRoleFolderPermissions[$roleId][$folderId];
+        return $roleAccessLevel;
     }
 
 
@@ -471,7 +489,7 @@ class Access
     private function getUserAccessLevel(User $user, int $service, int $serviceIdentifier = UserAccess::SID_NONE, bool $cache = true): int
     {
         // Check cache
-        if ($cache && isset($this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier])) {
+        if ($cache && $this->enableCache && isset($this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier])) {
             return $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier];
         }
 
