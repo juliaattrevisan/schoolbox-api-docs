@@ -14,6 +14,7 @@ namespace Schoolbox\Resource\Folder;
 use Alaress;
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
@@ -102,9 +103,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Array of cached NNIAN nodes
      *
-     * @var array
+     * To ensure database changes in long-running processes (eg Daemons) are respected,
+     * this cache respects $this->isCacheEnabled()
+     *
+     * Maps folder.id to its NNIAN folder
+     *
+     * @var self[]
      */
-    protected $cacheNnian = array();
+    private $cacheNnian = [];
 
     /**
      * A cache of ancestral Folder instances, to save
@@ -729,7 +735,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param int $id
      * @param bool $recurse
-     * @return Collection|\Schoolbox\Resource\Folder\Model[]
+     * @return Collection|Model[]
      */
     public function findAllChildren($id, $recurse = false)
     {
@@ -1452,7 +1458,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param bool $exactAccess If true, $access_level must be exact
      * @param bool $requireHomepage  If true, groups which do not have homepage are excluded.
      *
-     * @return \Schoolbox\Collection|Model[]
+     * @return Collection|Model[]
      */
     public function findForUser(
         User $user,
@@ -1704,8 +1710,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * Does not hydrate any joins
      *
-     * @param int   $folderId
-     * @param array $options
+     * @param int $folderId
      * @return Model
      * @throws DefinitionException
      * @throws Exception
@@ -1713,7 +1718,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @throws Exception\NotFound
      * @throws InvalidArgumentException
      */
-    public function findCheaplyById($folderId, array $options = []): Model
+    public function findCheaplyById($folderId): Model
     {
         // First, check the local body cache to see if we've already loaded this folder
         if ($this->isCacheEnabled() && $this->localBodyCache->contains($folderId)) {
@@ -1725,10 +1730,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return $this->findById($folderId);
         }
 
-        // Need to override default options
-        if (!array_key_exists('order', $options)) {
-            $options['order'] = [];
-        }
+        // Need to override default 'ORDER BY' clause that assumes default joins
+        $options = ['order' => []];
 
         $folder = $this->executeSelect(
             "SELECT {$this->getColumnString()}",
@@ -1771,73 +1774,107 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $searcher;
     }
 
+
     /**
      * Finds the nearest non-inheriting ancestral node (NNIAN)
      *
-     * -_-_-_-_-_-_-_,------,
-     * _-_-_-_-_-_-_-|   /\_/\
-     * -_-_-_-_-_-_-~|__( ^ .^)
-     * // _-_-_-_-_-_-_-""  ""
+     * If ancestral nodes are found in this mapper's localBodyCache, it will use those, otherwise
+     * it will fall back to loading cheaply from database.
      *
      * @param Model $folder
-     * @param array $interimNodes
      * @return Model
-     * @throws MapperException
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws Exception
+     * @throws Exception\InsufficientHydrationException
+     * @throws Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
-    public function findNearestNonInheritingAncestralNode(Model $folder, array $interimNodes = [])
+    public function findNearestNonInheritingAncestralNode(Model $folder): Model
     {
-        // Check cache first
+        if ($folder->isRootNode()) {
+            throw new InvalidArgumentException("Cannot find a NNIAN for Folder pseudo root");
+        }
 
-        if (isset($this->cacheNnian[$folder->getId()])) {
-            // If found parent in cache, set the parent for interim nodes as well.
-            foreach ($interimNodes as $id) {
-                $this->cacheNnian[$id] = $this->cacheNnian[$folder->getId()];
-            }
+        // Check cache first (if enabled)
+        if ($this->isCacheEnabled() && isset($this->cacheNnian[$folder->getId()])) {
             return $this->cacheNnian[$folder->getId()];
         }
 
-        // If we've recursed too much error out
+        $interimNodes = $this->getNnianAncestors($folder);
+        $nnian        = $interimNodes->last();
 
-        if (count($interimNodes) > $this->getMaxRecursionDepth()) {
-            throw new MapperException("Recursion limit reached");
+        // Ensure all interim nodes have their NNIAN cached
+        foreach ($interimNodes as $node) {
+            $this->cacheNnian[$node->getId()] = $nnian;
         }
 
-        // Check if the node inherits permissions
+        return $nnian;
+    }
 
-        if ($folder->getInherit()) {
-            // Current folder has already been visited.
-            if (\in_array($folder->getId(), $interimNodes)) {
-                throw new MapperException("Circular dependency detected");
+
+    /**
+     * Returns the specified folder's nnian ancestry.
+     *
+     * This includes all folders from the specified folder to the NNIAN, inclusive.
+     * The first item will be the passed in folder, the last item will be the NNIAN folder.
+     *
+     * @param Model $folder
+     * @return GenericCollection<Model>|Model[] Indexed by folder.id
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws Exception
+     * @throws Exception\InsufficientHydrationException
+     * @throws Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     */
+    public function getNnianAncestors(Model $folder): GenericCollection
+    {
+        if ($folder->isRootNode()) {
+            throw new InvalidArgumentException("Cannot find a NNIAN ancestors for Folder pseudo root");
+        }
+
+        // Were we passed a stub? If so, hydrate it so we can use its parent.
+        if ($folder->getParent() === null) {
+            $folder = $this->findCheaplyById($folder->getId());
+        }
+
+        // Folders from $folder to NNIAN, inclusive
+        $interimNodes = $this->createCollection([$folder->getId() => $folder]);
+        $node         = $folder;
+        while ($node->getInherit()) {
+
+            // Climb ancestry tree using cheapest mechanism available.
+            if ($node->getParent()->getParent() && $node->getParent()->getParent()->getId() !== null) {
+                // Has this folder's parent already been sufficiently hydrated?
+                $node = $node->getParent();
+            } elseif ($node->getParent()->getId() && $this->localBodyCache->contains($node->getParent()->getId())) {
+                // Else does the parent exist in the local body cache?
+                $node = $this->localBodyCache->get($node->getParent()->getId());
+            } else {
+                // Else load it cheaply
+                $node = $this->findCheaplyById($node->getParent()->getId());
             }
 
-            // Make sure we aren't hitting the root
-            /** @var Model $parent */
-            $parent = $folder->getParent();
-            if ($parent->isRootNode()) {
-                // Don't error out - throw exception instead, and let calling code deal with it
+            // Make sure we aren't hitting the root.
+            // (There is a business rule that all top-level nodes must not inherit permissions)
+            if ($node->isRootNode()) {
                 throw new MapperException("Folder has no NNIAN");
             }
 
-            // Just another interim node, store its ID so we can cache it for later calls
-            $interimNodes[] = $folder->getId();
-            // Round we go again
-            $parent = $this->findCheaplyById($folder->getParent()->getId(), ['deleted' => true]);
-
-            /** @noinspection PhpUnusedLocalVariableInspection */
-            $result = $this->findNearestNonInheritingAncestralNode($parent, $interimNodes);
-        } else {
-            // The node doesn't inherit, we found what we were looking for! Cache it
-            $this->cacheNnian[$folder->getId()] = $folder;
-
-            // Cache any interim nodes we traversed as well
-            foreach ($interimNodes as $id) {
-                $this->cacheNnian[$id] = $folder;
+            // Check we don't have a cyclic ancestry graph
+            if ($node->getId() === $folder->getId()) {
+                throw new MapperException("Circular dependency detected");
             }
-            return $folder;
+
+            $interimNodes->setOffset($node->getId(), $node);
         }
 
-        return $result;
+        return $interimNodes;
     }
+
 
     /**
      * Decide whether inheritance value we provided activates
