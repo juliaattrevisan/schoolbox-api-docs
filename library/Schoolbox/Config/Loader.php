@@ -126,30 +126,6 @@ class Loader implements IConfigLoader
     {
         // Sorry, I know this should be injected but the amount of configs
         // strewn everywhere make that impossible
-        $database = Factory::getInstanceInternal();
-        $query    = $database->prepareQuery("SELECT name, value, field_id FROM config");
-        $query->execute();
-        foreach ($query->getIterator() as $row) {
-            $this->cache[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
-        }
-    }
-
-
-    /**
-     * Light-weight hydration to respect boolean fields
-     *
-     * @param int   $fieldId
-     * @param mixed $value
-     * @return mixed
-     */
-    private function hydrateValue(int $fieldId, $value)
-    {
-        switch ($fieldId) {
-            case ConfigMapper::FIELD_BOOLEAN:
-            case ConfigMapper::FIELD_CHECKBOX:
-                return $value === null ? null : (bool)$value;
-            default:
-        }
-        return $value;
+        $this->cache = ConfigMapper::getInstance()->findAllConfigs();
     }
 }

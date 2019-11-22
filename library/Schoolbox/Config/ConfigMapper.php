@@ -137,6 +137,23 @@ class ConfigMapper extends Mapper
 
 
     /**
+     * Find all config options that are available within Schoolbox.
+     *
+     * @return array
+     */
+    public function findAllConfigs(): array
+    {
+        $configs = [];
+        $query   = $this->getDatabase()->prepare("SELECT name, value, field_id FROM {$this->getTable()}");
+        $query->execute();
+        foreach ($query as $row) {
+            $configs[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
+        }
+        return $configs;
+    }
+
+
+    /**
      * Find all available config types, as a scalar list.
      *
      * @return array|string[]
@@ -184,6 +201,25 @@ class ConfigMapper extends Mapper
           INNER JOIN lu_config_field lcf on config.field_id = lcf.id
           LEFT  JOIN lu_config_type  lct on config.type_id  = lct.id
         ";
+    }
+
+
+    /**
+     * Light-weight hydration to respect boolean fields
+     *
+     * @param int   $fieldId
+     * @param mixed $value
+     * @return mixed
+     */
+    private function hydrateValue(int $fieldId, $value)
+    {
+        switch ($fieldId) {
+            case self::FIELD_BOOLEAN:
+            case self::FIELD_CHECKBOX:
+                return $value === null ? null : (bool)$value;
+            default:
+        }
+        return $value;
     }
 
 
