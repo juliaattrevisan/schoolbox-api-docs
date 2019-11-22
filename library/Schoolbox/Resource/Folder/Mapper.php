@@ -1710,7 +1710,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * Does not hydrate any joins
      *
-     * @param int $folderId
+     * @param int $folderId TODO Upgrade this type-hint to a type-declaration in signature
      * @return Model
      * @throws DefinitionException
      * @throws Exception
