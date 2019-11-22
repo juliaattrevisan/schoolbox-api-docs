@@ -12,6 +12,8 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use InvalidArgumentException;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
@@ -920,6 +922,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $yearLevelMapper      = $this->getJoinMapper('folder_year_level');
         /** @var Node\Mapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_category');
+        /** @var Storage\Mapper $coverImageMapper */
+        $coverImageMapper     = $this->getJoinMapper('coverImage');
+        /** @var MimetypeMapper $coverImageMimeMapper */
+        $coverImageMimeMapper = $coverImageMapper->getJoinMapper('allowedFileExtension');
 
         $folders = $this->createCollection();
 
@@ -929,7 +935,33 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
          */
         $yearLevelCache = [];
 
+        // Track which joins we need to hydrate.
+        $hydrateCodes           = false;
+        $hydrateYearLevels      = false;
+        $hydrateCurriculumNodes = false;
+        $hydrateHomepage        = false;
+        $hydrateGroup           = false;
+        $hydrateCourseSpec      = false;
+        $hydrateUnitSpec        = false;
+        $hydrateCoverImage      = false;
+        $hydrateCoverImageMime  = false;
+        $firstRow               = true;
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            // Examine the first row to determine what joins to hydrate
+            if ($firstRow) {
+                $hydrateCodes           = array_key_exists('cc.code', $row);
+                $hydrateYearLevels      = array_key_exists('yl.' . YearLevel\Mapper::COL_ID, $row);
+                $hydrateCurriculumNodes = array_key_exists('cn.id', $row); // TODO this probably needs to be more granular
+                $hydrateHomepage        = array_key_exists('hp.cid', $row);
+                $hydrateGroup           = array_key_exists('ug.cid', $row);
+                $hydrateCourseSpec      = array_key_exists('cs.id', $row);
+                $hydrateUnitSpec        = array_key_exists('us.id', $row);
+                $hydrateCoverImage      = array_key_exists('ci.hash', $row);
+                $hydrateCoverImageMime  = array_key_exists('cim.fileTypeId', $row);
+                $firstRow               = false;
+            }
 
             $folderId = (int)$row['id'];
 
@@ -938,29 +970,35 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $folders[$folderId] = $this->hydrate($row);
 
                 // Instantiate collections we are about to populate
-                $folders[$folderId]->setCodes($codeMapper->createCollection());
-                $folders[$folderId]->setYearLevels($yearLevelMapper->createCollection());
-                $folders[$folderId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
-
-                $folders[$folderId]->setHomepage($homepageConfigMapper->hydrate($row, 'hp'));
-                $folders[$folderId]->setGroup($groupMapper->hydrate($row, 'ug'));
-
-                $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
-                if($courseSpec){
-                    $folders[$folderId]->setCourseSpecification($courseSpec);
+                if ($hydrateCodes) {
+                    $folders[$folderId]->setCodes($codeMapper->createCollection());
                 }
-
-                $unitSpec = $unitSpecMapper->hydrate($row, 'us');
-                if($unitSpec){
-                    $folders[$folderId]->setUnitSpecification($unitSpec);
+                if ($hydrateYearLevels) {
+                    $folders[$folderId]->setYearLevels($yearLevelMapper->createCollection());
                 }
-
-                /** @var Storage\Model $coverImage */
-                $coverImage = $this->hydrateJoin($row, 'coverImage', 'ci');
-                if ($coverImage) {
-                    $coverImageMimeType = $this->hydrateJoin($row, 'coverImage.allowedFileExtension', 'cim');
-                    if ($coverImageMimeType) {
-                        $coverImage->setMimetype($coverImageMimeType);
+                if ($hydrateCurriculumNodes) {
+                    $folders[$folderId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
+                }
+                // Hydrate reverse joins if present in row
+                if ($hydrateHomepage) {
+                    $folders[$folderId]->setHomepage($homepageConfigMapper->hydrate($row, 'hp'));
+                }
+                if ($hydrateGroup) {
+                    $folders[$folderId]->setGroup($groupMapper->hydrate($row, 'ug'));
+                }
+                if ($hydrateCourseSpec) {
+                    $folders[$folderId]->setCourseSpecification($courseSpecMapper->hydrate($row, 'cs'));
+                }
+                if ($hydrateUnitSpec) {
+                    $folders[$folderId]->setUnitSpecification($unitSpecMapper->hydrate($row, 'us'));
+                }
+                if ($hydrateCoverImage) {
+                    $coverImage = $coverImageMapper->hydrate($row, 'ci');
+                    if ($coverImage && $hydrateCoverImageMime) {
+                        $coverImageMimeType = $coverImageMimeMapper->hydrate($row, 'cim');
+                        if ($coverImageMimeType) {
+                            $coverImage->setMimetype($coverImageMimeType);
+                        }
                     }
                     $folders[$folderId]->setCoverImage($coverImage);
                 }
@@ -1254,11 +1292,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         // special case: 0 === root, but not in db
         // TODO localise setName()
-        if ($id === IFolder::ROOT_ID || $id === (string)IFolder::ROOT_ID) {
+        if ($id === Model::ROOT_ID || $id === (string)Model::ROOT_ID) {
             return $this->createModel()
                         ->setId(IFolder::ROOT_ID)
                         ->setName('Top Level')
-                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID))
+                        ->setParent($this->createModel()->setId(Model::ROOT_PARENT_ID))
+                        ->setInherit(false)
                         ->setCodes($this->getJoinMapper('codes')->createCollection())
                         ->setYearLevels($this->getJoinMapper('folder_year_level')->createCollection())
                         ->setCurriculumNodes($this->getJoinMapper('curriculum_node_for_category')->createCollection());
@@ -1663,60 +1702,45 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * A budget version of findById
      *
-     * This only gives you the id, name and permission-inherit of the folder
-     * This was used to cheaply manufacture breadcrumb trails
+     * Does not hydrate any joins
      *
-     * @param $folderId
+     * @param int   $folderId
      * @param array $options
-     * @return \Schoolbox\Resource\Folder\Model
-     * @throws MapperException
+     * @return Model
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws Exception\Deleted
+     * @throws Exception\NotFound
+     * @throws InvalidArgumentException
      */
-    public function findCheaplyById($folderId, $options = array()) {
+    public function findCheaplyById($folderId, array $options = []): Model
+    {
+        // First, check the local body cache to see if we've already loaded this folder
+        if ($this->isCacheEnabled() && $this->localBodyCache->contains($folderId)) {
+            return $this->localBodyCache->get($folderId);
+        }
 
         // special case: 0 == root, but not in db
-        if ($folderId == 0) {
-            return $this->createModel()
-                ->setId(0)
-                ->setName('Top Level')
-                ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID))
-                ->setInherit(false);
+        if ($folderId === Model::ROOT_ID || $folderId === (string)Model::ROOT_ID) {
+            return $this->findById($folderId);
         }
 
-        $query = "
-            SELECT id, name, parent, inherit
-            FROM `{$this->getTable()}` c
-            WHERE id = :folderId
-        ";
-
-        if(empty($options['deleted']) || !$options['deleted']){
-            $query .= "
-                AND deleted_at IS NULL
-            ";
+        // Need to override default options
+        if (!array_key_exists('order', $options)) {
+            $options['order'] = [];
         }
 
-        $statement = $this->database->prepare($query);
-        $statement->execute(array(
-            'folderId' => $folderId
-        ));
-
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
-
-        if ($row) {
-            // This done by hand to ensure no caches are harmed
-            /** @var Model $folder */
-            $folder = new $this->model;
-            $folder->setId((int)$row['id']);
-            $folder->setName($row['name']);
-            $folder->setInherit((bool)$row['inherit']);
-            /** @var Model $parent */
-            $parent = new $this->model;
-            $parent->setId($row['parent'] === null ? null : (int)$row['parent']);
-            $folder->setParent($parent);
-
+        $folder = $this->executeSelect(
+            "SELECT {$this->getColumnString()}",
+            "FROM {$this->getTable()}",
+            $this->getPredicateBuilder(),
+            [$this->getIdentifierColumn() => $folderId],
+            $options
+        )->first();
+        if ($folder) {
             return $folder;
-        } else {
-            throw new MapperException\NotFound();
         }
+        throw new MapperException\NotFound();
     }
 
 
