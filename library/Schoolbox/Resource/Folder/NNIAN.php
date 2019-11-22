@@ -34,7 +34,7 @@ class NNIAN
      *
      * Maps folder.id to its NNIAN folder
      *
-     * @var self[]
+     * @var Model[]
      */
     private $cacheNnian = [];
 
