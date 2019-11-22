@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
@@ -395,10 +396,14 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * Decide whether this node is a Root node
      *
      * @return bool
+     * @throws InsufficientHydrationException If id is not hydrated.
      */
-    public function isRootNode()
+    public function isRootNode(): bool
     {
-        return ($this->getId() == 0);
+        if ($this->id === null) {
+            throw new InsufficientHydrationException("Unable to determine if folder is root node, id is unset");
+        }
+        return $this->id === self::ROOT_ID;
     }
 
     /* Getters/Setters
