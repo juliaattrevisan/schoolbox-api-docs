@@ -37,6 +37,13 @@ use const PHP_SAPI;
  *
  * Note that the caches are disabled in CLI/Daemon contexts to ensure long-running processes
  * respect changes occurring in database
+ *
+ * Business Rules:
+ * * All users have READ access to root folder
+ * * All roles have READ access to root folder
+ * * SU have FULL access to root folder
+ * * Staff have WRITE access to folders which they teach (SIS enrollment)
+ * * Students have DENY/READ access to their subject folders (SIS enrollment) depending on config flag
  */
 class Access
 {
