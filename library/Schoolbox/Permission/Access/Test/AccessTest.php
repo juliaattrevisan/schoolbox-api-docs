@@ -530,7 +530,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User2 is staff.
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
             [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
             [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
@@ -538,7 +538,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User3 is student.
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
             [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
             [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
@@ -546,7 +546,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User4 is student.
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
             [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
             [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
@@ -554,7 +554,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User5 is student.
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
             [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
             [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
@@ -562,7 +562,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User6 is parent.
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
             [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
             [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
@@ -570,7 +570,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User7 is parent.
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
             [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
             [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
@@ -578,7 +578,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User8 is guest.
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
             [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
             [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
@@ -586,7 +586,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User9 is guest. Has CMS WRITE perm
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
             [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
             [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
             [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
@@ -629,7 +629,7 @@ class AccessTest extends TestCase
             [$access, $user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User2 is staff.
-            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
             [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
             [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
@@ -637,7 +637,7 @@ class AccessTest extends TestCase
             [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User3 is student.
-            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
             [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
             [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
@@ -645,7 +645,7 @@ class AccessTest extends TestCase
             [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User4 is student.
-            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_READ],
             [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
             [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_READ],
@@ -653,7 +653,7 @@ class AccessTest extends TestCase
             [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User5 is student.
-            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_READ],
             [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
             [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_READ],
@@ -661,7 +661,7 @@ class AccessTest extends TestCase
             [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User6 is parent.
-            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
             [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
             [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
@@ -669,7 +669,7 @@ class AccessTest extends TestCase
             [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User7 is parent.
-            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
             [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
             [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
@@ -677,7 +677,7 @@ class AccessTest extends TestCase
             [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User8 is guest. Has CMS FULL perm.
-            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
             [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
             [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
@@ -685,7 +685,7 @@ class AccessTest extends TestCase
             [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User9 is guest. Has CMS WRITE perm
-            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
             [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
             [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
@@ -774,7 +774,7 @@ class AccessTest extends TestCase
         $user1Folders = [Folder\Model::ROOT_ID, self::FOLDER_1_ID];
         $user2Folders = [self::FOLDER_3_ID, self::FOLDER_4_ID];
         $user3Folders = [self::FOLDER_4_ID];
-        $user4Folders = [Folder\Model::ROOT_ID, self::FOLDER_3_ID, self::FOLDER_4_ID];
+        $user4Folders = [self::FOLDER_3_ID, self::FOLDER_4_ID];
         $user5Folders = [self::FOLDER_1_ID, self::FOLDER_2_ID, self::FOLDER_3_ID, self::FOLDER_4_ID, self::FOLDER_5_ID];
         $user6Folders = [self::FOLDER_3_ID, self::FOLDER_4_ID];
         $user7Folders = [self::FOLDER_2_ID];
@@ -786,7 +786,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_1_ID), $user1Folders, UserAccess::ACCESS_FULL],
             [$access, $users->getOffset(self::USER_2_ID), $user2Folders, UserAccess::ACCESS_DENY],
             [$access, $users->getOffset(self::USER_3_ID), $user3Folders, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_4_ID), $user4Folders, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_4_ID), $user4Folders, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_5_ID), $user5Folders, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_6_ID), $user6Folders, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_7_ID), $user7Folders, UserAccess::ACCESS_WRITE],
@@ -954,7 +954,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User2 is staff.
-            [$access, $users->getOffset(self::USER_2_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_2_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
             [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
             [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
@@ -962,7 +962,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User3 is student.
-            [$access, $users->getOffset(self::USER_3_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_3_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
             [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
@@ -970,7 +970,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User4 is student.
-            [$access, $users->getOffset(self::USER_4_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_4_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_1_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_3_ID, UserAccess::ACCESS_READ],
@@ -978,7 +978,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User5 is student.
-            [$access, $users->getOffset(self::USER_5_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_5_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_1_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_3_ID, UserAccess::ACCESS_READ],
@@ -986,7 +986,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User6 is parent.
-            [$access, $users->getOffset(self::USER_6_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_6_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
             [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
             [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
@@ -994,7 +994,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User7 is parent.
-            [$access, $users->getOffset(self::USER_7_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_7_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
             [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
             [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
@@ -1002,7 +1002,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User8 is guest. Has CMS FULL perm
-            [$access, $users->getOffset(self::USER_8_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_8_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
             [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
             [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
@@ -1010,7 +1010,7 @@ class AccessTest extends TestCase
             [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User9 is guest. Has CMS WRITE perm
-            [$access, $users->getOffset(self::USER_9_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [$access, $users->getOffset(self::USER_9_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
             [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
             [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
             [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
