@@ -45,7 +45,7 @@ These are its args, which is given for you
 </ul>
 <div class="card small-12 column meta-preview">
     {% if file.mimetype.isImage %}
-        <a data-plugin="preview" href="{{ send ~ file.id }}&width=1024&height=1024">
+        <a data-plugin="preview" href="{{ send ~ file.id }}&width=2048&height=2048">
             <img class="icon" src="{{ image ~ file.id }}&width=64&height=64" alt="{{ file.title }}" />
         </a>
     {% elseif file.mimetype.isAudio %}

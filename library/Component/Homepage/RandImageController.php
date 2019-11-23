@@ -94,7 +94,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $image = $fileList->first();
 
             //get link
-            $imageurl = "/cms/image.php?id={$image->getId()}&height=1024&width=1024";
+            $imageurl = "/cms/image.php?id={$image->getId()}&height=2048&width=2048";
 
             $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
