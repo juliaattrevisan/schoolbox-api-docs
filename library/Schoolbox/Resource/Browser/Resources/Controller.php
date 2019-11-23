@@ -18,6 +18,7 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class Controller extends AbstractController
 {
@@ -84,24 +85,22 @@ class Controller extends AbstractController
         // Redirect to this folder next time page gets reloaded
         $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
-        $data['parent'] = FolderMapper::getInstance()->findCheaplyById($data['folder']->getParent()->getId());
-        $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($data['folder']);
-        $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), $folderId);
-
-        $admins = UserAccessMapper::getInstance()->findAdminsInCategory($data['folder']);
-
-        if ($admins->count()) {
-            $data['admin'] = $this->userMapper->findById($admins->first()->getId());
-        } else {
-            $data['admin'] = new User();
-            $data['admin']->setFirstname('Nobody');
-        }
-
-        // moving forward! log the folder view
-
-        if($folderId > 0) {
+        if($folderId > FolderModel::ROOT_ID) {
             FolderLogMapper::getInstance()->incrementHitcount($this->getUser(), $data['folder']);
             FolderMapper::getInstance()->logPageView($data['folder']);
+
+            $data['parent'] = FolderMapper::getInstance()->findCheaplyById($data['folder']->getParent()->getId());
+            $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($data['folder']);
+            $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), $folderId);
+
+            $admins = UserAccessMapper::getInstance()->findAdminsInCategory($data['folder']);
+
+            if ($admins->count()) {
+                $data['admin'] = $this->userMapper->findById($admins->first()->getId());
+            } else {
+                $data['admin'] = new User();
+                $data['admin']->setFirstname('Nobody');
+            }
         }
 
         return $data;

@@ -405,7 +405,7 @@ class Access
         // Special case for root folder
         if ($folderId === Folder\Model::ROOT_ID) {
             // Superusers have FULL access, other users have DENY
-            return $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_DENY;
+            return $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_READ;
         }
 
         // check cache before we proceed for shortcuts
