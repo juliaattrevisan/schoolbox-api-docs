@@ -91,7 +91,7 @@ class PDO extends BasePDO
      */
     public function commit()
     {
-        db2_commit($this->getConnectionWithCheck());
+        return db2_commit($this->getConnectionWithCheck());
     }
 
     /**
@@ -99,7 +99,7 @@ class PDO extends BasePDO
      */
     public function rollBack()
     {
-        db2_rollback($this->getConnectionWithCheck());
+        return db2_rollback($this->getConnectionWithCheck());
     }
 
     /**
@@ -115,7 +115,7 @@ class PDO extends BasePDO
      */
     public function setAttribute($attribute, $value)
     {
-        db2_set_option($this->getConnectionWithCheck(), [$attribute => $value], 1);
+        return db2_set_option($this->getConnectionWithCheck(), [$attribute => $value], 1);
     }
 
     /**
@@ -133,8 +133,8 @@ class PDO extends BasePDO
 
         $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement);
 
-        if (db2_execute($this->lastStatement->getStatement())) {
-            return db2_num_rows($this->lastStatement->getStatement());
+        if (db2_execute($resource)) {
+            return db2_num_rows($resource);
         }
 
         // If the query failed, return false
@@ -156,7 +156,7 @@ class PDO extends BasePDO
 
         $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement, $mode);
 
-        if (db2_execute($this->lastStatement->getStatement())) {
+        if (db2_execute($resource)) {
             return $this->lastStatement;
         }
 

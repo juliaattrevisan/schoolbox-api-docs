@@ -186,7 +186,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 break;
             }
         }
-        return $sequence;
+        $period['PeriodNumber'] = $sequence;
+        return $period;
     }
 
     /**
