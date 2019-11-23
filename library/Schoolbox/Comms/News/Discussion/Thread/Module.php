@@ -9,10 +9,13 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Discussion\Thread;
 
 use Alaress\Authorizer as Auth;
+use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Comms-specific module for discussion threads.
@@ -23,6 +26,39 @@ class Module extends Thread\Module
      * @var string
      */
     protected $basename = 'commsDiscussionThreads';
+
+
+    /**
+     * All discussion thread routes have a preloader for fetching the context.
+     *
+     * Articles require hydrated audience segments to determine some permissions.
+     * Only superusers and Comms Officers can edit articles with no audience.
+     * If you are write accessor, you need hydrated audience segments to do things
+     * First experienced in SA-9164; see CanModerateAudience.php:54
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher): void
+    {
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) {
+                $audienceMapper = $this->getMapperFactory()->get(News\Audience\Mapper::class);
+
+                try {
+                    $article = $this->buildContext()->findById($params['contextId']);
+                    $article->setAudience($audienceMapper->findForArticles([$article->getId()]));
+                } catch (MapperException $e) {
+                    throw new NotFound("No article found for 'articleId' {$params['contextId']}", 0, $e);
+                }
+
+                return [
+                    'context' => $article,
+                ];
+            }
+        );
+    }
 
 
     /**
