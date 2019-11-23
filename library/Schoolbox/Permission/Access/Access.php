@@ -400,7 +400,7 @@ class Access
      * @throws LogicException           If unable to build an ExternalUser instance
      * @throws UnexpectedValueException
      */
-    public function getFolderAccess(User $user, $folderId, $cache = true): int
+    public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {
         // Special case for root folder
         if ($folderId === Folder\Model::ROOT_ID) {
