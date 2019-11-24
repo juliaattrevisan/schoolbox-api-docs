@@ -94,14 +94,25 @@ class Module extends BaseModule
             }
         };
 
+        // Must have WRITE+ access and folder must not be root folder
+        $writeAccessAndNotRoot = new Rule\All(
+            $folderWriteAccess,
+            new Rule\Callback(static function (array $params = []) {
+                /** @var Model $folder */
+                $folder = $params['folder'];
+                if ($folder->getId() === Model::ROOT_ID) {
+                    throw new InvalidPath("Folder is root");
+                }
+            }));
+
         $this->register('GET',    '/mygroups',                            'getGroups',        $loggedInAccess);
         $this->register('GET',    '/folder/{parentId:\d+}/create',        'getFolderCreate',  $parentWriteAccess, $preloadParent);
         $this->register('POST',   '/folder/{parentId:\d+}/create',        'postCreateFolder', $parentWriteAccess, $preloadParent);
-        $this->register('GET',    '/folder/{id:\d+}/modify',              'getFolderModify',  $folderWriteAccess, $preloadFolder);
-        $this->register('POST',   '/folder/{id:\d+}/update',              'postUpdateFolder', $folderWriteAccess, $preloadFolder);
+        $this->register('GET',    '/folder/{id:\d+}/modify',              'getFolderModify',  $writeAccessAndNotRoot, $preloadFolder);
+        $this->register('POST',   '/folder/{id:\d+}/update',              'postUpdateFolder', $writeAccessAndNotRoot, $preloadFolder);
         $this->register('PUT',    '/folder/{id:\d+}/move/{parentId:\d+}', 'putMoveFolder',    $permWriteBoth,     $preloadBoth);
-        $this->register('DELETE', '/folder/{id:\d+}',                     'deleteFolder',     $folderWriteAccess, $preloadFolder);
-        $this->register('POST',   '/folder/{id:\d+}/reset',               'postFolderReset',  $folderWriteAccess, $preloadFolder);
+        $this->register('DELETE', '/folder/{id:\d+}',                     'deleteFolder',     $writeAccessAndNotRoot, $preloadFolder);
+        $this->register('POST',   '/folder/{id:\d+}/reset',               'postFolderReset',  $writeAccessAndNotRoot, $preloadFolder);
     }
 
 
