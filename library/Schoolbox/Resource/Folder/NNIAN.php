@@ -130,7 +130,7 @@ class NNIAN
         }
 
         // Folders from $folder to NNIAN, inclusive
-        $interimNodes = $this->folderMapper->createCollection([$folder->getId() => $folder]);
+        $interimNodes = (Model::createCollection())->setOffset($folder->getId(), $folder);
         $node         = $folder;
         while ($node->getInherit()) {
 
