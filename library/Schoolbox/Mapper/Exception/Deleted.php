@@ -22,9 +22,12 @@ class Deleted extends BaseException {
 
     /**
      * @param ISoftDeletable $deleted_object
+     * @return Deleted
      */
-    public function setDeletedObject(ISoftDeletable $deleted_object) {
+    public function setDeletedObject(ISoftDeletable $deleted_object): self
+    {
         $this->deleted_object = $deleted_object;
+        return $this;
     }
 
     /**
