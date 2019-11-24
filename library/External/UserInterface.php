@@ -161,30 +161,6 @@ interface External_UserInterface extends External\IConnector
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array;
 
     /**
-     * Gets some basic information about a student
-     *
-     * StudentID,
-     * NetworkLogin,
-     * StudentTitle,
-     * StudentPreferred,
-     * StudentSurname,
-     * StudentGender,
-     * StudentEmail,
-     * StudentOccupEmail,
-     * StudentYearLevel,
-     * StudentHouse,
-     * StudentBoarder,
-     * StudentBoardingHouse,
-     * StudentCampus
-     *
-     * @importance high - used in sync scripts.
-     * @deprecated No new sync scripts will be developed - use the User Provisioning System instead
-     *
-     * @return array
-     */
-    public function getStudentUserAccountInfo(): array;
-
-    /**
      * Returns a list of email parent email addresseses for students.
      *
      * @param array $externalUserIds
@@ -229,64 +205,7 @@ interface External_UserInterface extends External\IConnector
      */
     public function getParent(string $externalUserId): array;
 
-    /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the $externalUserId of the Contact, not the Student. Anyone who
-     * is not supposed to be having their details publicised (via the
-     * DirectoryIncludeFlag) are not included in the result set.
-     *
-     * I think this was used to only update parents of current Schoolbox
-     * students, rather than updating everyone blindly
-     *
-     * Accept array of Synergy IDs, or just an int
-     *
-     * @importance low - used in some sync scripts.
-     *
-     * @param string[] $externalUserIds
-     *
-     * @return array(
-     *     array(
-     *         ID,
-     *         Title,
-     *         Preferred,
-     *         Surname,
-     *         Email,
-     *         OccupEmail,
-     *         DefaultEmailCode,
-     *         DirectoryIncludeFlag
-     *     )
-     * )
-     */
-    public function getParentSync(array $externalUserIds): array;
 
-    /**
-     * Get the following fields for all parents
-     * (yes they're prefixed as Student-)
-     *
-     * Used in Synchronise
-     *
-     * StudentContactNetworkLogin,
-     * StudentContactID,
-     * StudentContactTitle,
-     * StudentContactPreferred,
-     * StudentContactSurname,
-     * StudentContactDefaultEmail,
-     * StudentContactSpouseNetworkLogin,
-     * StudentContactSpouseID,
-     * StudentContactSpouseTitle,
-     * StudentContactSpousePreferred,
-     * StudentContactSpouseSurname,
-     * StudentContactSpouseDefaultEmail,
-     * StudentYearLevel,
-     * StudentCampus,
-     * StudentGender
-     *
-     * @importance high - used in sync script.
-     * @deprecated No new sync scripts will be developed - use the User Provisioning System instead
-     *
-     * @return array
-     */
-    public function getParentUserAccountInfo(): array;
 
     /* Staff-specific
      */
@@ -312,32 +231,6 @@ interface External_UserInterface extends External\IConnector
      * @return array
      */
     public function getStaff(string $externalUserId): array;
-
-    /**
-     * Get staff account information
-     *
-     * @importance high - used in sync scripts.
-     * @deprecated No new sync scripts will be developed - use the User Provisioning System instead
-     *
-     * @return array(
-     *     array(
-     *         StaffID,
-     *         NetworkLogin,
-     *         ActiveFlag,
-     *         StaffTitle,
-     *         StaffPreferredName,
-     *         StaffSurname,
-     *         DefaultEmailCode,
-     *         OccupEmail,
-     *         Email,
-     *         StaffCampus,
-     *         StaffCategoryType,
-     *         StaffCategory,
-     *         StaffDepartment
-     *     )
-     * )
-     */
-    public function getStaffUserAccountInfo(): array;
 
     /* Common methods
      */

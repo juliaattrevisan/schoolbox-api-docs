@@ -14,12 +14,6 @@ use Schoolbox\Collection;
 
 class Student extends Base {
 
-    /**
-     * Generate a list of all people
-     */
-    public function generateAllPeople() {
-        $this->setAllPeople($this->getAdapter()->getStudentUserAccountInfo());
-    }
 
     /**
      * Generate data

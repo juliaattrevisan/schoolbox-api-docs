@@ -392,40 +392,6 @@ class External_Schoolbox_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getParentSync(array $externalUserIds): array
-    {
-        return [];
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * @return array
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getStaff(string $externalUserId): array
     {
         $staff = $this->internalDatabase->executeQuery(

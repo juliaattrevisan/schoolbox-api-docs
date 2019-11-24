@@ -281,15 +281,6 @@ class External_Schooledge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-
-    /**
-     * @inheritDoc
-     */
     public function getParentEmails(array $externalUserIds): array
     {
         if (empty($externalUserIds)) {
@@ -350,25 +341,6 @@ class External_Schooledge_User implements External_UserInterface
         return $this->database->getRow($query) ?: [];
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentSync(array $externalUserIds): array
-    {
-        return [];
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-
     /**
      * Get the following fields for the staff member $externalUserId
      *
@@ -407,16 +379,6 @@ class External_Schooledge_User implements External_UserInterface
         ";
         return $this->database->getRow($query) ?: [];
     }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return [];
-    }
-
 
     /**
      * @inheritDoc

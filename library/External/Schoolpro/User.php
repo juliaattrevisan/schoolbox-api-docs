@@ -67,29 +67,6 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParentSync(array $externalIds): array
-    {
-        $vars = [
-            'sbGetParent',
-            [
-                'pUserName' => 'alaress',
-                'pUserPass' => 'alaress',
-                'pSchoolNum' => $externalIds,
-            ]
-        ];
-
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
-
-        trigger_error(__METHOD__ . ' not implemented', E_USER_WARNING);
-        if ($result['success']) {
-            return [];
-        }
-        return [];
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getParentEmails(array $externalUserIds): array
     {
         $emails = [];
@@ -424,7 +401,6 @@ class External_Schoolpro_User implements External_UserInterface
 
     }
 
-
     /**
      * Returns a local path to the user's portrait
      *
@@ -508,56 +484,6 @@ class External_Schoolpro_User implements External_UserInterface
         \Schoolbox\UserMapper::getInstance()->save($user);
 
         return null;
-    }
-
-    /**
-     * Stub method, probably not used
-     *
-     * @inheritDoc
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        $vars = [
-            'sbGetStudentAccounts',
-            [
-                'pUserName' => 'alaress',
-                'pUserPass' => 'alaress',
-            ]
-        ];
-
-        return $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
-    }
-
-    /**
-     * Stub method, probably not used
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        $vars = [
-            'sbGetGuardianAccounts',
-            [
-                'pUserName' => 'alaress',
-                'pUserPass' => 'alaress',
-            ]
-        ];
-
-        return $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
-    }
-
-    /**
-     * Stub method, probably not used
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        $vars = [
-            'sbGetStaffAccounts',
-            [
-                'pUserName' => 'alaress',
-                'pUserPass' => 'alaress',
-            ]
-        ];
-
-        return $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
     }
 
     /**

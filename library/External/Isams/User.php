@@ -75,21 +75,6 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * I gots me no frigging clue what the difference here is...
-     *
-     * @param array $externalUserIds
-     * @return array
-     */
-    public function getParentSync(array $externalUserIds): array
-    {
-        $parents = [];
-        foreach ($externalUserIds as $externalUserId) {
-            $parents[] = $this->getParent($externalUserId);
-        }
-        return $parents;
-    }
-
-    /**
      * Get all the parents emails for a class, or group of students
      *
      * @param array $externalUserIds
@@ -359,93 +344,6 @@ class External_Isams_User implements External_UserInterface
         ";
 
         return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetchAll();
-    }
-
-
-    /**
-     * @inheritDoc
-     * @throws \Alaress\Database\Exception
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        $query = "
-            SELECT      StudentID               AS StudentID,
-                        Username                AS NetworkLogin,
-                        Title                   AS StudentTitle,
-                        StudentFirstname        AS StudentPreferred,
-                        StudentSurname          AS StudentSurname,
-                        Gender                  AS StudentGender,
-                        StudentEmail            AS StudentEmail,
-                        ''                      AS StudentOccupEmail,
-                        Grade                   AS StudentYearLevel,
-                        ''                      AS StudentHouse,
-                        ''                      AS StudentBoarder,
-                        ''                      AS StudentBoardingHouse,
-                        campus                  AS StudentCampus
-            FROM        V_Student
-        ";
-
-        return $this->getConnector()->executeQuery($query)->fetchAll();
-    }
-
-
-    /**
-     * @inheritDoc
-     * @throws \Alaress\Database\Exception
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        $query = "
-            SELECT      
-                        V_Parent.Username             AS StudentContactNetworkLogin,
-                        V_Parent.ParentID             AS StudentContactID,
-                        V_Parent.Title                AS StudentContactTitle,
-                        V_Parent.ParentFirstname      AS StudentContactPreferred,
-                        V_Parent.ParentSurname        AS StudentContactSurname,
-                        V_Parent.PersonalEmail        AS StudentContactDefaultEmail,
-                        ''                            AS StudentContactSpouseNetworkLogin,
-                        ''                            AS StudentContactSpouseID,
-                        ''                            AS StudentContactSpouseTitle,
-                        ''                            AS StudentContactSpousePreferred,
-                        ''                            AS StudentContactSpouseSurname,
-                        ''                            AS StudentContactSpouseDefaultEmail,
-                        V_Student.Grade               AS StudentYearLevel,
-                        V_Student.campus              AS StudentCampus,
-                        V_Student.Gender              AS StudentGender
-            FROM        V_Student
-            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = V_Student.StudentID
-        ";
-
-        return $this->getConnector()->executeQuery($query)->fetchAll();
-    }
-
-
-    /**
-     * @inheritDoc
-     * @throws \Alaress\Database\Exception
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        $query = "
-            SELECT      StaffID           AS StaffID,
-                        Username          AS NetworkLogin,
-                        1                 AS ActiveFlag,
-                        title             AS StaffTitle,
-                        PreferredName     AS StaffPreferredName,
-                        teacherlastname   AS StaffSurname,
-                        'o'               AS DefaultEmailCode,
-                        Email             AS OccupEmail,
-                        ''                AS Email,
-                        Campus            AS StaffCampus,
-                        ''                AS StaffCategoryType,
-                        ''                AS StaffCategory,
-                        ''                AS StaffDepartment
-            FROM        V_Staff
-            ORDER BY    teacherlastname, PreferredName
-        ";
-
-        return $this->getConnector()->executeQuery($query)->fetchAll();
-
     }
 
     /**

@@ -49,16 +49,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentSync(array $externalUserIds): array
-    {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -138,34 +128,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        return $this->bypassCache(__FUNCTION__, func_get_args()); // TODO why bypass cache?
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        return $this->bypassCache(__FUNCTION__, func_get_args()); // TODO why bypass cache?
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
-    }
-
 
     /**
      * @inheritdoc

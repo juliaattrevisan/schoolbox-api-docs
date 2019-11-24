@@ -23,14 +23,6 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function getParentSync(array $externalUserIds): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getParentEmails(array $externalUserIds): array
     {
         return [];
@@ -107,30 +99,6 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     public function getPortrait(User $user): ?Storage\Model
     {
         return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return [];
     }
 
     /**
