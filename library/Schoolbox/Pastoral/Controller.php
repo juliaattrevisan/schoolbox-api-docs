@@ -295,7 +295,9 @@ class Controller extends Base
                 'student'        => $student,
                 'pageCurrent'    => $pageCurrent,
                 'types'          => $this->pastoralTypeMapper->findAll(),
-                'linkedStudents' => $this->pastoralDataSource->getLinkedStudentRecordCount($user, $student->getId()),
+                // TODO: This count is causing a performance issue SA-9641
+                // 'linkedStudents' => $this->pastoralDataSource->getLinkedStudentRecordCount($user, $student->getId()),
+                'linkedStudents' => [],
                 'typeSelected'   => $typeId,
             ],
             'title'    => $student->getFullName(),
