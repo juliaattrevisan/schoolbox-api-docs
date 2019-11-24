@@ -86,12 +86,12 @@ class Controller extends AbstractController
 
         /** @var Folder\Model $folder */
         $folder = $data['folder'];
-        if($folderId !== Folder\Model::ROOT_ID) {
+        if ($folderId !== Folder\Model::ROOT_ID) {
             Folder\Log\Mapper::getInstance()->incrementHitcount($this->getUser(), $folder);
             Folder\Mapper::getInstance()->logPageView($folder);
             $data['parent'] = Folder\Mapper::getInstance()->findCheaplyById($folder->getParent()->getId());
             $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($folder);
-            $admins = UserAccessMapper::getInstance()->findAdminsInCategory($folder);
+            $admins         = UserAccessMapper::getInstance()->findAdminsInCategory($folder);
             if ($admins->count()) {
                 $data['admin'] = $this->userMapper->findById($admins->first()->getId());
             } else {
