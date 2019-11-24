@@ -171,7 +171,7 @@
                 </dl>
             {% else %}
                 <dl class="inline-dl">
-                    {% if user.role.type == 'staff' and folder.id > 0 %}
+                    {% if user.role.type == 'staff' %}
                         {% for access in roles %}
                             <dt class="small-8">{{ access.role.name }}</dt>
                             <dd class="small-4">
