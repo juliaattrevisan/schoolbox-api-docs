@@ -525,14 +525,30 @@ class Controller extends BaseController
         // only allow recursive permissions to supers
         if (($recursePermissions || $recurseYearLevels) && $user->isSuperuser()) {
             foreach ($this->folderMapper->findAllChildren($folder->getId(), true) as $descendant) {
+                $saveFolderRequired = false;
                 if ($recursePermissions) {
-                    // Mapper post-save will handle the group/role permission + folder-code clean up for us
-                    $descendant->enableInherit();
+                    if ($inherit) {
+                        // Mapper post-save will handle the group/role permission + folder-code clean up for us
+                        $descendant->enableInherit();
+                        $saveFolderRequired = true;
+                    } else {
+                        $rolePermsToSave = $this->updateRolePermissions($descendant, $rolePermissions);
+                        if ($rolePermsToSave->count()) {
+                            $this->roleAccessMapper->save($rolePermsToSave);
+                        }
+                        if ($descendant->getInherit()) {
+                            $descendant->setInherit(false);
+                            $saveFolderRequired = true;
+                        }
+                    }
                 }
                 if ($recurseYearLevels) {
                     $this->updateFolderYearLevels($descendant, $yearLevelIds);
+                    $saveFolderRequired = true;
                 }
-                $this->folderMapper->save($descendant);
+                if ($saveFolderRequired) {
+                    $this->folderMapper->save($descendant);
+                }
             }
         }
 
