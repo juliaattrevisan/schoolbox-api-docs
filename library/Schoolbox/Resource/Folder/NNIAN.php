@@ -113,7 +113,7 @@ class NNIAN
      * @throws DefinitionException
      * @throws Deleted
      * @throws Exception
-     * @throws Exception\InsufficientHydrationException
+     * @throws Exception\InsufficientHydrationException If folder.id not hydrated
      * @throws Exception\NotFound
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
