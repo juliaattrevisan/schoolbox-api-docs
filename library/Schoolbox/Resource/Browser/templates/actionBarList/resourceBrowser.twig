@@ -1,22 +1,20 @@
-{% if folder.hasHomepage %}
-    <li><a class="icon-home"   data-action="folder"   href="/homepage/{{ folder.id }}">Homepage</a></li>
-{% endif %}
-{% if folder.id == 0 %}
-    <li><a class="icon-folder"   data-action="folder"   href="{{ routeLookup('folder.getFolderCreate', {parentId: folder.id}) }}">Add Folder</a></li>
-{% else %}
-    {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-modify"   data-action="modify"   href="{{ routeLookup('folder.getFolderModify', {id: folder.id}) }}">Modify</a></li>
-        <li><a class="icon-drop-box" data-action="file"     href="/cms/file/new/{{ folder.id }}">Post File</a></li>
-        <li><a class="icon-folder"   data-action="folder"   href="{{ routeLookup('folder.getFolderCreate', {parentId: folder.id}) }}">Add Folder</a></li>
-        <li><a class="icon-link"     data-action="link"     href="/cms/link/new/{{ folder.id }}">Add Link</a></li>
-        <li><a class="icon-download" data-action="download" href="/cms/fetchFolder.php?folder={{ folder.id }}" title="{{ folder.name }}">Download</a></li>    {% endif %}
-    {% if user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload) %}
-        <li><a class="icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a></li>
-    {% endif %}
-    {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-delete"   data-action="delete"   href="{{ routeLookup('folder.deleteFolder', {id: folder.id}) }}">Delete</a></li>
-    {% endif %}
-{% endif %}
+{% set routeModify    = routeLookupIfAuthorized('folder.getFolderModify', {id: folder.id, folder: folder}) %}
+{% set routePostFile  = folder.id != 0 and access >= 2 ? '/cms/file/new/' ~ folder.id : false %}
+{% set routeCreate    = routeLookupIfAuthorized('folder.getFolderCreate', {parentId: folder.id, parent: folder.parent}) %}
+{% set routeAddLink   = folder.id != 0 and access >= 2 ? '/cms/link/new/' ~ folder.id : false %}
+{% set routeDownload  = folder.id != 0 and access >= 2 ? '/cms/fetchFolder.php?folder=' ~ folder.id : false %}
+{% set routeUploadZip = folder.id != 0 and (user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload)) ? '/cms/zipFile/' ~ folder.id : false %}
+{% set routeDelete    = routeLookupIfAuthorized('folder.deleteFolder', {id: folder.id, folder: folder}) %}
+
+{% if folder.hasHomepage %}<li><a class="icon-home"     data-action="folder"   href="/homepage/{{ folder.id }}">Homepage</a></li>{% endif %}
+{% if routeModify        %}<li><a class="icon-modify"   data-action="modify"   href="{{ routeModify }}">Modify</a></li>{% endif %}
+{% if routePostFile      %}<li><a class="icon-drop-box" data-action="file"     href="{{ routePostFile }}">Post File</a></li>{% endif %}
+{% if routeCreate        %}<li><a class="icon-folder"   data-action="folder"   href="{{ routeCreate }}">Add Folder</a></li>{% endif %}
+{% if routeAddLink       %}<li><a class="icon-link"     data-action="link"     href="{{ routeAddLink }}">Add Link</a></li>{% endif %}
+{% if routeDownload      %}<li><a class="icon-download" data-action="download" href="{{ routeDownload }}" title="{{ folder.name }}">Download</a></li>{% endif %}
+{% if routeUploadZip     %}<li><a class="icon-upload"   data-action="zip"      href="{{ routeUploadZip }}">Upload ZIP</a></li>{% endif %}
+{% if routeDelete        %}<li><a class="icon-delete"   data-action="delete"   href="{{ routeDelete }}">Delete</a></li>{% endif %}
+
 {% if folder.group.category %}
     <li>
 
