@@ -272,11 +272,28 @@ class Folder extends SimpleStrategy
     public function canModerate(User $user, ?string $entityValue): bool
     {
         // Special case for folders
-        return
+        if (
             $user->isSuperuser() ||
             $this->hasCmsServicePerm($user, UserAccess::ACCESS_WRITE) ||
-            $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
-            (null !== $entityValue && $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE);
+            $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE)
+        ) {
+            // These can all moderated, regardless of whether segment points to a valid folder
+            return true;
+        }
+
+        // No other user can moderate if value not set
+        if (null === $entityValue) {
+            return false;
+        }
+
+        try {
+            // Other users can moderate if folder exists, and user has WRITE+ perm
+            return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
+        } /** @noinspection BadExceptionsProcessingInspection */
+        catch (Mapper\Exception\Deleted|Mapper\Exception\NotFound $e) {
+            // If deleted or not found, then cannot be moderated
+            return false;
+        }
     }
 
 
