@@ -116,7 +116,7 @@ class NNIAN
      * @throws Exception\InsufficientHydrationException If folder.id not hydrated
      * @throws Exception\NotFound
      * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
+     * @throws UnexpectedValueException If cannot add item to folder collection (TODO SA-9670)
      */
     public function getNnianAncestors(Model $folder): GenericCollection
     {
