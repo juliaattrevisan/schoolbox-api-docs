@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,11 +8,17 @@
 
 namespace Schoolbox\Permission\Access;
 
-
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 
+/**
+ * @method static GenericCollection|self[] createCollection()
+ */
 class RoleAccess {
+
+    use CreateCollection;
 
 	/** @var Folder */
 	protected $category;
@@ -73,4 +79,4 @@ class RoleAccess {
 
 
 
-} 
+}
