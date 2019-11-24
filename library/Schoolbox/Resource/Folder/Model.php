@@ -17,6 +17,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
@@ -40,11 +41,13 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\Resource\Folder
  * @method Model getParent()
+ * @method static GenericCollection|self[] createCollection()
  */
 class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel
 {
     use Node\Traits\HasCurriculumNodes;
     use DeletedAtDate;
+    use CreateCollection;
 
     /**
      * A homepage instance (if this folder has one)
