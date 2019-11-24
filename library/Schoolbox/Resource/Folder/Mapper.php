@@ -967,18 +967,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
 
             // Folder Codes: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
-            if ($row['cc.code']) {
+            if ($hydrateCodes) {
                 $folderCode = $codeMapper->hydrate($row, 'cc');
-                $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
+                if ($folderCode) {
+                    $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
+                }
             }
 
             // Year Level usages: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
-            $yearLevelId = $row['yl.' . YearLevel\Mapper::COL_ID];
-            if ($yearLevelId) {
-                if (!array_key_exists($yearLevelId, $yearLevelCache)) {
-                    $yearLevelCache[$yearLevelId] = $yearLevelMapper->hydrate($row, 'yl');
+            if ($hydrateYearLevels) {
+                $yearLevelId = $row['yl.' . YearLevel\Mapper::COL_ID];
+                if ($yearLevelId) {
+                    if (!array_key_exists($yearLevelId, $yearLevelCache)) {
+                        $yearLevelCache[$yearLevelId] = $yearLevelMapper->hydrate($row, 'yl');
+                    }
+                    $folders[$folderId]->getYearLevels()->setOffset($yearLevelId, $yearLevelCache[$yearLevelId]);
                 }
-                $folders[$folderId]->getYearLevels()->setOffset($yearLevelId, $yearLevelCache[$yearLevelId]);
             }
 
             // Hydrate curriculum node codes (avoiding duplicates)
