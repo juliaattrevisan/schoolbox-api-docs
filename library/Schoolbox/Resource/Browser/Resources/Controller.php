@@ -8,13 +8,14 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
 use Schoolbox\Mapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 
@@ -83,22 +84,31 @@ class Controller extends AbstractController
         // Redirect to this folder next time page gets reloaded
         $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
+        /** @var Folder\Model $folder */
+        $folder = $data['folder'];
         if($folderId !== Folder\Model::ROOT_ID) {
-            Folder\Log\Mapper::getInstance()->incrementHitcount($this->getUser(), $data['folder']);
-            Folder\Mapper::getInstance()->logPageView($data['folder']);
-
-            $data['parent'] = Folder\Mapper::getInstance()->findCheaplyById($data['folder']->getParent()->getId());
-            $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($data['folder']);
-            $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), $folderId);
-
-            $admins = UserAccessMapper::getInstance()->findAdminsInCategory($data['folder']);
-
+            Folder\Log\Mapper::getInstance()->incrementHitcount($this->getUser(), $folder);
+            Folder\Mapper::getInstance()->logPageView($folder);
+            $data['parent'] = Folder\Mapper::getInstance()->findCheaplyById($folder->getParent()->getId());
+            $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($folder);
+            $admins = UserAccessMapper::getInstance()->findAdminsInCategory($folder);
             if ($admins->count()) {
                 $data['admin'] = $this->userMapper->findById($admins->first()->getId());
             } else {
                 $data['admin'] = new User();
                 $data['admin']->setFirstname('Nobody');
             }
+        } else {
+            $access       = Access::getInstance();
+            $roleAccesses = RoleAccess::createCollection();
+            foreach (RoleMapper::getInstance()->findAll() as $role) {
+                $roleAccess = (new RoleAccess())
+                    ->setRole($role)
+                    ->setCategory($folder)
+                    ->setType($access->getFolderAccessForRole($role->getId(), $folderId));
+                $roleAccesses->setOffset($role->getId(), $roleAccess);
+            }
+            $data['roles'] = $roleAccesses;
         }
 
         return $data;
