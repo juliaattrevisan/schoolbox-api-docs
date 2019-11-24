@@ -405,7 +405,7 @@ class Access
      * @throws InvalidArgumentException TODO implement better annotation/handling for impossible logic exceptions
      * @throws Mapper\Exception         If folder does not exist.
      * @throws LogicException           If unable to build an ExternalUser instance
-     * @throws UnexpectedValueException
+     * @throws UnexpectedValueException If cannot add item to folder collection (TODO SA-9670)
      */
     public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {
