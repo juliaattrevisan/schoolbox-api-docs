@@ -1030,22 +1030,6 @@ class Adapter {
     }
 
     /**
-     * Return a housemaster for a particular house
-     *
-     * @param $houseId
-     * @return Staff
-     */
-    public function getHousemasterByHouseId(string $houseId): Staff
-    {
-        $currentResult = $this->handler->getHousemasterByHouseId($houseId);
-
-        $staff = new Staff();
-        $staff->setId($currentResult);
-
-        return $staff;
-    }
-
-    /**
      * Translate a $boarderValue into a human-readable variant
      * e.g. translates D, W into "Day" and B into "Boarder"
      *

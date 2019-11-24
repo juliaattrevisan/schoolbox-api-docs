@@ -406,14 +406,6 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getHousemasterEmails(array $externalUserIds): array

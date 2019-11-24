@@ -873,14 +873,6 @@ class External_Maze_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];

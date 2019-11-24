@@ -349,17 +349,6 @@ interface External_UserInterface extends External\IConnector
     public function determineBoarderType(?string $boarderValue): string;
 
     /**
-     * Find the housemasterId for a particular house
-     *
-     * @importance low - I'm not sure this is used anywhere yet?
-     *
-     * @param string $houseID
-     * @return string|null
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string;
-
-
-    /**
      * Returns email addresses for any users who are both:
      * * current housemasters, and
      * * match $externalUserIds

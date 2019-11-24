@@ -69,23 +69,6 @@ class External_Denbigh_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        $house = $this->externalDatabase->executeQuery(
-            "
-                SELECT    Houses.housemaster_id
-                FROM      Houses
-                WHERE     Houses.id = :houseId
-            ",
-            ['houseId' => $houseID]
-        )->fetch();
-
-        return $house['housemaster_id'] ?? null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getParent(string $externalUserId): array
     {
         if (empty($externalUserId)) {

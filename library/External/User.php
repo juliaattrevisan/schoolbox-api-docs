@@ -137,16 +137,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
-    }
-
-
     /**
      * @inheritdoc
      */

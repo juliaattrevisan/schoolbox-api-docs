@@ -973,14 +973,6 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getHousemasterEmails(array $externalUserIds): array

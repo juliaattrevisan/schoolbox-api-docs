@@ -427,15 +427,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
     /**
      * @inheritdoc
-     * @deprecated
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
      */
     public function getHousemasterEmails(array $externalUserIds): array
     {

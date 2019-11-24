@@ -112,14 +112,6 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];

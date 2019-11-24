@@ -497,14 +497,6 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];

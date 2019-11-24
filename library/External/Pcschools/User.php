@@ -471,15 +471,6 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        // Non-core promise
-        return null;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getHousemasterEmails(array $externalUserIds): array

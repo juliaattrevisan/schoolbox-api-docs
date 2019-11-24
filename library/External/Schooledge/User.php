@@ -513,16 +513,6 @@ class External_Schooledge_User implements External_UserInterface
         return '';
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -531,7 +521,6 @@ class External_Schooledge_User implements External_UserInterface
         return [];
     }
 
-
     /**
      * @inheritDoc
      */
@@ -539,7 +528,6 @@ class External_Schooledge_User implements External_UserInterface
     {
         return [];
     }
-
 
     /**
      * @inheritDoc

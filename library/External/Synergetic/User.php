@@ -1058,16 +1058,6 @@ class External_Synergetic_User implements External_UserInterface
         )->fetchColumn() ?: '';
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-
     /**
      * @inheritdoc
      * @throws \Alaress\Database\Exception
