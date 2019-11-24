@@ -985,9 +985,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // BTW fetching multiple 1-M relations in a single query
             // is how you get ants!
             // TODO replace ant infestation with `\Schoolbox\Curriculum\Node\Mapper::findForOtherMapper`
-            $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-            if($curriculumNode){
-                $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
+            if ($hydrateCurriculumNodes) {
+                $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+                if ($curriculumNode) {
+                    $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
+                }
             }
         }
 
