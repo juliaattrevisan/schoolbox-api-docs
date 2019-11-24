@@ -1682,8 +1682,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // Need to override default 'ORDER BY' clause that assumes default joins
-        $options = ['order' => []];
+        $options = [
+            'deleted' => true,
+            'order'   => [],
+        ];
 
+        /** @var Model $folder */
         $folder = $this->executeSelect(
             "SELECT {$this->getColumnString()}",
             "FROM {$this->getTable()}",
@@ -1692,6 +1696,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $options
         )->first();
         if ($folder) {
+            if ($folder->isDeleted()) {
+                throw (new Exception\Deleted())->setDeletedObject($folder);
+            }
             return $folder;
         }
         throw new MapperException\NotFound();
