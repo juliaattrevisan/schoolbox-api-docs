@@ -313,8 +313,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param ReturnedWork|QuizAttempt $feedback
      * @return bool
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Alaress\Database\Exception
      * @throws Exception
      */
@@ -327,8 +325,18 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             // Handle submission box result
             $box      = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
             $activity = $this->buildActivityFromSubmissionBox($box);
-            $marker   = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
-            $student  = UserMapper::getInstance()->findById($feedback->getOwner()->getId());
+            try {
+                $marker = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                $marker = $e->getDeletedObject();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                return false;
+            }
+            try {
+                $student = UserMapper::getInstance()->findById($feedback->getOwner()->getId());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                return false;
+            }
 
             // If the mark type is set to none then we shouldn't be saving a normalised mark
             if ($box->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {

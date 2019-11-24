@@ -433,7 +433,7 @@ class Mapper extends BaseMapper
                 `{$this->getTable()}` `a`
                 LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
                 LEFT JOIN {$this->getJoinSql('work_type', 'a', 't')}
-                LEFT JOIN {$this->getJoinSql('user', 'a', 'u')}
+                LEFT JOIN {$this->getJoinSql('user', 'a', 'u', true)}
                 LEFT JOIN {$this->getJoinSql('am', 'a', 'am')}
             WHERE
                 `a`.assess_id = :id
