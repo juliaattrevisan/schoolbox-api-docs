@@ -1142,7 +1142,7 @@ class AccessTest extends TestCase
         });
 
         $root = (new Folder\Model())
-            ->setId(0)
+            ->setId(Folder\Model::ROOT_ID)
             ->setName('Root')
             ->setInherit(false);
         $tree->addElement($root);
