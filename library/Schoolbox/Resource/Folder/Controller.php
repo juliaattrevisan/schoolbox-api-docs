@@ -565,10 +565,14 @@ class Controller extends BaseController
 
             foreach ($rolePermissions as $roleId => $permissionLevel) {
                 $existingPerm = $existingRolePerms[$roleId];
-                if ($existingPerm && $existingPerm->getType() !== (int)$permissionLevel) {
-                    $existingPerm->setType($permissionLevel);
-                    $rolePermsToSave[$roleId] = $existingPerm;
+                if ($existingPerm) {
+                    // Only modify if not already at this value
+                    if ($existingPerm->getType() !== (int)$permissionLevel) {
+                        $existingPerm->setType($permissionLevel);
+                        $rolePermsToSave[$roleId] = $existingPerm;
+                    }
                 } else {
+                    // Create
                     $rolePermsToSave[$roleId] = (new RoleAccess())
                         ->setCategory($folder)
                         ->setRole(RoleMapper::getInstance()->createModel($roleId))
