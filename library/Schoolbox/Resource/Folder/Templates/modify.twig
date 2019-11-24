@@ -190,7 +190,7 @@
         }, 'Class codes may not exceed 20 characters.');
 
         {#
-            Warn user that permission recursion will delete role/group/class permissions.
+            Warn user that permission recursion will delete role/group/class permissions if inherit is ON
             Only superusers can recurse permission changes, and its only relevant on modification
         #}
         {% if user.isSuperuser and action == 'Modify' %}
