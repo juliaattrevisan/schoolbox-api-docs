@@ -532,13 +532,13 @@ class Controller extends BaseController
                         $descendant->enableInherit();
                         $saveFolderRequired = true;
                     } else {
-                        $rolePermsToSave = $this->updateRolePermissions($descendant, $rolePermissions);
-                        if ($rolePermsToSave->count()) {
-                            $this->roleAccessMapper->save($rolePermsToSave);
-                        }
                         if ($descendant->getInherit()) {
                             $descendant->setInherit(false);
                             $saveFolderRequired = true;
+                        }
+                        $rolePermsToSave = $this->updateRolePermissions($descendant, $rolePermissions);
+                        if ($rolePermsToSave->count()) {
+                            $this->roleAccessMapper->save($rolePermsToSave);
                         }
                     }
                 }
