@@ -20,9 +20,9 @@ class PATMathematics extends Base
     /**
      * Find all the data for PAT Mathematics graph
      *
-     * @return array
+     * @return Payload
      */
-    public function findData(): array
+    public function findData(): Payload
     {
         /* Default to current year if none was specified
          */
@@ -51,9 +51,10 @@ class PATMathematics extends Base
             $payload
                 ->aggregateStudent((bool)$row['ThisStudentStanine'], (string)$row['Seq'], (string)$row['IndividualMathsPATStanineMarker'])
                 ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanMathsPATStaninePercentage'])
-                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage']);
+                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage'])
+                ->setHasData(true);
         }
 
-        return $payload->getData();
+        return $payload;
     }
 }
