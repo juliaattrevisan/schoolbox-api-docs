@@ -72,6 +72,7 @@ class Definition extends Filter\AbstractDefinition
     public static function getPages(): array
     {
         return [
+            Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
             Filter\Page\Model::PAGE_GRADES,
             Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
