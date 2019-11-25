@@ -45,7 +45,7 @@ class PATMathematics extends Base
          */
         $stack = [
             'graph' => [
-                'title' => 'PAT Mathematics',
+                'title' => "PAT Mathematics {$this->year}",
                 'y' => '% of Children'
             ],
             'data' => [
