@@ -1,0 +1,49 @@
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script>
+    $(function () {
+        $('#PATMathematics').highcharts({
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: false
+            },
+            series: [
+                {
+                    color: '#17419b',
+                    data: [2,2,4,5],
+                    type: 'column'
+
+                },
+                {
+                    color: '#a01c1c',
+                    data: [3,4,5,2],
+                    type: 'spline'
+
+                },
+                {
+                    color: '#bfaf03',
+                    data: [null,3,null,null],
+                    marker: {
+                        lineColor: '#847700',
+                        lineWidth: 1,
+                        radius: 7,
+                        symbol: 'circle'
+                    },
+                    type: 'scatter'
+                }
+            ],
+            title: {
+                text: 'PAT Mathematics'
+            },
+            tooltip: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [1,2,3,4]
+            }
+        });
+    });
+</script>
+
+<div id="PATMathematics"></div>
