@@ -14,18 +14,20 @@
                 enabled: false
             },
             legend: {
-                enabled: false
+                enabled: true
             },
             series: [
                 {
                     color: '#17419b',
                     data: [{{ series.diocesan|join(',') }}],
+                    name: 'Diocesan %',
                     type: 'column'
 
                 },
                 {
                     color: '#a01c1c',
                     data: [{{ series.national|join(',') }}],
+                    name: 'National %',
                     type: 'spline'
 
                 },
@@ -38,6 +40,7 @@
                         radius: 7,
                         symbol: 'circle'
                     },
+                    showInLegend: false,
                     type: 'scatter'
                 }
             ],
