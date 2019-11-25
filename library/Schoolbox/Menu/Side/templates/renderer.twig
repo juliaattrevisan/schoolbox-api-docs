@@ -50,7 +50,7 @@
             {% elseif section.section == 'groups' and section.visible %}
                 {% if groups | length > 0 %}
                     <li id="side-menu-mygroups">
-                        <h3>{{ section.title }}</h3>
+                        <h3><a href="{{ routeLookup('folder.getGroups') }}">{{ section.title }}</a></h3>
                         <div class="nav-wrapper">
                             <ul class="off-canvas-list">
                                 {% for group in groups %}
@@ -80,7 +80,7 @@
             {% elseif section.section == 'subjects' and section.visible %}
                 {% if subjects | length > 0 %}
                     <li id="side-menu-mysubjects">
-                        <h3>{{ section.title }}</h3>
+                        <h3><a href="{{ routeLookup('learning.getClasses') }}">{{ section.title }}</a></h3>
                         <div class="nav-wrapper">
                             <ul class="off-canvas-list">
                                 {% for type,subjectTypes in subjects %}
