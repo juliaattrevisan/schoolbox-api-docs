@@ -9,7 +9,7 @@
 {% endblock individualEducationPlan %}
 
 {% block details_gender %}
-    {% if externalUser.StudentGender %}
+    {% if externalUser.StudentGender and isStaff %}
         <dt class="small-4 medium-3 columns">Gender:</dt>
         <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>
     {% endif %}
