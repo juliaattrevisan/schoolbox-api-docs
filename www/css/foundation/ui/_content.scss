@@ -1179,6 +1179,13 @@ $selector-width: 2.25rem;
         margin-bottom: 0;
       }
     }
+
+    .gradient-none-bg {
+      span {
+        color: $black !important;
+      }
+    }
+
     .grade {
         display: flex;
         flex: 0 1 auto;

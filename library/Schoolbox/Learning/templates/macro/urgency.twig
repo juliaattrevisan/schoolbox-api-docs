@@ -56,6 +56,7 @@
  #}
 {% macro marks(normalisedMark) %}
 {% spaceless %}
+    {% set index = 'none' %}
     {% if config.grade_gradient %}
         {% if normalisedMark|length %}
             {% set index = (normalisedMark/10)|round(0, 'floor') %}
@@ -73,9 +74,8 @@
             {% if index < min %}
                 {% set index = min %}
             {% endif %}
-
-            gradient-{{ index }}
         {% endif %}
     {% endif %}
+    gradient-{{ index }}
 {% endspaceless %}
 {% endmacro %}
