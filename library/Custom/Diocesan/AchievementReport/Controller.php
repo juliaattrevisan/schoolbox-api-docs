@@ -152,7 +152,7 @@ class Controller extends Base {
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $this->getResponse()->content->set(array(
-            'template' => '@standardisedTest/StandardisedTest.twig',
+            'template' => '@standardisedTest/index.twig',
             'data' => [
                 'navigation' => array(
                     'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
