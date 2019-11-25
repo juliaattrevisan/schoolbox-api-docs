@@ -182,9 +182,7 @@ class Controller extends Base
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws \ReflectionException
      * @throws DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
      * @throws UnexpectedValueException
      */
