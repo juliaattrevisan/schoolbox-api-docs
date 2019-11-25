@@ -10,6 +10,7 @@ use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATTable;
 use MSSQL;
 use Schoolbox\User;
@@ -170,7 +171,8 @@ class Controller extends Base {
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
 
-                'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData()
+                'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData(),
+                'PATMathematics' => (new PATMathematics($user, $externalUser, $db, $year))->findData(),
             ]
         ));
     }
