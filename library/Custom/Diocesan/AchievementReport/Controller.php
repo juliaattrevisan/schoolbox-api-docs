@@ -175,6 +175,7 @@ class Controller extends Base {
                 ),
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'year' => $year,
 
                 'subnavigation' => [
                     'all' => (new Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
@@ -185,7 +186,10 @@ class Controller extends Base {
                 ],
 
                 'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData(),
-                'PATNavigation' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
+                'PATNavigation' => [
+                    'all' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
+                    'selected' => $year
+                ],
                 'PATMathematics' => [
                     'data' => $mathematicsPayload->getData(),
                     'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())

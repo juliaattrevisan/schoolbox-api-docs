@@ -24,6 +24,10 @@
         </div>
     </div>
 
+    {% include '@standardisedTest/PATNavigation.twig' with {
+        elements: PATNavigation
+    } %}
+
     <div class="row">
         {% if PATMathematics.visible %}
             <div class="small-12 large-6 columns">

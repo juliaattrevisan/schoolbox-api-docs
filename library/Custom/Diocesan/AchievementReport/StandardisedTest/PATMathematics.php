@@ -26,7 +26,7 @@ class PATMathematics extends Base
     {
         /* Default to current year if none was specified
          */
-        $this->year ?: $this->year = date('Y');
+        $this->year ?: $this->year = (int)date('Y');
 
         $query = "
             SELECT 

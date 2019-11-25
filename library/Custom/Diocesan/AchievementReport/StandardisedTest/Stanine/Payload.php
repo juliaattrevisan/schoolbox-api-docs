@@ -45,10 +45,10 @@ class Payload
      * Stanine constructor.
      *
      * @param string      $title
-     * @param string      $year
+     * @param int         $year
      * @param string|null $yAxis
      */
-    public function __construct(string $title, string $year, ?string $yAxis = null)
+    public function __construct(string $title, int $year, ?string $yAxis = null)
     {
         $this->stack['graph']['title'] = "{$title} {$year}";
 
