@@ -135,7 +135,7 @@ class Definition extends Filter\AbstractDefinition
             switch ($pageFilter->getPage()) {
 
                 case Filter\Page\Model::PAGE_GRADES:
-                    // Do not permit 'upcoming' on the 'grades' page
+                    // Do not permit 'unpublished' on the 'grades' page
                     if ($key === self::KEY_UNPUBLISHED || !in_array($key, self::getTemporalStates(), true)) {
                         $cleanedPageOptions->offsetUnset($idx);
                     }
