@@ -456,8 +456,20 @@ class Controller extends Base {
      */
     public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $allActivities = (new CoCurricular\Activities($user, $externalUser, $db, $year))->findData();
+        $output = [
+            'template' => '@coCurricular/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::COCURRICULAR_KEY
+                ],
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+                'activities' => (new CoCurricular\Activities($user, $externalUser, $db, $year))->findData(),
+            ]
+        ];
 
-        $this->getResponse()->content->set([]);
+        $this->getResponse()->content->set($output);
     }
 }
