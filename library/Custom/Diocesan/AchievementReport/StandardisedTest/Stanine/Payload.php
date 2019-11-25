@@ -86,6 +86,13 @@ class Payload
          */
         if ($condition) {
             $this->stack['series']['student'][$x] = $y;
+
+            /* If a value in IndividualMathsPATStanineMarker != 0
+             * then this student has data
+             */
+            if ($y) {
+                $this->hasData = true;
+            }
         } else {
             $this->stack['series']['student'][$x] = 'null';
         }
@@ -143,18 +150,5 @@ class Payload
     public function hasData(): bool
     {
         return $this->hasData;
-    }
-
-
-    /**
-     * @param bool $hasData
-     *
-     * @return Payload
-     */
-    public function setHasData(bool $hasData): self
-    {
-        $this->hasData = $hasData;
-
-        return $this;
     }
 }

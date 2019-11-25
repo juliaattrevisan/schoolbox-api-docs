@@ -51,8 +51,7 @@ class PATMathematics extends Base
             $payload
                 ->aggregateStudent((bool)$row['ThisStudentStanine'], (string)$row['Seq'], (string)$row['IndividualMathsPATStanineMarker'])
                 ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanMathsPATStaninePercentage'])
-                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage'])
-                ->setHasData(true);
+                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage']);
         }
 
         return $payload;

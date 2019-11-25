@@ -51,8 +51,7 @@ class PATReadingComprehension extends Base
             $payload
                 ->aggregateStudent((bool)$row['ThisStudentStanine'], (string)$row['Seq'], (string)$row['IndividualReadingComprehensionPATStanineMarker'])
                 ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanReadingComprehensionPATStaninePercentage'])
-                ->aggregateNational((string)$row['Seq'], (string)$row['NationalReadingComprehensionPATStaninePercentage'])
-                ->setHasData(true);
+                ->aggregateNational((string)$row['Seq'], (string)$row['NationalReadingComprehensionPATStaninePercentage']);
         }
 
         return $payload;
