@@ -12,10 +12,12 @@ use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATListeningComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingVocabulary;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATTable;
 use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATListeningComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATMathematics;
+use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingVocabulary;
 use MSSQL;
 use Schoolbox\User;
@@ -161,6 +163,7 @@ class Controller extends Base {
         $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $year))->findData();
         $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $year))->findData();
         $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $db, $year))->findData();
+        $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $db, $year))->findData();
 
         $this->getResponse()->content->set(array(
             'template' => '@standardisedTest/index.twig',
@@ -192,6 +195,10 @@ class Controller extends Base {
                 'PATReadingVocabulary' => [
                     'data' => $readingVocabularyPayload->getData(),
                     'visible' => (new ValidPATReadingVocabulary())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
+                ],
+                'PATReadingComprehension' => [
+                    'data' => $readingComprehensionPayload->getData(),
+                    'visible' => (new ValidPATReadingComprehension())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
                 ]
             ]
         ));
