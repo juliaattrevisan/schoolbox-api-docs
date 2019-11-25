@@ -579,7 +579,7 @@ class Controller extends Base
                         if (!empty($humanReadableMark) || !empty($comment)) {
                             $graphInfoValue = [
                                 'displayMark'  => $humanReadableMark,
-                                'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
+                                'gradientMark' => $this->getConfigLoader()->get('grade_gradient') ? (int)($feedback->getNormalisedMark() / 10) : null,
                                 'info'         => $comment ?? '',
                             ];
                         }
@@ -590,7 +590,7 @@ class Controller extends Base
                             // Handle project mark, not available through feedback
                             $graphInfoValue = [
                                 'displayMark'  => $humanReadableMark,
-                                'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
+                                'gradientMark' => $this->getConfigLoader()->get('grade_gradient') ? (int)($feedback->getNormalisedMark() / 10) : null,
                                 'info'         => '',
                             ];
                         }
