@@ -23,9 +23,13 @@
     </div>
 </div>
 
-{% include '@standardisedTest/PATMathematics.twig' with {
-    identifier: 'PATMathematics',
-    title: PATMathematics.graph.title,
-    yAxis: PATMathematics.graph.y,
-    data: PATMathematics.data
-} %}
+<div class="row">
+    <div class="small-12 columns">
+        {% include '@standardisedTest/PATMathematics.twig' with {
+            identifier: 'PATMathematics',
+            title: PATMathematics.graph.title,
+            yAxis: PATMathematics.graph.y,
+            data: PATMathematics.data
+        } %}
+    </div>
+</div>
