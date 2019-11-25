@@ -9,6 +9,7 @@ namespace Custom\Diocesan\AchievementReport;
 use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
 use MSSQL;
 use Schoolbox\User;
 
@@ -159,6 +160,14 @@ class Controller extends Base {
                 ),
                 'externalUser' => $externalUser,
                 'user' => $user,
+
+                'subnavigation' => [
+                    'all' => (new Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+
+                    /* TODO: For each Standardised Test report piece
+                     */
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
             ]
         ));
     }
