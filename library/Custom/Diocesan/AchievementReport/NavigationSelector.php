@@ -1,18 +1,20 @@
 <?php
 /**
- * ReportSelector
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport;
 
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Schoolbox\User;
 use MSSQL;
 
+/**
+ * Class NavigationSelector
+ *
+ * @package Custom\Diocesan\AchievementReport
+ */
 class NavigationSelector
 {
 
@@ -26,6 +28,7 @@ class NavigationSelector
     public const COMMENTS_KEY = 'comments';
     public const COCURRICULAR_KEY = 'coCurricular';
 
+
     /**
      * MSSQL db handler
      *
@@ -33,12 +36,14 @@ class NavigationSelector
      */
     private $db;
 
+
     /**
      * An externalUser array
      *
      * @var array
      */
-    private $externalUser = [];
+    private $externalUser;
+
 
     /**
      * User
@@ -47,12 +52,14 @@ class NavigationSelector
      */
     private $user;
 
+
     /**
      * Has NCEA records
      *
      * @var bool
      */
     private $hasNcea = false;
+
 
     /**
      * Has IB records
@@ -61,12 +68,14 @@ class NavigationSelector
      */
     private $hasIb = false;
 
+
     /**
      * Has School Grades
      *
      * @var bool
      */
     private $hasSchoolGrades = false;
+
 
     /**
      * Has Comments
@@ -75,12 +84,22 @@ class NavigationSelector
      */
     private $hasComments = false;
 
+
+    /**
+     * Has Co-Curricular activities
+     *
+     * @var bool
+     */
+    private $hasCoCurricular = false;
+
+
     /**
      * Available navigation options
      *
      * @var array
      */
     private $availableNavigation = [];
+
 
     /**
      * Default report information
@@ -107,6 +126,7 @@ class NavigationSelector
          */
         $this->navigationData();
     }
+
 
     /**
      * Determine default report
@@ -141,6 +161,7 @@ class NavigationSelector
             }
         }
     }
+
 
     /**
      * Checks to see how many IB records exist for a person
@@ -188,6 +209,14 @@ class NavigationSelector
             $availableNavigation[self::COMMENTS_KEY] = 'Comments';
         }
 
+        /* Conditionally add CoCurricular option
+         */
+        if ($this->hasCoCurricular()) {
+            $this->hasCoCurricular = true;
+            $availableNavigation[self::COCURRICULAR_KEY] = 'Co-Curricular';
+
+        }
+
         $this->availableNavigation = $availableNavigation;
     }
 
@@ -198,18 +227,16 @@ class NavigationSelector
     private function hasComments()
     {
         $query = "
-            SELECT 
-                TOP 1 COUNT(*) AS 'computed'
-            FROM 
-                dbo.uvSchoolBoxReportComments
-            WHERE 
-                id = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxReportComments
+            WHERE id = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
 
         return $count['computed'];
     }
+
 
     /**
      * Find out if they are in the School Grades table
@@ -217,18 +244,16 @@ class NavigationSelector
     private function hasSchoolGrades()
     {
         $query = "
-            SELECT
-                TOP 1 COUNT(*) AS 'computed'
-            FROM
-                dbo.uvSchoolBoxSchoolGradeResults
-            WHERE
-                ID = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxSchoolGradeResults
+            WHERE ID = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
 
         return $count['computed'];
     }
+
 
     /**
      * Find out if they are in the NCEA table
@@ -236,12 +261,9 @@ class NavigationSelector
     private function hasNcea()
     {
         $query = "
-            SELECT
-                TOP 1 COUNT(*) AS 'computed'
-            FROM
-                dbo.uvSchoolBoxNCEAResults
-            WHERE
-                ID = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxNCEAResults
+            WHERE ID = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
@@ -249,23 +271,40 @@ class NavigationSelector
         return $count['computed'];
     }
 
+
     /**
      * Find out if they are in the IB table
      */
     private function hasIb()
     {
         $query = "
-            SELECT
-                TOP 1 COUNT(*) AS 'computed'
-            FROM
-                dbo.uvSchoolBoxIBResults
-            WHERE
-                ID = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxIBResults
+            WHERE ID = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
 
         return $count['computed'];
+    }
+
+
+    /**
+     * Find out if they have any data in Co Curricular
+     *
+     * @return int
+     */
+    private function hasCoCurricular(): int
+    {
+        $query = "
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM uvSchoolBoxCoCurricularClasses 
+            WHERE StudentID = '{$this->externalUser['StudentID']}'
+        ";
+
+        $count = $this->db->getRow($query);
+
+        return (int)$count['computed'];
     }
 
 
