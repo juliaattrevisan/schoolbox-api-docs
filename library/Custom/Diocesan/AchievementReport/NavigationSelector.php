@@ -123,21 +123,21 @@ class NavigationSelector
 
 
     /**
-     * Constructor
+     * NavigationSelector constructor.
      *
-     * @param Router $router
-     * @param MSSQL  $db
-     * @param User   $user
-     * @param array  $externalUser
-     * @param int    $year
+     * @param Router   $router
+     * @param User     $user
+     * @param array    $externalUser
+     * @param MSSQL    $db
+     * @param int|null $year
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function __construct(Router $router, MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function __construct(Router $router, User $user, array $externalUser, MSSQL $db, ?int $year)
     {
         $this->router = $router;
+        $this->user = $user;
         $this->externalUser = $externalUser;
         $this->db = $db;
-        $this->user = $user;
         $this->year = $year;
 
         /* Determine navigation options
