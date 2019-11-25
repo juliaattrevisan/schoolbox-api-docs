@@ -127,7 +127,7 @@ class Component_Renderer
 
         $folderCodes = implode(', ', $temp);
 
-        $component->getPageTemplate()->setVar('ID', $folder->getId());
+        $component->getPageTemplate()->setVar('ID', (string)$folder->getId());
         $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folderCodes)));
         $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
         $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));

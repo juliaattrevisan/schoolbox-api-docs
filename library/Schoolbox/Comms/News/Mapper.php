@@ -19,7 +19,7 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -359,7 +359,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $pb = $this->getPredicateBuilder()
             ->equals('author_id', $user->getId());
 
-        if ((new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
+        if ((new ValidNewsModerator(Access::getInstance()))->isSatisfiedBy($user)) {
             $pb->equals('accepted_by', $user->getId());
         }
 

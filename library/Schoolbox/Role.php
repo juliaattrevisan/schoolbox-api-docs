@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
 class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
 {
     use ModelTrait\DeletedAtDate;
+    use ModelTrait\CreateCollection;
 
     /** @var int */
     private $id;

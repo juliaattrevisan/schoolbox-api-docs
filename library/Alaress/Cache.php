@@ -9,6 +9,9 @@
 namespace Alaress;
 
 use InvalidArgumentException;
+use function array_key_exists;
+use function gettype;
+use function is_scalar;
 
 /**
  * Class Cache
@@ -90,4 +93,19 @@ class Cache
         return call_user_func_array($this->fetch, $fetchArgs);
     }
 
+
+    /**
+     * Returns whether this cache contains an item for the specified key
+     *
+     * @param mixed $key
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function contains($key): bool
+    {
+        if (!is_scalar($key)) {
+            throw new InvalidArgumentException("Key must be scalar, got " . gettype($key));
+        }
+        return array_key_exists($key, $this->cache);
+    }
 }

@@ -271,8 +271,9 @@ abstract class AbstractController extends BaseController
      *
      * @param int $folderId
      */
-    public function browse($folderId = 0)
+    public function browse(?int $folderId)
     {
+        $folderId = $folderId ?? Resource\Folder\Model::ROOT_ID;
         // if a folder ID was supplied, stash that in session then redirect
         if ($folderId) {
             $this->getSession()->set('resourcesID', $folderId, $this->namespace);
@@ -362,7 +363,7 @@ abstract class AbstractController extends BaseController
      *
      * @param int $folderId
      */
-    public function showFolderInfo($folderId)
+    public function showFolderInfo(int $folderId)
     {
         $data = $this->getFolderData($folderId);
         $data['attachzone'] = $this->getFolderAttachzoneData();

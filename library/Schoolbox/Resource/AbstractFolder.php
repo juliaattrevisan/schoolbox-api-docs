@@ -78,7 +78,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Get id
      *
-     * @return int|string
+     * @return int
      */
     public function getId()
     {

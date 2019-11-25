@@ -65,7 +65,7 @@ if ($_POST['allDay']) {
 
 /* Check user has permission to create this event
  */
-$eventAccess = new Access(new FolderAccess());
+$eventAccess = new Access(FolderAccess::getInstance());
 if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner) == false) {
     error(35);
 }

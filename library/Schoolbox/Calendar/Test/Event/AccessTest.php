@@ -21,6 +21,9 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Calendar\Relation\Category as CategoryRelation;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AccessTest extends TestCase
 {
     /** @var Role[] */
@@ -219,7 +222,7 @@ class AccessTest extends TestCase
     private function getMockFolderAccess(User $effector, array $groups)
     {
         // Create mock folder access object and mock getMinFolderAccess() to bypass DB
-        $mockFolderAccess = $this->getMockBuilder(FolderAccess::class)->getMock();
+        $mockFolderAccess = $this->createMock(FolderAccess::class);
         $mockFolderAccess->method('getMinFolderAccess')->willReturnCallback(function () use ($effector, $groups) {
             $relatedAccessList = $effector->getAccessList()->filter(function (UserAccess $access) use ($groups) {
                 return in_array($access->getServiceIdentifier(), $groups);

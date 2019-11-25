@@ -20,7 +20,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function getAllByCategory($folder_id)
     {
-        $query = "SELECT * FROM poll WHERE folder_id = '{$this->db->quote($folder_id)}' ORDER BY created DESC";
+        $query = "SELECT * FROM poll WHERE folder_id = '{$this->db->quote((string)$folder_id)}' ORDER BY created DESC";
         return $this->db->getAll($query);
     }
 

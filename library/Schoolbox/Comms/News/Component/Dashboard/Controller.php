@@ -10,36 +10,12 @@ namespace Schoolbox\Comms\News\Component\Dashboard;
 
 use Component_Config_Size;
 use Component_Dashboard_ControllerAbstract;
-use Component_Instance;
 use Schoolbox\Comms\News;
-use Schoolbox\User;
-use SitePage;
 
 class Controller extends Component_Dashboard_ControllerAbstract
 {
     // Max number of articles to show if 'size' config is set to 'ALL'
     private const HARD_LIMIT = 50;
-
-    /**
-     * @var News\Mapper
-     */
-    private $newsMapper;
-
-
-    /**
-     * Controller constructor.
-     *
-     * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
-     * @throws \InvalidArgumentException
-     */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
-    {
-        parent::__construct($instance, $user, $sitepage);
-
-        $this->newsMapper  = $this->getMapperFactory()->get(News\Mapper::class);
-    }
 
     /**
      * @return bool

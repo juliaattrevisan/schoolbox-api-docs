@@ -250,6 +250,9 @@ class Module extends BaseModule
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
+            'access'                     => $injector->lazy(function () {
+                return Access\Access::getInstance();
+            }),
             'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
             'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
         ];

@@ -7,23 +7,23 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
 
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 
 class ValidNewsModerator
 {
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
+    /** @var Access */
+    private $access;
 
     /**
      * ValidNewsModerator constructor.
      *
-     * @param UserAccessMapper $userAccessMapper
+     * @param Access $access
      */
-    public function __construct(UserAccessMapper $userAccessMapper)
+    public function __construct(Access $access)
     {
-        $this->userAccessMapper = $userAccessMapper;
+        $this->access = $access;
     }
 
     /**
@@ -33,6 +33,6 @@ class ValidNewsModerator
      */
     public function isSatisfiedBy(User $user): bool
     {
-        return $user->isSuperuser() || ($this->userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_WRITE);
+        return $user->isSuperuser() || ($this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_WRITE);
     }
 }

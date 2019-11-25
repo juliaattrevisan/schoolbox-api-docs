@@ -11,6 +11,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 
@@ -41,9 +42,9 @@ class PastoralGroup extends SimpleStrategy
      * @inheritdoc
      * @param IConnector $db
      */
-    public function __construct(UserAccessMapper $userAccessMapper, bool $staffCanPost, bool $moderationRequired, IConnector $db)
+    public function __construct(UserAccessMapper $userAccessMapper, Access $access, bool $staffCanPost, bool $moderationRequired, IConnector $db)
     {
-        parent::__construct($userAccessMapper, $staffCanPost, $moderationRequired);
+        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired);
         $this->db = $db;
     }
 

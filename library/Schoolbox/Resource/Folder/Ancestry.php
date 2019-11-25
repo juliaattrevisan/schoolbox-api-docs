@@ -38,12 +38,27 @@ class Ancestry
      */
     private $recursionLimit = 50;
 
+    /** @var self */
+    private static $instance;
+
+    /**
+     * @param Mapper $folderMapper
+     * @return static
+     */
+    public static function getInstance(FolderMapper $folderMapper): self
+    {
+        if (!self::$instance) {
+            self::$instance = new static($folderMapper);
+        }
+        return self::$instance;
+    }
+
     /**
      * Constructor
      *
      * @param FolderMapper $folderMapper
      */
-    public function __construct(FolderMapper $folderMapper)
+    private function __construct(FolderMapper $folderMapper)
     {
         $this->setFolderMapper($folderMapper);
     }

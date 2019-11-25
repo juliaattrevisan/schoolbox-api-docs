@@ -35,7 +35,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
@@ -106,6 +105,9 @@ class Controller extends Base
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
 
+    /** @var Access */
+    private $access;
+
     /** @var Thread\Mapper */
     private $threadMapper;
 
@@ -133,6 +135,7 @@ class Controller extends Base
      * @param Audience\ArticleResolver         $articleResolver
      * @param Audience\UserResolver            $userResolver
      * @param Audience\Segment\StrategyFactory $strategyFactory
+     * @param Access                           $access
      * @param Thread\Mapper                    $threadMapper
      * @param ErrorMapper                      $errorMapper
      * @param CommentMapper                    $commentMapper
@@ -149,6 +152,7 @@ class Controller extends Base
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
         Audience\Segment\StrategyFactory $strategyFactory,
+        Access $access,
         Thread\Mapper $threadMapper,
         ErrorMapper $errorMapper,
         CommentMapper $commentMapper
@@ -164,6 +168,7 @@ class Controller extends Base
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
         $this->strategyFactory            = $strategyFactory;
+        $this->access                     = $access;
         $this->threadMapper               = $threadMapper;
         $this->errorMapper                = $errorMapper;
         $this->commentMapper              = $commentMapper;
@@ -1235,9 +1240,8 @@ class Controller extends Base
     {
         // Base Case:
         if ($segment->isSimple()) {
-            $userAccessMapper = new UserAccessMapper();
             return
-                $userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
+                $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
                 $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
                 Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
         }

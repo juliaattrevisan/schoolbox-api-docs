@@ -8,6 +8,7 @@
 namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Resource\Folder\NNIAN;
 use function count;
 use External_Class;
 use function implode;
@@ -16,7 +17,6 @@ use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -27,7 +27,6 @@ use Alaress\Database\Predicate;
 use PDOException;
 use UnderflowException;
 use InvalidArgumentException;
-use UnexpectedValueException;
 
 /**
  * Class UserAccessMapper
@@ -41,15 +40,8 @@ class UserAccessMapper extends Mapper
 {
 
     /**
-     * Cached permissions
-     * Nested array structure $cachedPermissions[id][service][sid]
-     * @var array
+     * @return void
      */
-    protected $cachedPermissions = [];
-
-    /**
-    * @return void
-    */
     protected function mapping()
     {
         $this->hasTable('userAccess');
@@ -539,7 +531,7 @@ class UserAccessMapper extends Mapper
         foreach ($serviceIds as $key => $serviceIdentifier) {
             if ($serviceIdentifier != 0) {
                 $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier);
-                $folderNnian = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+                $folderNnian = NNIAN::getInstance(FolderMapper::getInstance())->findNearestNonInheritingAncestralNode($folder);
                 $serviceIds[$key] = $folderNnian->getId();
             }
         }
@@ -562,208 +554,5 @@ class UserAccessMapper extends Mapper
 
         // check permission is in any
         return $postCount > 0;
-    }
-
-    /**
-     * When passed a schoolbox user ID and subject code (eg. 'CH123') returns true/false to indicate the users
-     * involvement in the class
-     *
-     * @param User       $user
-     * @param string    $code
-     * @return bool
-     */
-    public function involvedInSubject(User $user, $code)
-    {
-        // Take into account class codes with commas
-
-        $codes = explode(",", $code);
-
-        if ($user->getExternalId()) {
-            $externalUser = new \External_User;
-            $externalSubjectList = $externalUser->getSubjectList($user);
-
-            if (is_array($externalSubjectList)) {
-                foreach ($externalSubjectList as $currentSubject) {
-
-                    foreach ($codes as $code) {
-                        //If the code has a '/' it might not contain a campus
-                        //The class code itself may have a '/' in it. Check for exact match first
-                        if (strtolower($currentSubject["code"]) == strtolower($code)) {
-                            return true;
-                        }
-
-                        //Then check if there is a campus mangled in the class code
-                        if (strpos($code, '/') !== false) {
-                            $codeArray = explode('/', $code, 2);
-                            if (strtolower($currentSubject["code"]) == strtolower($codeArray[1]) &&
-                                strtolower($currentSubject["campusCode"]) == strtolower($codeArray[0])
-                            ) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if user is invovlved in a group
-     * @param User $user
-     * @param int $serviceIdentifier
-     * @return bool
-     */
-    public function involvedInGroup(User $user, $serviceIdentifier) {
-        try {
-            $this->findOneByColumnList(
-                array(
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'sid' => $serviceIdentifier,
-                    'uid' => $user->getId(),
-                )
-            );
-
-            return true;
-        } catch (Mapper\Exception $e) {
-            return false;
-        }
-    }
-
-
-    /**
-     * Returns the user's access level to the specified service, with optional service identifier
-     *
-     * @param User     $user
-     * @param null|int $serviceIdentifier
-     * @param int      $service
-     * @param bool     $cache
-     * @return int
-     */
-    public function getAccessLevel(User $user, ?int $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true): int
-    {
-        try {
-            return $this->getAccess($user, $serviceIdentifier, $service, $cache)->getAccessLevel();
-        } catch (Mapper\Exception $e) {
-            return UserAccess::ACCESS_DENY;
-        }
-    }
-
-
-    /**
-     * @param User     $user
-     * @param null|int $serviceIdentifier
-     * @param int      $service
-     * @param bool     $cache
-     * @return UserAccess
-     * @throws Mapper\Exception
-     */
-    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true): UserAccess
-    {
-        // Order of priority for permissions
-        //
-        // 1. Previously cached results
-        // 2. UserAccess table
-        // 3. External DB access (via Synergetic class code)
-
-        // Not sure what this is for (but Steve does apparently)
-
-        if (!isset($serviceIdentifier)) {
-            return $this->findOneByColumnList(
-                array(
-                    'service' => $service,
-                    'uid'     => $user->getId(),
-                )
-            );
-        }
-
-        // If we are getting the permission for a homepage, we need to take into account inheritance
-
-        if ($serviceIdentifier != 0 && $service == UserAccess::SERVICE_HOMEPAGE) {
-
-            // Find the NNIAN for the folder
-            $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
-            $folderNnian = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
-            $serviceIdentifier = $folderNnian->getId();
-        }
-
-        // Setup cache array for this user/service/sid if it doesn't already exist)
-
-        if (!isset($this->cachedPermissions[$user->getId()])) {
-            $this->cachedPermissions[$user->getId()] = [];
-        }
-
-        if (!isset($this->cachedPermissions[$user->getId()][$service])) {
-            $this->cachedPermissions[$user->getId()][$service] = [];
-        }
-
-        // Permission check #1 - Cached results
-
-        if (isset($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier]) && $cache) {
-
-            if ($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] == -1) {
-                // Found cached exception, throw it
-                throw new Mapper\Exception\NotFound();
-            }
-
-            // Found cached result, return it
-            return $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier];
-        }
-
-        // Permission check #2 - UserAccess table
-
-        try {
-            $result = $this->findOneByColumnList(
-                array(
-                    'service' => $service,
-                    'sid' => $serviceIdentifier,
-                    'uid' => $user->getId(),
-                )
-            );
-            // Found a result in UserAccess, cache it and return the permission object
-            $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = $result;
-            return $result;
-        } catch (\Exception $e) {
-
-            // Exception thrown if not found. Noop
-        }
-
-        // Permission check #3 - External DB
-        $folderCodeList = CodeMapper::getInstance()->findForCategory($serviceIdentifier);
-        if(count($folderCodeList) > 0) {
-            $allCodes = [];
-            foreach ($folderCodeList as $currentCode) {
-                $allCodes[]= $currentCode->getCode();
-            }
-            $result = $this->involvedInSubject($user, implode(',',$allCodes));
-            if ($result) {
-                // Found matching student, give them read/write perms if student/staff respectively
-
-                $studentReadAccess = $this->getConfigLoader()->get('allow_student_class_access') ? UserAccess::ACCESS_READ : UserAccess::ACCESS_DENY;
-
-                $model = new UserAccess();
-                $model->setService($service);
-                $model->setServiceIdentifier($serviceIdentifier);
-                $model->setUser($user);
-                $model->setAccessLevel(
-                    $user->getRole()->getType() == 'student'
-                        ? $studentReadAccess
-                        : UserAccess::ACCESS_WRITE);
-
-                // Cache for future calls and return the permission object
-
-                $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = $model;
-                return $model;
-            }
-        }
-
-
-        // The users got no permission in either UserAccess or external DB
-
-        // Cache and throw an exception
-
-        $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = -1;
-        throw new Mapper\Exception\NotFound();
     }
 }

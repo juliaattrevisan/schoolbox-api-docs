@@ -113,7 +113,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				  FROM wiki w
 				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE w.deleted = 'false' AND categoryID = '{$this->db->quote($categoryID)}'
+				  WHERE w.deleted = 'false' AND categoryID = '{$this->db->quote((string)$categoryID)}'
 				  {$orderBySQL} {$sortDir}";
 
 		if (is_numeric($limit) && ($limit > 0)) {

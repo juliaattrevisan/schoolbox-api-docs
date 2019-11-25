@@ -80,6 +80,12 @@ class UserAccess implements IModel
     public const SERVICE_SPORTS_ADMINISTRATOR = 10;
 
     /**
+     * Services that do not have have service identifiers (sid) use this value
+     * (This is enforced at the DB level by not permitted nulls, and defaulting to '0)
+     */
+    public const SID_NONE = 0;
+
+    /**
      * Status of your acceptance into the group
      * 0 awaiting authorisation
      * 1 you're in
@@ -134,6 +140,53 @@ class UserAccess implements IModel
         return [self::ACCESS_DENY, self::ACCESS_READ, self::ACCESS_WRITE, self::ACCESS_FULL,];
     }
 
+
+
+    /**
+     * Return all possible services
+     *
+     * @return int[]
+     */
+    public static function allServices(): array
+    {
+        return [
+            self::SERVICE_HOMEPAGE,
+            self::SERVICE_CALENDAR,
+            self::SERVICE_NEWS,
+            self::SERVICE_CMS,
+            self::SERVICE_HOUSEMASTER,
+            self::SERVICE_RESOURCE_BOOKING,
+            self::SERVICE_CURRICULUM,
+            self::SERVICE_PASTORAL,
+            self::SERVICE_SPORTS_ADMINISTRATOR,
+        ];
+    }
+
+
+    /**
+     * Returns the services that require an identifier
+     *
+     * @return int[]
+     */
+    public static function requiresServiceIdentifier(): array
+    {
+        return [
+            self::SERVICE_HOMEPAGE,
+            self::SERVICE_CALENDAR,
+            self::SERVICE_HOUSEMASTER,
+        ];
+    }
+
+
+    /**
+     * Returns the services that should not have an identifier
+     *
+     * @return int[]
+     */
+    public static function doesNotRequireServiceIdentifier(): array
+    {
+        return \array_diff(self::allServices(), self::requiresServiceIdentifier());
+    }
 
     /**
      * @param User $user

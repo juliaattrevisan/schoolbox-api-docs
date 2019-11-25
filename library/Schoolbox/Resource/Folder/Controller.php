@@ -261,7 +261,7 @@ class Controller extends BaseController
         }
 
         // New folders that are not in the root note inherit by default to reduce the user interface
-        if (!$folder->getId() && $folder->getParent()->getId() !== Mapper::FOLDER_ROOT) {
+        if (!$folder->getId() && $folder->getParent()->getId() !== Model::ROOT_ID) {
             $folder->enableInherit();
         }
 

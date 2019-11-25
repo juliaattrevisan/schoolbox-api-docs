@@ -256,7 +256,12 @@ abstract class Mapper implements IMapper, Serializable
     /** @var Propagator */
     private $propagatorSuppressed;
 
-    /** @var bool */
+    /**
+     * If this is TRUE, and a caller requests an entity that has already been fetched, it will return
+     * the previously fetched object instance. Otherwise it will return a new model.
+     *
+     * @var bool
+     */
     private $localBodyCacheBypass = false;
 
     /**
@@ -1870,7 +1875,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return bool
      */
-    protected function isCacheEnabled()
+    public function isCacheEnabled()
     {
         return $this->cacheEnabled;
     }

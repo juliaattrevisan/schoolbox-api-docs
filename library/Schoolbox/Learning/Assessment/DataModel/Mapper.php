@@ -976,7 +976,7 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
             if (isset($context) && !$context instanceof Project\Model) {
-                $folderIds[] = $context->getFolder()->getId();
+                $folderIds[$context->getFolder()->getId()] = $context->getFolder()->getId();
             }
         }
 

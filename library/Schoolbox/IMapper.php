@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -20,7 +20,7 @@ use Schoolbox\Mapper\Exception;
  *
  * @package Schoolbox
  */
-interface IMapper 
+interface IMapper
 {
     /**
      * Retrieve the singleton instance of this class.
@@ -215,7 +215,7 @@ interface IMapper
      * Returns first model whose $columnName = $columnValue.
      *
      * @param  string $columnName
-     * @param  string $columnValue
+     * @param  mixed  $columnValue
      * @param  array  $options (@see findByColumnList() for list of available options)
      *
      * @return object
