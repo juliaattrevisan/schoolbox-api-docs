@@ -32,7 +32,17 @@ class Activities extends Base
 
         $result = $this->getDb()->getAll($query) ?: [];
 
-        new \Alaress_Probe($result);
-        return $result;
+        /* Group activities by year
+         *
+         * I could have cheaped this further, but it's just easier to debug alongside DSFG
+         * if I leave their queries unaltered
+         */
+        $activities = [];
+
+        foreach ($result as $row) {
+            $activities[$row['StudentFileYear']][] = $row['SubjectClassesDescription'];
+        }
+
+        return $activities;
     }
 }
