@@ -23,13 +23,15 @@
     </div>
 </div>
 
+{% if PATMathematics.visible %}
 <div class="row">
     <div class="small-12 columns">
         {% include '@standardisedTest/Stanine/Graph.twig' with {
             identifier: 'PATMathematics',
-            title: PATMathematics.graph.title,
-            yAxis: PATMathematics.graph.y,
-            data: PATMathematics.data
+            title: PATMathematics.data.graph.title,
+            yAxis: PATMathematics.data.graph.y,
+            series: PATMathematics.data.series
         } %}
     </div>
 </div>
+{% endif %}
