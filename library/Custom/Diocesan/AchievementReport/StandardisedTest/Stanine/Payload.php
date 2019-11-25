@@ -25,12 +25,20 @@ class Payload
             'title' => '',
             'y' => '% of Children'
         ],
-        'data' => [
+        'series' => [
             'student' => [],
             'diocesan' => [],
             'national' => [],
         ]
     ];
+
+
+    /**
+     * Dirty bit
+     *
+     * @var bool
+     */
+    private $hasData = false;
 
 
     /**
@@ -77,9 +85,9 @@ class Payload
          * corresponding to ThisStudentStanine.
          */
         if ($condition) {
-            $this->stack['data']['student'][$x] = $y;
+            $this->stack['series']['student'][$x] = $y;
         } else {
-            $this->stack['data']['student'][$x] = 'null';
+            $this->stack['series']['student'][$x] = 'null';
         }
 
         return $this;
@@ -96,7 +104,7 @@ class Payload
      */
     public function aggregateDiocesan(string $x, string $y): self
     {
-        $this->stack['data']['diocesan'][$x] = $y;
+        $this->stack['series']['diocesan'][$x] = $y;
 
         return $this;
     }
@@ -112,7 +120,7 @@ class Payload
      */
     public function aggregateNational(string $x, string $y): self
     {
-        $this->stack['data']['national'][$x] = $y;
+        $this->stack['series']['national'][$x] = $y;
 
         return $this;
     }
@@ -126,5 +134,27 @@ class Payload
     public function getData(): array
     {
         return $this->stack;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasData(): bool
+    {
+        return $this->hasData;
+    }
+
+
+    /**
+     * @param bool $hasData
+     *
+     * @return Payload
+     */
+    public function setHasData(bool $hasData): self
+    {
+        $this->hasData = $hasData;
+
+        return $this;
     }
 }

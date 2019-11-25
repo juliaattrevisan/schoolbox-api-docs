@@ -19,19 +19,19 @@
             series: [
                 {
                     color: '#17419b',
-                    data: [{{ data.diocesan|join(',') }}],
+                    data: [{{ series.diocesan|join(',') }}],
                     type: 'column'
 
                 },
                 {
                     color: '#a01c1c',
-                    data: [{{ data.national|join(',') }}],
+                    data: [{{ series.national|join(',') }}],
                     type: 'spline'
 
                 },
                 {
                     color: '#bfaf03',
-                    data: [{{ data.student|join(',') }}],
+                    data: [{{ series.student|join(',') }}],
                     marker: {
                         lineColor: '#847700',
                         lineWidth: 1,
