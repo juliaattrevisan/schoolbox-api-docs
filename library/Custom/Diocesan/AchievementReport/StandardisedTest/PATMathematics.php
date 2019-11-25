@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 
-use Custom\Diocesan\AchievementReport\StandardisedTest\Payload\Stanine;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Stanine\Payload;
 
 /**
  * Class PATMathematics
@@ -45,7 +45,7 @@ class PATMathematics extends Base
 
         /* Find data for each of the three series
          */
-        $payload = new Stanine('PAT Mathematics', $this->year);
+        $payload = new Payload('PAT Mathematics', $this->year);
 
         foreach ($result as $row) {
             $payload

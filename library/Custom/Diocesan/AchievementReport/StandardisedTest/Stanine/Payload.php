@@ -5,9 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest\Payload;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\Stanine;
 
-class Stanine
+/**
+ * Class Payload
+ *
+ * @package Custom\Diocesan\AchievementReport\StandardisedTest\Stanine
+ */
+class Payload
 {
 
     /**
@@ -26,6 +31,7 @@ class Stanine
             'national' => [],
         ]
     ];
+
 
     /**
      * Stanine constructor.
@@ -56,7 +62,7 @@ class Stanine
      * @param string $x
      * @param string $y
      *
-     * @return Stanine
+     * @return Payload
      */
     public function aggregateStudent(bool $condition, string $x, string $y): self
     {
@@ -86,7 +92,7 @@ class Stanine
      * @param string $x
      * @param string $y
      *
-     * @return Stanine
+     * @return Payload
      */
     public function aggregateDiocesan(string $x, string $y): self
     {
@@ -102,7 +108,7 @@ class Stanine
      * @param string $x
      * @param string $y
      *
-     * @return Stanine
+     * @return Payload
      */
     public function aggregateNational(string $x, string $y): self
     {
