@@ -10,8 +10,10 @@ use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATListeningComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATTable;
+use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATListeningComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATMathematics;
 use MSSQL;
 use Schoolbox\User;
@@ -155,6 +157,7 @@ class Controller extends Base {
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $year))->findData();
+        $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $year))->findData();
 
         $this->getResponse()->content->set(array(
             'template' => '@standardisedTest/index.twig',
@@ -178,6 +181,10 @@ class Controller extends Base {
                 'PATMathematics' => [
                     'data' => $mathematicsPayload->getData(),
                     'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
+                ],
+                'PATListeningComprehension' => [
+                    'data' => $listeningComprehensionPayload->getData(),
+                    'visible' => (new ValidPATListeningComprehension())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
                 ]
             ]
         ));

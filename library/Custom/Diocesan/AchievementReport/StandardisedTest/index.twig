@@ -35,3 +35,16 @@
     </div>
 </div>
 {% endif %}
+
+{% if PATListeningComprehension.visible %}
+<div class="row">
+    <div class="small-12 columns">
+        {% include '@standardisedTest/Stanine/Graph.twig' with {
+            identifier: 'PATListeningComprehension',
+            title: PATListeningComprehension.data.graph.title,
+            yAxis: PATListeningComprehension.data.graph.y,
+            series: PATListeningComprehension.data.series
+        } %}
+    </div>
+</div>
+{% endif %}
