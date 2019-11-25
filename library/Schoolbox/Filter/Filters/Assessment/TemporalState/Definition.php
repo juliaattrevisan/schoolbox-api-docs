@@ -136,7 +136,7 @@ class Definition extends Filter\AbstractDefinition
 
                 case Filter\Page\Model::PAGE_GRADES:
                     // Do not permit 'unpublished' on the 'grades' page
-                    if ($key === self::KEY_UNPUBLISHED || !in_array($key, self::getTemporalStates(), true)) {
+                    if ($key === self::KEY_CUSTOM_UNPUBLISHED || !in_array($key, self::getCapTemporalStates(), true)) {
                         $cleanedPageOptions->offsetUnset($idx);
                     }
                     break;
