@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 
 /**
- * Class ValidPATMathematics
+ * Class ValidListeningComprehension
  *
  * Determine whether the PAT Listening Comprehension graph should appear
  *

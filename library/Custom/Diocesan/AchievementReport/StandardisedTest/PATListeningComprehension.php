@@ -10,7 +10,7 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Stanine\Payload;
 
 /**
- * Class PATMathematics
+ * Class PATListeningComprehension
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
@@ -18,7 +18,7 @@ class PATListeningComprehension extends Base
 {
 
     /**
-     * Find all the data for PAT Mathematics graph
+     * Find all the data for PAT Listening Comprehension graph
      *
      * @return Payload
      */

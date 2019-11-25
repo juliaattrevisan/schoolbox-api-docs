@@ -48,3 +48,16 @@
     </div>
 </div>
 {% endif %}
+
+{% if PATReadingVocabulary.visible %}
+    <div class="row">
+        <div class="small-12 columns">
+            {% include '@standardisedTest/Stanine/Graph.twig' with {
+                identifier: 'PATReadingVocabulary',
+                title: PATReadingVocabulary.data.graph.title,
+                yAxis: PATReadingVocabulary.data.graph.y,
+                series: PATReadingVocabulary.data.series
+            } %}
+        </div>
+    </div>
+{% endif %}
