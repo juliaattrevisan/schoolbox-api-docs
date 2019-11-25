@@ -209,6 +209,11 @@ class NavigationSelector
             $availableNavigation[self::COMMENTS_KEY] = 'Comments';
         }
 
+        /* PDF Reports
+         * This is a special case: it links to some other url that isn't in the Achievement Report
+         */
+        $availableNavigation['PDF Reports'] = 'PDF Reports';
+
         /* Conditionally add CoCurricular option
          */
         if ($this->hasCoCurricular()) {
