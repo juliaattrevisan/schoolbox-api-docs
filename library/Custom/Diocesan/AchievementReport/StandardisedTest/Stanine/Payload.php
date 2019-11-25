@@ -78,8 +78,8 @@ class Payload
         /* An assumption.
          *
          * ThisStudentStanine looks like it equates to Seq, which is the x-axis.
-         * ThisStudentStatnine an either equate to Seq, or be zero.
-         * If ThisStudentStatnine is zero, I don't render anything.
+         * ThisStudentStanine an either equate to Seq, or be zero.
+         * If ThisStudentStanine is zero, I don't render anything.
          *
          * Otherwise, I render the value of IndividualMathsPATStanineMarker in the column
          * corresponding to ThisStudentStanine.
