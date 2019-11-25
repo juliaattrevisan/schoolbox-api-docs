@@ -336,7 +336,10 @@ class DataSource
                 $this->accessLevelCensor->getPastoralGroupMemberMapper()->findByColumn('user_id', $viewer->getId())
             );
         }
-        $pastoralGroupIds = $viewer->getPastoralGroupsMemberships()->getPropertyValues('id');
+        $pastoralGroupIds = [];
+        foreach ($viewer->getPastoralGroupsMemberships() as $groupsMembership) {
+            $pastoralGroupIds[] = $groupsMembership->getGroup()->getId();
+        }
 
         /**
          * Pastoral records that we are interested in */
