@@ -111,6 +111,16 @@ class Controller extends Base {
 
                 break;
 
+            case NavigationSelector::COCURRICULAR_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.getCoCurricular', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
+                break;
+
             /* Error state - render an error page and leave it
              * at that, I guess
              */
@@ -433,5 +443,21 @@ class Controller extends Base {
         ];
 
         $this->getResponse()->content->set($output);
+    }
+
+
+    /**
+     * Get all the cocurricular activities for $externalUser
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     */
+    public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
+        $allActivities = (new CoCurricular\Activities($user, $externalUser, $db, $year))->findData();
+
+        $this->getResponse()->content->set([]);
     }
 }

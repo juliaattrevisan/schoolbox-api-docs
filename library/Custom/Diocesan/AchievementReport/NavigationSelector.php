@@ -24,7 +24,7 @@ class NavigationSelector
     public const NCEA_KEY = 'ncea';
     public const IB_KEY = 'ib';
     public const COMMENTS_KEY = 'comments';
-
+    public const COCURRICULAR_KEY = 'coCurricular';
 
     /**
      * MSSQL db handler
@@ -210,7 +210,7 @@ class NavigationSelector
 
         return $count['computed'];
     }
-    
+
     /**
      * Find out if they are in the School Grades table
      */
