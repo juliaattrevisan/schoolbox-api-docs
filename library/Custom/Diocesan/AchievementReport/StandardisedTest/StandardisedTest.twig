@@ -6,40 +6,7 @@
  #}
 
 {% include '@templates/Avatar.twig' %}
-
-<div class="row">
-    <div class="small-12 columns">
-        <ul class="sub-nav">
-            {% set standardisedTestRoute = routeLookupIfAuthorized('achievementreport.getStandardisedTest', {
-                externalUserId: externalUser.StudentID,
-                year: year
-            }) %}
-            {% if standardisedTestRoute %}
-            <li class="active">
-                <a href="{{ standardisedTestRoute }}">Standardised Test</a>
-            </li>
-            {% endif %}
-
-            {# Provide button only if you can get there
-             # Other places hardcode this url, but we can do it properly here
-             #}
-            {% set commentsRoute = routeLookupIfAuthorized('achievementreport.getComments', {
-                externalUserId: externalUser.StudentID,
-                year: year
-            }) %}
-
-            {% if commentsRoute %}
-            <li>
-                <a href="{{ commentsRoute }}">Comments</a>
-            </li>
-            {% endif %}
-
-            <li>
-                <a href="/user/profile/documents/reports/{{ user.id }}">PDF Reports</a>
-            </li>
-        </ul>
-    </div>
-</div>
+{% include '@templates/Navigation.twig' %}
 
 <div class="row">
     <div class="small-12 island">

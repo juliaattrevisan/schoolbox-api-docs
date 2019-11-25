@@ -153,6 +153,10 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@standardisedTest/StandardisedTest.twig',
             'data' => [
+                'navigation' => array(
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ),
                 'externalUser' => $externalUser,
                 'user' => $user,
             ]
@@ -211,6 +215,7 @@ class Controller extends Base {
         ));
     }
 
+
     /**
      * IB page
      *
@@ -265,6 +270,7 @@ class Controller extends Base {
             ]
         ]);
     }
+
 
     /**
      * NCEA page
@@ -451,6 +457,7 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
