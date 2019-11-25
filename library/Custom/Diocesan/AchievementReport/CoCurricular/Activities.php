@@ -23,11 +23,12 @@ class Activities extends Base
      */
     public function findData(): array
     {
-        $query = '
+        $query = "
             SELECT * 
             FROM uvSchoolBoxCoCurricularClasses 
+            WHERE StudentID = '{$this->getExternalUserId()}'
             ORDER BY StudentID, StudentFileYear Desc, OrderSort, SubjectClassesDescription
-        ';
+        ";
 
         $result = $this->getDb()->getAll($query) ?: [];
 
