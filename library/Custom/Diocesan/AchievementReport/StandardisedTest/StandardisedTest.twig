@@ -6,10 +6,13 @@
  #}
 
 {% include '@templates/Avatar.twig' %}
-{% include '@templates/Navigation.twig' %}
 
 {% include '@templates/Navigation.twig' with {
-    navigation: subnavigation
+    elements: navigation
+} %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: subnavigation
 } %}
 
 <div class="row">

@@ -1,5 +1,8 @@
 {% include '@templates/Avatar.twig' %}
-{% include '@templates/Navigation.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
 
 <div class="row">
     <div class="small-12 island achievement-report">

@@ -2,7 +2,10 @@
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/ncea/stackedBar.js"></script>
 
 {% include '@templates/Avatar.twig' %}
-{% include '@templates/Navigation.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
 
 <div class="row">
     <div class="small-12 columns achievement-report ncea">

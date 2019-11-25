@@ -3,13 +3,13 @@
  #
  # Adds a row of buttons so people can navigate betwen NCEA, School Grades, IB and Comments reports
  #
- # @param array navigation
+ # @param array elements
  #}
 <div class="row">
     <div class="small-12 columns">
         <ul class="sub-nav">
-            {% for key, data in navigation.all %}
-                <li {% if key == navigation.selected %}class="active"{% endif %}>
+            {% for key, data in elements.all %}
+                <li {% if key == elements.selected %}class="active"{% endif %}>
                     <a href="{{ data.url }}">{{ data.label }}</a>
                 </li>
             {% endfor %}
