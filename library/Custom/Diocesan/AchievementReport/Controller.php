@@ -49,7 +49,7 @@ class Controller extends Base {
      */
     public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $selector = new NavigationSelector($db, $user, $externalUser);
+        $selector = new NavigationSelector($this->getRouter(), $db, $user, $externalUser, $year);
         $selector->determineDefaultReport();
 
         $report = $selector->getDefaultReport();
@@ -169,7 +169,7 @@ class Controller extends Base {
      */
     public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $selector = new NavigationSelector($db, $user, $externalUser);
+        $selector = new NavigationSelector($this->getRouter(), $db, $user, $externalUser, $year);
         $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
         $gradeSummaryTable = new SchoolGrades\GradeSummary($user, $externalUser, $db, $year);
@@ -238,7 +238,7 @@ class Controller extends Base {
             );
         }
 
-        $selector = new NavigationSelector($db, $user, $externalUser);
+        $selector = new NavigationSelector($this->getRouter(), $db, $user, $externalUser, $year);
 
         $this->getResponse()->content->set([
             'template' => '@ib/index.twig',
@@ -278,7 +278,7 @@ class Controller extends Base {
      */
     public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $selector = new NavigationSelector($db, $user, $externalUser);
+        $selector = new NavigationSelector($this->getRouter(), $db, $user, $externalUser, $year);
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
@@ -426,7 +426,7 @@ class Controller extends Base {
             'template' => '@comments/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->getRouter(), $db, $user, $externalUser, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::COMMENTS_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -460,7 +460,7 @@ class Controller extends Base {
             'template' => '@coCurricular/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->getRouter(), $db, $user, $externalUser, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::COCURRICULAR_KEY
                 ],
                 'externalUser' => $externalUser,

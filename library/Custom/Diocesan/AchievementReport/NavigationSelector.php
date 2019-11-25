@@ -6,6 +6,7 @@
  */
 namespace Custom\Diocesan\AchievementReport;
 
+use Aura\Router\Router;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Schoolbox\User;
 use MSSQL;
@@ -51,6 +52,12 @@ class NavigationSelector
      * @var User
      */
     private $user;
+
+
+    /**
+     * @var int|null
+     */
+    private $year;
 
 
     /**
@@ -112,15 +119,19 @@ class NavigationSelector
     /**
      * Constructor
      *
-     * @param MSSQL $db
-     * @param User $user
-     * @param array $externalUser
+     * @param Router $router
+     * @param MSSQL  $db
+     * @param User   $user
+     * @param array  $externalUser
+     * @param int    $year
      */
-    public function __construct(MSSQL $db, User $user, array $externalUser)
+    public function __construct(Router $router, MSSQL $db, User $user, array $externalUser, ?int $year)
     {
+        $this->router = $router;
         $this->externalUser = $externalUser;
         $this->db = $db;
         $this->user = $user;
+        $this->year = $year;
 
         /* Determine navigation options
          */
@@ -179,47 +190,90 @@ class NavigationSelector
          */
         if ($this->hasNcea()) {
             $this->hasNcea = true;
-            $availableNavigation[self::NCEA_KEY] = 'NCEA';
+
+            $availableNavigation[self::NCEA_KEY] = [
+                'url' => $this->router->generate('achievementreport.getNcea', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'NCEA'
+            ];
         }
 
         /* Conditionally add IB option
          */
         if ($this->hasIb()) {
             $this->hasIb = true;
-            $availableNavigation[self::IB_KEY] = 'IB';
+
+            $availableNavigation[self::IB_KEY] = [
+                'url' => $this->router->generate('achievementreport.getIb', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'IB'
+            ];
         }
 
         /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
             $this->hasSchoolGrades = true;
-            $availableNavigation[self::SCHOOLGRADES_KEY] = 'School Grades';
+
+            $availableNavigation[self::SCHOOLGRADES_KEY] = [
+                'url' => $this->router->generate('achievementreport.getSchoolGrades', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'School Grades'
+            ];
         }
 
         /* Conditionally add Standardised Test option
          */
         if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
-            $availableNavigation[self::STANDARDISEDTEST_KEY] = 'Standardised Test';
+            $availableNavigation[self::STANDARDISEDTEST_KEY] = [
+                'url' => $this->router->generate('achievementreport.getStandardisedTest', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'Standardised Test'
+            ];
         }
 
         /* Conditionally add Comment option
          */
         if ($this->hasComments()) {
             $this->hasComments = true;
-            $availableNavigation[self::COMMENTS_KEY] = 'Comments';
+
+            $availableNavigation[self::COMMENTS_KEY] = [
+                'url' => $this->router->generate('achievementreport.getComments', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'Comments'
+            ];
         }
 
         /* PDF Reports
          * This is a special case: it links to some other url that isn't in the Achievement Report
          */
-        $availableNavigation['PDF Reports'] = 'PDF Reports';
+        $availableNavigation['PDF Reports'] = [
+            'url' => "/user/profile/documents/reports/{$this->user->getId()}",
+            'label' => 'PDF Reports'
+        ];
 
         /* Conditionally add CoCurricular option
          */
         if ($this->hasCoCurricular()) {
             $this->hasCoCurricular = true;
-            $availableNavigation[self::COCURRICULAR_KEY] = 'Co-Curricular';
 
+            $availableNavigation[self::COCURRICULAR_KEY] = [
+                'url' => $this->router->generate('achievementreport.getCoCurricular', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'Co-Curricular'
+            ];
         }
 
         $this->availableNavigation = $availableNavigation;
