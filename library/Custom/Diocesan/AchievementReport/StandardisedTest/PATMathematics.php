@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Payload\Stanine;
+
 /**
  * Class PATMathematics
  *
@@ -43,38 +45,15 @@ class PATMathematics extends Base
 
         /* Find data for each of the three series
          */
-        $stack = [
-            'graph' => [
-                'title' => "PAT Mathematics {$this->year}",
-                'y' => '% of Children'
-            ],
-            'data' => [
-                'student' => [],
-                'diocesan' => [],
-                'national' => [],
-            ]
-        ];
+        $payload = new Stanine('PAT Mathematics', $this->year);
 
-        /* An assumption.
-         *
-         * ThisStudentStanine looks like it equates to Seq, which is the x-axis.
-         * ThisStudentStatnine an either equate to Seq, or be zero.
-         * If ThisStudentStatnine is zero, I don't render anything.
-         *
-         * Otherwise, I render the value of IndividualMathsPATStanineMarker in the column
-         * corresponding to ThisStudentStanine.
-         */
         foreach ($result as $row) {
-            if ($row['ThisStudentStanine']) {
-                $stack['data']['student'][$row['Seq']] = $row['IndividualMathsPATStanineMarker'];
-            } else {
-                $stack['data']['student'][$row['Seq']] = 'null';
-            }
-
-            $stack['data']['diocesan'][$row['Seq']] = $row['DiocesanMathsPATStaninePercentage'];
-            $stack['data']['national'][$row['Seq']] = $row['NationalMathsPATStaninePercentage'];
+            $payload
+                ->aggregateStudent((bool)$row['ThisStudentStanine'], (string)$row['Seq'], (string)$row['IndividualMathsPATStanineMarker'])
+                ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanMathsPATStaninePercentage'])
+                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage']);
         }
 
-        return $stack;
+        return $payload->getData();
     }
 }
