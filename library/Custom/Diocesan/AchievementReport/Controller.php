@@ -161,10 +161,40 @@ class Controller extends Base {
      */
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
+
+        /* Each graph's payload and visibility status
+         */
         $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $year))->findData();
+
+        $PATMathematics = [
+            'data' => $mathematicsPayload->getData(),
+            'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
+        ];
+
         $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $year))->findData();
+
+        $PATListeningComprehension = [
+            'data' => $listeningComprehensionPayload->getData(),
+            'visible' => (new ValidPATListeningComprehension())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
+        ];
+
         $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $db, $year))->findData();
+
+        $PATReadingVocabulary = [
+            'data' => $readingVocabularyPayload->getData(),
+            'visible' => (new ValidPATReadingVocabulary())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
+        ];
+
         $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $db, $year))->findData();
+
+        $PATReadingComprehension = [
+            'data' => $readingComprehensionPayload->getData(),
+            'visible' => (new ValidPATReadingComprehension())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
+        ];
+
+        /* PAT Graph heading is only visible when there's at least one graph to show
+         */
+        $headingVisible = $PATMathematics['visible'] || $PATListeningComprehension['visible'] || $PATReadingVocabulary['visible'] || $PATReadingComprehension['visible'];
 
         $this->getResponse()->content->set(array(
             'template' => '@standardisedTest/index.twig',
@@ -190,22 +220,14 @@ class Controller extends Base {
                     'all' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
                     'selected' => $year ?? (int)date('Y')
                 ],
-                'PATMathematics' => [
-                    'data' => $mathematicsPayload->getData(),
-                    'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
+                'PATHeading' => [
+                    'label' => "Percentage of Year {$user->getYear()} Children by Stanine",
+                    'visible' => $headingVisible
                 ],
-                'PATListeningComprehension' => [
-                    'data' => $listeningComprehensionPayload->getData(),
-                    'visible' => (new ValidPATListeningComprehension())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
-                ],
-                'PATReadingVocabulary' => [
-                    'data' => $readingVocabularyPayload->getData(),
-                    'visible' => (new ValidPATReadingVocabulary())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
-                ],
-                'PATReadingComprehension' => [
-                    'data' => $readingComprehensionPayload->getData(),
-                    'visible' => (new ValidPATReadingComprehension())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
-                ]
+                'PATMathematics' => $PATMathematics,
+                'PATListeningComprehension' => $PATListeningComprehension,
+                'PATReadingVocabulary' => $PATReadingVocabulary,
+                'PATReadingComprehension' => $PATReadingComprehension
             ]
         ));
     }

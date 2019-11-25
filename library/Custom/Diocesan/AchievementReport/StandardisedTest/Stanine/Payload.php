@@ -50,7 +50,7 @@ class Payload
      */
     public function __construct(string $title, int $year, ?string $yAxis = null)
     {
-        $this->stack['graph']['title'] = "{$title} {$year}";
+        $this->stack['graph']['title'] = $title;
 
         /* Custom y-axis label
          */

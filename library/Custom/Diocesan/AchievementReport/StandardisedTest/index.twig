@@ -28,6 +28,14 @@
         elements: PATNavigation
     } %}
 
+    {% if PATHeading.visible %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader">{{ PATHeading.label }}</h2>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="row">
         {% if PATMathematics.visible %}
             <div class="small-12 large-6 columns">
