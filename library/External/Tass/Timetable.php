@@ -5,9 +5,11 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+use Schoolbox\Campus;
 
 class External_Tass_Timetable implements External_TimetableInterface
 {
+    use External_MssqlConnector;
 
     /**
      * @var MSSQL
@@ -31,32 +33,31 @@ class External_Tass_Timetable implements External_TimetableInterface
     private $externalUser;
     function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
-
+        $this->setupDatabase();
         $this->groupHandler = new Group;
         $this->externalUser = new External_User('tass');
     }
 
 
 
-    private function getCampusCode(\Schoolbox\Campus $campus)
+    private function getCampusCode(Campus $campus)
     {
         list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
         return $campusCode;
     }
 
-    private function getTimetableCode(\Schoolbox\Campus $campus)
+    private function getTimetableCode(Campus $campus)
     {
         list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
         return $timetableCode;
     }
 
-    private function getDays(\Schoolbox\Campus $campus)
+    private function getDays(Campus $campus)
     {
         return $campus->getTimetableDay();
     }
 
-    public function getTimetableDefinition(?string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
 
         $campusCode    = $this->getCampusCode($campus);
@@ -65,7 +66,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         /* Fetch the longest day to use as our day template...  */
         if ($day == 0) {
             $query      = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = '" . $timetableCode . "' AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
-            $longestDay = $this->getDatabase()->getRow($query);
+            $longestDay = $this->getConnector()->executeQuery($query)->fetch();
             $day        = $longestDay['day_code'];
         }
 
@@ -73,7 +74,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                 WHERE tt_id = '" . $timetableCode . "' AND cmpy_code = '$campusCode' AND day_code='$day'
                 ORDER BY prd_code";
 
-        $statement = $this->getDatabase()->query($query);
+        $statement = $this->getConnector()->executeQuery($query);
         $periodCount = 0;
         while ($period = $statement->fetch()) {
 
@@ -92,30 +93,32 @@ class External_Tass_Timetable implements External_TimetableInterface
     /**
      * Retrieve day number from TASS database
      *
-     * @param \Schoolbox\Campus $campus
+     * @param Campus $campus
      * @param int               $date
      *
      * @return int|string
      */
-    function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
+    function getDayNumber(Campus $campus, $date = 0)
     {
         if (!$date) {
             $date = time();
         }
 
-        $cmpyCode = $this->getDatabase()->quote($this->getCampusCode($campus));
-        $ttDate   = date("Y-m-d 00:00:00", $date);
-        $ttId     = $this->getDatabase()->quote($this->getTimetableCode($campus));
+        $params = [
+            'cmpyCode' => $this->getCampusCode($campus),
+            'ttDate'   => date("Y-m-d 00:00:00", $date),
+            'ttId'     => $this->getTimetableCode($campus),
+        ];
 
         $query = "
             SELECT  day_code 
             FROM    ttcalendar 
-            WHERE   cmpy_code = '{$cmpyCode}' AND 
-                    ttdate = '{$ttDate}' AND
-                    tt_id = '{$ttId}'
+            WHERE   cmpy_code = :cmpyCode AND 
+                    ttdate = :ttDate AND
+                    tt_id = :ttId
         ";
 
-        $result = $this->getDatabase()->query($query)->fetchColumn();
+        $result = $this->getConnector()->executeQuery($query, $params)->fetchColumn();
 
         if (strlen(trim($result)) === 0) {
             return 0;
@@ -136,7 +139,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
 
-    function getLastDay($date, \Schoolbox\Campus $campus)
+    function getLastDay($date, Campus $campus)
     {
 
         $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
@@ -147,7 +150,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                     AND tt_id = '" . $this->getTimetableCode($campus) . "'
                     ORDER BY ttdate DESC";
 
-        $result               = $this->getDatabase()->getRow($query);
+        $result               = $this->getConnector()->executeQuery($query)->fetch();
         $time                 = strtotime($result['ttdate']);
         $this->tassDay[$time] = $result['day_code'];
 
@@ -158,20 +161,23 @@ class External_Tass_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         return [];
     }
 
-    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId)) {
             return array();
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $params = [
+            'fileSemester' => $this->externalUser->getCurrentSemester($externalUserId),
+            'fileYear'     => $this->externalUser->getCurrentYear($externalUserId),
+        ];
+
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT room_code, tch_code, ttmast.sub_code,ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc
                         FROM studsub
@@ -179,7 +185,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester 
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                        WHERE yr_study = '$fileYear' AND studsub.semester = '$fileSemester'
+                        WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
                                 AND studsub.stud_code = '$externalUserId'
                                 AND day_code = '$dayNumber'
                         ORDER BY prd_code";
@@ -187,16 +193,17 @@ class External_Tass_Timetable implements External_TimetableInterface
             $query = "SELECT room_code, tch_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                        WHERE year_num = '$fileYear' AND semester = '$fileSemester'
+                        WHERE year_num = :fileYear AND semester = :fileSemester
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
                             AND tch_code = '$externalUserId'
                             AND day_code = '$dayNumber'
                          ORDER BY prd_code";
         }
 
-        $statement = $this->getDatabase()->query($query);
+        $statement = $this->getConnector()->executeQuery($query, $params);
 
         $timetable = array();
+        $useYearInCode = $this->config->get('external_tass_year_in_class_code');
 
         // Build the timetable
         if(is_array($timetabledef['desc'])) {
@@ -211,6 +218,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
             // Add classes into it
             while ($desc = $statement->fetch()) {
+                if (!$useYearInCode) {
+                    $desc['year_grp'] = '';
+                }
                 $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
                 foreach ($timetable as $x => $timetablePeriod) {
                     if ($desc['prd_code'] == $timetablePeriod['periodNumber']
@@ -235,21 +245,24 @@ class External_Tass_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
 
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (empty($externalUserId)) {
             return array();
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus);
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $params = [
+            'fileSemester' => $this->externalUser->getCurrentSemester($externalUserId),
+            'fileYear'     => $this->externalUser->getCurrentYear($externalUserId),
+        ];
+
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT room_code, tch_code, ttmast.sub_code,  ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc, day_code
                             FROM studsub
@@ -257,7 +270,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                             JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester
                                     AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS NULL) AND studsub.yr_study=ttmast.year_num
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                            WHERE yr_study = '$fileYear' AND studsub.semester = '$fileSemester'
+                            WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
                                     AND studsub.stud_code = '$externalUserId'
                             ORDER BY prd_code, day_code";
 
@@ -265,19 +278,20 @@ class External_Tass_Timetable implements External_TimetableInterface
             $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                        WHERE year_num = '$fileYear' AND semester = '$fileSemester'
+                        WHERE year_num = :fileYear AND semester = :fileSemester
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
                             AND tch_code = '$externalUserId'
                          ORDER BY prd_code, day_code";
         }
 
         $dayCount  = $timetabledef['dayCount'];
-        $statement    = $this->getDatabase()->query($query);
+        $statement    = $this->getConnector()->executeQuery($query, $params);
         $timetable = array();
+        $useYearInCode = $this->config->get('external_tass_year_in_class_code');
 
         // Build the timetable
         // TODO do this somewhere generic as it's the same for all connectors
-        if(is_array($timetabledef['desc'])) {
+        if (is_array($timetabledef['desc'])) {
             foreach ($timetabledef['desc'] as $x => $name) {
                 $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
                 $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
@@ -289,6 +303,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
             // Build the class list
             while ($desc = $statement->fetch()) {
+                if (!$useYearInCode) {
+                    $desc['year_grp'] = '';
+                }
                 $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
                 foreach ($timetable as $x => $timetablePeriod) {
                     if ($desc['prd_code'] == $timetablePeriod['periodNumber']
@@ -358,24 +375,12 @@ class External_Tass_Timetable implements External_TimetableInterface
                 ttmast.day_code ASC,
                 ttmast.prd_code ASC
         ";
-        $query = strtr(
-            $query,
-            array(
-                ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
-                ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
+        $params =
+            [
+                ':semester' => $this->externalUser->getCurrentSemester(),
+                ':year'     => $this->externalUser->getCurrentYear(),
                 ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $roomCodes)),
-            )
-        );
-        return $this->database->trimAll($this->database->getAll($query));
-    }
-
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    private function getDatabase()
-    {
-        return $this->database;
+            ];
+        return $this->getConnector()->executeQuery($query, $params)->fetchAll();
     }
 }
