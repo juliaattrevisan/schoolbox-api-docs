@@ -119,7 +119,7 @@ class Controller extends Base
         $headers->set('Cache-Control', ' ');
         $headers->set('Content-Type', $mimeType->getMime());
         $headers->set('Content-Length', $report['filesize']);
-        $headers->set('Content-Disposition', 'attachment; filename="' . $report['filename'].'"');
+        $headers->set('Content-Disposition', 'attachment; filename="' . $report['filename'] . '"');
 
         $this->getResponse()->content->set(
             $this->buildFileOutputFromString($report['blob'])
