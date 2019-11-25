@@ -23,14 +23,6 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function getParentSync(array $externalUserIds): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getParentEmails(array $externalUserIds): array
     {
         return [];
@@ -112,41 +104,9 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function getStudentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function determineBoarderType(?string $boarderValue): string
     {
         return '';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
     }
 
     /**

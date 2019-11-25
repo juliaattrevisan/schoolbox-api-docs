@@ -69,23 +69,6 @@ class External_Denbigh_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        $house = $this->externalDatabase->executeQuery(
-            "
-                SELECT    Houses.housemaster_id
-                FROM      Houses
-                WHERE     Houses.id = :houseId
-            ",
-            ['houseId' => $houseID]
-        )->fetch();
-
-        return $house['housemaster_id'] ?? null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getParent(string $externalUserId): array
     {
         if (empty($externalUserId)) {
@@ -487,79 +470,6 @@ class External_Denbigh_User implements External_UserInterface
         return $user->getPortrait();
     }
 
-
-    /**
-     * {@inheritDoc}
-     * @throws \Alaress\Database\Exception
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        /** @noinspection SqlDialectInspection */
-        return $this->externalDatabase->executeQuery(
-            "
-                SELECT  username,
-                        academicYear,
-                        firstname,
-                        surname,
-                        denbighID,
-                        email,
-                        house,
-                        cateringHouse,
-                        boardingStatus
-                FROM    Schoolbox_Students
-            "
-        )->fetchAll();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * @throws \Alaress\Database\Exception
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        return $this->externalDatabase->executeQuery(
-            "
-                SELECT    peo.title,
-                          preferred_name,
-                          peo.surname,
-                          adr.telephoneHome,
-                          peo.denbighID,
-                          par.familyDenbighID,
-                          peo.email,
-                          par.loginID
-                FROM      Addresses adr
-                LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
-                LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
-                WHERE     peo.id IS NOT NULL
-                GROUP BY  peo.denbighID
-                ORDER BY  familyDenbighID ASC,
-                          denbighID ASC
-            "
-        )->fetchAll();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * @throws \Alaress\Database\Exception
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return $this->externalDatabase->executeQuery(
-            "
-                SELECT    People.denbighID,
-                          surname,
-                          preferred_name,
-                          title,
-                          staffCode,
-                          email
-                FROM      Staff
-                LEFT JOIN People ON Staff.peopleDenbighID = People.denbighID
-            "
-        )->fetchAll();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -617,14 +527,6 @@ class External_Denbigh_User implements External_UserInterface
      * {@inheritDoc}
      */
     public function getHousemasterEmails(array $externalUserIds): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getParentSync(array $externalUserIds): array
     {
         return [];
     }

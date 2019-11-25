@@ -15,13 +15,6 @@ use Schoolbox\Collection;
 class Guardian extends Base {
 
     /**
-     * Generate a list of all people
-     */
-    public function generateAllPeople() {
-        $this->setAllPeople($this->getAdapter()->getParentUserAccountInfo());
-    }
-
-    /**
      * Generate data
      */
     public function execute() {

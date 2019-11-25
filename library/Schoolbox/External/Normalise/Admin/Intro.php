@@ -13,12 +13,6 @@ namespace Schoolbox\External\Normalise\Admin;
 class Intro extends Base {
 
     /**
-     * Generate a list of all people
-     */
-    public function generateAllPeople() {
-    }
-
-    /**
      * Generate data
      */
     public function execute() {

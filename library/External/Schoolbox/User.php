@@ -322,14 +322,6 @@ class External_Schoolbox_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
@@ -387,40 +379,6 @@ class External_Schoolbox_User implements External_UserInterface
         )->fetch();
 
         return $parent ?: [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getParentSync(array $externalUserIds): array
-    {
-        return [];
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * @return array
-     */
-    public function getStudentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return [];
     }
 
     /**

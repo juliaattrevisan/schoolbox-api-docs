@@ -160,47 +160,6 @@ class External_Maze_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParentSync(array $externalIds): array
-    {
-        $assignation = ' IN (\'' . implode('\',\'', $externalIds) . '\')';
-
-        $query = "
-			SELECT
-				DFKEY AS ContactID,
-				MTITLE AS Title,
-				MNAME AS Preferred,
-				MSURNAME AS Surname,
-				M_EMAIL AS Email,
-				DFKEY AS SpouseID,
-				FTITLE AS SpouseTitle,
-				FNAME AS SpousePreferred,
-				FSURNAME AS SpouseSurname,
-				F_EMAIL AS SpouseEmail,
-				'' AS OccupEmail,
-				'' AS DefaultEmailCode,
-				'' AS DirectoryIncludeFlag
-			FROM DF
-			WHERE DFKEY $assignation
-		";
-
-
-        $families = $this->getDb()->getAll($query);
-
-        $allFamilies = array();
-
-        foreach ($families as $currentFamily) {
-            $processed = $this->recombine($currentFamily);
-            $processed['ID'] = $currentFamily['ContactID'];
-
-            $allFamilies[] = $processed;
-        }
-
-        return $allFamilies;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getParentEmails(array $externalUserIds): array
     {
         if (!count($externalUserIds)) {
@@ -883,116 +842,6 @@ class External_Maze_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentUserAccountInfo(): array
-    {
-        $query = sprintf("
-			SELECT
-				USER_NAME AS NetworkLogin,
-				NULL AS StudentTitle,
-				FIRST_NAME AS StudentPreferred,
-				SURNAME AS StudentSurname,
-				STKEY AS StudentID,
-				NULL AS StudentOccupEmail,
-				%s AS StudentYearLevel,
-				HOUSE AS StudentHouse,
-				BOARDER AS boarding_status,
-				CAMPUS AS campus
-			FROM ST
-			WHERE STATUS != 'LEFT'
-		", self::REPLACE_CHARACTERS_FROM_YEAR_LEVEL);
-
-        return $this->getDb()->getAll($query);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        $query = "
-			SELECT
-				DF.DFKEY AS DFKEY,
-				DF.DFKEY AS ID,
-				DF.FTITLE AS Title,
-				DF.FNAME AS Preferred,
-				DF.FSURNAME AS Surname,
-				DF.F_EMAIL AS Email,
-				(DF.DFKEY + '1') AS SpouseID,
-				DF.MTITLE AS SpouseTitle,
-				DF.MNAME AS SpousePreferred,
-				DF.MSURNAME AS SpouseSurname,
-				DF.M_EMAIL AS SpouseDefaultEmail,
-				ST.SCHOOL_YEAR
-			FROM ST
-			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
-		";
-
-        $allFamilies = $this->getDb()->getAll($query);
-
-        $families = array();
-
-        foreach ($allFamilies as $currentFamily) {
-            $newFamily = $this->recombine($currentFamily);
-            $newFamily['ID'] = $currentFamily['ID'];
-
-            /* Change the key names with "StudentContact" as a prefix
-             * due to different interfaces from the original scenario
-             * recombine() was built for
-             */
-            $allKeys = array_keys($newFamily);
-
-            $updatedFamily = array();
-
-            foreach ($allKeys as $currentKey) {
-                if ($currentKey == 'ContactID') {
-                    $key = 'Student' . $currentKey;
-                    $updatedFamily[$key] = $currentFamily[$currentKey];
-                } else {
-                    $key = 'StudentContact' . $currentKey;
-                    $updatedFamily[$key] = $newFamily[$currentKey];
-                }
-            }
-
-            $families[$currentFamily['DFKEY']] = $updatedFamily;
-        }
-
-        return array_values($families);
-    }
-
-    /**
-     * Used in sync scripts
-     *
-     * Staff members with a Finish date are ignored
-     * Staff members with staff_type L (left/departed) are ignored
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        $query = "
-			SELECT
-				SFKEY AS StaffID,
-				USER_NAME AS NetworkLogin,
-				STAFF_TYPE AS ActiveFlag,
-				NULL AS StaffTitle,
-				FIRST_NAME AS StaffPreferredName,
-				SURNAME AS StaffSurname,
-				NULL AS DefaultEmailCode,
-				NULL AS OccupEmail,
-				SF_EMAIL AS Email,
-				CAMPUS AS StaffCampus,
-				NULL AS StaffCategoryType,
-				NULL AS StaffCategory,
-				NULL AS StaffDepartment
-			FROM SF
-			WHERE FINISH IS NULL
-			AND STAFF_TYPE != 'L'
-		";
-
-        return $this->getDb()->getAll($query);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getCampusFromTimetable(string $staffID): array
     {
         return array();
@@ -1019,14 +868,6 @@ class External_Maze_User implements External_UserInterface
     {
         // TODO: Implement getStaffContactListExtended() method.
         return array();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
     }
 
     /**

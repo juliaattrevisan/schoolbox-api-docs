@@ -218,41 +218,6 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentUserAccountInfo(): array
-    {
-        // "Null" date: 1/1/1753
-        // To reformat boarder status or not?
-        return $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll("
-                SELECT
-                    S.STUDKEY AS StudentID,
-                    ID.LOGIN AS NetworkLogin,
-                    S.GIVEN_NAME AS StudentPreferred,
-                    S.LEGAL_SURNAME AS StudentSurname,
-                    S.SEX AS StudentGender,
-                    S.EMAIL AS StudentEmail,
-                    '' AS StudentOccupEmail,
-                    S.CURRENT_YEAR AS StudentYearLevel,
-                    S.HOUSE AS StudentHouse,
-                    S.STATUS AS StudentBoarder,
-                    '' AS StudentBoardingHouse,
-                    S.CAMPUS AS StudentCampus
-                FROM STUDENT S
-                LEFT JOIN [IDENTITY] AS ID ON S.STUDENT# = ID.MEMBER#
-                WHERE (
-                    S.DATE_DEPART IS NULL
-                    OR
-                    DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
-                    OR
-                    DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
-                )
-            ")
-        );
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getParentEmails(array $externalUserIds): array
     {
         if (empty($externalUserIds)) {
@@ -312,80 +277,6 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParentSync(array $externalUserIds): array
-    {
-        // Non-core promise
-        return [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        $result = [];
-        $rowset = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll("
-                SELECT
-                    F.IDENTITY_ID#,
-                    ID.LOGIN,
-                    -- Father
-                    F.DAD_LMS,
-                    F.FATHER_TITLE,
-                    F.DAD_FIRSTNAME,
-                    F.DAD_SURNAME,
-                    F.DAD_EMAIL,
-                    -- Mother
-                    F.MUM_LMS,
-                    F.MOTHER_TITLE,
-                    F.MUM_FIRSTNAME,
-                    F.MUM_SURNAME,
-                    F.MUM_EMAIL,
-                    -- Guardian
-                    F.GUARD_LMS,
-                    F.GUARDIAN_TITLE,
-                    F.GUARD_FIRSTNAME,
-                    F.GUARD_SURNAME,
-                    F.GUARD_EMAIL,
-                    -- Carer
-                    F.CGIVE_LMS,
-                    F.CGIVE_TITLE,
-                    F.CGIVE_FIRSTNAME,
-                    F.CGIVE_SURNAME,
-                    F.CGIVE_EMAIL,
-                    -- Student
-                    S.CURRENT_YEAR AS StudentYearLevel,
-                    S.CAMPUS AS StudentCampus,
-                    S.SEX AS StudentGender
-                FROM FAMILY AS F
-                LEFT JOIN [IDENTITY] AS ID ON F.IDENTITY_ID# = ID.MEMBER#
-                INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
-                WHERE (
-                    S.DATE_DEPART IS NULL
-                    OR
-                    DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
-                    OR
-                    DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
-                )
-            ")
-        );
-        foreach ($rowset as $row) {
-            $student = [
-                'StudentYearLevel' => $row['StudentYearLevel'],
-                'StudentCampus'    => $row['StudentCampus'],
-                'StudentGender'    => $row['StudentGender'],
-            ];
-            $result = array_merge(
-                $result,
-                $this->buildParentRecords($student, $row)
-            );
-        }
-        return $result;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getStaff(string $externalUserId): array
     {
         return $this->getDatabase()->trimRow(
@@ -407,41 +298,6 @@ class External_Pcschools_User implements External_UserInterface
                 WHERE T.TEACHER_CODE = {$this->getDatabase()->smartQuote($externalUserId)}
             ")
         ) ?: [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        return $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll("
-                SELECT
-                    T.TEACHER# AS StaffID,
-                    ID.LOGIN AS NetworkLogin,
-                    '' AS ActiveFlag,
-                    T.SALUTATION AS StaffTitle,
-                    T.GIVEN_NAMES AS StaffPreferredName,
-                    T.SURNAME AS StaffSurname,
-                    '' AS DefaultEmailCode,
-                    '' AS OccupEmail,
-                    T.EMAIL AS Email,
-                    T.CAMPUS AS StaffCampus,
-                    '' AS StaffCategoryType,
-                    T.STATUS AS StaffCategory,
-                    '' AS StaffDepartment
-                FROM TEACHER T
-                LEFT JOIN [IDENTITY] AS ID ON T.TEACHER# = ID.MEMBER#
-                LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
-                WHERE (
-                    T.DATE_LEFT IS NULL
-                    OR
-                    DATEDIFF(YEAR, T.DATE_LEFT, '1901') >= 0
-                    OR
-                    DATEDIFF(DAY, T.DATE_LEFT, getdate()) <= 0
-                )
-            ")
-        );
     }
 
     /**
@@ -612,15 +468,6 @@ class External_Pcschools_User implements External_UserInterface
 //            }
 //        }
 //        return 'Day';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        // Non-core promise
-        return null;
     }
 
     /**

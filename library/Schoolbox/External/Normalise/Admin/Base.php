@@ -134,10 +134,8 @@ abstract class Base {
 
         $this->setAdapter(new Adapter(new \External_User()));
 
-        $this->generateAllPeople();
     }
 
-    abstract public function generateAllPeople();
     abstract public function execute();
 
     /* Getters/Setters

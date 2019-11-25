@@ -583,74 +583,7 @@ class External_Tass_User implements External_UserInterface
         return $user->getPortrait();
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getStaffUserAccountInfo(): array
-    {
-        // For Meriden:
-        // * filter on t.curr_flg = Y
-        // * filter out non-teachers
-        $query = "
-            SELECT
-                te.tch_code AS StaffID,
-                '' AS NetworkLogin,
-                CASE
-                    WHEN (t.term_date) IS NULL THEN 0
-                    ELSE 1
-                END AS ActiveFlag,
-                t.salutation_flag AS StaffTitle,
-                t.prefer_name_text AS StaffPreferredName,
-                t.surname_text AS StaffSurname,
-                '' AS StaffFullName,
-                '' AS DefaultEmailCode,
-                t.school_email AS OccupEmail,
-                t.e_mail AS Email,
-                '' AS StaffCampus,
-                '' AS StaffCategoryType,
-                '' AS StaffCategory,
-                td.tch_dept AS StaffDepartment,
-                *
-            FROM tel_vw_telemf AS t
-            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
-            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
-        ";
-        return $this->database->trimAll($this->database->getAll($query));
-    }
-
-    public function getStudentUserAccountInfo(): array
-    {
-        // Get all students who have a campus, and don't have a leaving date?
-        // (Maybe students who do have a leaving date should be deactivated instead)
-        $query = "
-            SELECT
-                s.stud_code AS StudentID,
-                '' AS NetworkLogin,
-                '' AS StudentTitle,
-                s.preferred_name AS StudentPreferred,
-                s.surname AS StudentSurname,
-                s.e_mail AS StudentEmail,
-                '' AS StudentOccupEmail,
-                s.year_grp AS StudentYearLevel,
-                s.house AS StudentHouse,
-                s.campus_code AS StudentCampus,
-                sb.resid_code AS StudentBoardingHouse,
-                s.*
-            FROM student AS s
-            LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
-            WHERE (s.dol IS NULL OR s.dol >= getdate())
-        ";
-
-        return $this->database->trimAll($this->database->getAll($query));
-    }
-
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
-    {
-        return [];
-    }
-
-    public function getParentSync(array $externalUserIds): array
     {
         return [];
     }
@@ -661,98 +594,6 @@ class External_Tass_User implements External_UserInterface
     public function getCampusFromTimetable(string $staffID): array
     {
         return array();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getParentUserAccountInfo(): array
-    {
-        // For Meriden: ignore split families,
-        // because they weren't retrieved with their original query.
-
-        // pia_sfaccess:
-        // * both add_nums and stud_codes are comma-separated lists, unfortunately
-        // joining students to parents:
-        // * if pia_sfaccess: join if student.stud_code is in pia_sfaccess.stud_codes
-        // * otherwise: always join
-
-        // pia_sfaccess: only join the relevant paraddress
-        // no pia_sfaccess: get all paraddress
-
-        $database = $this->database;
-        $query = "
-            SELECT
-                p.par_code AS StudentContactID,
-                '' AS StudentContactTitle,
-                p.f_name AS StudentContactPreferred,
-                p.surname AS StudentContactSurname,
-                pa.e_mail AS StudentContactDefaultEmail,
-
-                '' AS StudentContactSpouseID,
-                '' AS StudentContactSpouseTitle,
-                p.m_name AS StudentContactSpousePreferred,
-                '' AS StudentContactSpouseSurname,
-                '' AS StudentContactSpouseDefaultEmail,
-
-                s.year_grp AS StudentYearLevel,
-                s.campus_code AS StudentCampus,
-                s.sex AS StudentGender,
-
-                sf.sfa_num,
-                sf.stud_codes AS SplitStudentIDList,
-
-                p.*,
-                pa.*
-            FROM parent AS p
-            INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
-            LEFT JOIN pia_sfaccess AS sf
-                ON p.par_code = sf.par_code
-                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-                AND p.cmpy_code = sf.cmpy_code
-            LEFT JOIN student as s
-                ON p.par_code = s.par_code
-                AND p.cmpy_code = s.cmpy_code
-            ORDER BY p.par_code ASC
-        ";
-        $list = $database->trimAll($database->getAll($query));
-
-        // Inject pia_sfaccess address numbers separately?
-
-        // Inject student campuses, year levels, etc.
-        $newList = array();
-        foreach ($list as $listItem) {
-            if (isset($listItem['StudentYearLevel'])) {
-                // Base related student accounts are fetched in base query.
-                $newList[] = $listItem;
-            }
-            if (isset($listItem['SplitStudentIDList'])) {
-                // Inject pia_sfaccess children separately, because they may
-                // not belong to the same parent account
-                // (but they are still allowed access)
-                $codes = array_map(
-                    function ($code) use ($database) {
-                        return "'".$database->quote($code)."'";
-                    },
-                    explode(',', $listItem['SplitStudentIDList'])
-                );
-                $splitStudentQuery = sprintf(
-                    "SELECT
-                        s.year_grp AS StudentYearLevel,
-                        s.campus_code AS StudentCampus,
-                        s.sex AS StudentGender
-                    FROM student as s
-                    WHERE s.stud_code IN (%s)",
-                    implode(',', $codes)
-                );
-                foreach ($database->trimAll($database->getAll($splitStudentQuery)) as $child) {
-                    $newList[] = array_merge($listItem, $child);
-                }
-            }
-        }
-
-        return $newList;
     }
 
     /**
@@ -884,15 +725,6 @@ class External_Tass_User implements External_UserInterface
         ";
 
         return $database->trimAll($database->getAll($query));
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId(string $houseID): ?string
-    {
-        return null;
     }
 
     /**
