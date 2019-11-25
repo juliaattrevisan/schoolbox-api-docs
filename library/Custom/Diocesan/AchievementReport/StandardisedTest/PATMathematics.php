@@ -41,7 +41,35 @@ class PATMathematics extends Base
 
         $result = $this->getDb()->getAll($query);
 
-        new \Alaress_Probe($result, $this->externalUser['StudentID'], $this->year);
+        /* Find data for each of the three series
+         */
+        $stack = [
+            'student' => [],
+            'diocesan' => [],
+            'national' => [],
+        ];
+
+        /* An assumption.
+         *
+         * ThisStudentStanine looks like it equates to Seq, which is the x-axis.
+         * ThisStudentStatnine an either equate to Seq, or be zero.
+         * If ThisStudentStatnine is zero, I don't render anything.
+         *
+         * Otherwise, I render the value of IndividualMathsPATStanineMarker in the column
+         * corresponding to ThisStudentStanine.
+         */
+        foreach ($result as $row) {
+            if ($row['ThisStudentStanine']) {
+                $stack['student'][$row['Seq']] = $row['IndividualMathsPATStanineMarker'];
+            } else {
+                $stack['student'][$row['Seq']] = null;
+            }
+
+            $stack['diocesan'][$row['Seq']] = $row['DiocesanMathsPATStaninePercentage'];
+            $stack['national'][$row['Seq']] = $row['NationalMathsPATStaninePercentage'];
+        }
+
+        new \Alaress_Probe($stack);
 
         return [];
     }
