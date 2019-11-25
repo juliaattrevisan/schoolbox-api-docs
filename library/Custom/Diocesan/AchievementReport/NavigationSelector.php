@@ -61,6 +61,12 @@ class NavigationSelector
 
 
     /**
+     * @var Router
+     */
+    private $router;
+
+
+    /**
      * Has NCEA records
      *
      * @var bool
@@ -124,6 +130,7 @@ class NavigationSelector
      * @param User   $user
      * @param array  $externalUser
      * @param int    $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function __construct(Router $router, MSSQL $db, User $user, array $externalUser, ?int $year)
     {
@@ -148,21 +155,21 @@ class NavigationSelector
 
         if (($this->user->getYear() >= 1) && ($this->user->getYear() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
-        }
-        elseif (($this->user->getYear() >= 7) && ($this->user->getYear() <= 10)) {
+        } elseif (($this->user->getYear() >= 7) && ($this->user->getYear() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
-        }
-        /* NCEA for year 11 specifically
-         */
-        elseif ($this->user->getYear() == 11) {
+        } elseif ($this->user->getYear() == 11) {
+
+            /* NCEA for year 11 specifically
+             */
             if ($this->hasNcea) {
                 $this->defaultReport = self::NCEA_KEY;
             } else {
                 $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
             }
-        } /* Need to decide whether this is an IB or an NCEA student
-         */
-        elseif (($this->user->getYear() >= 12) && ($this->user->getYear() <= 13)) {
+        } elseif (($this->user->getYear() >= 12) && ($this->user->getYear() <= 13)) {
+
+            /* Need to decide whether this is an IB or an NCEA student
+             */
             if ($this->hasIb) {
                 $this->defaultReport = self::IB_KEY;
             } elseif ($this->hasNcea) {
@@ -181,6 +188,9 @@ class NavigationSelector
      * Remembers in a boolean format
      *
      * Facade method
+     *
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function navigationData(): void
     {
@@ -282,8 +292,10 @@ class NavigationSelector
 
     /**
      * Find out if they are in the Comments table
+     *
+     * @return int
      */
-    private function hasComments()
+    private function hasComments(): int
     {
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -293,14 +305,16 @@ class NavigationSelector
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
     }
 
 
     /**
      * Find out if they are in the School Grades table
+     *
+     * @return int
      */
-    private function hasSchoolGrades()
+    private function hasSchoolGrades(): int
     {
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -310,14 +324,16 @@ class NavigationSelector
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
     }
 
 
     /**
      * Find out if they are in the NCEA table
+     *
+     * @return int
      */
-    private function hasNcea()
+    private function hasNcea(): int
     {
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -327,14 +343,16 @@ class NavigationSelector
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
     }
 
 
     /**
      * Find out if they are in the IB table
+     *
+     * @return int
      */
-    private function hasIb()
+    private function hasIb(): int
     {
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -344,7 +362,7 @@ class NavigationSelector
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
     }
 
 
