@@ -188,7 +188,7 @@ class Controller extends Base {
                 'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData(),
                 'PATNavigation' => [
                     'all' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
-                    'selected' => $year
+                    'selected' => $year ?? (int)date('Y')
                 ],
                 'PATMathematics' => [
                     'data' => $mathematicsPayload->getData(),
