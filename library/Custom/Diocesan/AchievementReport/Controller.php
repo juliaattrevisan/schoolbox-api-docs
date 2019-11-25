@@ -12,6 +12,7 @@ use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATListeningComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATNavigation;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingVocabulary;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATTable;
@@ -184,6 +185,7 @@ class Controller extends Base {
                 ],
 
                 'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData(),
+                'PATNavigation' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
                 'PATMathematics' => [
                     'data' => $mathematicsPayload->getData(),
                     'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
