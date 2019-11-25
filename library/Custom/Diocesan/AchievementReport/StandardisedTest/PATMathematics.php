@@ -44,9 +44,15 @@ class PATMathematics extends Base
         /* Find data for each of the three series
          */
         $stack = [
-            'student' => [],
-            'diocesan' => [],
-            'national' => [],
+            'graph' => [
+                'title' => 'PAT Mathematics',
+                'y' => '% of Children'
+            ],
+            'data' => [
+                'student' => [],
+                'diocesan' => [],
+                'national' => [],
+            ]
         ];
 
         /* An assumption.
@@ -60,17 +66,15 @@ class PATMathematics extends Base
          */
         foreach ($result as $row) {
             if ($row['ThisStudentStanine']) {
-                $stack['student'][$row['Seq']] = $row['IndividualMathsPATStanineMarker'];
+                $stack['data']['student'][$row['Seq']] = $row['IndividualMathsPATStanineMarker'];
             } else {
-                $stack['student'][$row['Seq']] = null;
+                $stack['data']['student'][$row['Seq']] = 'null';
             }
 
-            $stack['diocesan'][$row['Seq']] = $row['DiocesanMathsPATStaninePercentage'];
-            $stack['national'][$row['Seq']] = $row['NationalMathsPATStaninePercentage'];
+            $stack['data']['diocesan'][$row['Seq']] = $row['DiocesanMathsPATStaninePercentage'];
+            $stack['data']['national'][$row['Seq']] = $row['NationalMathsPATStaninePercentage'];
         }
 
-        new \Alaress_Probe($stack);
-
-        return [];
+        return $stack;
     }
 }

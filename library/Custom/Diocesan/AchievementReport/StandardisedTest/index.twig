@@ -24,5 +24,8 @@
 </div>
 
 {% include '@standardisedTest/PATMathematics.twig' with {
-    data: PATMathematics
+    identifier: 'PATMathematics',
+    title: PATMathematics.graph.title,
+    yAxis: PATMathematics.graph.y,
+    data: PATMathematics.data
 } %}
