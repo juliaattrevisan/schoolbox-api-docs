@@ -125,7 +125,7 @@ Data:
                                             {% set hasInterminGrades = true %}
                                             {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
                                                 <div class="result-item">
-                                                    <span class="result-heading">{{ label | last }}*</span><br>
+                                                    <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
                                                     <span class="result-value">{{ value|default('-') }}</span>
                                                 </div>
                                             {% endfor %}
