@@ -18,6 +18,12 @@ class PATReadingVocabulary extends Base
 {
 
     /**
+     * Graph title
+     */
+    private const GRAPH_TITLE = 'PAT Reading Vocabulary';
+
+
+    /**
      * Find all the data for PAT Reading Vocabulary graph
      *
      * @return Payload
@@ -45,7 +51,7 @@ class PATReadingVocabulary extends Base
 
         /* Find data for each of the three series
          */
-        $payload = new Payload('PAT Reading Vocabulary', $this->year);
+        $payload = new Payload(self::GRAPH_TITLE, $this->year);
 
         foreach ($result as $row) {
             $payload

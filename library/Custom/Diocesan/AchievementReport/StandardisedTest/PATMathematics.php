@@ -18,6 +18,12 @@ class PATMathematics extends Base
 {
 
     /**
+     * Graph title
+     */
+    private const GRAPH_TITLE = 'PAT Mathematics';
+
+
+    /**
      * Find all the data for PAT Mathematics graph
      *
      * @return Payload
@@ -45,7 +51,7 @@ class PATMathematics extends Base
 
         /* Find data for each of the three series
          */
-        $payload = new Payload('PAT Mathematics', $this->year);
+        $payload = new Payload(self::GRAPH_TITLE, $this->year);
 
         foreach ($result as $row) {
             $payload

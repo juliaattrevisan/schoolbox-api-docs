@@ -18,6 +18,12 @@ class PATListeningComprehension extends Base
 {
 
     /**
+     * Graph title
+     */
+    private const GRAPH_TITLE = 'PAT Listening Comprehension';
+
+
+    /**
      * Find all the data for PAT Listening Comprehension graph
      *
      * @return Payload
@@ -45,7 +51,7 @@ class PATListeningComprehension extends Base
 
         /* Find data for each of the three series
          */
-        $payload = new Payload('PAT Listening Comprehension', $this->year);
+        $payload = new Payload(self::GRAPH_TITLE, $this->year);
 
         foreach ($result as $row) {
             $payload
