@@ -525,14 +525,30 @@ class Controller extends BaseController
         // only allow recursive permissions to supers
         if (($recursePermissions || $recurseYearLevels) && $user->isSuperuser()) {
             foreach ($this->folderMapper->findAllChildren($folder->getId(), true) as $descendant) {
+                $saveFolderRequired = false;
                 if ($recursePermissions) {
-                    // Mapper post-save will handle the group/role permission + folder-code clean up for us
-                    $descendant->enableInherit();
+                    if ($inherit) {
+                        // Mapper post-save will handle the group/role permission + folder-code clean up for us
+                        $descendant->enableInherit();
+                        $saveFolderRequired = true;
+                    } else {
+                        if ($descendant->getInherit()) {
+                            $descendant->setInherit(false);
+                            $saveFolderRequired = true;
+                        }
+                        $rolePermsToSave = $this->updateRolePermissions($descendant, $rolePermissions);
+                        if ($rolePermsToSave->count()) {
+                            $this->roleAccessMapper->save($rolePermsToSave);
+                        }
+                    }
                 }
                 if ($recurseYearLevels) {
                     $this->updateFolderYearLevels($descendant, $yearLevelIds);
+                    $saveFolderRequired = true;
                 }
-                $this->folderMapper->save($descendant);
+                if ($saveFolderRequired) {
+                    $this->folderMapper->save($descendant);
+                }
             }
         }
 
@@ -565,10 +581,14 @@ class Controller extends BaseController
 
             foreach ($rolePermissions as $roleId => $permissionLevel) {
                 $existingPerm = $existingRolePerms[$roleId];
-                if ($existingPerm && $existingPerm->getType() !== (int)$permissionLevel) {
-                    $existingPerm->setType($permissionLevel);
-                    $rolePermsToSave[$roleId] = $existingPerm;
+                if ($existingPerm) {
+                    // Only modify if not already at this value
+                    if ($existingPerm->getType() !== (int)$permissionLevel) {
+                        $existingPerm->setType($permissionLevel);
+                        $rolePermsToSave[$roleId] = $existingPerm;
+                    }
                 } else {
+                    // Create
                     $rolePermsToSave[$roleId] = (new RoleAccess())
                         ->setCategory($folder)
                         ->setRole(RoleMapper::getInstance()->createModel($roleId))

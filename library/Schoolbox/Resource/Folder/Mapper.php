@@ -686,37 +686,30 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $this->findByPredicates($builder, $options);
     }
 
+
     /**
      * Returns a collection of all folders that are children of the specified ID (with optional recursion)
      *
-     * @param int $id
+     * @param int  $id
      * @param bool $recurse
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>|Model[]
      */
-    public function findAllChildren($id, $recurse = false)
+    public function findAllChildren(int $id, bool $recurse = false): GenericCollection
     {
-        $collection = $this->createCollection();
-
         // Find all children of this node
+        $descendants = $this->findByColumn(self::COL_PARENT, $id);
 
-        $children = $this->findByColumn('parent', $id);
-
-        foreach ($children as $child) {
-            $collection->add($child);
-
-            // And optionally all of its children
-
-            if ($recurse) {
-                $kids = $this->findAllChildren($child->getId(), true);
-                foreach ($kids as $kid) {
-                    $collection->add($kid);
-                }
-            }
+        if (!$recurse) {
+            return $descendants->indexBy($this->getIdentifierProperty());
         }
 
-        // Return what we got
-
-        return $collection;
+        $ids = $descendants->getPropertyValues($this->getIdentifierProperty());
+        while (count($ids)) {
+            $children    = $this->findByColumn(self::COL_PARENT, $ids);
+            $descendants = $descendants->merge($children);
+            $ids         = $children->getPropertyValues($this->getIdentifierProperty());
+        }
+        return $descendants->indexBy($this->getIdentifierProperty());
     }
 
 

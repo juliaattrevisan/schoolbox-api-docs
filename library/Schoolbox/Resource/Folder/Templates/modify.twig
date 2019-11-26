@@ -189,14 +189,19 @@
 
         }, 'Class codes may not exceed 20 characters.');
 
-        // Warn user that permission recursion will delete role/group/class permissions.
-        $("#recursive-permissions").change(function() {
-            if ($("#recursive-permissions").prop("checked")) {
+        {#
+            Warn user that permission recursion will delete role/group/class permissions if inherit is ON
+            Only superusers can recurse permission changes, and its only relevant on modification
+        #}
+        {% if user.isSuperuser and action == 'Modify' %}
+        $("#recursive-permissions, #inherit").change(function() {
+            if ($("#recursive-permissions").prop("checked") && $("#inherit").prop("checked")) {
                 $("[data-alert-permissions]").removeClass("hide");
             } else {
                 $("[data-alert-permissions]").addClass("hide");
             }
         });
+        {% endif %}
 
         {# YearLevel selectize. Populated syncronously with all YearLevels known #}
         {% if editYearLevelUsage %}
