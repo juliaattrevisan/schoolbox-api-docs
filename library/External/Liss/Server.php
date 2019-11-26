@@ -97,7 +97,7 @@ class External_Liss_Server
     private const NO_EVENT_TYPES = 'Cannot find a default event type';
 
     /**
-     * Predefine a timetable_cycle record (this doesn't seem defined/accessible
+     * Predefine a sis_timetable_cycle record (this doesn't seem defined/accessible
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
      * @return object|\Schoolbox\External\TimetableCycle

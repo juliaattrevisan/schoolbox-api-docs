@@ -9,3 +9,6 @@ ALTER TABLE `class_user` RENAME TO `sis_class_user`;
 
 -- Rename timetable_campus to sis_timetable_campus
 ALTER TABLE `timetable_campus` RENAME TO `sis_timetable_campus`;
+
+-- Rename timetable_cycle to sis_timetable_cycle
+ALTER TABLE `timetable_cycle` RENAME TO `sis_timetable_cycle`;

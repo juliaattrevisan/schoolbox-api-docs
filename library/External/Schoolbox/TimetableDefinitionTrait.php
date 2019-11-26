@@ -72,7 +72,7 @@ trait External_Schoolbox_TimetableDefinitionTrait
                           ty.day_length,
                           ty.regular
                 FROM      sis_timetable_campus tc
-                LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+                LEFT JOIN sis_timetable_cycle ty ON ty.id = tc.cycle_id
                 WHERE     tc.campus_id = :campusId
                 AND       tc.start <= DATE(NOW())
                 AND       tc.finish >= DATE(NOW())
