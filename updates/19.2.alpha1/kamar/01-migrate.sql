@@ -12,3 +12,8 @@ ALTER TABLE `timetable_campus` RENAME TO `sis_timetable_campus`;
 
 -- Rename timetable_cycle to sis_timetable_cycle
 ALTER TABLE `timetable_cycle` RENAME TO `sis_timetable_cycle`;
+
+-- Rename timetable_period to sis_timetable_period
+ALTER TABLE `timetable_period` RENAME TO `sis_timetable_period`;
+
+

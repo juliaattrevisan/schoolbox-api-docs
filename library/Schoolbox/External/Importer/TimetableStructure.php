@@ -24,7 +24,7 @@ use Schoolbox\External\TimetablePeriodMapper;
  * Saves into the following tables:
  * * sis_timetable_cycle
  * * sis_timetable_campus
- * * timetable_period
+ * * sis_timetable_period
  *
  * @package Schoolbox\External\Importer
  */

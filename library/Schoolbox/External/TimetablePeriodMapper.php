@@ -18,7 +18,7 @@ class TimetablePeriodMapper extends Schoolbox\Mapper {
      * {@inheritdoc}
      */
     protected function mapping() {
-        $this->hasTable('timetable_period');
+        $this->hasTable('sis_timetable_period');
         $this->hasModel(TimetablePeriod::class);
         $this->hasMap(array(
             'column'     => 'id',

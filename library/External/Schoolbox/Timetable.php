@@ -77,7 +77,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                           tp.usable
             FROM          sis_timetable_campus tc
             LEFT JOIN     sis_timetable_cycle ty ON ty.id = tc.cycle_id
-            LEFT JOIN     timetable_period tp ON tp.cycle_id = ty.id
+            LEFT JOIN     sis_timetable_period tp ON tp.cycle_id = ty.id
             WHERE         tc.campus_id = :campusId AND 
                           tc.start <= DATE(NOW()) AND 
                           tc.finish >= DATE(NOW())
@@ -141,7 +141,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             tp.usable
                 FROM        sis_timetable_campus tc
                 LEFT JOIN   sis_timetable_cycle ty ON ty.id = tc.cycle_id
-                LEFT JOIN   timetable_period tp ON tp.cycle_id = ty.id
+                LEFT JOIN   sis_timetable_period tp ON tp.cycle_id = ty.id
                 WHERE       tc.campus_id = :campusId
                 AND         tc.start <= DATE(NOW())
                 AND         tc.finish >= DATE(NOW())
@@ -366,9 +366,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $statement = $this->internalDatabase->executeQuery(
             "
                 SELECT      sis_class_period.room AS RoomCode,
-                            class.description AS Description,
-                            timetable_period.day AS DayNumber,
-                            timetable_period.sequence AS PeriodNumber,
+                            sis_class.description AS Description,
+                            sis_timetable_period.day AS DayNumber,
+                            sis_timetable_period.sequence AS PeriodNumber,
                             luCampus.ext_timetable_code AS TimetableGroup,
                             sis_timetable_campus.campus_id AS TimetableCampus,
                             sis_class.code AS ClassCode,
@@ -376,20 +376,20 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             user.title AS StaffTitle,
                             user.firstname AS StaffPreferredName,
                             user.lastname AS StaffSurname,
-                            timetable_period.start AS PeriodStart,
-                            timetable_period.finish AS PeriodEnd,
-                            timetable_period.title AS PeriodName
+                            sis_timetable_period.start AS PeriodStart,
+                            sis_timetable_period.finish AS PeriodEnd,
+                            sis_timetable_period.title AS PeriodName
                 FROM        sis_class_period
                 LEFT JOIN   user ON sis_class_period.teacher_id = user.id AND user.deleted_at IS NULL
-                INNER JOIN  timetable_period ON sis_class_period.period_id = timetable_period.id
-                INNER JOIN  sis_timetable_campus ON timetable_period.cycle_id = sis_timetable_campus.cycle_id
+                INNER JOIN  sis_timetable_period ON sis_class_period.period_id = sis_timetable_period.id
+                INNER JOIN  sis_timetable_campus ON sis_timetable_period.cycle_id = sis_timetable_campus.cycle_id
                 INNER JOIN  luCampus ON sis_timetable_campus.campus_id = luCampus.id
                 INNER JOIN  sis_class ON sis_class_period.class_id = sis_class.id
                 WHERE       sis_timetable_campus.start <= DATE(NOW()) AND
                             sis_timetable_campus.finish >= DATE(NOW()) AND
                             sis_class_period.room IN ({$predicate["placeholders"]})
-                ORDER BY    timetable_period.day ASC,
-                            timetable_period.sequence ASC
+                ORDER BY    sis_timetable_period.day ASC,
+                            sis_timetable_period.sequence ASC
             ",
             $predicate["bindings"]
         );
