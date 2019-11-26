@@ -477,30 +477,33 @@ class Module extends BaseModule
      */
     private function buildAuthRuleCanSubmit()
     {
-        return new Rule\Any(
-            new Rule\All(
-                new Rule\Any(
+        return new Rule\all(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\All(
+                    new Rule\Any(
                     // (Superuser + impl) or (instructor + !interaction-locked)
-                    new Rule\All(
-                        new Rule\IsSuperuser(),
-                        new IsImplementation()
+                        new Rule\All(
+                            new Rule\IsSuperuser(),
+                            new IsImplementation()
+                        ),
+                        new Rule\All(
+                            $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                            new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
+                        )
                     ),
-                    new Rule\All(
-                        $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                        new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
+                    new Rule\Any(
+                        new CanRespondToAssessment($this->getAccess()), // SOBO
+                        new CanPreview($this->getAccess())              // Preview
                     )
                 ),
-                new Rule\Any(
-                    new CanRespondToAssessment($this->getAccess()), // SOBO
-                    new CanPreview($this->getAccess())              // Preview
+                new Rule\All(
+                    new CanViewAssessable(new Visibility($this->getAccess())),
+                    new Rule\IsUser('studentId'),
+                    new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                    new IsAssessmentOpen(),
+                    new CanRespondToAssessment($this->getAccess())
                 )
-            ),
-            new Rule\All(
-                new CanViewAssessable(new Visibility($this->getAccess())),
-                new Rule\IsUser('studentId'),
-                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
-                new IsAssessmentOpen(),
-                new CanRespondToAssessment($this->getAccess())
             )
         );
     }
