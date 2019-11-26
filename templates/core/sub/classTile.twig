@@ -9,12 +9,22 @@
 
 
 <div class="card-new small-12">
-    <a href="/homepage/{{ class.id }}">
-        <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
-    </a>
+    {% if homepageUrl %}
+        <a href="{{ homepageUrl }}">
+            <div class="card-feature-image"
+                 style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+        </a>
+    {% else %}
+        <div class="card-feature-image"
+             style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+    {% endif %}
     <div class="card-content actions-small-1">
         <div class="list-item">
-            <h3><a href="/homepage/{{ class.id }}" title="{{ class.title }}">{{ class.name }}</a></h3>
+            {% if homepageUrl %}
+                <h3><a href="{{ homepageUrl }}" title="{{ class.title }}">{{ class.name }}</a></h3>
+            {% else %}
+                <h3>{{ class.name }}</h3>
+            {% endif %}
             <p class="meta">{{ class.codeString }}<br>{{ classType }}</p>
         </div>
         {% if USER.getRole.isStaff == true %}
