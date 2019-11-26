@@ -25,7 +25,7 @@ class Activities extends Base
     {
         $query = "
             SELECT * 
-            FROM uvSchoolBoxCoCurricularClasses 
+            FROM dbo.uvSchoolBoxCoCurricularClasses 
             WHERE StudentID = '{$this->getExternalUserId()}'
             ORDER BY StudentID, StudentFileYear Desc, OrderSort, SubjectClassesDescription
         ";
