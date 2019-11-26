@@ -7,16 +7,16 @@
     } only %}
 #}
 
+{% set tileContent %}
+    <div class="card-feature-image"
+         style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+{% endset %}
 
 <div class="card-new small-12">
     {% if homepageUrl %}
-        <a href="{{ homepageUrl }}">
-            <div class="card-feature-image"
-                 style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
-        </a>
+        <a href="{{ homepageUrl }}">{{ tileContent }}</a>
     {% else %}
-        <div class="card-feature-image"
-             style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+        {{ tileContent }}
     {% endif %}
     <div class="card-content actions-small-1">
         <div class="list-item">
