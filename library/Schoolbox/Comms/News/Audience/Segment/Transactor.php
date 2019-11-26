@@ -13,6 +13,8 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
+use function trigger_error;
+use const E_USER_WARNING;
 
 /**
  * Responsible for the intricacies of news article audience segment persistence.
@@ -75,7 +77,8 @@ class Transactor
         }
 
         // Derive unique existing segments. (I don't know how duplicates are occurring, but they are)
-        $updatedSegments = $this->audienceMapper->createCollection();
+        $preExistingDuplicates = false;
+        $updatedSegments       = $this->audienceMapper->createCollection();
         foreach ($existingSegments as $existingSegment) {
             $unique = true;
             foreach ($updatedSegments as $updatedSegment) {
@@ -89,9 +92,13 @@ class Transactor
                 $updatedSegments->setOffset($existingSegment->getId(), $existingSegment);
             }
         }
+        if ($preExistingDuplicates) {
+            trigger_error("Articles appears to have pre-existing duplicate audience segments", E_USER_WARNING);
+        }
 
         // Add any segment that was posted but is not currently persisted
-        $segmentsToAdd = $this->audienceMapper->createCollection();
+        $postedDuplicatesDetected = false;
+        $segmentsToAdd            = $this->audienceMapper->createCollection();
         foreach ($postedSegments as $postedSegment) {
             $found = false;
             foreach ($existingSegments as $existingSegment) {
@@ -103,13 +110,17 @@ class Transactor
             // Ensure we don't persist new duplicates
             foreach ($segmentsToAdd as $segmentToAdd) {
                 if ($segmentToAdd->equals($postedSegment)) {
-                    $found = true;
+                    $postedDuplicatesDetected = true;
+                    $found                    = true;
                     break;
                 }
             }
             if (!$found) {
                 $segmentsToAdd->add($postedSegment);
             }
+        }
+        if ($postedDuplicatesDetected) {
+            trigger_error("POST appears to have duplicate audience segments", E_USER_WARNING);
         }
 
         $isSegmentsDeleted = $this->deleteRemovedSegments($article, $segmentsToDelete);
