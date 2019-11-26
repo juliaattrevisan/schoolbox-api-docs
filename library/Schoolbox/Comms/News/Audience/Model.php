@@ -12,8 +12,12 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 
+/**
+ * @method static GenericCollection|self[] createCollection()
+ */
 class Model
 {
     // Any audience modifier?
@@ -38,6 +42,7 @@ class Model
     }
 
     use Id;
+    use CreateCollection;
 
     /** @var News\Model() */
     private $commsNewsArticle;
@@ -138,6 +143,21 @@ class Model
                 return false;
             }
         }
+
+        // Ensure each other child is found in this composite (eg, protect against [A,A,B] == [A,B,C])
+        foreach ($other->children as $otherChild) {
+            $otherChildMatchFound = false;
+            foreach ($this->children as $thisChild) {
+                if ($otherChild->equals($thisChild)) {
+                    $otherChildMatchFound = true;
+                    break;
+                }
+            }
+            if (!$otherChildMatchFound) {
+                return false;
+            }
+        }
+
         return true;
     }
 
