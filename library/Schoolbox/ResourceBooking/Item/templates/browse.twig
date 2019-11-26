@@ -86,7 +86,11 @@
                             </a>
 
                             <p class="meta">
-                                <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+                                {% if item.category.isDeleted %}
+                                    <span>{{ item.category.name }}</span>
+                                {% else %}
+                                    <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+                                {% endif %}
 
                                 {% if item.moderatorList is not empty %}
                                     {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
