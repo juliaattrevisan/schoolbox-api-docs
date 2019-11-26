@@ -268,7 +268,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         u.lastname
             FROM        sis_class c
             LEFT JOIN   class_user cl ON c.id = cl.class_id
-            LEFT JOIN   class_period cp ON c.id = cp.class_id
+            LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
             LEFT JOIN   user u ON cp.teacher_id = u.id
             WHERE       cp.teacher_id = :userId OR 
                         cl.user_id = :userId2
@@ -365,7 +365,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $statement = $this->internalDatabase->executeQuery(
             "
-                SELECT      class_period.room AS RoomCode,
+                SELECT      sis_class_period.room AS RoomCode,
                             class.description AS Description,
                             timetable_period.day AS DayNumber,
                             timetable_period.sequence AS PeriodNumber,
@@ -379,15 +379,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             timetable_period.start AS PeriodStart,
                             timetable_period.finish AS PeriodEnd,
                             timetable_period.title AS PeriodName
-                FROM        class_period
-                LEFT JOIN   user ON class_period.teacher_id = user.id AND user.deleted_at IS NULL
-                INNER JOIN  timetable_period ON class_period.period_id = timetable_period.id
+                FROM        sis_class_period
+                LEFT JOIN   user ON sis_class_period.teacher_id = user.id AND user.deleted_at IS NULL
+                INNER JOIN  timetable_period ON sis_class_period.period_id = timetable_period.id
                 INNER JOIN  timetable_campus ON timetable_period.cycle_id = timetable_campus.cycle_id
                 INNER JOIN  luCampus ON timetable_campus.campus_id = luCampus.id
-                INNER JOIN  sis_class ON class_period.class_id = sis_class.id
+                INNER JOIN  sis_class ON sis_class_period.class_id = sis_class.id
                 WHERE       timetable_campus.start <= DATE(NOW()) AND
                             timetable_campus.finish >= DATE(NOW()) AND
-                            class_period.room IN ({$predicate["placeholders"]})
+                            sis_class_period.room IN ({$predicate["placeholders"]})
                 ORDER BY    timetable_period.day ASC,
                             timetable_period.sequence ASC
             ",
