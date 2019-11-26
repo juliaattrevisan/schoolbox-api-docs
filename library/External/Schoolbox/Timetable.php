@@ -266,7 +266,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         u.title, 
                         u.firstname, 
                         u.lastname
-            FROM        class c
+            FROM        sis_class c
             LEFT JOIN   class_user cl ON c.id = cl.class_id
             LEFT JOIN   class_period cp ON c.id = cp.class_id
             LEFT JOIN   user u ON cp.teacher_id = u.id
@@ -371,7 +371,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             timetable_period.sequence AS PeriodNumber,
                             luCampus.ext_timetable_code AS TimetableGroup,
                             timetable_campus.campus_id AS TimetableCampus,
-                            class.code AS ClassCode,
+                            sis_class.code AS ClassCode,
                             user.synergy_id AS StaffID,
                             user.title AS StaffTitle,
                             user.firstname AS StaffPreferredName,
@@ -384,7 +384,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 INNER JOIN  timetable_period ON class_period.period_id = timetable_period.id
                 INNER JOIN  timetable_campus ON timetable_period.cycle_id = timetable_campus.cycle_id
                 INNER JOIN  luCampus ON timetable_campus.campus_id = luCampus.id
-                INNER JOIN  class ON class_period.class_id = class.id
+                INNER JOIN  sis_class ON class_period.class_id = sis_class.id
                 WHERE       timetable_campus.start <= DATE(NOW()) AND
                             timetable_campus.finish >= DATE(NOW()) AND
                             class_period.room IN ({$predicate["placeholders"]})

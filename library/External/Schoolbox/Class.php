@@ -100,7 +100,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                               sups.special_needs,
                               sups.tutor_group,
                               sups.form_name
-                FROM          class c
+                FROM          sis_class c
                     JOIN               class_user cu ON cu.class_id = c.id
                     JOIN               user u ON u.id = cu.user_id
                     JOIN               groups g ON g.id = u.group_id
@@ -170,7 +170,7 @@ class External_Schoolbox_Class implements External_ClassInterface
             "
                 SELECT      u.id,
                             u.synergy_id
-                FROM        class c
+                FROM        sis_class c
                 LEFT JOIN   class_period cp ON c.id = cp.class_id
                 INNER JOIN  user u ON u.id = cp.teacher_id
                 WHERE       c.code IN ({$predicate["placeholders"]}) AND
