@@ -138,7 +138,7 @@ class External_Liss_Server
 
             $cycleMapper->save($cycle);
 
-            /* Force a timetable_campus record
+            /* Force a sis_timetable_campus record
              */
             $timetableCampusMapper = new TimetableCampusMapper();
             $timetableCampus = $timetableCampusMapper->createModel();

@@ -23,7 +23,7 @@ use Schoolbox\External\TimetablePeriodMapper;
  * Importer for timetable structure into the Schoolbox connector.
  * Saves into the following tables:
  * * timetable_cycle
- * * timetable_campus
+ * * sis_timetable_campus
  * * timetable_period
  *
  * @package Schoolbox\External\Importer

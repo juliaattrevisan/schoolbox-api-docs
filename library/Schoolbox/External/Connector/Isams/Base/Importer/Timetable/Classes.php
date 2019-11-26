@@ -154,7 +154,7 @@ class Classes implements IStrategy
                 luCampus.ext_timetable_code,
                 period.day, period.id, period.title
             FROM luCampus 
-            LEFT JOIN timetable_campus campus ON luCampus.id = campus.campus_id
+            LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
             LEFT JOIN timetable_cycle cycle ON campus.cycle_id = cycle.id
             LEFT JOIN timetable_period period ON cycle.id = period.cycle_id
                         

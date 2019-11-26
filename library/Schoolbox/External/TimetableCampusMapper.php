@@ -20,7 +20,7 @@ class TimetableCampusMapper extends Schoolbox\Mapper {
      * {@inheritdoc}
      */
     protected function mapping() {
-        $this->hasTable('timetable_campus');
+        $this->hasTable('sis_timetable_campus');
         $this->hasModel(TimetableCampus::class);
         $this->hasMap(array(
             'column'     => 'cycle_id',
