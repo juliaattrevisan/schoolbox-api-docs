@@ -102,6 +102,16 @@ class Model
      *
      * Ignores ID and child permutations
      *
+     * Considers the following to be NOT EQUAL due to different child counts.
+     * This has performance implications. Invalid data should be dealt with elsewhere, not compensated for here.
+     * ├─composite
+     * | ├─A
+     * | ├─A
+     * | └-B
+     * └─composite
+     *   ├─A
+     *   └-B
+     *
      * @param Model $other
      * @return bool
      * @throws InsufficientHydrationException
