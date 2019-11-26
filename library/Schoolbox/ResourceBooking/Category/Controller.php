@@ -95,32 +95,47 @@ class Controller extends Base {
     /**
      * Views an existing category
      *
-     * @param Model $item
+     * @param Model $category
      */
-    public function read(Model $item)
+    public function read(Model $category)
     {
         try {
             $calendarDate = \Alaress_Date_Format::newUrlDate($this->request->query->get('date'));
         } catch (\Exception $e) {
             $calendarDate = \Alaress_Date_Format::now();
         }
+
+
+        $resources = ItemMapper::getInstance()->findByColumn(
+            'resource_category_id',
+            $category->getId(),
+            ['order' => ['name' => 'asc']]
+        );
+
+        foreach ($resources->getAll() as $resource) {
+            /** @var \Schoolbox\ResourceBooking\Item\Model $resource */
+            $resource->setBookingIsAuthorized($this->getRouteIfAuthorized('resourceBooking.book', [
+                'id' => $resource->getId(),
+            ]));
+        }
+
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceCategory/read.twig',
-                'data'     => array(
-                    'item'      => $item,
+                'data'     => [
+                    'category'      => $category,
                     'resources' => ItemMapper::getInstance()->findByColumn(
                         'resource_category_id',
-                        $item->getId(),
-                        ['order' => ['name' => 'asc',]]
+                        $category->getId(),
+                        ['order' => ['name' => 'asc']]
                     ),
-                    'calendar' => array(
+                    'calendar' => [
                         'date' => $calendarDate->getDatabase(),
                         'view' => $this->request->query->get('view', 'week'),
-                    ),
+                    ],
                     'token' => $_SESSION['key']
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -172,15 +187,16 @@ class Controller extends Base {
     /**
      * Action for outputting a calendar
      *
-     * @param Model $item
+     * @param Model $category
+     * @throws \Exception
      */
-    public function calendar(Model $item)
+    public function calendar(Model $category)
     {
         $apiFactory = new CalendarApiFactory($this->getUser(), new \External_Timetable());
         $source     = $apiFactory->buildFromResourceCollection(
             ItemMapper::getInstance()->findByColumn(
                 'resource_category_id',
-                $item->getId(),
+                $category->getId(),
                 ['order' => ['name' => 'asc',]]
             ),
             true,

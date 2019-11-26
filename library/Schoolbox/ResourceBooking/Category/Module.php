@@ -6,7 +6,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Category;
 
 use Alaress\Authorizer\Authorizer;
@@ -43,11 +43,11 @@ class Module extends BaseModule
             '.*',
             function($params)  {
                 if (array_key_exists('id', $params)) {
-                    return array(
-                        'item' => $this->getMapper()->findById($params['id']),
-                    );
+                    return [
+                        'category' => $this->getMapper()->findById($params['id']),
+                    ];
                 }
-                return array();
+                return [];
             }
         );
     }

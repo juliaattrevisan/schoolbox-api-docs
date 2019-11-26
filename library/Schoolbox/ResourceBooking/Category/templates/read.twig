@@ -42,10 +42,9 @@
         defaultView:            calendarView,
         schedulerLicenseKey:    {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
         dateDisplayFormats:     dateDisplayFormats,
-        resourceBookingEndpoint:{{ routeLookup('resourceCategory.calendar', {id: item.id})|json_encode|raw }},
-        bookingIsAuthorized:    Boolean('{{ isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) }}'),
+        resourceBookingEndpoint:{{ routeLookup('resourceCategory.calendar', {id: category.id})|json_encode|raw }},
         createBookingPath:      {{ routeLookup('resourceBooking.book', {id: ''})|json_encode|raw }},
-        resourceId:             Number('{{ item.id }}'),
+        resourceId:             Number('{{ category.id }}'),
         resourceColumns: [{
             labelText: 'Resource',
 
