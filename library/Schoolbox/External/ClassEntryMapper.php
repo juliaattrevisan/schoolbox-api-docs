@@ -18,7 +18,7 @@ class ClassEntryMapper extends Schoolbox\Mapper {
      * {@inheritdoc}
      */
     protected function mapping() {
-        $this->hasTable('class');
+        $this->hasTable('sis_class');
         $this->hasModel(ClassEntry::class);
         $this->hasMap(array(
             'column'     => 'id',

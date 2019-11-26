@@ -18,7 +18,7 @@ class ClassPeriodMapper extends Schoolbox\Mapper {
      * {@inheritdoc}
      */
     protected function mapping() {
-        $this->hasTable('class_period');
+        $this->hasTable('sis_class_period');
         $this->hasModel(ClassPeriod::class);
         $this->hasMap(array(
             'column'     => 'id',
