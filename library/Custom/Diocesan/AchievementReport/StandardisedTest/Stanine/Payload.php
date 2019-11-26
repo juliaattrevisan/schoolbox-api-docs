@@ -66,33 +66,32 @@ class Payload
      * If they aren't meant to have a value here, use the string 'null' so
      * that highcharts can understand it (it won't understand empty string)
      *
-     * @param bool   $condition
      * @param string $x
      * @param string $y
      *
      * @return Payload
      */
-    public function aggregateStudent(bool $condition, string $x, string $y): self
+    public function aggregateStudent(string $x, string $y): self
     {
 
-        /* An assumption.
-         *
-         * ThisStudentStanine looks like it equates to Seq, which is the x-axis.
-         * ThisStudentStanine an either equate to Seq, or be zero.
-         * If ThisStudentStanine is zero, I don't render anything.
+        /* If IndividualMathsPATStanineMarker is zero, I don't render anything, regardless of
+         * the value of ThisStudentStanine. In fact that field has no meaning here.
          *
          * Otherwise, I render the value of IndividualMathsPATStanineMarker in the column
          * corresponding to ThisStudentStanine.
+         *
+         * Notes:
+         * ThisStudentStanine looks like it equates to Seq, which is the x-axis.
+         * ThisStudentStanine an either equate to Seq, or be zero
+         * ...but don't worry about that because this field has no meaning here
          */
-        if ($condition) {
+        if ($y) {
             $this->stack['series']['student'][$x] = $y;
 
             /* If a value in IndividualMathsPATStanineMarker != 0
              * then this student has data
              */
-            if ($y) {
-                $this->hasData = true;
-            }
+            $this->hasData = true;
         } else {
             $this->stack['series']['student'][$x] = 'null';
         }

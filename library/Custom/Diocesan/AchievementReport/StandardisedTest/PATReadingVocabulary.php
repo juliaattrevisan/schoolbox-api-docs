@@ -49,7 +49,7 @@ class PATReadingVocabulary extends Base
 
         foreach ($result as $row) {
             $payload
-                ->aggregateStudent((bool)$row['ThisStudentStanine'], (string)$row['Seq'], (string)$row['IndividualReadingVocabularyPATStanineMarker'])
+                ->aggregateStudent((string)$row['Seq'], (string)$row['IndividualReadingVocabularyPATStanineMarker'])
                 ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanReadingVocabularyPATStaninePercentage'])
                 ->aggregateNational((string)$row['Seq'], (string)$row['NationalReadingVocabularyPATStaninePercentage']);
         }
