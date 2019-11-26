@@ -101,7 +101,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                               sups.tutor_group,
                               sups.form_name
                 FROM          sis_class c
-                    JOIN               class_user cu ON cu.class_id = c.id
+                    JOIN               sis_class_user cu ON cu.class_id = c.id
                     JOIN               user u ON u.id = cu.user_id
                     JOIN               groups g ON g.id = u.group_id
                     LEFT JOIN          sis_user_profile up ON u.synergy_id = up.external_id

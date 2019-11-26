@@ -19,7 +19,7 @@ use Schoolbox\UserMapper;
  *
  * Importer for student enrolment into the Schoolbox connector.
  * Saves into the following tables:
- * * class_user
+ * * sis_class_user
  *
  * Assumes that `Schoolbox\External\Importer\TimetableStructure` and
  * `Schoolbox\External\Importer\Timetable` have been run.
@@ -161,7 +161,7 @@ class TimetableEnrolment extends AbstractImporter
             }
         }
         if ($this->performUpdate && count($enrolmentItems) > 0) {
-            $fullQuery = 'INSERT INTO class_user (id, class_id, user_id) VALUES ' . implode($enrolmentItems, ',') . ';';
+            $fullQuery = 'INSERT INTO sis_class_user (id, class_id, user_id) VALUES ' . implode($enrolmentItems, ',') . ';';
             try {
                 // Manual bulk insert into the DB of "$fullquery"
                 $this->externalDb->executeQuery($fullQuery);

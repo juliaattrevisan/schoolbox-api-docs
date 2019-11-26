@@ -21,7 +21,7 @@
  *
  * Turn on the Schoolbox connector in External DB
  *
- * Handcraft a record in class_user with values (1, 424, 208)
+ * Handcraft a record in sis_class_user with values (1, 424, 208)
  * Handcraft a homepage for 11CHE 1
  *
  * You can now view 208's timetable
@@ -182,13 +182,13 @@ class External_Liss_Server
                     'function' => [$this,'publishTeachers'],
                 ],
                 'liss.publishCalendar' => [
-                    'function' => [$this, 'publishCalendar'], 
+                    'function' => [$this, 'publishCalendar'],
                 ],
                 'liss.publishRooms' => [
                     'function' => [$this, 'publishRooms'],
                 ],
                 'liss.publishBellTimes' => [
-                    'function' => [$this, 'publishBellTimes'], 
+                    'function' => [$this, 'publishBellTimes'],
                 ],
                 'liss.publishClasses' => [
                     'function' => [$this, 'publishClasses'],
@@ -282,7 +282,7 @@ class External_Liss_Server
             }
 
             if (count($queryItems) > 0) {
-                $fullQuery = 'INSERT INTO class_user (id, class_id, user_id) VALUES ' . implode($queryItems, ',') . ';';
+                $fullQuery = 'INSERT INTO sis_class_user (id, class_id, user_id) VALUES ' . implode($queryItems, ',') . ';';
                 try {
                     // Manual bulk insert into the DB of "$fullquery"
                     $this->externalDb->executeQuery($fullQuery);

@@ -267,7 +267,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         u.firstname, 
                         u.lastname
             FROM        sis_class c
-            LEFT JOIN   class_user cl ON c.id = cl.class_id
+            LEFT JOIN   sis_class_user cl ON c.id = cl.class_id
             LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
             LEFT JOIN   user u ON cp.teacher_id = u.id
             WHERE       cp.teacher_id = :userId OR 
