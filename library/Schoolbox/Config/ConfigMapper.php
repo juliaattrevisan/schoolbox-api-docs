@@ -165,13 +165,8 @@ class ConfigMapper extends Mapper
             SELECT DISTINCT lu_config_type.type
             FROM {$this->getTable()}
             INNER JOIN lu_config_type ON config.type_id  = lu_config_type.id
-            WHERE NOT (
-                config.type_id = ?
-                AND
-                (SELECT c2.value FROM {$this->getTable()} c2 WHERE c2.name='boarder_leave_enabled') IS FALSE
-            )
         ";
-        $statement = $this->getDatabase()->query($query, [self::TYPE_BOARD]);
+        $statement = $this->getDatabase()->query($query);
         $result    = [];
         foreach ($statement as $row) {
             $result[] = $row['type'];
