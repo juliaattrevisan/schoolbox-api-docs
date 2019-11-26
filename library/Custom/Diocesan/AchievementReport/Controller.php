@@ -10,6 +10,7 @@ use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATHeading;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATListeningComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATNavigation;
@@ -221,7 +222,7 @@ class Controller extends Base {
                     'selected' => $year ?? (int)date('Y')
                 ],
                 'PATHeading' => [
-                    'label' => "Percentage of Year {$user->getYear()} Children by Stanine",
+                    'label' => (new PATHeading($user, $externalUser, $db, $year))->findData(),
                     'visible' => $headingVisible
                 ],
                 'PATMathematics' => $PATMathematics,
