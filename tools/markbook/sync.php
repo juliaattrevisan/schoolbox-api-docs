@@ -296,49 +296,44 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
 
                 /** @var User $student */
                 foreach ($classList as $student) {
-                    try {
-                        $result = $markbookHandler->getByUser($student['uid'], $submissionBox->getId());
+                    $result = $markbookHandler->getByUser($student['uid'], $submissionBox->getId());
 
-                        if (empty($result)) {
-                            continue;
-                        }
-
-                        // Create some fake user objects
-
-                        $owner = new User();
-                        $owner->setId($result[0]['owner']);
-
-                        $marker = new User();
-                        $marker->setId($result[0]['marker']);
-
-                        // Pretending to be a mapper even though we don't have one yet
-
-                        $return = new ReturnedWork();
-                        $return->setSubmissionBox($submissionBox->getSubmissionBox());
-                        $return->setNormalizedMark($result[0]['norm_mark']);
-                        $return->setHumanReadableMark($result[0]['visible_mark'] ?: $result[0]['mark']);
-                        $return->setMarker($marker);
-                        $return->setOwner($owner);
-                        $return->setComment($result[0]['comment']);
-
-                        $mark = $result[0]['norm_mark'];
-
-                        if (empty($mark)) {
-                            $mark = 'Unmarked';
-                        } else {
-                            $mark = round($mark,2);
-                        }
-
-                        $name = str_pad("{$student['firstname']} {$student['lastname']} ({$student['synergy_id']}):", 26, " ");
-                        $log->info("        {$name}{$mark}");
-
-                        if (!$dryRun) {
-                            $markbookExternal->setMark($return);
-
-                        }
+                    if (empty($result)) {
+                        continue;
                     }
-                    catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                        $log->warning("User or marker has been deleted from the system, not syncing result");
+
+                    // Create some fake user objects
+
+                    $owner = new User();
+                    $owner->setId($result[0]['owner']);
+
+                    $marker = new User();
+                    $marker->setId($result[0]['marker']);
+
+                    // Pretending to be a mapper even though we don't have one yet
+
+                    $return = new ReturnedWork();
+                    $return->setSubmissionBox($submissionBox->getSubmissionBox());
+                    $return->setNormalizedMark($result[0]['norm_mark']);
+                    $return->setHumanReadableMark($result[0]['visible_mark'] ?: $result[0]['mark']);
+                    $return->setMarker($marker);
+                    $return->setOwner($owner);
+                    $return->setComment($result[0]['comment']);
+
+                    $mark = $result[0]['norm_mark'];
+
+                    if (empty($mark)) {
+                        $mark = 'Unmarked';
+                    } else {
+                        $mark = round($mark, 2);
+                    }
+
+                    $name = str_pad("{$student['firstname']} {$student['lastname']} ({$student['synergy_id']}):", 26, " ");
+                    $log->info("        {$name}{$mark}");
+
+                    if (!$dryRun) {
+                        $markbookExternal->setMark($return);
+
                     }
                 }
             }
@@ -402,20 +397,15 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
                 $log->info("    {$action}" . count($classList));
 
                 foreach ($classList as $studentID => $result) {
-                    try {
-                        // Pretending to be a mapper, even though I dont have one yet.
-                        $return = new QuizAttempt();
-                        $return->setQuiz($quiz);
-                        $return->setId($result[0]['attempt_id']);
-                        $return->setUser(new User);
-                        $return->getUser()->setId($studentID);
+                    // Pretending to be a mapper, even though I dont have one yet.
+                    $return = new QuizAttempt();
+                    $return->setQuiz($quiz);
+                    $return->setId($result[0]['attempt_id']);
+                    $return->setUser(new User);
+                    $return->getUser()->setId($studentID);
 
-                        if (!$dryRun) {
-                            $markbookExternal->setMark($return);
-                        }
-                    }
-                    catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                        $log->warning("User or marker has been deleted from the system, not syncing result");
+                    if (!$dryRun) {
+                        $markbookExternal->setMark($return);
                     }
                 }
             }
