@@ -29,41 +29,41 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
     <li><a href="{{ routeLookup('resourceCategory.browse') }}">Resource Categories</a></li>
-    <li class="active"><a href="#">{% if item.id %}Edit{% else %}Add{% endif %}</a></li>
+    <li class="active"><a href="#">{% if category.id %}Edit{% else %}Add{% endif %}</a></li>
 </ul>
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{% if item.id %}Edit{% else %}Add{% endif %} Resource Category</h1>
+            <h1>{% if category.id %}Edit{% else %}Add{% endif %} Resource Category</h1>
         </div>
     </div>
-    {% if item.id and isRouteAuthorized('resourceCategory.delete:post', {id: item.id, item: item}) %}
+    {% if category.id and isRouteAuthorized('resourceCategory.delete:post', {id: category.id, category: category}) %}
     <nav>
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a id="resourcecategory-delete" class="icon-delete" title="Delete" data-action="{{ routeLookup('resourceCategory.delete:post', {id: item.id}) }}">Delete</a></li>
+        <li><a id="resourcecategory-delete" class="icon-delete" title="Delete" data-action="{{ routeLookup('resourceCategory.delete:post', {id: category.id}) }}">Delete</a></li>
     </ul>
     {% endif %}
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        <form id="resourcecategory-form" action="{% if item.id %}{{ routeLookup('resourceCategory.update:post', {id: item.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}" method="post" name="form">
-            <input type="hidden" name="id" value="{{ item.id }}"/>
+        <form id="resourcecategory-form" action="{% if category.id %}{{ routeLookup('resourceCategory.update:post', {id: category.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}" method="post" name="form">
+            <input type="hidden" name="id" value="{{ category.id }}"/>
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="name" class="required">Title</label>
-                        <input class="required" name="name" id="name" type="text" value="{{ item.name }}" maxlength="250" required/>
+                        <input class="required" name="name" id="name" type="text" value="{{ category.name }}" maxlength="250" required/>
                     </div>
                 </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <input id="resourcecategory-save" type="submit" value="{% if item.id %}Update{% else %}Create{% endif %}" />
+                    <input id="resourcecategory-save" type="submit" value="{% if category.id %}Update{% else %}Create{% endif %}" />
                 </div>
             </div>
         </form>

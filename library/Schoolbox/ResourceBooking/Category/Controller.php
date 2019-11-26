@@ -105,7 +105,6 @@ class Controller extends Base {
             $calendarDate = \Alaress_Date_Format::now();
         }
 
-
         $resources = ItemMapper::getInstance()->findByColumn(
             'resource_category_id',
             $category->getId(),
@@ -124,11 +123,7 @@ class Controller extends Base {
                 'template' => '@resourceCategory/read.twig',
                 'data'     => [
                     'category'      => $category,
-                    'resources' => ItemMapper::getInstance()->findByColumn(
-                        'resource_category_id',
-                        $category->getId(),
-                        ['order' => ['name' => 'asc']]
-                    ),
+                    'resources'     => $resources,
                     'calendar' => [
                         'date' => $calendarDate->getDatabase(),
                         'view' => $this->request->query->get('view', 'week'),
@@ -142,14 +137,15 @@ class Controller extends Base {
     /**
      * Displays form for editing an existing category
      *
-     * @param Model $item
+     * @param Model $category
      */
-    public function edit(Model $item) {
+    public function edit(Model $category): void
+    {
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceCategory/edit.twig',
                 'data'     => array(
-                    'item' => $item,
+                    'category' => $category,
                 ),
             )
         );
@@ -158,12 +154,15 @@ class Controller extends Base {
     /**
      * Backend for updating an existing category
      *
-     * @param Model $item
+     * @param Model $category
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function update(Model $item) {
+    public function update(Model $category): void
+    {
         $post = $this->getRequest()->post;
-        $item->setName($post['name']);
-        $this->getMapper()->save($item);
+        $category->setName($post['name']);
+        $this->getMapper()->save($category);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
@@ -175,10 +174,13 @@ class Controller extends Base {
     /**
      * Backend for deleting a category
      *
-     * @param Model $item
+     * @param Model $category
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function delete(Model $item) {
-        $this->getMapper()->delete($item);
+    public function delete(Model $category): void
+    {
+        $this->getMapper()->delete($category);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
