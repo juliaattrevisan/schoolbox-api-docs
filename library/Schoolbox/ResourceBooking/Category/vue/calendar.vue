@@ -166,7 +166,7 @@
             onDateClick(dateClickInfo) {
                 // Just a proposal.
                 // If the user doesn't have the rights to create a booking, just don't show the modal.
-                if (this.config.bookingIsAuthorized) {
+                if (dateClickInfo.resource.extendedProps.bookingIsAuthorized) {
                     this.$refs.createBooking.open({
                         date: dateClickInfo.date,
                         allDay: dateClickInfo.allDay,

@@ -95,46 +95,57 @@ class Controller extends Base {
     /**
      * Views an existing category
      *
-     * @param Model $item
+     * @param Model $category
      */
-    public function read(Model $item)
+    public function read(Model $category)
     {
         try {
             $calendarDate = \Alaress_Date_Format::newUrlDate($this->request->query->get('date'));
         } catch (\Exception $e) {
             $calendarDate = \Alaress_Date_Format::now();
         }
+
+        $resources = ItemMapper::getInstance()->findByColumn(
+            'resource_category_id',
+            $category->getId(),
+            ['order' => ['name' => 'asc']]
+        );
+
+        foreach ($resources->getAll() as $resource) {
+            /** @var \Schoolbox\ResourceBooking\Item\Model $resource */
+            $resource->setBookingIsAuthorized($this->getRouteIfAuthorized('resourceBooking.book', [
+                'id' => $resource->getId(),
+            ]));
+        }
+
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceCategory/read.twig',
-                'data'     => array(
-                    'item'      => $item,
-                    'resources' => ItemMapper::getInstance()->findByColumn(
-                        'resource_category_id',
-                        $item->getId(),
-                        ['order' => ['name' => 'asc',]]
-                    ),
-                    'calendar' => array(
+                'data'     => [
+                    'category'      => $category,
+                    'resources'     => $resources,
+                    'calendar' => [
                         'date' => $calendarDate->getDatabase(),
                         'view' => $this->request->query->get('view', 'week'),
-                    ),
+                    ],
                     'token' => $_SESSION['key']
-                ),
-            )
+                ],
+            ]
         );
     }
 
     /**
      * Displays form for editing an existing category
      *
-     * @param Model $item
+     * @param Model $category
      */
-    public function edit(Model $item) {
+    public function edit(Model $category): void
+    {
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceCategory/edit.twig',
                 'data'     => array(
-                    'item' => $item,
+                    'category' => $category,
                 ),
             )
         );
@@ -143,12 +154,15 @@ class Controller extends Base {
     /**
      * Backend for updating an existing category
      *
-     * @param Model $item
+     * @param Model $category
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function update(Model $item) {
+    public function update(Model $category): void
+    {
         $post = $this->getRequest()->post;
-        $item->setName($post['name']);
-        $this->getMapper()->save($item);
+        $category->setName($post['name']);
+        $this->getMapper()->save($category);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
@@ -160,10 +174,13 @@ class Controller extends Base {
     /**
      * Backend for deleting a category
      *
-     * @param Model $item
+     * @param Model $category
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function delete(Model $item) {
-        $this->getMapper()->delete($item);
+    public function delete(Model $category): void
+    {
+        $this->getMapper()->delete($category);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
@@ -172,15 +189,16 @@ class Controller extends Base {
     /**
      * Action for outputting a calendar
      *
-     * @param Model $item
+     * @param Model $category
+     * @throws \Exception
      */
-    public function calendar(Model $item)
+    public function calendar(Model $category)
     {
         $apiFactory = new CalendarApiFactory($this->getUser(), new \External_Timetable());
         $source     = $apiFactory->buildFromResourceCollection(
             ItemMapper::getInstance()->findByColumn(
                 'resource_category_id',
-                $item->getId(),
+                $category->getId(),
                 ['order' => ['name' => 'asc',]]
             ),
             true,

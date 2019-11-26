@@ -108,6 +108,11 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     protected $roleList;
 
+    /**
+     * @var bool
+     */
+    protected $bookingIsAuthorized = false;
+
     public function __construct() {
         $this->setImage(new Storage\Model());
     }
@@ -390,7 +395,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @param  Collection|RolePermission\Model[] $roleList
      *
-*@return $this
+     * @return $this
      */
     public function setRoleList($roleList) {
         $this->roleList = $roleList;
@@ -402,6 +407,25 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     public function getRoleList() {
         return $this->roleList;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getBookingIsAuthorized(): bool
+    {
+        return $this->bookingIsAuthorized;
+    }
+
+    /**
+     * @param bool $authorized
+     * @return $this
+     */
+    public function setBookingIsAuthorized(bool $authorized): self
+    {
+        $this->bookingIsAuthorized = $authorized;
+
+        return $this;
     }
 
     /**
@@ -472,6 +496,7 @@ class Model implements ISoftDeletable, JsonSerializable {
             'moderation_type'      => $this->getModerationType(),
             'moderator_list'       => $this->getModeratorList(),
             'category'             => $this->getCategory(),
+            'bookingIsAuthorized'  => $this->getBookingIsAuthorized(),
         );
     }
 
