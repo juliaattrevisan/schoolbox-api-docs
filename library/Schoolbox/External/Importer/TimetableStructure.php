@@ -232,8 +232,11 @@ class TimetableStructure extends AbstractImporter
                     $campus->getCampus()->getExtTimetableCode()
                 )
             );
-            $dayCount    = max(array_keys($timetable['periods']));
+
+            $keys        = array_keys($timetable['periods']);
+            $dayCount    = \count($keys) ? max($keys) : 0;
             $periodNames = [];
+
             foreach ($timetable['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
