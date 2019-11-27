@@ -128,6 +128,9 @@ class Controller extends Base
                         $deviceId = $this->request->post->get('deviceId');
                         if (isset($deviceId)) {
                             $registry->setDeviceId($deviceId);
+
+                            //De-register existing devices for other users
+                            $this->registryMapper->deleteByColumn('device_id', $deviceId);
                         }
 
                     } catch (MapperException $e) {
