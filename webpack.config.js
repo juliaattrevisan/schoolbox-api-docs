@@ -14,6 +14,7 @@ module.exports = {
         resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js",
         eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
         'datepicker.min.css': [
+            path.resolve(__dirname, 'node_modules/@fullcalendar/list/core.css'),
             path.resolve(__dirname, 'node_modules/@fullcalendar/list/main.css')
         ]
     },
