@@ -20,7 +20,9 @@ use UnderflowException;
 use UnexpectedValueException;
 use function array_column;
 use function array_keys;
+use function count;
 use function implode;
+use function max;
 use function preg_match;
 use function preg_replace;
 
@@ -59,6 +61,7 @@ class CourseSection
 
     /**
      * Maps all SB FolderCodes to a Canvas CourseSections.SisSourceIds (if one is found)
+     * The folderCode array key is the potentially re-mapped T3-T4 value, which does not equal the value in SB DB.
      * [
      *   2018 => [
      *     'J/abc123' => 'Y2018Cabc123NOT',
@@ -75,6 +78,7 @@ class CourseSection
 
     /**
      * Maps all SB FolderCodes to a SB folder so we can easily fetch the folder by either old folderCode or sisSourceId
+     * The folderCode array key is the potentially re-mapped T3-T4 value, which does not equal the value in SB DB.
      * [
      *   2018 => [
      *     'J/abc123' => $folder1,
@@ -104,6 +108,7 @@ class CourseSection
 
     /**
      * Maps all Canvas CourseSections.SisSourceIds to a SB FolderCode (if a match is found)
+     * The folderCode is the potentially re-mapped T3-T4 value, which does not equal the value in SB DB.
      * [
      *   'Y2018Cabc123NOT' => ['2018', 'J/abc123'],
      *   'Y2019Cabc123NOT' => ['2019', 'J/abc123'],
@@ -148,8 +153,7 @@ class CourseSection
      */
     public function execute(): void
     {
-        $this->populateAllSchoolboxFolderCodes();
-        $this->populateAllCanvasSisSourceIds();
+        $this->populateAllCanvasSisSourceIds($this->populateAllSchoolboxFolderCodes());
     }
 
 
@@ -247,8 +251,9 @@ class CourseSection
      * @throws Mapper\Exception
      * @throws UnderflowException
      * @throws UnexpectedValueException
+     * @return string[][] Remapped folderCodes, indexed by [$year][$originalFolderCode]
      */
-    private function populateAllSchoolboxFolderCodes(): void
+    private function populateAllSchoolboxFolderCodes(): array
     {
         $hashFunction = static function (Folder\Model $folder) {
             return $folder->getId();
@@ -302,6 +307,84 @@ class CourseSection
             $this->yearAndFolderCodeToSisSourceIdMap[$year][$folderCode] = null;
             $this->yearAndFolderCodeToFolderMap[$year][$folderCode]      = $folder;
         }
+
+        return $this->reMapFolderCodesForRollOver();
+    }
+
+
+    /**
+     * Optionally remaps some folder codes to account for T3 and T4 rollover.
+     *
+     * Returns any re-mappings that were applied
+     *
+     * We need to be able to map classes between Canvas:Schoolbox:Synergetic during the rollover period.
+     * STALOY has two roll ever events:
+     * 1. At the end of T3.
+     *    Yr 11 students begin Yr12 classes.
+     *    In Synergetic, these have FileYear=2019 and classCode~=11Bio1
+     *    In Schoolbox, all Yr 11 classes are rolled over
+     *    In Schoolbox, early-start class folders are created below the next calendar year, eg 2020 > 11 > 11Bio1
+     * 2. At the end of T4
+     *    Yr 11 folder (if it exists in SB) is renamed to '12'
+     *    All folder codes of early start classes are incremented, eg 'S/11Bio1' => 'S/12Bio1'
+     *    All non-early start class folders are created, eg 2020 > 11 > 11Bio1
+     *
+     * We need to be able to:
+     * 1. Map the early start classes to a Canvas courses after the T3 event
+     * 2. Continue to map classes after the T4 event
+     *
+     * To do so, we need to sometimes increment the year level in the folder code on the fly.
+     * We will do so if the data indicates we are between the T3 and T4 events.
+     * @return string[][]
+     */
+    private function reMapFolderCodesForRollOver(): array
+    {
+        // Examine latest data to see if we need to tweak the map indexes
+        $reMappedFolderCodes = [];
+        $years               = array_keys($this->yearAndFolderCodeToFolderMap);
+        if (count($years)) {
+
+            $latestYear = max($years);
+            $this->log->notice("Examining $latestYear folder codes to determine if we are in T3-T4 period");
+            $latestFolderCodes = $this->yearAndFolderCodeToFolderMap[$latestYear];
+            $folderCodes       = array_keys($latestFolderCodes);
+
+            $countYear11 = 0;
+            foreach ($folderCodes as $folderCode) {
+                if (preg_match("/\D?11\D+/", $folderCode, $matches)) {
+                    $countYear11++;
+                }
+            }
+            $countFolderCodes = count($folderCodes);
+            $this->log->info("Count $latestYear folder codes: $countFolderCodes");
+            $this->log->info("Count $latestYear Yr 11 folder codes: $countYear11");
+
+            // We will assume we are in the T3-T4 period if we have more than 10 folderCodes, and > 90% of for year 11
+            $reMap = $countFolderCodes > 10 && ($countYear11 / $countFolderCodes) > 0.9;
+
+            $this->log->notice(($reMap ? '' : "NOT ") . "Remapping $latestYear Year 11 folder codes to Year 12");
+
+            if ($reMap) {
+                foreach ($folderCodes as $folderCode) {
+                    $reMapped = preg_replace("/(\D?)11(\D+)/", '${1}12${2}', $folderCode, 1);
+                    if ($reMapped !== $folderCode) {
+                        $this->log->debug("Remapping '$folderCode' to '$reMapped'");
+                        $reMappedFolderCodes[$latestYear][$folderCode] = $reMapped;
+                        $sisSourceId                                   = $this->yearAndFolderCodeToSisSourceIdMap[$latestYear][$folderCode];
+                        $folder                                        = $this->yearAndFolderCodeToFolderMap[$latestYear][$folderCode];
+                        unset(
+                            $this->yearAndFolderCodeToSisSourceIdMap[$latestYear][$folderCode],
+                            $this->yearAndFolderCodeToFolderMap[$latestYear][$folderCode]
+                        );
+                        $this->yearAndFolderCodeToSisSourceIdMap[$latestYear][$reMapped] = $sisSourceId;
+                        $this->yearAndFolderCodeToFolderMap[$latestYear][$reMapped]      = $folder;
+                    } else {
+                        $this->log->warning("NOT remapping '$folderCode'");
+                    }
+                }
+            }
+        }
+        return $reMappedFolderCodes;
     }
 
 
@@ -374,12 +457,13 @@ class CourseSection
     /**
      * Fetch Canvas SisSourceIds and match up to Schoolbox folder codes
      *
+     * @param string[][] $remappedFolderCodes
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    private function populateAllCanvasSisSourceIds(): void
+    private function populateAllCanvasSisSourceIds(array $remappedFolderCodes): void
     {
         // It appears the SisSourceId is made up of ('Y' | $year | 'C' | $subjectCode), with no campus code.
         // The schoolbox folder code has the campus code prefixed, we need to therefore strip it off to compare across the systems.
@@ -449,6 +533,10 @@ class CourseSection
                 $folderCode     = $firstCodeModel->getCode();
             } else {
                 $folderCode = $this->parseRolledOverFolderCodeFromFolderName($folder->getName());
+            }
+
+            if (isset($remappedFolderCodes[$year][$folderCode])) {
+                $folderCode = $remappedFolderCodes[$year][$folderCode];
             }
 
             $this->yearAndFolderCodeToSisSourceIdMap[$year][$folderCode] = $sisSourceId;
