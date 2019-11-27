@@ -14,21 +14,31 @@ Data:
     data[folderId]['aasData']['data']                            array
     data[folderId]['aasData']['data'][unitSpecId]                array
     data[folderId]['aasData']['data'][unitSpecId]['comment']     string
+    data[folderId]['aasData']['data'][unitSpecId]['capabilityMarks'] string[]|null[]
     data[folderId]['ibGraphData'][idx]['showComponent']          bool
     data[folderId]['ibGraphData'][idx]['header']                 string
     data[folderId]['ibGraphData'][idx]['studentMark']            int
     data[folderId]['nesaGraphData'][idx]['showComponent']        string
     data[folderId]['nesaGraphData'][idx]['studentMark']          string
+    data[folderId]['unitspecs']                                  array   Sorted by most recent first
+    data[folderId]['unitspecs'][idx][id]                         int
+    data[folderId]['unitspecs'][idx][dueDate]                    ADF     Copied from a relevant dueWork inside the unit
+    data[folderId]['unitspecs'][idx][title]                      string
     reportDate                                                   null|string
 #}
 <style>
+    .legend {
+        position: absolute;
+        right: 2rem;
+        top: 1rem;
+    }
     .results {
         color: black;
         text-align: right;
     }
     .result-group {
         display: inline-block;
-        background-color: #cccccc;
+        background-color: #ccc;
         text-align: center;
         vertical-align: top;
     }
@@ -38,7 +48,7 @@ Data:
     }
     .result-item {
         display: inline-block;
-        padding: 3px 10px;
+        padding: 4px 12px;
     }
     .result-heading {
         font-weight: bold;
@@ -50,19 +60,36 @@ Data:
     .teacher-comment{
         color: black;
     }
+    @media (max-width: 640px) {
+        .results {
+            text-align: left;
+        }
+    }
+    @media (max-width: 340px) {
+        .legend {
+            position: relative;
+            right: 0;
+            top: 0;
+        }
+    }
 </style>
 
 <h2 class="subheader">Academic Transcript</h2>
 <div>
-    <ul class="subject-list">
-        {% for subject in subjects %}
-            {% set folderId = subject.folderId %}
-            {% set folderData = data[folderId] %}
-            {% set firstTeacher = subject.teachers | first %}
-            <li class="subject-list-item">
-                <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
-                    <div class="list-item">
-                        <div class="card column small-12 medium-6">
+    {#
+        We need to assign the subjectList markup to a variable and defer its render, so that we
+        can detect if any interim grades are present, and print a legend above the markup if they are.
+     #}
+    {% set hasInterminGrades = false %}
+    {% set subjectListHtml %}
+        <ul class="subject-list">
+            {% for subject in subjects %}
+                {% set folderId = subject.folderId %}
+                {% set folderData = data[folderId] %}
+                {% set firstTeacher = subject.teachers | first %}
+                <li class="subject-list-item">
+                    <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
+                        <div class="card small-12 medium-6">
 
                             <img src="/portrait.php?id={{ firstTeacher.id }}&amp;size=square64" width="48" alt="{{ firstTeacher.fullName }}">
                             <h3 class="subject-name">{{ subject.name }}
@@ -79,12 +106,32 @@ Data:
                         </div>
                         <div class="column small-12 medium-6 results">
                             <div class="result-group fal">
-                                {% for label, value in folderData.falData.data %}
-                                    <div class="result-item">
-                                        <span class="result-heading">{{ label | last }}</span><br>
-                                        <span class="result-value">{{ value|default('-') }}</span>
-                                    </div>
-                                {% endfor %}
+                                {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
+                                {% if folderData.falData.data %}
+                                    {# Explicit FAL data found, use that #}
+                                    {% for label, value in folderData.falData.data %}
+                                        <div class="result-item">
+                                            <span class="result-heading">{{ label | last }}</span><br>
+                                            <span class="result-value">{{ value|default('-') }}</span>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {# No explicit FAL data found, fall back to latest AAS assessment #}
+                                    {% set aasFound = false %}
+                                    {# These units are ordered from latest to oldest #}
+                                    {% for unitSpecData in folderData.unitSpecs if not aasFound %}
+                                        {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                            {% set aasFound = true %}
+                                            {% set hasInterminGrades = true %}
+                                            {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                <div class="result-item">
+                                                    <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
+                                                    <span class="result-value">{{ value|default('-') }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
                             </div>
 
                             {% set ibGraphData = folderData.ibGraphData.data | default(null) %}
@@ -98,26 +145,56 @@ Data:
                                 </div>
                             {% endif %}
 
+                            {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
                             {% if folderData.hscRankData %}
                                 <div class="result-group hsc-rank">
                                     {% if folderData.hscRankData.assessmentMark is defined %}
                                         <div class="result-item hsc-rank-mark">
                                             <span class="result-heading">Mark</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentMark }}</span>
+                                            <span class="result-value">{{ folderData.hscRankData.assessmentMark|default('-') }}</span>
                                         </div>
                                     {% endif %}
                                     {% if folderData.hscRankData.assessmentAverage is defined %}
                                         <div class="result-item hsc-rank-average">
                                             <span class="result-heading">Average</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentAverage }}</span>
+                                            <span class="result-value">{{ folderData.hscRankData.assessmentAverage|default('-') }}</span>
                                         </div>
                                     {% endif %}
                                     {% if folderData.hscRankData.assessmentRank is defined %}
                                     <div class="result-item hsc-rank-rank">
                                         <span class="result-heading">Rank</span><br>
-                                        <span class="result-value">{{ folderData.hscRankData.assessmentRank }}</span>
+                                        <span class="result-value">{{ folderData.hscRankData.assessmentRank|default('-') }}</span>
                                     </div>
                                     {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="result-group hsc-rank">
+                                {% set hasTaskFound = false %}
+                                {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
+                                    {% if folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                        {% set hasTaskFound = true %}
+                                        {% set hasInterminGrades = true %}
+                                        {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                        {% if hscTaskMarkData.studentMark is defined %}
+                                            <div class="result-item hsc-rank-mark">
+                                                <span class="result-heading">Mark*</span><br>
+                                                <span class="result-value">{{ hscTaskMarkData.studentMark|default('-') }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if hscTaskMarkData.cohortAverage is defined %}
+                                            <div class="result-item hsc-rank-average">
+                                                <span class="result-heading">Average*</span><br>
+                                                <span class="result-value">{{ hscTaskMarkData.cohortAverage|default('-') }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if hscTaskMarkData.cohortRank is defined %}
+                                            <div class="result-item hsc-rank-rank">
+                                                <span class="result-heading">Rank*</span><br>
+                                                <span class="result-value">{{ hscTaskMarkData.cohortRank|default('-') }}</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                                 </div>
                             {% endif %}
 
@@ -135,7 +212,7 @@ Data:
                                 {% endif %}
                             {% endif %}
                         </div>
-                        <div class="column small-12 teacher-comment">
+                        <div class="column small-12 teacher-comment content">
 
                             {# Render the first comment only #}
                             {% set commentFound = false %}
@@ -154,11 +231,15 @@ Data:
                                 {% endif %}
                             {% endfor %}
                         </div>
-                    </div>
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endset %}
+
+    {# We can now print the optional legend, and then the subject list markup #}
+    {% if hasInterminGrades %}<span class="meta legend">* - interim grade</span>{% endif %}
+    {{ subjectListHtml }}
 </div>
 
 

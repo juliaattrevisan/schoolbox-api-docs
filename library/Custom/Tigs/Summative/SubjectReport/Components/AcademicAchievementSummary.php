@@ -13,6 +13,7 @@ use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -20,6 +21,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use function array_key_exists;
 
 /**
  * Responsible for generating data that can be used by a template to render the
@@ -211,6 +213,7 @@ class AcademicAchievementSummary extends BaseComponent
             'showDescriptorValue' => true,
             'showGroupTotal'      => $dueWork->getMarkPerCapability(),
             'showRubricTotal'     => true,
+            'capabilityMarks'     => null,
         ];
 
         // Load rubric marks if they exist and current user is permitted to view grades
@@ -221,6 +224,7 @@ class AcademicAchievementSummary extends BaseComponent
             if ($feedback) {
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
                 $data['markedGrid'] = $feedback->getRubricMarkedGrid();
+                $data['capabilityMarks'] = $this->buildCapabilityMarks($data['markedGrid']);
 
                 // MYP students' comments will come from this assessment
                 if ($this->getAttributes()->isMyp()) {
@@ -255,5 +259,36 @@ class AcademicAchievementSummary extends BaseComponent
             return $this->router->generate($path, $routeParams);
         }
         return null;
+    }
+
+
+    /**
+     * Derive capability marks to support Academic Transcript using the mark as a placeholder until FAL marks are given
+     *
+     * Returns NULL if grid is null, or has no non-null marks for capabilities named in (A,B,C,D)
+     *
+     * @param MarkedGrid|null $markedGrid
+     * @return null|array
+     */
+    private function buildCapabilityMarks(?MarkedGrid $markedGrid): ?array
+    {
+        $capabilityMarks = [
+            'A' => null,
+            'B' => null,
+            'C' => null,
+            'D' => null,
+        ];
+        $hasMarks        = false;
+        if ($markedGrid !== null) {
+            foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+                $capabilityName  = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
+                $capabilityValue = $capabilityMark->getValue();
+                if (array_key_exists($capabilityName, $capabilityMarks) && $capabilityValue !== null) {
+                    $hasMarks                         = true;
+                    $capabilityMarks[$capabilityName] = $capabilityMark->getValue();
+                }
+            }
+        }
+        return $hasMarks ? $capabilityMarks : null;
     }
 }
