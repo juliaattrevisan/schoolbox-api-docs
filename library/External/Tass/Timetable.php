@@ -6,6 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 use Schoolbox\Campus;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 
 class External_Tass_Timetable implements External_TimetableInterface
 {
@@ -334,6 +335,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         if (empty($roomCodes)) {
             return [];
         }
+        $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCodes');
         $query = "
             SELECT
                 room_code AS RoomCode,
@@ -370,17 +372,18 @@ class External_Tass_Timetable implements External_TimetableInterface
                 ttperiod.tt_id=ttmast.tt_id
             WHERE year_num  = :year
             AND   semester  = :semester
-            AND   room_code IN (:rooms)
+            AND   room_code IN ({$predicate['placeholders']})
             ORDER BY
                 ttmast.day_code ASC,
                 ttmast.prd_code ASC
         ";
         $params =
             [
-                ':semester' => $this->externalUser->getCurrentSemester(),
-                ':year'     => $this->externalUser->getCurrentYear(),
-                ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $roomCodes)),
+                'semester' => $this->externalUser->getCurrentSemester(),
+                'year'     => $this->externalUser->getCurrentYear(),
             ];
+        $params = array_merge($params, $predicate['bindings']);
+
         return $this->getConnector()->executeQuery($query, $params)->fetchAll();
     }
 }
