@@ -477,7 +477,7 @@ class Module extends BaseModule
      */
     private function buildAuthRuleCanSubmit()
     {
-        return new Rule\all(
+        return new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\All(
