@@ -129,6 +129,23 @@ $(function() {
             }
         }
     });
+
+    $('input[type=radio][name=separator]').change(function() {
+
+        var text = $('#copy-email-text').text();
+        var replaceText = '';
+
+        if (this.value == 'comma') {
+            replaceText = text.replace(/\;/g, ',');
+        }
+        else if (this.value == 'colon') {
+            replaceText = text.replace(/\,/g, ';');
+        }
+
+        $('#copy-email-text').text(replaceText);
+
+    });
+
 });
 </script>
 <!-- END custom_head -->
@@ -210,6 +227,10 @@ $(function() {
 <div id="email-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
     <p>Use this to copy the addresses to your clipboard for use in other email programs</p>
     <textarea readonly id="copy-email-text" rows="6"></textarea>
+    <fieldset class="radiolist" >
+        <input type="radio" name="separator" value="comma" id="commaSep" checked><label for="commaSep" >Comma Separated</label>
+        <input type="radio" name="separator" value="colon" id="colonSep"><label for="colonSep" >Semi-Colon Separated</label>
+    </fieldset>
     <button id="copy-button" data-clipboard-target="copy-email-text" class="icon-copy">Copy to Clipboard</button>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
