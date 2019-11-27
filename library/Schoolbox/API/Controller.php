@@ -124,13 +124,13 @@ class Controller extends Base
                             ->setCreatedAt($now)
                             ->setTouchedAt($now);
 
+                        //De-register existing logins for other users
+                        $this->registryMapper->deleteByColumn('app_token', $token);
+
                         // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
                         $deviceId = $this->request->post->get('deviceId');
                         if (isset($deviceId)) {
                             $registry->setDeviceId($deviceId);
-
-                            //De-register existing devices for other users
-                            $this->registryMapper->deleteByColumn('device_id', $deviceId);
                         }
 
                     } catch (MapperException $e) {
