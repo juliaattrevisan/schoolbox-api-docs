@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter;
+use function array_merge;
 
 /**
  * A factory for building 'TemporalState' filter objects
@@ -27,8 +28,7 @@ class Factory extends AbstractFactory
         return new Definition(
             $filter,
             $this->getOptionMapper(),
-            $this->getDefaultsMapper(),
-            $this->getTemporalStates()
+            $this->getDefaultsMapper()
         );
     }
 
@@ -40,22 +40,9 @@ class Factory extends AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, $this->getTemporalStates());
+        return new KeyConverter(
+            $filter,
+            new Collection(array_merge(Definition::getTemporalStates(), Definition::getCapTemporalStates()))
+        );
     }
-
-
-    /**
-     * @return Collection|string[]
-     */
-    private function getTemporalStates()
-    {
-        return new Collection([
-            Definition::KEY_UNPUBLISHED,
-            Definition::KEY_UPCOMING,
-            Definition::KEY_OPEN,
-            Definition::KEY_OVERDUE,
-            Definition::KEY_CLOSED,
-        ]);
-    }
-
 }

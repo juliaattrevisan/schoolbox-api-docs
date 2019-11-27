@@ -11,9 +11,14 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
+use DomainException;
 use External_ClassInterface;
+use InvalidArgumentException;
+use LogicException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
+use Schoolbox\Mapper\DefinitionException;
+use UnexpectedValueException;
 use function func_get_args;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -23,6 +28,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -173,14 +179,12 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \ReflectionException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws DefinitionException
      * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date): void
     {
@@ -283,18 +287,20 @@ class Controller extends Base
     }
 
 
+    /** @noinspection PhpUnused */
     /**
      * Returns a JSON payload containing a HTML fragment where the HTML fragment is a filtered list of assessments.
      *
+     * @api /learning/due/{studentId:\d+}
+     *
      * @param User $student
      * @throws Filter\BrokenFilterException
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \ReflectionException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
      */
     public function postUpcomingForStudent(User $student): void
     {
@@ -306,14 +312,8 @@ class Controller extends Base
 
         // Only fetch assessments that are:
         // * assessment impls
-        // * upcoming, open or overdue (ie not unpublished or closed)
         $filters = \array_merge($filters, [
             Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-            Filters\Assessment\TemporalState\Definition::class            => [
-                Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_UPCOMING,
-                Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_OPEN,
-                Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_OVERDUE,
-            ],
         ]);
 
         $allWork = $this->assessmentDataSource
