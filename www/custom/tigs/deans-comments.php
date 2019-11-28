@@ -197,6 +197,8 @@ function processCsvData(
         $student = $userMapper->findByExternalId($studentId);
 
         // Sanity check
+        $logger->info("<br>Processing row #$rowId, checking student id ($studentId) and name alignment...");
+
         if ($student->getLastname() !== $surname) {
             $logger->warning("Lastname: {$student->getLastname()} !== Surname: {$surname}");
         } else {
@@ -371,7 +373,7 @@ function getLogger(): LoggerInterface
                 default;
                     return 'black';
                 case LogLevel::DEBUG;
-                    return 'blue';
+                    return 'green';
             }
         }
     };
