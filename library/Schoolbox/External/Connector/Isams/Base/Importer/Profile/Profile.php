@@ -191,7 +191,7 @@ class Profile implements IStrategy
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolCode);
             $username = trim((string)$student->SchoolCode);
-            $firstname = trim((string)$student->Preferredname);
+            $firstname = trim((string)$student->Forename);
             $lastname = trim((string)$student->Surname);
             $studentId = trim((string)$student->xpath('@Id')[0]);
             $yearLevel = trim((string)$student->NCYear);
@@ -747,7 +747,7 @@ class Profile implements IStrategy
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
             $username = trim((string)$staff->UserName);
-            $firstname = trim((string)$staff->PreferredName);
+            $firstname = trim((string)$staff->Forename);
             $lastname = trim((string)$staff->Surname);
 
             /* Staff without usernames are skipped
