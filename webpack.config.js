@@ -13,8 +13,8 @@ module.exports = {
         resourceBookingItemCalendar: "./library/Schoolbox/ResourceBooking/Item/vue/calendar.main.js",
         resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js",
         eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
-        'datepicker.min.css': [
-            path.resolve(__dirname, 'node_modules/@fullcalendar/list/core.css'),
+        'datepicker.css': [
+            path.resolve(__dirname, 'node_modules/@fullcalendar/core/main.css'),
             path.resolve(__dirname, 'node_modules/@fullcalendar/list/main.css')
         ]
     },
@@ -95,12 +95,12 @@ module.exports = {
     },
     plugins: [
         new VueLoaderPlugin(),
-        new ExtractTextPlugin("datepicker.min.css"),
+        new ExtractTextPlugin("datepicker.css"),
         new FileManagerPlugin({
             onEnd: {
                 move: [
                     {
-                        source: './www/javascript/components/datepicker.min.css', destination: './www/css/core/fullcalendar/datepicker.css'
+                        source: './www/javascript/components/datepicker.css', destination: './www/css/core/fullcalendar/datepicker.css'
                     }
                 ]
             }
