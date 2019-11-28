@@ -17,6 +17,7 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
+use LogicException;
 use PDOException;
 use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
@@ -250,11 +251,11 @@ class Controller extends Base
                 $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
 
                 $audienceSegment = new Audience\SegmentSelectizeOption(
-                    $codec->encodeSimpleAttributes($entityType, $folderId, Audience\Model::RELATIONSHIP_SELF),
+                    $codec->encodeSimpleAttributes($entityType, (string)$folderId, Audience\Model::RELATIONSHIP_SELF),
                     $label
                 );
 
-                $audienceSegment->addLabel($entityType, $codec->encodeValue($folderId), $label);
+                $audienceSegment->addLabel($entityType, $codec->encodeValue((string)$folderId), $label);
                 $audienceSegments[] = $audienceSegment;
             }
         }
@@ -730,7 +731,7 @@ class Controller extends Base
         );
 
         if (\count($topicData['articles']) < 1) {
-            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
+            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage($params->getFolderId());
         }
 
         return array_merge($topicData, [
@@ -877,18 +878,22 @@ class Controller extends Base
      *
      * @param int|null $year
      * @param int|null $month
+     * @throws AccessDenied
+     * @throws DefinitionException
      * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws LogicException
      * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws MapperException\NotFound
+     * @throws NotFound
+     * @throws PDOException
      * @throws RouteNotFound
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws PDOException
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
-     * @throws Exception
-     * @throws Unauthorized
      * @api   GET /news/archive{/year,month}
      * @since 18.1
      */
@@ -900,11 +905,7 @@ class Controller extends Base
          */
         $params = new Querystring($this->getRequest()->query);
 
-        if ($params->getFolderId()) {
-            if (Access::getInstance()->getFolderAccess($this->getUser(), $params->getFolderId()) < UserAccess::ACCESS_READ) {
-                throw new Unauthorized();
-            }
-        }
+        $this->assertValidFolder($params->getFolderId());
 
         $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
 
@@ -925,7 +926,6 @@ class Controller extends Base
         }
 
         $this->assertValidTopic($params->getSlug());
-        $this->assertValidFolder($params->getFolderId());
 
         $partialData = $this->generatePartialForArchive($urlPrefix, $params, false, $year, $month);
 
@@ -951,8 +951,8 @@ class Controller extends Base
             'newsItems' => $partialData,
         ];
 
-        if ($params->getFolderId()) {
-            $details = $this->folderMapper->findCheaplyById((int)$params->getFolderId())->findValueLabelPair();
+        if ($params->getFolderId() !== null) {
+            $details = $this->folderMapper->findCheaplyById($params->getFolderId())->findValueLabelPair();
 
             $metaDetails = [
                 'folderId'    => $details['value'],
@@ -1601,16 +1601,20 @@ class Controller extends Base
     /**
      * Asserts that a folder param is valid, throws 401 if not authorised
      *
-     * @param string|null $folderId
+     * @param int|null $folderId
      * @throws AccessDenied
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     * @throws LogicException
      */
-    private function assertValidFolder(?string $folderId): void
+    private function assertValidFolder(?int $folderId): void
     {
         if ($folderId === null) {
             return;
         }
 
-        if (Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId) === UserAccess::ACCESS_DENY) {
+        if (Access::getInstance()->getFolderAccess($this->getUser(), $folderId) === UserAccess::ACCESS_DENY) {
             throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
     }

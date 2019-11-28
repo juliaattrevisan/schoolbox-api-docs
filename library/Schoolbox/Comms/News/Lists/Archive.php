@@ -69,7 +69,7 @@ class Archive extends Base
      */
     public function find(string $urlPrefix, Querystring $params, User $user, ?int $year, ?int $month): array
     {
-        if($params->getFolderId()) {
+        if($params->getFolderId() !== null) {
             $folderFeed = new FolderFeed($this->articleResolver);
             $articleIdFilter = $folderFeed->find($params->getFolderId());
         } else {

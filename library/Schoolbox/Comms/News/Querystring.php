@@ -165,11 +165,11 @@ class Querystring
     /**
      * Get the folder id if one was specified
      *
-     * @return mixed
+     * @return null|int
      */
-    public function getFolderId()
+    public function getFolderId(): ?int
     {
-        return $this->querystring[self::FOLDER];
+        return isset($this->querystring[self::FOLDER]) ? (int)$this->querystring[self::FOLDER] : null;
     }
 
 
