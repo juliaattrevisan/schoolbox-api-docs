@@ -20,28 +20,28 @@ abstract class SignalEmitter implements EventEmitterInterface
         emit as emitEvent;
     }
 
-	/**
-	 * @param LoopInterface $loop
-	 */
-	public function __construct($loop)
+    /**
+     * @param LoopInterface $loop
+     */
+    public function __construct($loop)
     {
-		$loop->addPeriodicTimer(0.1, function () {
-			pcntl_signal_dispatch();
-		});
-	}
+        $loop->addPeriodicTimer(0.1, function () {
+            pcntl_signal_dispatch();
+        });
+    }
 
 
-	/**
-	 * Receive signals
-	 *
-	 * @param int $event
-	 * @param callable $listener
-	 */
-	public function on($event, callable $listener)
+    /**
+     * Receive signals
+     *
+     * @param int      $event
+     * @param callable $listener
+     */
+    public function on($event, callable $listener)
     {
-		pcntl_signal($event, [ $this, 'emit' ]);
+        pcntl_signal($event, [$this, 'emit']);
         $this->onEvent($event, $listener);
-	}
+    }
 
 
     /**
@@ -51,7 +51,7 @@ abstract class SignalEmitter implements EventEmitterInterface
      * @param int   $event
      * @param array $arguments
      */
-	public function emit($event, array $arguments = [])
+    public function emit($event, array $arguments = [])
     {
         $this->emitEvent($event, array_values($arguments));
     }
