@@ -45,14 +45,14 @@ class External_Schoolbox_User implements External_UserInterface
 
         $predicate = PredicateBuilder::getArrayBindings($id_list, 'contactId');
 
-        $parentIterator = $this->internalDatabase->getQueryIterator("
-                SELECT      parent.external_id AS StudentContactID,
+        $parentIterator = $this->internalDatabase->getQueryIterator(
+            "SELECT     parent.external_id AS StudentContactID,
                             supp.email AS StudentContactEmail
                 FROM        sis_user_profile child
-                    JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
-                    JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
-                    JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-                WHERE       child.external_id IN ({$predicate["placeholders"]})
+                JOIN        sis_user_profile_relation supr ON child.id = child_profile_id 
+                JOIN        sis_user_profile parent ON supr.user_profile_id = parent.id
+                JOIN        sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+                WHERE       child.external_id IN ({$predicate['placeholders']})
             ",
             $predicate['bindings']
         );
@@ -72,8 +72,7 @@ class External_Schoolbox_User implements External_UserInterface
     public function getStudent(string $externalUserId): array
     {
         $student = $this->internalDatabase->executeQuery(
-            "
-                SELECT    external_id AS StudentID,
+            "SELECT   external_id AS StudentID,
                           firstname AS StudentGiven1,
                           lastname AS StudentSurname,
                           gender AS StudentGender,
@@ -135,8 +134,7 @@ class External_Schoolbox_User implements External_UserInterface
         $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
 
         return $this->internalDatabase->executeQuery(
-            "
-                SELECT      parent.external_id AS StudentContactID,
+            "SELECT     parent.external_id AS StudentContactID,
                             parent.title AS StudentContactTitle,
                             parent.firstname AS StudentContactPreferred,
                             parent.lastname AS StudentContactSurname,
@@ -181,8 +179,8 @@ class External_Schoolbox_User implements External_UserInterface
 
         $params = ['externalUserId' => $externalId];
 
-        $classQuery = $this->internalDatabase->executeQuery("
-                SELECT      c.name, 
+        $classQuery = $this->internalDatabase->executeQuery(
+            "SELECT     c.name, 
                             c.code,
                             '' AS classType,
                             '' AS campusCode
@@ -196,8 +194,8 @@ class External_Schoolbox_User implements External_UserInterface
 
         $classList = $classQuery->fetchAll();
 
-        $subjectQuery = $this->internalDatabase->executeQuery("
-                SELECT      c.name,
+        $subjectQuery = $this->internalDatabase->executeQuery(
+            "SELECT     c.name,
                             c.code,
                             '' AS classType,
                             '' AS campusCode
@@ -228,8 +226,8 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getEnrolledStudents(string $externalUserId): array
     {
-        return $this->internalDatabase->executeQuery('
-                SELECT sup_child.external_id AS RelatedID
+        return $this->internalDatabase->executeQuery(
+            'SELECT sup_child.external_id AS RelatedID
                 FROM sis_user_profile sup
                     JOIN sis_user_profile_parent supp on sup.id = supp.sis_user_profile_id
                     JOIN sis_user_profile_relation supr ON supp.sis_user_profile_id =supr.user_profile_id
@@ -290,8 +288,8 @@ class External_Schoolbox_User implements External_UserInterface
     public function getStaffContactListExtended(): array
     {
         return $this->internalDatabase->executeQuery(
-                    "
-            SELECT    external_id AS StaffID,
+            "SELECT    
+                      external_id AS StaffID,
                       username AS NetworkLogin,
                       '' AS ActiveFlag,
                       title AS StaffTitle,
@@ -358,8 +356,7 @@ class External_Schoolbox_User implements External_UserInterface
     public function getParent(string $externalUserId): array
     {
         $parent = $this->internalDatabase->executeQuery(
-            "
-                SELECT   title AS Title,
+            "SELECT   title AS Title,
                          firstname AS Preferred,
                          lastname AS Surname,
                          email AS Email,
@@ -394,8 +391,8 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getStaff(string $externalUserId): array
     {
-        $staff = $this->internalDatabase->executeQuery("
-            SELECT    external_id AS SchoolStaffCode,
+        $staff = $this->internalDatabase->executeQuery(
+            "SELECT    external_id AS SchoolStaffCode,
                       building AS StaffBuilding,
                       room AS StaffRoom,
                       phone AS StaffExtension,
@@ -448,8 +445,8 @@ class External_Schoolbox_User implements External_UserInterface
             $bindings[':form'] = $form;
         }
 
-        return $this->internalDatabase->executeQuery("
-            SELECT    
+        return $this->internalDatabase->executeQuery(
+            "SELECT    
                         child.external_id AS StudentID,
                         child.firstname AS StudentPreferred,
                         child.lastname AS StudentSurname,
