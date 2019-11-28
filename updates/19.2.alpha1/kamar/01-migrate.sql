@@ -16,4 +16,7 @@ ALTER TABLE `timetable_cycle` RENAME TO `sis_timetable_cycle`;
 -- Rename timetable_period to sis_timetable_period
 ALTER TABLE `timetable_period` RENAME TO `sis_timetable_period`;
 
+-- Prepare external_id column in relational table
+ALTER TABLE `sis_class_user`
+ADD COLUMN `external_id` VARCHAR(255) NOT NULL AFTER `user_id`;
 
