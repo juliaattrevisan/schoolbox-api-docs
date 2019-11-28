@@ -4,19 +4,23 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\User;
 
+/**
+ * Class External_Schoolbox_Timetable
+ */
 class External_Schoolbox_Timetable implements External_TimetableInterface
 {
     use External_Schoolbox_TimetableDefinitionTrait;
 
+
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
+
 
     /**
      * External_Schoolbox_User constructor.
@@ -26,6 +30,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         /** @noinspection PhpDeprecationInspection */
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
+
 
     /**
      * {@inheritDoc}
@@ -58,16 +63,18 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $timetableDef;
     }
 
+
     /**
      * {@inheritDoc}
      * @param Campus $campus
      * @param int    $day
      *
      * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getPeriodList(Campus $campus, $day)
+    public function getPeriodList(Campus $campus, $day): array
     {
-        $query = "
+        $query = '
             SELECT        tp.id, 
                           tp.title, 
                           tp.day, 
@@ -81,13 +88,13 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             WHERE         tc.campus_id = :campusId AND 
                           tc.start <= DATE(NOW()) AND 
                           tc.finish >= DATE(NOW())
-        ";
+        ';
 
         if ($day > 0) {
-            $query .= "AND tp.day = :day ";
+            $query .= 'AND tp.day = :day ';
         }
 
-        $query .= "ORDER BY tp.day, tp.sequence";
+        $query .= 'ORDER BY tp.day, tp.sequence';
 
         if ($day > 0) {
             return $this->internalDatabase->executeQuery(
@@ -106,6 +113,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             ]
         )->fetchAll();
     }
+
 
     /**
      * {@inheritDoc}
@@ -131,7 +139,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             : Alaress_Date_Format::now();
 
         $periodStatement = $this->internalDatabase->executeQuery(
-            "
+            '
                 SELECT      tp.id, 
                             tp.title, 
                             tp.day, 
@@ -147,7 +155,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 AND         tc.finish >= DATE(NOW())
                 AND         :now BETWEEN tp.start AND tp.finish
                 AND         tp.day = :dayNumber
-            ",
+            ',
             [
                 'campusId'  => $campus->getId(),
                 'now'       => $time->getUsingFormat(Alaress_Date_Format::DATABASE_TIME_FORMAT),
@@ -167,6 +175,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return [];
     }
 
+
     /**
      * {@inheritDoc}
      * @param Campus $campus
@@ -182,6 +191,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             $date
         );
     }
+
 
     /**
      * {@inheritDoc}
@@ -245,6 +255,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $periodListAdaption;
     }
 
+
     /**
      * {@inheritDoc}
      * @param string $externalId
@@ -280,6 +291,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         ])->fetchAll();
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -295,6 +307,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             )
         );
     }
+
 
     /**
      * {@inheritDoc}
@@ -352,6 +365,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $periodListAdaption;
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -391,7 +405,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 ORDER BY    sis_timetable_period.day ASC,
                             sis_timetable_period.sequence ASC
             ",
-            $predicate["bindings"]
+            $predicate['bindings']
         );
 
         return $statement->fetchAll();
