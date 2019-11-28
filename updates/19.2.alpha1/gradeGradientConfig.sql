@@ -1,7 +1,7 @@
 -- Controls whether grades appear is red/green
 INSERT IGNORE INTO `config` (name, value, title, description, field_id, options, type_id, editable, hidden, required, module)
 VALUES (
-           'grade_gradient',
+           'grade_gradient_enable',
            '1',
            'Grade Colors',
            'If on, grades appear red to green based on value. If off, all grades appear in black.',
