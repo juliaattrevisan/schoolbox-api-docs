@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\NotAuthenticated;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebRequest;
 use Schoolbox\UserMapper;
 
@@ -45,6 +46,7 @@ if (isPost($_POST)) {
  * @param array $session
  * @throws AccessDenied
  * @throws NotAuthenticated
+ * @throws NotFound
  */
 function authenticateUser(array $session): void
 {
@@ -55,6 +57,10 @@ function authenticateUser(array $session): void
     }
     if (!$user || !$user->isSuperuser()) {
         throw new AccessDenied();
+    }
+
+    if(Cfg::get('site_location') !== 'tigs'){
+        throw new NotFound();
     }
 }
 
