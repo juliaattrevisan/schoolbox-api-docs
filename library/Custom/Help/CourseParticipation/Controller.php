@@ -471,20 +471,21 @@ class Controller extends Base
     private function isValidAuth(Request $request, string $schoolCode): bool
     {
         // 1. Check we have all the pieces we need
-        $missing = [];
-        if (null === $request->headers->get('Authentication')) {
-            $missing[] = 'Authentication';
+        if (null !== $request->headers->get('Authentication')) {
+            $authDigest = $request->headers->get('Authentication');
+        } elseif (null !== $request->query->get('digest')) {
+            // to support previous way of authentication
+            $authDigest = $request->query->get('digest');
+        } else {
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Missing authentication parameter');
+            return false;
         }
         if (null === $request->query->get('ts')) {
-            $missing[] = 'ts';
-        }
-        if (\count($missing)) {
-            $message = implode(',', $missing);
-            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "Missing authentication parameters: [{$message}]");
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Missing timestamp');
             return false;
         }
 
-//        // 2. Check the request's timestamp
+        // 2. Check the request's timestamp
         $requestTimestamp = Alaress_Date_Format::newFromTimestamp($request->query->get('ts', 0));
 
         // 3. Ensure the route is valid (ie the school-code exists)
@@ -497,7 +498,6 @@ class Controller extends Base
 
         // 4. Check the requester is who they say they are
 
-        $authDigest     = $request->headers->get('Authentication');
         $expectedDigest = $this->handler->computeAuthDigest($requestTimestamp->getUnixTimeStamp(), $schoolCode, $accessToken);
         if ($authDigest !== $expectedDigest) {
             $this->sendGenericStatus(self::STATUS_UNAUTHENTICATED, 'Incorrect API key and/or school code');
