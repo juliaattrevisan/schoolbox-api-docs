@@ -6,7 +6,8 @@
  */
 namespace Schoolbox\External\Importer;
 
-use Alaress\Csv\Reader;
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -28,37 +29,37 @@ use Schoolbox\UserMapper;
  */
 class TimetableEnrolment extends AbstractImporter
 {
+
     /**
-     * @var \Alaress\Database\Connector\IConnector
+     * @var IConnector
      */
     private $externalDb;
 
-    /**
-     * @var Reader
-     */
-    protected $csvReader;
 
     /**
      * @var UserMapper
      */
     protected $userMapper;
 
+
     /**
      * @var ClassEntryMapper
      */
     protected $classMapper;
+
 
     /**
      * @var ClassInvolvementMapper
      */
     protected $enrolmentMapper;
 
+
     /**
      * Documentation function for expected format
      *
      * @return array
      */
-    public static function getFormat()
+    public static function getFormat(): array
     {
         return [
             'Class Code'   => 'The code for the class',
@@ -67,33 +68,39 @@ class TimetableEnrolment extends AbstractImporter
         ];
     }
 
+
     /**
      * Custom setup function
      */
-    protected function setup()
+    protected function setup(): void
     {
-        $this->externalDb      = \Schoolbox\Database\Factory::getInstanceExternal();
+        $this->externalDb      = Factory::getInstanceExternal();
         $this->userMapper      = new UserMapper();
         $this->classMapper     = new ClassEntryMapper();
         $this->enrolmentMapper = new ClassInvolvementMapper();
     }
+
 
     /**
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
      * @return array|ClassInvolvement[]
+     * @throws Mapper\Exception
      */
-    protected function parse()
+    protected function parse(): array
     {
         if ($this->performUpdate) {
             $this->log->notice('Cleaning up all existing enrolments');
             $this->enrolmentMapper->truncate();
         }
+
         $result = [];
+
         foreach ($this->reader as $i => $row) {
             $classCode   = trim($row['Class Code']);
             $studentCode = trim($row['Student Code']);
+
             if (!isset($classCode) || !isset($studentCode)) {
                 $this->log->warning('Mandatory fields "Class Code" and "Student Code" not defined: skipping!');
                 continue;
@@ -105,31 +112,36 @@ class TimetableEnrolment extends AbstractImporter
                 $class = $this->classMapper->findOneByColumn('code', $classCode, ['cache'=>false]);
             } catch (Mapper\Exception $e) {
                 $this->log->warning(sprintf('Class "%s" not found: creating a new class', $classCode));
-                $class = $this->classMapper->createModel();
-                $class
+
+                $class = $this->classMapper->createModel()
                     ->setCode($classCode)
-                    ->setName(trim($row['Class Title']))
-                ;
+                    ->setName(trim($row['Class Title']));
             }
+
             try {
                 $student = $this->userMapper->findByExternalId($studentCode);
             } catch (Mapper\Exception $e) {
                 $this->log->warning(sprintf('Student "%s" not found: skipping!', $studentCode));
                 continue;
             }
-            $enrolment = new ClassInvolvement();
-            $enrolment
+
+            $result[] = (new ClassInvolvement())
                 ->setUser($student)
                 ->setClass($class);
-            $result[] = $enrolment;
         }
         return $result;
     }
 
+
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
+     *
+     * @return void
+     * @throws Mapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function save()
+    public function save(): void
     {
         // Eventual override rules:
         // * Enrolment: delete all existing and re-insert
@@ -152,21 +164,22 @@ class TimetableEnrolment extends AbstractImporter
                     }
                     $enrolment->setClass($class);
                 }
+
                 $user = $enrolment->getUser();
                 $enrolmentItems[] = "(NULL, '".$class->getId()."', '".$user->getExternalId()."')";
-            } else {
-                if (!$class->getId() && !isset($createdClasses[$class->getCode()])) {
-                    $createdClasses[$class->getCode()] = true;
-                }
+            } elseif (!$class->getId() && !isset($createdClasses[$class->getCode()])) {
+                $createdClasses[$class->getCode()] = true;
             }
         }
+
         if ($this->performUpdate && count($enrolmentItems) > 0) {
             $fullQuery = 'INSERT INTO sis_class_user (id, class_id, external_id) VALUES ' . implode($enrolmentItems, ',') . ';';
+
             try {
                 // Manual bulk insert into the DB of "$fullquery"
                 $this->externalDb->executeQuery($fullQuery);
             } catch (\Alaress\Database\Exception $e) {
-                $this->log->error(sprintf("Could not save enrolment! %s", $e->getMessage()));
+                $this->log->error(sprintf('Could not save enrolment! %s', $e->getMessage()));
             }
         }
     }
