@@ -193,7 +193,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, 0);
-        $classList  = $this->getClassUsers($userId);
+        $classList  = $this->getClassUsers($externalUserId);
 
         $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
         $dayCount            = $timetableDefinition['dayCount'];
