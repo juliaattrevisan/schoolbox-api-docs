@@ -273,25 +273,28 @@ class External_Liss_Server
                 $struct = $currentData->me['struct'];
 
                 try {
+
+                    /* TODO: Specify roletype here?
+                     */
                     $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
                     $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
-                    $queryItems[] = "(NULL, '".$class->getId()."', '".$user->getId()."')";
+                    $queryItems[] = "(NULL, '".$class->getId()."', '".$user->getExternalId()."')";
                 } catch (MapperException $e) {
-                    $this->log()->warning(sprintf("publishClassMemberships: Failed to put student %s in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
+                    $this->log()->warning(sprintf('publishClassMemberships: Failed to put student %s in %s: %s', trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
                 }
             }
 
             if (count($queryItems) > 0) {
-                $fullQuery = 'INSERT INTO sis_class_user (id, class_id, user_id) VALUES ' . implode($queryItems, ',') . ';';
+                $fullQuery = 'INSERT INTO sis_class_user (id, class_id, external_id) VALUES ' . implode($queryItems, ',') . ';';
                 try {
                     // Manual bulk insert into the DB of "$fullquery"
                     $this->externalDb->executeQuery($fullQuery);
                 } catch (Exception $e) {
-                    $this->log()->error(sprintf("publishClassMemberships: Failed to save class memberships: %s", $e->getMessage()));
+                    $this->log()->error(sprintf('publishClassMemberships: Failed to save class memberships: %s', $e->getMessage()));
                 }
             }
 
-            $this->log()->info("publishClassMemberships: completed request");
+            $this->log()->info('publishClassMemberships: completed request');
 
             return $this->generateResponse('Class Memberships imported');
         }

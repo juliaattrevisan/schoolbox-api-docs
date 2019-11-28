@@ -254,7 +254,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     protected function getClassUsers($userId)
     {
         // Get classes for which this user is involved, or is a teacher.
-        $query = "
+        $query = '
 
             SELECT      c.name, 
                         c.code, 
@@ -272,7 +272,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             LEFT JOIN   user u ON cp.teacher_id = u.id
             WHERE       cp.teacher_id = :userId OR 
                         cl.user_id = :userId2
-        ";
+        ';
 
         return $this->internalDatabase->executeQuery($query, [
             'userId'  => $userId,
