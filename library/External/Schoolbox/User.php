@@ -11,6 +11,9 @@ use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
+/**
+ * Class External_Schoolbox_User
+ */
 class External_Schoolbox_User implements External_UserInterface
 {
 
@@ -27,6 +30,7 @@ class External_Schoolbox_User implements External_UserInterface
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -41,8 +45,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         $predicate = PredicateBuilder::getArrayBindings($id_list, 'contactId');
 
-        $parentIterator = $this->internalDatabase->getQueryIterator(
-            "
+        $parentIterator = $this->internalDatabase->getQueryIterator("
                 SELECT      parent.external_id AS StudentContactID,
                             supp.email AS StudentContactEmail
                 FROM        sis_user_profile child
@@ -178,8 +181,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         $params = ['externalUserId' => $externalId];
 
-        $classQuery = $this->internalDatabase->executeQuery(
-            "
+        $classQuery = $this->internalDatabase->executeQuery("
                 SELECT      c.name, 
                             c.code,
                             '' AS classType,
@@ -196,8 +198,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         $classList = $classQuery->fetchAll();
 
-        $subjectQuery = $this->internalDatabase->executeQuery(
-            "
+        $subjectQuery = $this->internalDatabase->executeQuery("
                 SELECT      c.name,
                             c.code,
                             '' AS classType,
@@ -231,20 +232,20 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getEnrolledStudents(string $externalUserId): array
     {
-        return $this->internalDatabase->executeQuery(
-            "
+        return $this->internalDatabase->executeQuery('
                 SELECT sup_child.external_id AS RelatedID
                 FROM sis_user_profile sup
                     JOIN sis_user_profile_parent supp on sup.id = supp.sis_user_profile_id
                     JOIN sis_user_profile_relation supr ON supp.sis_user_profile_id =supr.user_profile_id
                     JOIN sis_user_profile sup_child ON supr.child_profile_id = sup_child.id 
                 WHERE sup.external_id = :externalUserId
-            ",
+            ',
             [
                 'externalUserId' => $externalUserId,
             ]
         )->fetchAll();
     }
+
 
     /**
      * {@inheritDoc}
@@ -253,6 +254,7 @@ class External_Schoolbox_User implements External_UserInterface
     {
         return $boarderValue ? 'Boarder' : '';
     }
+
 
     /**
      * {@inheritDoc}
@@ -265,6 +267,7 @@ class External_Schoolbox_User implements External_UserInterface
         return $user->getPortrait();
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -273,6 +276,7 @@ class External_Schoolbox_User implements External_UserInterface
         return date('m') < 6 ? '1' : '2';
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -280,6 +284,7 @@ class External_Schoolbox_User implements External_UserInterface
     {
         return date('Y');
     }
+
 
     // Useless functions
 
@@ -311,6 +316,7 @@ class External_Schoolbox_User implements External_UserInterface
         ")->fetchAll();
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -318,6 +324,7 @@ class External_Schoolbox_User implements External_UserInterface
     {
         return [];
     }
+
 
     /**
      * {@inheritDoc}
@@ -327,23 +334,27 @@ class External_Schoolbox_User implements External_UserInterface
         return [];
     }
 
+
     /**
      * {@inheritDoc}
      */
     public function getStudentForms(): array
     {
-        return $this->internalDatabase->executeQuery("SELECT DISTINCT form_name AS Code, form_name as Description FROM sis_user_profile_student")->fetchAll();
+        return $this->internalDatabase->executeQuery('SELECT DISTINCT form_name AS Code, form_name as Description FROM sis_user_profile_student')->fetchAll();
     }
+
 
     /**
      * {@inheritDoc}
      *
      * @return array
+     * @throws \Alaress\Database\Exception
      */
     public function getAllYearLevels(): array
     {
-        return $this->internalDatabase->executeQuery("SELECT DISTINCT year_level AS Code, year_level as Description FROM sis_user_profile_student")->fetchAll();
+        return $this->internalDatabase->executeQuery('SELECT DISTINCT year_level AS Code, year_level as Description FROM sis_user_profile_student')->fetchAll();
     }
+
 
     /**
      * {@inheritDoc}
@@ -381,13 +392,13 @@ class External_Schoolbox_User implements External_UserInterface
         return $parent ?: [];
     }
 
+
     /**
      * {@inheritDoc}
      */
     public function getStaff(string $externalUserId): array
     {
-        $staff = $this->internalDatabase->executeQuery(
-            "
+        $staff = $this->internalDatabase->executeQuery("
             SELECT    external_id AS SchoolStaffCode,
                       building AS StaffBuilding,
                       room AS StaffRoom,
@@ -409,6 +420,7 @@ class External_Schoolbox_User implements External_UserInterface
         return $staff ?: [];
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -420,29 +432,27 @@ class External_Schoolbox_User implements External_UserInterface
         $boardingQuery = '';
         $formQuery= '';
 
-        if($yearLevel) {
+        if ($yearLevel) {
             $yearLevelQuery = ' AND sups.year_level = :year_level';
             $bindings[':year_level'] = $yearLevel;
         }
 
-        if($name) {
+        if ($name) {
             $nameQuery = " AND CONCAT(child.firstname,' ',child.lastname) LIKE :name";
             $bindings[':name'] = '%'.$name.'%';
         }
 
-        if($boardingStatus) {
-            $boardingQuery = " AND sups.boarding_status = :boarding_status";
+        if ($boardingStatus) {
+            $boardingQuery = ' AND sups.boarding_status = :boarding_status';
             $bindings[':boarding_status'] = $boardingStatus == 'yes' ? 1 : 0;
         }
 
-        if($form) {
-            $formQuery = " AND sups.form_name = :form";
+        if ($form) {
+            $formQuery = ' AND sups.form_name = :form';
             $bindings[':form'] = $form;
         }
 
-
-        return $this->internalDatabase->executeQuery(
-            "
+        return $this->internalDatabase->executeQuery("
             SELECT    
                         child.external_id AS StudentID,
                         child.firstname AS StudentPreferred,
@@ -478,7 +488,7 @@ class External_Schoolbox_User implements External_UserInterface
             JOIN      sis_user_profile_relation supr ON child.id = child_profile_id 
             JOIN      sis_user_profile parent ON supr.user_profile_id = parent.id
             JOIN      sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-            WHERE     1=1 $yearLevelQuery $formQuery $nameQuery $boardingQuery
+            WHERE     1=1 {$yearLevelQuery} {$formQuery} {$nameQuery} {$boardingQuery}
         ", $bindings)->fetchAll();
     }
 }
