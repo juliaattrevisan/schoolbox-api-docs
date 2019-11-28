@@ -511,7 +511,7 @@ function renderHeader(): void
     <body>
     <h2>TIGS Deans Comments Import tool</h2>
     <p>This is a temporary hack to import deans comments until the feature is properly built.<br>
-        It is intended for use by Schoolbox Support agents</p>
+        It is intended for use by Schoolbox Support agents or TIGS SuperUsers</p>
 
 <?php }
 
@@ -523,9 +523,22 @@ function renderInstructions(): void
 { ?>
     <h3>Instructions:</h3>
     <ol>
-        <li>Attach client-provided CSV of comments</li>
+        <li>Attach client-provided CSV of comments<br>
+            Columns are expected to contain:
+            <ol>
+                <li>Dean Id</li>
+                <li>Student Id</li>
+                <li>Student Surname</li>
+                <li>Student Preferred name</li>
+                <li>Comment text</li>
+            </ol>
+            The first row is expected to contain headers and is ignored. It does not matter what value the header labels are.
+        </li>
+
         <li>Click DryRun</li>
-        <li>Review dry-run results to ensure they make sense</li>
+        <li>Review dry-run results to ensure they make sense.<br>
+            The tool will look up the student by ID in the DB, and check that the first/last names is the DB match those in the CSV, printing an orange warning if a mismatch is detected.
+        </li>
         <li>Only continue to 'Live Run' if dry run results look ok</li>
         <li>Click LiveRun</li>
     </ol>
