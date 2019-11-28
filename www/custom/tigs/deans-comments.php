@@ -423,17 +423,17 @@ function renderDryRunForm(string $yearLevel, string $year, string $semester): vo
     <form method="post" enctype="multipart/form-data" action="./deans-comments.php">
         <table style="border: 1px solid black;">
             <tr>
-                <td>Year Level:</td>
+                <td>Year Level: (eg '11')</td>
                 <td><input type="number" name="yearLevel" title="Year Level" value="<?php echo $yearLevel; ?>"
                            min="<?php echo YEAR_LEVEL_MIN; ?>" max="<?php echo YEAR_LEVEL_MAX; ?>" required></td>
             </tr>
             <tr>
-                <td>Year:</td>
+                <td>Year: (eg '2019')</td>
                 <td><input type="number" name="year" title="Year" value="<?php echo $year; ?>"
                            min="<?php echo YEAR_MIN; ?>" max="<?php echo YEAR_MAX; ?>" required></td>
             </tr>
             <tr>
-                <td>Semester:</td>
+                <td>Semester: (eg '2')</td>
                 <td><input type="number" name="semester" title="Semester" value="<?php echo $semester; ?>" min="1"
                            max="2" required></td>
             </tr>
@@ -519,20 +519,13 @@ function renderHeader(): void
  */
 function renderInstructions(): void
 { ?>
+    <h3>Instructions:</h3>
     <ol>
-        <li>Dry Run</li>
-        <ol>
-            <li>Attach client-provided CSV of comments</li>
-            <li>Click DryRun</li>
-            <li>Review dry-run results to ensure they make sense</li>
-            <li>Only continue to 'Live Run' if dry run results look ok</li>
-        </ol>
-        <li>Live Run</li>
-        <ol>
-            <li>Ensure 'Perform' checkbox IS checked</li>
-            <li>Attach client-provided CSV of comments</li>
-            <li>Click LiveRun</li>
-        </ol>
+        <li>Attach client-provided CSV of comments</li>
+        <li>Click DryRun</li>
+        <li>Review dry-run results to ensure they make sense</li>
+        <li>Only continue to 'Live Run' if dry run results look ok</li>
+        <li>Click LiveRun</li>
     </ol>
 <?php }
 
