@@ -186,11 +186,9 @@ class External_Schoolbox_User implements External_UserInterface
                             c.code,
                             '' AS classType,
                             '' AS campusCode
-                FROM        user u
-                INNER JOIN  sis_class_user cu ON cu.external_id = u.synergy_id
+                FROM        sis_class_user cu
                 INNER JOIN  sis_class c ON c.id = cu.class_id
-                WHERE       u.synergy_id = :externalUserId
-                AND         u.deleted_at IS NULL
+                WHERE       cu.external_id = :externalUserId
                 ORDER BY    c.code ASC, c.name ASC
             ",
             $params
@@ -203,11 +201,9 @@ class External_Schoolbox_User implements External_UserInterface
                             c.code,
                             '' AS classType,
                             '' AS campusCode
-                FROM        user u
-                INNER JOIN  sis_class_period cp ON cp.teacher_external_id = u.synergy_id
+                FROM        sis_class_period cp
                 INNER JOIN  sis_class c ON c.id = cp.class_id
-                WHERE       u.synergy_id = :externalUserId
-                AND         u.deleted_at IS NULL
+                WHERE       cp.teacher_external_id = :externalUserId
                 ORDER BY    c.code ASC, 
                             c.name ASC
             ",
