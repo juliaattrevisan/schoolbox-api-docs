@@ -20,3 +20,6 @@ ALTER TABLE `timetable_period` RENAME TO `sis_timetable_period`;
 ALTER TABLE `sis_class_user`
 ADD COLUMN `external_id` VARCHAR(255) NOT NULL AFTER `user_id`;
 
+-- Add teacher_external_id
+ALTER TABLE `sis_class_period`
+    ADD COLUMN `teacher_external_id` VARCHAR(255) NULL AFTER `teacher_id`;
