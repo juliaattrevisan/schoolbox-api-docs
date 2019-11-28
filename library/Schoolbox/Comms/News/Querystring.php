@@ -6,6 +6,8 @@
  */
 namespace Schoolbox\Comms\News;
 
+use ArrayAccess;
+
 /**
  * Class Querystring
  *
@@ -89,9 +91,9 @@ class Querystring
     /**
      * Querystring constructor.
      *
-     * @param string[] $data
+     * @param ArrayAccess|string[]|null[] $data
      */
-    public function __construct(array $data)
+    public function __construct(ArrayAccess $data)
     {
         $this->querystring = [
             self::COMPACT_MODE   => $data[self::COMPACT_MODE] ?? null,
