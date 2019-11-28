@@ -115,7 +115,7 @@ class Controller extends Base
         }
 
         //Santise the filename leaving only words, spaces, numbers and a few punctation characters
-        $filename = mb_ereg_replace("([^\w\s\d\-_~,;'()\[\]])", '', $report['filename']);
+        $filename = mb_ereg_replace("([^\w\s\d\-_~,;'()\[\]\.])", '', $report['filename']);
 
         $headers = $this->getResponse()->headers;
         $headers->set('Pragma', ' ');
