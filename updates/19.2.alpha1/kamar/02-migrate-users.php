@@ -57,6 +57,14 @@ HELP;
             DELETE FROM sis_class_user
             WHERE LENGTH(external_id) = 0 
         ');
+
+        /* Find corresponding externalIds for each teacher_id that exists at the moment
+         */
+        $this->getDatabaseInternal()->executeQuery('
+            UPDATE sis_class_period scp
+            INNER JOIN user u ON scp.teacher_id = u.id
+            SET scp.teacher_external_id = u.synergy_id   
+        ');
     }
 };
 
