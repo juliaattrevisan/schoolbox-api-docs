@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use UnexpectedValueException;
+use function array_key_exists;
 
 /**
  * Responsible for resolving a folder to it's "Nearest Non Inheriting Ancestral Node"
@@ -73,7 +74,7 @@ class NNIAN
      * @return Model
      * @throws DefinitionException
      * @throws Deleted
-     * @throws Exception
+     * @throws MapperException
      * @throws Exception\InsufficientHydrationException
      * @throws Exception\NotFound
      * @throws InvalidArgumentException
@@ -134,9 +135,17 @@ class NNIAN
         $node         = $folder;
         while ($node->getInherit()) {
 
+            // Check we don't have a cyclic inheritance tree
+            if (array_key_exists($node->getId(), array_slice($interimNodes->keys(), 1))) {
+                throw new MapperException("Circular dependency detected");
+            }
+
             // Climb ancestry tree using cheapest mechanism available.
             if ($node->getParent()->getParent() && $node->getParent()->getParent()->getId() !== null) {
                 // Has this folder's parent already been sufficiently hydrated?
+                if($node->getId() === $node->getParent()->getId()){
+                    throw new MapperException("Circular dependency detected. Node is own parent.");
+                }
                 $node = $node->getParent();
             } else {
                 // Else load it cheaply
