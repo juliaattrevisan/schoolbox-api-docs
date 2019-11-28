@@ -247,15 +247,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param int $userId
+     * @param string $externalId
      *
      * @return array
+     * @throws \Alaress\Database\Exception
      */
-    protected function getClassUsers($userId)
+    protected function getClassUsers(string $externalId): array
     {
         // Get classes for which this user is involved, or is a teacher.
         $query = '
-
             SELECT      c.name, 
                         c.code, 
                         c.description,
@@ -271,12 +271,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
             LEFT JOIN   user u ON cp.teacher_id = u.id
             WHERE       cp.teacher_id = :userId OR 
-                        cl.user_id = :userId2
+                        cl.external_id = :userId2
         ';
 
         return $this->internalDatabase->executeQuery($query, [
-            'userId'  => $userId,
-            'userId2' => $userId,
+            'userId'  => $externalId,
+            'userId2' => $externalId,
         ])->fetchAll();
     }
 
@@ -306,7 +306,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, $dayNumber);
-        $classList  = $this->getClassUsers($userId);
+        $classList  = $this->getClassUsers($externalUserId);
 
         $periodListAdaption = [];
 
