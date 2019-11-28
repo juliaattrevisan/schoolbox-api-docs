@@ -258,8 +258,9 @@ class NNIANTest extends TestCase
     {
         $this->expectException(MapperException::class);
 
-        // Create a loop of N folders, eg, 1 > 2 > 3 > 4 ...N > 2 > 3 ...
-        // Note here that 1 is not part of the loop, 2 IS part of the loop
+        // Create a loop of N folders, eg, 1 > N > 4 > 3 > 2 ... N
+        // Note here that 1 is not part of the loop, N IS part of the loop
+        // Note we go backwards from N to 2 to ensure we don't confuse array position with array index
 
         $leaf       = (new Folder\Model())
             ->setId(1)
@@ -268,7 +269,7 @@ class NNIANTest extends TestCase
         $prevFolder = $leaf;
 
         // Build a straight branch
-        for ($i = 2; $i <= $n; $i++) {
+        for ($i = $n; $i >= 2; $i--) {
             $prevFolder->setParent(
                 (new Folder\Model())
                     ->setId($i)
