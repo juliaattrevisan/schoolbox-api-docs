@@ -165,7 +165,7 @@ class TimetableEnrolment extends AbstractImporter
             try {
                 // Manual bulk insert into the DB of "$fullquery"
                 $this->externalDb->executeQuery($fullQuery);
-            } catch (Exception $e) {
+            } catch (\Alaress\Database\Exception $e) {
                 $this->log->error(sprintf("Could not save enrolment! %s", $e->getMessage()));
             }
         }
