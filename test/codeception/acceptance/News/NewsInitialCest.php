@@ -20,9 +20,9 @@ class NewsInitialCest
         $i->clickWithLeftButton($element);
         $i->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
-        $i->waitForText('Year 12', 5);
-        $Year_12_element = Locator::contains('div.checklist-wrapper', 'Year 12');
-        $i->clickWithLeftButton($Year_12_element);
+        $i->waitForText('Year 9', 5);
+        $Year_9_element = Locator::contains('div.checklist-wrapper', 'Year 9');
+        $i->clickWithLeftButton($Year_9_element);
         $i->click('button.button.submit');
         sleep(5);
         $i->click("Publish news");
@@ -60,7 +60,7 @@ class NewsInitialCest
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
-        $i->impersonate("Rachel Rhodes");
+        $i->impersonate("Jana Reed");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -71,7 +71,7 @@ class NewsInitialCest
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
-        $i->impersonate("Rachel Rhodes");
+        $i->impersonate("Jana Reed");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -120,7 +120,7 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
         $i->click(['css'=>'a.icon-delete.no-text']);
-        $i->waitForElementVisible('a.button.icon-approve.submit', 5);
+        $i->waitForElementVisible('a.button.icon-approve.submit', 8);
         $i->click(['css'=>'a.button.icon-approve.submit']);
     }
 
