@@ -1,7 +1,5 @@
 const path              = require('path');
 const {VueLoaderPlugin} = require('vue-loader');
-const FileManagerPlugin = require('filemanager-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -12,11 +10,7 @@ module.exports = {
         upcomingDueworkCalendar: "./library/Schoolbox/Learning/Upcoming/vue/calendar.main.js",
         resourceBookingItemCalendar: "./library/Schoolbox/ResourceBooking/Item/vue/calendar.main.js",
         resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js",
-        eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
-        'datepicker.css': [
-            path.resolve(__dirname, 'node_modules/@fullcalendar/core/main.css'),
-            path.resolve(__dirname, 'node_modules/@fullcalendar/list/main.css')
-        ]
+        eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js"
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
@@ -63,10 +57,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: 'css-loader'
-                })
+                use: ['vue-style-loader', 'css-loader']
             },
             {
                 test: /\.scss$/,
@@ -94,16 +85,6 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new VueLoaderPlugin(),
-        new ExtractTextPlugin("datepicker.css"),
-        new FileManagerPlugin({
-            onEnd: {
-                move: [
-                    {
-                        source: './www/javascript/components/datepicker.css', destination: './www/css/core/fullcalendar/datepicker.css'
-                    }
-                ]
-            }
-        })
+        new VueLoaderPlugin()
     ]
 };
