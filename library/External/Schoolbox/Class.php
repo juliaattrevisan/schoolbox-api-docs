@@ -172,7 +172,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                             u.synergy_id
                 FROM        sis_class c
                 LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
-                INNER JOIN  user u ON u.id = cp.teacher_id
+                INNER JOIN  user u ON u.synergy_iid = cp.teacher_external_id
                 WHERE       c.code IN ({$predicate["placeholders"]}) AND
                             u.deleted_at IS NULL
                 ORDER BY    u.lastname,

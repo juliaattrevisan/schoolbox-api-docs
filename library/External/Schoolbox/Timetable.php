@@ -272,7 +272,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         c.description,
                         cp.period_id, 
                         cp.room, 
-                        cp.teacher_id,
+                        cp.teacher_external_id,
                         u.synergy_id, 
                         u.title, 
                         u.firstname, 
@@ -280,8 +280,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             FROM        sis_class c
             LEFT JOIN   sis_class_user cl ON c.id = cl.class_id
             LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
-            LEFT JOIN   user u ON cp.teacher_id = u.id
-            WHERE       cp.teacher_id = :userId OR 
+            LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
+            WHERE       cp.teacher_external_id = :userId OR 
                         cl.external_id = :userId2
         ';
 
@@ -394,7 +394,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             sis_timetable_period.finish AS PeriodEnd,
                             sis_timetable_period.title AS PeriodName
                 FROM        sis_class_period
-                LEFT JOIN   user ON sis_class_period.teacher_id = user.id AND user.deleted_at IS NULL
+                LEFT JOIN   user ON sis_class_period.teacher_external_id = user.synergy_id AND user.deleted_at IS NULL
                 INNER JOIN  sis_timetable_period ON sis_class_period.period_id = sis_timetable_period.id
                 INNER JOIN  sis_timetable_campus ON sis_timetable_period.cycle_id = sis_timetable_campus.cycle_id
                 INNER JOIN  luCampus ON sis_timetable_campus.campus_id = luCampus.id

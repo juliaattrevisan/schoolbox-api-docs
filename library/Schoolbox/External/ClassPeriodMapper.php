@@ -39,7 +39,7 @@ class ClassPeriodMapper extends Schoolbox\Mapper {
             'join'     => 'period',
         ));
         $this->hasMap(array(
-            'column'   => 'teacher_id',
+            'column'   => 'teacher_external_id',
             'property' => 'teacher',
             'type'     => self::TYPE_MODEL,
             'join'     => 'teacher',
@@ -69,8 +69,8 @@ class ClassPeriodMapper extends Schoolbox\Mapper {
             'teacher',
             array(
                 'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'teacher_id',
-                'other_key' => 'id',
+                'this_key'  => 'teacher_external_id',
+                'other_key' => 'synergy_id',
             )
         );
     }
