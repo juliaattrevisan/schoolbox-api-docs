@@ -170,17 +170,6 @@ var jsDest = {
     vue: 'www/javascript/components/<%= pkg.name %>-vue.min.js'
 };
 
-let cssSrc = {
-    fullcalendar: [
-        'node_modules/@fullcalendar/core/main.css',
-        'node_modules/@fullcalendar/list/main.css',
-    ]
-};
-
-let cssDest = {
-    fullcalendar: 'www/css/core/fullcalendar/datepicker.css'
-};
-
 module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
@@ -218,15 +207,6 @@ module.exports = function(grunt) {
             vue: {
                 src: jsSrc.vue,
                 dest: jsDest.vue
-            },
-            fullcalendarCss: {
-                // This concats datepicker FullCalendar CSS, and is not just for develop
-                src: cssSrc.fullcalendar,
-                dest: cssDest.fullcalendar,
-                options: {
-                    stripBanners: true,
-                    separator: "\n"
-                }
             }
         },
         uglify: {
@@ -294,6 +274,6 @@ module.exports = function(grunt) {
             grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
         }
     });
-    grunt.registerTask('build',      ['bower', 'build.js', 'build.sass', 'concat:fullcalendarCss']);
+    grunt.registerTask('build',      ['bower', 'build.js', 'build.sass']);
     grunt.registerTask('default',    'build');
 };
