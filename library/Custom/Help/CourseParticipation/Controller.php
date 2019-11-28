@@ -11,7 +11,7 @@ namespace Custom\Help\CourseParticipation;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
-use Aura\Web\Request\Values;
+use Aura\Web\Request;
 use Custom\Help\CourseParticipation\Exception\ParticipantRolesNotFoundException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -215,14 +215,13 @@ class Controller extends Base
      * @param string $schoolCode
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      */
     public function getApiTestEnrolmentTable(string $schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq, $schoolCode)) {
             return;
         }
 
@@ -247,7 +246,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq, $schoolCode)) {
             return;
         }
 
@@ -280,7 +279,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq, $schoolCode)) {
             return;
         }
 
@@ -363,7 +362,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq, $schoolCode)) {
             return;
         }
 
@@ -393,7 +392,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if (!$this->isValidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq, $schoolCode)) {
             return;
         }
 
@@ -465,18 +464,19 @@ class Controller extends Base
      *
      * If not, also sets up a JSON-formatted response.
      *
-     * @param Values $query
+     * @param Request $request
      * @param string $schoolCode
      * @return bool
      */
-    private function isValidAuth(Values $query, string $schoolCode): bool
+    private function isValidAuth(Request $request, string $schoolCode): bool
     {
         // 1. Check we have all the pieces we need
         $missing = [];
-        foreach (['ts', 'digest'] as $required) {
-            if (null === $query->get($required)) {
-                $missing[] = $required;
-            }
+        if (null === $request->headers->get('Authentication')) {
+            $missing[] = 'Authentication';
+        }
+        if (null === $request->query->get('ts')) {
+            $missing[] = 'ts';
         }
         if (\count($missing)) {
             $message = implode(',', $missing);
@@ -484,17 +484,8 @@ class Controller extends Base
             return false;
         }
 
-        // 2. Check the request's timestamp is valid
-
-        // Client requests are considered unauthorised if they are older than self::REQUEST_TIMESTAMP_EXPIRY.
-        // This is to guard against replay attacks.
-        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($query->get('ts', 0));
-        $deltaTimestamp   = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
-        if ($deltaTimestamp > self::REQUEST_TIMESTAMP_EXPIRY) {
-            // Advise the reason to distinguish from other bad requests
-            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Timestamp has expired');
-            return false;
-        }
+//        // 2. Check the request's timestamp
+        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($request->query->get('ts', 0));
 
         // 3. Ensure the route is valid (ie the school-code exists)
         try {
@@ -506,8 +497,8 @@ class Controller extends Base
 
         // 4. Check the requester is who they say they are
 
-        $authDigest       = $query->get('digest');
-        $expectedDigest   = $this->handler->computeAuthDigest($requestTimestamp->getUnixTimeStamp(), $schoolCode, $accessToken);
+        $authDigest     = $request->headers->get('Authentication');
+        $expectedDigest = $this->handler->computeAuthDigest($requestTimestamp->getUnixTimeStamp(), $schoolCode, $accessToken);
         if ($authDigest !== $expectedDigest) {
             $this->sendGenericStatus(self::STATUS_UNAUTHENTICATED, 'Incorrect API key and/or school code');
             return false;
