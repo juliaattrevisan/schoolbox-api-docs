@@ -1,0 +1,27 @@
+openapi: 3.0.2
+
+info:
+  title:       Schoolbox Search API
+  description: |
+    Schoolbox Search API
+  x-api-id:    4514d761-b746-4f78-b69c-42fadb0763b2
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+
+servers:
+  - url: https://{hostname}.{domain}/
+    variables:
+      hostname:
+        description: The subdomain of the school's domain name on which Schoolbox is hosted.
+        default: demo
+      domain:
+        description: The school's domain name.
+        default: schoolbox.com.au
+
+
+paths: {}
