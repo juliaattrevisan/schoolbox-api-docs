@@ -4,18 +4,21 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Role;
 
+/**
+ * Class External_Schoolbox_Class
+ */
 class External_Schoolbox_Class implements External_ClassInterface
 {
 
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
+
 
     /**
      * External_Schoolbox_User constructor.
@@ -25,6 +28,7 @@ class External_Schoolbox_Class implements External_ClassInterface
         /** @noinspection PhpDeprecationInspection */
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
+
 
     /**
      * @inheritdoc
@@ -69,12 +73,14 @@ class External_Schoolbox_Class implements External_ClassInterface
         return $studentListAdaption;
     }
 
+
     /**
      * {@inheritDoc}
      * @param string $classCodes
      * @param string $type Const indicating type of user (e.g. Group::STUDENT_GROUP_TYPE)
      *
      * @return IIterator
+     * @throws \Alaress\Database\Exception
      */
     protected function getClassIterator($classCodes, $type)
     {
@@ -100,9 +106,9 @@ class External_Schoolbox_Class implements External_ClassInterface
                               sups.special_needs,
                               sups.tutor_group,
                               sups.form_name
-                FROM          class c
-                    JOIN               class_user cu ON cu.class_id = c.id
-                    JOIN               user u ON u.id = cu.user_id
+                FROM          sis_class c
+                    JOIN               sis_class_user cu ON cu.class_id = c.id
+                    JOIN               user u ON u.synergy_id = cu.external_id
                     JOIN               groups g ON g.id = u.group_id
                     LEFT JOIN          sis_user_profile up ON u.synergy_id = up.external_id
                     LEFT JOIN          sis_user_profile_student sups ON up.id = sups.sis_user_profile_id
@@ -118,6 +124,7 @@ class External_Schoolbox_Class implements External_ClassInterface
             )
         )->getIterator();
     }
+
 
     /**
      * @inheritdoc
@@ -150,13 +157,15 @@ class External_Schoolbox_Class implements External_ClassInterface
         return array_unique($teachers);
     }
 
+
     /**
      * {@inheritDoc}
      * @param string $classCodes
      *
      * @return IIterator
+     * @throws \Alaress\Database\Exception
      */
-    protected function getTeacherIterator($classCodes)
+    protected function getTeacherIterator($classCodes): IIterator
     {
         $codes = array_filter(explode(',', $classCodes));
 
@@ -170,17 +179,18 @@ class External_Schoolbox_Class implements External_ClassInterface
             "
                 SELECT      u.id,
                             u.synergy_id
-                FROM        class c
-                LEFT JOIN   class_period cp ON c.id = cp.class_id
-                INNER JOIN  user u ON u.id = cp.teacher_id
-                WHERE       c.code IN ({$predicate["placeholders"]}) AND
+                FROM        sis_class c
+                LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
+                INNER JOIN  user u ON u.synergy_id = cp.teacher_external_id
+                WHERE       c.code IN ({$predicate['placeholders']}) AND
                             u.deleted_at IS NULL
                 ORDER BY    u.lastname,
                             u.firstname
             ",
-            $predicate["bindings"]
+            $predicate['bindings']
         )->getIterator();
     }
+
 
     /**
      * @return array
@@ -189,6 +199,7 @@ class External_Schoolbox_Class implements External_ClassInterface
     {
         return [];
     }
+
 
     /**
      * @param string $filetype

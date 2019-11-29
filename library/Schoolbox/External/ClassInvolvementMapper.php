@@ -18,7 +18,7 @@ class ClassInvolvementMapper extends Schoolbox\Mapper {
      * {@inheritdoc}
      */
     protected function mapping() {
-        $this->hasTable('class_user');
+        $this->hasTable('sis_class_user');
         $this->hasModel(ClassInvolvement::class);
         $this->hasMap(array(
             'column'     => 'id',

@@ -21,7 +21,7 @@
  *
  * Turn on the Schoolbox connector in External DB
  *
- * Handcraft a record in class_user with values (1, 424, 208)
+ * Handcraft a record in sis_class_user with values (1, 424, 208)
  * Handcraft a homepage for 11CHE 1
  *
  * You can now view 208's timetable
@@ -97,7 +97,7 @@ class External_Liss_Server
     private const NO_EVENT_TYPES = 'Cannot find a default event type';
 
     /**
-     * Predefine a timetable_cycle record (this doesn't seem defined/accessible
+     * Predefine a sis_timetable_cycle record (this doesn't seem defined/accessible
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
      * @return object|\Schoolbox\External\TimetableCycle
@@ -138,7 +138,7 @@ class External_Liss_Server
 
             $cycleMapper->save($cycle);
 
-            /* Force a timetable_campus record
+            /* Force a sis_timetable_campus record
              */
             $timetableCampusMapper = new TimetableCampusMapper();
             $timetableCampus = $timetableCampusMapper->createModel();
@@ -182,13 +182,13 @@ class External_Liss_Server
                     'function' => [$this,'publishTeachers'],
                 ],
                 'liss.publishCalendar' => [
-                    'function' => [$this, 'publishCalendar'], 
+                    'function' => [$this, 'publishCalendar'],
                 ],
                 'liss.publishRooms' => [
                     'function' => [$this, 'publishRooms'],
                 ],
                 'liss.publishBellTimes' => [
-                    'function' => [$this, 'publishBellTimes'], 
+                    'function' => [$this, 'publishBellTimes'],
                 ],
                 'liss.publishClasses' => [
                     'function' => [$this, 'publishClasses'],
@@ -273,25 +273,28 @@ class External_Liss_Server
                 $struct = $currentData->me['struct'];
 
                 try {
+
+                    /* TODO: Specify roletype here?
+                     */
                     $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
                     $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
-                    $queryItems[] = "(NULL, '".$class->getId()."', '".$user->getId()."')";
+                    $queryItems[] = "(NULL, '".$class->getId()."', '".$user->getExternalId()."')";
                 } catch (MapperException $e) {
-                    $this->log()->warning(sprintf("publishClassMemberships: Failed to put student %s in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
+                    $this->log()->warning(sprintf('publishClassMemberships: Failed to put student %s in %s: %s', trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
                 }
             }
 
             if (count($queryItems) > 0) {
-                $fullQuery = 'INSERT INTO class_user (id, class_id, user_id) VALUES ' . implode($queryItems, ',') . ';';
+                $fullQuery = 'INSERT INTO sis_class_user (id, class_id, external_id) VALUES ' . implode($queryItems, ',') . ';';
                 try {
                     // Manual bulk insert into the DB of "$fullquery"
                     $this->externalDb->executeQuery($fullQuery);
                 } catch (Exception $e) {
-                    $this->log()->error(sprintf("publishClassMemberships: Failed to save class memberships: %s", $e->getMessage()));
+                    $this->log()->error(sprintf('publishClassMemberships: Failed to save class memberships: %s', $e->getMessage()));
                 }
             }
 
-            $this->log()->info("publishClassMemberships: completed request");
+            $this->log()->info('publishClassMemberships: completed request');
 
             return $this->generateResponse('Class Memberships imported');
         }

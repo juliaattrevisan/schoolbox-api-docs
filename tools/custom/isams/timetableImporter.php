@@ -28,12 +28,12 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  * ISAMS Timetable Importer
  *
  * Imports from an xml file and populates the following tables:
- *   class
- *   class_period
- *   class_user
- *   timetable_campus
- *   timetable_cycle
- *   timetable_period
+ *   sis_class
+ *   sis_class_period
+ *   sis_class_user
+ *   sis_timetable_campus
+ *   sis_timetable_cycle
+ *   sis_timetable_period
  */
 $app = new class extends CliTool\App
 {

@@ -18,7 +18,7 @@ class TimetableCycleMapper extends Schoolbox\Mapper {
      * {@inheritdoc}
      */
     protected function mapping() {
-        $this->hasTable('timetable_cycle');
+        $this->hasTable('sis_timetable_cycle');
         $this->hasModel(TimetableCycle::class);
         $this->hasMap(array(
             'column'     => 'id',

@@ -4,19 +4,23 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\User;
 
+/**
+ * Class External_Schoolbox_Timetable
+ */
 class External_Schoolbox_Timetable implements External_TimetableInterface
 {
     use External_Schoolbox_TimetableDefinitionTrait;
 
+
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
+
 
     /**
      * External_Schoolbox_User constructor.
@@ -26,6 +30,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         /** @noinspection PhpDeprecationInspection */
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
+
 
     /**
      * {@inheritDoc}
@@ -58,16 +63,18 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $timetableDef;
     }
 
+
     /**
      * {@inheritDoc}
      * @param Campus $campus
      * @param int    $day
      *
      * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getPeriodList(Campus $campus, $day)
+    public function getPeriodList(Campus $campus, $day): array
     {
-        $query = "
+        $query = '
             SELECT        tp.id, 
                           tp.title, 
                           tp.day, 
@@ -75,19 +82,19 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                           tp.start, 
                           tp.finish, 
                           tp.usable
-            FROM          timetable_campus tc
-            LEFT JOIN     timetable_cycle ty ON ty.id = tc.cycle_id
-            LEFT JOIN     timetable_period tp ON tp.cycle_id = ty.id
+            FROM          sis_timetable_campus tc
+            LEFT JOIN     sis_timetable_cycle ty ON ty.id = tc.cycle_id
+            LEFT JOIN     sis_timetable_period tp ON tp.cycle_id = ty.id
             WHERE         tc.campus_id = :campusId AND 
                           tc.start <= DATE(NOW()) AND 
                           tc.finish >= DATE(NOW())
-        ";
+        ';
 
         if ($day > 0) {
-            $query .= "AND tp.day = :day ";
+            $query .= 'AND tp.day = :day ';
         }
 
-        $query .= "ORDER BY tp.day, tp.sequence";
+        $query .= 'ORDER BY tp.day, tp.sequence';
 
         if ($day > 0) {
             return $this->internalDatabase->executeQuery(
@@ -106,6 +113,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             ]
         )->fetchAll();
     }
+
 
     /**
      * {@inheritDoc}
@@ -131,7 +139,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             : Alaress_Date_Format::now();
 
         $periodStatement = $this->internalDatabase->executeQuery(
-            "
+            '
                 SELECT      tp.id, 
                             tp.title, 
                             tp.day, 
@@ -139,15 +147,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             tp.start, 
                             tp.finish, 
                             tp.usable
-                FROM        timetable_campus tc
-                LEFT JOIN   timetable_cycle ty ON ty.id = tc.cycle_id
-                LEFT JOIN   timetable_period tp ON tp.cycle_id = ty.id
+                FROM        sis_timetable_campus tc
+                LEFT JOIN   sis_timetable_cycle ty ON ty.id = tc.cycle_id
+                LEFT JOIN   sis_timetable_period tp ON tp.cycle_id = ty.id
                 WHERE       tc.campus_id = :campusId
                 AND         tc.start <= DATE(NOW())
                 AND         tc.finish >= DATE(NOW())
                 AND         :now BETWEEN tp.start AND tp.finish
                 AND         tp.day = :dayNumber
-            ",
+            ',
             [
                 'campusId'  => $campus->getId(),
                 'now'       => $time->getUsingFormat(Alaress_Date_Format::DATABASE_TIME_FORMAT),
@@ -167,6 +175,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return [];
     }
 
+
     /**
      * {@inheritDoc}
      * @param Campus $campus
@@ -183,6 +192,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         );
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -193,7 +203,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, 0);
-        $classList  = $this->getClassUsers($userId);
+        $classList  = $this->getClassUsers($externalUserId);
 
         $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
         $dayCount            = $timetableDefinition['dayCount'];
@@ -245,40 +255,42 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $periodListAdaption;
     }
 
+
     /**
      * {@inheritDoc}
-     * @param int $userId
+     * @param string $externalId
      *
      * @return array
+     * @throws \Alaress\Database\Exception
      */
-    protected function getClassUsers($userId)
+    protected function getClassUsers(string $externalId): array
     {
         // Get classes for which this user is involved, or is a teacher.
-        $query = "
-
+        $query = '
             SELECT      c.name, 
                         c.code, 
                         c.description,
                         cp.period_id, 
                         cp.room, 
-                        cp.teacher_id,
+                        cp.teacher_external_id,
                         u.synergy_id, 
                         u.title, 
                         u.firstname, 
                         u.lastname
-            FROM        class c
-            LEFT JOIN   class_user cl ON c.id = cl.class_id
-            LEFT JOIN   class_period cp ON c.id = cp.class_id
-            LEFT JOIN   user u ON cp.teacher_id = u.id
-            WHERE       cp.teacher_id = :userId OR 
-                        cl.user_id = :userId2
-        ";
+            FROM        sis_class c
+            LEFT JOIN   sis_class_user cl ON c.id = cl.class_id
+            LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
+            LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
+            WHERE       cp.teacher_external_id = :userId OR 
+                        cl.external_id = :userId2
+        ';
 
         return $this->internalDatabase->executeQuery($query, [
-            'userId'  => $userId,
-            'userId2' => $userId,
+            'userId'  => $externalId,
+            'userId2' => $externalId,
         ])->fetchAll();
     }
+
 
     /**
      * {@inheritDoc}
@@ -296,6 +308,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         );
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -306,7 +319,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, $dayNumber);
-        $classList  = $this->getClassUsers($userId);
+        $classList  = $this->getClassUsers($externalUserId);
 
         $periodListAdaption = [];
 
@@ -352,6 +365,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $periodListAdaption;
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -365,33 +379,33 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $statement = $this->internalDatabase->executeQuery(
             "
-                SELECT      class_period.room AS RoomCode,
-                            class.description AS Description,
-                            timetable_period.day AS DayNumber,
-                            timetable_period.sequence AS PeriodNumber,
+                SELECT      sis_class_period.room AS RoomCode,
+                            sis_class.description AS Description,
+                            sis_timetable_period.day AS DayNumber,
+                            sis_timetable_period.sequence AS PeriodNumber,
                             luCampus.ext_timetable_code AS TimetableGroup,
-                            timetable_campus.campus_id AS TimetableCampus,
-                            class.code AS ClassCode,
+                            sis_timetable_campus.campus_id AS TimetableCampus,
+                            sis_class.code AS ClassCode,
                             user.synergy_id AS StaffID,
                             user.title AS StaffTitle,
                             user.firstname AS StaffPreferredName,
                             user.lastname AS StaffSurname,
-                            timetable_period.start AS PeriodStart,
-                            timetable_period.finish AS PeriodEnd,
-                            timetable_period.title AS PeriodName
-                FROM        class_period
-                LEFT JOIN   user ON class_period.teacher_id = user.id AND user.deleted_at IS NULL
-                INNER JOIN  timetable_period ON class_period.period_id = timetable_period.id
-                INNER JOIN  timetable_campus ON timetable_period.cycle_id = timetable_campus.cycle_id
-                INNER JOIN  luCampus ON timetable_campus.campus_id = luCampus.id
-                INNER JOIN  class ON class_period.class_id = class.id
-                WHERE       timetable_campus.start <= DATE(NOW()) AND
-                            timetable_campus.finish >= DATE(NOW()) AND
-                            class_period.room IN ({$predicate["placeholders"]})
-                ORDER BY    timetable_period.day ASC,
-                            timetable_period.sequence ASC
+                            sis_timetable_period.start AS PeriodStart,
+                            sis_timetable_period.finish AS PeriodEnd,
+                            sis_timetable_period.title AS PeriodName
+                FROM        sis_class_period
+                LEFT JOIN   user ON sis_class_period.teacher_external_id = user.synergy_id AND user.deleted_at IS NULL
+                INNER JOIN  sis_timetable_period ON sis_class_period.period_id = sis_timetable_period.id
+                INNER JOIN  sis_timetable_campus ON sis_timetable_period.cycle_id = sis_timetable_campus.cycle_id
+                INNER JOIN  luCampus ON sis_timetable_campus.campus_id = luCampus.id
+                INNER JOIN  sis_class ON sis_class_period.class_id = sis_class.id
+                WHERE       sis_timetable_campus.start <= DATE(NOW()) AND
+                            sis_timetable_campus.finish >= DATE(NOW()) AND
+                            sis_class_period.room IN ({$predicate["placeholders"]})
+                ORDER BY    sis_timetable_period.day ASC,
+                            sis_timetable_period.sequence ASC
             ",
-            $predicate["bindings"]
+            $predicate['bindings']
         );
 
         return $statement->fetchAll();

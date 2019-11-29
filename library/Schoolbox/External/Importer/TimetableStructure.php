@@ -22,9 +22,9 @@ use Schoolbox\External\TimetablePeriodMapper;
  *
  * Importer for timetable structure into the Schoolbox connector.
  * Saves into the following tables:
- * * timetable_cycle
- * * timetable_campus
- * * timetable_period
+ * * sis_timetable_cycle
+ * * sis_timetable_campus
+ * * sis_timetable_period
  *
  * @package Schoolbox\External\Importer
  */
@@ -232,8 +232,11 @@ class TimetableStructure extends AbstractImporter
                     $campus->getCampus()->getExtTimetableCode()
                 )
             );
-            $dayCount    = max(array_keys($timetable['periods']));
+
+            $keys        = array_keys($timetable['periods']);
+            $dayCount    = \count($keys) ? max($keys) : 0;
             $periodNames = [];
+
             foreach ($timetable['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {

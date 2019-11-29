@@ -154,9 +154,9 @@ class Classes implements IStrategy
                 luCampus.ext_timetable_code,
                 period.day, period.id, period.title
             FROM luCampus 
-            LEFT JOIN timetable_campus campus ON luCampus.id = campus.campus_id
-            LEFT JOIN timetable_cycle cycle ON campus.cycle_id = cycle.id
-            LEFT JOIN timetable_period period ON cycle.id = period.cycle_id
+            LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
+            LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
+            LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
                         
         ');
 
@@ -363,7 +363,7 @@ class Classes implements IStrategy
          *
          * - room comes from $class['period']['room']['name']
          * - teacherId is a schoolbox user id via a lookup on their external_id
-         * - period_id is a schoolbox timetable_period via lookup of Day and Period Name
+         * - period_id is a schoolbox sis_timetable_period via lookup of Day and Period Name
          * - class_id comes from $timetableClass->getId()
          */
 
