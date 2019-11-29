@@ -18,6 +18,8 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Timetable_ColourMapper;
 use UnexpectedValueException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Generates a list of classes, along with the courses imported to those classes, suitable
@@ -111,11 +113,24 @@ class ClassList
 
         $this->applyFolderColours($folderList);
 
+        $homepageUrls = [];
+        $access       = Access::getInstance();
+
+        // Only set those homepage URLs that user have access permission
+        foreach ($folderList as $folder) {
+            if ($access->getFolderAccess($this->user, $folder->getId()) >= UserAccess::ACCESS_READ) {
+                $homepageUrls[$folder->getId()] = "/homepage/{$folder->getId()}";
+            } else {
+                $homepageUrls[$folder->getId()] = false;
+            }
+        }
+
         return [
-            'term'       => $term,
-            'classList'  => $folderList,
-            'classTypes' => $classTypes,
-            'courses'    => $courseSpecs,
+            'term'         => $term,
+            'classList'    => $folderList,
+            'classTypes'   => $classTypes,
+            'courses'      => $courseSpecs,
+            'homepageUrls' => $homepageUrls,
         ];
     }
 

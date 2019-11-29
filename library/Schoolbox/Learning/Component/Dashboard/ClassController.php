@@ -43,6 +43,9 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     /** @var Timetable_ColourMapper */
     private $timeTableColourMapper;
 
+    /** @var string[] */
+    private $homepageUrls = [];
+
 
     /**
      * Injectable constructor
@@ -89,10 +92,11 @@ class ClassController extends Component_Dashboard_ControllerAbstract
         );
         $gridData = $classList->getClassList($this->termMapper->findForToday(), Alaress_Date_Format::now());
 
-        $this->currentTerm = $gridData['term'];
-        $this->classList   = $gridData['classList'];
-        $this->classTypes  = $gridData['classTypes'];
-        $this->courseSpecs = $gridData['courses'];
+        $this->currentTerm  = $gridData['term'];
+        $this->classList    = $gridData['classList'];
+        $this->classTypes   = $gridData['classTypes'];
+        $this->courseSpecs  = $gridData['courses'];
+        $this->homepageUrls = $gridData['homepageUrls'];
 
         return true;
     }
@@ -119,6 +123,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
                 'classList'           => $this->classList,
                 'classTypes'          => $this->classTypes,
                 'courses'             => $this->courseSpecs,
+                'homepageUrls'        => $this->homepageUrls,
             ]
         );
     }

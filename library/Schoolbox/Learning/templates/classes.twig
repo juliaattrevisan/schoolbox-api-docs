@@ -32,10 +32,11 @@
             <div class="small-12 medium-6 large-4 xlarge-3 island">
                 <section>
                     {% include 'sub/classTile.twig' with {
-                        'term':       term,
-                        'class':      class,
-                        'classType':  classTypes[class.id],
-                        'courses':    courses[class.id],
+                        'term':        term,
+                        'class':       class,
+                        'classType':   classTypes[class.id],
+                        'courses':     courses[class.id],
+                        'homepageUrl': homepageUrls[class.id],
                     } only %}
                 </section>
             </div>
