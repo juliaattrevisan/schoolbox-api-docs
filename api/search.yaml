@@ -91,7 +91,7 @@ components:
         - event
         - folder
         - assessment
-        - news
+        - comms
         - file
 
     searchResultUser:
@@ -105,6 +105,7 @@ components:
       title: Search result - event
       description: A search result for an event
       # TODO move this definition to its own place
+      # TODO consider adding _links
       type: object
       properties:
         id:
@@ -128,25 +129,79 @@ components:
         Which one is used depends on the event's "allDay" field: if it's true,
         only the date is shown.
       oneOf:
-        - $ref: '#/components/schemas/searchResultEventDate'
-        - $ref: '#/components/schemas/searchResultEventDateTime'
+        - $ref: '#/components/schemas/searchResultDate'
+        - $ref: '#/components/schemas/searchResultDateTime'
       discriminator:
         propertyName: allDay
         mapping:
-          true: '#/components/schemas/searchResultEventDate'
-          false: '#/components/schemas/searchResultEventDateTime'
+          true: '#/components/schemas/searchResultDate'
+          false: '#/components/schemas/searchResultDateTime'
 
-    searchResultEventDate:
-      title: Event date
-      description: An event's date, without a time component.
+    searchResultDate:
+      title: Search result date
+      description: A search result's date, without a time component.
       type: string
       format: date
 
-    searchResultEventDateTime:
-      title: Event date+time
-      description: An event's date and time.
+    searchResultDateTime:
+      title: Search result date+time
+      description: A search result's date, with a time component.
       type: string
       format: date-time
+
+    searchResultAssessment:
+      title: Search result assessment
+      description: An assessment found as part of a search.
+      # TODO move this definition to its own place
+      # TODO consider adding _links (for things like completion status)
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        publish:
+          $ref: '#/components/schemas/searchResultDateTime'
+        open:
+          $ref: '#/components/schemas/searchResultDateTime'
+        due:
+          $ref: '#/components/schemas/searchResultDateTime'
+        close:
+          $ref: '#/components/schemas/searchResultDateTime'
+
+    searchResultComms:
+      title: Search result comms article
+      description: An comms article found as part of a search.
+      # TODO move this definition to its own place
+      # TODO consider adding _links (for things like completion status)
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        blurb:
+          type: string
+        publish:
+          $ref: '#/components/schemas/searchResultDateTime'
+        archive:
+          $ref: '#/components/schemas/searchResultDateTime'
+
+    searchResultFolder:
+      title: Search result folder
+      description: |
+        A folder found as part of a search.
+
+        May contain sub-results
+      # TODO move this definition to its own place
+      # TODO consider adding _links (for things like completion status)
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        subResults:
+          type: array
 
 
   responses:
