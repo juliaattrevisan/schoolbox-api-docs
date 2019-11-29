@@ -33,7 +33,7 @@ class ClassInvolvementMapper extends Schoolbox\Mapper {
             'join'     => 'class',
         ));
         $this->hasMap(array(
-            'column'   => 'user_id',
+            'column'   => 'user_external_id',
             'property' => 'user',
             'type'     => self::TYPE_MODEL,
             'join'     => 'user',
@@ -50,8 +50,8 @@ class ClassInvolvementMapper extends Schoolbox\Mapper {
             'user',
             array(
                 'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'user_id',
-                'other_key' => 'id',
+                'this_key'  => 'user_external_id',
+                'other_key' => 'synergy_id',
             )
         );
     }

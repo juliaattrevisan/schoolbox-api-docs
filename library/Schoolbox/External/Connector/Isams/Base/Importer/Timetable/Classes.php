@@ -378,7 +378,7 @@ class Classes implements IStrategy
          * schoolbox user account
          */
         if (isset($users[$class['teachers']['username']])) {
-            $timetableClassPeriod->setTeacher($this->userMapper->createModel()->setId($users[$class['teachers']['username']]));
+            $timetableClassPeriod->setTeacher($this->userMapper->createModel()->setExternalId($users[$class['teachers']['username']]));
 
             $this->log->info(sprintf(
                 'Creating class period relation for teacher %s %s in room %s',
@@ -428,7 +428,7 @@ class Classes implements IStrategy
         /* Minimum user
          */
         $user = $this->userMapper->createModel()
-            ->setId($users[$student['username']]);
+            ->setExternalId($users[$student['username']]);
 
         /** @var ClassInvolvement $timetableClassInvolvement */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
@@ -440,7 +440,7 @@ class Classes implements IStrategy
             $timetableClass->getName(),
             $timetableClass->getCode(),
             $student['firstname'] . ' ' . $student['surname'],
-            $timetableClassInvolvement->getUser()->getId()
+            $timetableClassInvolvement->getUser()->getExternalId()
         ));
 
         if ($this->perform) {
