@@ -54,6 +54,12 @@ components:
           nullable: true
         content:
           type: string
+        relevance:
+          description: |
+            The relevance of this result to the search query, from 0 to 1
+          type: number
+          minimum: 0
+          maximum: 1
         created:
           $ref: 'common.yaml#/components/schemas/dateTime'
         updated:
@@ -74,6 +80,74 @@ components:
             $ref: '#/components/schemas/searchResult'
         metadata:
           $ref: 'common.yaml#/components/schemas/listMetadata'
+
+    searchResultType:
+      title: Search result type
+      description: A type of search result. May be used as a filter
+      readOnly: true
+      type: string
+      enum:
+        - user
+        - event
+        - folder
+        - assessment
+        - news
+        - file
+
+    searchResultUser:
+      title: Search result - user
+      description: A search result for a user
+      readOnly: true
+      allOf:
+        - $ref: 'user.yaml#/components/schemas/user'
+
+    searchResultEvent:
+      title: Search result - event
+      description: A search result for an event
+      # TODO move this definition to its own place
+      type: object
+      properties:
+        id:
+          # TODO who knows, events might have different identifiers
+          # should the API fetch non-Schoolbox events too?
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        allDay:
+          type: boolean
+        start:
+         $ref: '#/components/schemas/searchResultEventDateOrDateTime'
+        end:
+          $ref: '#/components/schemas/searchResultEventDateOrDateTime'
+
+    searchResultEventDateOrDateTime:
+      title: Event date or date+time
+      description: |
+        An event's date, with or without a time component.
+
+        Which one is used depends on the event's "allDay" field: if it's true,
+        only the date is shown.
+      oneOf:
+        - $ref: '#/components/schemas/searchResultEventDate'
+        - $ref: '#/components/schemas/searchResultEventDateTime'
+      discriminator:
+        propertyName: allDay
+        mapping:
+          true: '#/components/schemas/searchResultEventDate'
+          false: '#/components/schemas/searchResultEventDateTime'
+
+    searchResultEventDate:
+      title: Event date
+      description: An event's date, without a time component.
+      type: string
+      format: date
+
+    searchResultEventDateTime:
+      title: Event date+time
+      description: An event's date and time.
+      type: string
+      format: date-time
+
 
   responses:
     searchResultList:
