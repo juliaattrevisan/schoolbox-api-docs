@@ -1,5 +1,6 @@
 openapi: 3.0.2
 
+
 info:
   title:       Schoolbox Search API
   description: |
@@ -24,4 +25,68 @@ servers:
         default: schoolbox.com.au
 
 
-paths: {}
+paths:
+  /search:
+    get:
+      operationId: search
+      summary: Return search results for a query
+      responses:
+        '200':
+          $ref: '#/components/responses/searchResultList'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+    parameters:
+      - $ref: '#/components/parameters/query'
+
+
+components:
+  schemas:
+    searchResult:
+      title: Search result
+      description: Fields for search results
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        author:
+          allOf:
+            - $ref: 'user.yaml#/components/schemas/user'
+          nullable: true
+        content:
+          type: string
+        created:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+        updated:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+      required:
+        - id
+        - content
+
+    searchResultList:
+      title: Search result list
+      description: A list of search results
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/searchResult'
+        metadata:
+          $ref: 'common.yaml#/components/schemas/listMetadata'
+
+  responses:
+    searchResultList:
+      description: a list of search results
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/searchResultList'
+
+  parameters:
+    query:
+      name:        q
+      in:          query
+      description: The term to search for
+      schema:
+        type: string
