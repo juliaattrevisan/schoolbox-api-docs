@@ -48,22 +48,39 @@ components:
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
-        author:
-          allOf:
-            - $ref: 'user.yaml#/components/schemas/user'
-          nullable: true
-        content:
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultType'
+#        author:
+#          allOf:
+#            - $ref: 'user.yaml#/components/schemas/user'
+#          nullable: true
+        summary:
+          description: A brief human-readable summary of the search result.
           type: string
+        content:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultUser'
+            - $ref: '#/components/schemas/searchResultEvent'
+            - $ref: '#/components/schemas/searchResultFolder'
+            - $ref: '#/components/schemas/searchResultComms'
+          discriminator:
+            propertyName: type
+            mapping:
+              user: '#/components/schemas/searchResultUser'
+              event: '#/components/schemas/searchResultEvent'
+              folder: '#/components/schemas/searchResultFolder'
+              comms: '#/components/schemas/searchResultComms'
         relevance:
           description: |
             The relevance of this result to the search query, from 0 to 1
           type: number
           minimum: 0
           maximum: 1
-        created:
-          $ref: 'common.yaml#/components/schemas/dateTime'
-        updated:
-          $ref: 'common.yaml#/components/schemas/dateTime'
+#        created:
+#          $ref: 'common.yaml#/components/schemas/dateTime'
+#        updated:
+#          $ref: 'common.yaml#/components/schemas/dateTime'
       required:
         - id
         - content
@@ -90,9 +107,9 @@ components:
         - user
         - event
         - folder
-        - assessment
+#        - assessment
         - comms
-        - file
+#        - file
 
     searchResultUser:
       title: Search result - user
