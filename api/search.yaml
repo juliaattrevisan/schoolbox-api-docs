@@ -104,50 +104,8 @@ components:
     searchResultEvent:
       title: Search result - event
       description: A search result for an event
-      # TODO move this definition to its own place
-      # TODO consider adding _links
-      type: object
-      properties:
-        id:
-          # TODO who knows, events might have different identifiers
-          # should the API fetch non-Schoolbox events too?
-          $ref: 'common.yaml#/components/schemas/id'
-        title:
-          type: string
-        allDay:
-          type: boolean
-        start:
-         $ref: '#/components/schemas/searchResultEventDateOrDateTime'
-        end:
-          $ref: '#/components/schemas/searchResultEventDateOrDateTime'
-
-    searchResultEventDateOrDateTime:
-      title: Event date or date+time
-      description: |
-        An event's date, with or without a time component.
-
-        Which one is used depends on the event's "allDay" field: if it's true,
-        only the date is shown.
-      oneOf:
-        - $ref: '#/components/schemas/searchResultDate'
-        - $ref: '#/components/schemas/searchResultDateTime'
-      discriminator:
-        propertyName: allDay
-        mapping:
-          true: '#/components/schemas/searchResultDate'
-          false: '#/components/schemas/searchResultDateTime'
-
-    searchResultDate:
-      title: Search result date
-      description: A search result's date, without a time component.
-      type: string
-      format: date
-
-    searchResultDateTime:
-      title: Search result date+time
-      description: A search result's date, with a time component.
-      type: string
-      format: date-time
+      allOf:
+        - $ref: 'event.yaml#/components/schemas/event'
 
     searchResultAssessment:
       title: Search result assessment
@@ -203,6 +161,11 @@ components:
         subResults:
           type: array
 
+    searchResultDateTime:
+      title: Search result date+time
+      description: A search result's date, with a time component.
+      type: string
+      format: date-time
 
   responses:
     searchResultList:
