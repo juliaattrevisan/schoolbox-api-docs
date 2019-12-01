@@ -162,6 +162,64 @@ components:
         archive:
           $ref: '#/components/schemas/searchResultDateTime'
 
+    searchResultTextbox:
+      title: Search result text box
+      description: |
+        A text box found as part of a search.
+
+        The full content is not included: the summary of what matches will be
+        included within the "summary" property of the match.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+
+    searchResultFile:
+      title: Search result file
+      description: A file found as part of a search.
+      # TODO move this definition to its own place
+      # TODO consider adding _links (for things like download/modify/etc.)
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        type:
+          type: string
+
+    searchResultLink:
+      title: Search result link
+      description: A link found as part of a search.
+      # TODO move this definition to its own place
+      # TODO consider adding _links (for things like download/modify/etc.)
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        url:
+          type: string
+
+    searchResultTile:
+      title: Search result tile
+      description: A tile found as part of a search.
+      # TODO move this definition to its own place
+      # TODO consider adding _links (for things like download/modify/etc.)
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        url:
+          type: string
+        backgroundImage:
+          type: string
+
     searchResultFolder:
       title: Search result folder
       description: |
@@ -197,12 +255,20 @@ components:
             - $ref: '#/components/schemas/searchResultEvent'
             - $ref: '#/components/schemas/searchResultAssessment'
             - $ref: '#/components/schemas/searchResultComms'
+            - $ref: '#/components/schemas/searchResultFile'
+            - $ref: '#/components/schemas/searchResultTextbox'
+            - $ref: '#/components/schemas/searchResultLink'
+            - $ref: '#/components/schemas/searchResultTile'
           discriminator:
             propertyName: type
             mapping:
               event: '#/components/schemas/searchResultEvent'
               assessment: '#/components/schemas/searchResultAssessment'
               comms: '#/components/schemas/searchResultComms'
+              file: '#/components/schemas/searchResultFile'
+              textbox: '#/components/schemas/searchResultTextbox'
+              link: '#/components/schemas/searchResultLink'
+              tile: '#/components/schemas/searchResultTile'
 
     searchResultFolderSubResultType:
       title: Search result type
@@ -213,12 +279,13 @@ components:
       readOnly: true
       type: string
       enum:
-        - textbox
         - event
         - assessment
         - comms
         - file
+        - textbox
         - link
+        - tile
 
     searchResultDateTime:
       title: Search result date+time
