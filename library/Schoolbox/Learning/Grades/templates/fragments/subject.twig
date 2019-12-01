@@ -1,4 +1,4 @@
-
+{% import '@learning/macro/urgency.twig' as urgency %}
 <div class="small-12 content sibling">
     <h3 class="no-margin">
         {{ folder.name }}
@@ -10,7 +10,7 @@
     </h3>
 </div>
 {% if showOverallGrade %}
-    <div class="grade {{ urgency.marks(markbooks[folder.id].studentStatistics[studentId].meanNormalised) }}-bg no-margin">
-        <span>{{ markbooks[folder.id].studentStatistics[studentId].weightedMean }}</span>
+    <div class="grade {{ urgency.marks(studentGrade.meanNormalised) }}-bg no-margin">
+        <span>{{ studentGrade.weightedMean }}</span>
     </div>
 {% endif %}
