@@ -167,7 +167,7 @@ components:
       description: |
         A folder found as part of a search.
 
-        May contain sub-results
+        May contain sub-results.
       # TODO move this definition to its own place
       # TODO consider adding _links (for things like completion status)
       properties:
@@ -177,6 +177,48 @@ components:
           type: string
         subResults:
           type: array
+          items:
+            $ref: '#/components/schemas/searchResultFolderSubResult'
+
+    searchResultFolderSubResult:
+      title: Search result folder sub-result
+      description: |
+        A result found within a folder as part of a search.
+      type: object
+      properties:
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultFolderSubResultType'
+        summary:
+          description: A brief human-readable summary of the search result.
+          type: string
+        content:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultEvent'
+            - $ref: '#/components/schemas/searchResultAssessment'
+            - $ref: '#/components/schemas/searchResultComms'
+          discriminator:
+            propertyName: type
+            mapping:
+              event: '#/components/schemas/searchResultEvent'
+              assessment: '#/components/schemas/searchResultAssessment'
+              comms: '#/components/schemas/searchResultComms'
+
+    searchResultFolderSubResultType:
+      title: Search result type
+      description: |
+        A type of search result within a folder.
+
+        May be used as a filter as well.
+      readOnly: true
+      type: string
+      enum:
+        - textbox
+        - event
+        - assessment
+        - comms
+        - file
+        - link
 
     searchResultDateTime:
       title: Search result date+time
