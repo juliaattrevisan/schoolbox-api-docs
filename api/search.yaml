@@ -46,8 +46,8 @@ components:
       description: Fields for search results
       type: object
       properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
+#        id:
+#          $ref: 'common.yaml#/components/schemas/id'
         type:
           oneOf:
             - $ref: '#/components/schemas/searchResultType'
