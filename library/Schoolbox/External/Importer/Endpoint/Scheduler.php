@@ -42,15 +42,24 @@ class Scheduler
 
 
     /**
+     * When the scheduler was asked to run
+     *
+     * @var int
+     */
+    private $now;
+
+
+    /**
      * Scheduler constructor.
      *
      * @param string $schedule
      */
-    public function __construct(string $frequency, Factory $factory, string $type)
+    public function __construct(string $frequency, Factory $factory, string $type, int $now)
     {
         $this->frequency = $frequency;
         $this->factory = $factory;
         $this->type = $type;
+        $this->now = $now;
     }
 
 

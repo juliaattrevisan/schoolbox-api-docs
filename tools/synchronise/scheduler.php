@@ -90,7 +90,11 @@ HELP;
 
         $factory = new Factory($host, $key, true, $this->getLogger());
 
-        (new Endpoint\Scheduler($frequency, $factory, $type)->run();
+        /* The time when the script ran
+         */
+        $now = time();
+
+        (new Endpoint\Scheduler($frequency, $factory, $type, $now)->run();
     }
 };
 
