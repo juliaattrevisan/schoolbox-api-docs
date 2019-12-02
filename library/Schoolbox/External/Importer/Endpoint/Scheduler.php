@@ -88,14 +88,20 @@ class Scheduler
              * If it is, just do it
              * Otherwise, noop
              */
+            if (4 === date('g')) {
+                $composites = $this->factory->produce(null, $this->type);
+            }
 
         } elseif ($this->frequency == self::DAILY) {
 
             /* If the frequency is daily,
-             * Checkt hat the current hour is 1am
+             * Check that the current hour is 1am
              * If it is, just do it
              * Otherwise, noop
              */
+            if (1 == date('G')) {
+                $composites = $this->factory->produce(null, $this->type);
+            }
         }
 
         try {
