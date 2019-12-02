@@ -1,42 +1,52 @@
 <?php
 /**
- * Class period object for the Schoolbox connector.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\External;
 
 use Schoolbox\User;
 
-class ClassPeriod {
+/**
+ * Class ClassPeriod
+ *
+ * Class period object for the Schoolbox connector.
+ *
+ * @package Schoolbox\External
+ */
+class ClassPeriod
+{
 
     /**
      * @var int
      */
     protected $id;
 
+
     /**
      * @var ClassEntry
      */
     protected $class;
+
 
     /**
      * @var TimetablePeriod
      */
     protected $period;
 
+
     /**
-     * @var User
+     * @var string|null
      */
-    protected $teacher;
+    protected $teacherExternalId;
+
 
     /**
      * @var string
      */
     protected $room;
+
 
     /**
      * @param  \Schoolbox\External\ClassEntry $class
@@ -47,12 +57,14 @@ class ClassPeriod {
         return $this;
     }
 
+
     /**
      * @return \Schoolbox\External\ClassEntry
      */
     public function getClass() {
         return $this->class;
     }
+
 
     /**
      * @param  int   $id
@@ -63,12 +75,14 @@ class ClassPeriod {
         return $this;
     }
 
+
     /**
      * @return int
      */
     public function getId() {
         return $this->id;
     }
+
 
     /**
      * @param  \Schoolbox\External\TimetablePeriod $period
@@ -79,12 +93,14 @@ class ClassPeriod {
         return $this;
     }
 
+
     /**
      * @return \Schoolbox\External\TimetablePeriod
      */
     public function getPeriod() {
         return $this->period;
     }
+
 
     /**
      * @param  string $room
@@ -95,6 +111,7 @@ class ClassPeriod {
         return $this;
     }
 
+
     /**
      * @return string
      */
@@ -102,20 +119,21 @@ class ClassPeriod {
         return $this->room;
     }
 
+
     /**
-     * @param  \Schoolbox\User $teacher
+     * @param  string|null $teacherExternalId
      * @return $this
      */
-    public function setTeacher($teacher) {
-        $this->teacher = $teacher;
+    public function setTeacher($teacherExternalId) {
+        $this->teacherExternalId = $teacherExternalId;
         return $this;
     }
 
+
     /**
-     * @return \Schoolbox\User
+     * @return string|null
      */
     public function getTeacher() {
-        return $this->teacher;
+        return $this->teacherExternalId;
     }
-
 }

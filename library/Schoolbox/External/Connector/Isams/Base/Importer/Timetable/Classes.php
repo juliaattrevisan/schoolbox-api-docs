@@ -358,7 +358,7 @@ class Classes implements IStrategy
          * so you can look up individual pieces of the puzzle
          *
          * - room comes from $class['period']['room']['name']
-         * - teacherId is a schoolbox user id via a lookup on their external_id
+         * - teacherExternalIdId is the staff's external_id
          * - period_id is a schoolbox sis_timetable_period via lookup of Day and Period Name
          * - class_id comes from $timetableClass->getId()
          */
@@ -369,22 +369,9 @@ class Classes implements IStrategy
             ->setPeriod($period)
             ->setRoom($class['period']['room']['name']);
 
-        /* If we have no record of this teacher id existing then we
-         * we can't assign them to any classes - they don't have a
-         * schoolbox user account
+        /* Throw warning, but assign them anyway
          */
-        if (isset($users[$class['teachers']['username']])) {
-            $timetableClassPeriod->setTeacher($this->userMapper->createModel()->setExternalId($class['teachers']['username']));
-
-            $this->log->info(sprintf(
-                'Creating class period relation for teacher %s %s in room %s',
-                $class['teachers']['firstname'],
-                $class['teachers']['surname'],
-                $class['period']['room']['name']
-            ));
-        } else {
-            /* Throw warning, but assign them anyway
-             */
+        if (!isset($users[$class['teachers']['username']])) {
             $this->log->warning(sprintf(
                 'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s',
                 $class['teachers']['username'],
@@ -392,6 +379,15 @@ class Classes implements IStrategy
                 $timetableClass->getCode()
             ));
         }
+
+        $timetableClassPeriod->setTeacher($class['teachers']['username']);
+
+        $this->log->info(sprintf(
+            'Creating class period relation for teacher %s %s in room %s',
+            $class['teachers']['firstname'],
+            $class['teachers']['surname'],
+            $class['period']['room']['name']
+        ));
 
         $this->log->info(sprintf(
             'This occurs on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',

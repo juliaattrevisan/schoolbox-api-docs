@@ -20,35 +20,46 @@ class ClassPeriodMapper extends Schoolbox\Mapper {
     protected function mapping() {
         $this->hasTable('sis_class_period');
         $this->hasModel(ClassPeriod::class);
+
+
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',
             'type'       => self::TYPE_INTEGER,
             'identifier' => true
         ));
+
+
         $this->hasMap(array(
             'column'   => 'class_id',
             'property' => 'class',
             'type'     => self::TYPE_MODEL,
             'join'     => 'class',
         ));
+
+
         $this->hasMap(array(
             'column'   => 'period_id',
             'property' => 'period',
             'type'     => self::TYPE_MODEL,
             'join'     => 'period',
         ));
-        $this->hasMap(array(
+
+
+        $this->hasMap([
             'column'   => 'teacher_external_id',
             'property' => 'teacher',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'teacher',
-        ));
+            'type'     => self::TYPE_STRING,
+        ]);
+
+
         $this->hasMap(array(
             'column'   => 'room',
             'property' => 'room',
             'type'     => self::TYPE_STRING,
         ));
+
+
         $this->hasJoin(
             'class',
             array(
@@ -57,20 +68,14 @@ class ClassPeriodMapper extends Schoolbox\Mapper {
                 'other_key' => 'id',
             )
         );
+
+
         $this->hasJoin(
             'period',
             array(
                 'mapper'    => '\\Schoolbox\\External\\TimetablePeriodMapper',
                 'this_key'  => 'period_id',
                 'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'teacher',
-            array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'teacher_external_id',
-                'other_key' => 'synergy_id',
             )
         );
     }

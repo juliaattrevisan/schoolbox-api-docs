@@ -114,16 +114,16 @@ HELP;
          * do them in sequence, which gives me more dexterity later
          */
         $composites = [
-            new Profile\Composite(
-                $this->getLogger(),
-                $this->perform(),
-                $batchxml,
-                UserProfile\Mapper::getInstance(),
-                UserProfile\Student\Mapper::getInstance(),
-                UserProfile\Parent\Mapper::getInstance(),
-                UserProfile\Staff\Mapper::getInstance(),
-                UserProfile\Relationship\Mapper::getInstance()
-            ),
+//            new Profile\Composite(
+//                $this->getLogger(),
+//                $this->perform(),
+//                $batchxml,
+//                UserProfile\Mapper::getInstance(),
+//                UserProfile\Student\Mapper::getInstance(),
+//                UserProfile\Parent\Mapper::getInstance(),
+//                UserProfile\Staff\Mapper::getInstance(),
+//                UserProfile\Relationship\Mapper::getInstance()
+//            ),
             new Timetable\Composite(
                 $this->getLogger(),
                 $this->perform(),
