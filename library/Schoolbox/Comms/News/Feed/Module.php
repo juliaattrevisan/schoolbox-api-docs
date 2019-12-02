@@ -14,9 +14,11 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -107,6 +109,8 @@ class Module extends BaseModule
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(News\Statistics\Cumulative\Mapper::class),
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
+            'access'                     => $this->getMapperFactory()->getLazy(Access::class),
+            'commentMapper'              => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
             'audienceMapper'             => $this->getMapperFactory()->getLazy(News\Audience\Mapper::class),
         ];
     }
