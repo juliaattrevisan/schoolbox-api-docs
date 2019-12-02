@@ -21,6 +21,7 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
 /**
@@ -88,7 +89,8 @@ class Factory
     /**
      * @param string|null $file
      * @param string      $type
-     * @return array
+     *
+     * @return null|GenericCollection
      */
     public function produce(?string $file, string $type)
     {
@@ -99,19 +101,19 @@ class Factory
             case self::KAMAR:
             default:
                 // Use manual csv imports
-                return [];
+                return null;
         }
     }
 
 
     /**
-     * Produce the ISAMS composites with optional Mock api connection
+     * Produce the composites with optional Mock api connection
      * (use a locally-stored file path)
      *
      * @param string|null $file
-     * @return array
+     * @return GenericCollection
      */
-    private function produceIsams(?string $file): array
+    private function produceIsams(?string $file): GenericCollection
     {
         if ($file) {
             $this->logger->info("Loading from locally-cached xml file: {$file}");
@@ -130,8 +132,8 @@ class Factory
          * They're distinct pieces so instead of making a super-composite, I just
          * do them in sequence, which gives me more dexterity later
          */
-        return [
-            new Profile\Composite(
+        return (new GenericCollection(IStrategy::class))
+            ->add(new Profile\Composite(
                 $this->logger,
                 $this->perform,
                 $batchxml,
@@ -140,8 +142,8 @@ class Factory
                 UserProfile\Parent\Mapper::getInstance(),
                 UserProfile\Staff\Mapper::getInstance(),
                 UserProfile\Relationship\Mapper::getInstance()
-            ),
-            new Timetable\Composite(
+            ))
+            ->add(new Timetable\Composite(
                 $this->logger,
                 $this->perform,
                 $batchxml,
@@ -153,7 +155,6 @@ class Factory
                 ClassEntryMapper::getInstance(),
                 ClassInvolvementMapper::getInstance(),
                 ClassPeriodMapper::getInstance()
-            )
-        ];
+            ));
     }
 }
