@@ -11,3 +11,14 @@ UPDATE `config` SET `module`='schoolData', `type_id`=null WHERE `name`='external
 
 -- Data Source options, a freeform input field for now
 INSERT INTO `config` (`name`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`) VALUES ('schooldata_import_data_source', 'Data Source', 'Choose which importer to use when importing data from API endpoints', (SELECT id FROM lu_config_field WHERE field = 'select'), 'csv;CSV Files:isams;iSAMS:kamar;Kamar:sentral;Sentral', null, 'true', 'false', 'false', 'schoolData');
+
+-- Sequence config options
+-- Because I need them to appear in a particular order...
+ALTER TABLE `config`
+    ADD COLUMN `sequence` INT(11) NULL AFTER `module`;
+
+-- ...and this is the order
+UPDATE `config` SET `sequence`='1' WHERE `name`='schooldata_import_data_source';
+UPDATE `config` SET `sequence`='2' WHERE `name`='external_ups_provider_batchxml_host';
+UPDATE `config` SET `sequence`='3' WHERE `name`='external_ups_provider_batchxml_key';
+UPDATE `config` SET `sequence`='4' WHERE `name`='schooldata_import_frequency';
