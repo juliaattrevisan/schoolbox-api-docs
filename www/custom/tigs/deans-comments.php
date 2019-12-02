@@ -209,6 +209,7 @@ function processCsvData(
         } else {
             $logger->debug("Lastname: {$student->getFirstname()} === Surname: {$preferred}");
         }
+        $logger->debug("Comment: '$comment'");
 
         $heading = "Year $yearLevel $year Semester $semester Dean's Comment";
         $logger->info("Inserting comment for student {$student->getId()} '$heading'");
