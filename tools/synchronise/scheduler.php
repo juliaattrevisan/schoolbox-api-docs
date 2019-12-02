@@ -86,6 +86,8 @@ HELP;
          */
         $frequency = Endpoint\Scheduler::HOURLY;
 
+        /* This always perform updates
+         */
         $factory = new Endpoint\Factory($host, $key, true, $this->getLogger());
 
         /* The time when the script ran
