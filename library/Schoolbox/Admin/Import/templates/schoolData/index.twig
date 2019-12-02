@@ -1,3 +1,39 @@
+<script>
+    $(function() {
+
+        /**
+         * Init the available options based on the Data Source selected
+         *
+         * @param decider
+         */
+        function initOptions(dataSource) {
+            if ($(dataSource).val() == 'csv') {
+                $('#schooldata_import_batchxml_host').parent('div').hide();
+                $('#schooldata_import_batchxml_key').parent('div').hide();
+                $('#schooldata_import_frequency').parent('div').hide();
+            } else {
+                $('#schooldata_import_batchxml_host').parent('div').show();
+                $('#schooldata_import_batchxml_key').parent('div').show();
+                $('#schooldata_import_frequency').parent('div').show();
+            }
+        }
+
+        {# Set up all the options
+         # Set up the event listeners
+         # Un-hide the container element when everything is ready to avoid visual artefact
+         #}
+        initOptions($('#schooldata_import_data_source'));
+
+        $('#schooldata_import_data_source').on('change', function(event) {
+            event.preventDefault();
+
+            initOptions($(this));
+        });
+
+        $('#option-container').removeClass('hide');
+    });
+</script>
+
 {{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
@@ -6,7 +42,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row hide" id='option-container'>
     <div class="small-12 columns">
         {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
