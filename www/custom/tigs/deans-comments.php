@@ -115,7 +115,7 @@ function processDryRun(WebRequest\Kernel $kernel, int $yearLevel, int $year, int
     $fp      = fopen($file['tmp_name'], 'rb');
     $csvData = [];
     while ($row = fgetcsv($fp)) {
-        $csvData[] = $row;
+        $csvData[] = array_map('normalizeEncoding', $row);
     }
 
     $logger = getLogger();
@@ -128,6 +128,35 @@ function processDryRun(WebRequest\Kernel $kernel, int $yearLevel, int $year, int
         processCsvData($kernel, false, $logger, $yearLevel, $year, $semester, $csvData, $date);
     } else {
         saveSessionData(true, $yearLevel, $year, $semester, $csvData, $logger->getResults());
+    }
+}
+
+/**
+ * Normalize encoding of a cell from the uploaded CSV.
+ *
+ * `$string` _should_ be UTF-8, but the CSV could've been saved in another
+ * encoding. (So far, we only recognise Windows-1252)
+ *
+ * @param string $string
+ * @return string
+ */
+function normalizeEncoding(string $string): string
+{
+    // Assume $string is utf-8 encoded, unless proven otherwise
+    // If it isn't, assume it's Windows-1252
+    $encoding = mb_detect_encoding($string, ['UTF-8', 'Windows-1252', 'ISO-8859-1'], true);
+
+    switch ($encoding) {
+        case 'Windows-1252':
+        case 'CP1252':
+        case 'ISO-8859-1':
+            // All the CP1252 test strings I used detected as ISO-8859-1.
+            // You actually want CP1252
+            return mb_convert_encoding($string, 'UTF-8', 'CP1252');
+
+        case 'UTF-8':
+        default:
+            return $string;
     }
 }
 
@@ -195,6 +224,8 @@ function processCsvData(
         [$deanId, $studentId, $surname, $preferred, $comment] = $row;
         $dean    = $userMapper->findByExternalId($deanId);
         $student = $userMapper->findByExternalId($studentId);
+
+        $comment = trim($comment, " \t\n\r\0\x0B\u{00A0}"); // '\u{00A0}' = non-breaking space
 
         // Sanity check
         $logger->info("<br>Processing row #$rowId, checking student id ($studentId) and name alignment...");
