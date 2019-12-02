@@ -101,5 +101,17 @@ class Scheduler
          * If it is, just do it
          * Otherwise, noop
          */
+
+        try {
+            foreach ($composites as $composite) {
+                $composite->import();
+            }
+        } catch (\RuntimeException $e) {
+            $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
+        } catch (InvalidUriPartException $e) {
+            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
+        } catch (InvalidArgumentException $e) {
+            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
+        }
     }
 }
