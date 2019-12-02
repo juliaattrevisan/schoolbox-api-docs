@@ -99,6 +99,40 @@ components:
             (Since the search API itself will support a date range, this field
             needs to exist on all results. Different types of results may return
             different dates.)
+
+            Note: not all search results are temporal.
+
+            * Folder, User, File, Textbox, Link, Tile, Forum:
+            ** Effect on relevance: none
+            ** Affected by filter: if either create or last modified time is in
+               date search window, include it
+
+            * Comms:
+            ** Effect on relevance:
+            *** pre-publish: irrelevant (unless I am the author?)
+            *** published: full relevance
+            *** archived: reduced relevance?
+            ** Affected by filter:
+            *** include if publish-archive window overlaps date search window
+
+            * Event:
+            ** Effect on relevance:
+            *** pre-publish: irrelevant (unless I am the author?)
+            *** yet to start: relevance depends on how close the event start is
+            *** in start-end window: full relevance
+            *** past: reduced relevance (depends on how long ago?)
+            ** Affected by filter:
+            *** include if start-end window overlaps date search window
+
+            * Assessment:
+            ** Effect on relevance:
+            *** pre-publish: irrelevant (unless I am the author?)
+            *** published until late: filter in, full relevance?
+            *** past late: filter out, less relevance?
+            ** Affected by filter:
+            *** include if publish-close window overlaps date search window?
+            ** All of these are ignored for course-level assessments: they have
+               no concept of date
           allOf:
             - $ref: 'common.yaml#/components/schemas/dateTime'
       required:
