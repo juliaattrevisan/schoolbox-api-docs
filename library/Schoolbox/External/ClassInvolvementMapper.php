@@ -32,26 +32,21 @@ class ClassInvolvementMapper extends Schoolbox\Mapper {
             'type'     => self::TYPE_MODEL,
             'join'     => 'class',
         ));
-        $this->hasMap(array(
-            'column'   => 'user_external_id',
-            'property' => 'user',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'user',
-        ));
+
+
+        $this->hasMap([
+            'column'   => 'external_id',
+            'property' => 'externalId',
+            'type'     => self::TYPE_STRING,
+        ]);
+
+
         $this->hasJoin(
             'class',
             array(
                 'mapper'    => '\\Schoolbox\\External\\ClassEntryMapper',
                 'this_key'  => 'class_id',
                 'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'user',
-            array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'user_external_id',
-                'other_key' => 'synergy_id',
             )
         );
     }
@@ -68,5 +63,4 @@ class ClassInvolvementMapper extends Schoolbox\Mapper {
         $statement->execute(array('class' => $class->getId()));
         return $statement->rowCount();
     }
-
 }

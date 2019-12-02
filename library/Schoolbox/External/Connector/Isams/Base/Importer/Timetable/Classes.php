@@ -150,14 +150,14 @@ class Classes implements IStrategy
     private function initPeriodLookup(): array
     {
         $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
-            SELECT 
+            SELECT
                 luCampus.ext_timetable_code,
                 period.day, period.id, period.title
-            FROM luCampus 
+            FROM luCampus
             LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
             LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
             LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
-                        
+
         ');
 
         $periods = [];
@@ -286,19 +286,15 @@ class Classes implements IStrategy
                  */
                 foreach ($class['students'] as $student) {
 
-                    /* If we have no record of this student id existing then we
-                     * we can't assign them to any classes - they don't have a
-                     * schoolbox user account
+                    /* Throw warning, but assign them anyway
                      */
                     if (!isset($users[$student['username']])) {
                         $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox account %s to class %s %s; skipping',
+                            'Tried to assign nonexistent schoolbox account %s to class %s %s',
                             $student['username'],
                             $timetableClass->getName(),
                             $timetableClass->getCode()
                         ));
-
-                        continue;
                     }
 
                     $this->createTimetableClassInvolvement($users, $student, $timetableClass);
@@ -378,7 +374,7 @@ class Classes implements IStrategy
          * schoolbox user account
          */
         if (isset($users[$class['teachers']['username']])) {
-            $timetableClassPeriod->setTeacher($this->userMapper->createModel()->setExternalId($users[$class['teachers']['username']]));
+            $timetableClassPeriod->setTeacher($this->userMapper->createModel()->setExternalId($class['teachers']['username']));
 
             $this->log->info(sprintf(
                 'Creating class period relation for teacher %s %s in room %s',
@@ -387,6 +383,8 @@ class Classes implements IStrategy
                 $class['period']['room']['name']
             ));
         } else {
+            /* Throw warning, but assign them anyway
+             */
             $this->log->warning(sprintf(
                 'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s',
                 $class['teachers']['username'],
@@ -425,14 +423,10 @@ class Classes implements IStrategy
      */
     private function createTimetableClassInvolvement(array $users, array $student, ClassEntry $timetableClass): ClassInvolvement
     {
-        /* Minimum user
-         */
-        $user = $this->userMapper->createModel()
-            ->setExternalId($users[$student['username']]);
 
         /** @var ClassInvolvement $timetableClassInvolvement */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-            ->setUser($user)
+            ->setExternalId($student['username'])
             ->setClass($timetableClass);
 
         $this->log->info(sprintf(
@@ -440,7 +434,7 @@ class Classes implements IStrategy
             $timetableClass->getName(),
             $timetableClass->getCode(),
             $student['firstname'] . ' ' . $student['surname'],
-            $timetableClassInvolvement->getUser()->getExternalId()
+            $timetableClassInvolvement->getExternalId()
         ));
 
         if ($this->perform) {
