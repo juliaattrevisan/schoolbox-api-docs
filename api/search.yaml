@@ -48,16 +48,19 @@ components:
       properties:
 #        id:
 #          $ref: 'common.yaml#/components/schemas/id'
-        type:
-          oneOf:
-            - $ref: '#/components/schemas/searchResultType'
-#        author:
-#          allOf:
-#            - $ref: 'user.yaml#/components/schemas/user'
-#          nullable: true
+        creator:
+          description: |
+            The creator of the content which yielded this search result
+            (if known).
+          nullable: true
+          allOf:
+            - $ref: 'user.yaml#/components/schemas/user'
         summary:
           description: A brief human-readable summary of the search result.
           type: string
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultType'
         content:
           oneOf:
             - $ref: '#/components/schemas/searchResultUser'
@@ -74,13 +77,22 @@ components:
         relevance:
           description: |
             The relevance of this result to the search query, from 0 to 1
+            (higher: more relevant).
           type: number
           minimum: 0
           maximum: 1
-#        created:
-#          $ref: 'common.yaml#/components/schemas/dateTime'
-#        updated:
-#          $ref: 'common.yaml#/components/schemas/dateTime'
+        date:
+          description: |
+            The date on which this content became viewable (if known).
+
+            If the content is publishable as a separate step from being created,
+            it will be a publish date: otherwise, it will be a creation date.
+
+            (Since the search API itself will support a date range, this field
+            needs to exist on all results. Different types of results may return
+            different dates.)
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/dateTime'
       required:
         - id
         - content
@@ -134,13 +146,13 @@ components:
         title:
           type: string
         publish:
-          $ref: '#/components/schemas/searchResultDateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         open:
-          $ref: '#/components/schemas/searchResultDateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         due:
-          $ref: '#/components/schemas/searchResultDateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         close:
-          $ref: '#/components/schemas/searchResultDateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
 
     searchResultComms:
       title: Search result comms article
@@ -156,9 +168,9 @@ components:
         title:
           type: string
         publish:
-          $ref: '#/components/schemas/searchResultDateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         archive:
-          $ref: '#/components/schemas/searchResultDateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
 
     searchResultTextbox:
       title: Search result text box
