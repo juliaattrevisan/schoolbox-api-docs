@@ -71,21 +71,17 @@
                             <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}"
                                class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
                                 {% include '@learningGrades/fragments/subject.twig' with {
-                                    studentId:           student.id,
                                     showOverallGrade:    showOverallGrade,
-                                    year:                year,
                                     folder:              folder,
-                                    markbooks:           markbooks
+                                    studentGrade:        markbooks[folder.id].studentStatistics[student.id],
                                 } only %}
                             </a>
                         {% else %}
                             <h4 class="flex-grade">
                                 {% include '@learningGrades/fragments/subject.twig' with {
-                                    studentId:           student.id,
                                     showOverallGrade:    showOverallGrade,
-                                    year:                year,
                                     folder:              folder,
-                                    markbooks:           markbooks
+                                    studentGrade:        markbooks[folder.id].studentStatistics[student.id],
                                 } only %}
                             </h4>
                         {% endif %}
