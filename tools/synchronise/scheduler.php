@@ -80,7 +80,7 @@ HELP;
 
         /* TODO: Replace with config var
          */
-        $type = Factory::ISAMS;
+        $type = Endpoint\Factory::ISAMS;
 
         /* TODO: Replace with config var
          */
