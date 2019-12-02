@@ -8,13 +8,17 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Test;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\Isams\Base\Importer\MockApi;
-use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 
-
+/**
+ * Class ApiTest
+ *
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Test
+ */
 class ApiTest extends TestCase
 {
 

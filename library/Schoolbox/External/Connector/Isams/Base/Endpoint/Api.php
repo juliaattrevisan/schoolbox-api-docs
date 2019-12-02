@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Alaress_Curl_Url;
 use RuntimeException;

@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
@@ -14,7 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Isams\Base\Importer;
+use Schoolbox\External\Connector\Isams\Base\Endpoint;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -25,9 +25,9 @@ use Schoolbox\UserMapper;
  *
  * Strategy executor
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
-class Composite implements Importer\IStrategy
+class Composite implements Endpoint\IStrategy
 {
 
     /**
@@ -45,7 +45,7 @@ class Composite implements Importer\IStrategy
 
 
     /**
-     * @var Importer\Batchxml
+     * @var Endpoint\Batchxml
      */
     private $batchxml;
 
@@ -109,7 +109,7 @@ class Composite implements Importer\IStrategy
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Importer\Batchxml      $batchxml
+     * @param Endpoint\Batchxml      $batchxml
      * @param CampusMapper           $campusMapper
      * @param UserMapper             $userMapper
      * @param TimetableCampusMapper  $timetableCampusMapper
@@ -122,7 +122,7 @@ class Composite implements Importer\IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Importer\Batchxml $batchxml,
+        Endpoint\Batchxml $batchxml,
         CampusMapper $campusMapper,
         UserMapper $userMapper,
         TimetableCampusMapper $timetableCampusMapper,
@@ -153,9 +153,9 @@ class Composite implements Importer\IStrategy
     public function import(): void
     {
         $this->registry
-            ->add(new Importer\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
-            ->add(new Importer\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
-            ->add(new Importer\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
+            ->add(new Endpoint\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
+            ->add(new Endpoint\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
+            ->add(new Endpoint\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();

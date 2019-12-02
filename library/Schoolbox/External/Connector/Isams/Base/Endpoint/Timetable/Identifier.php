@@ -6,11 +6,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\IStrategy;
 
 /**
  * Class Identifier

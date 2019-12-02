@@ -6,11 +6,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Iterator;
 use RuntimeException;
-use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use SimpleXMLElement;
 
 /**
