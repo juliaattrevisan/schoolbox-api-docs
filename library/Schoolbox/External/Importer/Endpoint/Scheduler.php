@@ -73,7 +73,7 @@ class Scheduler
          */
         $composites = new GenericCollection(IStrategy::class);
 
-        if ($frequency == 'hourly') {
+        if ($this->frequency == self::HOURLY) {
 
             /* If the frequency is hourly, just do it
              * We'll make the assumption that Support won't configure it
@@ -81,7 +81,7 @@ class Scheduler
              */
             $composites = $this->factory->produce(null, $this->type);
 
-        } elseif ($frequency == 'twiceDaily') {
+        } elseif ($this->frequency == self::TWICE_DAILY) {
 
             /* If the frequency is twiceDaily,
              * Check that the current hour is 4am or 4pm
@@ -89,7 +89,7 @@ class Scheduler
              * Otherwise, noop
              */
 
-        } elseif ($frequency == 'daily') {
+        } elseif ($this->frequency == self::DAILY) {
 
             /* If the frequency is daily,
              * Checkt hat the current hour is 1am
