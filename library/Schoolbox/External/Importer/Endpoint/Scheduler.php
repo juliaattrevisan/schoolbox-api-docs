@@ -94,22 +94,30 @@ class Scheduler
          */
         $composites = new GenericCollection(IStrategy::class);
 
-        /* If the frequency is hourly, just do it
-         * We'll make the assumption that Support won't configure it
-         * to run more frequently than hourly anyway
-         */
+        if ($frequency == 'hourly') {
 
-        /* If the frequency is twiceDaily,
-         * Check that the current hour is 4am or 4pm
-         * If it is, just do it
-         * Otherwise, noop
-         */
+            /* If the frequency is hourly, just do it
+             * We'll make the assumption that Support won't configure it
+             * to run more frequently than hourly anyway
+             */
+            $composites = $factory->produce($file, $type);
 
-        /* If the frequency is daily,
-         * Checkt hat the current hour is 1am
-         * If it is, just do it
-         * Otherwise, noop
-         */
+        } elseif ($frequency == 'twiceDaily') {
+
+            /* If the frequency is twiceDaily,
+             * Check that the current hour is 4am or 4pm
+             * If it is, just do it
+             * Otherwise, noop
+             */
+
+        } elseif ($frequency == 'daily') {
+
+            /* If the frequency is daily,
+             * Checkt hat the current hour is 1am
+             * If it is, just do it
+             * Otherwise, noop
+             */
+        }
 
         try {
             foreach ($composites as $composite) {
