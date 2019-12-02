@@ -167,13 +167,13 @@ function processCsvData(
 
     $insertStatement = $db->prepareQuery("
         INSERT INTO pastoral (
-            owner_id, 
-            student_id, 
-            type_id, 
-            heading, 
-            body_public, 
-            modified_by_user_id, 
-            created_at, 
+            owner_id,
+            student_id,
+            type_id,
+            heading,
+            body_public,
+            modified_by_user_id,
+            created_at,
             updated_at
         ) VALUES (
             :owner_id,
@@ -441,7 +441,7 @@ function renderDryRunForm(string $yearLevel, string $year, string $semester): vo
             </tr>
             <tr>
                 <td>Deans Comments File:</td>
-                <td><input type="file" name="comments" title="Deans Comments CSV" accept="text/csv" required></td>
+                <td><input type="file" name="comments" title="Deans Comments CSV" accept="text/csv" required style="width: 400px;"></td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" name="dryRun" value="Dry Run"></td>
