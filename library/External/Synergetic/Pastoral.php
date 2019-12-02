@@ -563,6 +563,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         /** @var Pastoral $pastoral */
         $pastoral = $this->reloadModel($pastoral);
 
+        if (!$this->isExternalCodeValid($pastoral)) {
+            return false;
+        }
+
         // Get insert/update query based on the absence/presence of an external ID on the pastoral record
 
         if (empty($pastoral->getExternalId())) {
@@ -634,12 +638,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
-                    $propagator = $this->pastoralMapper->getEventPropagator();
-                    $this->pastoralMapper->setEventPropagator(new MockPropagator());
+                    $this->pastoralMapper->suppressNotification();
                     $this->pastoralMapper->save($pastoral);
 
                     // Restore the proper propagator
-                    $this->pastoralMapper->setEventPropagator($propagator);
+                    $this->pastoralMapper->restoreNotification();
                 }
 
                 // Export the permissions/audience of the pastoral record to Synergetic
@@ -726,6 +729,29 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $query = "SELECT COUNT(*) FROM tPastoralCare WHERE PastoralCareSeq = :externalId";
         $result = $this->connector->executeQuery($query, ['externalId' => $externalId]);
         return (bool)$result->fetchColumn();
+    }
+
+    /**
+     * Checks whether external code of types are valid
+     * @param Pastoral $pastoral
+     * @return bool
+     */
+    private function isExternalCodeValid(Pastoral $pastoral)
+    {
+
+        if ($pastoral->getType()
+            && !empty($pastoral->getType()->getExternalCode())
+            && !array_key_exists($pastoral->getType()->getExternalCode(), $this->getTypeList())) {
+            return false;
+        }
+
+        if ($pastoral->getSubType()
+            && !empty($pastoral->getSubType()->getExternalCode())
+            && !array_key_exists($pastoral->getSubType()->getExternalCode(), $this->getSubTypeList())) {
+            return false;
+        }
+
+        return true;
     }
 
     // Comment synchronization
@@ -1061,10 +1087,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         if (empty($pastoral->getType())) {
             $pastoralTypeCode = '';
         } else {
+            // validate code
             $pastoralTypeCode =
-                empty($pastoral->getType()->getExternalCode())
-                    ? ''
-                    : $pastoral->getType()->getExternalCode();
+                array_key_exists($pastoral->getType()->getExternalCode(), $this->getTypeList())
+                    ? $pastoral->getType()->getExternalCode()
+                    : '';
         }
 
         // Retrieve pastoral subtype, if there is no type as well we need to blank this out
@@ -1073,9 +1100,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $pastoralSubTypeCode = '';
         } else {
             $pastoralSubTypeCode =
-                empty($pastoral->getSubType()->getExternalCode())
-                    ? ''
-                    : $pastoral->getSubType()->getExternalCode();
+                array_key_exists($pastoral->getSubType()->getExternalCode(), $this->getSubTypeList())
+                    ? $pastoral->getSubType()->getExternalCode()
+                    : '';
         }
 
         // Retrieve our "external document classification" based on the pastoral type
@@ -1253,5 +1280,73 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         return $this->pastoralTypeCache[$record["CategoryCode"]];
+    }
+
+    /**
+     * Gets available pastoral types
+     * @return array
+     */
+    public function getTypeList(): array
+    {
+        $query              = "
+                    SELECT Code
+                    FROM dbo.luPastoralCareType
+                    WHERE ActiveFlag = 1
+                      AND Code != ''";
+        $pastoralTypes      = $this->getConnector()->executeQuery($query)->fetchAll();
+        $pastoralTypeLookup = [];
+        foreach ($pastoralTypes as $pastoralType) {
+            $pastoralTypeLookup[$pastoralType['Code']] = [
+                'key'   => $pastoralType['Code'],
+                'value' => $pastoralType['Code'],
+            ];
+        }
+        return $pastoralTypeLookup;
+    }
+
+    /**
+     * Gets available pastoral subtypes
+     * @return array
+     */
+    public function getSubtypeList(): array
+    {
+        $query              = "
+                    SELECT Code
+                    FROM dbo.luPastoralCareCategory
+                    WHERE ActiveFlag = 1
+                      AND Code != ''";
+        $pastoralTypes      = $this->getConnector()->executeQuery($query)->fetchAll();
+        $pastoralTypeLookup = [];
+        foreach ($pastoralTypes as $pastoralType) {
+            $pastoralTypeLookup[$pastoralType['Code']] = [
+                'key'   => $pastoralType['Code'],
+                'value' => $pastoralType['Code'],
+            ];
+        }
+        return $pastoralTypeLookup;
+
+    }
+
+    /**
+     * Gets available pastoral document classifications
+     * @return array
+     */
+    public function getDocumentClassificationList(): array
+    {
+        $query            = "
+                    SELECT Code
+                    FROM dbo.luDocumentClassification
+                    WHERE ActiveFlag = 1
+                      AND Code != ''
+        ";
+        $exDocClass       = $this->getConnector()->executeQuery($query)->fetchAll();
+        $exDocClassLookup = [];
+        foreach ($exDocClass as $docClass) {
+            $exDocClassLookup[$docClass['Code']] = [
+                'key'   => $docClass['Code'],
+                'value' => $docClass['Code'],
+            ];
+        }
+        return $exDocClassLookup;
     }
 }

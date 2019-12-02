@@ -90,6 +90,22 @@ interface External_PastoralInterface extends External\IConnector
      * @throws \Schoolbox\External\Exception
      */
     public function uploadPastoralDocument(Pastoral\UploadQueue\Model $upload): bool;
+
+    /**
+     * Gets available pastoral types
+     * @return array
+     */
+    public function getTypeList(): array;
+
+    /**
+     * Gets available pastoral subtypes
+     * @return array
+     */
+    public function getSubtypeList(): array;
+
+    /**
+     * Gets available document classifications
+     * @return array
+     */
+    public function getDocumentClassificationList(): array;
 }
-
-

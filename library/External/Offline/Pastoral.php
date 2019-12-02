@@ -84,4 +84,29 @@ class External_Offline_Pastoral implements External_PastoralInterface, IOfflineC
         // NOOP
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTypeList(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSubtypeList(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDocumentClassificationList(): array
+    {
+        return [];
+    }
+
 }
