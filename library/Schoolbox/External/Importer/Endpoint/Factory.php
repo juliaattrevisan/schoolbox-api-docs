@@ -40,6 +40,8 @@ class Factory
      */
     public const ISAMS = 'isams';
     public const KAMAR = 'kamar';
+    public const SENTRAL = 'sentral';
+
 
     /**
      * API Endpoint url
@@ -99,6 +101,7 @@ class Factory
                 return $this->produceIsams($file);
 
             case self::KAMAR:
+            case self::SENTRAL:
             default:
                 // Use manual csv imports
                 return null;
