@@ -17,6 +17,7 @@ use Schoolbox\Comms\News;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -107,6 +108,8 @@ class Module extends BaseModule
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(News\Statistics\Cumulative\Mapper::class),
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
+            'access'                     => $this->getMapperFactory()->getLazy(Access::class),
+            'commentMapper'              => $this->getMapperFactory()->getLazy(\Schoolbox\Discussion\Comment\Mapper::class),
             'audienceMapper'             => $this->getMapperFactory()->getLazy(News\Audience\Mapper::class),
         ];
     }
