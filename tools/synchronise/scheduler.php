@@ -94,7 +94,9 @@ HELP;
          */
         $now = time();
 
-        (new Endpoint\Scheduler($frequency, $factory, $type, $now))->run();
+        /* Execute scheduler
+         */
+        (new Endpoint\Scheduler($frequency, $factory, $type))->run($now);
     }
 };
 

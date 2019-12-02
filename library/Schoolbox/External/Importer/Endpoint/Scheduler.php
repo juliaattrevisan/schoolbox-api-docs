@@ -42,35 +42,26 @@ class Scheduler
 
 
     /**
-     * When the scheduler was asked to run
-     *
-     * @var int
-     */
-    private $now;
-
-
-    /**
      * Scheduler constructor.
      *
      * @param string $schedule
      */
-    public function __construct(string $frequency, Factory $factory, string $type, int $now)
+    public function __construct(string $frequency, Factory $factory, string $type)
     {
         $this->frequency = $frequency;
         $this->factory = $factory;
         $this->type = $type;
-        $this->now = $now;
     }
 
 
     /**
-     * Execute the importer
+     * Execute the importer at $now
      *
      * @return void
      */
-    public function run(): void
+    public function run(int $now): void
     {
-       if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->now)) {
+       if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $now)) {
             $composites = $this->factory->produce(null, $this->type);
 
             try {
