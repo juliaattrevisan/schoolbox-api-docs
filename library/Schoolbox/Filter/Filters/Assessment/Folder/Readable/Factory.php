@@ -101,8 +101,7 @@ class Factory extends FolderFilter\Factory
         if ($getOtherGroups) {
             $otherGroups = $folderMapper->findByPredicates(
                 $folderMapper->getPredicateBuilder()
-                             ->notNull('cc.code')
-                             ->isNull('cc.deleted_at')
+                             ->notNull('ug.cid')
             )->indexBy($folderIdColumn);
             $otherGroups = $otherGroups
                 ->diffBy($myClasses, $folderIdColumn)
