@@ -16,9 +16,9 @@ class Scheduler
     /**
      * The options you can choose
      */
-    private const HOURLY = 'hourly';
-    private const TWICE_DAILY = 'twiceDaily';
-    private const DAILY = 'daily';
+    public const HOURLY = 'hourly';
+    public const TWICE_DAILY = 'twiceDaily';
+    public const DAILY = 'daily';
 
 
     /**

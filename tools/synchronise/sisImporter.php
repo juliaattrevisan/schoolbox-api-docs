@@ -8,7 +8,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Importer\Endpoint\Factory;
+use Schoolbox\External\Importer\Endpoint;
 use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -88,9 +88,9 @@ HELP;
 
         /* TODO: Replace with config var
          */
-        $type = Factory::ISAMS;
+        $type = Endpoint\Factory::ISAMS;
 
-        $composites = (new Factory($host, $key, $this->perform(), $this->getLogger()))->produce($file, $type);
+        $composites = (new Endpoint\Factory($host, $key, $this->perform(), $this->getLogger()))->produce($file, $type);
 
         /* No composites produced; exit
          * Either you chose an invalid $type or you don't need a $type at all (csv imports)
