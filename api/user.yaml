@@ -125,10 +125,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/userProfile'
+          nullable: true
         children:
           type: array
           items:
             $ref: '#/components/schemas/userProfile'
+          nullable: true
         _links:
           type: object
           properties:
