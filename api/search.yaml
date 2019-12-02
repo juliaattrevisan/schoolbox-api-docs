@@ -119,9 +119,7 @@ components:
         - user
         - event
         - folder
-#        - assessment
         - comms
-#        - file
 
     searchResultUser:
       title: Search result - user
@@ -309,12 +307,6 @@ components:
         - textbox
         - link
         - tile
-
-    searchResultDateTime:
-      title: Search result date+time
-      description: A search result's date, with a time component.
-      type: string
-      format: date-time
 
   responses:
     searchResultList:
