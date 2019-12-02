@@ -74,7 +74,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Import user profile data from ISAMS xml into local schema. 
+Import user profile data from ISAMS xml into local schema.
 This is used by UPS to create user accounts.
 
 This also imports timetable data from ISAMS xml into local schema.
@@ -114,16 +114,16 @@ HELP;
          * do them in sequence, which gives me more dexterity later
          */
         $composites = [
-//            new Profile\Composite(
-//                $this->getLogger(),
-//                $this->perform(),
-//                $batchxml,
-//                UserProfile\Mapper::getInstance(),
-//                UserProfile\Student\Mapper::getInstance(),
-//                UserProfile\Parent\Mapper::getInstance(),
-//                UserProfile\Staff\Mapper::getInstance(),
-//                UserProfile\Relationship\Mapper::getInstance()
-//            ),
+            new Profile\Composite(
+                $this->getLogger(),
+                $this->perform(),
+                $batchxml,
+                UserProfile\Mapper::getInstance(),
+                UserProfile\Student\Mapper::getInstance(),
+                UserProfile\Parent\Mapper::getInstance(),
+                UserProfile\Staff\Mapper::getInstance(),
+                UserProfile\Relationship\Mapper::getInstance()
+            ),
             new Timetable\Composite(
                 $this->getLogger(),
                 $this->perform(),
