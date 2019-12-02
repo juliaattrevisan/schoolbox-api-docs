@@ -83,7 +83,11 @@ HELP;
          */
         $type = Factory::ISAMS;
 
-        (new Endpoint\Scheduler('hourly', $host, $key, $type, $this->getLogger())->run();
+        /* TODO: Replace with config var
+         */
+        $frequency = 'hourly';
+
+        (new Endpoint\Scheduler($frequency, $host, $key, $type, $this->getLogger())->run();
     }
 };
 

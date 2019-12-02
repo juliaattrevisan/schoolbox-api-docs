@@ -25,7 +25,7 @@ class Scheduler
      *
      * @var string
      */
-    private $schedule;
+    private $frequency;
 
 
     /**
@@ -66,9 +66,9 @@ class Scheduler
      * Scheduler constructor.
      * @param string $schedule
      */
-    public function __construct(string $schedule, string $host, string $key, string $type, LoggerInterface $logger)
+    public function __construct(string $frequency, string $host, string $key, string $type, LoggerInterface $logger)
     {
-        $this->schedule = $schedule;
+        $this->frequency = $frequency;
 
         /* Factory requirements
          * Always perform in crontab
