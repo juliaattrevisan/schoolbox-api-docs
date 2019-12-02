@@ -10,7 +10,8 @@
     </h3>
 </div>
 {% if showOverallGrade %}
-    <div class="grade {{ urgency.marks(studentGrade.meanNormalised) }}-bg no-margin">
+    {% set gradient = (urgency.marks(markbooks[folder.id].studentStatistics[studentId].meanNormalised)) ?: 'gradient-none' %}
+    <div class="grade {{ gradient }}-bg no-margin">
         <span>{{ studentGrade.weightedMean }}</span>
     </div>
 {% endif %}
