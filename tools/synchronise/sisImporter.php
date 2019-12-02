@@ -67,7 +67,7 @@ This is used by UPS to create user accounts.
 
 This also imports timetable data from third party endpoint into local schema.
 
-Usage: externalImporter.php [--file] [--perform]
+Usage: sisImporter.php [--file] [--perform]
         --perform   Persist changes
         --file      Optional path to a locally-cached xml file e.g. ../../../www/test.xml
                     Absence of this arg will cause the tool to access the api endpoint instead
