@@ -40,6 +40,7 @@ paths:
       - $ref: '#/components/parameters/from'
       - $ref: '#/components/parameters/to'
       - $ref: '#/components/parameters/creator'
+      - $ref: '#/components/parameters/type'
 
 
 components:
@@ -377,3 +378,42 @@ components:
       required: false
       schema:
         $ref: 'user.yaml#/components/schemas/user'
+
+    type:
+      name: type
+      in:   query
+      description: |
+        If provided, only return these types of result; otherwise, return all
+        results.
+      required: false
+      schema:
+        type: array
+        # TODO is there a better way to define this enum?
+        enum:
+          - user
+#          - user:staff
+#          - user:student
+#          - user:parent
+#          - user:guest
+          - folder
+#          - folder:homepage
+#          - folder:course
+#          - folder:class
+#          - folder:class-archive
+#          - folder:other
+          - event
+          - comms
+          - assessment
+#          - assessment:duework
+#          - assessment:quiz
+#          - assessment:task
+#          - assessment:project
+          - file
+#          - file:image
+#          - file:audio
+#          - file:video
+#          - file:document
+#          - file:other
+          - textbox
+          - link
+          - tile
