@@ -10,6 +10,7 @@ declare(strict_types=1);
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\External\Importer\Endpoint\Factory;
 use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -87,7 +88,9 @@ HELP;
          */
         $frequency = 'hourly';
 
-        (new Endpoint\Scheduler($frequency, $host, $key, $type, $this->getLogger())->run();
+        $factory = new Factory($host, $key, true, $this->getLogger());
+
+        (new Endpoint\Scheduler($frequency, $factory, $type)->run();
     }
 };
 

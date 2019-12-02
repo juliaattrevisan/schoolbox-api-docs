@@ -30,54 +30,27 @@ class Scheduler
 
 
     /**
-     * API Endpoint url
-     *
-     * @var string
+     * @var Factory
      */
-    private $host;
+    private $factory;
 
 
-    /**
-     * API Endpoint access token
-     *
-     * @var string
-     */
-    private $key;
-
-
-    /**
-     * @var bool
-     */
-    private $perform;
-
-
-    /**
+    /**'
      * @var string
      */
     private $type;
 
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-
-    /**
      * Scheduler constructor.
+     *
      * @param string $schedule
      */
-    public function __construct(string $frequency, string $host, string $key, string $type, LoggerInterface $logger)
+    public function __construct(string $frequency, Factory $factory, string $type)
     {
         $this->frequency = $frequency;
-
-        /* Factory requirements
-         * Always perform in crontab
-         */
-        $this->host = $host;
-        $this->key = $key;
-        $this->perform = true;
-        $this->logger = $logger;
+        $this->factory = $factory;
+        $this->type = $type;
     }
 
 
@@ -86,9 +59,6 @@ class Scheduler
      */
     public function run()
     {
-        /* This doesn't actually cost much to spawn
-         */
-        $factory = new Factory($host, $key, $this->perform(), $this->getLogger());
 
         /* Prepare a default collection
          */
@@ -100,7 +70,7 @@ class Scheduler
              * We'll make the assumption that Support won't configure it
              * to run more frequently than hourly anyway
              */
-            $composites = $factory->produce($file, $type);
+            $composites = $this->factory->produce(null, $this->type);
 
         } elseif ($frequency == 'twiceDaily') {
 
