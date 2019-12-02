@@ -26,7 +26,7 @@ class ValidScheduleExecution
          * We'll make the assumption that Support won't configure it
          * to run more frequently than hourly anyway
          */
-        if ($frequency == self::HOURLY) {
+        if ($frequency == Scheduler::HOURLY) {
             return true;
         }
 
@@ -35,7 +35,7 @@ class ValidScheduleExecution
          * If it is, just do it
          * Otherwise, noop
          */
-        if (($frequency == self::TWICE_DAILY) && (4 === date('g', $now))) {
+        if (($frequency == Scheduler::TWICE_DAILY) && (4 === date('g', $now))) {
             return true;
         }
 
@@ -44,7 +44,7 @@ class ValidScheduleExecution
          * If it is, just do it
          * Otherwise, noop
          */
-        if (($frequency == self::DAILY) && (1 == date('G', $now))) {
+        if (($frequency == Scheduler::DAILY) && (1 == date('G', $now))) {
             return true;
         }
 
