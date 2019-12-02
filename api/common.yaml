@@ -38,6 +38,7 @@ components:
       readOnly: true
       type: integer
       format: int32
+      minimum: 1
 
     cursor:
       title: Cursor
