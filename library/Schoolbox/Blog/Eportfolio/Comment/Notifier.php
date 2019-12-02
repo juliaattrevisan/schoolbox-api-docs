@@ -441,6 +441,10 @@ class Notifier extends AbstractModuleNotifier
 
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
+            /** @var User $target */
+            if (!$target->getChildren()) {
+                $target->setChildren(User::createCollection());
+            }
             $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector)
                 : new UserParam($effector);
