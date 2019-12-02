@@ -93,10 +93,11 @@ class Query
             $result[$key]['formattedName']  = $user->formatName();
             $result[$key]['metadata']       = $user->formatMetadata();
             $result[$key]['year']           = $user->getYear();
+            $result[$key]['sortBy']         = $user->getLastname() . ' ' . $user->getFirstname();
         }
 
         usort($result, function ($a, $b) {
-            return strnatcmp($a['formattedName'], $b['formattedName']);
+            return strnatcmp($a['sortBy'], $b['sortBy']);
         });
 
         return $result;
