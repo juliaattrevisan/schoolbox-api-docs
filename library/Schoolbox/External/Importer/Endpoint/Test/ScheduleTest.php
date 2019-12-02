@@ -20,13 +20,13 @@ class ScheduleTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validScheduleFrequency
+     * @dataProvider provider_validHourlyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
      * @param bool   $expected
      */
-    public function testScheduleFrequency(string $frequency, int $now, bool $expected): void
+    public function testHourlyScheduleFrequency(string $frequency, int $now, bool $expected): void
     {
         $scheduler = new ValidScheduleExecution();
 
@@ -39,7 +39,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validScheduleFrequency(): array
+    public function provider_validHourlyScheduleFrequency(): array
     {
         return [
             'Hourly 1' => [
@@ -59,7 +59,33 @@ class ScheduleTest extends TestCase
                 strtotime('2019-12-02 17:12:59'),
                 true
             ],
+        ];
+    }
 
+
+    /**
+     * @dataProvider provider_validTwiceDailyScheduleFrequency
+     *
+     * @param string $frequency
+     * @param int    $now
+     * @param bool   $expected
+     */
+    public function testTwiceDailyScheduleFrequency(string $frequency, int $now, bool $expected): void
+    {
+        $scheduler = new ValidScheduleExecution();
+
+        $this->assertEquals($expected, $scheduler->isSatisfiedBy($frequency, $now));
+    }
+
+
+    /**
+     * 'hourly' is functionally equivalent to "whenever the system's crontab is set"
+     *
+     * @return array
+     */
+    public function provider_validTwiceDailyScheduleFrequency(): array
+    {
+        return [
             'Twice Daily 1' => [
                 Scheduler::TWICE_DAILY,
                 strtotime('2019-12-02 03:59:59'),
@@ -107,7 +133,31 @@ class ScheduleTest extends TestCase
                 strtotime('2019-12-02 17:00:00'),
                 false
             ],
+        ];
+    }
 
+
+    /**
+     * @dataProvider provider_validDailyScheduleFrequency
+     *
+     * @param string $frequency
+     * @param int    $now
+     * @param bool   $expected
+     */
+    public function testDailyScheduleFrequency(string $frequency, int $now, bool $expected): void
+    {
+        $scheduler = new ValidScheduleExecution();
+
+        $this->assertEquals($expected, $scheduler->isSatisfiedBy($frequency, $now));
+    }
+
+
+    /**
+     * @return array
+     */
+    public function provider_validDailyScheduleFrequency(): array
+    {
+        return [
             'Daily 1' => [
                 Scheduler::TWICE_DAILY,
                 strtotime('2019-12-02 00:59:59'),
@@ -158,5 +208,3 @@ class ScheduleTest extends TestCase
         ];
     }
 }
-
-
