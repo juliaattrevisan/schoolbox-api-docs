@@ -70,7 +70,7 @@ class Scheduler
      */
     public function run(): void
     {
-       if ($this->isValidScheduleExecution()) {
+       if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->now)) {
             $composites = $this->factory->produce(null, $this->type);
 
             try {
@@ -85,44 +85,5 @@ class Scheduler
                 $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
             }
         }
-    }
-
-
-    /**
-     * Decide whether to execute the importer
-     *
-     * @return bool
-     */
-    public function isValidScheduleExecution(): bool
-    {
-        /* If the frequency is hourly, just do it
-         * We'll make the assumption that Support won't configure it
-         * to run more frequently than hourly anyway
-         */
-        if ($this->frequency == self::HOURLY) {
-            return true;
-        }
-
-        /* If the frequency is twiceDaily,
-         * Check that the current hour is 4am or 4pm
-         * If it is, just do it
-         * Otherwise, noop
-         */
-        if (($this->frequency == self::TWICE_DAILY) && (4 === date('g', $this->now))) {
-            return true;
-        }
-
-        /* If the frequency is daily,
-         * Check that the current hour is 1am
-         * If it is, just do it
-         * Otherwise, noop
-         */
-        if (($this->frequency == self::DAILY) && (1 == date('G', $this->now))) {
-            return true;
-        }
-
-        /* It's not time to run yet
-         */
-        return false;
     }
 }
