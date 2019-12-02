@@ -37,6 +37,9 @@ paths:
           $ref: 'common.yaml#/components/responses/problem'
     parameters:
       - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/creator'
 
 
 components:
@@ -342,6 +345,35 @@ components:
     query:
       name:        q
       in:          query
-      description: The term to search for
+      description: The search term.
       schema:
         type: string
+
+    from:
+      name: from
+      in:   query
+      description: |
+        If provided, only return search results that are relevant on or after
+        this date.
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/dateTime'
+
+    to:
+      name: to
+      in:   query
+      description: |
+        If provided, only return search results that are relevant on or before
+        this date.
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/dateTime'
+
+    creator:
+      name: creator
+      in:   query
+      description: |
+        If provided, only return search results that belong to this user.
+      required: false
+      schema:
+        $ref: 'user.yaml#/components/schemas/user'
