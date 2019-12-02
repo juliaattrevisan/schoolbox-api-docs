@@ -42,8 +42,8 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
-        $this->register('GET', '/direct', 'getDirectIndex', $perms);
-        $this->register('GET', '/schoolData', 'getSchoolDataIndex', $perms);
+        $this->register('GET', '/directImport', 'getDirectIndex', $perms);
+        $this->register('GET', '/schoolDataImport', 'getSchoolDataIndex', $perms);
     }
 
 
