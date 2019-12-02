@@ -22,3 +22,7 @@ UPDATE `config` SET `sequence`='1' WHERE `name`='schooldata_import_data_source';
 UPDATE `config` SET `sequence`='2' WHERE `name`='external_ups_provider_batchxml_host';
 UPDATE `config` SET `sequence`='3' WHERE `name`='external_ups_provider_batchxml_key';
 UPDATE `config` SET `sequence`='4' WHERE `name`='schooldata_import_frequency';
+
+-- Rename external_ups_provider_batchxml configs
+UPDATE `config` SET `name`='schooldata_import_batchxml_host' WHERE `name`='external_ups_provider_batchxml_host';
+UPDATE `config` SET `name`='schooldata_import_batchxml_key' WHERE `name`='external_ups_provider_batchxml_key';

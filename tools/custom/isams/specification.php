@@ -81,7 +81,7 @@ HELP;
             $api = new MockApi($file);
         } else {
             $this->getLogger()->info('Accessing api endpoint');
-            $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
+            $api = new Api($this->getConfig()->get('schooldata_import_batchxml_host'), $this->getConfig()->get('schooldata_import_batchxml_key'));
         }
 
         $composite = new Specification(

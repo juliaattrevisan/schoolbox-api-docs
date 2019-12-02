@@ -82,8 +82,8 @@ HELP;
          * This gives you the cli choice of loading from an api endpoint
          * or a locally-cached xml file instead
          */
-        $host = $this->getConfig()->get('external_ups_provider_batchxml_host');
-        $key = $this->getConfig()->get('external_ups_provider_batchxml_key');
+        $host = $this->getConfig()->get('schooldata_import_batchxml_host');
+        $key = $this->getConfig()->get('schooldata_import_batchxml_key');
         $file = $this->getOpt(self::OPT_LONG_FILE);
 
         /* TODO: Replace with config var
