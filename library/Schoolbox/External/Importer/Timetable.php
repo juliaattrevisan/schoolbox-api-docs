@@ -200,8 +200,7 @@ class Timetable extends AbstractImporter
                     $teacher = $this->userMapper->findByExternalId($teacherCode);
                     $teacherCache[$teacherCode] = $teacher;
                 } catch (Mapper\Exception $e) {
-                    $this->log->warning(sprintf('Teacher code "%s" not found: skipping!', $teacherCode));
-                    continue;
+                    $this->log->warning(sprintf('Teacher code "%s" not found', $teacherCode));
                 }
             }
 
@@ -209,7 +208,7 @@ class Timetable extends AbstractImporter
             $classPeriod = new ClassPeriod();
             $classPeriod
                 ->setClass($result[$key]['class'])
-                ->setTeacher($teacher)
+                ->setTeacher($teacher->getExternalId())
                 ->setPeriod($timetablePeriod);
 
             if (isset($row['Class Room'])) {
