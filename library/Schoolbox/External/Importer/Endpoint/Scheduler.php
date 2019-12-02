@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\GenericCollection;
 
 class Scheduler
 {
@@ -85,6 +86,14 @@ class Scheduler
      */
     public function run()
     {
+        /* This doesn't actually cost much to spawn
+         */
+        $factory = new Factory($host, $key, $this->perform(), $this->getLogger());
+
+        /* Prepare a default collection
+         */
+        $composites = new GenericCollection(IStrategy::class);
+
         /* If the frequency is hourly, just do it
          * We'll make the assumption that Support won't configure it
          * to run more frequently than hourly anyway
