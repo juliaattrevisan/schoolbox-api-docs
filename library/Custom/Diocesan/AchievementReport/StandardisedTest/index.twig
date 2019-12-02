@@ -1,0 +1,22 @@
+{##
+ # Standardised Test
+ #
+ # @param array     externalUser
+ # @param int|null  year
+ #}
+
+{% include '@templates/Avatar.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: subnavigation
+} %}
+
+<div class="row">
+    <div class="small-12 columns">
+        Standardised Test pieces go here.
+    </div>
+</div>

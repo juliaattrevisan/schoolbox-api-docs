@@ -9,6 +9,7 @@ namespace Custom\Diocesan\AchievementReport;
 use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
 use MSSQL;
 use Schoolbox\User;
 
@@ -151,10 +152,22 @@ class Controller extends Base {
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $this->getResponse()->content->set(array(
-            'template' => '@standardisedTest/StandardisedTest.twig',
+            'template' => '@standardisedTest/index.twig',
             'data' => [
+                'navigation' => array(
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ),
                 'externalUser' => $externalUser,
                 'user' => $user,
+
+                'subnavigation' => [
+                    'all' => (new Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+
+                    /* TODO: For each Standardised Test report piece
+                     */
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
             ]
         ));
     }
@@ -211,6 +224,7 @@ class Controller extends Base {
         ));
     }
 
+
     /**
      * IB page
      *
@@ -265,6 +279,7 @@ class Controller extends Base {
             ]
         ]);
     }
+
 
     /**
      * NCEA page
@@ -451,6 +466,7 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year)
     {

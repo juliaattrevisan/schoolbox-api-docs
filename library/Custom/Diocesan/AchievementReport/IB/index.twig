@@ -1,5 +1,8 @@
 {% include '@templates/Avatar.twig' %}
-{% include '@templates/Navigation.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
 
 <div class="achievement-report ib">
     {% include '@ib/Navigation.twig' with {
