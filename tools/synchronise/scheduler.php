@@ -93,7 +93,7 @@ HELP;
          */
         $now = time();
 
-        (new Endpoint\Scheduler($frequency, $factory, $type, $now)->run();
+        (new Endpoint\Scheduler($frequency, $factory, $type, $now))->run();
     }
 };
 
