@@ -11,12 +11,12 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Zend\Uri\Exception\InvalidUriPartException;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
  * Profile/Timetable Importer
  *
- * Imports from an xml file and populates the following tables:
+ * Imports from an xml file and populates the following local sis tables:
  *   sis_user_profile
  *   sis_user_profile_staff
  *   sis_user_profile_student
