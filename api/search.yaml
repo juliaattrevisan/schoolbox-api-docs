@@ -46,8 +46,12 @@ components:
       description: Fields for search results
       type: object
       properties:
-#        id:
-#          $ref: 'common.yaml#/components/schemas/id'
+        id:
+          description: |
+            The identifier for the object in `content`. Forms a composite key
+            for a search result with `type` (`content`'s discriminator field).
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/id'
         creator:
           description: |
             The creator of the content which yielded this search result
