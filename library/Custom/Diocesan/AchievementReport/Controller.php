@@ -1,12 +1,9 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
@@ -15,6 +12,11 @@ use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use MSSQL;
 use Schoolbox\User;
 
+/**
+ * Class Controller
+ *
+ * @package Custom\Diocesan\AchievementReport
+ */
 class Controller extends Base {
 
     /**
@@ -49,7 +51,7 @@ class Controller extends Base {
      */
     public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $selector = new NavigationSelector($db, $user, $externalUser);
+        $selector = new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year);
         $selector->determineDefaultReport();
 
         $report = $selector->getDefaultReport();
@@ -111,6 +113,16 @@ class Controller extends Base {
 
                 break;
 
+            case NavigationSelector::COCURRICULAR_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.getCoCurricular', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
+                break;
+
             /* Error state - render an error page and leave it
              * at that, I guess
              */
@@ -159,7 +171,6 @@ class Controller extends Base {
      */
     public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $selector = new NavigationSelector($db, $user, $externalUser);
         $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
         $gradeSummaryTable = new SchoolGrades\GradeSummary($user, $externalUser, $db, $year);
@@ -170,7 +181,7 @@ class Controller extends Base {
             'template' => '@schoolGrades/index.twig',
             'data' => array(
                 'navigation' => array(
-                    'all' => $selector->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::SCHOOLGRADES_KEY
                 ),
                 'footer' => array(
@@ -228,13 +239,11 @@ class Controller extends Base {
             );
         }
 
-        $selector = new NavigationSelector($db, $user, $externalUser);
-
         $this->getResponse()->content->set([
             'template' => '@ib/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => $selector->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::IB_KEY
                 ],
 
@@ -268,7 +277,6 @@ class Controller extends Base {
      */
     public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $selector = new NavigationSelector($db, $user, $externalUser);
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
@@ -279,7 +287,7 @@ class Controller extends Base {
             'template' => '@ncea/index.twig',
             'data' => array(
                 'navigation' => array(
-                    'all' => $selector->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::NCEA_KEY
                 ),
                 'footer' => array(
@@ -416,7 +424,7 @@ class Controller extends Base {
             'template' => '@comments/index.twig',
             'data' => [
                 'navigation' => [
-                    'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::COMMENTS_KEY
                 ],
                 'externalUser' => $externalUser,
@@ -429,6 +437,34 @@ class Controller extends Base {
                     'selected' => $year
                 ],
                 'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findData()
+            ]
+        ];
+
+        $this->getResponse()->content->set($output);
+    }
+
+
+    /**
+     * Get all the cocurricular activities for $externalUser
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     */
+    public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
+        $output = [
+            'template' => '@coCurricular/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::COCURRICULAR_KEY
+                ],
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+                'activities' => (new CoCurricular\Activities($user, $externalUser, $db, $year))->findData(),
             ]
         ];
 

@@ -1,0 +1,21 @@
+{% include '@templates/Avatar.twig' %}
+{% include '@templates/Navigation.twig' %}
+
+<div class="row">
+    <div class="small-12 island achievement-report">
+        {% for year, data in activities %}
+        <h2 class="subheader">{{ year }}</h2>
+        <section>
+            <ul class="grid small-block-grid-1 medium-block-grid-2">
+                {% for activity in data %}
+                <li>
+                    <div class="card small-12">
+                        {{ activity }}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endfor %}
+    </div>
+</div>

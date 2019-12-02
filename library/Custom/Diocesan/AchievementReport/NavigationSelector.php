@@ -1,18 +1,21 @@
 <?php
 /**
- * ReportSelector
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport;
 
+use Aura\Router\Router;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Schoolbox\User;
 use MSSQL;
 
+/**
+ * Class NavigationSelector
+ *
+ * @package Custom\Diocesan\AchievementReport
+ */
 class NavigationSelector
 {
 
@@ -24,6 +27,7 @@ class NavigationSelector
     public const NCEA_KEY = 'ncea';
     public const IB_KEY = 'ib';
     public const COMMENTS_KEY = 'comments';
+    public const COCURRICULAR_KEY = 'coCurricular';
 
 
     /**
@@ -33,12 +37,14 @@ class NavigationSelector
      */
     private $db;
 
+
     /**
      * An externalUser array
      *
      * @var array
      */
-    private $externalUser = [];
+    private $externalUser;
+
 
     /**
      * User
@@ -47,12 +53,26 @@ class NavigationSelector
      */
     private $user;
 
+
+    /**
+     * @var int|null
+     */
+    private $year;
+
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+
     /**
      * Has NCEA records
      *
      * @var bool
      */
     private $hasNcea = false;
+
 
     /**
      * Has IB records
@@ -61,12 +81,14 @@ class NavigationSelector
      */
     private $hasIb = false;
 
+
     /**
      * Has School Grades
      *
      * @var bool
      */
     private $hasSchoolGrades = false;
+
 
     /**
      * Has Comments
@@ -75,12 +97,22 @@ class NavigationSelector
      */
     private $hasComments = false;
 
+
+    /**
+     * Has Co-Curricular activities
+     *
+     * @var bool
+     */
+    private $hasCoCurricular = false;
+
+
     /**
      * Available navigation options
      *
      * @var array
      */
     private $availableNavigation = [];
+
 
     /**
      * Default report information
@@ -91,22 +123,28 @@ class NavigationSelector
 
 
     /**
-     * Constructor
+     * NavigationSelector constructor.
      *
-     * @param MSSQL $db
-     * @param User $user
-     * @param array $externalUser
+     * @param Router   $router
+     * @param User     $user
+     * @param array    $externalUser
+     * @param MSSQL    $db
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function __construct(MSSQL $db, User $user, array $externalUser)
+    public function __construct(Router $router, User $user, array $externalUser, MSSQL $db, ?int $year)
     {
+        $this->router = $router;
+        $this->user = $user;
         $this->externalUser = $externalUser;
         $this->db = $db;
-        $this->user = $user;
+        $this->year = $year;
 
         /* Determine navigation options
          */
         $this->navigationData();
     }
+
 
     /**
      * Determine default report
@@ -117,21 +155,21 @@ class NavigationSelector
 
         if (($this->user->getYear() >= 1) && ($this->user->getYear() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
-        }
-        elseif (($this->user->getYear() >= 7) && ($this->user->getYear() <= 10)) {
+        } elseif (($this->user->getYear() >= 7) && ($this->user->getYear() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
-        }
-        /* NCEA for year 11 specifically
-         */
-        elseif ($this->user->getYear() == 11) {
+        } elseif ($this->user->getYear() == 11) {
+
+            /* NCEA for year 11 specifically
+             */
             if ($this->hasNcea) {
                 $this->defaultReport = self::NCEA_KEY;
             } else {
                 $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
             }
-        } /* Need to decide whether this is an IB or an NCEA student
-         */
-        elseif (($this->user->getYear() >= 12) && ($this->user->getYear() <= 13)) {
+        } elseif (($this->user->getYear() >= 12) && ($this->user->getYear() <= 13)) {
+
+            /* Need to decide whether this is an IB or an NCEA student
+             */
             if ($this->hasIb) {
                 $this->defaultReport = self::IB_KEY;
             } elseif ($this->hasNcea) {
@@ -142,6 +180,7 @@ class NavigationSelector
         }
     }
 
+
     /**
      * Checks to see how many IB records exist for a person
      * Checks to see how many NCEA records exist for a person
@@ -149,6 +188,9 @@ class NavigationSelector
      * Remembers in a boolean format
      *
      * Facade method
+     *
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function navigationData(): void
     {
@@ -158,34 +200,90 @@ class NavigationSelector
          */
         if ($this->hasNcea()) {
             $this->hasNcea = true;
-            $availableNavigation[self::NCEA_KEY] = 'NCEA';
+
+            $availableNavigation[self::NCEA_KEY] = [
+                'url' => $this->router->generate('achievementreport.getNcea', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'NCEA'
+            ];
         }
 
         /* Conditionally add IB option
          */
         if ($this->hasIb()) {
             $this->hasIb = true;
-            $availableNavigation[self::IB_KEY] = 'IB';
+
+            $availableNavigation[self::IB_KEY] = [
+                'url' => $this->router->generate('achievementreport.getIb', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'IB'
+            ];
         }
 
         /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
             $this->hasSchoolGrades = true;
-            $availableNavigation[self::SCHOOLGRADES_KEY] = 'School Grades';
+
+            $availableNavigation[self::SCHOOLGRADES_KEY] = [
+                'url' => $this->router->generate('achievementreport.getSchoolGrades', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'School Grades'
+            ];
         }
 
         /* Conditionally add Standardised Test option
          */
         if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
-            $availableNavigation[self::STANDARDISEDTEST_KEY] = 'Standardised Test';
+            $availableNavigation[self::STANDARDISEDTEST_KEY] = [
+                'url' => $this->router->generate('achievementreport.getStandardisedTest', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'Standardised Test'
+            ];
         }
 
         /* Conditionally add Comment option
          */
         if ($this->hasComments()) {
             $this->hasComments = true;
-            $availableNavigation[self::COMMENTS_KEY] = 'Comments';
+
+            $availableNavigation[self::COMMENTS_KEY] = [
+                'url' => $this->router->generate('achievementreport.getComments', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'Comments'
+            ];
+        }
+
+        /* PDF Reports
+         * This is a special case: it links to some other url that isn't in the Achievement Report
+         */
+        $availableNavigation['PDF Reports'] = [
+            'url' => "/user/profile/documents/reports/{$this->user->getId()}",
+            'label' => 'PDF Reports'
+        ];
+
+        /* Conditionally add CoCurricular option
+         */
+        if ($this->hasCoCurricular()) {
+            $this->hasCoCurricular = true;
+
+            $availableNavigation[self::COCURRICULAR_KEY] = [
+                'url' => $this->router->generate('achievementreport.getCoCurricular', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'Co-Curricular'
+            ];
         }
 
         $this->availableNavigation = $availableNavigation;
@@ -194,78 +292,96 @@ class NavigationSelector
 
     /**
      * Find out if they are in the Comments table
+     *
+     * @return int
      */
-    private function hasComments()
+    private function hasComments(): int
     {
         $query = "
-            SELECT 
-                TOP 1 COUNT(*) AS 'computed'
-            FROM 
-                dbo.uvSchoolBoxReportComments
-            WHERE 
-                id = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxReportComments
+            WHERE id = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
     }
-    
+
+
     /**
      * Find out if they are in the School Grades table
+     *
+     * @return int
      */
-    private function hasSchoolGrades()
+    private function hasSchoolGrades(): int
     {
         $query = "
-            SELECT
-                TOP 1 COUNT(*) AS 'computed'
-            FROM
-                dbo.uvSchoolBoxSchoolGradeResults
-            WHERE
-                ID = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxSchoolGradeResults
+            WHERE ID = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
     }
+
 
     /**
      * Find out if they are in the NCEA table
+     *
+     * @return int
      */
-    private function hasNcea()
+    private function hasNcea(): int
     {
         $query = "
-            SELECT
-                TOP 1 COUNT(*) AS 'computed'
-            FROM
-                dbo.uvSchoolBoxNCEAResults
-            WHERE
-                ID = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxNCEAResults
+            WHERE ID = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
     }
+
 
     /**
      * Find out if they are in the IB table
+     *
+     * @return int
      */
-    private function hasIb()
+    private function hasIb(): int
     {
         $query = "
-            SELECT
-                TOP 1 COUNT(*) AS 'computed'
-            FROM
-                dbo.uvSchoolBoxIBResults
-            WHERE
-                ID = '{$this->externalUser['StudentID']}'
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxIBResults
+            WHERE ID = '{$this->externalUser['StudentID']}'
         ";
 
         $count = $this->db->getRow($query);
 
-        return $count['computed'];
+        return (int)$count['computed'];
+    }
+
+
+    /**
+     * Find out if they have any data in Co Curricular
+     *
+     * @return int
+     */
+    private function hasCoCurricular(): int
+    {
+        $query = "
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM uvSchoolBoxCoCurricularClasses 
+            WHERE StudentID = '{$this->externalUser['StudentID']}'
+        ";
+
+        $count = $this->db->getRow($query);
+
+        return (int)$count['computed'];
     }
 
 
