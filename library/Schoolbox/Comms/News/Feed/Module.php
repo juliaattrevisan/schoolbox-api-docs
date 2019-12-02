@@ -14,6 +14,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
@@ -109,7 +110,7 @@ class Module extends BaseModule
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'access'                     => $this->getMapperFactory()->getLazy(Access::class),
-            'commentMapper'              => $this->getMapperFactory()->getLazy(\Schoolbox\Discussion\Comment\Mapper::class),
+            'commentMapper'              => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
             'audienceMapper'             => $this->getMapperFactory()->getLazy(News\Audience\Mapper::class),
         ];
     }
