@@ -65,8 +65,10 @@ class Scheduler
 
     /**
      * Execute the importer
+     *
+     * @return void
      */
-    public function run()
+    public function run(): void
     {
        if ($this->isValidScheduleExecution()) {
             $composites = $this->factory->produce(null, $this->type);
