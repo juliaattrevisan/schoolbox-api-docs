@@ -11,7 +11,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\IStrategy;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;

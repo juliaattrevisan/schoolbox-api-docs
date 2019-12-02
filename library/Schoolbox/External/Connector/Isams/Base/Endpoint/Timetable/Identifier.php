@@ -10,7 +10,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\IStrategy;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
  * Class Identifier

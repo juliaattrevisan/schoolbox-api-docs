@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Isams\Base\Endpoint;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -22,7 +23,7 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
-class Composite implements Endpoint\IStrategy
+class Composite implements IStrategy
 {
 
     /**

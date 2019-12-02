@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -27,7 +28,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
-class Composite implements Endpoint\IStrategy
+class Composite implements IStrategy
 {
 
     /**
