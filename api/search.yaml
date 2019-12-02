@@ -70,10 +70,10 @@ components:
           discriminator:
             propertyName: type
             mapping:
-              user: '#/components/schemas/searchResultUser'
-              event: '#/components/schemas/searchResultEvent'
+              user:   '#/components/schemas/searchResultUser'
+              event:  '#/components/schemas/searchResultEvent'
               folder: '#/components/schemas/searchResultFolder'
-              comms: '#/components/schemas/searchResultComms'
+              comms:  '#/components/schemas/searchResultComms'
         relevance:
           description: |
             The relevance of this result to the search query, from 0 to 1
@@ -240,6 +240,22 @@ components:
           format: uri-reference
           nullable: true
 
+    searchResultForum:
+      title: Search result forum
+      description: A forum post found as part of a search.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        url:
+          description: |
+            The URL of the forum post. Will be an anchor link to a post within
+            the context of its thread.
+          type: string
+          format: uri-reference
+
     searchResultFolder:
       title: Search result folder
       description: |
@@ -280,16 +296,18 @@ components:
             - $ref: '#/components/schemas/searchResultTextbox'
             - $ref: '#/components/schemas/searchResultLink'
             - $ref: '#/components/schemas/searchResultTile'
+            - $ref: '#/components/schemas/searchResultForum'
           discriminator:
             propertyName: type
             mapping:
-              event: '#/components/schemas/searchResultEvent'
+              event:      '#/components/schemas/searchResultEvent'
               assessment: '#/components/schemas/searchResultAssessment'
-              comms: '#/components/schemas/searchResultComms'
-              file: '#/components/schemas/searchResultFile'
-              textbox: '#/components/schemas/searchResultTextbox'
-              link: '#/components/schemas/searchResultLink'
-              tile: '#/components/schemas/searchResultTile'
+              comms:      '#/components/schemas/searchResultComms'
+              file:       '#/components/schemas/searchResultFile'
+              textbox:    '#/components/schemas/searchResultTextbox'
+              link:       '#/components/schemas/searchResultLink'
+              tile:       '#/components/schemas/searchResultTile'
+              forum:      '#/components/schemas/searchResultForum'
 
     searchResultFolderSubResultType:
       title: Search result type
