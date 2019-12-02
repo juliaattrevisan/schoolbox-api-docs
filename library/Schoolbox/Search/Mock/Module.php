@@ -48,12 +48,13 @@ class Module extends BaseModule
     {
         // Build a Faker instance and shove it in
         $injector->params[Controller::class] = [
-            'faker' => $injector->lazy(static function () {
+            'resultBuilder' => $injector->lazy(static function () {
                 // Surprised that undefinedClass::class evaluates to "undefinedClass"
-                if (class_exists(Faker\Factory::class)) {
-                    return Faker\Factory::create();
-                }
-                return null;
+                return new ResultBuilder(
+                    class_exists(Faker\Factory::class)
+                        ? Faker\Factory::create()
+                        : null
+                );
             }),
         ];
     }

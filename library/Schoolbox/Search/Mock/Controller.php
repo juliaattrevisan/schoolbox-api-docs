@@ -17,19 +17,19 @@ use Faker\Generator;
 class Controller extends BaseController
 {
     /**
-     * @var Generator|null
+     * @var ResultBuilder
      */
-    private $faker;
+    private $resultBuilder;
 
 
     /**
      * Constructor
      *
-     * @param Generator|null $faker
+     * @param ResultBuilder $resultBuilder
      */
-    public function __construct(?Generator $faker)
+    public function __construct(ResultBuilder $resultBuilder)
     {
-        $this->faker = $faker;
+        $this->resultBuilder = $resultBuilder;
     }
 
 
@@ -42,7 +42,7 @@ class Controller extends BaseController
     public function getSearch(): void
     {
         $this->response->content->set(
-            $this->buildJsonOutput([])
+            $this->buildJsonOutput($this->resultBuilder->generate())
         );
     }
 }
