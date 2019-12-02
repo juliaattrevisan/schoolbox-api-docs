@@ -52,7 +52,8 @@ class ClassPeriod
      * @param  \Schoolbox\External\ClassEntry $class
      * @return $this
      */
-    public function setClass($class) {
+    public function setClass($class)
+    {
         $this->class = $class;
         return $this;
     }
@@ -61,7 +62,8 @@ class ClassPeriod
     /**
      * @return \Schoolbox\External\ClassEntry
      */
-    public function getClass() {
+    public function getClass()
+    {
         return $this->class;
     }
 
@@ -70,7 +72,8 @@ class ClassPeriod
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -79,7 +82,8 @@ class ClassPeriod
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -88,7 +92,8 @@ class ClassPeriod
      * @param  \Schoolbox\External\TimetablePeriod $period
      * @return $this
      */
-    public function setPeriod($period) {
+    public function setPeriod($period)
+    {
         $this->period = $period;
         return $this;
     }
@@ -97,7 +102,8 @@ class ClassPeriod
     /**
      * @return \Schoolbox\External\TimetablePeriod
      */
-    public function getPeriod() {
+    public function getPeriod()
+    {
         return $this->period;
     }
 
@@ -106,7 +112,8 @@ class ClassPeriod
      * @param  string $room
      * @return $this
      */
-    public function setRoom($room) {
+    public function setRoom($room)
+    {
         $this->room = $room;
         return $this;
     }
@@ -115,7 +122,8 @@ class ClassPeriod
     /**
      * @return string
      */
-    public function getRoom() {
+    public function getRoom()
+    {
         return $this->room;
     }
 
@@ -124,7 +132,8 @@ class ClassPeriod
      * @param  string|null $teacherExternalId
      * @return $this
      */
-    public function setTeacher($teacherExternalId) {
+    public function setTeacher($teacherExternalId)
+    {
         $this->teacherExternalId = $teacherExternalId;
         return $this;
     }
@@ -133,7 +142,8 @@ class ClassPeriod
     /**
      * @return string|null
      */
-    public function getTeacher() {
+    public function getTeacher()
+    {
         return $this->teacherExternalId;
     }
 }
