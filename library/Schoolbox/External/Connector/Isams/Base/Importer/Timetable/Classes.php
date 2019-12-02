@@ -297,7 +297,7 @@ class Classes implements IStrategy
                         ));
                     }
 
-                    $this->createTimetableClassInvolvement($users, $student, $timetableClass);
+                    $this->createTimetableClassInvolvement($student, $timetableClass);
                 }
             }
         }
@@ -409,7 +409,6 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class Involvement
      *
-     * @param array      $users
      * @param array      $student
      * @param ClassEntry $timetableClass
      * @return ClassInvolvement
@@ -417,7 +416,7 @@ class Classes implements IStrategy
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createTimetableClassInvolvement(array $users, array $student, ClassEntry $timetableClass): ClassInvolvement
+    private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
     {
 
         /** @var ClassInvolvement $timetableClassInvolvement */
