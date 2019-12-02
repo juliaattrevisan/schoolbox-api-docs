@@ -38,10 +38,11 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const COL_MODULE      = 'module';
 
     // Module column enum
-    public const MODULE_SETTINGS = 'settings';
-    public const MODULE_COMMS    = 'comms';
-    public const MODULE_CUSTOM   = 'custom';
-    public const MODULE_OAUTH    = 'oauth';
+    public const MODULE_SETTINGS   = 'settings';
+    public const MODULE_COMMS      = 'comms';
+    public const MODULE_CUSTOM     = 'custom';
+    public const MODULE_OAUTH      = 'oauth';
+    public const MODULE_SCHOOLDATA = 'schoolData';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -85,17 +86,17 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const TYPE_SAML          = 21;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
-    public const _GLOBAL_MODERATION     = 'global_moderation';
-    public const _PUBLISH_DATE_OFFSET   = 'publish_date_offset';
-    public const _EXPIRY_DATE_OFFSET    = 'news_default_expiry';
-    public const _READ_MORE             = 'read_more';
-    public const _SAVE_FOR_LATER        = 'save_for_later';
-    public const _STAFF_CAN_POST_NEWS   = 'news_staff_post_enabled';
-    public const _NEWS_EDIT_OTHERS      = 'news_edit_other';
-    public const _BOARDER_LEAVE_ENABLED = 'boarder_leave_enabled';
-    public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
-    public const _EXTERNAL_MS_SQL_SERVER_DRIVER = 'external_ms_sql_server_driver';
-    public const COMMS_COMMENTS_ENABLED = 'comms_comments_enabled';
+    public const _GLOBAL_MODERATION              = 'global_moderation';
+    public const _PUBLISH_DATE_OFFSET            = 'publish_date_offset';
+    public const _EXPIRY_DATE_OFFSET             = 'news_default_expiry';
+    public const _READ_MORE                      = 'read_more';
+    public const _SAVE_FOR_LATER                 = 'save_for_later';
+    public const _STAFF_CAN_POST_NEWS            = 'news_staff_post_enabled';
+    public const _NEWS_EDIT_OTHERS               = 'news_edit_other';
+    public const _BOARDER_LEAVE_ENABLED          = 'boarder_leave_enabled';
+    public const _AUDIENCE_TO_FOLDER_TEACHERS    = 'audience_to_folder_users_teachers';
+    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
+    public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';
     public const NAME_EXTERNAL_TYPE              = 'external_type';
     public const NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
 
@@ -169,7 +170,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
             self::TYPE_STRING,
             self::COLUMN_ENUM,
             null,
-            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH,]
+            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH, self::MODULE_SCHOOLDATA]
         );
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
     }

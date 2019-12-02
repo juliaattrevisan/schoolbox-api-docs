@@ -6,8 +6,18 @@
     </div>
 
     <div class="small-12 island">
-        <section class="content">
-            Select things here
-        </section>
+        <form data-action="saveSettings" id="settings" method="post" action="/adminv2/schoolData" novalidate="novalidate" _lpchecked="1">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="schoolData-import-data-source" class="required" aria-required="true">Data Source</label>
+
+                        {{ dump(configContext) }}
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
     </div>
 </div>

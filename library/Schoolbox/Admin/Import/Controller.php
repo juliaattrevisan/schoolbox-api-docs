@@ -8,9 +8,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import;
 
+use Alaress\Database\Predicate;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\Settings\ModuleConfig;
+use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 
 /**
  * Class Controller
@@ -19,7 +26,7 @@ use Schoolbox\Admin\Import\Navigation\SchoolData;
  *
  * @package Schoolbox\Admin\Import
  */
-class Controller extends Base
+class Controller extends ConfigController
 {
 
     /**
@@ -47,9 +54,34 @@ class Controller extends Base
      */
     public function getSchoolDataIndex()
     {
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate(),
+            $this->router->generate('adminImportIndex.postSchoolDataOptions')
+        );
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => 'import/schoolData',
-            'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes()
+            'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
+            'configContext' => $configContext
         ])->setTitle('School Data Import'));
+    }
+
+
+    public function postSchoolDataOptions()
+    {
+        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
+    }
+
+
+    /**
+     * Returns a predicate builder for finding all custom config for this module
+     *
+     * @return \Alaress\Database\Predicate\Builder
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    private function buildConfigPredicate(): Predicate\Builder
+    {
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SCHOOLDATA);
     }
 }
