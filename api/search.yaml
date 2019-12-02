@@ -127,8 +127,6 @@ components:
     searchResultAssessment:
       title: Search result assessment
       description: An assessment found as part of a search.
-      # TODO move this definition to its own place
-      # TODO consider adding _links (for things like completion status)
       type: object
       properties:
         id:
@@ -146,16 +144,16 @@ components:
 
     searchResultComms:
       title: Search result comms article
-      description: An comms article found as part of a search.
-      # TODO move this definition to its own place
-      # TODO consider adding _links (for things like completion status)
+      description: |
+        A comms article found as part of a search.
+
+        The full content is not included: the summary of what matches will be
+        included within the "summary" property of the match.
       type: object
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
         title:
-          type: string
-        blurb:
           type: string
         publish:
           $ref: '#/components/schemas/searchResultDateTime'
@@ -179,22 +177,28 @@ components:
     searchResultFile:
       title: Search result file
       description: A file found as part of a search.
-      # TODO move this definition to its own place
-      # TODO consider adding _links (for things like download/modify/etc.)
       type: object
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
-        title:
+        name:
+          description: The file's filename
           type: string
-        type:
+        mimetype:
+          description: The file's mimetype
           type: string
+        size:
+          description: The file's size, in bytes
+          type: integer
+          minimum: 0
+        url:
+          description: The URL from which the file may be downloaded.
+          type: string
+          format: uri-reference
 
     searchResultLink:
       title: Search result link
       description: A link found as part of a search.
-      # TODO move this definition to its own place
-      # TODO consider adding _links (for things like download/modify/etc.)
       type: object
       properties:
         id:
@@ -202,13 +206,13 @@ components:
         title:
           type: string
         url:
+          description: The URL to which this link points to.
           type: string
+          format: uri-reference
 
     searchResultTile:
       title: Search result tile
       description: A tile found as part of a search.
-      # TODO move this definition to its own place
-      # TODO consider adding _links (for things like download/modify/etc.)
       type: object
       properties:
         id:
@@ -216,9 +220,15 @@ components:
         title:
           type: string
         url:
+          description: The URL to which this tile points to, if any.
           type: string
-        backgroundImage:
+          format: uri-reference
+          nullable: true
+        backgroundImageUrl:
+          description: The URL of this tile's background image, if any.
           type: string
+          format: uri-reference
+          nullable: true
 
     searchResultFolder:
       title: Search result folder
@@ -226,8 +236,6 @@ components:
         A folder found as part of a search.
 
         May contain sub-results.
-      # TODO move this definition to its own place
-      # TODO consider adding _links (for things like completion status)
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
@@ -242,6 +250,9 @@ components:
       title: Search result folder sub-result
       description: |
         A result found within a folder as part of a search.
+
+        Relevance isn't included within folder contents search results: the
+        folder's relevance itself is what is considered relevant.
       type: object
       properties:
         type:
