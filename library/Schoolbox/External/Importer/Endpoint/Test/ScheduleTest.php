@@ -159,49 +159,49 @@ class ScheduleTest extends TestCase
     {
         return [
             'Daily 1' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 00:59:59'),
                 false
             ],
 
             'Daily 2' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 01:00:00'),
                 true
             ],
 
             'Daily 3' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 01:59:59'),
                 true
             ],
 
             'Daily 4' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 02:00:00'),
                 false
             ],
 
             'Daily 5' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 12:59:59'),
                 false
             ],
 
             'Daily 6' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 13:00:00'),
                 false
             ],
 
             'Daily 7' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 13:59:59'),
                 false
             ],
 
             'Daily 8' => [
-                Scheduler::TWICE_DAILY,
+                Scheduler::DAILY,
                 strtotime('2019-12-02 14:00:00'),
                 false
             ],
