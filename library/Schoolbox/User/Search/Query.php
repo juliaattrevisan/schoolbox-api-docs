@@ -83,7 +83,7 @@ class Query
     {
         $result = [];
 
-        $users = UserMapper::getInstance()->findByColumn('id', $userIds, ['order'=>['lastname'=>'ASC', 'firstname' => 'ASC']]);
+        $users = UserMapper::getInstance()->findByColumn('id', $userIds);
 
         foreach ($users as $key => $user) {
             $result[$key]['id']             = $user->getId();
@@ -94,6 +94,10 @@ class Query
             $result[$key]['metadata']       = $user->formatMetadata();
             $result[$key]['year']           = $user->getYear();
         }
+
+        usort($result, function ($a, $b) {
+            return strnatcmp($a['formattedName'], $b['formattedName']);
+        });
 
         return $result;
     }
@@ -158,20 +162,23 @@ class Query
     {
         $whereParts = [
             '(
-                CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstAndLastName
-                OR CONCAT_WS(" ", u.title, u.lastname) LIKE :lastname
+                CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstLastNameWithTitle
+                OR CONCAT_WS(" ", u.firstname, u.lastname) LIKE :firstAndLastNameOnly
+                OR CONCAT_WS(" ", u.title, u.lastname) LIKE :titleAndLastnameOnly
+                OR u.firstname LIKE :firstname
+                OR u.lastname LIKE :lastname
                 OR u.username LIKE :username
-                OR soundex(u.firstname) = soundex(:sfirstname)
-                OR soundex(u.lastname) = soundex(:slastname)
             )',
             'u.deleted_at IS NULL'
         ];
+
         $params = [
-            'firstAndLastName'  => $keyword,
-            'lastname'          => $keyword,
-            'username'          => $keyword,
-            'sfirstname'        => $keyword,
-            'slastname'         => $keyword,
+            'firstLastNameWithTitle'    => $keyword,
+            'firstAndLastNameOnly'      => $keyword,
+            'titleAndLastnameOnly'      => $keyword,
+            'firstname'                 => $keyword,
+            'lastname'                  => $keyword,
+            'username'                  => $keyword,
         ];
 
         /**

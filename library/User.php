@@ -219,11 +219,12 @@ class User extends DeprecatedModel
         $wherePart = sprintf("( synergy_id = '%s'", $this->db->quote($keyword));
         if (mb_strlen($keyword, 'UTF-8') >= 2) {
             $wherePart .= sprintf(
-                " OR CONCAT_WS(' ',title,firstname,lastname) LIKE '%1\$s'
-                OR CONCAT_WS(' ',title,lastname) LIKE '%1\$s'
-                OR username LIKE '%1\$s' 
-                OR soundex(firstname) = soundex('%1\$s') 
-                OR soundex(lastname) = soundex('%1\$s') ",
+                " OR CONCAT_WS(' ', title, firstname, lastname) LIKE '%1\$s'
+                OR CONCAT_WS(' ', firstname, lastname) LIKE '%1\$s'
+                OR CONCAT_WS(' ', title, lastname) LIKE '%1\$s'
+                OR firstname LIKE '%1\$s'
+                OR lastname LIKE '%1\$s'
+                OR username LIKE '%1\$s' ",
                 $this->db->quote('%' . $this->db->escapeForLike($keyword) . '%')
             );
         }
