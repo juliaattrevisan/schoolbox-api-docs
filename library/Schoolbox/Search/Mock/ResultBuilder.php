@@ -33,7 +33,7 @@ class ResultBuilder
         self::RESULT_TYPE_USER,
 //        self::RESULT_TYPE_EVENT,
         self::RESULT_TYPE_FOLDER,
-//        self::RESULT_TYPE_COMMS,
+        self::RESULT_TYPE_COMMS,
     ];
 
 
@@ -123,6 +123,11 @@ class ResultBuilder
                     'content' => $this->generateFolder($baseResult['id']),
                 ];
 
+            case self::RESULT_TYPE_COMMS:
+                return $baseResult + [
+                    'content' => $this->generateComms($baseResult['id']),
+                ];
+
             case self::RESULT_TYPE_USER:
             default:
                 return $baseResult + [
@@ -151,15 +156,34 @@ class ResultBuilder
 
 
     /**
-     * Generate a folder.
+     * Generate a folder result.
      *
      * @param int $id
-     * @return Folder
+     * @return array
      */
-    private function generateFolder(int $id): Folder
+    private function generateFolder(int $id): array
     {
-        return (new Folder())
-            ->setId($id)
-            ->setName($this->faker->bs);
+        return [
+            'id'         => $id,
+            'title'      => $this->faker->bs,
+            'subResults' => [],
+        ];
+    }
+
+
+    /**
+     * Generate a fake comms article result.
+     *
+     * @param int $id
+     * @return array
+     */
+    private function generateComms(int $id): array
+    {
+        return [
+            'id'      => $id,
+            'title'   => $this->faker->sentence(5),
+            'publish' => $this->faker->dateTimeBetween('-1 year', '-1 day')->format(\DateTime::RFC3339),
+            'archive' => $this->faker->dateTimeBetween('+1 day', '+1 year')->format(\DateTime::RFC3339),
+        ];
     }
 }
