@@ -47,7 +47,7 @@ class Controller extends Base
      */
     public function getSchoolDataIndex()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/navigation/schoolData.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => 'import/schoolData',
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('School Data Import'));
