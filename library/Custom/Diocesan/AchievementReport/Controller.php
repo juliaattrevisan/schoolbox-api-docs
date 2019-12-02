@@ -10,7 +10,17 @@ use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATHeading;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATListeningComprehension;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATNavigation;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingComprehension;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingVocabulary;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATTable;
+use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATListeningComprehension;
+use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATMathematics;
+use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingComprehension;
+use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingVocabulary;
 use MSSQL;
 use Schoolbox\User;
 
@@ -152,6 +162,41 @@ class Controller extends Base {
      */
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
+
+        /* Each graph's payload and visibility status
+         */
+        $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $year))->findData();
+
+        $PATMathematics = [
+            'data' => $mathematicsPayload->getData(),
+            'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
+        ];
+
+        $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $year))->findData();
+
+        $PATListeningComprehension = [
+            'data' => $listeningComprehensionPayload->getData(),
+            'visible' => (new ValidPATListeningComprehension())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
+        ];
+
+        $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $db, $year))->findData();
+
+        $PATReadingVocabulary = [
+            'data' => $readingVocabularyPayload->getData(),
+            'visible' => (new ValidPATReadingVocabulary())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
+        ];
+
+        $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $db, $year))->findData();
+
+        $PATReadingComprehension = [
+            'data' => $readingComprehensionPayload->getData(),
+            'visible' => (new ValidPATReadingComprehension())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
+        ];
+
+        /* PAT Graph heading is only visible when there's at least one graph to show
+         */
+        $headingVisible = $PATMathematics['visible'] || $PATListeningComprehension['visible'] || $PATReadingVocabulary['visible'] || $PATReadingComprehension['visible'];
+
         $this->getResponse()->content->set(array(
             'template' => '@standardisedTest/index.twig',
             'data' => [
@@ -161,6 +206,7 @@ class Controller extends Base {
                 ),
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'year' => $year,
 
                 'subnavigation' => [
                     'all' => (new Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
@@ -170,7 +216,19 @@ class Controller extends Base {
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
 
-                'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData()
+                'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData(),
+                'PATNavigation' => [
+                    'all' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
+                    'selected' => $year ?? (int)date('Y')
+                ],
+                'PATHeading' => [
+                    'label' => (new PATHeading($user, $externalUser, $db, $year))->findData(),
+                    'visible' => $headingVisible
+                ],
+                'PATMathematics' => $PATMathematics,
+                'PATListeningComprehension' => $PATListeningComprehension,
+                'PATReadingVocabulary' => $PATReadingVocabulary,
+                'PATReadingComprehension' => $PATReadingComprehension
             ]
         ));
     }

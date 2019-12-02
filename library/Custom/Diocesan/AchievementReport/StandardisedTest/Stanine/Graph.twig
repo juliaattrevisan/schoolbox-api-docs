@@ -1,0 +1,67 @@
+{##
+ # PAT Graph
+ #
+ # @param string identifier  the div in which to spawn the graph
+ # @param array  data        series data for student, diocesan, national
+ # @param string title       graph title
+ # @param string yAxis       y axis label
+ #}
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script>
+    $(function () {
+        $('#{{ identifier }}').highcharts({
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: true
+            },
+            series: [
+                {
+                    color: '#17419b',
+                    data: [{{ series.diocesan|join(',') }}],
+                    name: 'Diocesan %',
+                    type: 'column'
+
+                },
+                {
+                    color: '#a01c1c',
+                    data: [{{ series.national|join(',') }}],
+                    name: 'National %',
+                    type: 'spline'
+
+                },
+                {
+                    color: '#bfaf03',
+                    data: [{{ series.student|join(',') }}],
+                    marker: {
+                        lineColor: '#847700',
+                        lineWidth: 1,
+                        radius: 7,
+                        symbol: 'url(/custom/diocesan/achievementreport/img/star.png)'
+                    },
+                    showInLegend: false,
+                    type: 'scatter'
+                }
+            ],
+            title: {
+                text: '{{ title }}'
+            },
+            tooltip: {
+                enabled: false
+            },
+            xAxis: {
+
+                {# I think these stay the same, so I've hardcoded them for now #}
+                categories: [1,2,3,4,5,6,7,8,9]
+            },
+            yAxis: {
+                title: {
+                    text: '{{ yAxis }}'
+                }
+            }
+        });
+    });
+</script>
+
+<div id="{{ identifier }}" class="stanine"></div>
