@@ -35,7 +35,7 @@ class ValidScheduleExecution
          * If it is, just do it
          * Otherwise, noop
          */
-        if (($frequency == Scheduler::TWICE_DAILY) && (4 === date('g', $now))) {
+        if (($frequency == Scheduler::TWICE_DAILY) && (4 === (int)date('g', $now))) {
             return true;
         }
 
@@ -44,7 +44,7 @@ class ValidScheduleExecution
          * If it is, just do it
          * Otherwise, noop
          */
-        if (($frequency == Scheduler::DAILY) && (1 == date('G', $now))) {
+        if (($frequency == Scheduler::DAILY) && (1 === (int)date('G', $now))) {
             return true;
         }
 
