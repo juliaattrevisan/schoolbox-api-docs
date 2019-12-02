@@ -93,7 +93,7 @@ class Scheduler
      *
      * @return bool
      */
-    private function isValidScheduleExecution(): bool
+    public function isValidScheduleExecution(): bool
     {
         /* If the frequency is hourly, just do it
          * We'll make the assumption that Support won't configure it
