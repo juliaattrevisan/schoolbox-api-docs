@@ -7,7 +7,7 @@
          * @param decider
          */
         function initOptions(dataSource) {
-            if ($(dataSource).val() == 'csv') {
+            if ($(dataSource).val() == 'csv' || $(dataSource).val() == '') {
                 $('#schooldata_import_batchxml_host').parent('div').hide();
                 $('#schooldata_import_batchxml_key').parent('div').hide();
                 $('#schooldata_import_frequency').parent('div').hide();
