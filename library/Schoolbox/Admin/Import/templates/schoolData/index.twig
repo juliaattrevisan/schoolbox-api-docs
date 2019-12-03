@@ -9,31 +9,7 @@
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
          #}
-        if ('{{ dataSource }}' == '') {
-            $('#csv-island').hide();
-            $('#schooldata_import_batchxml_host').parent('div').hide();
-            $('#schooldata_import_batchxml_key').parent('div').hide();
-            $('#schooldata_import_frequency').parent('div').hide();
-        }
-        else if ('{{ dataSource }}' == 'csv') {
-
-            {# If it's csv island, just show that
-             # Hide the config island
-             #}
-            $('#csv-island').show();
-            $('#schooldata_import_batchxml_host').parent('div').hide();
-            $('#schooldata_import_batchxml_key').parent('div').hide();
-            $('#schooldata_import_frequency').parent('div').hide();
-        } else {
-
-            {# Otherwise, show the config island and hide the csv island
-             # Show the host/key/frequency input elements
-             #}
-            $('#csv-island').hide();
-            $('#schooldata_import_batchxml_host').parent('div').show();
-            $('#schooldata_import_batchxml_key').parent('div').show();
-            $('#schooldata_import_frequency').parent('div').show();
-        }
+        switchIslands('{{ dataSource }}');
 
         {# Show the container that we originally hid
          #}
@@ -43,12 +19,28 @@
          # it's one of either csv island or config island
          #}
         $('#schooldata_import_data_source').on('change', function(event) {
-            if ($(this).val() == '') {
+            switchIslands($(this).val());
+        });
+
+        /**
+         * Switch configuration options
+         *
+         * If you haven't chosen anything, hide both csv and config islands
+         * If you chose csv island, just show that and hide config island
+         * Otherwise show config island and hide the csv island
+         *
+         * @param val
+         */
+        function switchIslands(dataSource) {
+
+            {# If you haven't chosen anything, hide both csv and config islands
+             #}
+            if (dataSource == '') {
                 $('#csv-island').hide();
                 $('#schooldata_import_batchxml_host').parent('div').hide();
                 $('#schooldata_import_batchxml_key').parent('div').hide();
                 $('#schooldata_import_frequency').parent('div').hide();
-            } else if ($(this).val() == 'csv') {
+            } else if (dataSource == 'csv') {
 
                 {# If it's csv island, just show that
                  # Hide the config island
@@ -67,7 +59,7 @@
                 $('#schooldata_import_batchxml_key').parent('div').show();
                 $('#schooldata_import_frequency').parent('div').show();
             }
-        });
+        }
     });
 </script>
 
