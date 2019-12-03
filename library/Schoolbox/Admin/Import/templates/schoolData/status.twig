@@ -4,12 +4,10 @@
  # Get a report about an endpoint's availability and what it's producing
  # These are unique to each sis so isams will do it differently to kamar et al.
  #
- # @param IStatus status
+ # @param bool isReachable
  #}
-<section class="content">
-    {% if status.reachable %}
-    <span class="full-width success label">Online</span>
-    {% else %}
-    <span class="full-width alert label">Unavailable</span>
-    {% endif %}
-</section>
+{% if isReachable %}
+<span class="full-width success label">Online</span>
+{% else %}
+<span class="full-width alert label">Unavailable</span>
+{% endif %}

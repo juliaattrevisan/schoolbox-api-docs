@@ -68,7 +68,7 @@ class Controller extends ConfigController
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
             'configContext' => $configContext,
-            'statusRoute' => $this->getRouter()->generate('adminImportIndex.getStatus'),
+            'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
         ])->setTitle('School Data Import'));
     }
 
@@ -104,14 +104,14 @@ class Controller extends ConfigController
     /**
      * Build asynchronous status report
      */
-    public function getStatus()
+    public function getStatusIndicator()
     {
         $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
-            'status' => (new Endpoint\Status\Factory($host, $key))->produce($type)
+            'isReachable' => (new Endpoint\Status\Factory($host, $key))->produce($type)->isReachable()
         ]));
     }
 }

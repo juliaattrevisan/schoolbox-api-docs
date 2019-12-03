@@ -131,7 +131,7 @@
     <div class="small-12 island" id="config-island">
         <h3 class="subheader">Status</h3>
 
-        <div id="status-container">
+        <div id="status-indicator-container">
             <section class="content">
                 <div class="loader"></div>
             </section>
@@ -139,8 +139,8 @@
 
         <script>
             $(function() {
-                $.get('{{ statusRoute }}', function(response) {
-                    $('#status-container').html(response);
+                $.get('{{ statusIndicatorRoute }}', function(response) {
+                    $('#status-indicator-container').html(response);
                 });
             });
         </script>
