@@ -49,13 +49,20 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
-        $api = new Api($this->host, $this->key);
+        try {
+            $api = new Api($this->host, $this->key);
 
-        $batchxml = new Batchxml($api);
+            $batchxml = new Batchxml($api);
 
-        $result = $batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
+            $result = $batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
-        return (bool)$result;
+            return true;
+        } catch (\RuntimeException|InvalidUriPartException|InvalidArgumentException $e) {
+
+            // noop
+        }
+
+        return false;
     }
 
 
