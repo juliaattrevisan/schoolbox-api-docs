@@ -31,7 +31,7 @@ class ResultBuilder
 
     private const RESULT_TYPES_BASE = [
         self::RESULT_TYPE_USER,
-//        self::RESULT_TYPE_EVENT,
+        self::RESULT_TYPE_EVENT,
         self::RESULT_TYPE_FOLDER,
         self::RESULT_TYPE_COMMS,
     ];
@@ -128,6 +128,11 @@ class ResultBuilder
                     'content' => $this->generateComms($baseResult['id']),
                 ];
 
+            case self::RESULT_TYPE_EVENT:
+                return $baseResult + [
+                    'content' => $this->generateEvent($baseResult['id']),
+                ];
+
             case self::RESULT_TYPE_USER:
             default:
                 return $baseResult + [
@@ -184,6 +189,26 @@ class ResultBuilder
             'title'   => $this->faker->sentence(5),
             'publish' => $this->faker->dateTimeBetween('-1 year', '-1 day')->format(\DateTime::RFC3339),
             'archive' => $this->faker->dateTimeBetween('+1 day', '+1 year')->format(\DateTime::RFC3339),
+        ];
+    }
+
+
+    /**
+     * Generate a fake event result.
+     *
+     * @param int $id
+     * @return array
+     */
+    private function generateEvent(int $id): array
+    {
+        $allDay     = $this->faker->boolean(25);
+        $dateFormat = $allDay ? 'Y-m-d' : \DateTime::RFC3339;
+        return [
+            'id'     => $id,
+            'title'  => $this->faker->sentence(5),
+            'allDay' => $allDay,
+            'start'  => $this->faker->dateTimeBetween('-1 week', '-1 hour')->format($dateFormat),
+            'end'    => $this->faker->dateTimeBetween('+1 hour', '+1 week')->format($dateFormat),
         ];
     }
 }
