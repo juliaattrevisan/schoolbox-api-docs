@@ -54,21 +54,25 @@ class Specification
     /**
      * Specification constructor.
      *
-     * @param LoggerInterface $log
-     * @param Batchxml        $batchxml
+     * @param LoggerInterface|null $log
+     * @param Batchxml             $batchxml
      */
-    public function __construct(LoggerInterface $log, Batchxml $batchxml) {
+    public function __construct(?LoggerInterface $log, Batchxml $batchxml) {
         $this->log = $log;
         $this->batchxml = $batchxml;
     }
 
 
     /**
+     * Get a list of nodes that did, or didn't, get configured properly
+     *
+     * @return array
+     *
      * @throws \RuntimeException
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
      */
-    public function check(): void
+    public function check(): array
     {
         $paths = [
 
@@ -236,10 +240,28 @@ class Specification
 
         $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
 
+        $messages = [];
+
         foreach ($paths as $path) {
             $paddedPath = str_pad($path, $paddedLength);
 
-            $this->batchxml->fetchXml($path) ? $this->log->info("{$paddedPath} " . self::STATUS_OK) : $this->log->warning("{$paddedPath} " . self::STATUS_MISSING);
+            if ($this->batchxml->fetchXml($path)) {
+                $message = "{$paddedPath} " . self::STATUS_OK;
+
+                if ($this->log) {
+                    $this->log->info($message);
+                }
+            } else {
+                $message = "{$paddedPath} " . self::STATUS_MISSING;
+
+                if ($this->log) {
+                    $this->log->warning($message);
+                }
+            }
+
+            $messages[] = $message;
         }
+
+        return $messages;
     }
 }

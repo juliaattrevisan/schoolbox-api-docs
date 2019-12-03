@@ -73,9 +73,23 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
+        $api = new Api($this->host, $this->key);
 
-        /* Get Specification.php's contents and drop it here
-         */
-        return '';
+        $specification = new Specification(
+            null,
+            new Batchxml($api)
+        );
+
+        try {
+            return implode("\n", $specification->check());
+        } catch (\RuntimeException $e) {
+            return ["Cannot access api endpoint: {$e->getMessage()}"];
+        } catch (InvalidUriPartException $e) {
+            return ["Cannot access api endpoint, bad url: {$e->getMessage()}"];
+        } catch (InvalidArgumentException $e) {
+            return ["Cannot access api endpoint, bad url: {$e->getMessage()}"];
+        }
+
+        return [];
     }
 }
