@@ -1,36 +1,73 @@
 <script>
     $(function() {
 
-        /**
-         * Init the available options based on the Data Source selected
-         *
-         * @param decider
-         */
-        function initOptions(dataSource) {
-            if ($(dataSource).val() == 'csv' || $(dataSource).val() == '') {
+        {# Hide the container that has both the system-generated config vars
+         # and the handcrafted csv island - this stops a visual glitch when
+         # we have to use javascript to hide/show one or the other
+         #}
+
+        {# On document.ready, using dataSource, decide which island to show:
+         # it's one of either csv island or config island
+         #}
+        if ('{{ dataSource }}' == '') {
+            $('#csv-island').hide();
+            $('#schooldata_import_batchxml_host').parent('div').hide();
+            $('#schooldata_import_batchxml_key').parent('div').hide();
+            $('#schooldata_import_frequency').parent('div').hide();
+        }
+        else if ('{{ dataSource }}' == 'csv') {
+
+            {# If it's csv island, just show that
+             # Hide the config island
+             #}
+            $('#csv-island').show();
+            $('#schooldata_import_batchxml_host').parent('div').hide();
+            $('#schooldata_import_batchxml_key').parent('div').hide();
+            $('#schooldata_import_frequency').parent('div').hide();
+        } else {
+
+            {# Otherwise, show the config island and hide the csv island
+             # Show the host/key/frequency input elements
+             #}
+            $('#csv-island').hide();
+            $('#schooldata_import_batchxml_host').parent('div').show();
+            $('#schooldata_import_batchxml_key').parent('div').show();
+            $('#schooldata_import_frequency').parent('div').show();
+        }
+
+        {# Show the container that we originally hid
+         #}
+        $('#option-container').removeClass('hide');
+
+        {# On dataSource change, decide which island to show:
+         # it's one of either csv island or config island
+         #}
+        $('#schooldata_import_data_source').on('change', function(event) {
+            if ($(this).val() == '') {
+                $('#csv-island').hide();
+                $('#schooldata_import_batchxml_host').parent('div').hide();
+                $('#schooldata_import_batchxml_key').parent('div').hide();
+                $('#schooldata_import_frequency').parent('div').hide();
+            } else if ($(this).val() == 'csv') {
+
+                {# If it's csv island, just show that
+                 # Hide the config island
+                 #}
+                $('#csv-island').show();
                 $('#schooldata_import_batchxml_host').parent('div').hide();
                 $('#schooldata_import_batchxml_key').parent('div').hide();
                 $('#schooldata_import_frequency').parent('div').hide();
             } else {
+
+                {# Otherwise, show the config island and hide the csv island
+                 # Show the host/key/frequency input elements
+                 #}
+                $('#csv-island').hide();
                 $('#schooldata_import_batchxml_host').parent('div').show();
                 $('#schooldata_import_batchxml_key').parent('div').show();
                 $('#schooldata_import_frequency').parent('div').show();
             }
-        }
-
-        {# Set up all the options
-         # Set up the event listeners
-         # Un-hide the container element when everything is ready to avoid visual artefact
-         #}
-        initOptions($('#schooldata_import_data_source'));
-
-        $('#schooldata_import_data_source').on('change', function(event) {
-            event.preventDefault();
-
-            initOptions($(this));
         });
-
-        $('#option-container').removeClass('hide');
     });
 </script>
 
@@ -43,40 +80,11 @@
 </div>
 
 <div class="row hide" id='option-container'>
-    <div class="small-12 columns">
+    <div class="small-12 columns" id="config-island">
         {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
+    <div class="small-12 columns" id="csv-island">
+        {% include '@adminImportIndex/schoolData/csv.twig' with {allNavigation: allNavigation} %}
+    </div>
 </div>
-
-{# Hide the container that has both the system-generated config vars
- # and the handcrafted csv island - this stops a visual glitch when
- # we have to use javascript to hide/show one or the other
- #}
-
-{# On document.ready, using dataSource, decide which island to show:
- # it's one of either csv island or config island
- #}
-
-    {# If it's csv island, just show that
-     # Hide the config island
-     #}
-
-    {# Otherwise, show the config island and hide the csv island
-     # Show the host/key/frequency input elements
-     #}
-
-    {# Show the container that we originally hid
-     #}
-
-{# On dataSource change, decide which island to show:
- # it's one of either csv island or config island
- #}
-
-    {# If it's csv island, just show that
-     # Hide the config island
-     #}
-
-    {# Otherwise, show the config island and hide the csv island
-     # Show the host/key/frequency input elements
-     #}
 
