@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
-use Schoolbox\External\Importer\Endpoint\IStatus;
+use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
  * Class Status

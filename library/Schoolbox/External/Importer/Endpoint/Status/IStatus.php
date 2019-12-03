@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Importer\Endpoint;
+namespace Schoolbox\External\Importer\Endpoint\Status;
 
 /**
  * Interface IStatus
