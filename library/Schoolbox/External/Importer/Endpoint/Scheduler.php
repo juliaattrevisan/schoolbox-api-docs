@@ -73,7 +73,7 @@ class Scheduler
              * Either you chose an invalid $type or you don't need a $type at all (csv imports)
              */
             if (null === $composites) {
-               exit;
+                exit;
             }
 
             try {
