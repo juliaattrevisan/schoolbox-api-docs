@@ -88,11 +88,11 @@ class Status implements IStatus
         try {
             return implode("\n", $specification->check());
         } catch (\RuntimeException $e) {
-            return ["Cannot access api endpoint: {$e->getMessage()}"];
+            return "Cannot access api endpoint: {$e->getMessage()}";
         } catch (InvalidUriPartException $e) {
-            return ["Cannot access api endpoint, bad url: {$e->getMessage()}"];
+            return "Cannot access api endpoint, bad url: {$e->getMessage()}";
         } catch (InvalidArgumentException $e) {
-            return ["Cannot access api endpoint, bad url: {$e->getMessage()}"];
+            return "Cannot access api endpoint, bad url: {$e->getMessage()}";
         }
 
         return '';
