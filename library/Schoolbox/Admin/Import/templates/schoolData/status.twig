@@ -14,6 +14,18 @@
     {% endif %}
 </section>
 
+<style type="text/css">
+    .schooldata-statusreport-container {
+        max-height: 25rem;
+    }
+
+    .schooldata-statusreport-container pre {
+        font-size: 0.8rem;
+    }
+</style>
+
 <section class="content">
-    <pre>{{ status.report }}</pre>
+    <div class="scrollable schooldata-statusreport-container">
+        <pre>{{ status.report }}</pre>
+    </div>
 </section>
