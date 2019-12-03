@@ -46,7 +46,7 @@ class Controller extends ConfigController
     public function getDirectIndex()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct/index.twig', [
-            'pageCurrent' => 'import/direct',
+            'pageCurrent' => 'import/directImport',
             'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('Direct Import'));
     }
@@ -67,7 +67,7 @@ class Controller extends ConfigController
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
-            'pageCurrent' => 'import/schoolData',
+            'pageCurrent' => 'import/schoolDataImport',
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
             'logPath' => $this->getConfigLoader()->get('logs_dir') . '/' . self::LOG_FILE,
