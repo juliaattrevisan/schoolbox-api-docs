@@ -209,4 +209,67 @@ class ScheduleTest extends TestCase
             ],
         ];
     }
+
+
+    /**
+     * @dataProvider provider_validNoneScheduleFrequency
+     *
+     * @param string $frequency
+     * @param int    $now
+     * @param bool   $expected
+     */
+    public function testNoneScheduleFrequency(string $frequency, int $now, bool $expected): void
+    {
+        $scheduler = new ValidScheduleExecution();
+
+        $this->assertEquals($expected, $scheduler->isSatisfiedBy($frequency, $now));
+    }
+
+
+    /**
+     * When no schedule is chosen, do nothing
+     *
+     * @return array
+     */
+    public function provider_validNoneScheduleFrequency(): array
+    {
+        return [
+            'No schedule 1' => [
+                '',
+                strtotime('2019-12-02 17:13:00'),
+                false
+            ],
+            'No schedule 2' => [
+                '      ',
+                strtotime('2019-12-02 17:13:00'),
+                false
+            ],
+            'No schedule 3' => [
+                ' -- ',
+                strtotime('2019-12-02 17:13:00'),
+                false
+            ],
+            'No schedule 4' => [
+                'aslfjl;23j4 2l3j4lj;sjaf;jlkSJFU*(',
+                strtotime('2019-12-02 17:13:00'),
+                false
+            ],
+            'No schedule 5' => [
+                'null',
+                strtotime('2019-12-02 17:13:00'),
+                false
+            ],
+
+            'No schedule 6' => [
+                'None',
+                strtotime('2019-12-02 17:13:00'),
+                false
+            ],
+            'No schedule 7' => [
+                'none',
+                strtotime('2019-12-02 17:13:00'),
+                false
+            ],
+        ];
+    }
 }
