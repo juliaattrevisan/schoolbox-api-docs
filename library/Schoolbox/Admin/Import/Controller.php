@@ -76,6 +76,15 @@ class Controller extends ConfigController
     }
 
 
+    /**
+     * Save the configuration for School Data Import's chosen mechanism
+     *
+     * @throws Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
     public function postSchoolDataOptions()
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
