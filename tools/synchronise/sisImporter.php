@@ -77,7 +77,7 @@ HELP;
             exit;
         }
 
-        /* Spawn api based on args
+        /* Spawn composites based on args
          *
          * This gives you the cli choice of loading from an api endpoint
          * or a locally-cached xml file instead
@@ -85,10 +85,7 @@ HELP;
         $host = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
         $file = $this->getOpt(self::OPT_LONG_FILE);
-
-        /* TODO: Replace with config var
-         */
-        $type = Endpoint\Factory::ISAMS;
+        $type = $this->getConfig()->get('schooldata_import_data_source');
 
         $composites = (new Endpoint\Factory($host, $key, $this->perform(), $this->getLogger()))->produce($file, $type);
 

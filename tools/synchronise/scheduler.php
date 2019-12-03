@@ -68,21 +68,12 @@ HELP;
             exit;
         }
 
-        /* Spawn api based on args
-         *
-         * This gives you the cli choice of loading from an api endpoint
-         * or a locally-cached xml file instead
+        /* Spawn scheduler based on args
          */
         $host = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
-
-        /* TODO: Replace with config var
-         */
-        $type = Endpoint\Factory::ISAMS;
-
-        /* TODO: Replace with config var
-         */
-        $frequency = Endpoint\Scheduler::HOURLY;
+        $type = $this->getConfig()->get('schooldata_import_data_source');
+        $frequency = $this->getConfig()->get('schooldata_import_frequency');
 
         /* This always perform updates
          */
