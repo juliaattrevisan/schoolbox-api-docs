@@ -6,11 +6,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Iterator;
 use RuntimeException;
-use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use SimpleXMLElement;
 
 /**
@@ -19,7 +19,7 @@ use SimpleXMLElement;
  * Iterate a series of Schedule elements (these correspond to when periods occur)
  * and collate all the people and details involved
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
  */
 class ScheduleIterator implements Iterator
 {

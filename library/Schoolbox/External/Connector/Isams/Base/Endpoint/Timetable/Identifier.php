@@ -6,11 +6,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
  * Class Identifier
@@ -18,7 +18,7 @@ use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
  * Get a quick list of all the timetable ids that you need to shank into ext_timetable_code
  * This is used to bridge the gap between isams and schoolbox concepts of campus-specific timetables
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
  */
 class Identifier implements IStrategy
 {

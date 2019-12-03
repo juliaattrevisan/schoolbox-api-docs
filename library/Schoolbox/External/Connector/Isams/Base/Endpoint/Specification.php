@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
 
@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
  *
  * This explores an xml output to check whether certain nodes exist
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer\Profile
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Profile
  */
 class Specification
 {

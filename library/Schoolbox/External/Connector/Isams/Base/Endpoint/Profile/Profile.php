@@ -6,12 +6,12 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Profile;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
-use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Importer\IStrategy;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
@@ -24,7 +24,7 @@ use Schoolbox\Mapper\Exception;
  *
  * Imports sis_user_profile* data from ISAMS xml feed
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
 class Profile implements IStrategy
 {
@@ -86,7 +86,7 @@ class Profile implements IStrategy
      * @param bool                            $perform
      * @param Batchxml                        $batchxml
      * @param UserProfile\Mapper              $baseProfileMapper
-     * @param UserProfile\Student\Mapper     $studentProfileMapper
+     * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper

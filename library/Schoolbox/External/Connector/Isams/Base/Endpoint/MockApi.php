@@ -11,7 +11,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 class MockApi implements IApi
 {

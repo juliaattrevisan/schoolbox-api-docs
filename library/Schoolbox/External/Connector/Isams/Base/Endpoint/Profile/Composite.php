@@ -6,12 +6,13 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer\Profile;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
-use Schoolbox\External\Connector\Isams\Base\Importer;
+use Schoolbox\External\Connector\Isams\Base\Endpoint;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -20,9 +21,9 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * Strategy executor
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
-class Composite implements Importer\IStrategy
+class Composite implements IStrategy
 {
 
     /**
@@ -40,7 +41,7 @@ class Composite implements Importer\IStrategy
 
 
     /**
-     * @var Importer\Batchxml
+     * @var Endpoint\Batchxml
      */
     private $batchxml;
 
@@ -86,7 +87,7 @@ class Composite implements Importer\IStrategy
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param Importer\Batchxml               $batchxml
+     * @param Endpoint\Batchxml               $batchxml
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -96,7 +97,7 @@ class Composite implements Importer\IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Importer\Batchxml $batchxml,
+        Endpoint\Batchxml $batchxml,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -126,7 +127,7 @@ class Composite implements Importer\IStrategy
     public function import(): void
     {
         $this->registry
-            ->add(new Importer\Profile\Profile(
+            ->add(new Profile(
                 $this->log,
                 $this->perform,
                 $this->batchxml,

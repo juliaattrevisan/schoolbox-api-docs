@@ -6,14 +6,14 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Importer\Endpoint;
 
 /**
  * Interface IInterface
  *
  * Every importer strat must provide this method
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer
+ * @package Schoolbox\External\Importer\Endpoint
  */
 interface IStrategy
 {
