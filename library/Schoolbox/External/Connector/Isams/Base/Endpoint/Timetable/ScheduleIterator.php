@@ -19,7 +19,7 @@ use SimpleXMLElement;
  * Iterate a series of Schedule elements (these correspond to when periods occur)
  * and collate all the people and details involved
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
  */
 class ScheduleIterator implements Iterator
 {

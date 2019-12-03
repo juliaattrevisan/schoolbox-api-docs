@@ -29,7 +29,7 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * Import all the classes and their involvements for all the timetables in the xml
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
  */
 class Classes implements IStrategy
 {

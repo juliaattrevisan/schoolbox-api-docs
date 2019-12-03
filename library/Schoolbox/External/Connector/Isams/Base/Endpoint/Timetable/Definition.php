@@ -24,7 +24,7 @@ use Schoolbox\External\TimetablePeriodMapper;
  *
  * Timetable definition of days and periods
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
  */
 class Definition implements IStrategy
 {

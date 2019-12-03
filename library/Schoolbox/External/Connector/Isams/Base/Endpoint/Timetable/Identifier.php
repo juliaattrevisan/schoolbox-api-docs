@@ -18,7 +18,7 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  * Get a quick list of all the timetable ids that you need to shank into ext_timetable_code
  * This is used to bridge the gap between isams and schoolbox concepts of campus-specific timetables
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
  */
 class Identifier implements IStrategy
 {

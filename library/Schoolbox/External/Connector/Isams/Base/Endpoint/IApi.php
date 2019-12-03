@@ -12,7 +12,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
  *
  * Api and MockApi must implement these methods
  *
- * @package Schoolbox\External\Connector\Isams\Base\Importer
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
 interface IApi
 {

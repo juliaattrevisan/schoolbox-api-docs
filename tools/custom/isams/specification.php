@@ -8,10 +8,10 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Connector\Isams\Base\Importer\Api;
-use Schoolbox\External\Connector\Isams\Base\Importer\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Importer\MockApi;
-use Schoolbox\External\Connector\Isams\Base\Importer\Specification;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Specification;
 use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
