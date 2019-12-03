@@ -131,11 +131,13 @@
     <div class="small-12 island" id="config-island">
         <h3 class="subheader">Status</h3>
 
-        <div id="status-indicator-container">
-            <section class="content">
+        <section class="content">
+            <div id="status-indicator-container">
                 <div class="loader"></div>
-            </section>
-        </div>
+            </div>
+
+            <p>Find out more about your <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status.</p>
+        </section>
 
         <script>
             $(function() {
