@@ -102,7 +102,7 @@ class Controller extends ConfigController
 
 
     /**
-     * Build asynchronous status report
+     * Build asynchronous status indicator payload
      */
     public function getStatusIndicator()
     {
@@ -112,6 +112,22 @@ class Controller extends ConfigController
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
             'isReachable' => (new Endpoint\Status\Factory($host, $key))->produce($type)->isReachable()
+        ]));
+    }
+
+
+    /**
+     * Build asynchronous status report
+     */
+    public function getStatusReport()
+    {
+        $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
+        $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
+        $type = $this->getConfigLoader()->get('schooldata_import_data_source');
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
+            'pageCurrent' => 'import/schoolDataImport',
+            'report' => (new Endpoint\Status\Factory($host, $key))->produce($type)->getReport()
         ]));
     }
 }

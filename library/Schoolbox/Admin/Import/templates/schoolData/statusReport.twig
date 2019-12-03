@@ -6,18 +6,23 @@
  #
  # @param IStatus status
  #}
-<style type="text/css">
-    .schooldata-statusreport-container {
-        max-height: 25rem;
-    }
 
-    .schooldata-statusreport-container pre {
-        font-size: 0.8rem;
-    }
-</style>
+{{ renderAdminNavigation(pageCurrent) }}
 
-<section class="content">
-    <div class="scrollable schooldata-statusreport-container">
-        <pre>{{ status.report }}</pre>
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">School Data Import</h2>
     </div>
-</section>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h3 class="subheader">Status Report</h3>
+
+        <section class="content">
+            <div class="scrollable schooldata-statusreport-container">
+                <pre>{{ report }}</pre>
+            </div>
+        </section>
+    </div>
+</div>
