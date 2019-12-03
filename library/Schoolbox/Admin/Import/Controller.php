@@ -30,13 +30,6 @@ class Controller extends ConfigController
 {
 
     /**
-     * The log file containing the output of whatever was last imported
-     * from an api endpoint
-     */
-    private const LOG_FILE = 'sis-scheduler.log';
-
-
-    /**
      * Landing Page for Direct Import
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -70,7 +63,6 @@ class Controller extends ConfigController
             'pageCurrent' => 'import/schoolDataImport',
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
-            'logPath' => $this->getConfigLoader()->get('logs_dir') . '/' . self::LOG_FILE,
             'configContext' => $configContext
         ])->setTitle('School Data Import'));
     }
