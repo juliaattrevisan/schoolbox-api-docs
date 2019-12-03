@@ -30,6 +30,12 @@ class Loader implements IConfigLoader
 
 
     /**
+     * @var array
+     */
+    private static $allConfigs;
+
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -126,6 +132,23 @@ class Loader implements IConfigLoader
     {
         // Sorry, I know this should be injected but the amount of configs
         // strewn everywhere make that impossible
-        $this->cache = ConfigMapper::getInstance()->findAllConfigs();
+        $this->cache = self::findAllConfigs();
+    }
+
+
+    /**
+     * Static source for all config vars
+     *
+     * Added so that subsequent lookups don't hit the DB (which in the case of
+     * worker processes, may have had its connection terminated)
+     *
+     * @return array
+     */
+    private static function findAllConfigs(): array
+    {
+        if (!isset(self::$allConfigs)) {
+            self::$allConfigs = ConfigMapper::getInstance()->findAllConfigs();
+        }
+        return self::$allConfigs;
     }
 }
