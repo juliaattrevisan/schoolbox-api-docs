@@ -79,7 +79,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * 'hourly' is functionally equivalent to "whenever the system's crontab is set"
+     * Twice Daily: task runs at 4am and 4pm
      *
      * @return array
      */
@@ -153,6 +153,8 @@ class ScheduleTest extends TestCase
 
 
     /**
+     * Daily: task runs at 1am
+     *
      * @return array
      */
     public function provider_validDailyScheduleFrequency(): array
