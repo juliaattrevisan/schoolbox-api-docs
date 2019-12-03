@@ -18,15 +18,44 @@ class Status implements IStatus
 {
 
     /**
+     * @var string
+     */
+    private $host;
+
+
+    /**
+     * @var string
+     */
+    private $key;
+
+
+    /**
+     * Status constructor.
+     *
+     * @param string $host
+     * @param string $key
+     */
+    public function __construct(string $host, string $key)
+    {
+        $this->host = $host;
+        $this->key = $key;
+    }
+
+
+    /**
      * @inheritDoc
      *
      * @return bool
      */
-    public function isReachable()
+    public function isReachable(): bool
     {
+        $api = new Api($this->host, $this->key);
 
-        /* Do an an example API request at the given endpoint's host/key settings
-         */
+        $batchxml = new Batchxml($api);
+
+        $result = $batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
+
+        return (bool)$result;
     }
 
 
@@ -35,10 +64,11 @@ class Status implements IStatus
      *
      * @return string|null
      */
-    public function getReport()
+    public function getReport(): string
     {
 
         /* Get Specification.php's contents and drop it here
          */
+        return '';
     }
 }

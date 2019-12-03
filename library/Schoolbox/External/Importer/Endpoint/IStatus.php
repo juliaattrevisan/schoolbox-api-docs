@@ -16,6 +16,7 @@ interface IStatus
 {
     /**
      * Decide whether an endpoint can be reached
+     * (Do an an example API request at the given endpoint's host/key settings)
      *
      * @return bool
      */
