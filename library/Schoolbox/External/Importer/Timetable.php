@@ -193,9 +193,7 @@ class Timetable extends AbstractImporter
             // Load teacher from DB or cache
             $teacherCode = $row['Teacher Code'];
             /** @var \Schoolbox\User $teacher */
-            if (isset($teacherCache[$teacherCode])) {
-                $teacher = $teacherCache[$teacherCode];
-            } else {
+            if (!isset($teacherCache[$teacherCode])) {
                 try {
                     $teacher = $this->userMapper->findByExternalId($teacherCode);
                     $teacherCache[$teacherCode] = $teacher;
