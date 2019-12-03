@@ -11,12 +11,20 @@ namespace Schoolbox\Admin\CourseBuilder;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends Base
 {
+    /**
+     * A ConfigMapper instance
+     *
+     * @var ConfigMapper
+     */
+    private $configMapper;
+
     /**
      * A CourseConfigMapper instance
      *
@@ -41,19 +49,31 @@ class Controller extends Base
     /**
      * A FolderMapper instance
      *
-     * @var
+     * @var FolderMapper
      */
     private $folderMapper;
 
     /**
-     * Controller constructor.
+     * Constructor
+     *
+     * @param ConfigMapper           $configMapper
+     * @param CourseConfigMapper     $courseConfigMapper
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param RoleMapper             $roleMapper
+     * @param FolderMapper           $folderMapper
      */
-    public function __construct()
-    {
-        $this->setCourseConfigMapper(CourseConfigMapper::getInstance());
-        $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
-        $this->setRoleMapper(RoleMapper::getInstance());
-        $this->setFolderMapper(FolderMapper::getInstance());
+    public function __construct(
+        ConfigMapper $configMapper,
+        CourseConfigMapper $courseConfigMapper,
+        HomepageTemplateMapper $homepageTemplateMapper,
+        RoleMapper $roleMapper,
+        FolderMapper $folderMapper
+    ) {
+        $this->configMapper = $configMapper;
+        $this->courseConfigMapper = $courseConfigMapper;
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
+        $this->roleMapper = $roleMapper;
+        $this->folderMapper = $folderMapper;
     }
 
     /**
@@ -70,14 +90,14 @@ class Controller extends Base
         $permissions['course'] = [];
         $permissions['unit'] = [];
 
-        $coursePermissions = $this->getCourseConfigMapper()->findByColumn("page", "course");
+        $coursePermissions = $this->courseConfigMapper->findByColumn("page", "course");
 
         foreach ($coursePermissions as $permission) {
             $permissions['course'][$permission->getRoleId()] = [];
             $permissions['course'][$permission->getRoleId()][$permission->getPermission()] = 'checked';
         }
 
-        $unitPermissions = $this->getCourseConfigMapper()->findByColumn("page", "unit");
+        $unitPermissions = $this->courseConfigMapper->findByColumn("page", "unit");
 
         foreach ($unitPermissions as $permission) {
             $permissions['unit'][$permission->getRoleId()] = [];
@@ -92,9 +112,9 @@ class Controller extends Base
                 'data'     => array(
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
                     'tab' => $tab != '' ? $tab : 'course',
-                    'roles' => $this->getRoleMapper()->findAll(),
+                    'roles' => $this->roleMapper->findAll(),
                     'permissions' => $permissions,
-                    'templates' => $this->getHomepageTemplateMapper()->findAll()->sortBy("name", "asc"),
+                    'templates' => $this->homepageTemplateMapper->findAll()->sortBy("name", "asc"),
                     'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
                     'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
                     'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
@@ -113,135 +133,51 @@ class Controller extends Base
     {
         // Blow away old permissions, could probably be more graceful and update
 
-        $this->getCourseConfigMapper()->deleteByColumn('page', 'course');
-        $this->getCourseConfigMapper()->deleteByColumn('page', 'unit');
+        $this->courseConfigMapper->deleteByColumn('page', 'course');
+        $this->courseConfigMapper->deleteByColumn('page', 'unit');
 
         // Add course permissions back
 
         foreach ($this->getRequest()->post->get('course_group',[]) as $roleId => $permission) {
-            $model = $this->getCourseConfigMapper()->createModel();
+            $model = $this->courseConfigMapper->createModel();
             $model->setPage('course');
             $model->setPermission($permission);
             $model->setRoleId($roleId);
-            $this->getCourseConfigMapper()->save($model);
+            $this->courseConfigMapper->save($model);
         }
 
         // Add unit permissions back
 
         foreach ($this->getRequest()->post->get('unit_group',[]) as $roleId => $permission) {
-            $model = $this->getCourseConfigMapper()->createModel();
+            $model = $this->courseConfigMapper->createModel();
             $model->setPage('unit');
             $model->setPermission($permission);
             $model->setRoleId($roleId);
-            $this->getCourseConfigMapper()->save($model);
+            $this->courseConfigMapper->save($model);
         }
 
         // Update default page templates
 
-        $courseTemplate = $this->getConfigMapper()->findOneByColumn('name', 'course_builder_default_course_page_template');
+        $courseTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_course_page_template');
         $courseTemplate->setValue($this->getRequest()->post['courseTemplate']);
-        $this->getConfigMapper()->save($courseTemplate);
+        $this->configMapper->save($courseTemplate);
 
-        $unitTemplate = $this->getConfigMapper()->findOneByColumn('name', 'course_builder_default_unit_page_template');
+        $unitTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_unit_page_template');
         $unitTemplate->setValue($this->getRequest()->post['unitTemplate']);
-        $this->getConfigMapper()->save($unitTemplate);
+        $this->configMapper->save($unitTemplate);
 
         // Update default inheritance
 
-        $courseTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_course_page_inherit");
-        $courseTemplate->setValue($this->getFolderMapper()->decideInheritance($this->getRequest()->post["courseInherit"]));
-        $this->getConfigMapper()->save($courseTemplate);
+        $courseTemplate = $this->configMapper->findOneByColumn("name", "course_builder_default_course_page_inherit");
+        $courseTemplate->setValue($this->folderMapper->decideInheritance($this->getRequest()->post["courseInherit"]));
+        $this->configMapper->save($courseTemplate);
 
-        $unitTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_unit_page_inherit");
-        $unitTemplate->setValue($this->getFolderMapper()->decideInheritance($this->getRequest()->post["unitInherit"]));
-
-        $this->getConfigMapper()->save($unitTemplate);
+        $unitTemplate = $this->configMapper->findOneByColumn("name", "course_builder_default_unit_page_inherit");
+        $unitTemplate->setValue($this->folderMapper->decideInheritance($this->getRequest()->post["unitInherit"]));
+        $this->configMapper->save($unitTemplate);
 
         // Send them back to the admin page
 
         $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' .$this->getRequest()->post["tab"]);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Get course config mapper
-     *
-     * @return CourseConfigMapper
-     */
-    private function getCourseConfigMapper()
-    {
-        return $this->courseConfigMapper;
-    }
-
-    /**
-     * Set course config mapper
-     *
-     * @param CourseConfigMapper $courseConfigMapper
-     */
-    private function setCourseConfigMapper($courseConfigMapper)
-    {
-        $this->courseConfigMapper = $courseConfigMapper;
-    }
-
-    /**
-     * Get homepage template mapper
-     *
-     * @return HomepageTemplateMapper
-     */
-    private function getHomepageTemplateMapper()
-    {
-        return $this->homepageTemplateMapper;
-    }
-
-    /**
-     * Set homepage template mapper
-     *
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     */
-    private function setHomepageTemplateMapper($homepageTemplateMapper)
-    {
-        $this->homepageTemplateMapper = $homepageTemplateMapper;
-    }
-
-    /**
-     * Get Role Mapper
-     *
-     * @return RoleMapper
-     */
-    private function getRoleMapper()
-    {
-        return $this->roleMapper;
-    }
-
-    /**
-     * Set Role Mapper
-     *
-     * @param RoleMapper $roleMapper
-     */
-    private function setRoleMapper($roleMapper)
-    {
-        $this->roleMapper = $roleMapper;
-    }
-
-    /**
-     * Get Folder Mapper
-     *
-     * @return mixed
-     */
-    private function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * Set Folder Mapper
-     *
-     * @param mixed $folderMapper
-     */
-    private function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
     }
 }

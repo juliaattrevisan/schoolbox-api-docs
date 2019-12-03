@@ -16,6 +16,11 @@ use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
 {
@@ -43,7 +48,19 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:'.$this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'configMapper'           => $this->getMapperFactory()->getLazy(ConfigMapper::class),
+                    'courseConfigMapper'     => $this->getMapperFactory()->getLazy(CourseConfigMapper::class),
+                    'homepageTemplateMapper' => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
+                    'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
+                    'folderMapper'           => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                ]
+            )
+        );
     }
 
     /**
