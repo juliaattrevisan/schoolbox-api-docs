@@ -10,6 +10,11 @@ namespace Schoolbox\External\Importer\Endpoint;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 
+/**
+ * Class Scheduler
+ *
+ * @package Schoolbox\External\Importer\Endpoint
+ */
 class Scheduler
 {
 
