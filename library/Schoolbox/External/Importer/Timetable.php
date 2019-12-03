@@ -208,7 +208,7 @@ class Timetable extends AbstractImporter
             $classPeriod = new ClassPeriod();
             $classPeriod
                 ->setClass($result[$key]['class'])
-                ->setTeacher($teacher->getExternalId())
+                ->setTeacher($teacherCode)
                 ->setPeriod($timetablePeriod);
 
             if (isset($row['Class Room'])) {
