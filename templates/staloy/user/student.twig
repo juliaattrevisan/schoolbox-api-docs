@@ -1,5 +1,11 @@
 {% extends '@core/user/student.twig' %}
 
-{% block buttons_dueWork %}{# Suppress this button #}{% endblock buttons_dueWork %}
+{% block buttons_dueWork %}
+    {# Only show this button if not 'prod' server #}
+    {% if config.site_type != 'prod' %}{{ parent() }}{% endif %}
+{% endblock buttons_dueWork %}
 
-{% block buttons_grades %}{# Suppress this button #}{% endblock buttons_grades %}
+{% block buttons_grades %}
+    {# Only show this button if not 'prod' server #}
+    {% if config.site_type != 'prod' %}{{ parent() }}{% endif %}
+{% endblock buttons_grades %}
