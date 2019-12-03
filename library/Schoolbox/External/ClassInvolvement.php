@@ -39,7 +39,8 @@ class ClassInvolvement
      *
      * @return $this
      */
-    public function setClass($class) {
+    public function setClass($class)
+    {
         $this->class = $class;
         return $this;
     }
@@ -48,7 +49,8 @@ class ClassInvolvement
     /**
      * @return \Schoolbox\External\ClassEntry
      */
-    public function getClass() {
+    public function getClass()
+    {
         return $this->class;
     }
 
@@ -57,7 +59,8 @@ class ClassInvolvement
      * @param  int $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -66,7 +69,8 @@ class ClassInvolvement
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
