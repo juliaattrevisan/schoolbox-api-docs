@@ -110,8 +110,10 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
+        $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
-            'isReachable' => (new Endpoint\Status\Factory($host, $key))->produce($type)->isReachable()
+            'isReachable' => $status ? $status->isReachable() : false
         ]));
     }
 
@@ -125,9 +127,11 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
+        $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
             'pageCurrent' => 'import/schoolDataImport',
-            'report' => (new Endpoint\Status\Factory($host, $key))->produce($type)->getReport()
+            'report' => $status ? $status->getReport() : ''
         ]));
     }
 }
