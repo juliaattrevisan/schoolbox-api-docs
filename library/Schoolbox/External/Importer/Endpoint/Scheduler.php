@@ -64,6 +64,13 @@ class Scheduler
        if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $now)) {
             $composites = $this->factory->produce(null, $this->type);
 
+           /* No composites produced; exit
+            * Either you chose an invalid $type or you don't need a $type at all (csv imports)
+            */
+           if (null === $composites) {
+               exit;
+           }
+
             try {
                 foreach ($composites as $composite) {
                     $composite->import();
