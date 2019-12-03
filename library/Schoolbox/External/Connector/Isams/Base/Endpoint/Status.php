@@ -18,15 +18,9 @@ class Status implements IStatus
 {
 
     /**
-     * @var string
+     * @var Api
      */
-    private $host;
-
-
-    /**
-     * @var string
-     */
-    private $key;
+    private $api;
 
 
     /**
@@ -37,8 +31,7 @@ class Status implements IStatus
      */
     public function __construct(string $host, string $key)
     {
-        $this->host = $host;
-        $this->key = $key;
+        $this->api = new Api($host, $key);
     }
 
 
@@ -50,9 +43,7 @@ class Status implements IStatus
     public function isReachable(): bool
     {
         try {
-            $api = new Api($this->host, $this->key);
-
-            $batchxml = new Batchxml($api);
+            $batchxml = new Batchxml($this->api);
 
             $result = $batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
@@ -73,11 +64,9 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
-        $api = new Api($this->host, $this->key);
-
         $specification = new Specification(
             null,
-            new Batchxml($api)
+            new Batchxml($this->api)
         );
 
         try {
