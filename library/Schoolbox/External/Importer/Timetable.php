@@ -193,15 +193,12 @@ class Timetable extends AbstractImporter
             // Load teacher from DB or cache
             $teacherCode = $row['Teacher Code'];
             /** @var \Schoolbox\User $teacher */
-            if (isset($teacherCache[$teacherCode])) {
-                $teacher = $teacherCache[$teacherCode];
-            } else {
+            if (!isset($teacherCache[$teacherCode])) {
                 try {
                     $teacher = $this->userMapper->findByExternalId($teacherCode);
                     $teacherCache[$teacherCode] = $teacher;
                 } catch (Mapper\Exception $e) {
-                    $this->log->warning(sprintf('Teacher code "%s" not found: skipping!', $teacherCode));
-                    continue;
+                    $this->log->warning(sprintf('Teacher code "%s" not found', $teacherCode));
                 }
             }
 
@@ -209,7 +206,7 @@ class Timetable extends AbstractImporter
             $classPeriod = new ClassPeriod();
             $classPeriod
                 ->setClass($result[$key]['class'])
-                ->setTeacher($teacher)
+                ->setTeacher($teacherCode)
                 ->setPeriod($timetablePeriod);
 
             if (isset($row['Class Room'])) {
