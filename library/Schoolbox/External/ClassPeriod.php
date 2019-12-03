@@ -6,8 +6,6 @@
  */
 namespace Schoolbox\External;
 
-use Schoolbox\User;
-
 /**
  * Class ClassPeriod
  *
