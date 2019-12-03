@@ -124,18 +124,17 @@ class Controller extends Base
                             ->setCreatedAt($now)
                             ->setTouchedAt($now);
 
-                        //De-register existing logins for other users
-                        // after setting device ID
-                        $this->registryMapper->getDatabase()->transact(function () use ($token, $registry) {
-                            $this->registryMapper->deleteByColumn('app_token', $token);
-                            $this->registryMapper->save($registry);
-                        });
-
                         // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
                         $deviceId = $this->request->post->get('deviceId');
                         if (isset($deviceId)) {
                             $registry->setDeviceId($deviceId);
                         }
+
+                        // De-register existing logins for other users when saving
+                        $this->registryMapper->getDatabase()->transact(function () use ($token, $registry) {
+                            $this->registryMapper->deleteByColumn('app_token', $token);
+                            $this->registryMapper->save($registry);
+                        });
 
                     } catch (MapperException $e) {
                         /** @noinspection PhpUnhandledExceptionInspection */
@@ -144,8 +143,6 @@ class Controller extends Base
                         return;
                     }
                 }
-
-                $this->registryMapper->save($registry);
             }
 
             $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
