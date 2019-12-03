@@ -1,0 +1,23 @@
+{##
+ # Status
+ #
+ # Get a report about an endpoint's availability and what it's producing
+ # These are unique to each sis so isams will do it differently to kamar et al.
+ #
+ # @param IStatus status
+ #}
+<style type="text/css">
+    .schooldata-statusreport-container {
+        max-height: 25rem;
+    }
+
+    .schooldata-statusreport-container pre {
+        font-size: 0.8rem;
+    }
+</style>
+
+<section class="content">
+    <div class="scrollable schooldata-statusreport-container">
+        <pre>{{ status.report }}</pre>
+    </div>
+</section>
