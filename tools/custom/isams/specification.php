@@ -84,10 +84,10 @@ HELP;
             $api = new Api($this->getConfig()->get('schooldata_import_endpoint_host'), $this->getConfig()->get('schooldata_import_endpoint_key'));
         }
 
-        $composite = new Specification($this->getLogger(), new Batchxml($api));
+        $specification = new Specification($this->getLogger(), new Batchxml($api));
 
         try {
-            $composite->check();
+            $specification->check();
         } catch (\RuntimeException $e) {
             $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
         } catch (InvalidUriPartException $e) {
