@@ -12,7 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use PHPUnit;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\TestLoader;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -59,7 +59,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 Folder\Mapper::getInstance(),
                 Folder\Code\Mapper::getInstance(),
                 new External_Offline_User(),
-                ConfigMapper::getInstance(),
+                new TestLoader(),
                 new Folder\Code\SubjectMatcherBase()
             ),
             new External_Offline_User(),
