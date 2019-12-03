@@ -1,18 +1,17 @@
 <?php
 /**
- * Port of old Config class to use PDO database instead of DeprecatedDatabase.
- *
- * @author      Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Config;
 
 use OutOfRangeException;
-use Schoolbox\Database\Factory;
 use Schoolbox\IConfigLoader;
 
+/**
+ * The standard interface for retrieving Schoolbox configuration settings.
+ */
 class Loader implements IConfigLoader
 {
     /**
