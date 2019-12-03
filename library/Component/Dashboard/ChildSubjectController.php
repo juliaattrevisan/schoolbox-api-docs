@@ -148,7 +148,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             /* Academic report link
             */
             if ($this->getConfigLoader()->get('external_document_report_enabled')
-                && $this->getConfigMapper()->get('external_document_button_enable')) {
+                && $this->getConfigLoader()->get('external_document_button_enable')) {
                 $this->parse('reports_block', 'reports');
             } else {
                 $this->setVar('reports_block');

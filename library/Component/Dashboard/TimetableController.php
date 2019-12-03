@@ -240,7 +240,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function getAttendanceLinkTarget(): string
     {
-        switch ($this->getConfigMapper()->get('external_type')) {
+        switch ($this->getConfigLoader()->get('external_type')) {
             case 'tass':
                 return '_blank';
             case 'synergetic':
