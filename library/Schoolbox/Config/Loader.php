@@ -80,7 +80,7 @@ class Loader implements IConfigLoader
      */
     public function dropCache()
     {
-        $this->cache = [];
+        self::$allConfigs = null;
     }
 
 
@@ -117,7 +117,7 @@ class Loader implements IConfigLoader
      */
     public function __isset(string $name): bool
     {
-        if (empty($this->cache)) {
+        if (!isset($this->cache)) {
             $this->loadCache();
         }
         return isset($this->cache[$name]);
