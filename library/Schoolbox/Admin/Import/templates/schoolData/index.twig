@@ -1,3 +1,13 @@
+{##
+ # Configure your sis importer
+ #
+ # @param string pageCurrent
+ # @param array configContext
+ # @param array allNavigation
+ # @param string dataSource
+ # @param stirng logPath
+ #}
+
 <script>
     $(function() {
 
@@ -135,7 +145,7 @@
         <h3 class="subheader">Logs</h3>
 
         <section class="content">
-            <p>Your log file is located in ...</p>
+            <p>Your log file is located in {{ logPath }}</p>
         </section>
     </div>
     <div class="small-12 island" id="csv-island">
