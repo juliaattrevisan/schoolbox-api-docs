@@ -84,10 +84,7 @@ HELP;
             $api = new Api($this->getConfig()->get('schooldata_import_endpoint_host'), $this->getConfig()->get('schooldata_import_endpoint_key'));
         }
 
-        $composite = new Specification(
-            $this->getLogger(),
-            new Batchxml($api)
-        );
+        $composite = new Specification($this->getLogger(), new Batchxml($api));
 
         try {
             $composite->check();

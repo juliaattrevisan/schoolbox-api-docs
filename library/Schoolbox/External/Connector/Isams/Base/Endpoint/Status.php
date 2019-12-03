@@ -79,10 +79,7 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
-        $specification = new Specification(
-            null,
-            new Batchxml($this->api)
-        );
+        $specification = new Specification(null, new Batchxml($this->api));
 
         try {
             return implode("\n", $specification->check());
