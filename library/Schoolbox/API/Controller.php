@@ -130,6 +130,12 @@ class Controller extends Base
                             $registry->setDeviceId($deviceId);
                         }
 
+                        // De-register existing logins for other users when saving
+                        $this->registryMapper->getDatabase()->transact(function () use ($token, $registry) {
+                            $this->registryMapper->deleteByColumn('app_token', $token);
+                            $this->registryMapper->save($registry);
+                        });
+
                     } catch (MapperException $e) {
                         /** @noinspection PhpUnhandledExceptionInspection */
                         $this->response->status->setCode(400);
@@ -137,8 +143,6 @@ class Controller extends Base
                         return;
                     }
                 }
-
-                $this->registryMapper->save($registry);
             }
 
             $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
