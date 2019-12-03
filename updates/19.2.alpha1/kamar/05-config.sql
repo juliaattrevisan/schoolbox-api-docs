@@ -27,5 +27,5 @@ UPDATE `config` SET `sequence`='4' WHERE `name`='schooldata_import_frequency';
 UPDATE `config` SET `name`='schooldata_import_batchxml_host' WHERE `name`='external_ups_provider_batchxml_host';
 UPDATE `config` SET `name`='schooldata_import_batchxml_key' WHERE `name`='external_ups_provider_batchxml_key';
 
-UPDATE `config` SET `title`='School Data Endpoint Host' WHERE `name`='schooldata_import_batchxml_host';
-UPDATE `config` SET `title`='School Data Endpoint Key' WHERE `name`='schooldata_import_batchxml_key';
+UPDATE `config` SET `title`='School Data Endpoint Host' WHERE `name`='schooldata_import_endpoint_host';
+UPDATE `config` SET `title`='School Data Endpoint Key' WHERE `name`='schooldata_import_endpoint_key';
