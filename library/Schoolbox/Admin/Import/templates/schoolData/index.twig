@@ -6,6 +6,10 @@
          # we have to use javascript to hide/show one or the other
          #}
 
+        {# These config elements can be either hidden or shown, contextually
+         #}
+        var configElements = $('#schooldata_import_batchxml_host, #schooldata_import_batchxml_key, #schooldata_import_frequency');
+
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
          #}
@@ -37,27 +41,21 @@
              #}
             if (dataSource == '') {
                 $('#csv-island').hide();
-                $('#schooldata_import_batchxml_host').parent('div').hide();
-                $('#schooldata_import_batchxml_key').parent('div').hide();
-                $('#schooldata_import_frequency').parent('div').hide();
+                hideConfig(configElements);
             } else if (dataSource == 'csv') {
 
                 {# If it's csv island, just show that
                  # Hide the config island
                  #}
                 $('#csv-island').show();
-                $('#schooldata_import_batchxml_host').parent('div').hide();
-                $('#schooldata_import_batchxml_key').parent('div').hide();
-                $('#schooldata_import_frequency').parent('div').hide();
+                hideConfig(configElements);
             } else {
 
                 {# Otherwise, show the config island and hide the csv island
                  # Show the host/key/frequency input elements
                  #}
                 $('#csv-island').hide();
-                $('#schooldata_import_batchxml_host').parent('div').show();
-                $('#schooldata_import_batchxml_key').parent('div').show();
-                $('#schooldata_import_frequency').parent('div').show();
+                showConfig(configElements);
             }
         }
 
@@ -77,10 +75,30 @@
              #}
             if (dataSource == '' || dataSource == 'csv') {
                 $('#csv-island').hide();
-                $('#schooldata_import_batchxml_host').parent('div').hide();
-                $('#schooldata_import_batchxml_key').parent('div').hide();
-                $('#schooldata_import_frequency').parent('div').hide();
+                hideConfig(configElements);
             }
+        }
+
+        /**
+         * Hide config island elements in a special way
+         *
+         * @param elements
+         */
+        function hideConfig(elements) {
+            $.each(elements, function (index, element) {
+                $(element).parent('div').hide();
+            });
+        }
+
+        /**
+         * Show config island elements in a special way
+         *
+         * @param elements
+         */
+        function showConfig(elements) {
+            $.each(elements, function (index, element) {
+                $(element).parent('div').show();
+            });
         }
     });
 </script>
