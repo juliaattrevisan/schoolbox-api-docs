@@ -9,7 +9,7 @@
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
          #}
-        switchIslands('{{ dataSource }}');
+        initIslands('{{ dataSource }}');
 
         {# Show the container that we originally hid
          #}
@@ -31,7 +31,7 @@
          *
          * @param val
          */
-        function switchIslands(dataSource) {
+        function initIslands(dataSource) {
 
             {# If you haven't chosen anything, hide both csv and config islands
              #}
@@ -58,6 +58,28 @@
                 $('#schooldata_import_batchxml_host').parent('div').show();
                 $('#schooldata_import_batchxml_key').parent('div').show();
                 $('#schooldata_import_frequency').parent('div').show();
+            }
+        }
+
+        /**
+         * Switch configuration options
+         *
+         * If you haven't chosen anything, hide both csv and config islands
+         * If you chose csv island, just show that and hide config island
+         * Otherwise show config island and hide the csv island
+         *
+         * @param val
+         */
+        function switchIslands(dataSource) {
+
+            {# If you chose a non-isams/kamar/sentral/etc option, hide both csv and config islands
+             # This prompts the user to hit Save instead of distracting them with options
+             #}
+            if (dataSource == '' || dataSource == 'csv') {
+                $('#csv-island').hide();
+                $('#schooldata_import_batchxml_host').parent('div').hide();
+                $('#schooldata_import_batchxml_key').parent('div').hide();
+                $('#schooldata_import_frequency').parent('div').hide();
             }
         }
     });
