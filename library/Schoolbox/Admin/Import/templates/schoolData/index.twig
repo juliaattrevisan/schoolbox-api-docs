@@ -47,3 +47,36 @@
         {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
 </div>
+
+{# Hide the container that has both the system-generated config vars
+ # and the handcrafted csv island - this stops a visual glitch when
+ # we have to use javascript to hide/show one or the other
+ #}
+
+{# On document.ready, using dataSource, decide which island to show:
+ # it's one of either csv island or config island
+ #}
+
+    {# If it's csv island, just show that
+     # Hide the config island
+     #}
+
+    {# Otherwise, show the config island and hide the csv island
+     # Show the host/key/frequency input elements
+     #}
+
+    {# Show the container that we originally hid
+     #}
+
+{# On dataSource change, decide which island to show:
+ # it's one of either csv island or config island
+ #}
+
+    {# If it's csv island, just show that
+     # Hide the config island
+     #}
+
+    {# Otherwise, show the config island and hide the csv island
+     # Show the host/key/frequency input elements
+     #}
+
