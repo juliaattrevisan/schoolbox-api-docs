@@ -92,6 +92,13 @@ HELP;
 
         $composites = (new Factory($host, $key, $this->perform(), $this->getLogger()))->produce($file, $type);
 
+        /* No composites produced; exit
+         * Either you chose an invalid $type or you don't need a $type at all (csv imports)
+         */
+        if (null === $composites) {
+            exit;
+        }
+
         try {
             foreach ($composites as $composite) {
                 $composite->import();
