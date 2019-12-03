@@ -63,7 +63,7 @@ class Status implements IStatus
          *
          * Use an ultra cheep way at the cost of some neatness
          */
-        $result = get_headers("https://{$this->host}/api/batch/1.0/xml.ashx?apikey={$this->key}");
+        $result = @get_headers("https://{$this->host}/api/batch/1.0/xml.ashx?apikey={$this->key}");
 
         if (is_array($result)) {
             return strpos($result[0], '200') > -1;
