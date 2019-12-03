@@ -20,6 +20,7 @@ use Zend\Uri\Uri;
  */
 class Api implements IApi
 {
+
     /**
      * The host of the iSAMS server
      *
@@ -34,6 +35,12 @@ class Api implements IApi
      * @var string
      */
     private $apiKey;
+
+
+    /**
+     * @var Uri
+     */
+    private $url;
 
 
     /**
@@ -80,6 +87,26 @@ class Api implements IApi
 
 
     /**
+     * Cache a url definition then return its value
+     *
+     * @return Uri
+     * @throws Exception\InvalidArgumentException
+     * @throws Exception\InvalidUriPartException
+     */
+    public function getUrl() {
+        if (!$this->url) {
+            $this->url = (new Uri())
+                ->setScheme('https')
+                ->setHost($this->host)
+                ->setPath('/api/batch/1.0/xml.ashx')
+                ->setQuery(['apikey' => $this->apiKey]);
+        }
+
+        return $this->url;
+    }
+
+
+    /**
      * Set up curl instance
      *
      * @param string $filter
@@ -89,13 +116,7 @@ class Api implements IApi
      */
     private function initCurl(string $filter = ''): \Alaress_Curl_Url
     {
-        $url = (new Uri())
-            ->setScheme('https')
-            ->setHost($this->host)
-            ->setPath('/api/batch/1.0/xml.ashx')
-            ->setQuery(['apikey' => $this->apiKey]);
-
-        $curl = new Alaress_Curl_Url($url);
+        $curl = new Alaress_Curl_Url($this->url);
 
         if ('' !== $filter) {
             $curl->addOptions([
