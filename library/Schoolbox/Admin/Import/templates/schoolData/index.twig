@@ -146,6 +146,12 @@
         </script>
 
         <h3 class="subheader">View Data</h3>
+        <section class="content">
+            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
+            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
+            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
+            <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+        </section>
     </div>
     <div class="small-12 island" id="csv-island">
         <h3 class="subheader">Import from csv files</h3>
