@@ -41,6 +41,7 @@
              #}
             if (dataSource == '') {
                 $('#csv-island').hide();
+                $('#config-island').hide();
                 hideConfig(configElements);
             } else if (dataSource == 'csv') {
 
@@ -48,6 +49,7 @@
                  # Hide the config island
                  #}
                 $('#csv-island').show();
+                $('#config-island').hide();
                 hideConfig(configElements);
             } else {
 
@@ -55,6 +57,7 @@
                  # Show the host/key/frequency input elements
                  #}
                 $('#csv-island').hide();
+                $('#config-island').show();
                 showConfig(configElements);
             }
         }
@@ -75,6 +78,7 @@
              #}
             if (dataSource == '' || dataSource == 'csv') {
                 $('#csv-island').hide();
+                $('#config-island').hide();
                 hideConfig(configElements);
             }
         }
@@ -112,8 +116,27 @@
 </div>
 
 <div class="row hide" id='option-container'>
-    <div class="small-12 columns" id="config-island">
+    <div class="small-12 columns">
         {% include '@settings/moduleConfig.twig' with configContext only %}
+    </div>
+    <div class="small-12 island" id="config-island">
+        <h3 class="subheader">Status</h3>
+
+        <section class="content">
+            <p>Endpoint status goes here</p>
+        </section>
+
+        <h3 class="subheader">View Data</h3>
+
+        <section class="content">
+            <p>View data goes here</p>
+        </section>
+
+        <h3 class="subheader">Logs</h3>
+
+        <section class="content">
+            <p>Your log file is located in ...</p>
+        </section>
     </div>
     <div class="small-12 island" id="csv-island">
         <h3 class="subheader">Import from csv files</h3>
