@@ -15,20 +15,14 @@ use Schoolbox\IConfigLoader;
 class Loader implements IConfigLoader
 {
     /**
-     * Cached config values.
-     *
-     * @var array
-     */
-    private $cache;
-
-
-    /**
      * @var self
      */
     private static $instance;
 
 
     /**
+     * Cached config values.
+     *
      * @var array
      */
     private static $allConfigs;
@@ -66,10 +60,10 @@ class Loader implements IConfigLoader
      */
     public function get($var)
     {
-        if (!isset($this->cache)) {
+        if (!isset(self::$allConfigs)) {
             $this->loadCache();
         }
-        return $this->cache[$var] ?? null;
+        return self::$allConfigs[$var] ?? null;
     }
 
 
@@ -117,10 +111,10 @@ class Loader implements IConfigLoader
      */
     public function __isset(string $name): bool
     {
-        if (!isset($this->cache)) {
+        if (!isset(self::$allConfigs)) {
             $this->loadCache();
         }
-        return isset($this->cache[$name]);
+        return isset(self::$allConfigs[$name]);
     }
 
 
@@ -129,25 +123,8 @@ class Loader implements IConfigLoader
      */
     private function loadCache(): void
     {
-        // Sorry, I know this should be injected but the amount of configs
-        // strewn everywhere make that impossible
-        $this->cache = self::findAllConfigs();
-    }
-
-
-    /**
-     * Static source for all config vars
-     *
-     * Added so that subsequent lookups don't hit the DB (which in the case of
-     * worker processes, may have had its connection terminated)
-     *
-     * @return array
-     */
-    private static function findAllConfigs(): array
-    {
         if (!isset(self::$allConfigs)) {
             self::$allConfigs = ConfigMapper::getInstance()->findAllConfigs();
         }
-        return self::$allConfigs;
     }
 }
