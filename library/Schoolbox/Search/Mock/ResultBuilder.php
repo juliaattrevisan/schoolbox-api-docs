@@ -114,8 +114,9 @@ class ResultBuilder
     {
         $resultType = $this->faker->randomElement(self::RESULT_TYPES_BASE);
         $baseResult = [
-            'id'   => $this->faker->numberBetween(1, 999999),
-            'type' => $resultType,
+            'id'      => $this->faker->numberBetween(1, 999999),
+            'type'    => $resultType,
+            'summary' => $this->faker->text,
         ];
         switch ($resultType) {
             case self::RESULT_TYPE_FOLDER:
@@ -168,10 +169,17 @@ class ResultBuilder
      */
     private function generateFolder(int $id): array
     {
+        $subResultCount = $this->faker->numberBetween(0, 5);
+        $subResultList  = [];
+        if ($subResultCount > 0) {
+            foreach (range(1, $subResultCount) as $i) {
+                $subResultList[] = $this->generateFolderSubResult();
+            }
+        }
         return [
             'id'         => $id,
             'title'      => $this->faker->bs,
-            'subResults' => [],
+            'subResults' => $subResultList,
         ];
     }
 
@@ -210,5 +218,33 @@ class ResultBuilder
             'start'  => $this->faker->dateTimeBetween('-1 week', '-1 hour')->format($dateFormat),
             'end'    => $this->faker->dateTimeBetween('+1 hour', '+1 week')->format($dateFormat),
         ];
+    }
+
+
+    /**
+     * Generate a sub-result
+     *
+     * @return array
+     */
+    private function generateFolderSubResult(): array
+    {
+        $resultType = $this->faker->randomElement(self::RESULT_TYPES_IN_FOLDER);
+        $baseResult = [
+            'id'      => $this->faker->numberBetween(1, 999999),
+            'type'    => $resultType,
+            'summary' => $this->faker->text,
+        ];
+        switch ($resultType) {
+            case self::RESULT_TYPE_COMMS:
+                return $baseResult + [
+                    'content' => $this->generateComms($baseResult['id']),
+                ];
+
+            case self::RESULT_TYPE_EVENT:
+            default:
+                return $baseResult + [
+                    'content' => $this->generateEvent($baseResult['id']),
+                ];
+        }
     }
 }
