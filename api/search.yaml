@@ -323,6 +323,12 @@ components:
         folder's relevance itself is what is considered relevant.
       type: object
       properties:
+        id:
+          description: |
+            The identifier for the object in `content`. Forms a composite key
+            for a sub-result with `type` (`content`'s discriminator field).
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/id'
         type:
           oneOf:
             - $ref: '#/components/schemas/searchResultFolderSubResultType'

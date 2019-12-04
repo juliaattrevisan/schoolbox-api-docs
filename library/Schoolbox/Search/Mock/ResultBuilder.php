@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Mock;
 
 use Faker\Generator;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 /**
@@ -114,9 +113,12 @@ class ResultBuilder
     {
         $resultType = $this->faker->randomElement(self::RESULT_TYPES_BASE);
         $baseResult = [
-            'id'      => $this->faker->numberBetween(1, 999999),
-            'type'    => $resultType,
-            'summary' => $this->faker->text,
+            'id'        => $this->faker->numberBetween(1, 999999),
+            'type'      => $resultType,
+            'summary'   => $this->faker->text,
+            'creator'   => $this->generateUser($this->faker->numberBetween(1, 999999)),
+            'relevance' => $this->faker->randomFloat(5, 0, 1),
+            'date'      => $this->faker->dateTimeBetween('-1 month', '+1 month')->format(\DateTime::RFC3339),
         ];
         switch ($resultType) {
             case self::RESULT_TYPE_FOLDER:
