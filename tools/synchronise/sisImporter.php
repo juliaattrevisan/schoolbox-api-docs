@@ -95,7 +95,7 @@ HELP;
          */
         $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
-        (new Endpoint\Scheduler($frequency, $factory, $type, $file))->run(time());
+        (new Endpoint\Scheduler($frequency, $factory, $type, $file, $this->getLogger()))->run(time());
     }
 };
 
