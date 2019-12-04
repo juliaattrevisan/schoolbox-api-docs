@@ -48,10 +48,10 @@ class Lists
      */
     public function findForUser(int $userId): Collection
     {
-        $ids = $this->findSavedIdsForUser($userId);
+        $ids = $this->saveForLaterMapper->findSavedIdsForUser($userId);
 
         if (\count($ids)) {
-            return $this->newsMapper->findByColumn('id', $ids, [
+            return $this->newsMapper->findByColumnList(['id' => $ids, 'rejected_at' => null], [
                 'order' => [
                     'publish_at' => 'asc'
                 ]
@@ -59,23 +59,5 @@ class Lists
         }
 
         return $this->newsMapper->createCollection();
-    }
-
-
-    /**
-     * Returns an array of (article_id, 1) tuples for saved articles
-     * This allows you to quickly figger out if an article was Saved For Later
-     * and assign the state to the Save For Later button accordingly
-     *
-     * @param int $userId
-     * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    public function findSavedIdsForUser(int $userId): array
-    {
-        $pb = $this->saveForLaterMapper->getPredicateBuilder();
-        $pb->equals('user_id', $userId);
-
-        return $this->saveForLaterMapper->findScalarByPredicates('article_id', $pb);
     }
 }

@@ -40,4 +40,39 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT DISTINCT {$this->getColumnString('', ['article_id'])}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('article', '', 'a', true)} 
+        ";
+    }
+
+    /**
+     * Returns an array of (article_id, 1) tuples for saved articles
+     * This allows you to quickly figger out if an article was Saved For Later
+     * and assign the state to the Save For Later button accordingly
+     *
+     * @param int $userId
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function findSavedIdsForUser(int $userId) {
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('user_id', $userId);
+        $pb->isNull('a.rejected_at');
+        $pb->isNull('deleted_at');
+
+        $query = $this->getSelectString() . ' WHERE ' . implode(' AND ', $pb->getWhere());
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($pb->getParams());
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
 }
