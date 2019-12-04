@@ -92,10 +92,6 @@ class Scheduler
                 }
             } catch (\RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
-            } catch (InvalidUriPartException $e) {
-                $this->logger->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
-            } catch (\InvalidArgumentException $e) {
-                $this->logger->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
             }
         }
     }
