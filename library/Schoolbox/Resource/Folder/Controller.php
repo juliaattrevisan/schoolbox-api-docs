@@ -380,6 +380,10 @@ class Controller extends BaseController
         $errorMapper = $this->errorMapper;
         $post        = $this->getRequest()->post->getArrayCopy();
 
+        /** No whitespace in the codes or year levels please **/
+        $classCodes = array_map('trim', explode(',', $post['code']));
+        $yearLevels = array_map('trim', explode(',', $post['yearLevelIds']));
+
         try {
             $model = $this->persistFolder(
                 $folder,
@@ -391,8 +395,8 @@ class Controller extends BaseController
                 isset($post['curriculumCodes']) ? array_filter($post['curriculumCodes']) : null,
                 $post['group'],
                 (bool)($post['recursive-permissions'] ?? false),
-                array_filter(explode(',', $post['code'])),
-                array_filter(explode(',', $post['yearLevelIds'])),
+                $classCodes,
+                $yearLevels,
                 (bool)($post['recursive-year-levels'] ?? false),
                 $this->getUser()
             );
