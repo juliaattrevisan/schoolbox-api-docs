@@ -30,10 +30,6 @@ class PATMathematics extends Base
      */
     public function findData(): Payload
     {
-        /* Default to current year if none was specified
-         */
-        $this->year ?: $this->year = (int)date('Y');
-
         $query = "
             SELECT
                 Seq,
@@ -42,46 +38,13 @@ class PATMathematics extends Base
                 DiocesanMathsPATStaninePercentage,
                 NationalMathsPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
-            AND Fileyear = '{$this->year}'
-            ORDER BY seq
-        ";
+            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'";
 
-        $result = $this->getDb()->getAll($query);
-
-        /* Find data for each of the three series
-         */
-        $payload = new Payload(self::GRAPH_TITLE, $this->year);
-
-        foreach ($result as $row) {
-            $payload
-                ->aggregateStudent((string)$row['Seq'], (string)$row['IndividualMathsPATStanineMarker'])
-                ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanMathsPATStaninePercentage'])
-                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage']);
+        if ($this->year) {
+            $query .= " AND Fileyear = '{$this->year}' ";
         }
 
-        return $payload;
-    }
-
-
-    /**
-     * Find all the data for PAT Mathematics graph in any year
-     *
-     * @return Payload
-     */
-    public function findDataInAnyYear(): Payload
-    {
-        $query = "
-            SELECT
-                Seq,
-                ThisStudentStanine,
-                IndividualMathsPATStanineMarker,
-                DiocesanMathsPATStaninePercentage,
-                NationalMathsPATStaninePercentage
-            FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
-            ORDER BY seq
-        ";
+        $query .= " ORDER BY seq ";
 
         $result = $this->getDb()->getAll($query);
 

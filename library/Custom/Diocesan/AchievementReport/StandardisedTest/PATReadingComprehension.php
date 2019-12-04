@@ -30,22 +30,21 @@ class PATReadingComprehension extends Base
      */
     public function findData(): Payload
     {
-        /* Default to current year if none was specified
-         */
-        $this->year ?: $this->year = (int)date('Y');
-
         $query = "
-            SELECT 
+            SELECT
                 Seq,
                 ThisStudentStanine,
                 IndividualReadingComprehensionPATStanineMarker,
                 DiocesanReadingComprehensionPATStaninePercentage,
                 NationalReadingComprehensionPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
-            AND Fileyear = '{$this->year}'
-            ORDER BY seq
-        ";
+            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'";
+
+        if ($this->year) {
+            $query .= " AND Fileyear = '{$this->year}' ";
+        }
+
+        $query .= " ORDER BY seq ";
 
         $result = $this->getDb()->getAll($query);
 
