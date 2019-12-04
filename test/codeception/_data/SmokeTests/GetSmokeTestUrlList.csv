@@ -1,0 +1,5 @@
+Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/home
+Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
+Create a user,https://vagrant.dev.schoolbox.cloud/adminv2/user/create
+Go to service permissions,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions
+Go to bulk modify,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify
