@@ -72,15 +72,16 @@ class ValidPAT
      */
     public function isSatisifiedBy(User $user, array $externalUser): bool
     {
+
         /* Years 3-10 always show the tab
          */
-        if (\in_array($yearLevel, [3,4,5,6,7,8,9,10], true) ) {
+        if (\in_array((int)$user->getYear(), [3,4,5,6,7,8,9,10], true) ) {
             return true;
         }
 
         /* 11-13 requires us to check constituent pieces - if any exist, the PAT tab exists
          */
-        if (\in_array($yearLevel, [11,12,13], true)) {
+        if (\in_array((int)$user->getYear(), [11,12,13], true)) {
             $tablePayload = (new PATTable($user, $externalUser, $this->db, $this->year))->findData();
             $mathematicsPayload = (new PATMathematics($user, $externalUser, $this->db, $this->year))->findData();
             $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $this->db, $this->year))->findData();
