@@ -18,13 +18,13 @@
 <div class="achievement-report standardised-test">
     <div class="row">
         <div class="small-12 columns">
-            {% include '@standardisedTest/PATTable.twig' with {
+            {% include '@standardisedTest/PAT/Table.twig' with {
                 data: PATTable.data
             } %}
         </div>
     </div>
 
-    {% include '@standardisedTest/PATNavigation.twig' with {
+    {% include '@standardisedTest/PAT/Navigation.twig' with {
         elements: PATNavigation
     } %}
 
