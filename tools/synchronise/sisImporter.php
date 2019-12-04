@@ -77,36 +77,25 @@ HELP;
             exit;
         }
 
-        /* Spawn composites based on args
+        /* Spawn schedular based on args
          *
-         * This gives you the cli choice of loading from an api endpoint
-         * or a locally-cached xml file instead
+         * Use Hourly frequency, taking advantage of the functional equivalence
          */
         $host = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
-        $file = $this->getOpt(self::OPT_LONG_FILE);
+        $frequency = Endpoint\Scheduler::HOURLY;
         $type = $this->getConfig()->get('schooldata_import_data_source');
+        $file = $this->getOpt(self::OPT_LONG_FILE);
 
-        $composites = (new Endpoint\Factory($host, $key, $this->perform(), $this->getLogger()))->produce($file, $type);
-
-        /* No composites produced; exit
-         * Either you chose an invalid $type or you don't need a $type at all (csv imports)
+        /* Accept perform param from opts
          */
-        if (null === $composites) {
-            exit;
-        }
+        $perform = $this->perform();
 
-        try {
-            foreach ($composites as $composite) {
-                $composite->import();
-            }
-        } catch (\RuntimeException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
-        } catch (InvalidUriPartException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
-        } catch (InvalidArgumentException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
-        }
+        /* Execute scheduler
+         */
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
+
+        (new Endpoint\Scheduler($frequency, $factory, $type, $file))->run(time());
     }
 };
 

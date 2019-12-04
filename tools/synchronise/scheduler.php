@@ -69,23 +69,26 @@ HELP;
         }
 
         /* Spawn scheduler based on args
+         *
+         * This scheduler never takes a cached file as input source
+         * Though maybe it should be able to do that...? It would allow people
+         * to ftp stuff to a folder instead of providing an api endpoint
          */
         $host = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
-        $type = $this->getConfig()->get('schooldata_import_data_source');
         $frequency = $this->getConfig()->get('schooldata_import_frequency');
+        $type = $this->getConfig()->get('schooldata_import_data_source');
+        $file = null;
 
         /* This always perform updates
          */
-        $factory = new Endpoint\Factory($host, $key, true, $this->getLogger());
-
-        /* The time when the script ran
-         */
-        $now = time();
+        $perform = true;
 
         /* Execute scheduler
          */
-        (new Endpoint\Scheduler($frequency, $factory, $type, $this->getLogger()))->run($now);
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
+
+        (new Endpoint\Scheduler($frequency, $factory, $type, $file, $this->getLogger()))->run(time());
     }
 };
 

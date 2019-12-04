@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Scheduler
@@ -40,6 +39,15 @@ class Scheduler
     private $factory;
 
 
+    /**
+     * Optional path to a file containing cached nodes that can be read instead of
+     * realtime endpoint access (nicer for development/debugging)
+     *
+     * @var string|null
+     */
+    private $file;
+
+
     /**'
      * @var string
      */
@@ -58,13 +66,15 @@ class Scheduler
      * @param string          $frequency
      * @param Factory         $factory
      * @param string          $type
+     * @param string|null     $file
      * @param LoggerInterface $logger
      */
-    public function __construct(string $frequency, Factory $factory, string $type, LoggerInterface $logger)
+    public function __construct(string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
     {
         $this->frequency = $frequency;
         $this->factory = $factory;
         $this->type = $type;
+        $this->file = $file;
         $this->logger = $logger;
     }
 
@@ -77,7 +87,7 @@ class Scheduler
     public function run(int $now): void
     {
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $now)) {
-            $composites = $this->factory->produce(null, $this->type);
+            $composites = $this->factory->produce($this->file, $this->type);
 
             /* No composites produced; exit
              * Either you chose an invalid $type or you don't need a $type at all (csv imports)
