@@ -64,10 +64,16 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findSavedIdsForUser(int $userId)
     {
-        $pb = $this->getPredicateBuilder();
-        $pb->equals('user_id', $userId);
-        $pb->isNull('a.rejected_at');
-        $pb->isNull('deleted_at');
+        $nowDatabase = \Alaress_Date_Format::now()->getDatabase();
+
+        $pb = $this->getPredicateBuilder()
+                   ->equals('user_id', $userId)
+                   ->notNull('a.submitted_at')
+                   ->notNull('a.accepted_at')
+                   ->isNull('a.rejected_at')
+                   ->isNull('deleted_at')
+                   ->lessThanOrEqualTo('a.publish_at', $nowDatabase)
+                   ->greaterThan('a.expires_at', $nowDatabase);
 
         $query = $this->getSelectString() . ' WHERE ' . implode(' AND ', $pb->getWhere());
 
