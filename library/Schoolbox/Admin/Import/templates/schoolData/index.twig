@@ -132,15 +132,17 @@
     <div class="small-12 island" id="config-island">
         <h3 class="subheader">Status</h3>
 
-        <section class="content">
-            <p>Endpoint status goes here</p>
-        </section>
+        <div id="status-container"></div>
+
+        <script>
+            $(function() {
+                $.get('{{ statusRoute }}', function(response) {
+                    $('#status-container').html(response);
+                });
+            });
+        </script>
 
         <h3 class="subheader">View Data</h3>
-
-        <section class="content">
-            <p>View data goes here</p>
-        </section>
     </div>
     <div class="small-12 island" id="csv-island">
         <h3 class="subheader">Import from csv files</h3>

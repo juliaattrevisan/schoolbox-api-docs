@@ -18,6 +18,7 @@ use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -66,7 +67,8 @@ class Controller extends ConfigController
             'pageCurrent' => 'import/schoolDataImport',
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
-            'configContext' => $configContext
+            'configContext' => $configContext,
+            'statusRoute' => $this->getRouter()->generate('adminImportIndex.getStatus'),
         ])->setTitle('School Data Import'));
     }
 
@@ -96,5 +98,20 @@ class Controller extends ConfigController
     private function buildConfigPredicate(): Builder
     {
         return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SCHOOLDATA);
+    }
+
+
+    /**
+     * Build asynchronous status report
+     */
+    public function getStatus()
+    {
+        $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
+        $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
+        $type = $this->getConfigLoader()->get('schooldata_import_data_source');
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
+            'status' => (new Endpoint\Status\Factory($host, $key))->produce($type)
+        ]));
     }
 }

@@ -1,0 +1,15 @@
+{##
+ # Status
+ #
+ # Get a report about an endpoint's availability and what it's producing
+ # These are unique to each sis so isams will do it differently to kamar et al.
+ #
+ # @param IStatus status
+ #}
+<section class="content">
+    <p>{{ status.reachable }}</p>
+</section>
+
+<section class="content">
+    <pre>{{ status.report }}</pre>
+</section>
