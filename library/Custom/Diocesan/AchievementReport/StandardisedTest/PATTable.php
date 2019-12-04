@@ -16,6 +16,14 @@ class PATTable extends Base
 {
 
     /**
+     * Whether there was any data found
+     *
+     * @var bool
+     */
+    private $hasData = false;
+
+
+    /**
      * I changed the SELECT aliases from the original, in the interest of posterity
      *
      * @return array
@@ -23,14 +31,14 @@ class PATTable extends Base
     public function findData(): array
     {
         $query = "
-            SELECT 
-                R.YEARLEVEL AS year, 
+            SELECT
+                R.YEARLEVEL AS year,
                 MAX(R.MATHS) AS mathematics,
                 MAX(R.LC) AS listeningComprehension,
                 MAX(R.RV) AS readingVocabulary,
                 MAX(R.RC) AS readingComprehension,
                 MAX(R.PG ) AS punctuationGrammar
-            FROM 
+            FROM
             (
             select YearLevel,THISSTUDENTSTANINE,
             CASE WHEN IndividualMathsPATStanineMarker<>0 THEN THISSTUDENTSTANINE ELSE 0 END AS MATHS,
@@ -53,8 +61,19 @@ class PATTable extends Base
 
         foreach ($result as $row) {
             $stack[$row['year']] = $row;
+
+            $this->hasData = true;
         }
 
         return $stack;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasData(): bool
+    {
+        return $this->hasData;
     }
 }

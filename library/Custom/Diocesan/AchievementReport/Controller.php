@@ -21,6 +21,7 @@ use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATListeningComprehe
 use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATMathematics;
 use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingComprehension;
 use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingVocabulary;
+use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATTable;
 use MSSQL;
 use Schoolbox\User;
 
@@ -169,6 +170,13 @@ class Controller extends Base {
 
         /* Each graph's payload and visibility status
          */
+        $tablePayload = (new PATTable($user, $externalUser, $db, $year))->findData();
+
+        $PATTable = [
+            'data' => $tablePayload->getData(),
+            'visible' => (new ValidPATTable())->isSatisfiedBy($user->getYear(), $tablePayload->hasData())
+        ];
+
         $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATMathematics = [
@@ -220,7 +228,7 @@ class Controller extends Base {
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
 
-                'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData(),
+                'PATTable' => $PATTable,
                 'PATNavigation' => [
                     'all' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
                     'selected' => $year ?? (int)date('Y')
