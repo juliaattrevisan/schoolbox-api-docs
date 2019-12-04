@@ -170,10 +170,10 @@ class Controller extends Base {
 
         /* Each graph's payload and visibility status
          */
-        $tablePayload = (new PATTable($user, $externalUser, $db, $year))->findData();
+        $tablePayload = new PATTable($user, $externalUser, $db, $year);
 
         $PATTable = [
-            'data' => $tablePayload->getData(),
+            'data' => $tablePayload->findData(),
             'visible' => (new ValidPATTable())->isSatisfiedBy($user->getYear(), $tablePayload->hasData())
         ];
 
