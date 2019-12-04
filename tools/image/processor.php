@@ -44,10 +44,10 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Convert image files into their commonly-accessed transforms. This preconversion trades time for storage 
-so that first-time-accesses don't require an on-demand transform which can sometimes slow the system 
+Convert image files into their commonly-accessed transforms. This preconversion trades time for storage
+so that first-time-accesses don't require an on-demand transform which can sometimes slow the system
 down when everyone demands image transforms simultaneously.
- 
+
 Usage: processor.php
 
 
@@ -73,7 +73,7 @@ HELP;
             ],
             'WxH'    => [
                 [100, 100],
-                [1024, 1024],
+                [2048, 2048],
             ],
         ];
 
