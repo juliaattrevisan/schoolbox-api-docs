@@ -104,7 +104,7 @@ class Controller extends ConfigController
     /**
      * Build asynchronous status indicator payload
      */
-    public function getStatusIndicator()
+    public function getStatusIndicator(): void
     {
         $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
@@ -121,7 +121,7 @@ class Controller extends ConfigController
     /**
      * Build asynchronous status report
      */
-    public function getStatusReport()
+    public function getStatusReport(): void
     {
         $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
