@@ -9,9 +9,7 @@ namespace Custom\Diocesan\AchievementReport;
 use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
-use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
-use Custom\Diocesan\AchievementReport\StandardisedTest\Heading;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATNavigation;
+use Custom\Diocesan\AchievementReport\StandardisedTest;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 use MSSQL;
 use Schoolbox\User;
@@ -212,7 +210,7 @@ class Controller extends Base {
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
 
                     /* TODO: For each Standardised Test report piece
                      */
@@ -221,7 +219,7 @@ class Controller extends Base {
 
                 'PATTable' => $PATTable,
                 'PATNavigation' => [
-                    'all' => (new PATNavigation($user, $externalUser, $db, $selectedYear))->findData(),
+                    'all' => (new PAT\Navigation($user, $externalUser, $db, $selectedYear))->findData(),
                     'selected' => $year ?? (int)date('Y')
                 ],
                 'PATHeading' => [

@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 
 /**
  * Class PATNavigation
@@ -14,7 +14,7 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest;
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class PATNavigation extends Base
+class Navigation extends \Custom\Diocesan\AchievementReport\StandardisedTest\Base
 {
 
     /**
@@ -25,11 +25,11 @@ class PATNavigation extends Base
     public function findData(): array
     {
         $query = "
-            SELECT DISTINCT Fileyear 
+            SELECT DISTINCT Fileyear
             FROM uvSchoolBoxPATSTARSummary
             WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
             AND (
-                IndividualMathsPATStanineMarker <> 0 
+                IndividualMathsPATStanineMarker <> 0
                 OR IndividualListeningComprehensionPATStanineMarker <> 0
                 OR IndividualReadingComprehensionPATStanineMarker <> 0
                 OR IndividualReadingVocabularyPATStanineMarker <> 0
