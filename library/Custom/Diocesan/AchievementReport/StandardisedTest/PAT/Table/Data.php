@@ -5,14 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table;
 
 /**
- * Class PATTable
+ * Class Data
  *
- * @package Custom\Diocesan\AchievementReport\StandardisedTest
+ * @package Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table
  */
-class PATTable extends Base
+class Data extends \Custom\Diocesan\AchievementReport\StandardisedTest\Base
 {
 
     /**

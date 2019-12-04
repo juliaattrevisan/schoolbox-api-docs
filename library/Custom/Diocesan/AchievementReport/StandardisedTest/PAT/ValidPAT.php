@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 
 use MSSQL;
 use Schoolbox\User;
@@ -82,18 +82,18 @@ class ValidPAT
         /* 11-13 requires us to check constituent pieces - if any exist, the PAT tab exists
          */
         if (\in_array((int)$user->getYear(), [11,12,13], true)) {
-            $tablePayload = (new PATTable($user, $externalUser, $this->db, $this->year))->findData();
-            $mathematicsPayload = (new PATMathematics($user, $externalUser, $this->db, $this->year))->findData();
-            $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $this->db, $this->year))->findData();
-            $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $this->db, $this->year))->findData();
-            $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $this->db, $this->year))->findData();
+            $tablePayload = (new PAT\Table\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $mathematicsPayload = (new PAT\Mathematics\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $listeningComprehensionPayload = (new PAT\ListeningComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $readingVocabularyPayload = (new PAT\ReadingVocabulary\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $readingComprehensionPayload = (new PAT\ReadingComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
 
             return
-                (new ValidPATTable())->isSatisfiedBy($this->user->getYear(), $tablePayload->hasData()) ||
-                (new ValidPATMathematics())->isSatisfiedBy($this->user->getYear(), $mathematicsPayload->hasData()) ||
-                (new ValidPATListeningComprehension())->isSatisfiedBy($this->user->getYear(), $listeningComprehensionPayload->hasData()) ||
-                (new ValidPATReadingVocabulary())->isSatisfiedBy($this->user->getYear(), $readingVocabularyPayload->hasData()) ||
-                (new ValidPATReadingComprehension())->isSatisfiedBy($this->user->getYear(), $readingComprehensionPayload->hasData());
+                (new PAT\Table\ValidHasData())->isSatisfiedBy($this->user->getYear(), $tablePayload->hasData()) ||
+                (new PAT\Mathematics\ValidHasData())->isSatisfiedBy($this->user->getYear(), $mathematicsPayload->hasData()) ||
+                (new PAT\ListeningComprehension\ValidHasData())->isSatisfiedBy($this->user->getYear(), $listeningComprehensionPayload->hasData()) ||
+                (new PAT\ReadingVocabulary\ValidHasData())->isSatisfiedBy($this->user->getYear(), $readingVocabularyPayload->hasData()) ||
+                (new PAT\ReadingComprehension\ValidHasData())->isSatisfiedBy($this->user->getYear(), $readingComprehensionPayload->hasData());
         }
 
         /* Everyone else has nothing

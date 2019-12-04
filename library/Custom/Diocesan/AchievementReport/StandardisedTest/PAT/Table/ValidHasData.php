@@ -5,16 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table;
 
 /**
- * Class ValidPATTable
+ * Class ValidHasData
  *
  * Determine whether the PAT Table should appear
  *
- * @package Custom\Diocesan\AchievementReport\StandardisedTest
+ * @package Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table
  */
-class ValidPATTable
+class ValidHasData
 {
 
     /**

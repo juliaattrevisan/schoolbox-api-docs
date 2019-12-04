@@ -5,26 +5,26 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\ReadingVocabulary;
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Stanine\Payload;
 
 /**
- * Class PATMathematics
+ * Class Data
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class PATMathematics extends Base
+class Data extends \Custom\Diocesan\AchievementReport\StandardisedTest\Base
 {
 
     /**
      * Graph title
      */
-    private const GRAPH_TITLE = 'PAT Mathematics';
+    private const GRAPH_TITLE = 'PAT Reading Vocabulary';
 
 
     /**
-     * Find all the data for PAT Mathematics graph for the year specified
+     * Find all the data for PAT Reading Vocabulary graph
      *
      * @return Payload
      */
@@ -34,9 +34,9 @@ class PATMathematics extends Base
             SELECT
                 Seq,
                 ThisStudentStanine,
-                IndividualMathsPATStanineMarker,
-                DiocesanMathsPATStaninePercentage,
-                NationalMathsPATStaninePercentage
+                IndividualReadingVocabularyPATStanineMarker,
+                DiocesanReadingVocabularyPATStaninePercentage,
+                NationalReadingVocabularyPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
             WHERE ThisStudentID = '{$this->externalUser['StudentID']}'";
 
@@ -54,9 +54,9 @@ class PATMathematics extends Base
 
         foreach ($result as $row) {
             $payload
-                ->aggregateStudent((string)$row['Seq'], (string)$row['IndividualMathsPATStanineMarker'])
-                ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanMathsPATStaninePercentage'])
-                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage']);
+                ->aggregateStudent((string)$row['Seq'], (string)$row['IndividualReadingVocabularyPATStanineMarker'])
+                ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanReadingVocabularyPATStaninePercentage'])
+                ->aggregateNational((string)$row['Seq'], (string)$row['NationalReadingVocabularyPATStaninePercentage']);
         }
 
         return $payload;

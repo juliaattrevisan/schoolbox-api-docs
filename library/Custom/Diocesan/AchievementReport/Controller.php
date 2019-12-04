@@ -11,17 +11,8 @@ use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATHeading;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATListeningComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATNavigation;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingVocabulary;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATTable;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATListeningComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATMathematics;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingVocabulary;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATTable;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 use MSSQL;
 use Schoolbox\User;
 
@@ -170,39 +161,39 @@ class Controller extends Base {
 
         /* Each graph's payload and visibility status
          */
-        $tablePayload = new PATTable($user, $externalUser, $db, $year);
+        $tablePayload = new PAT\Table\Data($user, $externalUser, $db, $year);
 
         $PATTable = [
             'data' => $tablePayload->findData(),
-            'visible' => (new ValidPATTable())->isSatisfiedBy($user->getYear(), $tablePayload->hasData())
+            'visible' => (new PAT\Table\ValidHasData())->isSatisfiedBy($user->getYear(), $tablePayload->hasData())
         ];
 
-        $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $selectedYear))->findData();
+        $mathematicsPayload = (new PAT\Mathematics\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATMathematics = [
             'data' => $mathematicsPayload->getData(),
-            'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
+            'visible' => (new PAT\Mathematics\ValidHasData())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
         ];
 
-        $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $selectedYear))->findData();
+        $listeningComprehensionPayload = (new PAT\ListeningComprehension\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATListeningComprehension = [
             'data' => $listeningComprehensionPayload->getData(),
-            'visible' => (new ValidPATListeningComprehension())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
+            'visible' => (new PAT\ListeningComprehension\ValidHasData())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
         ];
 
-        $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $db, $selectedYear))->findData();
+        $readingVocabularyPayload = (new PAT\ReadingVocabulary\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATReadingVocabulary = [
             'data' => $readingVocabularyPayload->getData(),
-            'visible' => (new ValidPATReadingVocabulary())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
+            'visible' => (new PAT\ReadingVocabulary\ValidHasData())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
         ];
 
-        $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $db, $selectedYear))->findData();
+        $readingComprehensionPayload = (new PAT\ReadingComprehension\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATReadingComprehension = [
             'data' => $readingComprehensionPayload->getData(),
-            'visible' => (new ValidPATReadingComprehension())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
+            'visible' => (new PAT\ReadingComprehension\ValidHasData())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
         ];
 
         /* PAT Graph heading is only visible when there's at least one graph to show

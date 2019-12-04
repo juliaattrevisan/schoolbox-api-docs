@@ -5,16 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\ReadingComprehension;
 
 /**
- * Class ValidPATReadingComprehension
+ * Class ValidHasData
  *
  * Determine whether the PAT Reading Comprehension graph should appear
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class ValidPATReadingComprehension
+class ValidHasData
 {
 
     /**

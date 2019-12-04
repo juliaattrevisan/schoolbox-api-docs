@@ -5,16 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Mathematics;
 
 /**
- * Class ValidPATMathematics
+ * Class ValidHasData
  *
  * Determine whether the PAT Mathematics graph should appear
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class ValidPATMathematics
+class ValidHasData
 {
 
     /**

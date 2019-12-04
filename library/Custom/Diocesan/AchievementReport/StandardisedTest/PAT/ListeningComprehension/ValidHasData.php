@@ -5,16 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\ListeningComprehension;
 
 /**
- * Class ValidListeningComprehension
+ * Class ValidHasData
  *
  * Determine whether the PAT Listening Comprehension graph should appear
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class ValidPATListeningComprehension
+class ValidHasData
 {
 
     /**

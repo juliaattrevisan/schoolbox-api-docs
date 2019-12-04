@@ -5,16 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\ReadingVocabulary;
 
 /**
- * Class ValidReadingVocabulary
+ * Class ValidHasData
  *
  * Determine whether the PAT Reading Vocabulary graph should appear
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class ValidPATReadingVocabulary
+class ValidHasData
 {
 
     /**
