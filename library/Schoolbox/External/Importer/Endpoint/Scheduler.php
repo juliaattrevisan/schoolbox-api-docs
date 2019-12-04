@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Scheduler
@@ -93,7 +94,7 @@ class Scheduler
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
             } catch (InvalidUriPartException $e) {
                 $this->logger->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
-            } catch (InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->logger->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
             }
         }

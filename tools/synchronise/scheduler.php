@@ -7,10 +7,8 @@
  */
 declare(strict_types=1);
 
-use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
