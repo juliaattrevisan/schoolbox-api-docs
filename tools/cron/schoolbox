@@ -46,6 +46,6 @@ MAILTO="support@schoolbox.com.au"
 17 2 * * *    www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform --retry-failed -v >> /var/lib/schoolbox/cache/logs/kami-retry-failed.log 2>&1
 
 # SIS Data Importer - every hour
-0 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/synchronise/scheduler.php >> /var/lib/schoolbox/cache/logs/sis-scheduler.log 2>&1
+0 * * * *	www-data	php /usr/share/schoolbox/tools/synchronise/scheduler.php >> /var/lib/schoolbox/cache/logs/sis-scheduler.log 2>&1
 
 # End of file - do not delete
