@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Status
@@ -16,18 +18,6 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
  */
 class Status implements IStatus
 {
-
-    /**
-     * @var string
-     */
-    private $host;
-
-
-    /**
-     * @var string
-     */
-    private $key;
-
 
     /**
      * @var Api
@@ -43,9 +33,6 @@ class Status implements IStatus
      */
     public function __construct(string $host, string $key)
     {
-        $this->host = $host;
-        $this->key = $key;
-
         $this->api = new Api($host, $key);
     }
 
@@ -54,6 +41,8 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function isReachable(): bool
     {
@@ -76,6 +65,8 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return string
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function getReport(): string
     {
@@ -85,12 +76,6 @@ class Status implements IStatus
             return implode("\n", $specification->check());
         } catch (\RuntimeException $e) {
             return "Cannot access api endpoint: {$e->getMessage()}";
-        } catch (InvalidUriPartException $e) {
-            return "Cannot access api endpoint, bad url: {$e->getMessage()}";
-        } catch (InvalidArgumentException $e) {
-            return "Cannot access api endpoint, bad url: {$e->getMessage()}";
         }
-
-        return '';
     }
 }
