@@ -19,7 +19,7 @@ use Schoolbox\External\Profile as UserProfile;
  *
  * Strategy executor
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Profile
  */
 class Composite implements IStrategy
 {

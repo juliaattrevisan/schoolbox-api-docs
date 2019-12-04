@@ -23,7 +23,7 @@ use Zend\Uri\Exception\InvalidUriPartException;
  * The cached xpath-traversable lives for runtime duration, it doesn't write it
  * to disk or anything like that.
  *
- * @package Schoolbox\External\UPS
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
 class Batchxml
 {

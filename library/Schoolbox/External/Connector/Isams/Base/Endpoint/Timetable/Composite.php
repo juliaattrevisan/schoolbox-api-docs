@@ -26,7 +26,7 @@ use Schoolbox\UserMapper;
  *
  * Strategy executor
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
  */
 class Composite implements IStrategy
 {

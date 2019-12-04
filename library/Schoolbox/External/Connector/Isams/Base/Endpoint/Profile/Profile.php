@@ -29,7 +29,7 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * Imports sis_user_profile* data from ISAMS xml feed
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Profile
  */
 class Profile implements IStrategy
 {
