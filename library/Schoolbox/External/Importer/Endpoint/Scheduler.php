@@ -47,15 +47,25 @@ class Scheduler
 
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+
+    /**
      * Scheduler constructor.
      *
-     * @param string $schedule
+     * @param string          $frequency
+     * @param Factory         $factory
+     * @param string          $type
+     * @param LoggerInterface $logger
      */
-    public function __construct(string $frequency, Factory $factory, string $type)
+    public function __construct(string $frequency, Factory $factory, string $type, LoggerInterface $logger)
     {
         $this->frequency = $frequency;
         $this->factory = $factory;
         $this->type = $type;
+        $this->logger = $logger;
     }
 
 
@@ -81,11 +91,11 @@ class Scheduler
                     $composite->import();
                 }
             } catch (\RuntimeException $e) {
-                $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
+                $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
             } catch (InvalidUriPartException $e) {
-                $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
+                $this->logger->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
             } catch (InvalidArgumentException $e) {
-                $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
+                $this->logger->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
             }
         }
     }

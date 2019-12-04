@@ -96,7 +96,7 @@ HELP;
 
         /* Execute scheduler
          */
-        (new Endpoint\Scheduler($frequency, $factory, $type))->run($now);
+        (new Endpoint\Scheduler($frequency, $factory, $type, $this->getLogger()))->run($now);
     }
 };
 
