@@ -51,9 +51,9 @@ class Lists
         $ids = $this->saveForLaterMapper->findSavedIdsForUser($userId);
 
         if (\count($ids)) {
-            return $this->newsMapper->findByColumnList(['id' => $ids, 'rejected_at' => null], [
+            return $this->newsMapper->findByColumn('id', $ids, [
                 'order' => [
-                    'publish_at' => 'asc'
+                    'publish_at' => 'desc'
                 ]
             ]);
         }
