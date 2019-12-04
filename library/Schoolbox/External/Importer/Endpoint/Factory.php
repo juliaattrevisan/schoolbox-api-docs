@@ -31,7 +31,7 @@ use UnexpectedValueException;
  * Create a set of Composites which import Profile and Timetable data
  * from third-party endpoints into schoolbox
  *
- * @package Schoolbox\External\Importer
+ * @package Schoolbox\External\Importer\Endpoint
  */
 class Factory
 {
