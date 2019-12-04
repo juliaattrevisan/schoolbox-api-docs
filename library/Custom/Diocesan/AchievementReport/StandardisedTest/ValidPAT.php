@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 
+use MSSQL;
 use Schoolbox\User;
 
 /**

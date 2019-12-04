@@ -111,14 +111,12 @@ class Navigation
 
         /* Conditional PAT report
          */
-        if (new ValidPAT($this->user, $this->externalUser, $this->db, $this->year)) {
+        if (new ValidPAT($this->db)) {
             $availableNavigation[self::STANDARDISEDTEST_PAT_KEY] = [
                 'url' => '',
                 'label' => 'PAT'
             ];
         }
-
-
 
         /* Conditional STAR report
          */
