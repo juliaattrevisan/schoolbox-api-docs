@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
-use Zend\Uri\Uri;
 
 /**
  * Class Status
@@ -76,7 +75,7 @@ class Status implements IStatus
     /**
      * @inheritDoc
      *
-     * @return string|null
+     * @return string
      */
     public function getReport(): string
     {

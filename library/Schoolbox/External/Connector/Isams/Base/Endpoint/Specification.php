@@ -57,7 +57,8 @@ class Specification
      * @param LoggerInterface|null $log
      * @param Batchxml             $batchxml
      */
-    public function __construct(?LoggerInterface $log, Batchxml $batchxml) {
+    public function __construct(?LoggerInterface $log, Batchxml $batchxml)
+    {
         $this->log = $log;
         $this->batchxml = $batchxml;
     }
