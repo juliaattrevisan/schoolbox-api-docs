@@ -79,7 +79,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             $this->setBlock('has_image', 'preview_image', "preview_image_block");
             $this->setBlock('has_image', 'submit_image', 'submit_image_block');
 
-            $pixel = 1024;
+            $pixel = 2048;
             $this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image->getId()}&height=$pixel&width=$pixel");
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
 
