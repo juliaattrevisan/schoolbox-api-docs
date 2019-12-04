@@ -24,7 +24,7 @@ class PATMathematics extends Base
 
 
     /**
-     * Find all the data for PAT Mathematics graph
+     * Find all the data for PAT Mathematics graph for the year specified
      *
      * @return Payload
      */
@@ -35,7 +35,7 @@ class PATMathematics extends Base
         $this->year ?: $this->year = (int)date('Y');
 
         $query = "
-            SELECT 
+            SELECT
                 Seq,
                 ThisStudentStanine,
                 IndividualMathsPATStanineMarker,
@@ -44,6 +44,42 @@ class PATMathematics extends Base
             FROM uvSchoolBoxPATSTARSummary
             WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
             AND Fileyear = '{$this->year}'
+            ORDER BY seq
+        ";
+
+        $result = $this->getDb()->getAll($query);
+
+        /* Find data for each of the three series
+         */
+        $payload = new Payload(self::GRAPH_TITLE, $this->year);
+
+        foreach ($result as $row) {
+            $payload
+                ->aggregateStudent((string)$row['Seq'], (string)$row['IndividualMathsPATStanineMarker'])
+                ->aggregateDiocesan((string)$row['Seq'], (string)$row['DiocesanMathsPATStaninePercentage'])
+                ->aggregateNational((string)$row['Seq'], (string)$row['NationalMathsPATStaninePercentage']);
+        }
+
+        return $payload;
+    }
+
+
+    /**
+     * Find all the data for PAT Mathematics graph in any year
+     *
+     * @return Payload
+     */
+    public function findDataInAnyYear(): Payload
+    {
+        $query = "
+            SELECT
+                Seq,
+                ThisStudentStanine,
+                IndividualMathsPATStanineMarker,
+                DiocesanMathsPATStaninePercentage,
+                NationalMathsPATStaninePercentage
+            FROM uvSchoolBoxPATSTARSummary
+            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
             ORDER BY seq
         ";
 

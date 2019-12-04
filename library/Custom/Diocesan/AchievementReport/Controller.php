@@ -163,30 +163,34 @@ class Controller extends Base {
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
 
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? (int)date('Y');
+
         /* Each graph's payload and visibility status
          */
-        $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $year))->findData();
+        $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATMathematics = [
             'data' => $mathematicsPayload->getData(),
             'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
         ];
 
-        $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $year))->findData();
+        $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATListeningComprehension = [
             'data' => $listeningComprehensionPayload->getData(),
             'visible' => (new ValidPATListeningComprehension())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
         ];
 
-        $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $db, $year))->findData();
+        $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATReadingVocabulary = [
             'data' => $readingVocabularyPayload->getData(),
             'visible' => (new ValidPATReadingVocabulary())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
         ];
 
-        $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $db, $year))->findData();
+        $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATReadingComprehension = [
             'data' => $readingComprehensionPayload->getData(),
