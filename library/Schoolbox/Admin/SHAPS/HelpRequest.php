@@ -106,17 +106,18 @@ class HelpRequest
          * Host and Origin headers are for working around CSRF protection
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
-        $defaultQueryParams = ['ts' => $auth['timestamp'], 'digest' => $auth['digest']];
-        $queryString = \http_build_query(array_merge($defaultQueryParams, $queryParams));
-        $uri         = "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}?$queryString";
-        $headers     = [
-            'Host'   => $auth['host'],
-            'Origin' => $auth['host'],
+        $defaultQueryParams = ['ts' => $auth['timestamp']];
+        $queryString        = \http_build_query(array_merge($defaultQueryParams, $queryParams));
+        $uri                = "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}?$queryString";
+        $headers            = [
+            'Host'           => $auth['host'],
+            'Origin'         => $auth['host'],
+            'Authentication' => $auth['digest'],
         ];
-        if(null === $formParams){
+        if (null === $formParams) {
             $body = null;
         } else {
-            $body = \http_build_query($formParams, '', '&');
+            $body                    = \http_build_query($formParams, '', '&');
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
