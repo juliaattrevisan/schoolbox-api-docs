@@ -10,7 +10,7 @@ use Alaress\Web\Controller\Base;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATHeading;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Heading;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PATNavigation;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 use MSSQL;
@@ -221,11 +221,11 @@ class Controller extends Base {
 
                 'PATTable' => $PATTable,
                 'PATNavigation' => [
-                    'all' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
+                    'all' => (new PATNavigation($user, $externalUser, $db, $selectedYear))->findData(),
                     'selected' => $year ?? (int)date('Y')
                 ],
                 'PATHeading' => [
-                    'label' => (new PATHeading($user, $externalUser, $db, $year))->findData(),
+                    'label' => (new PAT\Heading($user, $externalUser, $db, $selectedYear))->findData(),
                     'visible' => $headingVisible
                 ],
                 'PATMathematics' => $PATMathematics,
