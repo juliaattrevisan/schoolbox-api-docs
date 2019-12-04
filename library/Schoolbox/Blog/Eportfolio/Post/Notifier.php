@@ -267,7 +267,20 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
+        // Are we targeting parents?
+        if (Role::PARENT === $roleType) {
+            // Load parents so we can display just their child's first name
+            $effector->loadParents();
+            if ($effector->getId() !== $owner->getId()) {
+                $owner->loadParents();
+            }
+        }
+
         foreach ($audience as $target) {
+            /** @var User $target */
+            if (!$target->getChildren()) {
+                $target->setChildren(User::createCollection());
+            }
             // Just first name if advising parent of child's action
             $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector, ParameterInterface::STACKING_REPLACE)
