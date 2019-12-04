@@ -38,6 +38,7 @@ class Factory
     /**
      * The family of importers that we can spawn
      */
+    public const CSV = 'csv';
     public const ISAMS = 'isams';
     public const KAMAR = 'kamar';
     public const SENTRAL = 'sentral';
