@@ -8,16 +8,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import;
 
-use Alaress\Database\Predicate;
-use Alaress\Web\Controller\Base;
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\ConfigController;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use PDOException;
+use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
-use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Admin\Settings\ModuleConfig;
-use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use UnexpectedValueException;
 
 /**
  * Class Controller
@@ -32,11 +34,11 @@ class Controller extends ConfigController
     /**
      * Landing Page for Direct Import
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
+     * @throws ServiceNotFound
+     * @throws RouteNotFound
+     * @throws ReflectionException
      */
-    public function getDirectIndex()
+    public function getDirectIndex(): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct/index.twig', [
             'pageCurrent' => 'import/directImport',
@@ -48,11 +50,12 @@ class Controller extends ConfigController
     /**
      * Landing Page for School Data Import
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
+     * @throws ServiceNotFound
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws InvalidColumnException
      */
-    public function getSchoolDataIndex()
+    public function getSchoolDataIndex(): void
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
@@ -71,13 +74,13 @@ class Controller extends ConfigController
     /**
      * Save the configuration for School Data Import's chosen mechanism
      *
-     * @throws Predicate\InvalidColumnException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws InvalidColumnException
+     * @throws RouteNotFound
+     * @throws PDOException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
-    public function postSchoolDataOptions()
+    public function postSchoolDataOptions(): void
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
@@ -87,10 +90,10 @@ class Controller extends ConfigController
     /**
      * Returns a predicate builder for finding all custom config for this module
      *
-     * @return \Alaress\Database\Predicate\Builder
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @return Builder
+     * @throws InvalidColumnException
      */
-    private function buildConfigPredicate(): Predicate\Builder
+    private function buildConfigPredicate(): Builder
     {
         return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SCHOOLDATA);
     }
