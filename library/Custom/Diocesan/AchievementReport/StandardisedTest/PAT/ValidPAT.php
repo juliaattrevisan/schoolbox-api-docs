@@ -53,10 +53,7 @@ class ValidPAT
     /**
      * ValidPAT constructor.
      *
-     * @param User     $user
-     * @param array    $externalUser
-     * @param MSSQL    $db
-     * @param int|null $year
+     * @param MSSQL $db
      */
     public function __construct(MSSQL $db)
     {
@@ -68,6 +65,8 @@ class ValidPAT
      * Certain year levels always display the tab.
      * Other year levels display the tab only if there is data there
      *
+     * @param User  $user
+     * @param array $externalUser
      * @return bool
      */
     public function isSatisifiedBy(User $user, array $externalUser): bool
@@ -82,18 +81,18 @@ class ValidPAT
         /* 11-13 requires us to check constituent pieces - if any exist, the PAT tab exists
          */
         if (\in_array((int)$user->getYear(), [11,12,13], true)) {
-            $tablePayload = (new PAT\Table\Data($user, $externalUser, $this->db, $this->year))->findData();
-            $mathematicsPayload = (new PAT\Mathematics\Data($user, $externalUser, $this->db, $this->year))->findData();
-            $listeningComprehensionPayload = (new PAT\ListeningComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
-            $readingVocabularyPayload = (new PAT\ReadingVocabulary\Data($user, $externalUser, $this->db, $this->year))->findData();
-            $readingComprehensionPayload = (new PAT\ReadingComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $tablePayload = (new Table\Data($user, $externalUser, $this->db, $this->year));
+            $mathematicsPayload = (new Mathematics\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $listeningComprehensionPayload = (new ListeningComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $readingVocabularyPayload = (new ReadingVocabulary\Data($user, $externalUser, $this->db, $this->year))->findData();
+            $readingComprehensionPayload = (new ReadingComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
 
             return
-                (new PAT\Table\ValidHasData())->isSatisfiedBy($this->user->getYear(), $tablePayload->hasData()) ||
-                (new PAT\Mathematics\ValidHasData())->isSatisfiedBy($this->user->getYear(), $mathematicsPayload->hasData()) ||
-                (new PAT\ListeningComprehension\ValidHasData())->isSatisfiedBy($this->user->getYear(), $listeningComprehensionPayload->hasData()) ||
-                (new PAT\ReadingVocabulary\ValidHasData())->isSatisfiedBy($this->user->getYear(), $readingVocabularyPayload->hasData()) ||
-                (new PAT\ReadingComprehension\ValidHasData())->isSatisfiedBy($this->user->getYear(), $readingComprehensionPayload->hasData());
+                (new Table\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $tablePayload->hasData()) ||
+                (new Mathematics\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $mathematicsPayload->hasData()) ||
+                (new ListeningComprehension\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $listeningComprehensionPayload->hasData()) ||
+                (new ReadingVocabulary\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $readingVocabularyPayload->hasData()) ||
+                (new ReadingComprehension\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $readingComprehensionPayload->hasData());
         }
 
         /* Everyone else has nothing
