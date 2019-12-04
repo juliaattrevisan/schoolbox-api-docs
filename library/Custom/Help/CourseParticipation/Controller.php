@@ -47,11 +47,6 @@ class Controller extends Base
     public const STATUS_SERVER_ERROR          = 500; // Something went wrong server side while processing the request.
 
     /**
-     * Client requests are considered unauthorised if they are older than this many seconds.
-     */
-    private const REQUEST_TIMESTAMP_EXPIRY = 10;
-
-    /**
      * @var UserAccessMapper
      */
     private $userAccessMapper;
