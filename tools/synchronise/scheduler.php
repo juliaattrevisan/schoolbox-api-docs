@@ -76,8 +76,8 @@ HELP;
          */
         $host = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
-        $frequency = $this->getConfig()->get('schooldata_import_frequency') ?? Endpoint\Scheduler::HOURLY;
-        $type = $this->getConfig()->get('schooldata_import_data_source') ?? Endpoint\Factory::CSV;
+        $frequency = $this->getConfig()->get('schooldata_import_frequency') ?: Endpoint\Scheduler::HOURLY;
+        $type = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
         $file = null;
 
         /* This always perform updates
