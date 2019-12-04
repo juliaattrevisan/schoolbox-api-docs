@@ -25,6 +25,8 @@ class ValidScheduleExecution
     /**
      * Decide whether to execute the importer
      *
+     * @param string $frequency
+     * @param int    $now
      * @return bool
      */
     public function isSatisfiedBy(string $frequency, int $now): bool

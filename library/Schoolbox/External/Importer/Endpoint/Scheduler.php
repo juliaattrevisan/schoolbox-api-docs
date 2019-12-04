@@ -71,7 +71,7 @@ class Scheduler
     /**
      * Execute the importer at $now
      *
-     * @return void
+     * @param int $now
      */
     public function run(int $now): void
     {
