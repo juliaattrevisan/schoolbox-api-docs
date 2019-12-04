@@ -381,8 +381,8 @@ class Controller extends BaseController
         $post        = $this->getRequest()->post->getArrayCopy();
 
         /** No whitespace in the codes or year levels please **/
-        $classCodes = array_map('trim', explode(',', $post['code']));
-        $yearLevels = array_map('trim', explode(',', $post['yearLevelIds']));
+        $classCodes = array_filter(array_map('trim', explode(',', $post['code'])));
+        $yearLevels = array_filter(array_map('trim', explode(',', $post['yearLevelIds'])));
 
         try {
             $model = $this->persistFolder(
@@ -496,7 +496,7 @@ class Controller extends BaseController
         // Validate class codes (prior to saving anything)
         if ($user->isSuperuser() && !$folder->getInherit()) {
             foreach ($classCodes as $code) {
-                if (strlen(trim($code)) > 20) {
+                if (strlen(trim($code)) > Code\Model::CODE_LENGTH_MAX) {
                     throw $this->errorMapper->generateException(ErrorMapper::ERROR_CODE_TOO_LONG);
                 }
             }
