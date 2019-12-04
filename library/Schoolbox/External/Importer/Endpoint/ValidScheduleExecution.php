@@ -16,6 +16,13 @@ class ValidScheduleExecution
 {
 
     /**
+     * Hours when twice-daily and daily occurs successfully
+     */
+    private const TWICE_DAILY_HOUR = 4;
+    private const DAILY_HOUR = 1;
+
+
+    /**
      * Decide whether to execute the importer
      *
      * @return bool
@@ -35,7 +42,7 @@ class ValidScheduleExecution
          * If it is, just do it
          * Otherwise, noop
          */
-        if (($frequency == Scheduler::TWICE_DAILY) && (4 === (int)date('g', $now))) {
+        if (($frequency == Scheduler::TWICE_DAILY) && (self::TWICE_DAILY_HOUR === (int)date('g', $now))) {
             return true;
         }
 
@@ -44,7 +51,7 @@ class ValidScheduleExecution
          * If it is, just do it
          * Otherwise, noop
          */
-        if (($frequency == Scheduler::DAILY) && (1 === (int)date('G', $now))) {
+        if (($frequency == Scheduler::DAILY) && (self::DAILY_HOUR === (int)date('G', $now))) {
             return true;
         }
 
