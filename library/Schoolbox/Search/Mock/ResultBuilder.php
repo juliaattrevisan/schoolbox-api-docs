@@ -307,12 +307,11 @@ class ResultBuilder
     private function generateFile(int $id): array
     {
         return [
-            'id'      => $id,
-            'title'   => $this->faker->sentence(5),
-            'publish' => $this->faker->dateTimeBetween('-1 week', '-1 hour')->format(\DateTime::RFC3339),
-            'open'    => $this->faker->dateTimeBetween('-1 hour', '-1 minute')->format(\DateTime::RFC3339),
-            'due'     => $this->faker->dateTimeBetween('+1 day', '+1 week')->format(\DateTime::RFC3339),
-            'close'   => $this->faker->dateTimeBetween('+1 week', '+2 week')->format(\DateTime::RFC3339),
+            'id'       => $id,
+            'mimetype' => $this->faker->mimeType,
+            'name'     => $this->faker->words,
+            'size'     => $this->faker->numberBetween(1000, 100000),
+            'url'      => $this->faker->imageUrl(800, 600),
         ];
     }
 
@@ -326,12 +325,8 @@ class ResultBuilder
     private function generateTextbox(int $id): array
     {
         return [
-            'id'      => $id,
-            'title'   => $this->faker->sentence(5),
-            'publish' => $this->faker->dateTimeBetween('-1 week', '-1 hour')->format(\DateTime::RFC3339),
-            'open'    => $this->faker->dateTimeBetween('-1 hour', '-1 minute')->format(\DateTime::RFC3339),
-            'due'     => $this->faker->dateTimeBetween('+1 day', '+1 week')->format(\DateTime::RFC3339),
-            'close'   => $this->faker->dateTimeBetween('+1 week', '+2 week')->format(\DateTime::RFC3339),
+            'id'    => $id,
+            'title' => $this->faker->sentence(5),
         ];
     }
 
@@ -345,12 +340,9 @@ class ResultBuilder
     private function generateLink(int $id): array
     {
         return [
-            'id'      => $id,
-            'title'   => $this->faker->sentence(5),
-            'publish' => $this->faker->dateTimeBetween('-1 week', '-1 hour')->format(\DateTime::RFC3339),
-            'open'    => $this->faker->dateTimeBetween('-1 hour', '-1 minute')->format(\DateTime::RFC3339),
-            'due'     => $this->faker->dateTimeBetween('+1 day', '+1 week')->format(\DateTime::RFC3339),
-            'close'   => $this->faker->dateTimeBetween('+1 week', '+2 week')->format(\DateTime::RFC3339),
+            'id'    => $id,
+            'title' => $this->faker->sentence(5),
+            'url'   => $this->faker->url,
         ];
     }
 
@@ -364,12 +356,10 @@ class ResultBuilder
     private function generateTile(int $id): array
     {
         return [
-            'id'      => $id,
-            'title'   => $this->faker->sentence(5),
-            'publish' => $this->faker->dateTimeBetween('-1 week', '-1 hour')->format(\DateTime::RFC3339),
-            'open'    => $this->faker->dateTimeBetween('-1 hour', '-1 minute')->format(\DateTime::RFC3339),
-            'due'     => $this->faker->dateTimeBetween('+1 day', '+1 week')->format(\DateTime::RFC3339),
-            'close'   => $this->faker->dateTimeBetween('+1 week', '+2 week')->format(\DateTime::RFC3339),
+            'id'                 => $id,
+            'title'              => $this->faker->sentence(5),
+            'url'                => $this->faker->url,
+            'backgroundImageUrl' => $this->faker->imageUrl(800, 600),
         ];
     }
 
@@ -383,12 +373,9 @@ class ResultBuilder
     private function generateForum(int $id): array
     {
         return [
-            'id'      => $id,
-            'title'   => $this->faker->sentence(5),
-            'publish' => $this->faker->dateTimeBetween('-1 week', '-1 hour')->format(\DateTime::RFC3339),
-            'open'    => $this->faker->dateTimeBetween('-1 hour', '-1 minute')->format(\DateTime::RFC3339),
-            'due'     => $this->faker->dateTimeBetween('+1 day', '+1 week')->format(\DateTime::RFC3339),
-            'close'   => $this->faker->dateTimeBetween('+1 week', '+2 week')->format(\DateTime::RFC3339),
+            'id'    => $id,
+            'title' => $this->faker->sentence(5),
+            'url'   => $this->faker->url,
         ];
     }
 }
