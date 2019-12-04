@@ -62,7 +62,8 @@ class Mapper extends \Schoolbox\Mapper
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findSavedIdsForUser(int $userId) {
+    public function findSavedIdsForUser(int $userId)
+    {
         $pb = $this->getPredicateBuilder();
         $pb->equals('user_id', $userId);
         $pb->isNull('a.rejected_at');
