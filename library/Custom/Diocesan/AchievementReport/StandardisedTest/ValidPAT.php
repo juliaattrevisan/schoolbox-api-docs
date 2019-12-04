@@ -80,13 +80,14 @@ class ValidPAT
         /* 11-13 requires us to check constituent pieces - if any exist, the PAT tab exists
          */
         if (\in_array($yearLevel, [11,12,13], true)) {
-
+            $tablePayload = (new PATTable($user, $externalUser, $this->db, $this->year))->findData();
             $mathematicsPayload = (new PATMathematics($user, $externalUser, $this->db, $this->year))->findData();
             $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $this->db, $this->year))->findData();
             $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $this->db, $this->year))->findData();
             $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $this->db, $this->year))->findData();
 
             return
+                (new ValidPATTable())->isSatisfiedBy($this->user->getYear(), $tablePayload->hasData()) ||
                 (new ValidPATMathematics())->isSatisfiedBy($this->user->getYear(), $mathematicsPayload->hasData()) ||
                 (new ValidPATListeningComprehension())->isSatisfiedBy($this->user->getYear(), $listeningComprehensionPayload->hasData()) ||
                 (new ValidPATReadingVocabulary())->isSatisfiedBy($this->user->getYear(), $readingVocabularyPayload->hasData()) ||
