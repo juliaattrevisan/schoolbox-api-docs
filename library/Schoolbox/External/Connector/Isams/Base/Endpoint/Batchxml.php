@@ -8,6 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
+use RuntimeException;
+use SimpleXMLElement;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Batchxml
@@ -34,7 +38,7 @@ class Batchxml
      * Cache the xml nodes that we downloaded so we don't end up re-fetching it
      * if we traverse the xml more than once
      *
-     * @var \SimpleXMLElement
+     * @var SimpleXMLElement
      */
     private $nodes;
 
@@ -56,10 +60,10 @@ class Batchxml
      * If it was already downloaded once before, don't download it again
      *
      * @param string $path
-     * @return \SimpleXMLElement[]
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @return SimpleXMLElement[]
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function fetchXml(string $path): array
     {
@@ -70,7 +74,7 @@ class Batchxml
          * $this->printXml();
          */
         if (!$this->nodes) {
-            $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
+            $this->nodes = new SimpleXMLElement($this->api->retrieveDocument());
         }
 
         return $this->nodes->xpath($path);

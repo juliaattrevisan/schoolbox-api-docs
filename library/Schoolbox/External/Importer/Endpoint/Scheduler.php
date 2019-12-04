@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use UnexpectedValueException;
 
 /**
  * Class Scheduler
@@ -83,6 +84,7 @@ class Scheduler
      * Execute the importer at $now
      *
      * @param int $now
+     * @throws UnexpectedValueException
      */
     public function run(int $now): void
     {

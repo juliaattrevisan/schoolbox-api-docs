@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
+use PDOException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -18,6 +20,9 @@ use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
+use UnexpectedValueException;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Profile
@@ -118,11 +123,11 @@ class Profile implements IStrategy
      *
      * @throws Exception
      * @throws Mapper\DefinitionException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \UnexpectedValueException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws PDOException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function import(): void
     {
@@ -170,11 +175,11 @@ class Profile implements IStrategy
      *
      * @throws Exception
      * @throws Mapper\DefinitionException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \UnexpectedValueException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws PDOException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function importStudents(): void
     {
@@ -369,9 +374,9 @@ class Profile implements IStrategy
      *
      * @param string $studentId
      * @return string
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findComments(string $studentId): string
     {
@@ -396,9 +401,9 @@ class Profile implements IStrategy
      *
      * @param string $id
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findTutor(string $id): array
     {
@@ -411,9 +416,9 @@ class Profile implements IStrategy
      *
      * @param string $houseName
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findHousemaster(string $houseName): array
     {
@@ -436,9 +441,9 @@ class Profile implements IStrategy
      *
      * @param string $form
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findFormTeacher(string $form): array
     {
@@ -461,9 +466,9 @@ class Profile implements IStrategy
      *
      * @param string $year
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findYearLevelCoordinator(string $year): array
     {
@@ -486,9 +491,9 @@ class Profile implements IStrategy
      *
      * @param string $id
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findStaffMemberById(string $id): array
     {
@@ -514,9 +519,9 @@ class Profile implements IStrategy
      *
      * @param string $studentId
      * @return string|null
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findMedicalAlert(string $studentId): ?string
     {
@@ -539,9 +544,9 @@ class Profile implements IStrategy
      *
      * @param string $studentId
      * @return bool
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findSpecialNeeds(string $studentId): bool
     {
@@ -559,9 +564,9 @@ class Profile implements IStrategy
      * Mine $nodes for Campus elements and the NCYear levels to which they relate
      *
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function prefetchCampuses(): array
     {
@@ -599,11 +604,11 @@ class Profile implements IStrategy
      * @return string
      * @throws Exception
      * @throws Mapper\DefinitionException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \UnexpectedValueException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws PDOException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): string
     {

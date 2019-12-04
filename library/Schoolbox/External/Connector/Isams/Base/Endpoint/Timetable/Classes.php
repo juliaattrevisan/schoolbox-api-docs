@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
+use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -21,6 +22,7 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -314,8 +316,8 @@ class Classes implements IStrategy
      * @param array $class
      * @return ClassEntry
      * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function createTimetableClass(array $class): ClassEntry
     {
@@ -349,8 +351,8 @@ class Classes implements IStrategy
      * @param ClassEntry      $timetableClass
      * @return ClassPeriod
      * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
@@ -413,8 +415,8 @@ class Classes implements IStrategy
      * @param ClassEntry $timetableClass
      * @return ClassInvolvement
      * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
     {

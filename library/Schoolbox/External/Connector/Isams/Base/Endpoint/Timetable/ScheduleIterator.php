@@ -12,6 +12,8 @@ use Iterator;
 use RuntimeException;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use SimpleXMLElement;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class ScheduleIterator
@@ -62,8 +64,8 @@ class ScheduleIterator implements Iterator
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      * @since 5.0.0
      */
     public function current()
@@ -106,8 +108,8 @@ class ScheduleIterator implements Iterator
      * @param string $setCode
      * @return array
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findSubject(string $setCode): array
     {
@@ -135,8 +137,8 @@ class ScheduleIterator implements Iterator
      * @param SimpleXMLElement $schedule
      * @return array|SimpleXMLElement[]|string
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findPeriod(SimpleXMLElement $schedule)
     {
@@ -200,8 +202,8 @@ class ScheduleIterator implements Iterator
      * @param string $roomId
      * @return array
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findRoom(string $roomId): array
     {
@@ -229,8 +231,8 @@ class ScheduleIterator implements Iterator
      * @param string $teacherCode
      * @return array
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findTeacher(string $teacherCode): array
     {
@@ -264,8 +266,8 @@ class ScheduleIterator implements Iterator
      * @param string $setCode
      * @return array
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     private function findStudents(string $setCode): array
     {

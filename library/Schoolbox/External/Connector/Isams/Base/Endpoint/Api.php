@@ -1,7 +1,5 @@
 <?php
 /**
- * Api
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,6 +13,11 @@ use RuntimeException;
 use Zend\Uri\Exception;
 use Zend\Uri\Uri;
 
+/**
+ * Class Api
+ *
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ */
 class Api implements IApi
 {
     /**

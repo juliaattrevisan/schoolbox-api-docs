@@ -23,6 +23,7 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * Class Factory
@@ -94,8 +95,9 @@ class Factory
      * @param string      $type
      *
      * @return null|GenericCollection
+     * @throws UnexpectedValueException
      */
-    public function produce(?string $file, string $type)
+    public function produce(?string $file, string $type): ?GenericCollection
     {
         switch ($type) {
             case self::ISAMS:
@@ -116,6 +118,7 @@ class Factory
      *
      * @param string|null $file
      * @return GenericCollection
+     * @throws UnexpectedValueException
      */
     private function produceIsams(?string $file): GenericCollection
     {

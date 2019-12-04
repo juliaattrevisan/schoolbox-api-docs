@@ -8,13 +8,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Isams\Base\Endpoint;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Composite
@@ -119,10 +117,6 @@ class Composite implements IStrategy
 
     /**
      * Execute each of the strategies
-     *
-     * @throws \RuntimeException
-     * @throws InvalidUriPartException
-     * @throws InvalidArgumentException
      */
     public function import(): void
     {

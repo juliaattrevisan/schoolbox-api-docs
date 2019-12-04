@@ -8,13 +8,15 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Specification
  *
  * This explores an xml output to check whether certain nodes exist
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Profile
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
 class Specification
 {
@@ -63,8 +65,8 @@ class Specification
 
     /**
      * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function check(): void
     {
