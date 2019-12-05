@@ -72,8 +72,7 @@ class Mapper extends \Schoolbox\Mapper
                    ->notNull('a.accepted_at')
                    ->isNull('a.rejected_at')
                    ->isNull('deleted_at')
-                   ->lessThanOrEqualTo('a.publish_at', $nowDatabase)
-                   ->greaterThan('a.expires_at', $nowDatabase);
+                   ->lessThanOrEqualTo('a.publish_at', $nowDatabase);
 
         $query = $this->getSelectString() . ' WHERE ' . implode(' AND ', $pb->getWhere());
 
