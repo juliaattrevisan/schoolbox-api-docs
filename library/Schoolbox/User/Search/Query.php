@@ -63,11 +63,10 @@ class Query
         ];
 
         if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
-            $searchString = '%' . $keyword . '%';
-            $userIds = $this->getUserIdsByKeyword($searchString, $viewer);
+            $userIds = $this->getUserIdsByKeyword($keyword, $viewer);
             if ($userIds) {
                 $result['results']    = $this->getUserData($userIds);
-                $result['totalCount'] = $this->getTotalCount($searchString, $viewer);
+                $result['totalCount'] = $this->getTotalCount($keyword, $viewer);
             }
         }
 
@@ -161,6 +160,8 @@ class Query
      */
     private function getQueryFilter(string $keyword, User $viewer): array
     {
+        $searchString = $this->db->escapeForLike($keyword);
+
         $whereParts = [
             '(
                 CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstLastNameWithTitle
@@ -174,12 +175,12 @@ class Query
         ];
 
         $params = [
-            'firstLastNameWithTitle'    => $keyword,
-            'firstAndLastNameOnly'      => $keyword,
-            'titleAndLastnameOnly'      => $keyword,
-            'firstname'                 => $keyword,
-            'lastname'                  => $keyword,
-            'username'                  => $keyword,
+            'firstLastNameWithTitle'    => $searchString,
+            'firstAndLastNameOnly'      => $searchString,
+            'titleAndLastnameOnly'      => $searchString,
+            'firstname'                 => $searchString,
+            'lastname'                  => $searchString,
+            'username'                  => $searchString,
         ];
 
         /**
