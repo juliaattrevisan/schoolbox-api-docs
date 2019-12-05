@@ -63,11 +63,17 @@ class Controller extends ConfigController
             $this->router->generate('adminImportIndex.postSchoolDataOptions')
         );
 
+        $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
+        $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
+
+        $hasIndicator = $host !== '' && $key !== '';
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => 'import/schoolDataImport',
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
             'configContext' => $configContext,
+            'hasIndicator' => $hasIndicator,
             'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
         ])->setTitle('School Data Import'));
     }

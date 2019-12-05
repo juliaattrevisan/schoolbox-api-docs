@@ -130,6 +130,7 @@
     </div>
     <div class="small-12 island" id="config-island">
         <div class="row">
+            {% if hasIndicator %}
             <div class="small-12 medium-6 island">
                 <h3 class="subheader">Status</h3>
 
@@ -152,7 +153,9 @@
                     </p>
                 </section>
             </div>
-            <div class="small-12 medium-6 island">
+            {% endif %}
+
+            <div class="small-12 {% if hasIndicator %}medium-6{% endif %} island">
                 <h3 class="subheader">Your Data</h3>
 
                 <section class="content">
