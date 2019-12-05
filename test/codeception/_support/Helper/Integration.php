@@ -9,6 +9,7 @@ use Codeception\Module\REST;
 use Codeception\TestInterface;
 use Payload\Request;
 use Symfony\Component\BrowserKit\Cookie;
+use phpDocumentor\Reflection\Types\Mixed_;
 
 /**
  * This Helper provides custom extensions to the REST module
@@ -62,5 +63,11 @@ class Integration extends REST
         foreach ($request->getHeaders() as $name => $value) {
             $this->deleteHeader($name);
         }
+    }
+    
+    
+    public function grabResponseCode(): int
+    {
+        return $this->connectionModule->_getResponseStatusCode();
     }
 }
