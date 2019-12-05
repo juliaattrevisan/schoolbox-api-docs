@@ -63,7 +63,11 @@ class Data extends Base
 
         foreach ($result as $row) {
             $stack[$row['year']] = $row;
+        }
 
+        /* Decide if the table had any data
+         */
+        if (\count($stack)) {
             $this->hasData = true;
         }
 
