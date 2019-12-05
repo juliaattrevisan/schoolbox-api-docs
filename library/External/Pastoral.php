@@ -85,4 +85,28 @@ class External_Pastoral implements External_PastoralInterface
     {
         return $this->database->uploadPastoralDocument($upload);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTypeList(): array
+    {
+        return $this->database->getTypeList();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSubtypeList(): array
+    {
+        return $this->database->getSubtypeList();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDocumentClassificationList(): array
+    {
+        return $this->database->getDocumentClassificationList();
+    }
 }

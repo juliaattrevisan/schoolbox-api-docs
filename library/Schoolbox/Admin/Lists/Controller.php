@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
+use Schoolbox\Pastoral\DocumentClassification\Model;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
@@ -307,7 +308,9 @@ class Controller extends Base
 
         $luDocumentClassifications = [];
 
+        $pastoralExternal = new \External_Pastoral();
         foreach ($documentClassifications as $classification) {
+            /** @var Model $classification */
             $luDocumentClassifications[] = [
                 'key' => $classification->getId(),
                 'value' => $classification->getName()
@@ -608,6 +611,10 @@ class Controller extends Base
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
+                        'lookup'    => $pastoralExternal->getTypeList(),
+                        'nullable'  => true,
+                        'mandatory' => false,
+                        'nullable_label' => 'N/A',
                         'width'     => 3,
                         'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luPastoralCareType). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
                     ],
@@ -634,6 +641,10 @@ class Controller extends Base
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
+                        'lookup'    => $pastoralExternal->getSubtypeList(),
+                        'nullable'  => true,
+                        'mandatory' => false,
+                        'nullable_label' => 'N/A',
                         'width'     => 2,
                         'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luPastoralCareCategory). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
                     ],
@@ -653,6 +664,10 @@ class Controller extends Base
                     'externalCode' => [
                         'caption'   => 'SIS Code',
                         'width'     => 2,
+                        'lookup'    => $pastoralExternal->getDocumentClassificationList(),
+                        'nullable'  => true,
+                        'mandatory' => false,
+                        'nullable_label' => 'N/A',
                         'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luDocumentClassification). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
                     ],
                 ]
