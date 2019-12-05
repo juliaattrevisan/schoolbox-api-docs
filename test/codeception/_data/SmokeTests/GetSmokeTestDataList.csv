@@ -1,35 +1,1008 @@
-"Go admin dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
-"Go admin dashboard",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
-"Go admin dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
-"Go admin dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
-"Go admin dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
-"Go admin dashboard","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
-"Go admin dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
-"Go to user admin",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
-"Go to user admin",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
-"Go to user admin",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
-"Go to user admin",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
-"Go to user admin","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
-"Go to user admin","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
-"Go to user admin","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
-"Create a user",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
-"Create a user",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
-"Create a user",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
-"Create a user",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
-"Create a user","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
-"Create a user","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
-"Create a user","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
-"Go to service permissions",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
-"Go to service permissions",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
-"Go to service permissions",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
-"Go to service permissions",Student,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
-"Go to service permissions","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
-"Go to service permissions","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
-"Go to service permissions","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
-"Go to bulk modify",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
-"Go to bulk modify",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
-"Go to bulk modify",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
-"Go to bulk modify",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
-"Go to bulk modify","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
-"Go to bulk modify","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
-"Go to bulk modify","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
+"Go admin dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/home,200
+"Go admin dashboard",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/home,200
+"Go admin dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
+"Go admin dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
+"Go admin dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,IGNORE
+"Go admin dashboard","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/home,IGNORE
+"Go admin dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,IGNORE
+"Go to user admin",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user,200
+"Go to user admin",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user,200
+"Go to user admin",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user,401
+"Go to user admin",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user,401
+"Go to user admin","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user,IGNORE
+"Go to user admin","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user,IGNORE
+"Go to user admin","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user,IGNORE
+"Create a user",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,200
+"Create a user",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,200
+"Create a user",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,401
+"Create a user",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,401
+"Create a user","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,IGNORE
+"Create a user","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,IGNORE
+"Create a user","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,IGNORE
+"Go to service permissions",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,200
+"Go to service permissions",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,200
+"Go to service permissions",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,401
+"Go to service permissions",Student,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,401
+"Go to service permissions","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,IGNORE
+"Go to service permissions","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,IGNORE
+"Go to service permissions","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,IGNORE
+"Go to bulk modify",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,200
+"Go to bulk modify",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,200
+"Go to bulk modify",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,401
+"Go to bulk modify",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,401
+"Go to bulk modify","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,IGNORE
+"Go to bulk modify","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,IGNORE
+"Go to bulk modify","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,IGNORE
+"Go to side menu",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side,200
+"Go to side menu",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side,200
+"Go to side menu",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side,401
+"Go to side menu",Student,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side,401
+"Go to side menu","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-side,IGNORE
+"Go to side menu","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-side,IGNORE
+"Go to side menu","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-side,IGNORE
+"Create a sidemenu item",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert,200
+"Create a sidemenu item",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert,200
+"Create a sidemenu item",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert,401
+"Create a sidemenu item",Student,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert,401
+"Create a sidemenu item","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert,IGNORE
+"Create a sidemenu item","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert,IGNORE
+"Create a sidemenu item","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert,IGNORE
+"Go to top menu",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top,200
+"Go to top menu",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top,200
+"Go to top menu",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top,401
+"Go to top menu",Student,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top,401
+"Go to top menu","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-top,IGNORE
+"Go to top menu","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-top,IGNORE
+"Go to top menu","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-top,IGNORE
+"Create top menu",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create,200
+"Create top menu",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create,200
+"Create top menu",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create,401
+"Create top menu",Student,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create,401
+"Create top menu","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create,IGNORE
+"Create top menu","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create,IGNORE
+"Create top menu","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create,IGNORE
+"Go to profile button",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,200
+"Go to profile button",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,200
+"Go to profile button",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
+"Go to profile button",Student,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
+"Go to profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,IGNORE
+"Go to profile button","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,IGNORE
+"Go to profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,IGNORE
+"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,200
+"Create profile button",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,200
+"Create profile button",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,401
+"Create profile button",Student,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,401
+"Create profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,IGNORE
+"Create profile button","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,IGNORE
+"Create profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,IGNORE
+"Setup dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,200
+"Setup dashboard",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,200
+"Setup dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,401
+"Setup dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,401
+"Setup dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,IGNORE
+"Setup dashboard","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,IGNORE
+"Setup dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,IGNORE
+"Setup homepage templates",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
+"Setup homepage templates",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
+"Setup homepage templates",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
+"Setup homepage templates",Student,https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
+"Setup homepage templates","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,IGNORE
+"Setup homepage templates","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,IGNORE
+"Setup homepage templates","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,IGNORE
+"Setup ePortfolio template ",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio,200
+"Setup ePortfolio template ",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio,200
+"Setup ePortfolio template ",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio,401
+"Setup ePortfolio template ",Student,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio,401
+"Setup ePortfolio template ","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio,IGNORE
+"Setup ePortfolio template ","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio,IGNORE
+"Setup ePortfolio template ","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio,IGNORE
+"Deploy ePortfolio",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,200
+"Deploy ePortfolio",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,200
+"Deploy ePortfolio",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,401
+"Deploy ePortfolio",Student,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,401
+"Deploy ePortfolio","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,IGNORE
+"Deploy ePortfolio","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,IGNORE
+"Deploy ePortfolio","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,IGNORE
+"Config News",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/news,200
+"Config News",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/news,200
+"Config News",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
+"Config News",Student,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
+"Config News","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,IGNORE
+"Config News","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/news,IGNORE
+"Config News","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,IGNORE
+"Setup allowed files",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,200
+"Setup allowed files",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,200
+"Setup allowed files",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
+"Setup allowed files",Student,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
+"Setup allowed files","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,IGNORE
+"Setup allowed files","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,IGNORE
+"Setup allowed files","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,IGNORE
+"Configure settings",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting,200
+"Configure settings",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/setting,200
+"Configure settings",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting,401
+"Configure settings",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting,401
+"Configure settings","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting,IGNORE
+"Configure settings","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/setting,IGNORE
+"Configure settings","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting,IGNORE
+"Configure security",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,200
+"Configure security",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,200
+"Configure security",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,401
+"Configure security",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,401
+"Configure security","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,IGNORE
+"Configure security","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,IGNORE
+"Configure security","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,IGNORE
+"Configure skin",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config,200
+"Configure skin",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config,200
+"Configure skin",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config,401
+"Configure skin",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config,401
+"Configure skin","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config,IGNORE
+"Configure skin","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config,IGNORE
+"Configure skin","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config,IGNORE
+"Configure Terminology",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,200
+"Configure Terminology",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,200
+"Configure Terminology",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
+"Configure Terminology",Student,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
+"Configure Terminology","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,IGNORE
+"Configure Terminology","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,IGNORE
+"Configure Terminology","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,IGNORE
+"Import a calendar",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,200
+"Import a calendar",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,200
+"Import a calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,401
+"Import a calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,401
+"Import a calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar,IGNORE
+"Import a calendar","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar,IGNORE
+"Import a calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar,IGNORE
+"Subscibe to a calendar",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,200
+"Subscibe to a calendar",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,200
+"Subscibe to a calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
+"Subscibe to a calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
+"Subscibe to a calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,IGNORE
+"Subscibe to a calendar","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,IGNORE
+"Subscibe to a calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,IGNORE
+"Cleanup calendar",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,200
+"Cleanup calendar",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,200
+"Cleanup calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
+"Cleanup calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
+"Cleanup calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,IGNORE
+"Cleanup calendar","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,IGNORE
+"Cleanup calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,IGNORE
+"Bulk add folders",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
+"Bulk add folders",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
+"Bulk add folders",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
+"Bulk add folders",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
+"Bulk add folders","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,IGNORE
+"Bulk add folders","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,IGNORE
+"Bulk add folders","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,IGNORE
+"Rollover folders",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
+"Rollover folders",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
+"Rollover folders",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
+"Rollover folders",Student,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
+"Rollover folders","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,IGNORE
+"Rollover folders","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,IGNORE
+"Rollover folders","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,IGNORE
+"Setup grades",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/grades,200
+"Setup grades",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/grades,200
+"Setup grades",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
+"Setup grades",Student,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
+"Setup grades","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/grades,IGNORE
+"Setup grades","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/grades,IGNORE
+"Setup grades","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/grades,IGNORE
+"Setup rubric resultset",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,200
+"Setup rubric resultset",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,200
+"Setup rubric resultset",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
+"Setup rubric resultset",Student,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
+"Setup rubric resultset","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,IGNORE
+"Setup rubric resultset","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,IGNORE
+"Setup rubric resultset","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,IGNORE
+"Configure terms",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/terms,200
+"Configure terms",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/terms,200
+"Configure terms",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
+"Configure terms",Student,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
+"Configure terms","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terms,IGNORE
+"Configure terms","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/terms,IGNORE
+"Configure terms","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terms,IGNORE
+"Configure course builder",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,200
+"Configure course builder",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,200
+"Configure course builder",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,401
+"Configure course builder",Student,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,401
+"Configure course builder","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,IGNORE
+"Configure course builder","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,IGNORE
+"Configure course builder","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,IGNORE
+"Setup notifications",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages,200
+"Setup notifications",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/messages,200
+"Setup notifications",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages,401
+"Setup notifications",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages,401
+"Setup notifications","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages,IGNORE
+"Setup notifications","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/messages,IGNORE
+"Setup notifications","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages,IGNORE
+"Configure notification delivery",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,200
+"Configure notification delivery",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,200
+"Configure notification delivery",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,401
+"Configure notification delivery",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,401
+"Configure notification delivery","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,IGNORE
+"Configure notification delivery","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,IGNORE
+"Configure notification delivery","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,IGNORE
+"Configure student notifications",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,200
+"Configure student notifications",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,200
+"Configure student notifications",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,401
+"Configure student notifications",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,401
+"Configure student notifications","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,IGNORE
+"Configure student notifications","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,IGNORE
+"Configure student notifications","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,IGNORE
+"Configure push providers",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,200
+"Configure push providers",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,200
+"Configure push providers",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,401
+"Configure push providers",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,401
+"Configure push providers","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,IGNORE
+"Configure push providers","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,IGNORE
+"Configure push providers","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,IGNORE
+"Configure oAuth providers",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/oauth,200
+"Configure oAuth providers",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/oauth,200
+"Configure oAuth providers",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/oauth,401
+"Configure oAuth providers",Student,https://vagrant.dev.schoolbox.cloud/adminv2/oauth,401
+"Configure oAuth providers","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/oauth,IGNORE
+"Configure oAuth providers","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/oauth,IGNORE
+"Configure oAuth providers","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/oauth,IGNORE
+"Review registered push apps",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,200
+"Review registered push apps",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,200
+"Review registered push apps",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,401
+"Review registered push apps",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,401
+"Review registered push apps","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,IGNORE
+"Review registered push apps","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,IGNORE
+"Review registered push apps","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,IGNORE
+"Review role list",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists,200
+"Review role list",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/lists,200
+"Review role list",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists,401
+"Review role list",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists,401
+"Review role list","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists,IGNORE
+"Review role list","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/lists,IGNORE
+"Review role list","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists,IGNORE
+"Review news topics",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic,200
+"Review news topics",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic,200
+"Review news topics",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic,401
+"Review news topics",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic,401
+"Review news topics","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic,IGNORE
+"Review news topics","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic,IGNORE
+"Review news topics","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic,IGNORE
+"Review timetable colours",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,200
+"Review timetable colours",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,200
+"Review timetable colours",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,401
+"Review timetable colours",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,401
+"Review timetable colours","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,IGNORE
+"Review timetable colours","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,IGNORE
+"Review timetable colours","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour,IGNORE
+"Review pastoral types",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,200
+"Review pastoral types",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,200
+"Review pastoral types",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,401
+"Review pastoral types",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,401
+"Review pastoral types","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,IGNORE
+"Review pastoral types","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,IGNORE
+"Review pastoral types","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,IGNORE
+"Setup LTI provider",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lti,200
+"Setup LTI provider",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/lti,200
+"Setup LTI provider",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lti,401
+"Setup LTI provider",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lti,401
+"Setup LTI provider","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lti,IGNORE
+"Setup LTI provider","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/lti,IGNORE
+"Setup LTI provider","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lti,IGNORE
+"View storage usage",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,200
+"View storage usage",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,200
+"View storage usage",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,401
+"View storage usage",Student,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,401
+"View storage usage","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,IGNORE
+"View storage usage","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,IGNORE
+"View storage usage","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,IGNORE
+"Review engagement",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/engagement,200
+"Review engagement",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/engagement,200
+"Review engagement",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/engagement,401
+"Review engagement",Student,https://vagrant.dev.schoolbox.cloud/adminv2/engagement,401
+"Review engagement","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/engagement,IGNORE
+"Review engagement","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/engagement,IGNORE
+"Review engagement","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/engagement,IGNORE
+"Setup UPS rules",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/ups,200
+"Setup UPS rules",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/ups,200
+"Setup UPS rules",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/ups,401
+"Setup UPS rules",Student,https://vagrant.dev.schoolbox.cloud/adminv2/ups,401
+"Setup UPS rules","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/ups,IGNORE
+"Setup UPS rules","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/ups,IGNORE
+"Setup UPS rules","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/ups,IGNORE
+"Setup UPS rules for students",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student,200
+"Setup UPS rules for students",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student,200
+"Setup UPS rules for students",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student,401
+"Setup UPS rules for students",Student,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student,401
+"Setup UPS rules for students","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/ups/student,IGNORE
+"Setup UPS rules for students","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/ups/student,IGNORE
+"Setup UPS rules for students","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/ups/student,IGNORE
+"View Media Queue",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/video,200
+"View Media Queue",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/video,200
+"View Media Queue",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/video,401
+"View Media Queue",Student,https://vagrant.dev.schoolbox.cloud/adminv2/video,401
+"View Media Queue","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,IGNORE
+"View Media Queue","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/video,IGNORE
+"View Media Queue","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,IGNORE
+"Import users",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount,200
+"Import users",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount,200
+"Import users",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount,401
+"Import users",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount,401
+"Import users","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount,IGNORE
+"Import users","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount,IGNORE
+"Import users","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount,IGNORE
+"Import photos",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,200
+"Import photos",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,200
+"Import photos",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
+"Import photos",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
+"Import photos","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,IGNORE
+"Import photos","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,IGNORE
+"Import photos","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,IGNORE
+"Config filters",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/filters,200
+"Config filters",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/filters,200
+"Config filters",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters,401
+"Config filters",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters,401
+"Config filters","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/filters,IGNORE
+"Config filters","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/filters,IGNORE
+"Config filters","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/filters,IGNORE
+"Configure filters on pending assessment",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending,200
+"Configure filters on pending assessment",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending,200
+"Configure filters on pending assessment",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending,401
+"Configure filters on pending assessment",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending,401
+"Configure filters on pending assessment","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending,IGNORE
+"Configure filters on pending assessment","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending,IGNORE
+"Configure filters on pending assessment","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending,IGNORE
+"Configre feature tours",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,200
+"Configre feature tours",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,200
+"Configre feature tours",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,401
+"Configre feature tours",Student,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,401
+"Configre feature tours","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,IGNORE
+"Configre feature tours","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,IGNORE
+"Configre feature tours","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,IGNORE
+"View calendar",Superuser,https://vagrant.dev.schoolbox.cloud/calendar,UNKNOWN
+"View calendar",Admin,https://vagrant.dev.schoolbox.cloud/calendar,UNKNOWN
+"View calendar",Teacher,https://vagrant.dev.schoolbox.cloud/calendar,UNKNOWN
+"View calendar",Student,https://vagrant.dev.schoolbox.cloud/calendar,UNKNOWN
+"View calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/calendar,UNKNOWN
+"View calendar","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/calendar,UNKNOWN
+"View calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/calendar,UNKNOWN
+"Export calendar",Superuser,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,UNKNOWN
+"Export calendar",Admin,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,UNKNOWN
+"Export calendar",Teacher,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,UNKNOWN
+"Export calendar",Student,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,UNKNOWN
+"Export calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,UNKNOWN
+"Export calendar","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,UNKNOWN
+"Export calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,UNKNOWN
+"Create event",Superuser,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,UNKNOWN
+"Create event",Admin,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,UNKNOWN
+"Create event",Teacher,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,UNKNOWN
+"Create event",Student,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,UNKNOWN
+"Create event","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,UNKNOWN
+"Create event","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,UNKNOWN
+"Create event","News Moderator",https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,UNKNOWN
+"View all folders",Superuser,https://vagrant.dev.schoolbox.cloud/resources/,UNKNOWN
+"View all folders",Admin,https://vagrant.dev.schoolbox.cloud/resources/,UNKNOWN
+"View all folders",Teacher,https://vagrant.dev.schoolbox.cloud/resources/,UNKNOWN
+"View all folders",Student,https://vagrant.dev.schoolbox.cloud/resources/,UNKNOWN
+"View all folders","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resources/,UNKNOWN
+"View all folders","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resources/,UNKNOWN
+"View all folders","News Moderator",https://vagrant.dev.schoolbox.cloud/resources/,UNKNOWN
+"Add folder",Superuser,https://vagrant.dev.schoolbox.cloud/resource/folder/57/create,UNKNOWN
+"Add folder",Admin,https://vagrant.dev.schoolbox.cloud/resource/folder/57/create,UNKNOWN
+"Add folder",Teacher,https://vagrant.dev.schoolbox.cloud/resource/folder/57/create,UNKNOWN
+"Add folder",Student,https://vagrant.dev.schoolbox.cloud/resource/folder/57/create,UNKNOWN
+"Add folder","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource/folder/57/create,UNKNOWN
+"Add folder","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource/folder/57/create,UNKNOWN
+"Add folder","News Moderator",https://vagrant.dev.schoolbox.cloud/resource/folder/57/create,UNKNOWN
+"Modify folder",Superuser,https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify,UNKNOWN
+"Modify folder",Admin,https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify,UNKNOWN
+"Modify folder",Teacher,https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify,UNKNOWN
+"Modify folder",Student,https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify,UNKNOWN
+"Modify folder","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify,UNKNOWN
+"Modify folder","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify,UNKNOWN
+"Modify folder","News Moderator",https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify,UNKNOWN
+"Post file",Superuser,https://vagrant.dev.schoolbox.cloud/cms/file/new/57,UNKNOWN
+"Post file",Admin,https://vagrant.dev.schoolbox.cloud/cms/file/new/57,UNKNOWN
+"Post file",Teacher,https://vagrant.dev.schoolbox.cloud/cms/file/new/57,UNKNOWN
+"Post file",Student,https://vagrant.dev.schoolbox.cloud/cms/file/new/57,UNKNOWN
+"Post file","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/cms/file/new/57,UNKNOWN
+"Post file","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/cms/file/new/57,UNKNOWN
+"Post file","News Moderator",https://vagrant.dev.schoolbox.cloud/cms/file/new/57,UNKNOWN
+"Post link",Superuser,https://vagrant.dev.schoolbox.cloud/cms/link/new/57,UNKNOWN
+"Post link",Admin,https://vagrant.dev.schoolbox.cloud/cms/link/new/57,UNKNOWN
+"Post link",Teacher,https://vagrant.dev.schoolbox.cloud/cms/link/new/57,UNKNOWN
+"Post link",Student,https://vagrant.dev.schoolbox.cloud/cms/link/new/57,UNKNOWN
+"Post link","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/cms/link/new/57,UNKNOWN
+"Post link","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/cms/link/new/57,UNKNOWN
+"Post link","News Moderator",https://vagrant.dev.schoolbox.cloud/cms/link/new/57,UNKNOWN
+"Add tile",Superuser,https://vagrant.dev.schoolbox.cloud/tile/add/25,UNKNOWN
+"Add tile",Admin,https://vagrant.dev.schoolbox.cloud/tile/add/25,UNKNOWN
+"Add tile",Teacher,https://vagrant.dev.schoolbox.cloud/tile/add/25,UNKNOWN
+"Add tile",Student,https://vagrant.dev.schoolbox.cloud/tile/add/25,UNKNOWN
+"Add tile","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/tile/add/25,UNKNOWN
+"Add tile","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/tile/add/25,UNKNOWN
+"Add tile","News Moderator",https://vagrant.dev.schoolbox.cloud/tile/add/25,UNKNOWN
+"Post blog",Superuser,https://vagrant.dev.schoolbox.cloud/blog/modify/new/83,UNKNOWN
+"Post blog",Admin,https://vagrant.dev.schoolbox.cloud/blog/modify/new/83,UNKNOWN
+"Post blog",Teacher,https://vagrant.dev.schoolbox.cloud/blog/modify/new/83,UNKNOWN
+"Post blog",Student,https://vagrant.dev.schoolbox.cloud/blog/modify/new/83,UNKNOWN
+"Post blog","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/blog/modify/new/83,UNKNOWN
+"Post blog","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/blog/modify/new/83,UNKNOWN
+"Post blog","News Moderator",https://vagrant.dev.schoolbox.cloud/blog/modify/new/83,UNKNOWN
+"View blog archive",Superuser,https://vagrant.dev.schoolbox.cloud/blog/archive/83,UNKNOWN
+"View blog archive",Admin,https://vagrant.dev.schoolbox.cloud/blog/archive/83,UNKNOWN
+"View blog archive",Teacher,https://vagrant.dev.schoolbox.cloud/blog/archive/83,UNKNOWN
+"View blog archive",Student,https://vagrant.dev.schoolbox.cloud/blog/archive/83,UNKNOWN
+"View blog archive","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/blog/archive/83,UNKNOWN
+"View blog archive","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/blog/archive/83,UNKNOWN
+"View blog archive","News Moderator",https://vagrant.dev.schoolbox.cloud/blog/archive/83,UNKNOWN
+"Manage groups",Superuser,https://vagrant.dev.schoolbox.cloud/group/join,UNKNOWN
+"Manage groups",Admin,https://vagrant.dev.schoolbox.cloud/group/join,UNKNOWN
+"Manage groups",Teacher,https://vagrant.dev.schoolbox.cloud/group/join,UNKNOWN
+"Manage groups",Student,https://vagrant.dev.schoolbox.cloud/group/join,UNKNOWN
+"Manage groups","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/group/join,UNKNOWN
+"Manage groups","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/group/join,UNKNOWN
+"Manage groups","News Moderator",https://vagrant.dev.schoolbox.cloud/group/join,UNKNOWN
+"Manage my links",Superuser,https://vagrant.dev.schoolbox.cloud/cms/myLinks,UNKNOWN
+"Manage my links",Admin,https://vagrant.dev.schoolbox.cloud/cms/myLinks,UNKNOWN
+"Manage my links",Teacher,https://vagrant.dev.schoolbox.cloud/cms/myLinks,UNKNOWN
+"Manage my links",Student,https://vagrant.dev.schoolbox.cloud/cms/myLinks,UNKNOWN
+"Manage my links","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/cms/myLinks,UNKNOWN
+"Manage my links","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/cms/myLinks,UNKNOWN
+"Manage my links","News Moderator",https://vagrant.dev.schoolbox.cloud/cms/myLinks,UNKNOWN
+"Manage my message settings",Superuser,https://vagrant.dev.schoolbox.cloud/settings/messages,UNKNOWN
+"Manage my message settings",Admin,https://vagrant.dev.schoolbox.cloud/settings/messages,UNKNOWN
+"Manage my message settings",Teacher,https://vagrant.dev.schoolbox.cloud/settings/messages,UNKNOWN
+"Manage my message settings",Student,https://vagrant.dev.schoolbox.cloud/settings/messages,UNKNOWN
+"Manage my message settings","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/settings/messages,UNKNOWN
+"Manage my message settings","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/settings/messages,UNKNOWN
+"Manage my message settings","News Moderator",https://vagrant.dev.schoolbox.cloud/settings/messages,UNKNOWN
+"View user profile",Superuser,https://vagrant.dev.schoolbox.cloud/search/user/1,UNKNOWN
+"View user profile",Admin,https://vagrant.dev.schoolbox.cloud/search/user/1,UNKNOWN
+"View user profile",Teacher,https://vagrant.dev.schoolbox.cloud/search/user/1,UNKNOWN
+"View user profile",Student,https://vagrant.dev.schoolbox.cloud/search/user/1,UNKNOWN
+"View user profile","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/search/user/1,UNKNOWN
+"View user profile","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/search/user/1,UNKNOWN
+"View user profile","News Moderator",https://vagrant.dev.schoolbox.cloud/search/user/1,UNKNOWN
+"View homepage statistics",Superuser,https://vagrant.dev.schoolbox.cloud/homepage/153,UNKNOWN
+"View homepage statistics",Admin,https://vagrant.dev.schoolbox.cloud/homepage/153,UNKNOWN
+"View homepage statistics",Teacher,https://vagrant.dev.schoolbox.cloud/homepage/153,UNKNOWN
+"View homepage statistics",Student,https://vagrant.dev.schoolbox.cloud/homepage/153,UNKNOWN
+"View homepage statistics","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/homepage/153,UNKNOWN
+"View homepage statistics","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/homepage/153,UNKNOWN
+"View homepage statistics","News Moderator",https://vagrant.dev.schoolbox.cloud/homepage/153,UNKNOWN
+"Get homepage RSS feed",Superuser,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,UNKNOWN
+"Get homepage RSS feed",Admin,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,UNKNOWN
+"Get homepage RSS feed",Teacher,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,UNKNOWN
+"Get homepage RSS feed",Student,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,UNKNOWN
+"Get homepage RSS feed","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,UNKNOWN
+"Get homepage RSS feed","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,UNKNOWN
+"Get homepage RSS feed","News Moderator",https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,UNKNOWN
+"Manage homepage group",Superuser,https://vagrant.dev.schoolbox.cloud/group/modify/153,UNKNOWN
+"Manage homepage group",Admin,https://vagrant.dev.schoolbox.cloud/group/modify/153,UNKNOWN
+"Manage homepage group",Teacher,https://vagrant.dev.schoolbox.cloud/group/modify/153,UNKNOWN
+"Manage homepage group",Student,https://vagrant.dev.schoolbox.cloud/group/modify/153,UNKNOWN
+"Manage homepage group","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/group/modify/153,UNKNOWN
+"Manage homepage group","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/group/modify/153,UNKNOWN
+"Manage homepage group","News Moderator",https://vagrant.dev.schoolbox.cloud/group/modify/153,UNKNOWN
+"Visit pending asses",Superuser,https://vagrant.dev.schoolbox.cloud/learning/pending/,UNKNOWN
+"Visit pending asses",Admin,https://vagrant.dev.schoolbox.cloud/learning/pending/,UNKNOWN
+"Visit pending asses",Teacher,https://vagrant.dev.schoolbox.cloud/learning/pending/,UNKNOWN
+"Visit pending asses",Student,https://vagrant.dev.schoolbox.cloud/learning/pending/,UNKNOWN
+"Visit pending asses","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,UNKNOWN
+"Visit pending asses","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/pending/,UNKNOWN
+"Visit pending asses","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,UNKNOWN
+"Visit classes",Superuser,https://vagrant.dev.schoolbox.cloud/learning/classes,UNKNOWN
+"Visit classes",Admin,https://vagrant.dev.schoolbox.cloud/learning/classes,UNKNOWN
+"Visit classes",Teacher,https://vagrant.dev.schoolbox.cloud/learning/classes,UNKNOWN
+"Visit classes",Student,https://vagrant.dev.schoolbox.cloud/learning/classes,UNKNOWN
+"Visit classes","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/classes,UNKNOWN
+"Visit classes","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/classes,UNKNOWN
+"Visit classes","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/classes,UNKNOWN
+"Visit Class List",Superuser,https://vagrant.dev.schoolbox.cloud/learning/class/106,UNKNOWN
+"Visit Class List",Admin,https://vagrant.dev.schoolbox.cloud/learning/class/106,UNKNOWN
+"Visit Class List",Teacher,https://vagrant.dev.schoolbox.cloud/learning/class/106,UNKNOWN
+"Visit Class List",Student,https://vagrant.dev.schoolbox.cloud/learning/class/106,UNKNOWN
+"Visit Class List","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/class/106,UNKNOWN
+"Visit Class List","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/class/106,UNKNOWN
+"Visit Class List","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/class/106,UNKNOWN
+"Visit class markbook",Superuser,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,UNKNOWN
+"Visit class markbook",Admin,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,UNKNOWN
+"Visit class markbook",Teacher,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,UNKNOWN
+"Visit class markbook",Student,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,UNKNOWN
+"Visit class markbook","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,UNKNOWN
+"Visit class markbook","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,UNKNOWN
+"Visit class markbook","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,UNKNOWN
+"Visit rubric markbook",Superuser,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,UNKNOWN
+"Visit rubric markbook",Admin,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,UNKNOWN
+"Visit rubric markbook",Teacher,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,UNKNOWN
+"Visit rubric markbook",Student,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,UNKNOWN
+"Visit rubric markbook","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,UNKNOWN
+"Visit rubric markbook","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,UNKNOWN
+"Visit rubric markbook","News Moderator",https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,UNKNOWN
+"Visit class",Superuser,https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA,UNKNOWN
+"Visit class",Admin,https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA,UNKNOWN
+"Visit class",Teacher,https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA,UNKNOWN
+"Visit class",Student,https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA,UNKNOWN
+"Visit class","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA,UNKNOWN
+"Visit class","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA,UNKNOWN
+"Visit class","News Moderator",https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA,UNKNOWN
+"View course list",Superuser,https://vagrant.dev.schoolbox.cloud/course/list,UNKNOWN
+"View course list",Admin,https://vagrant.dev.schoolbox.cloud/course/list,UNKNOWN
+"View course list",Teacher,https://vagrant.dev.schoolbox.cloud/course/list,UNKNOWN
+"View course list",Student,https://vagrant.dev.schoolbox.cloud/course/list,UNKNOWN
+"View course list","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/course/list,UNKNOWN
+"View course list","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/course/list,UNKNOWN
+"View course list","News Moderator",https://vagrant.dev.schoolbox.cloud/course/list,UNKNOWN
+"Import course into classes",Superuser,https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0,UNKNOWN
+"Import course into classes",Admin,https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0,UNKNOWN
+"Import course into classes",Teacher,https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0,UNKNOWN
+"Import course into classes",Student,https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0,UNKNOWN
+"Import course into classes","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0,UNKNOWN
+"Import course into classes","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0,UNKNOWN
+"Import course into classes","News Moderator",https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0,UNKNOWN
+"Manage rubric capabilities on a course",Superuser,https://vagrant.dev.schoolbox.cloud/rubric/manager/16,UNKNOWN
+"Manage rubric capabilities on a course",Admin,https://vagrant.dev.schoolbox.cloud/rubric/manager/16,UNKNOWN
+"Manage rubric capabilities on a course",Teacher,https://vagrant.dev.schoolbox.cloud/rubric/manager/16,UNKNOWN
+"Manage rubric capabilities on a course",Student,https://vagrant.dev.schoolbox.cloud/rubric/manager/16,UNKNOWN
+"Manage rubric capabilities on a course","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/rubric/manager/16,UNKNOWN
+"Manage rubric capabilities on a course","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/rubric/manager/16,UNKNOWN
+"Manage rubric capabilities on a course","News Moderator",https://vagrant.dev.schoolbox.cloud/rubric/manager/16,UNKNOWN
+"View course markbook",Superuser,https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,UNKNOWN
+"View course markbook",Admin,https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,UNKNOWN
+"View course markbook",Teacher,https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,UNKNOWN
+"View course markbook",Student,https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,UNKNOWN
+"View course markbook","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,UNKNOWN
+"View course markbook","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,UNKNOWN
+"View course markbook","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,UNKNOWN
+"View learning analytics",Superuser,https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2,UNKNOWN
+"View learning analytics",Admin,https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2,UNKNOWN
+"View learning analytics",Teacher,https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2,UNKNOWN
+"View learning analytics",Student,https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2,UNKNOWN
+"View learning analytics","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2,UNKNOWN
+"View learning analytics","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2,UNKNOWN
+"View learning analytics","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2,UNKNOWN
+"View assessment calendar",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,UNKNOWN
+"View assessment calendar",Admin,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,UNKNOWN
+"View assessment calendar",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,UNKNOWN
+"View assessment calendar",Student,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,UNKNOWN
+"View assessment calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,UNKNOWN
+"View assessment calendar","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,UNKNOWN
+"View assessment calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,UNKNOWN
+"Modify course",Superuser,https://vagrant.dev.schoolbox.cloud/course/modify/2,UNKNOWN
+"Modify course",Admin,https://vagrant.dev.schoolbox.cloud/course/modify/2,UNKNOWN
+"Modify course",Teacher,https://vagrant.dev.schoolbox.cloud/course/modify/2,UNKNOWN
+"Modify course",Student,https://vagrant.dev.schoolbox.cloud/course/modify/2,UNKNOWN
+"Modify course","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/course/modify/2,UNKNOWN
+"Modify course","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/course/modify/2,UNKNOWN
+"Modify course","News Moderator",https://vagrant.dev.schoolbox.cloud/course/modify/2,UNKNOWN
+"Create project",Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create project",Admin,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create project",Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create project",Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create project","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create project","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create project","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create task",Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create task",Admin,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create task",Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create task",Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create task","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create task","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create task","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create due work",Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create due work",Admin,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create due work",Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create due work",Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create due work","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create due work","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create due work","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create quiz",Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create quiz",Admin,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create quiz",Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create quiz",Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create quiz","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create quiz","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"Create quiz","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,UNKNOWN
+"View due work",Superuser,https://vagrant.dev.schoolbox.cloud/learning/due,UNKNOWN
+"View due work",Admin,https://vagrant.dev.schoolbox.cloud/learning/due,UNKNOWN
+"View due work",Teacher,https://vagrant.dev.schoolbox.cloud/learning/due,UNKNOWN
+"View due work",Student,https://vagrant.dev.schoolbox.cloud/learning/due,UNKNOWN
+"View due work","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/due,UNKNOWN
+"View due work","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/due,UNKNOWN
+"View due work","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/due,UNKNOWN
+"View grades summary",Superuser,https://vagrant.dev.schoolbox.cloud/learning/grades/25,UNKNOWN
+"View grades summary",Admin,https://vagrant.dev.schoolbox.cloud/learning/grades/25,UNKNOWN
+"View grades summary",Teacher,https://vagrant.dev.schoolbox.cloud/learning/grades/25,UNKNOWN
+"View grades summary",Student,https://vagrant.dev.schoolbox.cloud/learning/grades/25,UNKNOWN
+"View grades summary","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/grades/25,UNKNOWN
+"View grades summary","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/grades/25,UNKNOWN
+"View grades summary","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/grades/25,UNKNOWN
+"View grades for class",Superuser,https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=,UNKNOWN
+"View grades for class",Admin,https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=,UNKNOWN
+"View grades for class",Teacher,https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=,UNKNOWN
+"View grades for class",Student,https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=,UNKNOWN
+"View grades for class","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=,UNKNOWN
+"View grades for class","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=,UNKNOWN
+"View grades for class","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=,UNKNOWN
+"View assessment with rubric and feedback history",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,UNKNOWN
+"View assessment with rubric and feedback history",Admin,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,UNKNOWN
+"View assessment with rubric and feedback history",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,UNKNOWN
+"View assessment with rubric and feedback history",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,UNKNOWN
+"View assessment with rubric and feedback history","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,UNKNOWN
+"View assessment with rubric and feedback history","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,UNKNOWN
+"View assessment with rubric and feedback history","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,UNKNOWN
+"View all resources",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item,UNKNOWN
+"View all resources",Admin,https://vagrant.dev.schoolbox.cloud/resource-booking/item,UNKNOWN
+"View all resources",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item,UNKNOWN
+"View all resources",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item,UNKNOWN
+"View all resources","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/item,UNKNOWN
+"View all resources","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource-booking/item,UNKNOWN
+"View all resources","News Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/item,UNKNOWN
+"View resource booking category",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,UNKNOWN
+"View resource booking category",Admin,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,UNKNOWN
+"View resource booking category",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,UNKNOWN
+"View resource booking category",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,UNKNOWN
+"View resource booking category","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,UNKNOWN
+"View resource booking category","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,UNKNOWN
+"View resource booking category","News Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,UNKNOWN
+"View resource item",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,UNKNOWN
+"View resource item",Admin,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,UNKNOWN
+"View resource item",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,UNKNOWN
+"View resource item",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,UNKNOWN
+"View resource item","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,UNKNOWN
+"View resource item","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,UNKNOWN
+"View resource item","News Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,UNKNOWN
+"Add new resource",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,UNKNOWN
+"Add new resource",Admin,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,UNKNOWN
+"Add new resource",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,UNKNOWN
+"Add new resource",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,UNKNOWN
+"Add new resource","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,UNKNOWN
+"Add new resource","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,UNKNOWN
+"Add new resource","News Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,UNKNOWN
+"Book a resource",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1,UNKNOWN
+"Book a resource",Admin,https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1,UNKNOWN
+"Book a resource",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1,UNKNOWN
+"Book a resource",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1,UNKNOWN
+"Book a resource","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1,UNKNOWN
+"Book a resource","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1,UNKNOWN
+"Book a resource","News Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1,UNKNOWN
+"View booking report",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/report,UNKNOWN
+"View booking report",Admin,https://vagrant.dev.schoolbox.cloud/resource-booking/report,UNKNOWN
+"View booking report",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/report,UNKNOWN
+"View booking report",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/report,UNKNOWN
+"View booking report","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/report,UNKNOWN
+"View booking report","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/resource-booking/report,UNKNOWN
+"View booking report","News Moderator",https://vagrant.dev.schoolbox.cloud/resource-booking/report,UNKNOWN
+"View pastoral dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral,UNKNOWN
+"View pastoral dashboard",Admin,https://vagrant.dev.schoolbox.cloud/pastoral,UNKNOWN
+"View pastoral dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral,UNKNOWN
+"View pastoral dashboard",Student,https://vagrant.dev.schoolbox.cloud/pastoral,UNKNOWN
+"View pastoral dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,UNKNOWN
+"View pastoral dashboard","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral,UNKNOWN
+"View pastoral dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,UNKNOWN
+"View all reports",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/report,UNKNOWN
+"View all reports",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/report,UNKNOWN
+"View all reports",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/report,UNKNOWN
+"View all reports",Student,https://vagrant.dev.schoolbox.cloud/pastoral/report,UNKNOWN
+"View all reports","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report,UNKNOWN
+"View all reports","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/report,UNKNOWN
+"View all reports","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report,UNKNOWN
+"Create a report",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,UNKNOWN
+"Create a report",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,UNKNOWN
+"Create a report",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,UNKNOWN
+"Create a report",Student,https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,UNKNOWN
+"Create a report","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,UNKNOWN
+"Create a report","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,UNKNOWN
+"Create a report","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,UNKNOWN
+"View a report",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,UNKNOWN
+"View a report",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,UNKNOWN
+"View a report",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,UNKNOWN
+"View a report",Student,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,UNKNOWN
+"View a report","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,UNKNOWN
+"View a report","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,UNKNOWN
+"View a report","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,UNKNOWN
+"Group management",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,UNKNOWN
+"Group management",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,UNKNOWN
+"Group management",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,UNKNOWN
+"Group management",Student,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,UNKNOWN
+"Group management","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,UNKNOWN
+"Group management","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,UNKNOWN
+"Group management","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,UNKNOWN
+"Create a group",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,UNKNOWN
+"Create a group",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,UNKNOWN
+"Create a group",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,UNKNOWN
+"Create a group",Student,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,UNKNOWN
+"Create a group","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,UNKNOWN
+"Create a group","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,UNKNOWN
+"Create a group","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,UNKNOWN
+"Modify a group",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,UNKNOWN
+"Modify a group",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,UNKNOWN
+"Modify a group",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,UNKNOWN
+"Modify a group",Student,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,UNKNOWN
+"Modify a group","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,UNKNOWN
+"Modify a group","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,UNKNOWN
+"Modify a group","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,UNKNOWN
+"Manage visibility",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,UNKNOWN
+"Manage visibility",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,UNKNOWN
+"Manage visibility",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,UNKNOWN
+"Manage visibility",Student,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,UNKNOWN
+"Manage visibility","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,UNKNOWN
+"Manage visibility","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,UNKNOWN
+"Manage visibility","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,UNKNOWN
+"Create a record for student",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,UNKNOWN
+"Create a record for student",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,UNKNOWN
+"Create a record for student",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,UNKNOWN
+"Create a record for student",Student,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,UNKNOWN
+"Create a record for student","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,UNKNOWN
+"Create a record for student","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,UNKNOWN
+"Create a record for student","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,UNKNOWN
+"View a record",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2,UNKNOWN
+"View a record",Admin,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2,UNKNOWN
+"View a record",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2,UNKNOWN
+"View a record",Student,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2,UNKNOWN
+"View a record","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2,UNKNOWN
+"View a record","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2,UNKNOWN
+"View a record","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2,UNKNOWN
+"Get an RSS feed",Superuser,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all,UNKNOWN
+"Get an RSS feed",Admin,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all,UNKNOWN
+"Get an RSS feed",Teacher,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all,UNKNOWN
+"Get an RSS feed",Student,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all,UNKNOWN
+"Get an RSS feed","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all,UNKNOWN
+"Get an RSS feed","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all,UNKNOWN
+"Get an RSS feed","News Moderator",https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all,UNKNOWN
+"Load news feed on news page",Superuser,https://vagrant.dev.schoolbox.cloud/news/lists/feed,UNKNOWN
+"Load news feed on news page",Admin,https://vagrant.dev.schoolbox.cloud/news/lists/feed,UNKNOWN
+"Load news feed on news page",Teacher,https://vagrant.dev.schoolbox.cloud/news/lists/feed,UNKNOWN
+"Load news feed on news page",Student,https://vagrant.dev.schoolbox.cloud/news/lists/feed,UNKNOWN
+"Load news feed on news page","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/lists/feed,UNKNOWN
+"Load news feed on news page","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/lists/feed,UNKNOWN
+"Load news feed on news page","News Moderator",https://vagrant.dev.schoolbox.cloud/news/lists/feed,UNKNOWN
+"View created by me",Superuser,https://vagrant.dev.schoolbox.cloud/news/me,UNKNOWN
+"View created by me",Admin,https://vagrant.dev.schoolbox.cloud/news/me,UNKNOWN
+"View created by me",Teacher,https://vagrant.dev.schoolbox.cloud/news/me,UNKNOWN
+"View created by me",Student,https://vagrant.dev.schoolbox.cloud/news/me,UNKNOWN
+"View created by me","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/me,UNKNOWN
+"View created by me","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/me,UNKNOWN
+"View created by me","News Moderator",https://vagrant.dev.schoolbox.cloud/news/me,UNKNOWN
+"View require moderation",Superuser,https://vagrant.dev.schoolbox.cloud/news/moderation,UNKNOWN
+"View require moderation",Admin,https://vagrant.dev.schoolbox.cloud/news/moderation,UNKNOWN
+"View require moderation",Teacher,https://vagrant.dev.schoolbox.cloud/news/moderation,UNKNOWN
+"View require moderation",Student,https://vagrant.dev.schoolbox.cloud/news/moderation,UNKNOWN
+"View require moderation","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/moderation,UNKNOWN
+"View require moderation","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/moderation,UNKNOWN
+"View require moderation","News Moderator",https://vagrant.dev.schoolbox.cloud/news/moderation,UNKNOWN
+"Create news",Superuser,https://vagrant.dev.schoolbox.cloud/news/create,UNKNOWN
+"Create news",Admin,https://vagrant.dev.schoolbox.cloud/news/create,UNKNOWN
+"Create news",Teacher,https://vagrant.dev.schoolbox.cloud/news/create,UNKNOWN
+"Create news",Student,https://vagrant.dev.schoolbox.cloud/news/create,UNKNOWN
+"Create news","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/create,UNKNOWN
+"Create news","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/create,UNKNOWN
+"Create news","News Moderator",https://vagrant.dev.schoolbox.cloud/news/create,UNKNOWN
+"Read news",Superuser,https://vagrant.dev.schoolbox.cloud/news,UNKNOWN
+"Read news",Admin,https://vagrant.dev.schoolbox.cloud/news,UNKNOWN
+"Read news",Teacher,https://vagrant.dev.schoolbox.cloud/news,UNKNOWN
+"Read news",Student,https://vagrant.dev.schoolbox.cloud/news,UNKNOWN
+"Read news","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news,UNKNOWN
+"Read news","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news,UNKNOWN
+"Read news","News Moderator",https://vagrant.dev.schoolbox.cloud/news,UNKNOWN
+"View an individual news item",Superuser,https://vagrant.dev.schoolbox.cloud/news/34,UNKNOWN
+"View an individual news item",Admin,https://vagrant.dev.schoolbox.cloud/news/34,UNKNOWN
+"View an individual news item",Teacher,https://vagrant.dev.schoolbox.cloud/news/34,UNKNOWN
+"View an individual news item",Student,https://vagrant.dev.schoolbox.cloud/news/34,UNKNOWN
+"View an individual news item","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/34,UNKNOWN
+"View an individual news item","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/34,UNKNOWN
+"View an individual news item","News Moderator",https://vagrant.dev.schoolbox.cloud/news/34,UNKNOWN
+"View saved news",Superuser,https://vagrant.dev.schoolbox.cloud/news/saved,UNKNOWN
+"View saved news",Admin,https://vagrant.dev.schoolbox.cloud/news/saved,UNKNOWN
+"View saved news",Teacher,https://vagrant.dev.schoolbox.cloud/news/saved,UNKNOWN
+"View saved news",Student,https://vagrant.dev.schoolbox.cloud/news/saved,UNKNOWN
+"View saved news","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/saved,UNKNOWN
+"View saved news","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/saved,UNKNOWN
+"View saved news","News Moderator",https://vagrant.dev.schoolbox.cloud/news/saved,UNKNOWN
+"View news archive",Superuser,https://vagrant.dev.schoolbox.cloud/news/archive,UNKNOWN
+"View news archive",Admin,https://vagrant.dev.schoolbox.cloud/news/archive,UNKNOWN
+"View news archive",Teacher,https://vagrant.dev.schoolbox.cloud/news/archive,UNKNOWN
+"View news archive",Student,https://vagrant.dev.schoolbox.cloud/news/archive,UNKNOWN
+"View news archive","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/news/archive,UNKNOWN
+"View news archive","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/news/archive,UNKNOWN
+"View news archive","News Moderator",https://vagrant.dev.schoolbox.cloud/news/archive,UNKNOWN
+"Go to fixtures",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures,UNKNOWN
+"Go to fixtures",Admin,https://vagrant.dev.schoolbox.cloud/fixtures,UNKNOWN
+"Go to fixtures",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures,UNKNOWN
+"Go to fixtures",Student,https://vagrant.dev.schoolbox.cloud/fixtures,UNKNOWN
+"Go to fixtures","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures,UNKNOWN
+"Go to fixtures","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures,UNKNOWN
+"Go to fixtures","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures,UNKNOWN
+"See all seasons",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/seasons,UNKNOWN
+"See all seasons",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/seasons,UNKNOWN
+"See all seasons",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/seasons,UNKNOWN
+"See all seasons",Student,https://vagrant.dev.schoolbox.cloud/fixtures/seasons,UNKNOWN
+"See all seasons","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons,UNKNOWN
+"See all seasons","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons,UNKNOWN
+"See all seasons","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons,UNKNOWN
+"Change a seacon",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit,UNKNOWN
+"Change a seacon",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit,UNKNOWN
+"Change a seacon",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit,UNKNOWN
+"Change a seacon",Student,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit,UNKNOWN
+"Change a seacon","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit,UNKNOWN
+"Change a seacon","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit,UNKNOWN
+"Change a seacon","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit,UNKNOWN
+"Add external schools if needed",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/school,UNKNOWN
+"Add external schools if needed",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/school,UNKNOWN
+"Add external schools if needed",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/school,UNKNOWN
+"Add external schools if needed",Student,https://vagrant.dev.schoolbox.cloud/fixtures/school,UNKNOWN
+"Add external schools if needed","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/school,UNKNOWN
+"Add external schools if needed","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/school,UNKNOWN
+"Add external schools if needed","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/school,UNKNOWN
+"Update match status",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/statuses,UNKNOWN
+"Update match status",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/statuses,UNKNOWN
+"Update match status",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/statuses,UNKNOWN
+"Update match status",Student,https://vagrant.dev.schoolbox.cloud/fixtures/statuses,UNKNOWN
+"Update match status","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/statuses,UNKNOWN
+"Update match status","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/statuses,UNKNOWN
+"Update match status","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/statuses,UNKNOWN
+"View all sports.",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/sports,UNKNOWN
+"View all sports.",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/sports,UNKNOWN
+"View all sports.",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/sports,UNKNOWN
+"View all sports.",Student,https://vagrant.dev.schoolbox.cloud/fixtures/sports,UNKNOWN
+"View all sports.","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports,UNKNOWN
+"View all sports.","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/sports,UNKNOWN
+"View all sports.","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports,UNKNOWN
+"See all sport types sport teams.",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2,UNKNOWN
+"See all sport types sport teams.",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2,UNKNOWN
+"See all sport types sport teams.",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2,UNKNOWN
+"See all sport types sport teams.",Student,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2,UNKNOWN
+"See all sport types sport teams.","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/2,UNKNOWN
+"See all sport types sport teams.","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/2,UNKNOWN
+"See all sport types sport teams.","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/2,UNKNOWN
+"Check all venues.",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/venues,UNKNOWN
+"Check all venues.",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/venues,UNKNOWN
+"Check all venues.",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/venues,UNKNOWN
+"Check all venues.",Student,https://vagrant.dev.schoolbox.cloud/fixtures/venues,UNKNOWN
+"Check all venues.","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/venues,UNKNOWN
+"Check all venues.","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/venues,UNKNOWN
+"Check all venues.","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/venues,UNKNOWN
+"Add remove positions to sports team template",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit,UNKNOWN
+"Add remove positions to sports team template",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit,UNKNOWN
+"Add remove positions to sports team template",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit,UNKNOWN
+"Add remove positions to sports team template",Student,https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit,UNKNOWN
+"Add remove positions to sports team template","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit,UNKNOWN
+"Add remove positions to sports team template","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit,UNKNOWN
+"Add remove positions to sports team template","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit,UNKNOWN
+"Assign players to team",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby,UNKNOWN
+"Assign players to team",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby,UNKNOWN
+"Assign players to team",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby,UNKNOWN
+"Assign players to team",Student,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby,UNKNOWN
+"Assign players to team","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby,UNKNOWN
+"Assign players to team","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby,UNKNOWN
+"Assign players to team","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby,UNKNOWN
+"Edit venue",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit,UNKNOWN
+"Edit venue",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit,UNKNOWN
+"Edit venue",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit,UNKNOWN
+"Edit venue",Student,https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit,UNKNOWN
+"Edit venue","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit,UNKNOWN
+"Edit venue","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit,UNKNOWN
+"Edit venue","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit,UNKNOWN
+"Create a new season",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new,UNKNOWN
+"Create a new season",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new,UNKNOWN
+"Create a new season",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new,UNKNOWN
+"Create a new season",Student,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new,UNKNOWN
+"Create a new season","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new,UNKNOWN
+"Create a new season","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new,UNKNOWN
+"Create a new season","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new,UNKNOWN
+"Create a new venue",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/venues/new,UNKNOWN
+"Create a new venue",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/venues/new,UNKNOWN
+"Create a new venue",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/venues/new,UNKNOWN
+"Create a new venue",Student,https://vagrant.dev.schoolbox.cloud/fixtures/venues/new,UNKNOWN
+"Create a new venue","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/venues/new,UNKNOWN
+"Create a new venue","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/venues/new,UNKNOWN
+"Create a new venue","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/venues/new,UNKNOWN
+"Create new sport",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/sports/new,UNKNOWN
+"Create new sport",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/sports/new,UNKNOWN
+"Create new sport",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/sports/new,UNKNOWN
+"Create new sport",Student,https://vagrant.dev.schoolbox.cloud/fixtures/sports/new,UNKNOWN
+"Create new sport","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/new,UNKNOWN
+"Create new sport","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/new,UNKNOWN
+"Create new sport","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/new,UNKNOWN
+"Add new division",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new,UNKNOWN
+"Add new division",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new,UNKNOWN
+"Add new division",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new,UNKNOWN
+"Add new division",Student,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new,UNKNOWN
+"Add new division","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new,UNKNOWN
+"Add new division","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new,UNKNOWN
+"Add new division","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new,UNKNOWN
+"Add new team",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new,UNKNOWN
+"Add new team",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new,UNKNOWN
+"Add new team",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new,UNKNOWN
+"Add new team",Student,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new,UNKNOWN
+"Add new team","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new,UNKNOWN
+"Add new team","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new,UNKNOWN
+"Add new team","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new,UNKNOWN
+"View all matches in a division",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches,UNKNOWN
+"View all matches in a division",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches,UNKNOWN
+"View all matches in a division",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches,UNKNOWN
+"View all matches in a division",Student,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches,UNKNOWN
+"View all matches in a division","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches,UNKNOWN
+"View all matches in a division","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches,UNKNOWN
+"View all matches in a division","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches,UNKNOWN
+"Add a new match to the division",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1,UNKNOWN
+"Add a new match to the division",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1,UNKNOWN
+"Add a new match to the division",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1,UNKNOWN
+"Add a new match to the division",Student,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1,UNKNOWN
+"Add a new match to the division","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1,UNKNOWN
+"Add a new match to the division","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1,UNKNOWN
+"Add a new match to the division","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1,UNKNOWN
+"Fixture match details",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1,UNKNOWN
+"Fixture match details",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1,UNKNOWN
+"Fixture match details",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1,UNKNOWN
+"Fixture match details",Student,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1,UNKNOWN
+"Fixture match details","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1,UNKNOWN
+"Fixture match details","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1,UNKNOWN
+"Fixture match details","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1,UNKNOWN
+"View team matches",Superuser,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches,UNKNOWN
+"View team matches",Admin,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches,UNKNOWN
+"View team matches",Teacher,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches,UNKNOWN
+"View team matches",Student,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches,UNKNOWN
+"View team matches","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches,UNKNOWN
+"View team matches","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches,UNKNOWN
+"View team matches","News Moderator",https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches,UNKNOWN
+"View their ePortfolio",Superuser,https://vagrant.dev.schoolbox.cloud/eportfolio,UNKNOWN
+"View their ePortfolio",Admin,https://vagrant.dev.schoolbox.cloud/eportfolio,UNKNOWN
+"View their ePortfolio",Teacher,https://vagrant.dev.schoolbox.cloud/eportfolio,UNKNOWN
+"View their ePortfolio",Student,https://vagrant.dev.schoolbox.cloud/eportfolio,UNKNOWN
+"View their ePortfolio","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio,UNKNOWN
+"View their ePortfolio","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/eportfolio,UNKNOWN
+"View their ePortfolio","News Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio,UNKNOWN
+"View a students ePortfolio",Superuser,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile,UNKNOWN
+"View a students ePortfolio",Admin,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile,UNKNOWN
+"View a students ePortfolio",Teacher,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile,UNKNOWN
+"View a students ePortfolio",Student,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile,UNKNOWN
+"View a students ePortfolio","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile,UNKNOWN
+"View a students ePortfolio","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile,UNKNOWN
+"View a students ePortfolio","News Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile,UNKNOWN
+"view one of the pages",Superuser,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16,UNKNOWN
+"view one of the pages",Admin,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16,UNKNOWN
+"view one of the pages",Teacher,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16,UNKNOWN
+"view one of the pages",Student,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16,UNKNOWN
+"view one of the pages","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/16,UNKNOWN
+"view one of the pages","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/16,UNKNOWN
+"view one of the pages","News Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/16,UNKNOWN
+"Create a page on the students ePortfolio",Superuser,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,UNKNOWN
+"Create a page on the students ePortfolio",Admin,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,UNKNOWN
+"Create a page on the students ePortfolio",Teacher,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,UNKNOWN
+"Create a page on the students ePortfolio",Student,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,UNKNOWN
+"Create a page on the students ePortfolio","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,UNKNOWN
+"Create a page on the students ePortfolio","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,UNKNOWN
+"Create a page on the students ePortfolio","News Moderator",https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,UNKNOWN
+"Search for user with results",Superuser,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1",UNKNOWN
+"Search for user with results",Admin,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1",UNKNOWN
+"Search for user with results",Teacher,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1",UNKNOWN
+"Search for user with results",Student,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1",UNKNOWN
+"Search for user with results","Pastoral Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1",UNKNOWN
+"Search for user with results","Fixtures Administrator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1",UNKNOWN
+"Search for user with results","News Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all,1",UNKNOWN
+"View only users results",Superuser,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1",UNKNOWN
+"View only users results",Admin,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1",UNKNOWN
+"View only users results",Teacher,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1",UNKNOWN
+"View only users results",Student,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1",UNKNOWN
+"View only users results","Pastoral Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1",UNKNOWN
+"View only users results","Fixtures Administrator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1",UNKNOWN
+"View only users results","News Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user,1",UNKNOWN
+"View only Textbox results",Superuser,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1",UNKNOWN
+"View only Textbox results",Admin,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1",UNKNOWN
+"View only Textbox results",Teacher,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1",UNKNOWN
+"View only Textbox results",Student,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1",UNKNOWN
+"View only Textbox results","Pastoral Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1",UNKNOWN
+"View only Textbox results","Fixtures Administrator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1",UNKNOWN
+"View only Textbox results","News Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox,1",UNKNOWN
+"View only news results",Superuser,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1",UNKNOWN
+"View only news results",Admin,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1",UNKNOWN
+"View only news results",Teacher,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1",UNKNOWN
+"View only news results",Student,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1",UNKNOWN
+"View only news results","Pastoral Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1",UNKNOWN
+"View only news results","Fixtures Administrator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1",UNKNOWN
+"View only news results","News Moderator","https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news,1",UNKNOWN
+"Search and resieve no results.",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,UNKNOWN
+"Search and resieve no results.",Admin,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,UNKNOWN
+"Search and resieve no results.",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,UNKNOWN
+"Search and resieve no results.",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,UNKNOWN
+"Search and resieve no results.","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,UNKNOWN
+"Search and resieve no results.","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,UNKNOWN
+"Search and resieve no results.","News Moderator",https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,UNKNOWN
