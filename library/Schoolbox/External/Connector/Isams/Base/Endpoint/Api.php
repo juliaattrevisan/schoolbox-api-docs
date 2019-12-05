@@ -93,7 +93,8 @@ class Api implements IApi
      * @throws Exception\InvalidArgumentException
      * @throws Exception\InvalidUriPartException
      */
-    public function getUrl() {
+    public function getUrl(): Uri
+    {
         if (!$this->url) {
             $this->url = (new Uri())
                 ->setScheme('https')
