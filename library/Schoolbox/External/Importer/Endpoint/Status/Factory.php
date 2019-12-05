@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint\Status;
 
-use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector;
 use Schoolbox\External\Importer\Endpoint;
 
