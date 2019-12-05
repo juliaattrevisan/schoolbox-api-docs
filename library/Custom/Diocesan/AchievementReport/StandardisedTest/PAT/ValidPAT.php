@@ -86,23 +86,23 @@ class ValidPAT
              */
             $registry = [
                 [
-                    'payload' => new Table\Data($user, $externalUser, $this->db, $this->year),
+                    'data' => new Table\Data($user, $externalUser, $this->db, $this->year),
                     'test' => new Table\ValidHasData()
                 ],
                 [
-                    'payload' => new Mathematics\Data($user, $externalUser, $this->db, $this->year),
+                    'data' => new Mathematics\Data($user, $externalUser, $this->db, $this->year),
                     'test' => new Mathematics\ValidHasData()
                 ],
                 [
-                    'payload' => new ListeningComprehension\Data($user, $externalUser, $this->db, $this->year),
+                    'data' => new ListeningComprehension\Data($user, $externalUser, $this->db, $this->year),
                     'test' => new ListeningComprehension\ValidHasData()
                 ],
                 [
-                    'payload' => new ReadingVocabulary\Data($user, $externalUser, $this->db, $this->year),
+                    'data' => new ReadingVocabulary\Data($user, $externalUser, $this->db, $this->year),
                     'test' => new ReadingVocabulary\ValidHasData()
                 ],
                 [
-                    'payload' => new ReadingComprehension\Data($user, $externalUser, $this->db, $this->year),
+                    'data' => new ReadingComprehension\Data($user, $externalUser, $this->db, $this->year),
                     'test' => new ReadingComprehension\ValidHasData()
                 ],
             ];
@@ -111,7 +111,7 @@ class ValidPAT
              * Then test what we found
              */
             foreach ($registry as $piece) {
-                if ($piece['test']->isSatisifiedBy((int)$this->user->getYear(), $piece['payload']->hasDataFromAnyYear())) {
+                if ($piece['test']->isSatisifiedBy((int)$this->user->getYear(), $piece['data']->hasDataFromAnyYear())) {
                     return true;
                 }
             }
