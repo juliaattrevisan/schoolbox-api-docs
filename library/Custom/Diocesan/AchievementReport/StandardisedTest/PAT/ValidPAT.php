@@ -81,18 +81,46 @@ class ValidPAT
         /* 11-13 requires us to check constituent pieces - if any exist, the PAT tab exists
          */
         if (\in_array((int)$user->getYear(), [11,12,13], true)) {
-            $tablePayload = (new Table\Data($user, $externalUser, $this->db, $this->year));
-            $mathematicsPayload = (new Mathematics\Data($user, $externalUser, $this->db, $this->year))->findData();
-            $listeningComprehensionPayload = (new ListeningComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
-            $readingVocabularyPayload = (new ReadingVocabulary\Data($user, $externalUser, $this->db, $this->year))->findData();
-            $readingComprehensionPayload = (new ReadingComprehension\Data($user, $externalUser, $this->db, $this->year))->findData();
 
-            return
-                (new Table\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $tablePayload->hasData()) ||
-                (new Mathematics\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $mathematicsPayload->hasData()) ||
-                (new ListeningComprehension\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $listeningComprehensionPayload->hasData()) ||
-                (new ReadingVocabulary\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $readingVocabularyPayload->hasData()) ||
-                (new ReadingComprehension\ValidHasData())->isSatisfiedBy((int)$this->user->getYear(), $readingComprehensionPayload->hasData());
+            /* Minimise queries by testing in order until one return true
+             */
+            $registry = [
+                [
+                    'payload' => new Table\Data($user, $externalUser, $this->db, $this->year),
+                    'test' => new Table\ValidHasData()
+                ],
+                [
+                    'payload' => new Mathematics\Data($user, $externalUser, $this->db, $this->year),
+                    'test' => new Mathematics\ValidHasData()
+                ],
+                [
+                    'payload' => new ListeningComprehension\Data($user, $externalUser, $this->db, $this->year),
+                    'test' => new ListeningComprehension\ValidHasData()
+                ],
+                [
+                    'payload' => new ReadingVocabulary\Data($user, $externalUser, $this->db, $this->year),
+                    'test' => new ReadingVocabulary\ValidHasData()
+                ],
+                [
+                    'payload' => new ReadingComprehension\Data($user, $externalUser, $this->db, $this->year),
+                    'test' => new ReadingComprehension\ValidHasData()
+                ],
+            ];
+
+            /* Fetch data that we must inspect to determine validity
+             * Then test what we found
+             */
+            foreach ($registry as $piece) {
+                $piece['payload']->findData();
+
+                if ($piece['test']->isSatisifiedBy((int)$this->user->getYear(), $piece['payload']->hasData())) {
+                    return true;
+                }
+            }
+
+            /* No data anywhere
+             */
+            return false;
         }
 
         /* Everyone else has nothing
