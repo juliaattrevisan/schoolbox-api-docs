@@ -57,7 +57,7 @@ cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
 echo "Running phpstan checks"
 
-sudo vendor/phpstan/phpstan/bin/phpstan analyze
+vendor/phpstan/phpstan/phpstan analyze
 
 phpstanResult=$?
 

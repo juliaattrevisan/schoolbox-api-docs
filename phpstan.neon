@@ -11,8 +11,6 @@ parameters:
         - dav
         - library
         - tools
-        - updates
-        - www
     ignoreErrors:
         -
             message: '#Using \$this outside a class.#'
@@ -22,5 +20,3 @@ parameters:
             path: %rootDir%/../../../www/*
     excludes_analyse:
         -   %rootDir%/../../../library/Alaress/Twitter/Loader/oauth/twitteroauth.php
-        -   %rootDir%/../../../tools/synchronise/abstract/SynchroniseAbstract.php
-        -   %rootDir%/../../../updates/18.0.alpha1/self-assessment/090-linkRubricMarksToResponses.php
