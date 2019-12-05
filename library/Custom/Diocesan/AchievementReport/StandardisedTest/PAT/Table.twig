@@ -1,0 +1,31 @@
+{##
+ # PAT Progressive Achievement Test
+ #
+ # Table of data across all year levels for a particular student
+ #
+ # @param array data
+ #}
+<table>
+    <thead>
+        <tr>
+            <th class="centered">Year</th>
+            <th class="centered">PAT Mathematics</th>
+            <th class="centered">PAT Listening Comprehension</th>
+            <th class="centered">PAT Reading Vocabulary</th>
+            <th class="centered">PAT Reading Comprehension</th>
+            <th class="centered">PAT Punctuation And Grammar</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, values in data %}
+        <tr>
+            <td class="centered">{{ year }}</td>
+            <td class="centered">{{ values.mathematics }}</td>
+            <td class="centered">{{ values.listeningComprehension }}</td>
+            <td class="centered">{{ values.readingVocabulary }}</td>
+            <td class="centered">{{ values.readingComprehension }}</td>
+            <td class="centered">{{ values.punctuationGrammar }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -5,15 +5,25 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table;
+
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
 
 /**
- * Class PATTable
+ * Class Data
  *
- * @package Custom\Diocesan\AchievementReport\StandardisedTest
+ * @package Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table
  */
-class PATTable extends Base
+class Data extends Base
 {
+
+    /**
+     * Whether there was any data found
+     *
+     * @var bool
+     */
+    private $hasData = false;
+
 
     /**
      * I changed the SELECT aliases from the original, in the interest of posterity
@@ -23,14 +33,14 @@ class PATTable extends Base
     public function findData(): array
     {
         $query = "
-            SELECT 
-                R.YEARLEVEL AS year, 
+            SELECT
+                R.YEARLEVEL AS year,
                 MAX(R.MATHS) AS mathematics,
                 MAX(R.LC) AS listeningComprehension,
                 MAX(R.RV) AS readingVocabulary,
                 MAX(R.RC) AS readingComprehension,
                 MAX(R.PG ) AS punctuationGrammar
-            FROM 
+            FROM
             (
             select YearLevel,THISSTUDENTSTANINE,
             CASE WHEN IndividualMathsPATStanineMarker<>0 THEN THISSTUDENTSTANINE ELSE 0 END AS MATHS,
@@ -55,6 +65,34 @@ class PATTable extends Base
             $stack[$row['year']] = $row;
         }
 
+        /* Decide if the table had any data
+         */
+        if (\count($stack)) {
+            $this->hasData = true;
+        }
+
         return $stack;
+    }
+
+
+    /**
+     * Find out if this student has data from any year
+     *
+     * @return bool
+     */
+    public function hasDataFromAnyYear(): bool
+    {
+        $result = $this->findData();
+
+        return (bool)\count($result);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasData(): bool
+    {
+        return $this->hasData;
     }
 }

@@ -7,20 +7,11 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
-use Custom\Diocesan\AchievementReport\StandardisedTest\Navigation;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATHeading;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATListeningComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATMathematics;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATNavigation;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATReadingVocabulary;
-use Custom\Diocesan\AchievementReport\StandardisedTest\PATTable;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATListeningComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATMathematics;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingComprehension;
-use Custom\Diocesan\AchievementReport\StandardisedTest\ValidPATReadingVocabulary;
+use Custom\Diocesan\AchievementReport\StandardisedTest;
+use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 use MSSQL;
 use Schoolbox\User;
 
@@ -29,7 +20,8 @@ use Schoolbox\User;
  *
  * @package Custom\Diocesan\AchievementReport
  */
-class Controller extends Base {
+class Controller extends Base
+{
 
     /**
      * Internal/External types
@@ -51,6 +43,7 @@ class Controller extends Base {
         ]
     ];
 
+
     /**
      * Selects which report to redirect towards, based on certain
      * conditions particular to a student
@@ -59,7 +52,7 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
@@ -158,39 +151,50 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
+
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? (int)date('Y');
 
         /* Each graph's payload and visibility status
          */
-        $mathematicsPayload = (new PATMathematics($user, $externalUser, $db, $year))->findData();
+        $tablePayload = new PAT\Table\Data($user, $externalUser, $db, $year);
+
+        $PATTable = [
+            'data' => $tablePayload->findData(),
+            'visible' => (new PAT\Table\ValidHasData())->isSatisfiedBy($user->getYear(), $tablePayload->hasData())
+        ];
+
+        $mathematicsPayload = (new PAT\Mathematics\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATMathematics = [
             'data' => $mathematicsPayload->getData(),
-            'visible' => (new ValidPATMathematics())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
+            'visible' => (new PAT\Mathematics\ValidHasData())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
         ];
 
-        $listeningComprehensionPayload = (new PATListeningComprehension($user, $externalUser, $db, $year))->findData();
+        $listeningComprehensionPayload = (new PAT\ListeningComprehension\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATListeningComprehension = [
             'data' => $listeningComprehensionPayload->getData(),
-            'visible' => (new ValidPATListeningComprehension())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
+            'visible' => (new PAT\ListeningComprehension\ValidHasData())->isSatisfiedBy($user->getYear(), $listeningComprehensionPayload->hasData())
         ];
 
-        $readingVocabularyPayload = (new PATReadingVocabulary($user, $externalUser, $db, $year))->findData();
+        $readingVocabularyPayload = (new PAT\ReadingVocabulary\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATReadingVocabulary = [
             'data' => $readingVocabularyPayload->getData(),
-            'visible' => (new ValidPATReadingVocabulary())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
+            'visible' => (new PAT\ReadingVocabulary\ValidHasData())->isSatisfiedBy($user->getYear(), $readingVocabularyPayload->hasData())
         ];
 
-        $readingComprehensionPayload = (new PATReadingComprehension($user, $externalUser, $db, $year))->findData();
+        $readingComprehensionPayload = (new PAT\ReadingComprehension\Data($user, $externalUser, $db, $selectedYear))->findData();
 
         $PATReadingComprehension = [
             'data' => $readingComprehensionPayload->getData(),
-            'visible' => (new ValidPATReadingComprehension())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
+            'visible' => (new PAT\ReadingComprehension\ValidHasData())->isSatisfiedBy($user->getYear(), $readingComprehensionPayload->hasData())
         ];
 
         /* PAT Graph heading is only visible when there's at least one graph to show
@@ -209,20 +213,20 @@ class Controller extends Base {
                 'year' => $year,
 
                 'subnavigation' => [
-                    'all' => (new Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
 
                     /* TODO: For each Standardised Test report piece
                      */
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
 
-                'PATTable' => (new PATTable($user, $externalUser, $db, $year))->findData(),
+                'PATTable' => $PATTable,
                 'PATNavigation' => [
-                    'all' => (new PATNavigation($user, $externalUser, $db, $year))->findData(),
+                    'all' => (new PAT\Navigation($user, $externalUser, $db, $selectedYear))->findData(),
                     'selected' => $year ?? (int)date('Y')
                 ],
                 'PATHeading' => [
-                    'label' => (new PATHeading($user, $externalUser, $db, $year))->findData(),
+                    'label' => (new PAT\Heading($user, $externalUser, $db, $selectedYear))->findData(),
                     'visible' => $headingVisible
                 ],
                 'PATMathematics' => $PATMathematics,
@@ -241,9 +245,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
@@ -293,9 +297,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getIb(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getIb(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -349,9 +353,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
@@ -475,9 +479,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getComments(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getComments(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -527,9 +531,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         $output = [
             'template' => '@coCurricular/index.twig',

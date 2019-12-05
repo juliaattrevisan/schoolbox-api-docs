@@ -82,7 +82,6 @@ class Navigation
      * @param array    $externalUser
      * @param MSSQL    $db
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function __construct(Router $router, User $user, array $externalUser, MSSQL $db, ?int $year)
     {
@@ -111,10 +110,12 @@ class Navigation
 
         /* Conditional PAT report
          */
-        $availableNavigation[self::STANDARDISEDTEST_PAT_KEY] = [
-            'url' => '',
-            'label' => 'PAT'
-        ];
+        if ((new PAT\ValidPAT($this->db))->isSatisifiedBy($this->user, $this->externalUser)) {
+            $availableNavigation[self::STANDARDISEDTEST_PAT_KEY] = [
+                'url' => '',
+                'label' => 'PAT'
+            ];
+        }
 
         /* Conditional STAR report
          */
@@ -136,7 +137,6 @@ class Navigation
             'url' => '',
             'label' => 'Writing'
         ];
-
 
         /* Conditional Mathematics report
          */

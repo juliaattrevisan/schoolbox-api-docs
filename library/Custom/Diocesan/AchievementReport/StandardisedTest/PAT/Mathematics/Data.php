@@ -5,16 +5,17 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Mathematics;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Stanine\Payload;
 
 /**
- * Class PATMathematics
+ * Class Data
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class PATMathematics extends Base
+class Data extends Base
 {
 
     /**
@@ -24,18 +25,14 @@ class PATMathematics extends Base
 
 
     /**
-     * Find all the data for PAT Mathematics graph
+     * Find all the data for PAT Mathematics graph for the year specified
      *
      * @return Payload
      */
     public function findData(): Payload
     {
-        /* Default to current year if none was specified
-         */
-        $this->year ?: $this->year = (int)date('Y');
-
         $query = "
-            SELECT 
+            SELECT
                 Seq,
                 ThisStudentStanine,
                 IndividualMathsPATStanineMarker,
@@ -44,14 +41,13 @@ class PATMathematics extends Base
             FROM uvSchoolBoxPATSTARSummary
             WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
             AND Fileyear = '{$this->year}'
-            ORDER BY seq
-        ";
+            ORDER BY seq";
 
         $result = $this->getDb()->getAll($query);
 
         /* Find data for each of the three series
          */
-        $payload = new Payload(self::GRAPH_TITLE, $this->year);
+        $payload = new Payload(self::GRAPH_TITLE, (int)$this->year);
 
         foreach ($result as $row) {
             $payload
@@ -61,5 +57,30 @@ class PATMathematics extends Base
         }
 
         return $payload;
+    }
+
+
+    /**
+     * Find out if this student has data from any year
+     *
+     * @return bool
+     */
+    public function hasDataFromAnyYear(): bool
+    {
+        $query = "
+            SELECT
+                Seq,
+                ThisStudentStanine,
+                IndividualMathsPATStanineMarker,
+                DiocesanMathsPATStaninePercentage,
+                NationalMathsPATStaninePercentage
+            FROM uvSchoolBoxPATSTARSummary
+            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            AND IndividualMathsPATStanineMarker <> 0
+            ORDER BY seq";
+
+        $result = $this->getDb()->getAll($query);
+
+        return (bool)\count($result);
     }
 }

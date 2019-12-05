@@ -5,7 +5,9 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Diocesan\AchievementReport\StandardisedTest;
+namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
+
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
 
 /**
  * Class PATHeading
@@ -15,7 +17,7 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest;
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class PATHeading extends Base
+class Heading extends Base
 {
 
     /**
