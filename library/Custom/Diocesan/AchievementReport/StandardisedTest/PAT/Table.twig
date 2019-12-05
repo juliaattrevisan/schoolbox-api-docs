@@ -8,23 +8,23 @@
 <table>
     <thead>
         <tr>
-            <th>Year</th>
-            <th>PAT Mathematics</th>
-            <th>PAT Listening Comprehension</th>
-            <th>PAT Reading Vocabulary</th>
-            <th>PAT Reading Comprehension</th>
-            <th>PAT Punctuation And Grammar</th>
+            <th class="centered">Year</th>
+            <th class="centered">PAT Mathematics</th>
+            <th class="centered">PAT Listening Comprehension</th>
+            <th class="centered">PAT Reading Vocabulary</th>
+            <th class="centered">PAT Reading Comprehension</th>
+            <th class="centered">PAT Punctuation And Grammar</th>
         </tr>
     </thead>
     <tbody>
         {% for year, values in data %}
         <tr>
-            <td>{{ year }}</td>
-            <td>{{ values.mathematics }}</td>
-            <td>{{ values.listeningComprehension }}</td>
-            <td>{{ values.readingVocabulary }}</td>
-            <td>{{ values.readingComprehension }}</td>
-            <td>{{ values.punctuationGrammar }}</td>
+            <td class="centered">{{ year }}</td>
+            <td class="centered">{{ values.mathematics }}</td>
+            <td class="centered">{{ values.listeningComprehension }}</td>
+            <td class="centered">{{ values.readingVocabulary }}</td>
+            <td class="centered">{{ values.readingComprehension }}</td>
+            <td class="centered">{{ values.punctuationGrammar }}</td>
         </tr>
         {% endfor %}
     </tbody>
