@@ -10,8 +10,10 @@
         </span>
     </h3>
 </div>
-{% if showOverallGrade %}
+
+{% set weightedMean = studentGrade.weightedMean %}
+{% if showOverallGrade and weightedMean %}
     <div class="grade {{ urgency.marks(studentGrade.meanNormalised) }}-bg no-margin">
-        <span>{{ studentGrade.weightedMean }}</span>
+        <span>{{ weightedMean }}</span>
     </div>
 {% endif %}
