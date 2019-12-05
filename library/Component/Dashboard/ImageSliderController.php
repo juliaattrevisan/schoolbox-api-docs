@@ -97,7 +97,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         // Load images for the current homepage
         $opts = [
             'filter' => 'image',
-            'size' => (int)$this->getConfigMapper()->get('image_slideshow_max'),
+            'size' => (int)$this->getConfigLoader()->get('image_slideshow_max'),
             'sort' => $this->getConfig('sort'),
             'sortdir' => $this->getConfig('sortdir')
         ];

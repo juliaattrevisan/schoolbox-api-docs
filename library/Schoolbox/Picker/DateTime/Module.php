@@ -115,6 +115,7 @@ class Module extends BaseModule
                 'termMapper'       => $this->getMapperFactory()->getLazy(TermMapper::class),
                 'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'timetableHandler' => $this->getInjector()->lazyGet('externalTimetable'),
             ])
         );
     }

@@ -20,6 +20,6 @@ class Footer extends Base
      */
     public function findData()
     {
-        return \Cfg::get('dio_achievement_report_ncea_footer');
+        return \Config::get('dio_achievement_report_ncea_footer');
     }
 }

@@ -2,7 +2,7 @@
 
 use Schoolbox\Breadcrumbs;
 
-if (!Cfg::get('webdav_enable')) {
+if (!Config::get('webdav_enable')) {
     error(2);
 }
 

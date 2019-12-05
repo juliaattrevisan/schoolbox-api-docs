@@ -16,8 +16,8 @@ use Calendar\Event\Collection\JsonExporter;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Collection\VCalExporter;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception;
@@ -139,9 +139,11 @@ try {
     }
     $viewer = $user;
 
-    $back              = (int)ConfigMapper::getInstance()->get('calendar_export_start');
-    $forward           = (int)ConfigMapper::getInstance()->get('calendar_export_end');
-    $timetable_forward = (int)ConfigMapper::getInstance()->get('timetable_export_end');
+    /** @var IConfigLoader $config */
+    $config            = $kernel->get('config');
+    $back              = (int)$config->get('calendar_export_start');
+    $forward           = (int)$config->get('calendar_export_end');
+    $timetable_forward = (int)$config->get('timetable_export_end');
 
     $back              = $back ? abs($back) : 1;
     $forward           = $forward ? abs($forward) : 12;
@@ -284,7 +286,7 @@ try {
             $api = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
                 [$user, $viewer],
-                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled'),
+                (bool)$config->get('resource_booking_enabled'),
                 $sentry
             );
 
@@ -297,7 +299,7 @@ try {
 
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
-            if (ConfigMapper::getInstance()->get('resource_booking_enabled')) {
+            if ($config->get('resource_booking_enabled')) {
 
                 $item = ItemMapper::getInstance()->findById($resourceId);
                 $roomCode = trim($item->getRoomCode());
@@ -334,7 +336,7 @@ try {
         case 'resource_category':
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
-            if (ConfigMapper::getInstance()->get('resource_booking_enabled')) {
+            if ($config->get('resource_booking_enabled')) {
 
                 $apiFactory = new CalendarApiFactory($user, $kernel->getDependencyInjector()->get('externalTimetable'));
                 $api = $apiFactory->buildFromResourceCollection(
@@ -370,7 +372,7 @@ try {
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
             $factory          = new ExternalConnectorFactory();
             $externalEvents   = $factory->build(
-                new \Schoolbox\Config\Loader(),
+                $kernel->getDependencyInjector()->get('config'),
                 $databaseExternal,
                 ExternalConnectorFactory::EXTERNAL_EVENTS
             );
@@ -391,7 +393,7 @@ try {
             $api = buildApiClass(
                 Calendar_Api_EventType_Custom_EOTC_Default::class,
                 [$user, $viewer],
-                (bool)ConfigMapper::getInstance()->get('eotc_enabled'),
+                (bool)$config->get('eotc_enabled'),
                 $sentry
             );
 
@@ -409,7 +411,7 @@ try {
             $api->add($subApi);
 
             // Only include these api if Resource Booking is enabled by Feature Flag
-            $resourceBookingEnabled = (bool)ConfigMapper::getInstance()->get('resource_booking_enabled');
+            $resourceBookingEnabled = (bool)$config->get('resource_booking_enabled');
             if ($resourceBookingEnabled) {
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
@@ -428,7 +430,7 @@ try {
             }
 
             // Only include EOTC if enabled
-            $eotcEnabled = (bool)ConfigMapper::getInstance()->get('eotc_enabled');
+            $eotcEnabled = (bool)$config->get('eotc_enabled');
             if ($eotcEnabled) {
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Custom_EOTC_Default::class,

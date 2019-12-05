@@ -737,7 +737,7 @@ abstract class Kernel
                     $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
                     $baseLoader  = new Twig_Loader_Filesystem(array());
                     // Paths: prefer templates/{site_location} over templates/core
-                    $basePath     = $config->get('siteRoot').'/templates/';
+                    $basePath     = SITE_root.'/templates/';
                     $overridePath = $basePath.$config->get('site_location');
                     $corePath     = $basePath.'core';
                     if (is_dir($overridePath)) {

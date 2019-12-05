@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+
 /**
  *
  * An image selector for eportfolio components
@@ -20,7 +23,7 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract
         $allImages    = [];
         $pageInstance = $component->getContext();
         if ($pageInstance instanceof Eportfolio_Page_Instance) {
-            $fileMapper = new \Schoolbox\MyFileMapper();
+            $fileMapper = new MyFileMapper();
             $allImages  = $fileMapper->findAllImagesByUser($pageInstance->getUserId());
         }
 

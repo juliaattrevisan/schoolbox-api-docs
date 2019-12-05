@@ -387,6 +387,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function buildConfigLoader()
     {
+        // TODO SA-8354: disentangle circular dependency between mapper and config
         return new ConfigLoader();
     }
 

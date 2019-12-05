@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -28,6 +28,7 @@ abstract class WorkNotifier implements Serializable {
      * @param LoggerInterface $log
      */
     public function __construct($configLoader = null, $log = null) {
+        // TODO SA-8354: inject this always
         $this->conf = $configLoader ?: new Loader();
 
         if ($log) {

@@ -84,7 +84,7 @@ else {
 
 // setup pagination vars from args
 if (!$exportToCSV) {
-    $limit = Cfg::get('search_type_limit') * 2;
+    $limit = Config::get('search_type_limit') * 2;
     $offset = ($page - 1) * $limit;
 }
 else {

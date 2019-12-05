@@ -19,7 +19,6 @@ use Component_ConfigMapper;
 use Component_ControllerAbstract;
 use DateTime;
 use Exception;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -97,9 +96,6 @@ class Controller extends Base
     /** @var Component_ConfigMapper $componentConfigMapper */
     private $componentConfigMapper;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
-
     /** @var string */
     private $baseUrl;
 
@@ -113,7 +109,6 @@ class Controller extends Base
     {
         $this->componentConfigMapper           = Component_ConfigMapper::getInstance();
         $this->componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-        $this->configMapper                    = ConfigMapper::getInstance();
         $this->baseUrl                         = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}";
     }
 
@@ -287,7 +282,7 @@ class Controller extends Base
                 'componentTitle' => $title,
                 'url'            => $targetUrl,
                 'height'         => $component->getConfig(self::COMPONENT_CONFIG_HEIGHT),
-                'version'        => $this->configMapper->get('site_version'),
+                'version'        => $this->getConfigLoader()->get('site_version'),
             ],
         ]);
     }
@@ -396,14 +391,14 @@ class Controller extends Base
             'launch_presentation_return_url'         => $launchPresentationReturnUrl,
             'ext_content_return_types'               => $returnTypes,
             'ext_content_return_url'                 => $extContentReturnUrl,
-            'tool_consumer_instance_guid'            => $this->configMapper->get('site_location'),
-            'tool_consumer_instance_name'            => $this->configMapper->get('school_name'),
+            'tool_consumer_instance_guid'            => $this->getConfigLoader()->get('site_location'),
+            'tool_consumer_instance_name'            => $this->getConfigLoader()->get('school_name'),
             'tool_consumer_instance_description'     => 'Schoolbox LMS',
             'tool_consumer_instance_url'             => $this->baseUrl,
-            'tool_consumer_instance_contact_email'   => $this->configMapper->get('mail_from_address'),
+            'tool_consumer_instance_contact_email'   => $this->getConfigLoader()->get('mail_from_address'),
             'tool_consumer_info_product_family_code' => 'schoolbox',
-            'tool_consumer_info_version'             => $this->configMapper->get('site_version'),
-            'ext_lms'                                => 'schoolbox-' . $this->configMapper->get('site_version'),
+            'tool_consumer_info_version'             => $this->getConfigLoader()->get('site_version'),
+            'ext_lms'                                => 'schoolbox-' . $this->getConfigLoader()->get('site_version'),
             'lti_version'                            => self::LTI_VERSION_1,
             'lti_message_type'                       => $ltiRequestType,
             'oauth_callback'                         => 'about:blank',
@@ -562,7 +557,7 @@ class Controller extends Base
                 'componentTitle' => $title,
                 'url'            => $url,
                 'height'         => $height,
-                'version'        => $this->configMapper->get('site_version'),
+                'version'        => $this->getConfigLoader()->get('site_version'),
             ],
         ]);
 

@@ -14,7 +14,7 @@ $spBaseUrl = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domai
 
 $settingsInfo = array (
     'idp' => [
-        'entityId' => Config::get('saml_sso_url') ?: Cfg::get('saml_idp_metadata_url'),
+        'entityId' => Config::get('saml_sso_url') ?: Config::get('saml_idp_metadata_url'),
         'singleSignOnService' => array (
             'url' => Config::get('saml_sso_url'),
         ),
@@ -30,8 +30,8 @@ $settingsInfo = array (
         'digestAlgorithm'                   => XMLSecurityDSig::SHA256,
         'lowercaseUrlencoding'              => true,
         'wantNameId'                        => true,
-        'logoutRequestSigned'               => Cfg::get('saml_private_cert') ? true : false,
-        'logoutResponseSigned'              => Cfg::get('saml_private_cert') ? true : false,
+        'logoutRequestSigned'               => Config::get('saml_private_cert') ? true : false,
+        'logoutResponseSigned'              => Config::get('saml_private_cert') ? true : false,
 
     ],
 );
@@ -45,7 +45,7 @@ if (Config::get('saml_auth_context') !== 'unspecified') {
 SAMLDebugLog(json_encode($settingsInfo));
 
 try {
-    $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
+    $url = new \Zend\Uri\Uri(Config::get('saml_idp_metadata_url'));
     $idpMetadataUrl = $url->toString();
 
     $cache = new Alaress_Saml_Cache();
@@ -69,7 +69,7 @@ try {
  */
 $privateKey = false;
 
-$privateKeyResource = openssl_pkey_get_private(Cfg::get('saml_private_cert'), sha1(strtolower(trim(Cfg::get('site_school_code')))));
+$privateKeyResource = openssl_pkey_get_private(Config::get('saml_private_cert'), sha1(strtolower(trim(Config::get('site_school_code')))));
 if( $privateKeyResource !== false ) {
     openssl_pkey_export($privateKeyResource, $privateKey);
 }
@@ -86,8 +86,8 @@ $settingsInfo['sp'] = [
             'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
         ],
         'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
-        'x509cert' => Cfg::get('saml_public_cert'),
-        'privateKey' => $privateKey ? $privateKey : Cfg::get('saml_public_cert'),
+        'x509cert' => Config::get('saml_public_cert'),
+        'privateKey' => $privateKey ? $privateKey : Config::get('saml_public_cert'),
     ];
 
 /**

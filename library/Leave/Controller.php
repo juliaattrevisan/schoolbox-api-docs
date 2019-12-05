@@ -371,7 +371,7 @@ class Leave_Controller extends Controller
            */
         $this->getPage()->setVar(
             array(
-                'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions')
+                'TERMS_AND_CONDITIONS' => Config::get('terms_and_conditions')
             )
         );
 
@@ -533,7 +533,7 @@ class Leave_Controller extends Controller
 	 */
     private function isOutsideCreationThreshold($startDate)
     {
-        $thresholdHours = \Cfg::get('boarder_leave_creation_threshold');
+        $thresholdHours = \Config::get('boarder_leave_creation_threshold');
 
         /* Use 0 to deactivate this feature
 		 */
@@ -1644,7 +1644,7 @@ class Leave_Controller extends Controller
      */
     public function sendParentNotice($request)
     {
-        if (Cfg::get('boarder_leave_parent_notification_enabled')) {
+        if (Config::get('boarder_leave_parent_notification_enabled')) {
 
             /* Choose the Factory, have it produce() the notice object and send
              */
@@ -1674,7 +1674,7 @@ class Leave_Controller extends Controller
     {
         $email = new Mailer('../modules/leave/userNoticeEmail.html', 'test', 'steve.chan@alaress.com.au');
 
-        $email->setFrom(Cfg::get('mail_from_address'), 'Test Schoolbox');
+        $email->setFrom(Config::get('mail_from_address'), 'Test Schoolbox');
         $email->send();
     }
 

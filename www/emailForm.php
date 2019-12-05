@@ -11,8 +11,7 @@
 */
 
 use Alaress\Mail\AbstractMailer;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 
@@ -52,15 +51,15 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
 
     $context['NAME'] = $name;
 
-    $myconf = ConfigMapper::getInstance();
-    $core = new CoreContext($myconf);
-    $email = new TwigEmail('feedback.twig');
+    $myconf = ConfigLoader::getInstance();
+    $core   = new CoreContext($myconf);
+    $email  = new TwigEmail('feedback.twig');
     $email->setCoreContext($core->getContext());
     $email->setFrom($_POST['email'], $name);
-    $email->setSubject(Cfg::get('title') . ' Feedback - ' . $_POST['subject']);
+    $email->setSubject(Config::get('title') . ' Feedback - ' . $_POST['subject']);
     $email->setContext($context)->send(array(
-                        'name' => Cfg::get('mail_from_name'),
-                        'email' => Cfg::get('mail_support_address')
+                        'name' => Config::get('mail_from_name'),
+                        'email' => Config::get('mail_support_address')
                 ));
 
 /*	if($_POST['receipt']) {

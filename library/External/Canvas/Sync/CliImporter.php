@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -304,8 +305,8 @@ class CliImporter extends CliTool\App
         /** @var UnitImpl\Mapper */
         $unitImplMapper = $mapperFactory->get(UnitImpl\Mapper::class);
         $unitSpecMapper = $mapperFactory->get(UnitSpec\Mapper::class);
-        /** @var ConfigMapper */
-        $configMapper = $mapperFactory->get(ConfigMapper::class);
+        /** @var IConfigLoader */
+        $config = $this->getDi()->get('config');
 
         $dataSync = new DataSync(
             $canvasDb,
@@ -323,7 +324,7 @@ class CliImporter extends CliTool\App
             $courseSpecMapper,
             $unitImplMapper,
             $unitSpecMapper,
-            $configMapper,
+            $config,
             $this->perform(),
             $this->getLogger()
         );

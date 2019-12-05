@@ -68,6 +68,7 @@ class Factory
      */
     public static function getInstanceExternal(): ?IConnector
     {
+        // TODO SA-8354: use DI'd database instead
         if (!isset(self::$connectorExternal)) {
             self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
         }

@@ -45,7 +45,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     {
         $this->userAccessMapper  = $this->getMapperFactory()->get(UserAccessMapper::class);
         $this->termMapper        = $this->getMapperFactory()->get(Term\Mapper::class);
-        $this->externalDbEnabled = (bool)Cfg::get('external_enable');
+        $this->externalDbEnabled = (bool)Config::get('external_enable');
 
         // This component is always present on homepages (embedded in page tot menu)
         return true;
@@ -132,7 +132,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Show course markbook link to staff on unit or course pages (if feature enabled)
-        if ($isStaffOrSuper && ($isUnitPage || $isCoursePage) && $this->getConfigMapper()->get('course_markbook_enable')) {
+        if ($isStaffOrSuper && ($isUnitPage || $isCoursePage) && $this->getConfigLoader()->get('course_markbook_enable')) {
             $this->setVar('COURSE_MARKBOOK_LINK', $this->buildCourseMarkbookLink($isUnitPage, $isCoursePage));
             $this->parse('course_markbook_link_block', 'course_markbook_link');
             $hasClassActions = true;
@@ -145,7 +145,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $route = 'learningAssessmentCalendar.getReport';
         $params = [];
 
-        if ($authorizer->isPathAuthorizedForUser($route, $params, $this->getUser()) && $this->getConfigMapper()->get('assessment_calendar_enabled')) {
+        if ($authorizer->isPathAuthorizedForUser($route, $params, $this->getUser()) && $this->getConfigLoader()->get('assessment_calendar_enabled')) {
             $this->parse('assessment_calendar_link_block', 'assessment_calendar_link');
         } else {
             $this->setVar([

@@ -44,7 +44,7 @@ foreach ($componentCollection as $component) {
         }
     } catch (\Throwable $e) {
         // if a component explodes for any reason, we only want it to explode the page if we're in debug mode
-        if (Cfg::get('debug_mode')) {
+        if (Config::get('debug_mode')) {
             throw $e;
         }
 

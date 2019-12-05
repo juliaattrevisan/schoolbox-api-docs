@@ -51,6 +51,7 @@ class Group extends DeprecatedModel
     {
         // only load this if you *actually* need it
         if (empty($this->userNotifier)) {
+            // TODO SA-8354: audit all places this could be used: replace with mapper
             $this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
         }
         return $this->userNotifier;
@@ -245,36 +246,6 @@ class Group extends DeprecatedModel
         $this->update($data);
     }
 
-    /**
-     * Update service types for a user.
-     *
-     * @param <type> $sid
-     * @param <type> $uid
-     * @param <type> $type
-     */
-    function setUserGroupType($sid, $uid, $type)
-    {
-        $query = "UPDATE userAccess SET type = '$type' WHERE uid = '$uid' AND service = '" . $this->_service . "' AND sid = '$sid'";
-        if ($this->db->query($query)) {
-            $this->getUserNotifier()->manualNotifyUpdated($uid, $_SESSION['user']);
-        }
-    }
-
-    /**
-     * Update sid value for a user.
-     *
-     * @param <type> $sid
-     * @param <type> $uid
-     * @param <type> $type
-     */
-    function setSID($previousSid, $sid, $uid)
-    {
-        $query = "UPDATE userAccess SET sid = '$sid' WHERE uid = '$uid' AND service = '" . $this->_service . "' AND sid = '$previousSid'";
-        if ($this->db->query($query)) {
-            $this->getUserNotifier()->manualNotifyUpdated($uid, $_SESSION['user']);
-        }
-    }
-
     function getOwner($relationID)
     {
 
@@ -294,7 +265,7 @@ class Group extends DeprecatedModel
     function allowOwner($userID)
     {
         //checks if the user can become the owner of group
-        if (Cfg::get('group_staff_only')) {
+        if (Config::get('group_staff_only')) {
             return $this->isStaff($userID);
         } else {
             return true;
@@ -345,6 +316,16 @@ class Group extends DeprecatedModel
         }
     }
 
+    /**
+     * TODO remove this and update/remove everywhere which uses it:
+     * * sync scripts
+     * * add users to group
+     *
+     * @param     $relationID
+     * @param     $userID
+     * @param int $type
+     * @return bool
+     */
     function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
     {
         if (!$this->isUser($relationID, $userID)) {
@@ -364,6 +345,9 @@ class Group extends DeprecatedModel
 
     /**
      * Deletes a uid also can optionally delete a user based on its permission
+     *
+     * TODO remove this and update/remove everywhere which uses it:
+     * * group delete
      *
      * @param $relationID
      * @param $userID
@@ -406,12 +390,6 @@ class Group extends DeprecatedModel
         return $this->getPermission($category_id, $user_id) >= UserAccess::ACCESS_READ
         && $this->isParent($user_id)
         && !$this->involvedInGroup($user_id, $category_id);
-    }
-
-    function setUserPermission($relationID, $userID, $type = UserAccess::ACCESS_READ)
-    {
-        $this->deleteUser($relationID, $userID);
-        return $this->addUser($relationID, $userID, $type);
     }
 
     /**
@@ -505,7 +483,7 @@ class Group extends DeprecatedModel
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
         if ($user->getRole()->isStaff()
-            && (Cfg::get('news_staff_post_enabled') == '1')
+            && (Config::get('news_staff_post_enabled') == '1')
             && ($this->_service == UserAccess::SERVICE_NEWS)
             && ($permission < UserAccess::ACCESS_WRITE)
         ) {
@@ -729,7 +707,7 @@ class Group extends DeprecatedModel
 
         $catList = array();
 
-        if ($includeSubjectList == true && Cfg::get('external_enable')) {
+        if ($includeSubjectList == true && Config::get('external_enable')) {
             foreach ($this->involvedInSubjects($userID) as $subject) {
                 // Subjects must still respect $accessType
                 if ($this->getPermission($subject['id'], $userID) >= $accessType) {

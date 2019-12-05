@@ -140,7 +140,7 @@ class Report_Parent extends Report_Abstract
              * If you are a parent, ensure that you have a child in the selected year level.
              * If you don't have a child in this year level, you can't view it.
              */
-            if (Cfg::get('restrict_parent_directory')) {
+            if (Config::get('restrict_parent_directory')) {
                 if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
                     foreach ($_SESSION['children'] as $currentChild) {
                         $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
@@ -291,7 +291,7 @@ class Report_Parent extends Report_Abstract
      */
     protected function isYearsRestricted()
     {
-        return Cfg::get('restrict_parent_directory')
+        return Config::get('restrict_parent_directory')
         && !$this->getGroupHandler()->isSuperuser()
         && !$this->getGroupHandler()->isStaff();
     }

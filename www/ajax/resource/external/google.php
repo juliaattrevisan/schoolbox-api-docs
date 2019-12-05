@@ -8,7 +8,7 @@ use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage;
 
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -33,7 +33,13 @@ if (function_exists('apache_request_headers')) {
     $headers['Authorization'] = $_SERVER['HTTP_AUTHORIZATION'];
 }
 $proxy   = new Proxy\Server($conf);
-$grive   = new GDriveFetcher(ExtensionMapper::getInstance(), sys_get_temp_dir(), $proxy->curlInit(), $headers['Authorization']);
+$grive   = new GDriveFetcher(
+    ExtensionMapper::getInstance(),
+    sys_get_temp_dir(),
+    $proxy->curlInit(),
+    $headers['Authorization'],
+    (bool)$conf->get('googledrive_export_pdf')
+);
 $mapper  = Storage\Mapper::getInstance();
 $files   = array();
 

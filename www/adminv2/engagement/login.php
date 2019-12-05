@@ -1,7 +1,7 @@
 <?php
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
+use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Schoolbox\RoleMapper;
 use Schoolbox\Engagement\Login;
@@ -24,12 +24,12 @@ $currentMonth = clone $start;
 
 /**
  * @var MapperFactory $mapperFactory
- * @var ConfigMapper  $configMapper
+ * @var IConfigLoader $config
  * @var RoleMapper    $roleMapper
  */
 $mapperFactory = $this->getDi()->get('mapperFactory');
-$configMapper  = $mapperFactory->get(ConfigMapper::class);
-$loginReport   = new Login(Database\Factory::getInstanceInternal(), $configMapper->get('session_length'));
+$config        = $this->getDi()->get('config');
+$loginReport   = new Login($this->getDi()->get('databaseInternal'), $config->get('session_length'));
 $roleMapper    = $mapperFactory->get(RoleMapper::class);
 $roleList      = $roleMapper->findAll();
 

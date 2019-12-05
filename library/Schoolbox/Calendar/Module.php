@@ -22,7 +22,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\CampusMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -144,7 +143,7 @@ class Module extends BaseModule
             'eventTypeMapper'   => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
             'calApiConfigMapper'=> $this->getMapperFactory()->getLazy(\Calendar_Api_Config_Mapper::class),
             'moduleChecker'     => $injector->lazyNew(ModuleChecker::class, [
-                'config'    => $this->getMapperFactory()->getLazy(ConfigMapper::class),
+                'config'        => $injector->lazyGet('config'),
             ]),
             'eventMapper'       => $this->getMapperFactory()->getLazy(EventMapper::class),
         ];

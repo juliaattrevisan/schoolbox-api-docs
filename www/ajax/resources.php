@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -23,15 +23,16 @@ $multi    = $this->arg[2] == 'multi';
 $mime     = $_GET['mime'];
 
 $this->setVar([
-    'SITE_VERSION'  => Cfg::get('site_version'),
+    'SITE_VERSION'  => Config::get('site_version'),
     'SITE_LOCATION' => $this->site,
 ]);
 
 $factory = new Schoolbox\Resource\Attachment\Factory();
 
+// TODO use DI version
 $factory->setSource($location, $source)
         ->setMimeFilter($mime)
         ->allowMulti($multi)
-        ->setConfig(new \Schoolbox\Config\Loader());
+        ->setConfig($this->getDi()->get('config'));
 
 $factory->build()->parse($this);

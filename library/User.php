@@ -1,6 +1,6 @@
 <?php
 
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 
 
@@ -28,6 +28,7 @@ class User extends DeprecatedModel
     {
         // only load this if you *actually* need it
         if (empty($this->userNotifier)) {
+            // TODO SA-8354: audit all places this could be used: replace with mapper
             $this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
         }
         return $this->userNotifier;
@@ -185,12 +186,12 @@ class User extends DeprecatedModel
     {
         $searchFilter = '';
         if ($user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
+            (!$user->getRole()->isStaff() && Config::get('parent_search_enable') != 1)
         ) {
             $searchFilter =  " `groups`.`group_type` != 'parent' AND ";
         }
         if ($user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Cfg::get('student_search_enable') != 1)
+            (!$user->getRole()->isStaff() && Config::get('student_search_enable') != 1)
         ) {
             $searchFilter .= " `groups`.`group_type` != 'student' AND ";
         }
@@ -238,7 +239,7 @@ class User extends DeprecatedModel
 
         /* Show disabled users only if ticked (hide when unticked)
          */
-        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+        if (!ConfigLoader::getInstance()->get('show_disabled_users')) {
             $wherePart .= ' AND `user`.enabled = 1';
         }
 
@@ -289,7 +290,7 @@ class User extends DeprecatedModel
 
         /* Show disabled users only if ticked (hide when unticked)
          */
-        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+        if (!ConfigLoader::getInstance()->get('show_disabled_users')) {
             $wherePart .= ' AND `user`.enabled = 1';
         }
 
@@ -484,6 +485,10 @@ class User extends DeprecatedModel
     /**
      * Update an existing user's details
      *
+     * TODO remove this and update/remove everywhere which uses it:
+     * * sync scripts
+     * * bulk user modify
+     *
      * @param array $user
      * @return bool
      */
@@ -548,6 +553,10 @@ class User extends DeprecatedModel
 
     /**
      * Create a new user record
+     *
+     * TODO remove this and update/remove everywhere which uses it:
+     * * sync scripts
+     * * bulk user modify
      *
      * @param array $user
      *
@@ -682,7 +691,7 @@ class User extends DeprecatedModel
     {
         // Check for custom format
         if (empty($format)) {
-            $format = Cfg::get('name_format');
+            $format = Config::get('name_format');
         }
         /* Replace tags */
         preg_match_all('|{\w+}|', $format, $tags);

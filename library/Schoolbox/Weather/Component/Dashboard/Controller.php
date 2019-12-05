@@ -39,7 +39,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        $location = (new Location())->detect($this->getConfig('url'), $this->getConfigMapper()->getConfigLoader()->get('weather_location'));
+        $location = (new Location())->detect($this->getConfig('url'), $this->getConfigLoader()->getConfigLoader()->get('weather_location'));
 
         // Number of days of forecast to show.
         // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option,
@@ -50,8 +50,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
         $forecastLimit++;
 
-        $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
-        $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
+        $apiKey = $this->getConfigLoader()->getConfigLoader()->get('weather_api_key');
+        $apiUrl = $this->getConfigLoader()->getConfigLoader()->get('weather_api_url');
 
         $this->weatherPayload                           = (new WeatherstackClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
         $this->weatherPayload['weeklyForecastLocation'] = $location;

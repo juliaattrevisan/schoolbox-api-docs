@@ -32,7 +32,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
         $listSyns = null;
 
-        if (($this->getContext()->getCodeString() != '') && $this->getConfigMapper()->get('external_enable')) {
+        if (($this->getContext()->getCodeString() != '') && $this->getConfigLoader()->get('external_enable')) {
             $externalClassHandler = new External_Class();
             $listSyns = $externalClassHandler->getTeachers($this->getContext()->getCodeString());
         }
@@ -111,10 +111,10 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 'LIST_STYLE' => $displayOptions[$display]['css'],
             ]);
 
-            if (($this->getContext()->getCodeString() != '') && $this->getConfigMapper()->get('external_enable')) {
+            if (($this->getContext()->getCodeString() != '') && $this->getConfigLoader()->get('external_enable')) {
                 $externalClassHandler = new External_Class();
                 $userMapper = \Schoolbox\UserMapper::getInstance();
-                $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
+                $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
 
                 // If the config flag is enabled:
                 // restrict students in this class to only seeing the teacher(s)
@@ -122,7 +122,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 $classCodeString    = $this->getContext()->getCodeString();
                 $classCodesRetained = [];
                 if ($user->getRole()->isStudent()
-                    && $this->getConfigMapper()->get('student_teacher_class_visibility')
+                    && $this->getConfigLoader()->get('student_teacher_class_visibility')
                 ) {
 
                     $classCodesRetained = [];

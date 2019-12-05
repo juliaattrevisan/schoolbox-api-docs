@@ -1,19 +1,56 @@
 <?php
 /**
- * Port of old Config class to use PDO database instead of DeprecatedDatabase.
- *
- * @author      Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Config;
 
-use ArrayAccess;
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 
-class Loader implements IConfigLoader, ArrayAccess {
+/**
+ * The standard interface for retrieving Schoolbox configuration settings.
+ */
+class Loader implements IConfigLoader
+{
+    /**
+     * @var self
+     */
+    private static $instance;
+
+
+    /**
+     * Cached config values.
+     *
+     * @var array
+     */
+    private static $allConfigs;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        // TODO inject DB access class here
+    }
+
+
+    /**
+     * Temporary getInstance method, for replacing
+     * `\Schoolbox\Config\ConfigMapper::getInstance`.
+     *
+     * @return static
+     */
+    public static function getInstance(): self
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
 
     /**
      * Get a config variable
@@ -23,53 +60,12 @@ class Loader implements IConfigLoader, ArrayAccess {
      */
     public function get($var)
     {
-        return ConfigMapper::getInstance()->get($var);
+        if (!isset(self::$allConfigs)) {
+            $this->loadCache();
+        }
+        return self::$allConfigs[$var] ?? null;
     }
 
-    /**
-     * Does this offset exist or not?
-     *
-     * Currently it is impossible to tell from Cfg::get() if a config option is
-     * blank or it does not exist, so this always returns true.
-     *
-     * @param  mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return true;
-    }
-
-    /**
-     * Gets this config option.
-     *
-     * @param  mixed $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * Config options are not writable from this class.
-     *
-     * @throws OutOfRangeException
-     */
-    public function offsetSet($offset, $value)
-    {
-        throw new OutOfRangeException('Schoolbox\\Config\\Loader is read-only');
-    }
-
-    /**
-     * Config options are not writable from this class.
-     *
-     * @throws OutOfRangeException
-     */
-    public function offsetUnset($offset)
-    {
-        throw new OutOfRangeException('Schoolbox\\Config\\Loader is read-only');
-    }
 
     /**
      * Drop any cached config
@@ -78,6 +74,57 @@ class Loader implements IConfigLoader, ArrayAccess {
      */
     public function dropCache()
     {
-        ConfigMapper::getInstance()->dropCache();
+        self::$allConfigs = null;
+    }
+
+
+    /**
+     * Get a config variable
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get(string $name)
+    {
+        return $this->get($name);
+    }
+
+
+    /**
+     * Config options are not writable here.
+     *
+     * @param string $name
+     * @param mixed  $value
+     * @throws OutOfRangeException
+     */
+    public function __set(string $name, $value)
+    {
+        throw new OutOfRangeException(sprintf('"%s" is read-only', __CLASS__));
+    }
+
+
+    /**
+     * Does this config setting exist or not?
+     *
+     * @param  mixed $name
+     * @return bool
+     */
+    public function __isset(string $name): bool
+    {
+        if (!isset(self::$allConfigs)) {
+            $this->loadCache();
+        }
+        return isset(self::$allConfigs[$name]);
+    }
+
+
+    /**
+     * Load cached config values
+     */
+    private function loadCache(): void
+    {
+        if (!isset(self::$allConfigs)) {
+            self::$allConfigs = ConfigMapper::getInstance()->findAllConfigs();
+        }
     }
 }

@@ -299,10 +299,10 @@ class Homepage
 
         foreach (array('top','left','right') as $position) {
             $homepageConfig = array_merge($homepageConfig, array(
-                $position . '_head_font' => Cfg::get('homepage_colour_head_font'),
-                $position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
-                $position . '_font' => Cfg::get('homepage_colour_font'),
-                $position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary')
+                $position . '_head_font' => Config::get('homepage_colour_head_font'),
+                $position . '_head_bg' => Config::get('homepage_colour_head_bg'),
+                $position . '_font' => Config::get('homepage_colour_font'),
+                $position . '_bg_primary' => Config::get('homepage_colour_bg_primary')
             ));
         }
 

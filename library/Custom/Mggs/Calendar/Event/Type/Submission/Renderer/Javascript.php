@@ -11,7 +11,7 @@ use Aura\Di\ContainerInterface;
 use Calendar\Event\Type\Submission;
 use Calendar\Event\Type\Submission\Renderer\Javascript as SubmissionRendererJavascript;
 use Custom\Mggs\Personalised\Participant\Mapper as ParticipantMapper;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -208,7 +208,7 @@ class Javascript extends SubmissionRendererJavascript
             $threshold = 'pbl_mastery_threshold';
         }
 
-        if ($mark === null || $mark >= ConfigMapper::getInstance()->get($threshold)) {
+        if ($mark === null || $mark >= ConfigLoader::getInstance()->get($threshold)) {
             // Mark as success if null, or above mastery level
 
             return 'reviewed';

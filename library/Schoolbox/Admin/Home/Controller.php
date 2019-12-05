@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Database;
 use Schoolbox\Resource\LogMapper;
-use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
@@ -51,8 +50,8 @@ class Controller extends Base
     {
         // Disk usage
 
-        $disk_total = disk_total_space(ConfigMapper::getInstance()->get('file_dir'));
-        $disk_free = disk_free_space(ConfigMapper::getInstance()->get('file_dir'));
+        $disk_total = disk_total_space($this->getConfigLoader()->get('file_dir'));
+        $disk_free = disk_free_space($this->getConfigLoader()->get('file_dir'));
         $disk_used = $disk_total - $disk_free;
         $disk_percentage = round(($disk_used / $disk_total) * 100);;
 
@@ -76,36 +75,36 @@ class Controller extends Base
             $memory_gradient = '';
         }
 
-        // External database checked 
+        // External database checked
 
         $external_db_version = '';
 
-        if (ConfigMapper::getInstance()->get('external_enable')) {
+        if ($this->getConfigLoader()->get('external_enable')) {
             $external_ping = new \External_Ping();
 
             if ($external_ping->isResponsive()) {
-                $external_db = ucfirst(ConfigMapper::getInstance()->get('external_type'));
+                $external_db = ucfirst($this->getConfigLoader()->get('external_type'));
                 $external_db_light = 'success';
                 $external_db_status = 'Online';
                 $external_db_version = $external_ping->getVersion();
             } else {
-                $external_db = ucfirst(ConfigMapper::getInstance()->get('external_type'));
+                $external_db = ucfirst($this->getConfigLoader()->get('external_type'));
                 $external_db_light = 'alert';
                 $external_db_status = 'Offline';
             }
         } else {
-            $external_db = ucfirst(ConfigMapper::getInstance()->get('external_type'));
+            $external_db = ucfirst($this->getConfigLoader()->get('external_type'));
             $external_db_light = 'alert';
             $external_db_status = 'Disabled';
         }
 
         // Email status
 
-        if (ConfigMapper::getInstance()->get('mail_enable') && ConfigMapper::getInstance()->get('mail_smtp_host')) {
+        if ($this->getConfigLoader()->get('mail_enable') && $this->getConfigLoader()->get('mail_smtp_host')) {
             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
 
-            if (@socket_connect($socket, ConfigMapper::getInstance()->get('mail_smtp_host'), ConfigMapper::getInstance()->get('mail_smtp_port'))) {
+            if (@socket_connect($socket, $this->getConfigLoader()->get('mail_smtp_host'), $this->getConfigLoader()->get('mail_smtp_port'))) {
                 $email_light = 'success';
                 $email_status = 'Online';
             } else {
@@ -127,16 +126,16 @@ class Controller extends Base
         $ldap_alt_light = 'alert';
         $ldap_alt_status = 'Disabled';
 
-        if (ConfigMapper::getInstance()->get('ldap_enable')) {
+        if ($this->getConfigLoader()->get('ldap_enable')) {
             $tempsession = new \Session;
 
             // Check primary LDAP server bind
 
-            if (trim(ConfigMapper::getInstance()->get('ldap_host')) != "") {
-                $ds = ldap_connect(ConfigMapper::getInstance()->get('ldap_host'));
+            if (trim($this->getConfigLoader()->get('ldap_host')) != "") {
+                $ds = ldap_connect($this->getConfigLoader()->get('ldap_host'));
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(ConfigMapper::getInstance()->get('ldap_user')), utf8_encode(ConfigMapper::getInstance()->get('ldap_pass')));
+                $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape($this->getConfigLoader()->get('ldap_user')), utf8_encode($this->getConfigLoader()->get('ldap_pass')));
 
                 if ($ldapbind) {
                     $ldap_light = 'success';
@@ -151,11 +150,11 @@ class Controller extends Base
 
             // Check secondary LDAP server bind
 
-            if (trim(ConfigMapper::getInstance()->get('ldap_host_alt')) != "") {
-                $ds = ldap_connect(ConfigMapper::getInstance()->get('ldap_host_alt'));
+            if (trim($this->getConfigLoader()->get('ldap_host_alt')) != "") {
+                $ds = ldap_connect($this->getConfigLoader()->get('ldap_host_alt'));
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(ConfigMapper::getInstance()->get('ldap_user_alt')), utf8_encode(ConfigMapper::getInstance()->get('ldap_pass')));
+                $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape($this->getConfigLoader()->get('ldap_user_alt')), utf8_encode($this->getConfigLoader()->get('ldap_pass')));
 
                 if ($ldapbind) {
                     $ldap_alt_light = 'success';

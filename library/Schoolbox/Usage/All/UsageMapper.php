@@ -55,8 +55,8 @@ class UsageMapper
      */
     public function findTotalUsage()
     {
-        $total = disk_total_space(\Cfg::get('file_dir'));
-        $free = disk_free_space(\Cfg::get('file_dir'));
+        $total = disk_total_space(\Config::get('file_dir'));
+        $free = disk_free_space(\Config::get('file_dir'));
         $used = $total - $free;
 
         return array(

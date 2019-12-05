@@ -31,6 +31,8 @@ class Server
     /**
      * Return the Singleton ProxyServer instance.
      *
+     * TODO replace this with a DI'd proxy, or even a DI'd CURL client
+     *
      * @return Server
      */
     public static function getInstance()
@@ -59,6 +61,7 @@ class Server
      */
     public function __construct($conf)
     {
+        // TODO SA-8354: typedef and don't accept null?
         if (!$conf instanceof IConfigLoader) {
             $conf = new ConfigLoader();
         }

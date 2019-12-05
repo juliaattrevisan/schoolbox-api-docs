@@ -28,7 +28,6 @@ use Schoolbox\RoleMapper;
 use Alaress\Redis;
 use Schoolbox\MobileApp;
 use Schoolbox\UserMapper;
-use Schoolbox\Config\ConfigMapper;
 
 class Controller extends BaseController
 {
@@ -179,7 +178,7 @@ class Controller extends BaseController
         $apples = $apps->filterBy('providerName', MobileApp\Registry::PROVIDER_APPLE);
 
         foreach ($apples as $app) {
-            $appId = $app->getId();
+            $appId         = $app->getId();
             $zones[$appId] = (new Zone($appId))->getTwigContext();
         }
 
@@ -189,7 +188,7 @@ class Controller extends BaseController
             'attachzones' => $zones,
             'providers'   => [
                 'apns' => 'Apple Push Notification Service',
-                'gcm'  => 'Google Cloud Messaging'
+                'gcm'  => 'Google Cloud Messaging',
             ],
         ];
 
@@ -293,7 +292,7 @@ class Controller extends BaseController
 
         $filters = [
             'options'  => $roletypes,
-            'selected' => array_search($roletype, $roletypes, true) ?: 0
+            'selected' => array_search($roletype, $roletypes, true) ?: 0,
         ];
 
         $r = $this->getRoleMapper();
@@ -310,21 +309,21 @@ class Controller extends BaseController
 
         //Filtering out disabled modules
         //   Modules            => Related Notifications
-        $checkEnabled = Array(
-            'eotc'              => [NSMapper::NS_EOTC],
-            'resource_booking'  => [NSMapper::NS_RESOURCE_BOOKING],
-            'pastoral'          => [NSMapper::NS_PASTORAL, NSMapper::NS_PASTORAL_LOG, NSMapper::NS_PASTORAL_COMMENT],
-            'fixtures'          => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT]
-        );
+        $checkEnabled = [
+            'eotc'             => [NSMapper::NS_EOTC],
+            'resource_booking' => [NSMapper::NS_RESOURCE_BOOKING],
+            'pastoral'         => [NSMapper::NS_PASTORAL, NSMapper::NS_PASTORAL_LOG, NSMapper::NS_PASTORAL_COMMENT],
+            'fixtures'         => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT],
+        ];
 
-        $configMapper = ConfigMapper::getInstance();
+        $config = $this->getConfigLoader();
 
-        foreach ($ns as $i=>$namespace) {
-            foreach ($checkEnabled as $notifType=>$notifs) {
-                if(in_array($namespace->getSlug(), $notifs)){
-                    if(0 == $configMapper->get($notifType.'_enabled')){
-                        unset($ns[$i]);
-                    }
+        foreach ($ns as $i => $namespace) {
+            foreach ($checkEnabled as $notifType => $notifs) {
+                if (in_array($namespace->getSlug(), $notifs, true)
+                    && !$config->get($notifType . '_enabled')
+                ) {
+                    unset($ns[$i]);
                 }
             }
         }
@@ -333,8 +332,6 @@ class Controller extends BaseController
                                ->findAll()
                                ->indexBy('id')
                                ->getAll();
-
-        $config = $this->getConfig()->find($rolec->getColumnValues('id'));
 
         //Filtering out $config display further in Twig. Is there a more elegant solution?
 
@@ -347,8 +344,8 @@ class Controller extends BaseController
                 'ns'      => $ns,
                 'sources' => $sources,
                 'perms'   => $this->getConfig()->getPermissionList(),
-                'config'  => $config,
-            ]
+                'config'  => $this->getConfig()->find($rolec->getColumnValues('id')),
+            ],
         ]);
     }
 
@@ -370,13 +367,13 @@ class Controller extends BaseController
         } else {
             // no config set (not persisted?) mimic defaults
             $role = [
-                'mask'    => [ 'DI', 'IN', 'MO', 'EM' ],
-                'default' => [ 'IN' ]
+                'mask'    => ['DI', 'IN', 'MO', 'EM'],
+                'default' => ['IN'],
             ];
         }
 
         // combine dry ingredients in a large bowl and mix thoroughly
-        $role = array_merge($this->getRoleMapper()->dehydrate($this->getRoleMapper()->findById($q['role'])), $role, [ 'enabled' => true ]);
+        $role = array_merge($this->getRoleMapper()->dehydrate($this->getRoleMapper()->findById($q['role'])), $role, ['enabled' => true]);
 
         /** @var Source $source */
         $source = $this->getSourceMapper()->findById($source['id']);
@@ -386,16 +383,16 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set([
             'template' => '@adminMessages/custom-config.twig',
-            'data' => [
-                'ns'        => [ $ns->getId() => $ns ],
-                'namespace' => [ 'id' => $ns->getId() ],
-                'sources'   => [ $source->getId() => $source ],
+            'data'     => [
+                'ns'        => [$ns->getId() => $ns],
+                'namespace' => ['id' => $ns->getId()],
+                'sources'   => [$source->getId() => $source],
                 'source'    => $source,
                 'role'      => $role,
                 'perms'     => $this->getConfig()->getPermissionList(),
-                'roletype'  => $q['roletype'] ?: ''
+                'roletype'  => $q['roletype'] ?: '',
             ],
-            'format' => 'nochrome'
+            'format'   => 'nochrome',
         ]);
     }
 
@@ -449,7 +446,7 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set([
             'data'   => $conf,
-            'format' => 'json'
+            'format' => 'json',
         ]);
     }
 
@@ -476,7 +473,7 @@ class Controller extends BaseController
 
         $content = [
             'template' => '@adminMessages/puush.twig',
-            'data'     => []
+            'data'     => [],
         ];
 
         if ($userId) {
@@ -490,13 +487,13 @@ class Controller extends BaseController
                     unserialize(gzuncompress($data), ['allowed_classes' => [Instance::class, Param::class,],])
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ 'exception'=>$e ]);
+                $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", ['exception' => $e]);
             }
 
             $log->warning('-- END --');
 
         } else {
-            $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll([ 'order' => [ 'user_id' => 'asc' ] ]);
+            $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll(['order' => ['user_id' => 'asc']]);
         }
 
         rewind($write);

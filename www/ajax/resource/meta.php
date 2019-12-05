@@ -198,7 +198,7 @@ function getFolderMeta($folderId)
 
             /* Allow teachers to upload a zip file
              */
-            if ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload')) {
+            if ($groupHandler->isStaff() && \Config::get('enable_teacher_zip_upload')) {
                 $actions[] = 'zip';
             }
 

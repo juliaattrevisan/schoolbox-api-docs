@@ -1,14 +1,14 @@
 #!/usr/bin/php
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Html\ToText as Html2Text;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -46,7 +46,7 @@ if (!$rm->isPublic()) {
 }
 
 /** @var AbstractModuleNotifier $notifier */
-$notifier = new $classname(ConfigMapper::getInstance());
+$notifier = new $classname(ConfigLoader::getInstance());
 
 try {
     $object = $notifier->getMapper()->findById($id);

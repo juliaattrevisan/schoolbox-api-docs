@@ -35,7 +35,7 @@ if (isset($_GET['sls'])) {
         error(ErrorMapper::ERROR_PROCESSING, $errorReason);
     }
 
-    $samlLogoutUrl = trim(Cfg::get('saml_logout_url'));
+    $samlLogoutUrl = trim(Config::get('saml_logout_url'));
 
     // Replace some dynamic variables in the logout URL if set
     $samlLogoutUrl = str_replace('{SCHOOLBOX_ADDRESS}',$_SERVER['SERVER_NAME'],$samlLogoutUrl);

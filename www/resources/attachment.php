@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -37,7 +37,7 @@ $factory = new ResourceAttachmentFactory($filteredOptions);
 
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
-        ->setConfig(new \Schoolbox\Config\Loader())
+        ->setConfig($this->getDi()->get('config'))
         ->setRosetta($this->getDi()->get('l10n'));
 
 foreach ($factory->getMappedControllers() as $controller) {

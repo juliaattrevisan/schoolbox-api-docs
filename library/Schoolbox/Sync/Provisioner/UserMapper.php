@@ -58,8 +58,7 @@ class UserMapper extends SchoolboxMapper
         /* Modify accessList only when ups_groups_enabled is actually enabled
          * Otherwise leave it unchanged from whatever it was
          */
-
-        $config = new ConfigLoader();
+        $config = $this->getConfigLoader();
 
         if ($config->get('ups_groups_enabled')) {
             /** @var UserAccessMapper $userAccessMapper */

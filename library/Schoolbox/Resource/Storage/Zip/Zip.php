@@ -11,14 +11,11 @@ namespace Schoolbox\Resource\Storage\Zip;
 
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
-use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\IConfigLoader;
 
 class Zip
 {
-    /** @var ConfigLoader */
+    /** @var IConfigLoader */
     private $configLoader;
 
     /** @var string */
@@ -26,15 +23,6 @@ class Zip
 
     /** @var string */
     private $filenameTemp;
-
-    /** @var StorageMapper */
-    private $storageMapper;
-
-    /** @var ErrorMapper */
-    private $errorMapper;
-
-    /** @var MimetypeMapper */
-    private $mimetypeMapper;
 
     /** @var Filesystem */
     private $zipFilesystem;
@@ -44,14 +32,12 @@ class Zip
 
     /**
      * Constructor
-     * @param string $filename Optional filename to initialise the archive
+     * @param IConfigLoader $config
+     * @param string|null   $filename Optional filename to initialise the archive
      */
-    public function __construct($filename = null)
+    public function __construct(IConfigLoader $config, string $filename = null)
     {
-        $this->configLoader = new ConfigLoader();
-        $this->storageMapper = StorageMapper::getInstance();
-        $this->errorMapper = ErrorMapper::getInstance();
-        $this->mimetypeMapper = MimetypeMapper::getInstance();
+        $this->configLoader = $config;
 
         register_shutdown_function([$this, 'shutdown']);
 

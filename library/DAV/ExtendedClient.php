@@ -33,9 +33,9 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
         }
 
         $settings = $this->createCurlSettingsArray($request);
-        $settings[CURLOPT_HTTPAUTH]   = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
+        $settings[CURLOPT_HTTPAUTH]   = Config::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
         $settings[CURLOPT_COOKIEFILE] = '';
-        if (Cfg::get('webdav_allow_insecure')) {
+        if (Config::get('webdav_allow_insecure')) {
             $settings[CURLOPT_SSL_VERIFYHOST] = false;
             $settings[CURLOPT_SSL_VERIFYPEER] = false;
         }

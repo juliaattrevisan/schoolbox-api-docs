@@ -3,7 +3,7 @@
 use Calendar\Api\ApiHierarchyGenerator;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\Calendar\Relation;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 if (!$_SESSION['user']->isSuperuser()) {
     error(19);
@@ -107,7 +107,7 @@ foreach ($typeList as $type) {
 
         /* Subscribe page
          */
-        $moduleChecker = new ModuleChecker(ConfigMapper::getInstance());
+        $moduleChecker = new ModuleChecker(ConfigLoader::getInstance());
         $generator     = new ApiHierarchyGenerator($moduleChecker);
         $availableApi  = $generator->generateApiHierarchy();
 

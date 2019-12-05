@@ -35,8 +35,8 @@ $mapper->search(
     $articleResolver,
     $_SESSION['user'],
     $keyword,
-    ($current_page - 1) * Cfg::get('search_type_limit'),
-    Cfg::get('search_type_limit'),
+    ($current_page - 1) * Config::get('search_type_limit'),
+    Config::get('search_type_limit'),
     'score',
     'desc'
 );

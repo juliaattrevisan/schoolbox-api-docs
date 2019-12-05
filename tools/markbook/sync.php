@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -64,15 +64,15 @@ function traverse($folderId, $folderMapper, $catsWithCodes = array())
 /**
  * Display help text
  *
- * @param ConfigMapper $configMapper
+ * @param IConfigLoader $config
  */
-function help($configMapper)
+function help($config)
 {
     $additionalParameters = "";
 
     // Synergetic receives some additional options around FileYear/FileSemester
 
-    if ($configMapper->get('external_type') === 'synergetic') {
+    if ($config->get('external_type') === 'synergetic') {
         $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook and student marks, format --year=2016 (must be used with semester parameter)\n";
         $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook and student marks, --semester=1 (must be used with year parameter)\n";
         $addParamsShort = "[--year=yyyy] [--semester=s] ";
@@ -80,7 +80,7 @@ function help($configMapper)
 
     // Get pretty uppercased SIS name
 
-    $remoteSystemName = ucwords($configMapper->get('external_type'));
+    $remoteSystemName = ucwords($config->get('external_type'));
 
     echo <<<HELP
     
@@ -112,15 +112,15 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
     $dryRun     = isset($opts['dry-run']);
 
     // Make sure markbook sync is actually enabled
-    $configMapper = ConfigMapper::getInstance();
-
-    if (!$configMapper->get('external_markbook')) {
+    /** @var IConfigLoader $config */
+    $config = $di->get('config');
+    if (!$config->get('external_markbook')) {
         $log->error("ERROR: External markbook synchronisation is not enabled in Schoolbox. Please enable in your Schoolbox administrator settings and try again.");
         exit(1);
     }
 
     if ($help) {
-        help($configMapper);
+        help($config);
         exit(0);
     }
 
@@ -135,12 +135,12 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
     $markbookHandler = new SubmissionReturn();
 
     // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
-    if ($configMapper->get('external_type') === 'synergetic') {
+    if ($config->get('external_type') === 'synergetic') {
         try {
             $markbookExternal = new External_Synergetic_Markbook($year, $semester);
         } catch (InvalidArgumentException $e) {
             $log->error("ERROR: {$e->getMessage()}");
-            help($configMapper);
+            help($config);
             exit(1);
         }
     } else {

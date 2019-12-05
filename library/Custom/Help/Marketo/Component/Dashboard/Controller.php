@@ -18,7 +18,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        return $this->getConfigMapper()->get('site_location') === 'help';
+        return $this->getConfigLoader()->get('site_location') === 'help';
     }
 
     /**

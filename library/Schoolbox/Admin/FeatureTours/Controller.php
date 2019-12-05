@@ -32,7 +32,7 @@ class Controller extends Base
     public function render()
     {
         $twigData = [
-            'toursEnabled' => ConfigMapper::getInstance()->get('tours_enabled'),
+            'toursEnabled' => $this->getConfigLoader()->get('tours_enabled'),
             'pageCurrent' => 'feature-tours',
             'tours' => $this->tourMapper->findAll()
         ];

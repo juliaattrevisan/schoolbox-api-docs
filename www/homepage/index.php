@@ -106,10 +106,10 @@ $colorFactory = new \Alaress\Color\ColorFactory();
 
 // Colors (defaults)
 $defaultColour = array(
-    'head_font' => Cfg::get('homepage_colour_head_font'),
-    'head_bg' => Cfg::get('homepage_colour_head_bg'),
-    'font' => Cfg::get('homepage_colour_font'),
-    'bg_primary' => Cfg::get('homepage_colour_bg_primary')
+    'head_font' => Config::get('homepage_colour_head_font'),
+    'head_bg' => Config::get('homepage_colour_head_bg'),
+    'font' => Config::get('homepage_colour_font'),
+    'bg_primary' => Config::get('homepage_colour_bg_primary')
 );
 
 // Load this homepage's color list, falling back to defaults as required
@@ -179,7 +179,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     }
 
 
-    if (Cfg::get('homepage_enable_colour')) {
+    if (Config::get('homepage_enable_colour')) {
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
     } else {
         $this->setVar('homepage_color_selector_block', '');
@@ -402,10 +402,10 @@ $this->parse('colour_list_block', 'colour_list', true);
 
 // Defaults
 $defaultColour = array(
-    'head_font' => Cfg::get('homepage_colour_head_font'),
-    'head_bg' => Cfg::get('homepage_colour_head_bg'),
-    'font' => Cfg::get('homepage_colour_font'),
-    'bg_primary' => Cfg::get('homepage_colour_bg_primary')
+    'head_font' => Config::get('homepage_colour_head_font'),
+    'head_bg' => Config::get('homepage_colour_head_bg'),
+    'font' => Config::get('homepage_colour_font'),
+    'bg_primary' => Config::get('homepage_colour_bg_primary')
 );
 
 $columns = array('top', 'left', 'right');
@@ -452,7 +452,7 @@ foreach ($componentCollection as $component) {
         }
     } catch (\Throwable $e) {
         // if a component explodes for any reason, we only want it to explode the page if we're in debug mode
-        if (Cfg::get('debug_mode')) {
+        if (Config::get('debug_mode')) {
             throw $e;
         }
 

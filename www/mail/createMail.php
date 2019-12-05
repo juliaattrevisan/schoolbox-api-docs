@@ -17,7 +17,7 @@ $page->setDi($kernel->getDependencyInjector());
 
 $groupHandler = new Group;
 
-if (Cfg::get('mail_enable') == 1) {
+if (Config::get('mail_enable') == 1) {
 
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value

@@ -48,7 +48,7 @@ else if ($_POST['type'] == 'delete') {
 
 		/* Delete it
 		 */
-		$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
+		$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'));
 		$client->deletePad($pad->getPadId());
 
 		/* Soft delete it

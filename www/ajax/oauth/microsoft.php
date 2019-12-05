@@ -1,12 +1,12 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Config\Loader;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Browser\Office365\Tenant;
 
 if (empty($this)) {
@@ -25,7 +25,8 @@ $sesskey = 'sp_oauth2state';
 
 
 /* CONF */
-$conf = new Loader();
+/** @var IConfigLoader $conf */
+$conf = $this->getDi()->get('config');
 
 $clientId     = $conf->get('office365_client');
 $clientSecret = $conf->get('office365_secret');

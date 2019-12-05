@@ -3,6 +3,7 @@
 use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
@@ -43,7 +44,7 @@ class SitePage extends Page
     /** @var User $user */
     private $user;
 
-    /** @var Config */
+    /** @var ConfigLoader */
     private $config;
 
     /**
@@ -56,9 +57,12 @@ class SitePage extends Page
     {
         parent::__construct();
 
-        $this->config = \Config::getInstance();
+        // TODO SA-8354: ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
         if ($di) {
             $this->di = $di;
+            $this->config = $di->get('config');
+        } else {
+            $this->config = ConfigLoader::getInstance();
         }
 
         if(isset($_SESSION['user'])) {
@@ -310,8 +314,8 @@ class SitePage extends Page
         $templateVar = [
             'USER_ID'      => $this->user->getId(),
             'USER_ROLE'    => $this->user->getRole()->getName(),
-            'SITE_NAME'    => $this->config::get('school_name'),
-            'SITE_VERSION' => $this->config::get('site_version'),
+            'SITE_NAME'    => $this->config->get('school_name'),
+            'SITE_VERSION' => $this->config->get('site_version'),
         ];
         $this->setVar($templateVar);
         $this->localise();
@@ -405,7 +409,7 @@ class SitePage extends Page
 
         // Resend session cookie
         $cookieParams  = session_get_cookie_params();
-        $sessionLength = \Config::get('session_length');
+        $sessionLength = $this->config->get('session_length');
         $sessionExpiry = ($sessionLength > 0)
             ? $_SERVER['REQUEST_TIME'] + $sessionLength
             : 0;

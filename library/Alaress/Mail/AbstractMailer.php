@@ -11,9 +11,9 @@ namespace Alaress\Mail;
 
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
+use Schoolbox\Config\Loader as ConfigLoader;
 use function count;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Swift_Attachment;
@@ -401,7 +401,7 @@ abstract class AbstractMailer implements IMailer
     protected static function getConfig()
     {
         if (!self::$conf instanceof IConfigLoader) {
-            self::$conf = ConfigMapper::getInstance();
+            self::$conf = ConfigLoader::getInstance();
         }
         return self::$conf;
     }
@@ -507,4 +507,4 @@ abstract class AbstractMailer implements IMailer
     {
         return \chr(self::EMAIL_SEPARATOR_CODE);
     }
-} 
+}

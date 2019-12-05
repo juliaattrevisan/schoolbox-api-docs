@@ -76,7 +76,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             return false;
         }
 
-        if (!($_SESSION['timetable'] && $this->getConfigMapper()->get('external_enable'))) {
+        if (!($_SESSION['timetable'] && $this->getConfigLoader()->get('external_enable'))) {
             return false;
         }
 
@@ -180,7 +180,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
     {
-        switch ($this->getConfigMapper()->get('external_type')) {
+        switch ($this->getConfigLoader()->get('external_type')) {
             case 'synergetic':
                 if (!$class['AttendanceEnabled'] || empty($class['AttendancePeriods'])) {
                     return '';
@@ -240,7 +240,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function getAttendanceLinkTarget(): string
     {
-        switch ($this->getConfigMapper()->get('external_type')) {
+        switch ($this->getConfigLoader()->get('external_type')) {
             case 'tass':
                 return '_blank';
             case 'synergetic':
@@ -347,7 +347,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         ];
 
         // Optionally link to Attendance Records
-        if ('' !== $class['code'] && $this->getConfigMapper()->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
+        if ('' !== $class['code'] && $this->getConfigLoader()->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
 
             $classContext['attendance'] = [
                 'link'    => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
@@ -389,7 +389,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             '@timetable/Dashboard/component.twig',
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
-                'externalType'        => $this->getConfigMapper()->get('external_type'),
+                'externalType'        => $this->getConfigLoader()->get('external_type'),
                 'campusTimetables'    => $timetableContexts,
             ],
             false,

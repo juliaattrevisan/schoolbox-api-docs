@@ -115,7 +115,7 @@ class Scrub
             // position, top/left/right/bottom, z-index
             $config->set('CSS.Trusted', true);
 
-            $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');
+            $config->set('Cache.SerializerPath', Config::get('xml_dir') . '/../purifier/');
             $config->set('AutoFormat.Linkify', true);
 
             // Allow Iframe

@@ -117,7 +117,7 @@ abstract class Base
         // render pagination
         $this->getPage()->setBlock('RESULT', 'pagination', 'pagination_block');
 
-        $number_pages = ceil($mapperResult->getCount() / \Cfg::get('search_type_limit'));
+        $number_pages = ceil($mapperResult->getCount() / \Config::get('search_type_limit'));
 
         if ($number_pages > 1) {
             if (($currentPage - 5) <= 1) {

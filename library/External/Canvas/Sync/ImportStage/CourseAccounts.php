@@ -13,7 +13,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\DataStructures\ObjectTree;
 use External\Canvas\Sync\Bridge;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\TreeBuilder;
@@ -72,7 +72,7 @@ class CourseAccounts
      * @param IConnector      $canvasDb
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
-     * @param ConfigMapper    $configMapper
+     * @param IConfigLoader   $config
      * @param LoggerInterface $log
      * @param Bridge\Account  $accountBridge
      * @throws UnexpectedValueException
@@ -81,7 +81,7 @@ class CourseAccounts
         IConnector $canvasDb,
         IConnector $schoolboxDb,
         Folder\Mapper $folderMapper,
-        ConfigMapper $configMapper,
+        IConfigLoader $config,
         LoggerInterface $log,
         Bridge\Account $accountBridge
     ) {
@@ -91,7 +91,7 @@ class CourseAccounts
         $this->accountBridge = $accountBridge;
         $this->log           = $log;
 
-        $facultyFolderId = preg_replace('/[\D]/', '', $configMapper->get('course_homepage'));
+        $facultyFolderId = preg_replace('/[\D]/', '', $config->get('course_homepage'));
         if (!$facultyFolderId) {
             throw new UnexpectedValueException('Faculty root not configured. Please configure in schoolbox admin');
         }

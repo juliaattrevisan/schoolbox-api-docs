@@ -19,7 +19,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         $this->rss = new Alaress_Rss_Stream($this->getConfig('url'));
         $size = $this->getConfig('size');
         if (!$size) {
-            $size = Cfg::get('welcome_rss_limit');
+            $size = Config::get('welcome_rss_limit');
         }
         $this->rss->setLimit($size);
         $this->rss->stream();

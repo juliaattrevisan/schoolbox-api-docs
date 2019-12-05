@@ -11,7 +11,7 @@
 
 namespace Schoolbox\Preview\Chain;
 
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Preview\Chain\Strategy\External\IFrame;
 use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
@@ -32,7 +32,7 @@ class External extends Base
         $this->start([
             new Image($decodedUrl, ''),
             new Embed($decodedUrl, ''),
-            new IFrame($decodedUrl, explode("\n", ConfigMapper::getInstance()->get('safe_iframe_source_list'))),
+            new IFrame($decodedUrl, explode("\n", ConfigLoader::getInstance()->get('safe_iframe_source_list'))),
             new Redirect($decodedUrl, ''),
         ]);
     }

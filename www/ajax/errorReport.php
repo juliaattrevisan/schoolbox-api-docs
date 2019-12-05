@@ -17,7 +17,7 @@ if(!count($_POST['err'])) {
 }
 
 // where to send the error report
-$from = 'trouble@' . Cfg::get('site_domain');
+$from = 'trouble@' . Config::get('site_domain');
 $to = 'support@alaress.com.au';
 
 // combine all the articles together, and sub the H1s for H2s
@@ -35,7 +35,7 @@ $mailResponse = $email->send();
 if($mailResponse instanceof PEAR_Error) {
     // mailfail
     // log the report to file instead
-    $dir = Cfg::get('logs_dir');
+    $dir = Config::get('logs_dir');
     $fp = fopen($dir . '/giza'.date('YmdHis').'.err', 'w');
     if(!$fp) {
         die('Could not log the report, sorry. If the problem persists please contact your System Administrator.');

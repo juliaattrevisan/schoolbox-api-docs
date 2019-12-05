@@ -24,7 +24,7 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract
      */
     protected function setup()
     {
-        $this->cachedTime = Cfg::get('xml_cache_timeout');
+        $this->cachedTime = Config::get('xml_cache_timeout');
         $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 

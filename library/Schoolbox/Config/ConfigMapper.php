@@ -8,7 +8,6 @@
 namespace Schoolbox\Config;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 
 /**
@@ -18,7 +17,7 @@ use Schoolbox\Mapper;
  * @method Config findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Config[] findByColumn($columnName, $columnValue, $options = array())
  */
-class ConfigMapper extends Mapper implements IConfigLoader
+class ConfigMapper extends Mapper
 {
 
     // Table definition
@@ -107,44 +106,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _CANVAS_DATA_API_KEY               = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
 
-    /** @var array */
-    protected $cache = array();
-
-    /** @var array */
-    protected $consts;
-
-    /**
-     * This mapper has no database by default.
-     * (It can be installed later?)
-     */
-    protected function setupDatabase()
-    {
-    }
-
-    /**
-     * This object IS a config loader, so the method for building it returns itself.
-     *
-     * @return $this
-     */
-    protected function buildConfigLoader()
-    {
-        // this line will possibly blow up in the Doctor's face
-        return $this;
-    }
-
-    /**
-     * Set up required constants.
-     */
-    protected function setup()
-    {
-        $w = realpath(__DIR__ . "/../../..");
-        $this->consts = array(
-            'siteRoot' => $w,
-            'webRoot'  => "$w/www",
-            'webBase'  => ''
-        );
-    }
-
 
     /**
      * @throws \InvalidArgumentException
@@ -177,52 +138,41 @@ class ConfigMapper extends Mapper implements IConfigLoader
 
 
     /**
-     * Get a config variable
+     * Find all config options that are available within Schoolbox.
      *
-     * @param string $var
-     * @return mixed
+     * @return array
      */
-    public function get($var)
+    public function findAllConfigs(): array
     {
-        if (isset($this->consts[$var])) {
-            return $this->consts[$var];
-        } elseif (defined($var)) {
-            return constant($var);
+        $configs = [];
+        $query   = $this->getDatabase()->prepare("SELECT name, value, field_id FROM {$this->getTable()}");
+        $query->execute();
+        foreach ($query as $row) {
+            $configs[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
         }
-        if (empty($this->cache)) {
-            $this->loadCache();
-        }
-        if (isset($this->cache[$var])) {
-            return $this->cache[$var];
-        }
-        return null;
-    }
-
-    /**
-     * Load entire cache at once, not just one result at a time
-     */
-    protected function loadCache()
-    {
-        // Load database on request only
-        if (!($this->database instanceof \Database)) {
-            $this->database = \Database::getInstance();
-        }
-
-        // Perform this common action without the overhead of hydration
-        foreach ($this->database->query("SELECT `name`, `value`, field_id FROM `{$this->getTable()}`") as $row) {
-            $this->cache[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
-        }
+        return $configs;
     }
 
 
     /**
-     * Drop any cached config
+     * Find all available config types, as a scalar list.
      *
-     * @return void
+     * @return array|string[]
      */
-    public function dropCache()
+    public function findTypeList(): array
     {
-        $this->cache = array();
+        // Don't include boarder leave configs if boarder leave is off
+        $query = "
+            SELECT DISTINCT lu_config_type.type
+            FROM {$this->getTable()}
+            INNER JOIN lu_config_type ON config.type_id  = lu_config_type.id
+        ";
+        $statement = $this->getDatabase()->query($query);
+        $result    = [];
+        foreach ($statement as $row) {
+            $result[] = $row['type'];
+        }
+        return $result;
     }
 
 
@@ -234,7 +184,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
      */
     protected function updateCache(Config $model): bool
     {
-        $this->cache[$model->getName()] = $this->hydrateValue($model->getFieldId(), $model->getValue());
+        // TODO consider updating cache of ConfigLoader?
         return true;
     }
 

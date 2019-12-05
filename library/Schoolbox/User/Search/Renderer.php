@@ -13,7 +13,6 @@ use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use Alaress_Date_Format;
 use Config;
-use Cfg;
 use Eportfolio_Authenticator;
 
 class Renderer extends Handler
@@ -154,7 +153,7 @@ class Renderer extends Handler
                 if ($groupHandler->isStudent($user['id'])) {
                     if ($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
                         // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
-                        if (Cfg::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
+                        if (Config::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
                             $hasActions = true;
                         } else {
@@ -162,7 +161,7 @@ class Renderer extends Handler
                         }
 
                     }
-                    if (Cfg::get('boarder_leave_enabled') == '1') {
+                    if (Config::get('boarder_leave_enabled') == '1') {
                         if ($groupHandler->isStaff() and $user['residential_house_id']) {
                             $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
                             $hasActions = true;
@@ -225,7 +224,7 @@ class Renderer extends Handler
                 if ($hasActions) {
                     $this->getPage()->parse('tot_block', 'tot');
                 }
-                
+
                 $this->getPage()->parse('user_block', 'user', true);
             }
 

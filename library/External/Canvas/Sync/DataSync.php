@@ -17,7 +17,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -81,8 +81,8 @@ class DataSync
     /** @var UnitImpl\Mapper */
     private $unitSpecMapper;
 
-    /** @var ConfigMapper */
-    private $configMapper;
+    /** @var IConfigLoader */
+    private $config;
 
     /** @var IConnector */
     private $persist;
@@ -107,7 +107,7 @@ class DataSync
      * @param CourseSpec\Mapper       $courseSpecMapper
      * @param UnitImpl\Mapper         $unitImplMapper
      * @param UnitSpec\Mapper         $unitSpecMapper
-     * @param ConfigMapper            $configMapper
+     * @param IConfigLoader           $config
      * @param bool                    $persist Whether to persist changes to schoolbox database
      * @param LoggerInterface         $log
      */
@@ -127,7 +127,7 @@ class DataSync
         CourseSpec\Mapper $courseSpecMapper,
         UnitImpl\Mapper $unitImplMapper,
         UnitSpec\Mapper $unitSpecMapper,
-        ConfigMapper $configMapper,
+        IConfigLoader $config,
         bool $persist,
         LoggerInterface $log
     ) {
@@ -146,7 +146,7 @@ class DataSync
         $this->courseSpecMapper    = $courseSpecMapper;
         $this->unitImplMapper      = $unitImplMapper;
         $this->unitSpecMapper      = $unitSpecMapper;
-        $this->configMapper        = $configMapper;
+        $this->config              = $config;
         $this->persist             = $persist;
         $this->log                 = $log;
     }
@@ -184,7 +184,7 @@ class DataSync
             $this->canvasDb,
             $this->schoolboxDb,
             $this->folderMapper,
-            $this->configMapper,
+            $this->config,
             $this->log,
             $accountBridge
         ))->synchronise();

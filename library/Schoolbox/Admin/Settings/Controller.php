@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings;
 
 use Alaress\Web\Controller\ConfigController;
-use Cfg;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
@@ -33,7 +32,8 @@ class Controller extends ConfigController
     public function getSettings(string $typeLabel = null): void
     {
         $typeLabel  = $typeLabel ? urldecode($typeLabel) : 'Site';
-        $typeLabels = array_column(Cfg::getTypeList() ?: [], 'type');
+
+        $typeLabels = $this->getConfigMapper()->findTypeList();
 
         if (!\in_array($typeLabel, $typeLabels, true)) {
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);

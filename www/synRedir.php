@@ -4,7 +4,7 @@ require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = new SitePage;
 $user = $_SESSION['user'];
-$url = new \Zend\Uri\Uri(Cfg::get('external_portal'));
+$url = new \Zend\Uri\Uri(Config::get('external_portal'));
 
 /* If the user has already passed by the login, we can go directly to the page */
 if($_SESSION['communityLogin']) {
@@ -43,7 +43,7 @@ else {
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $action);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Cfg::get('site_version'));
+	curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Config::get('site_version'));
 	$login = curl_exec($ch);
 	curl_close($ch);
 	unset($ch);

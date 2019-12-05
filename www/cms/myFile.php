@@ -2,8 +2,8 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
-use Schoolbox\MyFileMapper;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
@@ -58,7 +58,7 @@ if ($this->arg[0] == 'new') {
         'ACTION' => 'Add',
         'FILE_ID' => '',
         'DESCRIPTION' => '',
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+        'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $parent['id'],
         "COMPONENT_INSTANCE_ID" => $publishComponent,
         "USER_ID" => $userId
@@ -107,7 +107,7 @@ if ($this->arg[0] == 'new') {
         'ACTION' => 'Modify',
         'FILE_ID' => $file['id'],
         'DESCRIPTION' => Scrub::text($file['description']),
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+        'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $file['parent'],
     );
     $this->setVar($output);

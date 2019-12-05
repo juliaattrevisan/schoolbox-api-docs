@@ -5,9 +5,9 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = new SitePage(false);
 
 $internalUrl = $_GET['page'] ?: '/';
-if (Cfg::get('login_anonymous') && !$_SESSION['user']) {
+if (Config::get('login_anonymous') && !$_SESSION['user']) {
     $session = new \Session;
-    $session->create(Cfg::get('login_anonymous'), true);
+    $session->create(Config::get('login_anonymous'), true);
     $page->localRedir($internalUrl);
 } else {
     $page->localRedir($internalUrl);

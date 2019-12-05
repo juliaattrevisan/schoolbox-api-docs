@@ -12,11 +12,11 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
         //    window.location.href = '/';
         //}
     </script>
-    <link rel="stylesheet" type="text/css" href="/css/<?php echo Scrub::text(Cfg::get('site_location'));?>/chrome-foundation.css?v=<?php echo Scrub::text(Cfg::get('site_version'));?>" />
+    <link rel="stylesheet" type="text/css" href="/css/<?php echo Scrub::text(Config::get('site_location'));?>/chrome-foundation.css?v=<?php echo Scrub::text(Config::get('site_version'));?>" />
 </head>
 <body>
     <div class="row island">
-        <h1><?php echo Scrub::text(Cfg::get('title'));?> no longer supports Internet Explorer 10 and below</h1>
+        <h1><?php echo Scrub::text(Config::get('title'));?> no longer supports Internet Explorer 10 and below</h1>
         <section class="content" >
             <p>
                 If you are using Windows 7 you are able to upgrade to Internet Explorer 11,
@@ -34,7 +34,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
   <div id="footer" class="clearfix">
     <ul>
-    <li class="last"><?php echo date('Y');?> &copy; Copyright <a href="<?php echo Cfg::get('school_address');?>"><?php echo Cfg::get('school_name');?></a></li>
+    <li class="last"><?php echo date('Y');?> &copy; Copyright <a href="<?php echo Config::get('school_address');?>"><?php echo Config::get('school_name');?></a></li>
     </ul>
   </div>
 

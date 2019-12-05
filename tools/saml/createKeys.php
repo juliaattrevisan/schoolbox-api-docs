@@ -9,6 +9,8 @@
  * @link      https://schoolbox.com.au/
  */
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\MapperFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -53,9 +55,7 @@ HELP;
             exit;
         }
 
-        /** @var Config $conf */
-        $conf = Config::getInstance();
-
+        $conf   = $this->getConfig();
         $config = [
             'digest_alg' => self::DIGEST_ALGORITHM,
             'private_key_bits' => 4096,
@@ -68,7 +68,7 @@ HELP;
             'localityName' => 'Melbourne',
             'organizationName' => 'Schoolbox Pty Ltd',
             'organizationalUnitName' => 'Schoolbox',
-            'commonName' =>    $conf::get('site_hostname').'.'.$conf::get('site_domain'),
+            'commonName' =>    $conf->get('site_hostname').'.'.$conf->get('site_domain'),
             'emailAddress' => 'support@schoolbox.com.au',
         ];
 
@@ -81,14 +81,23 @@ HELP;
         // Save your private key, CSR and self-signed cert for later use
         openssl_csr_export($csr, $csrout);
         openssl_x509_export($x509, $certout);
-        openssl_pkey_export($privkey, $pkeyout, sha1(strtolower(trim($conf::get('site_school_code')))));
+        openssl_pkey_export($privkey, $pkeyout, sha1(strtolower(trim($conf->get('site_school_code')))));
 
-        $conf::set('saml_private_cert', $pkeyout);
+        // Need to set config using the mapper
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $this->getDi()->get('mapperFactory');
 
+        /** @var ConfigMapper $configMapper */
+        $configMapper = $mapperFactory->get(ConfigMapper::class);
+
+        $samlPrivate = $configMapper->findOneByColumn('name', 'saml_private_cert');
+        $samlPrivate->setValue($pkeyout);
+        $configMapper->save($samlPrivate);
         $this->getLogger()->info('saml_private_cert was updated.');
 
-        $conf::set('saml_public_cert', $certout);
-
+        $samlPublic = $configMapper->findOneByColumn('name', 'saml_public_cert');
+        $samlPublic->setValue($certout);
+        $configMapper->save($samlPublic);
         $this->getLogger()->info('saml_public_cert was updated.');
     }
 };

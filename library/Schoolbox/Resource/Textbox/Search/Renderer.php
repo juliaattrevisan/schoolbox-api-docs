@@ -71,7 +71,7 @@ class Renderer extends Base
 
             /* "outputMore"
              */
-            if ($type == 'all' && $mapperResult->getCount() > \Cfg::get('search_all_limit')) {
+            if ($type == 'all' && $mapperResult->getCount() > \Config::get('search_all_limit')) {
                 $this->getPage()->setVar('MORE_COUNT', $mapperResult->getCount());
                 $this->getPage()->parse('see_more_block', 'see_more');
             }

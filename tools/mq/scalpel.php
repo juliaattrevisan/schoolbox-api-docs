@@ -9,7 +9,6 @@
  */
 
 use Alaress\Async\AMQP\Bunny\BunnyControl;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -125,7 +124,7 @@ $app = new class extends CliTool\App{
         // stop the socket daemon
         shell_exec('service schoolbox-socketd stop');
 
-        $conf = ConfigMapper::getInstance();
+        $conf = $this->getConfig();
 
         // get a list of all available amqp queues
         $ctrl = new BunnyControl([

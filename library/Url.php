@@ -40,8 +40,8 @@ class Url
 
         // No override, use config
         if(null === $siteHost) {
-            $site_hostname = trim(Cfg::get('site_hostname'));
-            $site_domain = trim(Cfg::get('site_domain'));
+            $site_hostname = trim(Config::get('site_hostname'));
+            $site_domain = trim(Config::get('site_domain'));
 
             // Is domain part set ?
             if ($site_domain) {

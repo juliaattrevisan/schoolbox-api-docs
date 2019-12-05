@@ -13,16 +13,14 @@ namespace Alaress\Image\Cache;
 
 use External_User;
 use Group;
-use Schoolbox\Config\Loader;
-use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Portrait extends Storage
 {
-
-    /** @var IConfigLoader */
-    private $config;
+    private const PROTECT_TEACHER_PHOTOS_FROM_NONE     = 0;
+    private const PROTECT_TEACHER_PHOTOS_FROM_ALL      = 1;
+    private const PROTECT_TEACHER_PHOTOS_FROM_STUDENTS = 2;
 
     /** @var UserMapper */
     private $userMapper;
@@ -31,26 +29,45 @@ class Portrait extends Storage
     private $sessionUser;
 
     /**
-     * Portrait constructor.
+     * @var bool
+     */
+    private $protectStudentPhotos;
+
+    /**
+     * @var int
+     */
+    private $protectTeacherPhotos;
+
+    /**
+     * Constructor
      *
      * @param User   $user
      * @param string $key
      * @param User   $sessionUser
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @param bool   $loadPhotosFromSis
+     * @param bool   $protectStudentPhotos
+     * @param int    $protectTeacherPhotos
      */
-    public function __construct(User $user, string $key, User $sessionUser)
-    {
-        $this->config      = new Loader();
-        $this->sessionUser = $sessionUser;
-        $this->userMapper  = UserMapper::getInstance();
+    public function __construct(
+        User $user,
+        string $key,
+        User $sessionUser,
+        bool $loadPhotosFromSis,
+        bool $protectStudentPhotos,
+        int $protectTeacherPhotos
+    ) {
+        // TODO inject user mapper and external user
+        $this->sessionUser          = $sessionUser;
+        $this->userMapper           = UserMapper::getInstance();
+        $this->protectStudentPhotos = $protectStudentPhotos;
+        $this->protectTeacherPhotos = $protectTeacherPhotos;
 
         $externalHandler = new External_User();
 
         /* If Load Photos From SIS is on, yank down the latest version, then cache it in brownhole
          * Otherwise try to use the one assigned to user, which lives in storage
          */
-        if ($this->config->get('photo_sis_import')) {
+        if ($loadPhotosFromSis) {
             $portrait = $externalHandler->getPortrait($user);
         } else {
             $portrait = $user->getPortrait();
@@ -118,7 +135,7 @@ class Portrait extends Storage
                 return true;
             }
 
-            if ($group->isStudent($userId) && !$this->config->get('protect_student_photo') && $this->sessionUser->getRole()->isStudent()) {
+            if (!$this->protectStudentPhotos && $group->isStudent($userId) && $this->sessionUser->getRole()->isStudent()) {
                 return true;
             }
 
@@ -128,17 +145,16 @@ class Portrait extends Storage
 
                 /**
                  * Options in protect_teacher_photo are;
-                 *  0 => Staff, parents and students can see photo
-                 *  1 => No one can see photo
-                 *  2 => Staff and Parents can see photo
+                 *  PROTECT_TEACHER_PHOTOS_FROM_NONE     => Staff, parents and students can see photo
+                 *  PROTECT_TEACHER_PHOTOS_FROM_ALL      => No one can see photo
+                 *  PROTECT_TEACHER_PHOTOS_FROM_STUDENTS => Staff and Parents can see photo
                  */
-                switch ($this->config->get('protect_teacher_photo')) {
-                    case 0:
+                switch ($this->protectTeacherPhotos) {
+                    case self::PROTECT_TEACHER_PHOTOS_FROM_NONE:
                         return $this->sessionUser->getRole()->isStudent() || $this->sessionUser->getRole()->isParent();
-                    case 1:
-                        return false;
-                    case 2:
+                    case self::PROTECT_TEACHER_PHOTOS_FROM_STUDENTS:
                         return $this->sessionUser->getRole()->isParent();
+                    case self::PROTECT_TEACHER_PHOTOS_FROM_ALL:
                     default:
                         return false;
                 }

@@ -33,7 +33,7 @@ if(is_array($superuserList)) {
 
         $output = array(
 			'SUPERUSER_NAME' => $userHandler->formatName($superuser),
-			'SUPERUSER_LOGIN' => date(Cfg::get('date_short'),strtotime( $loginLog[0]['date'])),
+			'SUPERUSER_LOGIN' => date(Config::get('date_short'),strtotime( $loginLog[0]['date'])),
 			'SUPERUSER_ID' => $superuser['uid']
 		);
 

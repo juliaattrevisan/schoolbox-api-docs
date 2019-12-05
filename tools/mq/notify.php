@@ -1,11 +1,13 @@
 #!/usr/bin/php
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Config\Loader as ConfigLoader;
 
 $helptext = <<<EOF
 Usage: $argv[0] [--icon=<icon>] [--href=<href>] [--severity=<level>] <topic> <bodytext>
@@ -91,7 +93,7 @@ $instance = $builder
 //	->setSeverity($values['severity'])
 //	->setTopics((array)$topic);
 
-$n = \Schoolbox\Notif\Notifactory::create($topic, \Schoolbox\Config\ConfigMapper::getInstance());
+$n = \Schoolbox\Notif\Notifactory::create($topic, ConfigLoader::getInstance());
 
 $n->log($values['severity'], "$instance");
 

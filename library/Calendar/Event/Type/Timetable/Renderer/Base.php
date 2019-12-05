@@ -43,6 +43,7 @@ abstract class Base extends RendererBase
      */
     public function showAttendanceLink() {
 
+        // TODO SA-8354: inject, or use version from DI
         $config = new Config();
 
         if (

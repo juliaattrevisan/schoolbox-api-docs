@@ -63,7 +63,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         // don't show forums to parents if they not a direct member of group
         // (Allow parents to read, but not post, if a child is in group)
         $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext()->getId());
-        if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
+        if (!$is_post_allowed && Config::get('restrict_parent_forum_access')) {
             return false;
         }
 

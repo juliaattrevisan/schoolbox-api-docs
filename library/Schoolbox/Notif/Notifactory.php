@@ -15,7 +15,7 @@ use Database;
 use Mailer;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Swift_Transport;
 
@@ -94,7 +94,7 @@ class Notifactory
                 // try for a config mapper instance
                 Database::reinitialise();
 
-                $this->conf = ConfigMapper::getInstance();
+                $this->conf = ConfigLoader::getInstance();
                 $this->conf->get('mail_support_address');
 
             } catch (PDOException $e) {

@@ -142,7 +142,7 @@ class Session
 
             //if no mail enabled or user has elected to use external client set mailhandle to mailto:
             //TODO: remove this parent special config, but schools currently rely on it, need to update all parents to mail_handler = 1
-            if (Cfg::get('mail_enable') == 0 || $user->getUseInternalMail() || ($groupHandler->isParent() && !$user->getLocalEmail())) {
+            if (Config::get('mail_enable') == 0 || $user->getUseInternalMail() || ($groupHandler->isParent() && !$user->getLocalEmail())) {
                 $_SESSION['mailhandle'] = "mailto:";
             } else {
                 $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
@@ -155,7 +155,7 @@ class Session
 
             // If external is off, or user is not a parent, user explicitly has no children (as opposed to unknown)
             $user->setChildren(new GenericCollection(User::class));
-            if (Cfg::get('external_enable')) {
+            if (Config::get('external_enable')) {
                 $this->setSynergyInfo($userMapper, $user);
             }
 
@@ -211,7 +211,7 @@ class Session
 
         // Fall back to using email address
         if(!$user instanceof \Schoolbox\User) {
-            if (Cfg::get('auth_email_enabled')) {
+            if (Config::get('auth_email_enabled')) {
                 $user = $userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
                 //Override username with actual username, rather than email address so user can proceed
                 if($user instanceof \Schoolbox\User) {
@@ -243,11 +243,11 @@ class Session
         $result = false;
 
         // Function to check username exists and password is correct
-        if (Cfg::get('ldap_enable')) {
+        if (Config::get('ldap_enable')) {
             $result = $this->authenticateLDAP($username, $password);
         }
 
-        if (!$result && Cfg::get('edumate_auth_enabled')) {
+        if (!$result && Config::get('edumate_auth_enabled')) {
             $result = $this->authenticateEdumate($username, $password);
         }
 
@@ -268,7 +268,7 @@ class Session
             // Store password as hash for DAV authentication later
             $save = [
                 'username' => $username,
-                'hash'     => md5($username . ':' . Cfg::get('site_location') . ':' . $password)
+                'hash'     => md5($username . ':' . Config::get('site_location') . ':' . $password)
             ];
 
             // ensure a key is set on login
@@ -305,9 +305,9 @@ class Session
         // perform search for user in ldap server specified
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, $version);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, $referrals);
-        @ldap_bind($ds, $this->ldap_escape($ldap_user), utf8_encode(Cfg::get('ldap_pass')));
-        $searchString = "(" . Cfg::get('ldap_username') . "=" . $this->ldap_escape($username) . ")";
-        $ldap_search_filter = Cfg::get('ldap_search_filter');
+        @ldap_bind($ds, $this->ldap_escape($ldap_user), utf8_encode(Config::get('ldap_pass')));
+        $searchString = "(" . Config::get('ldap_username') . "=" . $this->ldap_escape($username) . ")";
+        $ldap_search_filter = Config::get('ldap_search_filter');
         if (strlen($ldap_search_filter)) {
             $searchString = sprintf('(&(%s)%s)', $ldap_search_filter, $searchString);
         }
@@ -366,25 +366,25 @@ class Session
 
     private function authenticateLDAP($username, $password)
     {
-        $ds = ldap_connect(Cfg::get('ldap_host'));
+        $ds = ldap_connect(Config::get('ldap_host'));
 
         // test authentication in primary server
-        if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user'), Cfg::get('ldap_base'))) {
+        if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user'), Config::get('ldap_base'))) {
             return true;
         }
 
         // test authentication in secondary server
-        if (Cfg::get('ldap_host_alt')) {
-            $ds = ldap_connect(Cfg::get('ldap_host_alt'));
-            if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_alt'), Cfg::get('ldap_base_alt'))) {
+        if (Config::get('ldap_host_alt')) {
+            $ds = ldap_connect(Config::get('ldap_host_alt'));
+            if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user_alt'), Config::get('ldap_base_alt'))) {
                 return true;
             }
         }
 
         // test authentication in tertiary server
-        if (Cfg::get('ldap_host_ter')) {
-            $ds = ldap_connect(Cfg::get('ldap_host_ter'));
-            if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_ter'), Cfg::get('ldap_base_ter'))) {
+        if (Config::get('ldap_host_ter')) {
+            $ds = ldap_connect(Config::get('ldap_host_ter'));
+            if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user_ter'), Config::get('ldap_base_ter'))) {
                 return true;
             }
         }
@@ -412,7 +412,7 @@ class Session
     {
         //
         // Only for parents.
-        $url = Cfg::get('edumate_auth_url');
+        $url = Config::get('edumate_auth_url');
         if (empty($url)) {
             return false;
         }
@@ -468,7 +468,7 @@ class Session
         ";
         $this->db->query($query);
 
-        if ($this->db->countRows() < Cfg::get('login_allowed')) {
+        if ($this->db->countRows() < Config::get('login_allowed')) {
             return false;
         } else {
             return true;

@@ -10,8 +10,6 @@ use Alaress\Authorizer\Rule;
 use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
@@ -22,7 +20,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
  * Sub-module for a student's upcoming due work.
@@ -50,7 +47,7 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF)
         );
         // parents may view their child's work only if config.restrict_parent_duework_access is off
-        if (!$this->getConfigMapper()->get('restrict_parent_duework_access')) {
+        if (!$this->getConfig()->get('restrict_parent_duework_access')) {
             $access->addRule( new Rule\LazyCallback(function () {
                 return new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId');
             }));
@@ -154,16 +151,6 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
-
-    /**
-     * @return ConfigMapper|\Schoolbox\Mapper
-     * @throws \InvalidArgumentException
-     */
-    private function getConfigMapper()
-    {
-        return $this->getMapperFactory()->get(ConfigMapper::class);
-    }
-
 
     /**
      * @return ErrorMapper|\Schoolbox\Mapper

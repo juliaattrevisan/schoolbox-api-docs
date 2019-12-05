@@ -8,7 +8,6 @@
  */
 namespace Schoolbox\Comms\News\Search;
 use Alaress\Database\Connector\IConnector;
-use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment;
@@ -162,6 +161,7 @@ class Result extends Base
      */
     private function prepareSearchDependencies(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): array
     {
+        // TODO SA-8354: inject this, or remove it completely if ElasticSearch happens
         $config = new \Schoolbox\Config\Loader();
 
         $strategyFactory = new Segment\StrategyFactory(

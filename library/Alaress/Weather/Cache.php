@@ -18,7 +18,7 @@ class Alaress_Weather_Cache extends Alaress_Cache_Abstract {
      * @return mixed|void
      */
     protected function setup() {
-        $this->cachedTime = Cfg::get('weather_api_caching');
+        $this->cachedTime = Config::get('weather_api_caching');
         $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 }
