@@ -163,7 +163,7 @@ class Query
      */
     private function getQueryFilter(string $keyword, User $viewer): array
     {
-        $searchString = $this->db->escapeForLike($keyword);
+        $searchString = '%'.$this->db->escapeForLike($keyword).'%';
 
         $whereParts = [
             '(
