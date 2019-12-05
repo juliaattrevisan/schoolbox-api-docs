@@ -171,7 +171,7 @@ abstract class Base
     protected function findSavedArticles(User $user, bool $saveForLaterEnabled): array
     {
         if ($saveForLaterEnabled) {
-            $savedArticleIds = (new SaveForLater\Lists($this->saveForLaterMapper, $this->newsMapper))->findSavedIdsForUser($user->getId());
+            $savedArticleIds = $this->saveForLaterMapper->findSavedIdsForUser($user->getId());
 
             return array_fill_keys($savedArticleIds, SaveForLater\Mapper::SAVED);
         }
