@@ -1,0 +1,28 @@
+{##
+ # Status
+ #
+ # Get a report about an endpoint's availability and what it's producing
+ # These are unique to each sis so isams will do it differently to kamar et al.
+ #
+ # @param IStatus status
+ #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">School Data Import</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h3 class="subheader">Status Report</h3>
+
+        <section class="content">
+            <div class="scrollable schooldata-statusreport-container">
+                <pre>{{ report }}</pre>
+            </div>
+        </section>
+    </div>
+</div>

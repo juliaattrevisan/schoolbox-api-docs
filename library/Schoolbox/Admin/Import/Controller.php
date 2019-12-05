@@ -18,6 +18,7 @@ use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -62,11 +63,18 @@ class Controller extends ConfigController
             $this->router->generate('adminImportIndex.postSchoolDataOptions')
         );
 
+        $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
+        $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
+
+        $hasIndicator = $host !== '' && $key !== '';
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => 'import/schoolDataImport',
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
-            'configContext' => $configContext
+            'configContext' => $configContext,
+            'hasIndicator' => $hasIndicator,
+            'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
         ])->setTitle('School Data Import'));
     }
 
@@ -96,5 +104,40 @@ class Controller extends ConfigController
     private function buildConfigPredicate(): Builder
     {
         return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SCHOOLDATA);
+    }
+
+
+    /**
+     * Build asynchronous status indicator payload
+     */
+    public function getStatusIndicator(): void
+    {
+        $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
+        $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
+        $type = $this->getConfigLoader()->get('schooldata_import_data_source');
+
+        $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
+            'isReachable' => $status ? $status->isReachable() : false
+        ]));
+    }
+
+
+    /**
+     * Build asynchronous status report
+     */
+    public function getStatusReport(): void
+    {
+        $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
+        $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
+        $type = $this->getConfigLoader()->get('schooldata_import_data_source');
+
+        $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
+            'pageCurrent' => 'import/schoolDataImport',
+            'report' => $status ? $status->getReport() : ''
+        ]));
     }
 }

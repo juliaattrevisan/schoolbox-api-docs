@@ -7,7 +7,6 @@
  # @param string dataSource
  # @param stirng logPath
  #}
-
 <script>
     $(function() {
 
@@ -130,17 +129,45 @@
         {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
     <div class="small-12 island" id="config-island">
-        <h3 class="subheader">Status</h3>
+        <div class="row">
+            {% if hasIndicator %}
+            <div class="small-12 medium-6 island">
+                <h3 class="subheader">Status</h3>
 
-        <section class="content">
-            <p>Endpoint status goes here</p>
-        </section>
+                <section class="content">
+                    <div id="status-indicator-container">
+                        <div class="loader"></div>
+                    </div>
 
-        <h3 class="subheader">View Data</h3>
+                    <script>
+                        $(function() {
+                            $.get('{{ statusIndicatorRoute }}', function(response) {
+                                $('#status-indicator-container').html(response);
+                            });
+                        });
+                    </script>
 
-        <section class="content">
-            <p>View data goes here</p>
-        </section>
+                    <p>
+                        Find out more about your
+                        <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status</a>.
+                    </p>
+                </section>
+            </div>
+            {% endif %}
+
+            <div class="small-12 {% if hasIndicator %}medium-6{% endif %} island">
+                <h3 class="subheader">Your Data</h3>
+
+                <section class="content">
+                    <p>You can download the current state of your data below.</p>
+
+                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+                </section>
+            </div>
+        </div>
     </div>
     <div class="small-12 island" id="csv-island">
         <h3 class="subheader">Import from csv files</h3>
