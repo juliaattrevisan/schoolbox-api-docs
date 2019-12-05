@@ -7,12 +7,14 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
+
 /**
  * Class Data
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest\PAT\Table
  */
-class Data extends \Custom\Diocesan\AchievementReport\StandardisedTest\Base
+class Data extends Base
 {
 
     /**

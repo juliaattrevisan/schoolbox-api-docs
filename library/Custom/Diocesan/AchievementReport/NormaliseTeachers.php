@@ -1,14 +1,19 @@
 <?php
 /**
- * NormaliseTeachers
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport;
 
+/**
+ * Class NormaliseTeachers
+ *
+ * Arrange teacher information into a set of (key, value) tuples
+ * from a denormalised query result
+ *
+ * @package Custom\Diocesan\AchievementReport
+ */
 class NormaliseTeachers
 {
 

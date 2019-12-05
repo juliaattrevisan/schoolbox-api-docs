@@ -6,6 +6,7 @@
  */
 namespace Custom\Diocesan\AchievementReport;
 
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Schoolbox\User;
@@ -130,7 +131,7 @@ class NavigationSelector
      * @param array    $externalUser
      * @param MSSQL    $db
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function __construct(Router $router, User $user, array $externalUser, MSSQL $db, ?int $year)
     {
@@ -190,7 +191,7 @@ class NavigationSelector
      * Facade method
      *
      * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     private function navigationData(): void
     {
@@ -375,7 +376,7 @@ class NavigationSelector
     {
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
-            FROM uvSchoolBoxCoCurricularClasses 
+            FROM uvSchoolBoxCoCurricularClasses
             WHERE StudentID = '{$this->externalUser['StudentID']}'
         ";
 

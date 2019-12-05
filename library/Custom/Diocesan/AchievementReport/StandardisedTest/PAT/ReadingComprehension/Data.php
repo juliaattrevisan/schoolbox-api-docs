@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT\ReadingComprehension;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Stanine\Payload;
 
 /**
@@ -14,7 +15,7 @@ use Custom\Diocesan\AchievementReport\StandardisedTest\Stanine\Payload;
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class Data extends \Custom\Diocesan\AchievementReport\StandardisedTest\Base
+class Data extends Base
 {
 
     /**
@@ -50,7 +51,7 @@ class Data extends \Custom\Diocesan\AchievementReport\StandardisedTest\Base
 
         /* Find data for each of the three series
          */
-        $payload = new Payload(self::GRAPH_TITLE, $this->year);
+        $payload = new Payload(self::GRAPH_TITLE, (int)$this->year);
 
         foreach ($result as $row) {
             $payload

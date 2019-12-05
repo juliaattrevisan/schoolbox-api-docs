@@ -1,20 +1,22 @@
 <?php
 /**
- * Base
- *
- * All report subclasses that need external db connection should
- * inherit this class
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport;
 
 use MSSQL;
 use Schoolbox\User;
 
+/**
+ * Class Base
+ *
+ * All report subclasses that need external db connection should
+ * inherit this class
+ *
+ * @package Custom\Diocesan\AchievementReport
+ */
 abstract class Base
 {
 
@@ -36,10 +38,12 @@ abstract class Base
      */
     protected $db;
 
+
     /**
      * @var User
      */
     protected $user;
+
 
     /**
      * An externalUser array
@@ -48,12 +52,14 @@ abstract class Base
      */
     protected $externalUser = [];
 
+
     /**
      * Table heading
      *
      * @var string
      */
     protected $heading = '';
+
 
     /**
      * The year for which to obtain data
@@ -62,12 +68,14 @@ abstract class Base
      */
     protected $year = 0;
 
+
     /**
      * The current year
      *
      * @var string
      */
     protected $currentYear = 0;
+
 
     /**
      * All Letter Grades
@@ -78,12 +86,14 @@ abstract class Base
      */
     protected $letterRegistry = array('N', 'A', 'M', 'E');
 
+
     /**
      * Achievement Letter Grades
      *
      * @var array
      */
     protected $achievementLetterRegistry = array('A', 'M', 'E');
+
 
     /**
      * Exclusion Letter Grades
@@ -113,6 +123,7 @@ abstract class Base
         $this->setCurrentYear(date('Y'));
     }
 
+
     /**
      * Get a list of all the views with 'uv' as a prefix
      */
@@ -132,12 +143,14 @@ abstract class Base
         new \Alaress_Probe($stuff);
     }
 
+
     /**
      * Returns data for twig rendering
      *
      * @return mixed
      */
     abstract public function findData();
+
 
     /**
      * Get the primary key out of $externalUser array
@@ -147,6 +160,7 @@ abstract class Base
     protected function getExternalUserId() {
         return $this->externalUser['StudentID'];
     }
+
 
     /**
      * Determine if this result is progressive
@@ -159,8 +173,10 @@ abstract class Base
         return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\d*\]/', $result);
     }
 
+
     /* Getters/Setters
      */
+
 
     /**
      * Set db
@@ -172,6 +188,7 @@ abstract class Base
         $this->db = $db;
     }
 
+
     /**
      * Get db
      *
@@ -181,6 +198,7 @@ abstract class Base
     {
         return $this->db;
     }
+
 
     /**
      * Set heading
@@ -192,6 +210,7 @@ abstract class Base
         $this->heading = $heading;
     }
 
+
     /**
      * Get heading
      *
@@ -201,6 +220,7 @@ abstract class Base
     {
         return $this->heading;
     }
+
 
     /**
      * Set externalUser
@@ -212,6 +232,7 @@ abstract class Base
         $this->externalUser = $externalUser;
     }
 
+
     /**
      * Get externalUser
      *
@@ -222,6 +243,7 @@ abstract class Base
         return $this->externalUser;
     }
 
+
     /**
      * @param string $year
      */
@@ -230,6 +252,7 @@ abstract class Base
         $this->year = $year;
     }
 
+
     /**
      * @return string
      */
@@ -237,6 +260,7 @@ abstract class Base
     {
         return $this->year;
     }
+
 
     /**
      * Set current year
@@ -248,6 +272,7 @@ abstract class Base
         $this->currentYear = $currentYear;
     }
 
+
     /**
      * Get current year
      *
@@ -257,6 +282,7 @@ abstract class Base
     {
         return $this->currentYear;
     }
+
 
     /**
      * Set letter registry
@@ -268,6 +294,7 @@ abstract class Base
         $this->letterRegistry = $letterRegistry;
     }
 
+
     /**
      * Get letter registry
      *
@@ -277,6 +304,7 @@ abstract class Base
     {
         return $this->letterRegistry;
     }
+
 
     /**
      * Set achievement letter registry
@@ -288,6 +316,7 @@ abstract class Base
         $this->achievementLetterRegistry = $achievementLetterRegistry;
     }
 
+
     /**
      * Get achievement letter registry
      *
@@ -298,6 +327,7 @@ abstract class Base
         return $this->achievementLetterRegistry;
     }
 
+
     /**
      * Get exclusion letter registry
      *
@@ -307,6 +337,7 @@ abstract class Base
     {
         $this->exclusionLetterRegistry = $exclusionLetterRegistry;
     }
+
 
     /**
      * Set exclusion letter registry

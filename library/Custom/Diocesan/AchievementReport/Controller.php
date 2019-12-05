@@ -7,6 +7,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest;
@@ -19,7 +20,8 @@ use Schoolbox\User;
  *
  * @package Custom\Diocesan\AchievementReport
  */
-class Controller extends Base {
+class Controller extends Base
+{
 
     /**
      * Internal/External types
@@ -41,6 +43,7 @@ class Controller extends Base {
         ]
     ];
 
+
     /**
      * Selects which report to redirect towards, based on certain
      * conditions particular to a student
@@ -49,7 +52,7 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
@@ -148,9 +151,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
 
         /* Default to this year if none specified
@@ -242,9 +245,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
@@ -294,9 +297,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getIb(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getIb(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -350,9 +353,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
@@ -476,9 +479,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getComments(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getComments(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -528,9 +531,9 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
-    public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         $output = [
             'template' => '@coCurricular/index.twig',

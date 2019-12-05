@@ -20,6 +20,11 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Module
+ *
+ * @package Custom\Diocesan\AchievementReport
+ */
 class Module extends BaseModule
 {
     /**
@@ -143,7 +148,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()
     {

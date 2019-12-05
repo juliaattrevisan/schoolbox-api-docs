@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
+
 /**
  * Class PATNavigation
  *
@@ -14,7 +16,7 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
  *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
-class Navigation extends \Custom\Diocesan\AchievementReport\StandardisedTest\Base
+class Navigation extends Base
 {
 
     /**

@@ -82,7 +82,6 @@ class Navigation
      * @param array    $externalUser
      * @param MSSQL    $db
      * @param int|null $year
-     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function __construct(Router $router, User $user, array $externalUser, MSSQL $db, ?int $year)
     {
