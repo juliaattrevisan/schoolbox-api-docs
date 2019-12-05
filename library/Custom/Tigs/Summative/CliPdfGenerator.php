@@ -48,6 +48,7 @@ class CliPdfGenerator extends CliTool\App
     private const OPT_LONG_REPORT_DATE      = 'report-date:';      // to generate a report for some point in time
     private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
     private const OPT_LONG_ROLE_TYPE        = 'role-type:';        // role-type override
+    private const OPT_LONG_INCLUDE_SUBJECTS = 'include-subjects';  // include subject reports
 
     private const DEFAULT_MAX_FAILS   = 3;
     private const DEFAULT_JS_DELAY    = 1000;
@@ -160,6 +161,7 @@ class CliPdfGenerator extends CliTool\App
             self::OPT_LONG_REPORT_DATE,
             self::OPT_LONG_USER_STYLE_SHEET,
             self::OPT_LONG_ROLE_TYPE,
+            self::OPT_LONG_INCLUDE_SUBJECTS,
         ];
     }
 
@@ -654,6 +656,12 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [new Uri($participationReportUrl)];
 
+        /* Optionally include subject reports if specified
+         */
+        if (!(bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS)) {
+            return $urls;
+        }
+
         $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes);
         $queryArgs        = $this->roleTypeOverride ? "?role-type={$this->roleTypeOverride}" : '';
 
@@ -935,55 +943,58 @@ DESCRIPTION
     By default, writes archive to STDOUT (1>) and writes log to STDERR (2>)
 
     This can be changed by providing an output and/or log file. If provided, tool will not write to STDOUT or STDERR, respectively.
-    
+
     To authenticate the app, you can either provide a session hash, or a username + password. If the latter, this app will prompt you to
     enter the password on STDIN and STDOUT.
-    
+
     $yellow-h, --help$white
         Print this help and exit
-        
+
     $yellow-o=OUT_FILE$white
         Filename to write archive to, eg '-o=output.zip'
-        
+
     $yellow-l=LOG_FILE$white
         Filename to append logs to, eg '-l=error.log'
-        
+
     $yellow-v[v[v]]$white
         Log verbosity. Max 3 levels, eg -vvv
-    
+
     $yellow--hash=HASH$white
         A valid session hash, you can extract this from a browser session
-        
+
     $yellow--username=USERNAME$white
         A username to run the tool as
-        
+
     $yellow--student-id=ID$white
         Just generate the report for this student. (Value is SIS id, not Schoolbox id)
-        
+
     $yellow--year-level=YEAR$white
         Just generate reports for students in this year level
-        
+
     $yellow--curriculum=[ib|hsc]$white
         Just generate reports for students enrolled in this curriculum
-        
+
     $yellow--max-fails=COUNT$white
          If the tool fails for this many students in a row, exit immediately.
          Defaults to $defaultMaxFails.
-         
+
     $yellow--js-delay=COUNT$white
          Number of milliseconds to wait before printing a page to allow javascript to execute.
          Defaults to $defaultJsDelay.
-         
+
     $yellow--report-date=REPORT_DATE$white
          Attempt to produce a report for some specific point in time.
          Supports any format accepted by PHP's strtotime()
-         
+
     $yellow--user-style-sheet=STYLE_FILE$white
          Filename of a style sheet to load with every page.
-         
+
     $yellow--role-type=ROLE_TYPE$white
          Print Subject Reports as they would appear to users with this role type.
          Must be one of [{$roleTypes}]
+
+     $yellow--include-subjects$white
+         If provided, include the Subject Reports.
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip
