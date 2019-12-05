@@ -1140,7 +1140,10 @@ $selector-width: 2.25rem;
     }
 }
 
-.grade{
+.grade {
+    &.gradient-none {
+      padding: .285rem 0;
+    }
     font-size: rem-calc(($base-font-size - 4));
     padding: .285rem 1rem;
     span {
