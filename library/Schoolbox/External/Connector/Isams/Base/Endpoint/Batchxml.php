@@ -74,7 +74,20 @@ class Batchxml
          * $this->printXml();
          */
         if (!$this->nodes) {
-            $this->nodes = new SimpleXMLElement($this->api->retrieveDocument());
+            $xml = $this->api->retrieveDocument();
+
+            if (strpos($xml, '<') !== 0) {
+                throw new RuntimeException($xml);
+            }
+
+            try {
+                $this->nodes = new SimpleXMLElement($xml);
+            } catch (\Exception $e) {
+
+                /* iSAMS returned some sort of error message, not xml
+                 */
+                throw new RuntimeException("{$e->getMessage()}\n\n{$xml}");
+            }
         }
 
         return $this->nodes->xpath($path);
