@@ -39,13 +39,9 @@ class Data extends Base
                 DiocesanReadingComprehensionPATStaninePercentage,
                 NationalReadingComprehensionPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'";
-
-        if ($this->year) {
-            $query .= " AND Fileyear = '{$this->year}' ";
-        }
-
-        $query .= " ORDER BY seq ";
+            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            AND Fileyear = '{$this->year}'
+            ORDER BY seq";
 
         $result = $this->getDb()->getAll($query);
 
@@ -61,5 +57,30 @@ class Data extends Base
         }
 
         return $payload;
+    }
+
+
+    /**
+     * Find out if this student has data from any year
+     *
+     * @return bool
+     */
+    public function hasDataFromAnyYear(): bool
+    {
+        $query = "
+            SELECT
+                Seq,
+                ThisStudentStanine,
+                IndividualReadingComprehensionPATStanineMarker,
+                DiocesanReadingComprehensionPATStaninePercentage,
+                NationalReadingComprehensionPATStaninePercentage
+            FROM uvSchoolBoxPATSTARSummary
+            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            AND IndividualReadingComprehensionPATStanineMarker <> 0
+            ORDER BY seq";
+
+        $result = $this->getDb()->getAll($query);
+
+        return (bool)\count($result);
     }
 }

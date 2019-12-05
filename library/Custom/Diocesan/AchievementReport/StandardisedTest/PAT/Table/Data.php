@@ -72,6 +72,19 @@ class Data extends Base
 
 
     /**
+     * Find out if this student has data from any year
+     *
+     * @return bool
+     */
+    public function hasDataFromAnyYear(): bool
+    {
+        $result = $this->findData();
+
+        return (bool)\count($result);
+    }
+
+
+    /**
      * @return bool
      */
     public function hasData(): bool
