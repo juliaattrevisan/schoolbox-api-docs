@@ -63,11 +63,10 @@ class Query
         ];
 
         if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
-            $searchString = '%' . $keyword . '%';
-            $userIds = $this->getUserIdsByKeyword($searchString, $viewer);
+            $userIds = $this->getUserIdsByKeyword($keyword, $viewer);
             if ($userIds) {
                 $result['results']    = $this->getUserData($userIds);
-                $result['totalCount'] = $this->getTotalCount($searchString, $viewer);
+                $result['totalCount'] = $this->getTotalCount($keyword, $viewer);
             }
         }
 
@@ -83,7 +82,15 @@ class Query
     {
         $result = [];
 
-        $users = UserMapper::getInstance()->findByColumn('id', $userIds, ['order'=>['lastname'=>'ASC', 'firstname' => 'ASC']]);
+        $users = UserMapper::getInstance()->findByColumn(
+            'id',
+            $userIds, [
+                'order'=>[
+                    'lastname'  => 'ASC',
+                    'firstname' => 'ASC',
+                ]
+            ]
+        );
 
         foreach ($users as $key => $user) {
             $result[$key]['id']             = $user->getId();
@@ -156,22 +163,27 @@ class Query
      */
     private function getQueryFilter(string $keyword, User $viewer): array
     {
+        $searchString = '%'.$this->db->escapeForLike($keyword).'%';
+
         $whereParts = [
             '(
-                CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstAndLastName
-                OR CONCAT_WS(" ", u.title, u.lastname) LIKE :lastname
+                CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstLastNameWithTitle
+                OR CONCAT_WS(" ", u.firstname, u.lastname) LIKE :firstAndLastNameOnly
+                OR CONCAT_WS(" ", u.title, u.lastname) LIKE :titleAndLastnameOnly
+                OR u.firstname LIKE :firstname
+                OR u.lastname LIKE :lastname
                 OR u.username LIKE :username
-                OR soundex(u.firstname) = soundex(:sfirstname)
-                OR soundex(u.lastname) = soundex(:slastname)
             )',
             'u.deleted_at IS NULL'
         ];
+
         $params = [
-            'firstAndLastName'  => $keyword,
-            'lastname'          => $keyword,
-            'username'          => $keyword,
-            'sfirstname'        => $keyword,
-            'slastname'         => $keyword,
+            'firstLastNameWithTitle'    => $searchString,
+            'firstAndLastNameOnly'      => $searchString,
+            'titleAndLastnameOnly'      => $searchString,
+            'firstname'                 => $searchString,
+            'lastname'                  => $searchString,
+            'username'                  => $searchString,
         ];
 
         /**
