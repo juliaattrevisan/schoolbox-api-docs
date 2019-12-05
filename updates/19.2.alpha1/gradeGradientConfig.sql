@@ -4,7 +4,7 @@ VALUES (
            'grade_gradient_enable',
            '1',
            'Grade Colors',
-           'If on, grades appear red to green based on value. If off, all grades appear in black.',
+           'If on, grades appear red to green based on value; otherwise grades appear in a neutral colour.',
            (SELECT id from lu_config_field WHERE field = 'boolean'),
            null,
            (SELECT id from lu_config_type WHERE type = 'LMS Policy'),
