@@ -135,12 +135,12 @@ class ScheduleIterator implements Iterator
      * Find period data for a given $periodId
      *
      * @param SimpleXMLElement $schedule
-     * @return array|SimpleXMLElement[]|string
+     * @return array
      * @throws RuntimeException
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
      */
-    private function findPeriod(SimpleXMLElement $schedule)
+    private function findPeriod(SimpleXMLElement $schedule): array
     {
         $periodId = trim((string)$schedule->PeriodId);
 
