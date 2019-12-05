@@ -1140,7 +1140,10 @@ $selector-width: 2.25rem;
     }
 }
 
-.grade{
+.grade {
+    &.gradient-none {
+      padding: .285rem 0;
+    }
     font-size: rem-calc(($base-font-size - 4));
     padding: .285rem 1rem;
     span {
@@ -1179,6 +1182,11 @@ $selector-width: 2.25rem;
         margin-bottom: 0;
       }
     }
+
+    .gradient-none-bg {
+        background-color: $aluminum;
+    }
+
     .grade {
         display: flex;
         flex: 0 1 auto;
