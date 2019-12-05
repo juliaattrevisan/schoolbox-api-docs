@@ -23,6 +23,7 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * Class Factory
@@ -30,7 +31,7 @@ use Schoolbox\UserMapper;
  * Create a set of Composites which import Profile and Timetable data
  * from third-party endpoints into schoolbox
  *
- * @package Schoolbox\External\Importer
+ * @package Schoolbox\External\Importer\Endpoint
  */
 class Factory
 {
@@ -38,6 +39,7 @@ class Factory
     /**
      * The family of importers that we can spawn
      */
+    public const CSV = 'csv';
     public const ISAMS = 'isams';
     public const KAMAR = 'kamar';
     public const SENTRAL = 'sentral';
@@ -93,8 +95,9 @@ class Factory
      * @param string      $type
      *
      * @return null|GenericCollection
+     * @throws UnexpectedValueException
      */
-    public function produce(?string $file, string $type)
+    public function produce(?string $file, string $type): ?GenericCollection
     {
         switch ($type) {
             case self::ISAMS:
@@ -115,6 +118,7 @@ class Factory
      *
      * @param string|null $file
      * @return GenericCollection
+     * @throws UnexpectedValueException
      */
     private function produceIsams(?string $file): GenericCollection
     {

@@ -14,7 +14,10 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\UserMapper;
 
 /**
@@ -42,8 +45,26 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
-        $this->register('GET', '/direct', 'getDirectIndex', $perms);
-        $this->register('GET', '/schoolData', 'getSchoolDataIndex', $perms);
+
+        $this->register('GET', '/directImport', 'getDirectIndex', $perms);
+        $this->register('GET', '/schoolDataImport', 'getSchoolDataIndex', $perms);
+        $this->register('POST', '/schoolDataImport', 'postSchoolDataOptions', $perms);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        $injector->params[Controller::class] = [
+            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
+            'fieldStrategyFactory' => $injector->lazy(function () {
+                return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
+            }),
+        ];
     }
 
 
@@ -62,24 +83,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-        ];
     }
 
 

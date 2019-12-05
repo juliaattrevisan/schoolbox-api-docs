@@ -68,33 +68,27 @@ HELP;
             exit;
         }
 
-        /* Spawn api based on args
+        /* Spawn scheduler based on args
          *
-         * This gives you the cli choice of loading from an api endpoint
-         * or a locally-cached xml file instead
+         * This scheduler never takes a cached file as input source
+         * Though maybe it should be able to do that...? It would allow people
+         * to ftp stuff to a folder instead of providing an api endpoint
          */
-        $host = $this->getConfig()->get('external_ups_provider_batchxml_host');
-        $key = $this->getConfig()->get('external_ups_provider_batchxml_key');
-
-        /* TODO: Replace with config var
-         */
-        $type = Endpoint\Factory::ISAMS;
-
-        /* TODO: Replace with config var
-         */
-        $frequency = Endpoint\Scheduler::HOURLY;
+        $host = $this->getConfig()->get('schooldata_import_endpoint_host');
+        $key = $this->getConfig()->get('schooldata_import_endpoint_key');
+        $frequency = $this->getConfig()->get('schooldata_import_frequency') ?: Endpoint\Scheduler::HOURLY;
+        $type = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
+        $file = null;
 
         /* This always perform updates
          */
-        $factory = new Endpoint\Factory($host, $key, true, $this->getLogger());
-
-        /* The time when the script ran
-         */
-        $now = time();
+        $perform = true;
 
         /* Execute scheduler
          */
-        (new Endpoint\Scheduler($frequency, $factory, $type, $this->getLogger()))->run($now);
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
+
+        (new Endpoint\Scheduler($frequency, $factory, $type, $file, $this->getLogger()))->run(time());
     }
 };
 

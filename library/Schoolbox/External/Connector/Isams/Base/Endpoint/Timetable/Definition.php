@@ -18,6 +18,8 @@ use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
+use Schoolbox\Mapper\Exception;
+use SimpleXMLElement;
 
 /**
  * Class Definition
@@ -217,11 +219,11 @@ class Definition implements IStrategy
     /**
      * Find all the Days in a given $cycle and the longest Day of them all
      *
-     * @param \SimpleXMLElement $cycle
+     * @param SimpleXMLElement $cycle
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      */
-    private function findDays(\SimpleXMLElement $cycle): array
+    private function findDays(SimpleXMLElement $cycle): array
     {
         $struct = [
 

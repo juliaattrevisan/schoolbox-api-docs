@@ -77,39 +77,25 @@ HELP;
             exit;
         }
 
-        /* Spawn api based on args
+        /* Spawn schedular based on args
          *
-         * This gives you the cli choice of loading from an api endpoint
-         * or a locally-cached xml file instead
+         * Use Hourly frequency, taking advantage of the functional equivalence
          */
-        $host = $this->getConfig()->get('external_ups_provider_batchxml_host');
-        $key = $this->getConfig()->get('external_ups_provider_batchxml_key');
+        $host = $this->getConfig()->get('schooldata_import_endpoint_host');
+        $key = $this->getConfig()->get('schooldata_import_endpoint_key');
+        $frequency = Endpoint\Scheduler::HOURLY;
+        $type = $this->getConfig()->get('schooldata_import_data_source');
         $file = $this->getOpt(self::OPT_LONG_FILE);
 
-        /* TODO: Replace with config var
+        /* Accept perform param from opts
          */
-        $type = Endpoint\Factory::ISAMS;
+        $perform = $this->perform();
 
-        $composites = (new Endpoint\Factory($host, $key, $this->perform(), $this->getLogger()))->produce($file, $type);
-
-        /* No composites produced; exit
-         * Either you chose an invalid $type or you don't need a $type at all (csv imports)
+        /* Execute scheduler
          */
-        if (null === $composites) {
-            exit;
-        }
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
-        try {
-            foreach ($composites as $composite) {
-                $composite->import();
-            }
-        } catch (\RuntimeException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
-        } catch (InvalidUriPartException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
-        } catch (InvalidArgumentException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
-        }
+        (new Endpoint\Scheduler($frequency, $factory, $type, $file, $this->getLogger()))->run(time());
     }
 };
 

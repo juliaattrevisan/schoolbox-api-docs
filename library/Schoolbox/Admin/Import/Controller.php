@@ -8,9 +8,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import;
 
-use Alaress\Web\Controller\Base;
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Web\Controller\ConfigController;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use PDOException;
+use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\Exception;
+use UnexpectedValueException;
 
 /**
  * Class Controller
@@ -19,20 +28,20 @@ use Schoolbox\Admin\Import\Navigation\SchoolData;
  *
  * @package Schoolbox\Admin\Import
  */
-class Controller extends Base
+class Controller extends ConfigController
 {
 
     /**
      * Landing Page for Direct Import
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
+     * @throws ServiceNotFound
+     * @throws RouteNotFound
+     * @throws ReflectionException
      */
-    public function getDirectIndex()
+    public function getDirectIndex(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/navigation/direct.twig', [
-            'pageCurrent' => 'import/direct',
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct/index.twig', [
+            'pageCurrent' => 'import/directImport',
             'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('Direct Import'));
     }
@@ -41,15 +50,51 @@ class Controller extends Base
     /**
      * Landing Page for School Data Import
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
+     * @throws ServiceNotFound
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws InvalidColumnException
      */
-    public function getSchoolDataIndex()
+    public function getSchoolDataIndex(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/navigation/schoolData.twig', [
-            'pageCurrent' => 'import/schoolData',
-            'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes()
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate(),
+            $this->router->generate('adminImportIndex.postSchoolDataOptions')
+        );
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
+            'pageCurrent' => 'import/schoolDataImport',
+            'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
+            'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
+            'configContext' => $configContext
         ])->setTitle('School Data Import'));
+    }
+
+
+    /**
+     * Save the configuration for School Data Import's chosen mechanism
+     *
+     * @throws InvalidColumnException
+     * @throws RouteNotFound
+     * @throws PDOException
+     * @throws Exception
+     * @throws UnexpectedValueException
+     */
+    public function postSchoolDataOptions(): void
+    {
+        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
+    }
+
+
+    /**
+     * Returns a predicate builder for finding all custom config for this module
+     *
+     * @return Builder
+     * @throws InvalidColumnException
+     */
+    private function buildConfigPredicate(): Builder
+    {
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SCHOOLDATA);
     }
 }

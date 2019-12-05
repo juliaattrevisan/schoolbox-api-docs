@@ -1,12 +1,10 @@
-
-
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="row">
     <div class="small-12 island collapse">
         <h1>User Photos</h1>
-        {% include '@adminImport/navigation/subnavigation.twig' with { allNodes: allNavigation } %}
+        {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 </div>
 

@@ -48,7 +48,12 @@ abstract class ConfigController extends Base
     {
         return (new ModuleConfig($this->fieldStrategyFactory))->getContext(
             $this->getConfigLoader()->get('site_version'),
-            $this->configMapper->findByPredicates($pb, ['order' => [ConfigMapper::COL_ID => 'ASC']]),
+            $this->configMapper->findByPredicates($pb, [
+                'order' => [
+                    'sequence' => 'ASC',
+                    ConfigMapper::COL_ID => 'ASC'
+                ]
+            ]),
             $postRoute
         );
     }

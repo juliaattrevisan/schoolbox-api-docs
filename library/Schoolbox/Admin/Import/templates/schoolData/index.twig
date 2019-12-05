@@ -1,0 +1,155 @@
+{##
+ # Configure your sis importer
+ #
+ # @param string pageCurrent
+ # @param array configContext
+ # @param array allNavigation
+ # @param string dataSource
+ # @param stirng logPath
+ #}
+
+<script>
+    $(function() {
+
+        {# Hide the container that has both the system-generated config vars
+         # and the handcrafted csv island - this stops a visual glitch when
+         # we have to use javascript to hide/show one or the other
+         #}
+
+        {# These config elements can be either hidden or shown, contextually
+         #}
+        var configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency');
+
+        {# On document.ready, using dataSource, decide which island to show:
+         # it's one of either csv island or config island
+         #}
+        initIslands('{{ dataSource }}');
+
+        {# Show the container that we originally hid
+         #}
+        $('#option-container').removeClass('hide');
+
+        {# On dataSource change, decide which island to show:
+         # it's one of either csv island or config island
+         #}
+        $('#schooldata_import_data_source').on('change', function(event) {
+            switchIslands($(this).val());
+        });
+
+        /**
+         * Switch configuration options
+         *
+         * If you haven't chosen anything, hide both csv and config islands
+         * If you chose csv island, just show that and hide config island
+         * Otherwise show config island and hide the csv island
+         *
+         * @param val
+         */
+        function initIslands(dataSource) {
+
+            {# If you haven't chosen anything, hide both csv and config islands
+             #}
+            if (dataSource == '') {
+                $('#csv-island').hide();
+                $('#config-island').hide();
+                hideConfig(configElements);
+            } else if (dataSource == 'csv') {
+
+                {# If it's csv island, just show that
+                 # Hide the config island
+                 #}
+                $('#csv-island').show();
+                $('#config-island').hide();
+                hideConfig(configElements);
+            } else {
+
+                {# Otherwise, show the config island and hide the csv island
+                 # Show the host/key/frequency input elements
+                 #}
+                $('#csv-island').hide();
+                $('#config-island').show();
+                showConfig(configElements);
+            }
+        }
+
+        /**
+         * Switch configuration options
+         *
+         * If you haven't chosen anything, hide both csv and config islands
+         * If you chose csv island, just show that and hide config island
+         * Otherwise show config island and hide the csv island
+         *
+         * @param val
+         */
+        function switchIslands(dataSource) {
+
+            {# If you chose a non-isams/kamar/sentral/etc option, hide both csv and config islands
+             # This prompts the user to hit Save instead of distracting them with options
+             #}
+            if (dataSource == '' || dataSource == 'csv') {
+                $('#csv-island').hide();
+                $('#config-island').hide();
+                hideConfig(configElements);
+            }
+        }
+
+        /**
+         * Hide config island elements in a special way
+         *
+         * @param elements
+         */
+        function hideConfig(elements) {
+            $.each(elements, function (index, element) {
+                $(element).parent('div').hide();
+            });
+        }
+
+        /**
+         * Show config island elements in a special way
+         *
+         * @param elements
+         */
+        function showConfig(elements) {
+            $.each(elements, function (index, element) {
+                $(element).parent('div').show();
+            });
+        }
+    });
+</script>
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">School Data Import</h2>
+    </div>
+</div>
+
+<div class="row hide" id='option-container'>
+    <div class="small-12 columns">
+        {% include '@settings/moduleConfig.twig' with configContext only %}
+    </div>
+    <div class="small-12 island" id="config-island">
+        <h3 class="subheader">Status</h3>
+
+        <section class="content">
+            <p>Endpoint status goes here</p>
+        </section>
+
+        <h3 class="subheader">View Data</h3>
+
+        <section class="content">
+            <p>View data goes here</p>
+        </section>
+    </div>
+    <div class="small-12 island" id="csv-island">
+        <h3 class="subheader">Import from csv files</h3>
+
+        {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
+
+        <section class="content">
+            <p>From this page you can import different data into Schoolbox via CSV import files.  Please note if you are using a live connection you may only load users, all other data will be loaded automatically via your SIS connector.</p>
+        </section>
+    </div>
+</div>
+
