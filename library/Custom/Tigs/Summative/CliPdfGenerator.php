@@ -993,6 +993,9 @@ DESCRIPTION
          Print Subject Reports as they would appear to users with this role type.
          Must be one of [{$roleTypes}]
 
+     $yellow--include-subjects$white
+         If provided, include the Subject Reports.
+
 EXAMPLES:
  * Write log to terminal, output to archive.zip
       $file 1> archive.zip
