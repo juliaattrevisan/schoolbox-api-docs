@@ -84,7 +84,7 @@
         "codeception/codeception": "^2.3",
         "phpunit/phpunit": "~6.4.3",
         "fzaninotto/faker": "^1.8",
-        "phpstan/phpstan": "^0.11.5",
+        "phpstan/phpstan": "^0.12.0",
         "roave/security-advisories": "dev-master",
         "brianium/paratest": "1.*"
     }
