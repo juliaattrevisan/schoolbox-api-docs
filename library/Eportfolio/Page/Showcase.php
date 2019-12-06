@@ -182,7 +182,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                             $this->getPage()->setVar(
                                 array(
                                     'SHOWCASED_WORK_RETURNED_MARK' => $return->getHumanReadableMark(),
-                                    'SHOWCASED_WORK_RETURNED_GRADIENT' => $return->getGradientFromNormalizedMark(),
+                                    'SHOWCASED_WORK_RETURNED_GRADIENT' => Config::get('grade_gradient_enable') ? $return->getGradientFromNormalizedMark() : 'none',
                                 )
                             );
                         } else {

@@ -232,7 +232,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     $mark = $latestReturn->getHumanReadableMark();
                     $this->getPage()->setVar(array(
                         'SHOWCASED_WORK_RETURNED_MARK' => $mark,
-                        'SHOWCASED_WORK_RETURNED_GRADIENT' => $latestReturn->getGradientFromNormalizedMark(),
+                        'SHOWCASED_WORK_RETURNED_GRADIENT' => Config::get('grade_gradient_enable') ? $latestReturn->getGradientFromNormalizedMark() : 'none',
                     ));
                 } else {
                     $this->getPage()->setVar(array(
