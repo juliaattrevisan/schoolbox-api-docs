@@ -311,8 +311,21 @@ class Importer
                 ->setFirstname($row['Firstname'])
                 ->setLastname($row['Surname']);
 
+            /* Date of birth - strtotime doesn't understand empty cells and returns false
+             * ADF can't make a new timestamp from a bool
+             */
+            $dob = null;
+
+            if ($row['Date of Birth']) {
+                $dobTimestamp = strtotime($row['Date of Birth']);
+
+                if (false !== $dobTimestamp) {
+                    $dob = \Alaress_Date_Format::newFromTimestamp($dobTimestamp);
+                }
+            }
+
             $studentProfile
-                ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime($row['Date of Birth'])))
+                ->setDateOfBirth($dob)
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
                 ->setGender($row['Gender'])
@@ -399,8 +412,8 @@ class Importer
          */
         $statement = $this->database->executeQuery("
             SELECT GROUP_CONCAT(sis_user_profile_id) AS deletions
-            FROM {$mapper->getTable()} 
-            WHERE sis_user_profile_id NOT IN ({$ids}) 
+            FROM {$mapper->getTable()}
+            WHERE sis_user_profile_id NOT IN ({$ids})
         ");
 
         /* Remove those from both tables
