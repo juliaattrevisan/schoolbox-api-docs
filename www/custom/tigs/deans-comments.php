@@ -55,7 +55,7 @@ function authenticateUser(array $session): void
     if (!$user) {
         throw new NotAuthenticated();
     }
-    if (!$user || !$user->isSuperuser()) {
+    if (!$user->isSuperuser()) {
         throw new AccessDenied();
     }
 
