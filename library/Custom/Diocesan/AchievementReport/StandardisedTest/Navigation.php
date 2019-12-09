@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use MSSQL;
 use Schoolbox\User;
@@ -82,6 +83,7 @@ class Navigation
      * @param array    $externalUser
      * @param MSSQL    $db
      * @param int|null $year
+     * @throws RouteNotFound
      */
     public function __construct(Router $router, User $user, array $externalUser, MSSQL $db, ?int $year)
     {
@@ -103,7 +105,7 @@ class Navigation
      * Finds all the years that have data
      *
      * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     private function navigationData(): void
     {
@@ -134,7 +136,10 @@ class Navigation
         /* Conditional Reading report
          */
         $availableNavigation[self::STANDARDISEDTEST_READING_KEY] = [
-            'url' => '',
+            'url' => $this->router->generate('achievementreport.getStandardisedTestReading', [
+                'externalUserId' => $this->externalUser['StudentID'],
+                'year' => $this->year
+            ]),
             'label' => 'Reading'
         ];
 
