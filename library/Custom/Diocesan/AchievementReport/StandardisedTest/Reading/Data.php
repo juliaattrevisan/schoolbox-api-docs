@@ -18,6 +18,38 @@ class Data extends Base
 {
 
     /**
+     * Y categories incl. colour band
+     */
+    private const Y_CATEGORIES = [
+        'Magenta',
+        'Red',
+        'Yellow',
+        'Blue',
+        'Green',
+        'Orange',
+        'Turquoise',
+        'Purple',
+        'Gold',
+        '7.0 - 8.0',
+        '7.5 - 8.5',
+        '8.0 - 9.0',
+        '8.5 - 9.5',
+        '9.0 - 10.0',
+        '9.5 - 10.5',
+        '10.0 - 11.0',
+        '10.5 - 11.5',
+        '11.0 - 12.0',
+        '11.5 - 12.5',
+        '12.0 - 13.0',
+        '12.5 - 13.5',
+        '13.0 - 14.0',
+        '13.5 - 14.5',
+        '14.0 - 15.0',
+        '14.5 - 15.5'
+    ];
+
+
+    /**
      * Whether there was any data found
      *
      * @var bool
@@ -50,6 +82,9 @@ class Data extends Base
             'x' => [
                 'categories' => []
             ],
+            'y' => [
+                'categories' => '"' . implode('","', self::Y_CATEGORIES) . '"'
+            ],
             'series' => [
                 'student' => [],
                 'grey1' => [],
@@ -63,19 +98,21 @@ class Data extends Base
 
             /* Accumulate the x-axis categories
              */
-            $stack['x']['categories'][] = $row['xAxis'];
+            $stack['x']['categories'][] = "'{$row['xAxis']}'";
 
             /* The stars (what the student got)
              */
-            $stack['series']['student'][] = $row['ActualMaskSeq'];
+            !$row['ActualMaskSeq'] ? $stack['series']['student'][] = 'null' : $stack['series']['student'][] = $row['ActualMaskSeq'];
 
             /* Grey squares
              */
-            $stack['series']['grey1'][] = $row['Line1'];
-            $stack['series']['grey2'][] = $row['Line2'];
-            $stack['series']['grey3'][] = $row['Line3'];
-            $stack['series']['grey4'][] = $row['Line4'];
+            !$row['Line1'] ? $stack['series']['grey1'][] = 'null' : $stack['series']['grey1'][] = $row['Line1'];
+            !$row['Line2'] ? $stack['series']['grey2'][] = 'null' : $stack['series']['grey2'][] = $row['Line2'];
+            !$row['Line3'] ? $stack['series']['grey3'][] = 'null' : $stack['series']['grey3'][] = $row['Line3'];
+            !$row['Line4'] ? $stack['series']['grey4'][] = 'null' : $stack['series']['grey4'][] = $row['Line4'];
         }
+
+        $stack['x']['categories'] = implode(',', $stack['x']['categories']);
 
         /* If the student has stars, they have values
          */

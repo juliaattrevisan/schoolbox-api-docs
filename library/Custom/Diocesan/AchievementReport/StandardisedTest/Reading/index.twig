@@ -14,7 +14,145 @@
     elements: subnavigation
 } %}
 
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+
 <div class="achievement-report standardised-test">
+    {% if reading.visible %}
+        <script>
+            $(function () {
+                $('#reading').highcharts({
+                    chart: {
+                        height: 680,
+                        spacingBottom: 30
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        area: {
+                            fillOpacity: 0.2
+                        }
+                    },
+                    series: [
+
+                        {# First set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey1|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        },
+
+                        {# Second set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey2|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        },
+
+                        {# Third set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey3|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        },
+
+                        {# Fourth set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey4|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        },
+
+                        {# Student Data #}
+                        {
+                            data: [{{ reading.data.series.student|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 7,
+                                fillColor: '#dd0000',
+                                symbol: 'circle'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        }
+                    ],
+                    subtitle: {
+                        text: 'Based on Diocesan Reading Expectations for Year 0-6'
+                    },
+                    title: {
+                        text: 'Tracked Achievement Over Time'
+                    },
+                    tooltip: {
+                        enabled: false,
+                    },
+                    xAxis: {
+                        gridLineWidth: 1,
+                        categories: [{{ reading.data.x.categories|purify }}]
+                    },
+                    yAxis: [
+                        {
+                            categories: ['null', {{ reading.data.y.categories|purify }}],
+                            max: 22,
+                            min: 1
+                        }
+                    ],
+                });
+            });
+        </script>
+        <div class="row">
+            <div class="small-12 columns">
+                <div id="reading"></div>
+            </div>
+        </div>
+    {% endif %}
+
     <div class="row">
         <div class="small-12 island">
             <section class="content">
