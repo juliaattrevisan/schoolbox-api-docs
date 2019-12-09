@@ -447,7 +447,7 @@ class Controller extends Base
          */
         $selectedYear = $year ?? (int)date('Y');
 
-        /* Reading
+        /* Mathematics
          */
         $mathematicsPayload = (new Mathematics\Data($user, $externalUser, $db, $selectedYear));
 
