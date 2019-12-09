@@ -5,8 +5,9 @@ Ceremonies are the regular meetings we have. Along with the four formal events p
 > Block quotes taken from the [Scrum Guide](http://www.scrumguides.org/scrum-guide.html#events).
 
 ## Retrospective
-* **When:** First day of the next Sprint at 10:30am
+* **When:** Last day of the Sprint at 1:30pm
 * **Timebox:** 1 hour
+* **Participants** Product Team
 
 > The purpose of the Sprint Retrospective is to:
 > * Inspect how the last Sprint went with regards to people, relationships, process, and tools;
@@ -18,8 +19,9 @@ Prior to the Sprint Retrospective - any Product Team members may contact the Scr
 All discussions that identify areas where the team should improve should involve a quick brainstorm by the team for potential solutions, and a plan should be agreed on for the team to follow up on during the next Sprint.
 
 ## Sprint Planning
-* **When:** First day of the Sprint at 11:30am
+* **When:** First day of the Sprint at 11:00am
 * **Timebox:** 30 minutes
+* **Participants** Product Team
 
 > Sprint Planning answers the following:
 > * What can be delivered in the Increment resulting from the upcoming Sprint?
@@ -28,8 +30,9 @@ All discussions that identify areas where the team should improve should involve
 Prior to the Sprint Planning meeting - the Product Owner and Scrum Master will work together to prepare a rough Sprint worth of work. In this meeting we go through this work to get everyone up to speed on the work, assigning out specific tickets to team members, and agreeing as a team on the unit of work that we plan to complete for the Sprint.
 
 ## Daily Standup / Scrum
-* **When:** 2pm every day of the Sprint (excluding the first and last days of the sprint)
+* **When:** 10:30am every day of the Sprint (excluding the first and last days of the sprint)
 * **Timebox:** 15 minutes
+* **Participants** Product Team
 
 > The Development Team plans work for the next 24 hours. The Development Team uses the Daily Scrum to inspect progress toward the Sprint Goal and to inspect how progress is trending toward completing the work in the Sprint Backlog.
 
@@ -48,8 +51,9 @@ The Standup should be short and sweet, generally only high level details should 
 Often the Product Owner or Scrum Master will utilise the Daily Standup to ask the team to focus their efforts in a specific area where possible (eg. QA'ing a point release).
 
 ## Workshops
-* **When:** Tuesdays and Thursdays at 11:00am, as required
+* **When:** As required
 * **Timebox:** Varies per session, 2 hours at most
+* **Participants** individual Product Team members, external stakeholders
 
 Workshops will take the some form of a UX session, depending on what is required most at the time.
 
@@ -57,22 +61,26 @@ Some sessions will require the whole Product Team, and some will require just th
 
 See [workshops.md](workshops.md) for a list of the different types of workshops.
 
-## Refinement
-* **When:** Tuesdays and Thursdays at 11:00am, as required
-* **Timebox:** Varies per session, 2 hours at most
+## Refinements
+* **When:** Monday, Tuesday and Wednesday of 2nd week of sprint at 11:00am, as required
+* **Timebox:** 1 hour
+* **Participants** Scrum Master, other Product Team members (two at most)
 
 > Product Backlog refinement is the act of adding detail, estimates, and order to items in the Product Backlog.
 
 During a refinement session, the Product Team endeavours to reach a shared understanding of the business requirements and technical implications of the tickets being examined.
 
+In practise, this results in the refinements being split into:
+* Mon: ensure that Acceptance Criteria are in place for all tickets in this sprint and next
+* Tue: ensure that Story Points are in place for all tickets in this sprint and next
+* Wed: add AC and SP to any remaining tickets, if any were missed in the previous refinements (due to the timebox being exceeded)
 
 ## Showcase
-* **When:** Last day of Sprint at 2:00pm
-* **Timebox:** 2 hours
+* **When:** Last day of Sprint at 11:00am
+* **Timebox:** 1 hour
+* **Participants** Product Team, representatives from other Teams
 
-> A Sprint Review is held at the end of the Sprint to inspect the Increment and adapt the Product Backlog if needed. During the Sprint Review, the Scrum Team and stakeholders collaborate about what was done in the Sprint. Based on that and any changes to the Product Backlog during the Sprint, attendees collaborate on the next things that could be done to optimize value. This is an informal meeting, not a status meeting, and the presentation of the Increment is intended to elicit feedback and foster collaboration.
-
-Showcases are our chance to the whole company up to speed with where we're at with our development, and allow us to collaborate and get feedback on what we've got and where we're going.
+> Showcases are our chance to the whole company up to speed with where we're at with our development, and allow us to collaborate and get feedback on what we've got and where we're going.
 
 Showcases will generally take the following form:
 * The Product Owner will open the meeting with a quick summary what our focus was for the Sprint, what we got "done" and what we didn't get "done".
