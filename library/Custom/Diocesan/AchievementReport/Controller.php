@@ -328,6 +328,10 @@ class Controller extends Base
 
                 'STARTable' => $STARTable,
                 'STARStanine' => $STARStanine,
+                'STARStanineNavigation' => [
+                    'all' => (new STAR\Stanine\Navigation($user, $externalUser, $db, $selectedYear))->findData(),
+                    'selected' => $year ?? (int)date('Y')
+                ],
             ]
         ));
     }

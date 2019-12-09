@@ -25,6 +25,10 @@
         </div>
     </div>
 
+    {% include '@standardisedTest/STAR/Stanine/Navigation.twig' with {
+        elements: STARStanineNavigation
+    } %}
+
     {% if STARStanine.visible %}
         <div class="small-12 large-6 columns">
             {% include '@standardisedTest/Stanine/Graph.twig' with {

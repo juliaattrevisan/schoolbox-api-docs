@@ -1,0 +1,25 @@
+{##
+ # Navigation
+ #
+ # Adds a row of buttons linked to a year for the STAR Stanine graph
+ #
+ # @param array elements
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="sub-nav">
+            {% for year in elements.all %}
+                <li {% if year == elements.selected %}class="active"{% endif %}>
+                    {% set standardisedTestRoute = routeLookupIfAuthorized('achievementreport.getStandardisedTestSTAR', {
+                        externalUserId: externalUser.StudentID,
+                        year: year
+                    }) %}
+
+                    {% if standardisedTestRoute %}
+                    <a href="{{ standardisedTestRoute }}">{{ year }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
