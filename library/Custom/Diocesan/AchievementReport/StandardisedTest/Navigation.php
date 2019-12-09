@@ -166,7 +166,10 @@ class Navigation
         /* Conditional Literacy/Numeracy report
          */
         $availableNavigation[self::STANDARDISEDTEST_LITERACYNUMERACY_KEY] = [
-            'url' => '',
+            'url' => $this->router->generate('achievementreport.getStandardisedTestLiteracyNumeracy', [
+                'externalUserId' => $this->externalUser['StudentID'],
+                'year' => $this->year
+            ]),
             'label' => 'Literacy/Numeracy'
         ];
 

@@ -1,0 +1,47 @@
+{##
+ # Standardised Test
+ #
+ # @param array     externalUser
+ # @param int|null  year
+ #}
+{% include '@templates/Avatar.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: subnavigation
+} %}
+
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+
+<div class="achievement-report standardised-test">
+    {% if literacy.visible %}
+        {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>
+                    This literacy and numeracy progress report shows you where your daughter is achieving in relation
+                    to the Diocesan expectations for her age. The shaded area on the graph shows the Diocesan
+                    Expectations based on student performance in assessments. These expectations make explicit the
+                    standard of reading, writing and numeracy expertise that students are expected to reach. They are
+                    high but attainable standards based on consistent expectations for learning.
+                </p>
+
+                <p>
+                    The stars indicate the level of achievement your daughter has reached. This is based on an overall
+                    teacher judgement. Making an overall judgement means drawing on a range of evidence gathered and
+                    analysed to make an informed decision on the student's performance. Data from e-asTTle is one of
+                    the measures used to inform the overall teacher judgement along with classroom based assessment.
+                    Aligned to the New Zealand curriculum, e-asTTle is an online tool to assess a student's overall
+                    achievement in reading, writing and mathematics, and is norm referenced to a sample of other
+                    students in New Zealand.
+                </p>
+            </section>
+        </div>
+    </div>
+</div>
