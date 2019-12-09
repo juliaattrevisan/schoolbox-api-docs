@@ -99,6 +99,12 @@ class Data extends Base
      */
     public function findData()
     {
+
+        /* maskseq is what the student got
+         * colour is the star colour (red for reading, blue for writing)
+         * Seq is the order of the stars (red comes before blue)
+         * Each of the xaxis rows needs to be grouped by AreaSeq
+         */
         $query = "
             SELECT
                 xAxis,
@@ -115,17 +121,11 @@ class Data extends Base
                 maskseq
             FROM uvSchoolBoxLitNumSummary
             WHERE code='LiteracyNumeracyY7_8_Lit'
-        ";
-
-        $query = "
-            SELECT DISTINCT
-            StudentID
-            FROM uvSchoolBoxLitNumSummary
-            WHERE code='LiteracyNumeracyY7_8_Lit'
+            ORDER BY xAxisOrderSeq, Seq
         ";
 
         $result = $this->getDb()->getAll($query);
-new \Alaress_Probe($result);
+
         $stack = [
             'x' => [
                 'categories' => []
@@ -135,7 +135,8 @@ new \Alaress_Probe($result);
                 'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
             ],
             'series' => [
-                'student' => [],
+                'red',
+                'blue',
                 'grey1' => [],
                 'grey2' => [],
                 'grey3' => [],
