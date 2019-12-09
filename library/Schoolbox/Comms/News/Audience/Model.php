@@ -12,8 +12,12 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 
+/**
+ * @method static GenericCollection|self[] createCollection()
+ */
 class Model
 {
     // Any audience modifier?
@@ -38,6 +42,7 @@ class Model
     }
 
     use Id;
+    use CreateCollection;
 
     /** @var News\Model() */
     private $commsNewsArticle;
@@ -60,7 +65,6 @@ class Model
 
     public function __construct()
     {
-        /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
         $this->children = new GenericCollection(self::class);
     }
 
@@ -97,6 +101,16 @@ class Model
      *
      * Ignores ID and child permutations
      *
+     * Considers the following to be NOT EQUAL due to different child counts.
+     * This has performance implications. Invalid data should be dealt with elsewhere, not compensated for here.
+     * ├─composite
+     * | ├─A
+     * | ├─A
+     * | └-B
+     * └─composite
+     *   ├─A
+     *   └-B
+     *
      * @param Model $other
      * @return bool
      * @throws InsufficientHydrationException
@@ -106,7 +120,6 @@ class Model
         if ($this->isSimple() !== $other->isSimple()) {
             return false;
         }
-
 
         if ($this->getEntityType() !== $other->getEntityType() ||
             $this->getEntityValue() !== $other->getEntityValue() ||
@@ -126,18 +139,15 @@ class Model
         }
 
         // Ensure each child is found in the other composite
-        foreach ($this->children as $thisChild) {
-            $otherChildMatchFound = false;
-            foreach ($other->children as $otherChild) {
-                if ($thisChild->equals($otherChild)) {
-                    $otherChildMatchFound = true;
-                    break;
-                }
-            }
-            if (!$otherChildMatchFound) {
-                return false;
-            }
+        if (!$this->containsAll($this->children, $other->children)) {
+            return false;
         }
+
+        // Ensure each other child is found in this composite (eg, protect against [A,A,B] == [A,B,C])
+        if (!$this->containsAll($other->children, $this->children)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -262,5 +272,34 @@ class Model
     {
         $this->children->replaceWith($children);
         return $this;
+    }
+
+    // Helpers
+
+    /**
+     * Returns whether all segments in $search are found in $subject
+     *
+     * Note that this does not imply collection equality. eg call([A,B,B],[A,B,C]) will return TRUE
+     *
+     * @param GenericCollection|self[] $search  Segments we are trying to match
+     * @param GenericCollection|self[] $subject Segments we are matching against
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    private function containsAll(GenericCollection $search, GenericCollection $subject): bool
+    {
+        foreach ($search as $segment1) {
+            $matchFound = false;
+            foreach ($subject as $segment2) {
+                if ($segment1->equals($segment2)) {
+                    $matchFound = true;
+                    break;
+                }
+            }
+            if (!$matchFound) {
+                return false;
+            }
+        }
+        return true;
     }
 }

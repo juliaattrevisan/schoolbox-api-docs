@@ -13,6 +13,8 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
+use function trigger_error;
+use const E_USER_WARNING;
 
 /**
  * Responsible for the intricacies of news article audience segment persistence.
@@ -58,10 +60,8 @@ class Transactor
         /** @var Audience\Model[]|GenericCollection $existingSegments */
         $existingSegments = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty());
 
-        $segmentsToAdd    = $this->audienceMapper->createCollection();
-        $segmentsToDelete = $this->audienceMapper->createCollection();
-
         // Delete any segment that currently exists, but was not posted from form (ie it's been removed by user)
+        $segmentsToDelete = $this->audienceMapper->createCollection();
         foreach ($existingSegments as $existingSegment) {
             $found = false;
             foreach ($postedSegments as $postedSegment) {
@@ -72,9 +72,33 @@ class Transactor
             }
             if (!$found) {
                 $segmentsToDelete->add($existingSegment);
+                $existingSegments->offsetUnset($existingSegment->getId());
             }
         }
+
+        // Derive unique existing segments. (I don't know how duplicates are occurring, but they are)
+        $preExistingDuplicates = false;
+        $updatedSegments       = $this->audienceMapper->createCollection();
+        foreach ($existingSegments as $existingSegment) {
+            $unique = true;
+            foreach ($updatedSegments as $updatedSegment) {
+                if ($existingSegment->equals($updatedSegment)) {
+                    $segmentsToDelete->add($existingSegment);
+                    $unique = false;
+                    break;
+                }
+            }
+            if ($unique) {
+                $updatedSegments->setOffset($existingSegment->getId(), $existingSegment);
+            }
+        }
+        if ($preExistingDuplicates) {
+            trigger_error("Articles appears to have pre-existing duplicate audience segments", E_USER_WARNING);
+        }
+
         // Add any segment that was posted but is not currently persisted
+        $postedDuplicatesDetected = false;
+        $segmentsToAdd            = $this->audienceMapper->createCollection();
         foreach ($postedSegments as $postedSegment) {
             $found = false;
             foreach ($existingSegments as $existingSegment) {
@@ -83,13 +107,29 @@ class Transactor
                     break;
                 }
             }
+            // Ensure we don't persist new duplicates
+            foreach ($segmentsToAdd as $segmentToAdd) {
+                if ($segmentToAdd->equals($postedSegment)) {
+                    $postedDuplicatesDetected = true;
+                    $found                    = true;
+                    break;
+                }
+            }
             if (!$found) {
                 $segmentsToAdd->add($postedSegment);
             }
         }
+        if ($postedDuplicatesDetected) {
+            trigger_error("POST appears to have duplicate audience segments", E_USER_WARNING);
+        }
 
         $isSegmentsDeleted = $this->deleteRemovedSegments($article, $segmentsToDelete);
         $isSegmentsAdded   = $this->saveAddedSegments($article, $segmentsToAdd);
+
+        foreach ($segmentsToAdd as $addedSegment) {
+            $updatedSegments->offsetSet($addedSegment->getId(), $addedSegment);
+        }
+        $article->setAudience($updatedSegments);
 
         return $isSegmentsDeleted || $isSegmentsAdded;
     }
