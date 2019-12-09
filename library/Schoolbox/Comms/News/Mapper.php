@@ -101,7 +101,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     protected function getSelectString(): string
     {
         return "
-            SELECT 
+            SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('author', 'a')},
                 {$this->getJoinColumnString('comms_news_article_topic', 'topics')},
@@ -319,7 +319,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
-            SELECT 
+            SELECT
                 SUBSTRING(publish_at, 1, 4) AS year,
                 SUBSTRING(publish_at, 6, 2) AS month
             FROM {$this->getTable()}
@@ -424,6 +424,12 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             throw new \DomainException('Invalid year/month combination');
         }
 
+        /* This user can't see any articles
+         */
+        if (null === $folderId && \count($availableArticleIds) < 1) {
+            return [];
+        }
+
         /* If either year or month is specified, we're looking in the news archive
          * Look for expired items matching a certain year/month combination
          */
@@ -434,11 +440,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $pb = $this->getPredicateBuilder()
             ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
-            ->isNull('deleted_at');
-
-        if (\count($availableArticleIds)) {
-            $pb->in('id', $availableArticleIds);
-        }
+            ->isNull('deleted_at')
+            ->in('id', $availableArticleIds);
 
         if ($year || $month) {
             $paddedMonth = $month ? str_pad((string)$month, 2, '0', STR_PAD_LEFT) : '';
@@ -463,7 +466,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         }
 
         if (null !== $folderId) {
-            $join .= "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id 
+            $join .= "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id
             AND cnau.entity_type = :entityType AND cnau.entity_value = :folderId";
         }
 
