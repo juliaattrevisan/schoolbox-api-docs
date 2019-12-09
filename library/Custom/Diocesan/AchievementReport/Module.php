@@ -63,6 +63,7 @@ class Module extends BaseModule
         $this->register('GET', '/standardisedTest/STAR/{externalUserId}{/year}', 'getStandardisedTestSTAR', $getPerms, $preload);
         $this->register('GET', '/standardisedTest/reading/{externalUserId}{/year}', 'getStandardisedTestReading', $getPerms, $preload);
         $this->register('GET', '/standardisedTest/writing/{externalUserId}{/year}', 'getStandardisedTestWriting', $getPerms, $preload);
+        $this->register('GET', '/standardisedTest/mathematics/{externalUserId}{/year}', 'getStandardisedTestMathematics', $getPerms, $preload);
         $this->register('GET', '/standardisedTest/{externalUserId}{/year}', 'getStandardisedTest', $getPerms, $preload);
         $this->register('GET', '/coCurricular/{externalUserId}{/year}', 'getCoCurricular', $getPerms, $preload);
     }
