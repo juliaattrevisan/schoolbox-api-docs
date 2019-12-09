@@ -142,15 +142,22 @@
                     },
                     yAxis: [
                         {
+                            categories: ['null', {{ reading.data.y.probeAge|purify }}],
+                            max: 25,
+                            min: 1,
+                            title: {
+                                text: 'Probe Age',
+                                y: -150
+                            }
+                        },
+                        {
                             categories: ['null', {{ reading.data.y.colourWheel|purify }}],
                             max: 25,
                             min: 1,
-                            gridLineWidth: 0
-                        },
-                        {
-                            categories: ['null', {{ reading.data.y.probeAge|purify }}],
-                            max: 25,
-                            min: 1
+                            title: {
+                                text: 'Colour Wheel',
+                                y: 240
+                            }
                         }
                     ],
                 });
