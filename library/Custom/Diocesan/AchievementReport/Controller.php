@@ -13,6 +13,7 @@ use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 use Custom\Diocesan\AchievementReport\StandardisedTest\STAR;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Reading;
 use MSSQL;
 use Schoolbox\User;
 
@@ -350,6 +351,15 @@ class Controller extends Base
          */
         $selectedYear = $year ?? (int)date('Y');
 
+        /* Reading
+         */
+        $readingPayload = (new Reading\Data($user, $externalUser, $db, $selectedYear));
+
+        $reading = [
+            'data' => $readingPayload->findData(),
+            'visible' => (new Reading\ValidHasData())->isSatisfiedBy($user->getYear(), $readingPayload->hasData())
+        ];
+
         $this->getResponse()->content->set([
             'template' => '@standardisedTest/Reading/index.twig',
             'data' => [
@@ -368,6 +378,8 @@ class Controller extends Base
                      */
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
+
+                'reading' => $reading
             ]
         ]);
     }

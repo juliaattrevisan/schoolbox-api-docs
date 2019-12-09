@@ -18,11 +18,18 @@ class Data extends Base
 {
 
     /**
+     * Whether there was any data found
+     *
+     * @var bool
+     */
+    private $hasData = false;
+
+
+    /**
      * Find all the data for Reading graph
      */
     public function findData()
     {
-
         $query = "
             SELECT
                 xAxisOrderSeq,
@@ -36,9 +43,14 @@ class Data extends Base
             WHERE StudentID='{$this->externalUser['StudentID']}'
             ORDER BY xAxisOrderSeq
         ";
+
         $result = $this->getDb()->getAll($query);
 
-        return [];
+        foreach ($result as $row) {
+            $this->hasData = true;
+        }
+
+        return $result;
     }
 
 
@@ -49,22 +61,17 @@ class Data extends Base
      */
     public function hasDataFromAnyYear(): bool
     {
-        $query = "
-            SELECT
-                xAxisOrderSeq,
-                xAxis,
-                Line1,
-                Line2,
-                Line3,
-                Line4,
-                ActualMaskSeq
-            FROM uSchoolBoxReadingSummary
-            WHERE StudentID='{$this->externalUser['StudentID']}'
-            ORDER BY xAxisOrderSeq
-        ";
+        $result = $this->findData();
 
-        $result = $this->getDb()->getOne($query);
+        return (bool)\count($result);
+    }
 
-        return (bool)$result;
+
+    /**
+     * @return bool
+     */
+    public function hasData(): bool
+    {
+        return $this->hasData;
     }
 }
