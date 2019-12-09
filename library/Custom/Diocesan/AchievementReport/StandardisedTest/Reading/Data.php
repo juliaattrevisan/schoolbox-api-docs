@@ -18,9 +18,9 @@ class Data extends Base
 {
 
     /**
-     * Y categories incl. colour band
+     * Y categories, colour band
      */
-    private const Y_CATEGORIES = [
+    private const Y_COLOURWHEEL = [
         'Magenta',
         'Red',
         'Yellow',
@@ -30,6 +30,20 @@ class Data extends Base
         'Turquoise',
         'Purple',
         'Gold',
+        ' ', ' ', ' ', ' ', ' ',
+        ' ', ' ', ' ', ' ', ' ',
+        ' ', ' ', ' ', ' ', ' ',
+        ' '
+    ];
+
+
+    /**
+     * Y categories, probe age
+     */
+    private const Y_PROBEAGE = [
+        ' ', ' ', ' ',
+        ' ', ' ', ' ',
+        ' ', ' ', ' ',
         '7.0 - 8.0',
         '7.5 - 8.5',
         '8.0 - 9.0',
@@ -83,7 +97,8 @@ class Data extends Base
                 'categories' => []
             ],
             'y' => [
-                'categories' => '"' . implode('","', self::Y_CATEGORIES) . '"'
+                'colourWheel' => '"' . implode('","', self::Y_COLOURWHEEL) . '"',
+                'probeAge' => '"' . implode('","', self::Y_PROBEAGE) . '"'
             ],
             'series' => [
                 'student' => [],
