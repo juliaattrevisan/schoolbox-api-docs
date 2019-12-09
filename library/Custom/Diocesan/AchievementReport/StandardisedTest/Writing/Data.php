@@ -18,6 +18,40 @@ class Data extends Base
 {
 
     /**
+     * Y categories, Stages
+     */
+    private const Y_STAGES = [
+        'Beginning',
+        'Proficient',
+        'Advanced',
+        'Beginning',
+        'Proficient',
+        'Advanced',
+        'Beginning',
+        'Proficient',
+        'Advanced',
+        'Beginning',
+        'Proficient',
+        'Advanced',
+    ];
+
+
+    /**
+     * Y categories, Curriculum Levels
+     */
+    private const Y_CURRICULUM_LEVELS = [
+        null, null,
+        'Curriculum Level 1',
+        null, null,
+        'Curriculum Level 2',
+        null, null,
+        'Curriculum Level 3',
+        null, null,
+        'Curriculum Level 4',
+    ];
+
+
+    /**
      * Whether there was any data found
      *
      * @var bool
@@ -47,7 +81,22 @@ class Data extends Base
 
         $result = $this->getDb()->getAll($query);
 
-        $stack = [];
+        $stack = [
+            'x' => [
+                'categories' => []
+            ],
+            'y' => [
+                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
+                'curriculumLevels' => '"' . implode('","', self::Y_CURRICULUM_LEVELS) . '"'
+            ],
+            'series' => [
+                'student' => [],
+                'grey1' => [],
+                'grey2' => [],
+                'grey3' => [],
+                'grey4' => [],
+            ]
+        ];
 
         foreach ($result as $row) {
 

@@ -146,7 +146,7 @@
                     },
                     yAxis: [
                         {
-                            categories: ['null', {{ writing.data.y.probeAge|purify }}],
+                            categories: ['null', {{ writing.data.y.stages|purify }}],
                             max: 12,
                             min: 1,
                             title: {
@@ -154,10 +154,9 @@
                             }
                         },
                         {
-                            categories: ['null', {{ writing.data.y.colourWheel|purify }}],
+                            categories: ['null', {{ writing.data.y.curriculumLevels|purify }}],
                             max: 12,
                             min: 1,
-                            offset: 0,
                             title: {
                                 text: ''
                             }
