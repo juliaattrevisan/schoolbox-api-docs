@@ -121,6 +121,7 @@ class Data extends Base
                 maskseq
             FROM uvSchoolBoxLitNumSummary
             WHERE code='LiteracyNumeracyY7_8_Lit'
+            AND StudentID='{$this->externalUser['StudentID']}'
             ORDER BY xAxisOrderSeq, Seq
         ";
 
@@ -144,25 +145,29 @@ class Data extends Base
             ]
         ];
 
+        $template = [];
+
+        /* Find all the data points we actually need
+         * This will be used as a series template
+         */
         foreach ($result as $row) {
-
-            /* Accumulate the x-axis categories
-             */
-            $stack['x']['categories'][] = "'{$row['xAxis']}'";
-
-            /* The stars (what the student got)
-             */
-            !$row['ActualMaskSeq'] ? $stack['series']['student'][] = 'null' : $stack['series']['student'][] = $row['ActualMaskSeq'];
-
-            /* Grey squares
-             */
-            !$row['Line1'] ? $stack['series']['grey1'][] = 'null' : $stack['series']['grey1'][] = $row['Line1'];
-            !$row['Line2'] ? $stack['series']['grey2'][] = 'null' : $stack['series']['grey2'][] = $row['Line2'];
-            !$row['Line3'] ? $stack['series']['grey3'][] = 'null' : $stack['series']['grey3'][] = $row['Line3'];
-            !$row['Line4'] ? $stack['series']['grey4'][] = 'null' : $stack['series']['grey4'][] = $row['Line4'];
+            $template['x'][$row['xAxis']][$row['AreaSeq']] = 'null';
         }
 
-        $stack['x']['categories'] = implode(',', $stack['x']['categories']);
+        $redSeries = $template;
+        $blueSeries = $template;
+
+        /* Start manufacturing the star series
+         */
+        foreach ($result as $row) {
+            if ($row['colour'] == 'Red') {
+                $redSeries['x'][$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
+            } elseif ($row['colour'] == 'Rlue') {
+                $blueSeries['x'][$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
+            }
+        }
+
+        new \Alaress_Probe($result, $template, $redSeries, $blueSeries);
 
         /* If the student has stars, they have values
          */
