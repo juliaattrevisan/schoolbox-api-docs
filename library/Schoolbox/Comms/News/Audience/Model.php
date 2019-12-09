@@ -65,7 +65,6 @@ class Model
 
     public function __construct()
     {
-        /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
         $this->children = new GenericCollection(self::class);
     }
 
@@ -122,7 +121,6 @@ class Model
             return false;
         }
 
-
         if ($this->getEntityType() !== $other->getEntityType() ||
             $this->getEntityValue() !== $other->getEntityValue() ||
             $this->getRelationship() !== $other->getRelationship()) {
@@ -141,31 +139,13 @@ class Model
         }
 
         // Ensure each child is found in the other composite
-        foreach ($this->children as $thisChild) {
-            $otherChildMatchFound = false;
-            foreach ($other->children as $otherChild) {
-                if ($thisChild->equals($otherChild)) {
-                    $otherChildMatchFound = true;
-                    break;
-                }
-            }
-            if (!$otherChildMatchFound) {
-                return false;
-            }
+        if (!$this->containsAll($this->children, $other->children)) {
+            return false;
         }
 
         // Ensure each other child is found in this composite (eg, protect against [A,A,B] == [A,B,C])
-        foreach ($other->children as $otherChild) {
-            $otherChildMatchFound = false;
-            foreach ($this->children as $thisChild) {
-                if ($otherChild->equals($thisChild)) {
-                    $otherChildMatchFound = true;
-                    break;
-                }
-            }
-            if (!$otherChildMatchFound) {
-                return false;
-            }
+        if (!$this->containsAll($other->children, $this->children)) {
+            return false;
         }
 
         return true;
@@ -292,5 +272,34 @@ class Model
     {
         $this->children->replaceWith($children);
         return $this;
+    }
+
+    // Helpers
+
+    /**
+     * Returns whether all segments in $search are found in $subject
+     *
+     * Note that this does not imply collection equality. eg call([A,B,B],[A,B,C]) will return TRUE
+     *
+     * @param GenericCollection|self[] $search  Segments we are trying to match
+     * @param GenericCollection|self[] $subject Segments we are matching against
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    private function containsAll(GenericCollection $search, GenericCollection $subject): bool
+    {
+        foreach ($search as $segment1) {
+            $matchFound = false;
+            foreach ($subject as $segment2) {
+                if ($segment1->equals($segment2)) {
+                    $matchFound = true;
+                    break;
+                }
+            }
+            if (!$matchFound) {
+                return false;
+            }
+        }
+        return true;
     }
 }
