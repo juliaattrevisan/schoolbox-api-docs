@@ -103,6 +103,7 @@ class Navigation
      * Finds all the years that have data
      *
      * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function navigationData(): void
     {
@@ -123,7 +124,10 @@ class Navigation
         /* Conditional STAR report
          */
         $availableNavigation[self::STANDARDISEDTEST_STAR_KEY] = [
-            'url' => '',
+            'url' => $this->router->generate('achievementreport.getStandardisedTestSTAR', [
+                'externalUserId' => $this->externalUser['StudentID'],
+                'year' => $this->year
+            ]),
             'label' => 'STAR'
         ];
 
