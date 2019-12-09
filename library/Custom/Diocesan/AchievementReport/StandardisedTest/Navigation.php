@@ -146,7 +146,10 @@ class Navigation
         /* Conditional Writing report
          */
         $availableNavigation[self::STANDARDISEDTEST_WRITING_KEY] = [
-            'url' => '',
+            'url' => $this->router->generate('achievementreport.getStandardisedTestWriting', [
+                'externalUserId' => $this->externalUser['StudentID'],
+                'year' => $this->year
+            ]),
             'label' => 'Writing'
         ];
 
