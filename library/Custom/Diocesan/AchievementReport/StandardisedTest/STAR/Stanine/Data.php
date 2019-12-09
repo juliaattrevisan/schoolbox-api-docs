@@ -19,7 +19,7 @@ class Data extends Base
 {
 
     /**
-     * Find all the data for PAT Listening Comprehension graph
+     * Find all the data for STAR Stanine graph
      *
      * @return Payload
      */
