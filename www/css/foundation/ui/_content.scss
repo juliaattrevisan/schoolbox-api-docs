@@ -1207,18 +1207,22 @@ $selector-width: 2.25rem;
             margin-bottom: 0.5rem;
         }
         .grade {
-            flex: 1 100%;
-            margin-left: 0;
-            padding: 0 1rem;
-
-            span {
-                line-height: 3rem;
-                font-size: 1rem;
-            }
+            display: none;
         }
     }
     ~ blockquote {
         margin-bottom: 0;
+    }
+}
+
+.grade-small {
+    display: none;
+
+    @media #{$medium-down} {
+        display: flex;
+        flex: 1 100%;
+        padding: 0 1rem;
+        justify-content: center;
     }
 }
 
