@@ -399,7 +399,7 @@ class Controller extends Base
          */
         $selectedYear = $year ?? (int)date('Y');
 
-        /* Reading
+        /* Writing
          */
         $writingPayload = (new Writing\Data($user, $externalUser, $db, $selectedYear));
 
