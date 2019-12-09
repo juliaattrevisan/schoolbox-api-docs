@@ -176,12 +176,21 @@ class Data extends Base
         foreach ($result as $row) {
             if ($row['colour'] == 'Red') {
                 $redSeries[$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
-            } elseif ($row['colour'] == 'Rlue') {
+            } elseif ($row['colour'] == 'Blue') {
                 $blueSeries[$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
             }
         }
 
-        new \Alaress_Probe($result, $template, $xCategories, $redSeries, $blueSeries);
+        /* Assemble the red and blue series in accordance with x-categories
+         */
+        $temp = [];
+
+        foreach ($redSeries as $category => $vals) {
+            new \Alaress_Probe('adding this: ', $vals, $temp);
+            $temp += array_values($vals);
+        }
+
+        new \Alaress_Probe($xCategories, $redSeries, $temp, $blueSeries);
 
         /* If the student has stars, they have values
          */
