@@ -1144,7 +1144,7 @@ $selector-width: 2.25rem;
     span {
         display: block;
         white-space: nowrap;
-        font-size: rem-calc(($base-font-size + 8));
+        font-size: 1rem;
         line-height: 2rem;
     }
     a:hover{
@@ -1163,7 +1163,6 @@ $selector-width: 2.25rem;
 
 // Grades that sit along side of other elements
 .flex-grade {
-    align-items: center;
     display: flex;
 
     .sibling {
@@ -1183,14 +1182,15 @@ $selector-width: 2.25rem;
     }
 
     .grade {
+        align-items: center;
         display: flex;
-        flex: 0 1 auto;
+        flex: 0 0 auto;
         justify-content: center;
         margin-left: .75rem;
 
         span {
             color: $white;
-            line-height: 3.4rem;
+            line-height: inherit;
         }
         &.review {
             background-color: $warning-color;
