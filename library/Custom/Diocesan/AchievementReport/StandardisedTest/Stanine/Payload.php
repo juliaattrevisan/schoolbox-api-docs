@@ -150,4 +150,18 @@ class Payload
     {
         return $this->hasData;
     }
+
+
+    /**
+     * Arbitrarily set the title
+     *
+     * @param string $title
+     * @return $this
+     */
+    public function setTitle(string $title): self
+    {
+        $this->stack['graph']['title'] = $title;
+
+        return $this;
+    }
 }

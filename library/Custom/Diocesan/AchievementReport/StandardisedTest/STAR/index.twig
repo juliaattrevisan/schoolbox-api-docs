@@ -3,8 +3,9 @@
  #
  # @param array     externalUser
  # @param int|null  year
+ # @param array     STARTable
+ # @param array     STARStanine
  #}
-
 {% include '@templates/Avatar.twig' %}
 
 {% include '@templates/Navigation.twig' with {
@@ -23,4 +24,15 @@
             } %}
         </div>
     </div>
+
+    {% if STARStanine.visible %}
+        <div class="small-12 large-6 columns">
+            {% include '@standardisedTest/Stanine/Graph.twig' with {
+                identifier: 'STARStanine',
+                title: STARStanine.data.graph.title,
+                yAxis: STARStanine.data.graph.y,
+                series: STARStanine.data.series
+            } %}
+        </div>
+    {% endif %}
 </div>

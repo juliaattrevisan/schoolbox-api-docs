@@ -298,6 +298,15 @@ class Controller extends Base
             'visible' => (new STAR\Table\ValidHasData())->isSatisfiedBy($user->getYear(), $tablePayload->hasData())
         ];
 
+        /* STAR Stanine
+         */
+        $STARStaninePayload = (new STAR\Stanine\Data($user, $externalUser, $db, $selectedYear))->findData();
+
+        $STARStanine = [
+            'data' => $STARStaninePayload->getData(),
+            'visible' => (new STAR\Stanine\ValidHasData())->isSatisfiedBy($user->getYear(), $STARStaninePayload->hasData())
+        ];
+
         $this->getResponse()->content->set(array(
             'template' => '@standardisedTest/STAR/index.twig',
             'data' => [
@@ -318,6 +327,7 @@ class Controller extends Base
                 ],
 
                 'STARTable' => $STARTable,
+                'STARStanine' => $STARStanine,
             ]
         ));
     }
