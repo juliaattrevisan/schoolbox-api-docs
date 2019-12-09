@@ -55,7 +55,7 @@ class Renderer extends Handler
             foreach ($result as $blog) {
 
                 try {
-                    $folder = $folderMapper->findCheaplyById($blog['cid']);
+                    $folder = $folderMapper->findCheaplyById($blog['folder_id']);
 
                     foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
                         $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
