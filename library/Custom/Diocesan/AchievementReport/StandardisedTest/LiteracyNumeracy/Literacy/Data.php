@@ -151,7 +151,21 @@ class Data extends Base
          * This will be used as a series template
          */
         foreach ($result as $row) {
-            $template['x'][$row['xAxis']][$row['AreaSeq']] = 'null';
+            $template[$row['xAxis']][$row['AreaSeq']] = 'null';
+        }
+
+        /* Mine out the categories and dupe out exactly two of them
+         * One set for each star (there's only red and blue stars here)
+         */
+        $categories = array_keys($template);
+
+        $xCategories = [];
+
+        /* Yep, you read this right
+         */
+        foreach ($categories as $category) {
+            $xCategories[] = $category;
+            $xCategories[] = $category;
         }
 
         $redSeries = $template;
@@ -161,13 +175,13 @@ class Data extends Base
          */
         foreach ($result as $row) {
             if ($row['colour'] == 'Red') {
-                $redSeries['x'][$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
+                $redSeries[$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
             } elseif ($row['colour'] == 'Rlue') {
-                $blueSeries['x'][$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
+                $blueSeries[$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
             }
         }
 
-        new \Alaress_Probe($result, $template, $redSeries, $blueSeries);
+        new \Alaress_Probe($result, $template, $xCategories, $redSeries, $blueSeries);
 
         /* If the student has stars, they have values
          */
