@@ -32,9 +32,11 @@
                     magenta: 'magenta'
                 };
 
-                $('#reading').highcharts({
+                var chart = new Highcharts.Chart({
                     chart: {
                         height: 880,
+                        reflow: true,
+                        renderTo: 'reading',
                         spacingBottom: 30
                     },
                     credits: {
@@ -185,6 +187,8 @@
                         }
                     ],
                 });
+
+                chart.reflow();
             });
         </script>
         <div class="row">
