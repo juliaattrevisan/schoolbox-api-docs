@@ -149,8 +149,12 @@
                         enabled: false,
                     },
                     xAxis: {
+                        categories: [{{ reading.data.x.categories|purify }}],
                         gridLineWidth: 1,
-                        categories: [{{ reading.data.x.categories|purify }}]
+                        title: {
+                            text: 'Time at school',
+                            y: 10
+                        }
                     },
                     yAxis: [
                         {
