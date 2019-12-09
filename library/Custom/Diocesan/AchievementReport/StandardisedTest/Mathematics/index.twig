@@ -154,25 +154,38 @@
                             }
                         },
                         {
-                            categories: ['null', {{ mathematics.data.y.curriculumLevels|purify }}],
+                            categories: ['null', {{ mathematics.data.y.levelGroups|purify }}],
                             gridLineWidth: 0,
                             labels: {
                                 x: -100,
-                                y: 41
+                                y: 32
                             },
                             max: 27,
                             min: 1,
                             offset: 0,
                             startOnTick: false,
                             tickColor: '#dddddd',
-                            tickLength: 200,
+                            tickLength: 150,
                             tickmarkPlacement: 'between',
                             tickPositions: [3,6,9,12,15,18,21,24,27],
                             tickWidth: 1,
                             title: {
                                 text: ''
                             }
-                        }
+                        },
+                        {
+                            categories: ['null', {{ mathematics.data.y.lower|purify }}],
+                            gridLineWidth: 0,
+                            labels: {
+                                y: -7
+                            },
+                            max: 27,
+                            min: 1,
+                            offset: 0,
+                            title: {
+                                text: ''
+                            }
+                        },
                     ],
                 });
 
