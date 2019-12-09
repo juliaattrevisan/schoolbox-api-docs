@@ -145,7 +145,7 @@ class Controller extends Base
 
 
     /**
-     * Standardised Test placeholder
+     * Standardised Tests index
      *
      * @param MSSQL    $db
      * @param User     $user
@@ -156,6 +156,43 @@ class Controller extends Base
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
 
+        /* TODO: Redirect to the first available section of the standardised test
+         * PAT, STAR, Reading, Writing, Mathematics, Literacy/Numeracy
+         */
+        $this->getResponse()->content->set([
+            'template' => '@standardisedTest/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+
+                'subnavigation' => [
+                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+
+                    /* TODO: For each Standardised Test report piece
+                     */
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+            ]
+        ]);
+    }
+
+
+    /**
+     * PAT section of Standardised Test
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws RouteNotFound
+     */
+    public function getStandardisedTestPAT(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    {
         /* Default to this year if none specified
          */
         $selectedYear = $year ?? (int)date('Y');
@@ -236,7 +273,6 @@ class Controller extends Base
             ]
         ));
     }
-
 
     /**
      * School Grades page

@@ -112,7 +112,10 @@ class Navigation
          */
         if ((new PAT\ValidPAT($this->db))->isSatisifiedBy($this->user, $this->externalUser)) {
             $availableNavigation[self::STANDARDISEDTEST_PAT_KEY] = [
-                'url' => '',
+                'url' => $this->router->generate('achievementreport.getStandardisedTestPAT', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
                 'label' => 'PAT'
             ];
         }
