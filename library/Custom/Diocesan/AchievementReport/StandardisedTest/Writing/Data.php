@@ -40,13 +40,17 @@ class Data extends Base
      * Y categories, Curriculum Levels
      */
     private const Y_CURRICULUM_LEVELS = [
-        null, null,
+        'a ',
+        'b ',
         'Curriculum Level 1',
-        null, null,
+        'c ',
+        'd ',
         'Curriculum Level 2',
-        null, null,
+        'e ',
+        'f ',
         'Curriculum Level 3',
-        null, null,
+        'g ',
+        'h ',
         'Curriculum Level 4',
     ];
 

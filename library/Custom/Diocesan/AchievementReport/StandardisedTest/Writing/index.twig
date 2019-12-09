@@ -22,7 +22,7 @@
             $(function () {
                 var chart = new Highcharts.Chart({
                     chart: {
-                        height: 880,
+                        height: 600,
                         reflow: true,
                         renderTo: 'writing',
                         spacingBottom: 30
@@ -155,8 +155,20 @@
                         },
                         {
                             categories: ['null', {{ writing.data.y.curriculumLevels|purify }}],
+                            gridLineWidth: 0,
+                            labels: {
+                                x: -100,
+                                y: 41
+                            },
                             max: 12,
                             min: 1,
+                            offset: 0,
+                            startOnTick: false,
+                            tickColor: '#dddddd',
+                            tickLength: 200,
+                            tickmarkPlacement: 'between',
+                            tickPositions: [3,6,9,12],
+                            tickWidth: 1,
                             title: {
                                 text: ''
                             }
