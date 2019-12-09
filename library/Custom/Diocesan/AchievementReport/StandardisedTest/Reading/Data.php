@@ -46,11 +46,44 @@ class Data extends Base
 
         $result = $this->getDb()->getAll($query);
 
+        $stack = [
+            'x' => [
+                'categories' => []
+            ],
+            'series' => [
+                'student' => [],
+                'grey1' => [],
+                'grey2' => [],
+                'grey3' => [],
+                'grey4' => [],
+            ]
+        ];
+
         foreach ($result as $row) {
+
+            /* Accumulate the x-axis categories
+             */
+            $stack['x']['categories'][] = $row['xAxis'];
+
+            /* The stars (what the student got)
+             */
+            $stack['series']['student'][] = $row['ActualMaskSeq'];
+
+            /* Grey squares
+             */
+            $stack['series']['grey1'][] = $row['Line1'];
+            $stack['series']['grey2'][] = $row['Line2'];
+            $stack['series']['grey3'][] = $row['Line3'];
+            $stack['series']['grey4'][] = $row['Line4'];
+        }
+
+        /* If the student has stars, they have values
+         */
+        if (\count($stack['series']['student'])) {
             $this->hasData = true;
         }
 
-        return $result;
+        return $stack;
     }
 
 
@@ -61,9 +94,7 @@ class Data extends Base
      */
     public function hasDataFromAnyYear(): bool
     {
-        $result = $this->findData();
-
-        return (bool)\count($result);
+        return $this->findData()->hasData();
     }
 
 
