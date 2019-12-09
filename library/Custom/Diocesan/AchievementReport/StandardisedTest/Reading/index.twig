@@ -20,6 +20,18 @@
     {% if reading.visible %}
         <script>
             $(function () {
+                const colors = {
+                    gold: 'gold',
+                    purple: 'purple',
+                    turquoise: 'turquoise',
+                    orange: 'orange',
+                    green: 'green',
+                    blue: 'blue',
+                    yellow: '#cec931',
+                    red: 'red',
+                    magenta: 'magenta'
+                };
+
                 $('#reading').highcharts({
                     chart: {
                         height: 880,
@@ -152,6 +164,15 @@
                         },
                         {
                             categories: ['null', {{ reading.data.y.colourWheel|purify }}],
+                            labels: {
+                                formatter: function() {
+                                    if (this.value != ' ') {
+                                        return `<span style="font-weight:bold;color: ${colors[this.value.toLowerCase()]}">${this.value}</p>`;
+                                    }
+
+                                    return this.value;
+                                }
+                            },
                             max: 25,
                             min: 1,
                             title: {
