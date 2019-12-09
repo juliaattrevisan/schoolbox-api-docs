@@ -77,7 +77,7 @@ class Data extends Base
             FROM uvSchoolBoxPATSTARSummary
             WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
             AND IndividualStarTestStanineMarker <> 0
-            ";
+        ";
 
         $result = $this->getDb()->getOne($query);
 
