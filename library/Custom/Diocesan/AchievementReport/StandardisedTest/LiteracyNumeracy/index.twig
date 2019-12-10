@@ -17,9 +17,13 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 
 <div class="achievement-report standardised-test">
-    {% if literacy.visible %}
-        {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
-    {% endif %}
+    <div class="row">
+        {% if literacy.visible %}
+        <div class="small-6 columns">
+            {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
+        </div>
+        {% endif %}
+    </div>
 
     <div class="row">
         <div class="small-12 island">
