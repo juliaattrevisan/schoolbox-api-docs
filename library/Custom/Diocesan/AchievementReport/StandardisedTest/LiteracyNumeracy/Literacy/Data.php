@@ -172,14 +172,34 @@ class Data extends Base
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $stack['x']['categories'] = '"' . implode('","', array_keys($temp)) . '"';
+        $names = array_keys($temp);
+        $template = [];
+
+        foreach ($names as $category) {
+            $template[] = $category;
+            $template[] = $category;
+        }
+
+        $stack['x']['categories'] = '"' . implode('","', $template) . '"';
 
         /* Build result sets
          */
+        $red = $blue = array_fill(0, \count($template), 'null');
+
+        $index = 0;
+        $numSeries = 2;
+
         foreach ($temp as $category => $vals) {
-            $stack['series'][self::RED_SERIES][] = $vals[self::RED_SERIES_AREASEQ];
-            $stack['series'][self::BLUE_SERIES][] = $vals[self::BLUE_SERIES_AREASEQ];
+            $red[$index] = $vals[self::RED_SERIES_AREASEQ];
+            $blue[$index+1] = $vals[self::BLUE_SERIES_AREASEQ];
+
+            $index += $numSeries;
         }
+
+        $stack['series']['red'] = $red;
+        $stack['series']['blue'] = $blue;
+
+        new \Alaress_Probe($temp, $template, $red, $blue, $stack);
 
         /* If the student has stars, they have values - one of the series must have data
          */
