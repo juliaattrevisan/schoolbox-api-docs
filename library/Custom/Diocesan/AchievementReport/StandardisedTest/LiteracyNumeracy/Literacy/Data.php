@@ -168,13 +168,7 @@ class Data extends Base
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $names = array_keys($temp);
-        $template = [];
-
-        foreach ($names as $category) {
-            $template[] = $category;
-            $template[] = $category;
-        }
+        $template = $this->generateXCategories($temp);
 
         $stack['x']['categories'] = '"' . implode('","', $template) . '"';
 
@@ -232,6 +226,26 @@ class Data extends Base
 //
 //        new \Alaress_Probe($result, $temp, $greys);
         return $stack;
+    }
+
+
+    /**
+     * Generate a template of x categories
+     *
+     * @param array $placeholder
+     * @return array
+     */
+    private function generateXCategories(array $placeholder): array
+    {
+        $names = array_keys($placeholder);
+        $template = [];
+
+        foreach ($names as $category) {
+            $template[] = $category;
+            $template[] = $category;
+        }
+
+        return $template;
     }
 
 
