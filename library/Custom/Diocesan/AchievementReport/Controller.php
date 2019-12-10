@@ -256,10 +256,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_PAT_KEY
                 ],
 
                 'PATTable' => $PATTable,
@@ -324,10 +321,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_STAR_KEY
                 ],
 
                 'STARTable' => $STARTable,
@@ -376,10 +370,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_READING_KEY
                 ],
 
                 'reading' => $reading
@@ -423,10 +414,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_WRITING_KEY
                 ],
 
                 'writing' => $writing
@@ -470,10 +458,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_MATHEMATICS_KEY
                 ],
 
                 'mathematics' => $mathematics
@@ -526,10 +511,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_LITERACYNUMERACY_KEY
                 ],
 
                 'literacy' => $literacy,
