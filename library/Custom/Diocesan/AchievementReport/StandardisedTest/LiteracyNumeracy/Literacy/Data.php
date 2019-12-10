@@ -87,6 +87,13 @@ class Data extends Base
 
 
     /**
+     * Indexes of each series
+     */
+    private const RED_SERIES_AREASEQ = 2;
+    private const BLUE_SERIES_AREASEQ = 3;
+
+
+    /**
      * Whether there was any data found
      *
      * @var bool
@@ -94,46 +101,29 @@ class Data extends Base
     private $hasData = false;
 
 
-    private const RED_SERIES_AREASEQ = 2;
-    private const BLUE_SERIES_AREASEQ = 3;
-
-
-    /**
-     * Find the series data for red/blue/green stars
-     *
-     * @param int    $areaSeq
-     * @param string $externalId
-     * @return array|bool
-     */
-    private function findSeries(int $areaSeq, string $externalId)
-    {
-
-
-    }
-
     /**
      * Find all the data for Writing graph
      */
     public function findData()
     {
 
-//        $stack = [
-//            'x' => [
-//                'categories' => []
-//            ],
-//            'y' => [
-//                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
-//                'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
-//            ],
-//            'series' => [
-//                'red' => [],
-//                'blue' => [],
-//                'grey1' => [],
-//                'grey2' => [],
-//                'grey3' => [],
-//                'grey4' => [],
-//            ]
-//        ];
+        $stack = [
+            'x' => [
+                'categories' => []
+            ],
+            'y' => [
+                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
+                'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
+            ],
+            'series' => [
+                'red' => [],
+                'blue' => [],
+                'grey1' => [],
+                'grey2' => [],
+                'grey3' => [],
+                'grey4' => [],
+            ]
+        ];
 
 
         /* maskseq is what the student got
@@ -179,20 +169,16 @@ class Data extends Base
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $categories = array_keys($temp);
+        $stack['x']['categories'] = array_keys($temp);
 
         /* Build result sets
          */
-        $red = [];
-        $blue = [];
-
         foreach ($temp as $category => $vals) {
-            $red[] = $vals[2];
-            $blue[] = $vals[3];
+            $stack['series']['red'][] = $vals[self::RED_SERIES_AREASEQ];
+            $stack['series']['blue'][] = $vals[self::BLUE_SERIES_AREASEQ];
         }
 
-        new \Alaress_Probe($result, $categories, $temp, $red, $blue);
-
+        new \Alaress_Probe($result, $temp, $stack);
 
         /* If the student has stars, they have values
          */
