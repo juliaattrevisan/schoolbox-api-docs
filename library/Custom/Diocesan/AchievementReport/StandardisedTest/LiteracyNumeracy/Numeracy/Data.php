@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Numeracy;
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
+use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\GroupData;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Squares;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Stars;
@@ -80,7 +81,7 @@ class Data extends Base
         /* Group everything by xAxis, AreaSeq
          * This removes dupes because multiple series are in this dataset
          */
-        $groupData = $this->groupData($result, 'maskseq');
+        $groupData = (new GroupData())->generate($result, 'maskseq');
 
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
@@ -120,34 +121,6 @@ class Data extends Base
 
 
     /**
-     * Generate a placeholder array, grouped by x-axis labels and AreaSeq value
-     * Placeholder array defaults to string 'null', for highcharts
-     *
-     * @param array  $result
-     * @param string $key
-     * @return array
-     */
-    private function groupData(array $result, string $key): array
-    {
-        $temp = [];
-
-        foreach ($result as $row) {
-            $xAxis = $row['xAxis'];
-            $areaSeq = $row['AreaSeq'];
-            $y = $row[$key] ?: 'null';
-
-            /* Overwrite placeholder value
-             */
-            if (!isset($temp[$xAxis][$areaSeq]) || $temp[$xAxis][$areaSeq] === 'null') {
-                $temp[$xAxis][$areaSeq] = $y;
-            }
-        }
-
-        return $temp;
-    }
-
-
-    /**
      * Find the AreaSeq sequence that we use to map red/blue/green data series
      *
      * @param array $placeholder
@@ -178,9 +151,6 @@ class Data extends Base
 
         return $template;
     }
-
-
-
 
 
     /**
