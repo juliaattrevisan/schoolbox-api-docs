@@ -298,13 +298,17 @@ class NavigationSelector
      */
     private function hasComments(): int
     {
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM dbo.uvSchoolBoxReportComments
-            WHERE id = '{$this->externalUser['StudentID']}'
+            WHERE id = :externalId
         ";
 
-        $count = $this->db->getRow($query);
+        $count = $this->db->getRow($query, $params);
 
         return (int)$count['computed'];
     }
@@ -317,13 +321,17 @@ class NavigationSelector
      */
     private function hasSchoolGrades(): int
     {
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM dbo.uvSchoolBoxSchoolGradeResults
-            WHERE ID = '{$this->externalUser['StudentID']}'
+            WHERE ID = :externalId
         ";
 
-        $count = $this->db->getRow($query);
+        $count = $this->db->getRow($query, $params);
 
         return (int)$count['computed'];
     }
@@ -336,13 +344,17 @@ class NavigationSelector
      */
     private function hasNcea(): int
     {
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM dbo.uvSchoolBoxNCEAResults
-            WHERE ID = '{$this->externalUser['StudentID']}'
+            WHERE ID = :externalId
         ";
 
-        $count = $this->db->getRow($query);
+        $count = $this->db->getRow($query, $params);
 
         return (int)$count['computed'];
     }
@@ -355,13 +367,17 @@ class NavigationSelector
      */
     private function hasIb(): int
     {
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM dbo.uvSchoolBoxIBResults
-            WHERE ID = '{$this->externalUser['StudentID']}'
+            WHERE ID = :externalId
         ";
 
-        $count = $this->db->getRow($query);
+        $count = $this->db->getRow($query, $params);
 
         return (int)$count['computed'];
     }
@@ -374,13 +390,17 @@ class NavigationSelector
      */
     private function hasCoCurricular(): int
     {
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM uvSchoolBoxCoCurricularClasses
-            WHERE StudentID = '{$this->externalUser['StudentID']}'
+            WHERE StudentID = :externalId
         ";
 
-        $count = $this->db->getRow($query);
+        $count = $this->db->getRow($query, $params);
 
         return (int)$count['computed'];
     }
