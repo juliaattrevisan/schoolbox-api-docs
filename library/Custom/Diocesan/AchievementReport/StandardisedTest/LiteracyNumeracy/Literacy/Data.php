@@ -213,6 +213,9 @@ class Data extends Base
             }
         }
 
+        /* TODO: Mine out the grey squares
+         */
+
         return $stack;
     }
 
