@@ -1,0 +1,215 @@
+{##
+ # Standardised Test
+ #
+ # @param array     externalUser
+ # @param int|null  year
+ #}
+{% include '@templates/Avatar.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: subnavigation
+} %}
+
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+
+<div class="achievement-report standardised-test">
+    {% if reading.visible %}
+        <script>
+            $(function () {
+                const colors = {
+                    gold: 'gold',
+                    purple: 'purple',
+                    turquoise: 'turquoise',
+                    orange: 'orange',
+                    green: 'green',
+                    blue: 'blue',
+                    yellow: '#cec931',
+                    red: 'red',
+                    magenta: 'magenta'
+                };
+
+                var chart = new Highcharts.Chart({
+                    chart: {
+                        height: 880,
+                        reflow: true,
+                        renderTo: 'reading',
+                        spacingBottom: 30
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        area: {
+                            fillOpacity: 0.2
+                        }
+                    },
+                    series: [
+
+                        {# First set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey1|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Second set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey2|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Third set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey3|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Fourth set of grey squares #}
+                        {
+                            data: [{{ reading.data.series.grey4|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Student Data #}
+                        {
+                            data: [{{ reading.data.series.student|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                symbol: 'url(/custom/diocesan/achievementreport/img/star-red.png)'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        }
+                    ],
+                    subtitle: {
+                        text: 'Based on Diocesan Reading Expectations for Year 0-6'
+                    },
+                    title: {
+                        text: 'Tracked Achievement Over Time'
+                    },
+                    tooltip: {
+                        enabled: false,
+                    },
+                    xAxis: {
+                        categories: [{{ reading.data.x.categories|purify }}],
+                        gridLineWidth: 1,
+                        title: {
+                            text: 'Time at school',
+                            y: 10
+                        }
+                    },
+                    yAxis: [
+                        {
+                            categories: ['null', {{ reading.data.y.probeAge|purify }}],
+                            max: 25,
+                            min: 1,
+                            title: {
+                                text: 'PROBE Age',
+                                y: -150
+                            }
+                        },
+                        {
+                            categories: ['null', {{ reading.data.y.colourWheel|purify }}],
+                            labels: {
+                                formatter: function() {
+                                    if (this.value != ' ') {
+                                        return `<span style="font-weight:bold;color: ${colors[this.value.toLowerCase()]}">${this.value}</p>`;
+                                    }
+
+                                    return this.value;
+                                }
+                            },
+                            max: 25,
+                            min: 1,
+                            offset: 0,
+                            title: {
+                                text: 'Colour Wheel',
+                                y: 240
+                            }
+                        }
+                    ],
+                });
+
+                chart.reflow();
+            });
+        </script>
+        <div class="row">
+            <div class="small-12 columns">
+                <div id="reading"></div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>
+                    Achievement and progress in reading is assessed using a variety of tools. Two of the common tools,
+                    Running Records and PROBE reading tests are used in the Junior School. In a running record it is the
+                    level number that indicates achievement and progress. The 25 levels usedin running records are
+                    divided into colour bands. A PROBE reading test returns a reading age based on a detailed analysis
+                    of your daughter's responses to a text. It is not unusual to notice a slight dip in achievement
+                    as the students move from being assessed using running records to being assessed using a PROBE test.
+                </p>
+            </section>
+        </div>
+    </div>
+</div>
