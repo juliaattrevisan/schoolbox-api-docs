@@ -93,7 +93,13 @@ class Data extends Base
 
         /* Mine out the stars' series
          */
-        $stack['series'] = array_merge($stack['series'], $this->generateStars($groupData, $areaSeqMapping, $template));
+        $stars = $this->generateStars($groupData, $areaSeqMapping, $template);
+
+        $series = [Payload::RED_SERIES, Payload::BLUE_SERIES, Payload::GREEN_SERIES];
+
+        for ($i = 0; $i < self::NUM_SERIES; $i++) {
+            $stack['series'][$series[$i]] = $stars[$i];
+        }
 
         /* Mine out the grey squares
          */
@@ -118,32 +124,37 @@ class Data extends Base
      */
     private function generateStars(array $groupData, array $areaSeqMapping, array $template): array
     {
-        $red = $blue = $green = $this->initialisePlaceholder($template);
-
         $index = 0;
 
+        $payload = [];
+
         foreach ($groupData as $category => $vals) {
-            $red[$index] = $vals[$areaSeqMapping[0]];
-            $blue[$index+1] = $vals[$areaSeqMapping[1]];
-            $green[$index+2] = $vals[$areaSeqMapping[2]];
+            for ($i = 0; $i < self::NUM_SERIES; $i++) {
+
+                /* Initialise with string 'null' for each x category
+                 */
+                if (!isset($payload[$i])) {
+                    $payload[$i] = $this->initialisePlaceholder($template);
+                }
+
+                /* Insert values algorithmically
+                 */
+                $payload[$i][$index+$i] = $vals[$areaSeqMapping[$i]];
+
+                /* Might as well do data detection here
+                 * If the student has a row with maskseq != 0, they have data
+                 */
+                if ($vals[$areaSeqMapping[$i]]) {
+                    $this->hasData = true;
+                }
+            }
 
             /* Move to the next group of data points
              */
             $index += self::NUM_SERIES;
-
-            /* Might as well do data detection here
-             * If the student has a row with maskseq != 0, they have data
-             */
-            if ($vals[$areaSeqMapping[0]] || $vals[$areaSeqMapping[1]] || $vals[$areaSeqMapping[2]]) {
-                $this->hasData = true;
-            }
         }
 
-        return [
-            Payload::RED_SERIES => $red,
-            Payload::BLUE_SERIES => $blue,
-            Payload::GREEN_SERIES => $green
-        ];
+        return $payload;
     }
 
 
