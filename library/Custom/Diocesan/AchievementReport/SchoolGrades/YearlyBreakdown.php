@@ -1,15 +1,18 @@
 <?php
 /**
- * YearlyBreakdownTable
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
-class YearlyBreakdown extends Base {
+/**
+ * Class YearlyBreakdown
+ *
+ * @package Custom\Diocesan\AchievementReport\SchoolGrades
+ */
+class YearlyBreakdown extends Base
+{
 
     /**
      * Heading
@@ -27,13 +30,12 @@ class YearlyBreakdown extends Base {
     public function findData()
     {
 
-        /**
-         * Rearrange everything into a nice order
+        /* Rearrange everything into a nice order
          *
          * $totals is a separate row for the table data
          */
-        $yearStack = array();
-        $totals = array();
+        $yearStack = [];
+        $totals = [];
 
         $preprocessed = $this->recombination();
 
@@ -69,7 +71,7 @@ class YearlyBreakdown extends Base {
                 /* Explore all the areas
                  */
                 foreach ($allAreas as $currentArea => $allTerms) {
-                    foreach (array('term4', 'term3', 'term2', 'term1') as $term) {
+                    foreach (['term4', 'term3', 'term2', 'term1'] as $term) {
                         if ($allTerms[$term] != '') {
                             $data = $allTerms[$term];
                             $letter = $data['StrippedResult'];
@@ -80,7 +82,7 @@ class YearlyBreakdown extends Base {
 
                             /* Ignore anything outside of the letter registry
                              */
-                            if (in_array($letter, $this->getLetterRegistry())) {
+                            if (in_array($letter, $this->getLetterRegistry(), false)) {
                                 if (!$this->isProgressive($result)) {
                                     $yearStack[$year][$courseName]['letters'][$letter]++;
                                     $totals[$year]['letters'][$letter]++;
@@ -88,7 +90,7 @@ class YearlyBreakdown extends Base {
                                     /* Achieved Grades only accumulate when student got an
                                      * achievement letter
                                      */
-                                    if (in_array($letter, $this->getAchievementLetterRegistry())) {
+                                    if (in_array($letter, $this->getAchievementLetterRegistry(), false)) {
                                         $yearStack[$year][$courseName]['achievedGrades']++;
                                         $totals[$year]['achievedGrades']++;
                                     }
@@ -111,11 +113,9 @@ class YearlyBreakdown extends Base {
             }
         }
 
-        $finalStack = array(
+        return [
             'yearStack' => $yearStack,
             'totals' => $totals
-        );
-
-        return $finalStack;
+        ];
     }
 }
