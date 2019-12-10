@@ -22,26 +22,10 @@ class Data extends Base
 {
 
     /**
-     * Indexes of each series
-     */
-    private const RED_SERIES = 'red';
-    private const BLUE_SERIES = 'blue';
-    private const GREEN_SERIES = 'green';
-
-
-    /**
      * Number of series to look for here
      * These denote the number of x-categories per data group
      */
     private const NUM_SERIES = 3;
-
-
-    /**
-     * Whether there was any data found
-     *
-     * @var bool
-     */
-    private $hasData = false;
 
 
     /**
@@ -86,7 +70,7 @@ class Data extends Base
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $template = $this->generateXCategories($groupData);
+        $template = $this->generateXCategories($groupData, self::NUM_SERIES);
 
         $stack['x']['categories'] = '"' . implode('","', $template) . '"';
 
@@ -117,58 +101,5 @@ class Data extends Base
         $stack['series']['grey4'] = $squaresSeries[3];
 
         return $stack;
-    }
-
-
-    /**
-     * Find the AreaSeq sequence that we use to map red/blue/green data series
-     *
-     * @param array $placeholder
-     * @return array
-     */
-    private function generateAreaSeqMapping(array $placeholder): array
-    {
-        return array_keys(array_values($placeholder)[0]);
-    }
-
-
-    /**
-     * Generate a template of x categories
-     *
-     * @param array $placeholder
-     * @return array
-     */
-    private function generateXCategories(array $placeholder): array
-    {
-        $names = array_keys($placeholder);
-        $template = [];
-
-        foreach ($names as $category) {
-            $template[] = $category;
-            $template[] = $category;
-            $template[] = $category;
-        }
-
-        return $template;
-    }
-
-
-    /**
-     * Find out if this student has data from any year
-     *
-     * @return bool
-     */
-    public function hasDataFromAnyYear(): bool
-    {
-        return $this->findData()->hasData();
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function hasData(): bool
-    {
-        return $this->hasData;
     }
 }
