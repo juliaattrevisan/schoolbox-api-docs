@@ -97,12 +97,27 @@
                     yAxis: 1
                 },
 
-                {# Student Data #}
+                {# Student Data: Red (Reading) #}
                 {
-                    data: [{{ literacy.data.series.student|join(',') }}],
+                    data: [{{ literacy.data.series.red|join(',') }}],
                     enableMouseTracking: false,
                     marker: {
                         symbol: 'url(/custom/diocesan/achievementreport/img/star-red.png)'
+                    },
+                    states: {
+                        inactive: {
+                            opacity: 1.0
+                        }
+                    },
+                    type: 'scatter',
+                },
+
+                {# Student Data: Blue (Writing) #}
+                {
+                    data: [{{ literacy.data.series.blue|join(',') }}],
+                    enableMouseTracking: false,
+                    marker: {
+                        symbol: 'url(/custom/diocesan/achievementreport/img/star-blue.png)'
                     },
                     states: {
                         inactive: {

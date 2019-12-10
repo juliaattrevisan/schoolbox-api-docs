@@ -172,7 +172,7 @@ class Data extends Base
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $stack['x']['categories'] = array_keys($temp);
+        $stack['x']['categories'] = '"' . implode('","', array_keys($temp)) . '"';
 
         /* Build result sets
          */
