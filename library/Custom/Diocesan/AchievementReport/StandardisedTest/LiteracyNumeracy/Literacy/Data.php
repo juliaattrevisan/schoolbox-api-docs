@@ -94,10 +94,18 @@ class Data extends Base
     private $hasData = false;
 
 
+    private const RED_SERIES_AREASEQ = 2;
+    private const BLUE_SERIES_AREASEQ = 3;
+
+
     /**
-     * Find all the data for Writing graph
+     * Find the series data for red/blue/green stars
+     *
+     * @param int    $areaSeq
+     * @param string $externalId
+     * @return array|bool
      */
-    public function findData()
+    private function findSeries(int $areaSeq, string $externalId)
     {
 
         /* maskseq is what the student got
@@ -121,11 +129,19 @@ class Data extends Base
                 maskseq
             FROM uvSchoolBoxLitNumSummary
             WHERE code='LiteracyNumeracyY7_8_Lit'
-            AND StudentID='{$this->externalUser['StudentID']}'
+            AND StudentID='{$externalId}'
+            AND AreaSeq = '{$areaSeq}'
             ORDER BY xAxisOrderSeq, Seq
         ";
 
-        $result = $this->getDb()->getAll($query);
+        return $this->getDb()->getAll($query);
+    }
+
+    /**
+     * Find all the data for Writing graph
+     */
+    public function findData()
+    {
 
         $stack = [
             'x' => [
@@ -136,8 +152,8 @@ class Data extends Base
                 'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
             ],
             'series' => [
-                'red',
-                'blue',
+                'red' => [],
+                'blue' => [],
                 'grey1' => [],
                 'grey2' => [],
                 'grey3' => [],
@@ -145,52 +161,29 @@ class Data extends Base
             ]
         ];
 
-        $template = [];
-
-        /* Find all the data points we actually need
-         * This will be used as a series template
+        /* Series data for the red star
          */
-        foreach ($result as $row) {
-            $template[$row['xAxis']][$row['AreaSeq']] = 'null';
+        $redResult = $this->findSeries(self::RED_SERIES_AREASEQ, $this->externalUser['StudentID']);
+new \Alaress_Probe($redResult);
+        foreach ($redResult as $row) {
+            $stack['series']['red'][] = $row['maskseq'] ?: 'null';
+
+            /* Infer the x-categories from this stack
+             */
+            $stack['x']['categories'][] = $row['xAxis'];
         }
 
-        /* Mine out the categories and dupe out exactly two of them
-         * One set for each star (there's only red and blue stars here)
+        /* Series data for the blue star
          */
-        $categories = array_keys($template);
+        $blueResult = $this->findSeries(self::RED_SERIES_AREASEQ, $this->externalUser['StudentID']);
 
-        $xCategories = [];
-
-        /* Yep, you read this right
-         */
-        foreach ($categories as $category) {
-            $xCategories[] = $category;
-            $xCategories[] = $category;
+        foreach ($redResult as $row) {
+            $stack['series']['blue'][] = $row['maskseq'] ?: 'null';
         }
 
-        $redSeries = $template;
-        $blueSeries = $template;
 
-        /* Start manufacturing the star series
-         */
-        foreach ($result as $row) {
-            if ($row['colour'] == 'Red') {
-                $redSeries[$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
-            } elseif ($row['colour'] == 'Blue') {
-                $blueSeries[$row['xAxis']][$row['AreaSeq']] = $row['maskseq'];
-            }
-        }
+        new \Alaress_Probe($stack);
 
-        /* Assemble the red and blue series in accordance with x-categories
-         */
-        $temp = [];
-
-        foreach ($redSeries as $category => $vals) {
-            new \Alaress_Probe('adding this: ', $vals, $temp);
-            $temp += array_values($vals);
-        }
-
-        new \Alaress_Probe($xCategories, $redSeries, $temp, $blueSeries);
 
         /* If the student has stars, they have values
          */
