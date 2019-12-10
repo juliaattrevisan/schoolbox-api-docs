@@ -57,9 +57,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $routeData = $this->redis->get($redisKey);
         $routeEntries = json_decode(gzuncompress($routeData), true);
         foreach ($routeEntries as $route => $userIds) {
-            echo "===============\n";
-            echo "$route\n";
-            echo implode(',', array_keys($userIds)) . "\n";
+            $this->getLogger()->debug("===============");
+            $this->getLogger()->debug("$route");
+            $this->getLogger()->debug(implode(',', array_keys($userIds)) . "\n");
         }
     }
 
