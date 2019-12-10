@@ -44,16 +44,4 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\Base
     {
         return $this->hasData;
     }
-
-
-    /**
-     * Find the AreaSeq sequence that we use to map red/blue/green data series
-     *
-     * @param array $placeholder
-     * @return array
-     */
-    protected function generateAreaSeqMapping(array $placeholder): array
-    {
-        return array_keys(array_values($placeholder)[0]);
-    }
 }

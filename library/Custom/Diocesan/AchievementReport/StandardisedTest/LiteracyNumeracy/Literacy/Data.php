@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Literacy;
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
+use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\AreaSeqMapping;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Categories;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\GroupData;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
@@ -77,7 +78,7 @@ class Data extends Base
 
         /* Map AreaSeq values to series' $index; AreaSeq values can be any sequenced integer
          */
-        $areaSeqMapping = $this->generateAreaSeqMapping($groupData);
+        $areaSeqMapping = (new AreaSeqMapping())->generate($groupData);
 
         /* Mine out the stars' series
          */
