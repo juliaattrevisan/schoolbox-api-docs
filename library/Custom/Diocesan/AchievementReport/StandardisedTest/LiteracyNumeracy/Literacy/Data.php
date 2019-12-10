@@ -97,6 +97,13 @@ class Data extends Base
 
 
     /**
+     * Number of series to look for here
+     * These denote the number of x-categories per data group
+     */
+    private const NUM_SERIES = 2;
+
+
+    /**
      * Whether there was any data found
      *
      * @var bool
@@ -187,19 +194,16 @@ class Data extends Base
         $red = $blue = array_fill(0, \count($template), 'null');
 
         $index = 0;
-        $numSeries = 2;
 
         foreach ($temp as $category => $vals) {
             $red[$index] = $vals[self::RED_SERIES_AREASEQ];
             $blue[$index+1] = $vals[self::BLUE_SERIES_AREASEQ];
 
-            $index += $numSeries;
+            $index += self::NUM_SERIES;
         }
 
-        $stack['series']['red'] = $red;
-        $stack['series']['blue'] = $blue;
-
-        new \Alaress_Probe($temp, $template, $red, $blue, $stack);
+        $stack['series'][self::RED_SERIES] = $red;
+        $stack['series'][self::BLUE_SERIES] = $blue;
 
         /* If the student has stars, they have values - one of the series must have data
          */
