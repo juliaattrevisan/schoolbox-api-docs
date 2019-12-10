@@ -92,6 +92,9 @@ class Data extends Base
     private const RED_SERIES_AREASEQ = 2;
     private const BLUE_SERIES_AREASEQ = 3;
 
+    private const RED_SERIES = 'red';
+    private const BLUE_SERIES = 'blue';
+
 
     /**
      * Whether there was any data found
@@ -174,16 +177,16 @@ class Data extends Base
         /* Build result sets
          */
         foreach ($temp as $category => $vals) {
-            $stack['series']['red'][] = $vals[self::RED_SERIES_AREASEQ];
-            $stack['series']['blue'][] = $vals[self::BLUE_SERIES_AREASEQ];
+            $stack['series'][self::RED_SERIES][] = $vals[self::RED_SERIES_AREASEQ];
+            $stack['series'][self::BLUE_SERIES][] = $vals[self::BLUE_SERIES_AREASEQ];
         }
 
-        new \Alaress_Probe($result, $temp, $stack);
-
-        /* If the student has stars, they have values
+        /* If the student has stars, they have values - one of the series must have data
          */
-        if (\count($stack['series']['student'])) {
-            $this->hasData = true;
+        foreach ([self::RED_SERIES, self::BLUE_SERIES] as $series) {
+            if (\count(array_filter($stack['series'][$series]))) {
+                $this->hasData = true;
+            }
         }
 
         return $stack;
