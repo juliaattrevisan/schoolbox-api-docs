@@ -26,10 +26,14 @@ class Navigation extends Base
      */
     public function findData(): array
     {
-        $query = "
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
+        $query = '
             SELECT DISTINCT Fileyear
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            WHERE ThisStudentID = :externalId
             AND (
                 IndividualMathsPATStanineMarker <> 0
                 OR IndividualListeningComprehensionPATStanineMarker <> 0
@@ -37,8 +41,8 @@ class Navigation extends Base
                 OR IndividualReadingVocabularyPATStanineMarker <> 0
             )
             ORDER BY Fileyear DESC
-        ";
+        ';
 
-        return array_column($this->getDb()->getAll($query), 'Fileyear');
+        return array_column($this->getDb()->getAll($query, $params), 'Fileyear');
     }
 }
