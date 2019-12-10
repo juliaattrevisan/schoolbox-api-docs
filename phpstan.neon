@@ -1,7 +1,7 @@
 parameters:
     autoload_directories:
         - %rootDir%/../../../conf
-        - %rootDir%/../../../test/acceptance
+        - %rootDir%/../../../test/codeception
         - %rootDir%/../../../test/behavior/bootstrap
         - %rootDir%/../../../test/notif/tests
     bootstrap: %rootDir%/../../../conf/core/require.php
@@ -11,16 +11,3 @@ parameters:
         - dav
         - library
         - tools
-        - updates
-        - www
-    ignoreErrors:
-        -
-            message: '#Using \$this outside a class.#'
-            path: %rootDir%/../../../www/*
-        -
-            message: '#Undefined variable: \$this#'
-            path: %rootDir%/../../../www/*
-    excludes_analyse:
-        -   %rootDir%/../../../library/Alaress/Twitter/Loader/oauth/twitteroauth.php
-        -   %rootDir%/../../../tools/synchronise/abstract/SynchroniseAbstract.php
-        -   %rootDir%/../../../updates/18.0.alpha1/self-assessment/090-linkRubricMarksToResponses.php
