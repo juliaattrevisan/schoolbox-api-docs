@@ -9,6 +9,7 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Nu
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
+use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Stars;
 
 /**
  * Class Data
@@ -93,17 +94,19 @@ class Data extends Base
 
         /* Mine out the stars' series
          */
-        $stars = $this->generateStars($groupData, $areaSeqMapping, $template);
+        $stars = new Stars();
+        $starsSeries = $stars->generate($groupData, $areaSeqMapping, $template, self::NUM_SERIES);
+        $this->hasData = $stars->hasData();
 
         $series = [Payload::RED_SERIES, Payload::BLUE_SERIES, Payload::GREEN_SERIES];
 
         for ($i = 0; $i < self::NUM_SERIES; $i++) {
-            $stack['series'][$series[$i]] = $stars[$i];
+            $stack['series'][$series[$i]] = $starsSeries[$i];
         }
 
         /* Mine out the grey squares
          */
-        $greys = $this->generateGreySquares($result, $areaSeqMapping, $template);
+        $greys = $this->generateGreySquares($result, $areaSeqMapping, $template, self::NUM_SERIES);
 
         $stack['series']['grey1'] = $greys[0];
         $stack['series']['grey2'] = $greys[1];
@@ -115,58 +118,15 @@ class Data extends Base
 
 
     /**
-     * Mine out the stars as individual series
-     *
-     * @param array $groupData
-     * @param array $areaSeqMapping
-     * @param array $template
-     * @return array
-     */
-    private function generateStars(array $groupData, array $areaSeqMapping, array $template): array
-    {
-        $index = 0;
-
-        $payload = [];
-
-        foreach ($groupData as $category => $vals) {
-            for ($i = 0; $i < self::NUM_SERIES; $i++) {
-
-                /* Initialise with string 'null' for each x category
-                 */
-                if (!isset($payload[$i])) {
-                    $payload[$i] = $this->initialisePlaceholder($template);
-                }
-
-                /* Insert values algorithmically
-                 */
-                $payload[$i][$index+$i] = $vals[$areaSeqMapping[$i]];
-
-                /* Might as well do data detection here
-                 * If the student has a row with maskseq != 0, they have data
-                 */
-                if ($vals[$areaSeqMapping[$i]]) {
-                    $this->hasData = true;
-                }
-            }
-
-            /* Move to the next group of data points
-             */
-            $index += self::NUM_SERIES;
-        }
-
-        return $payload;
-    }
-
-
-    /**
      * Mine out the grey squares as individual series
      *
      * @param array $result
      * @param array $areaSeqMapping
      * @param array $template
+     * @param int   $numSeries
      * @return array
      */
-    private function generateGreySquares(array $result, array $areaSeqMapping, array $template): array
+    private function generateGreySquares(array $result, array $areaSeqMapping, array $template, int $numSeries): array
     {
         $greys = [];
 
@@ -177,31 +137,19 @@ class Data extends Base
             $index = 0;
 
             foreach ($groupData as $category => $vals) {
-                $grey[$index] = $vals[$areaSeqMapping[0]];
-                $grey[$index+1] = $vals[$areaSeqMapping[1]];
-                $grey[$index+2] = $vals[$areaSeqMapping[2]];
+                for ($i = 0; $i < $numSeries; $i++) {
+                    $grey[$index+$i] = $vals[$areaSeqMapping[$i]];
+                }
 
                 /* Move to the next group of data points
                  */
-                $index += self::NUM_SERIES;
+                $index += $numSeries;
             }
 
             $greys[] = $grey;
         }
 
         return $greys;
-    }
-
-
-    /**
-     * Find the AreaSeq sequence that we use to map red/blue/green data series
-     *
-     * @param array $placeholder
-     * @return array
-     */
-    private function generateAreaSeqMapping(array $placeholder): array
-    {
-        return array_keys(array_values($placeholder)[0]);
     }
 
 
@@ -214,6 +162,18 @@ class Data extends Base
     private function initialisePlaceholder(array $template): array
     {
         return array_fill(0, \count($template), 'null');
+    }
+
+
+    /**
+     * Find the AreaSeq sequence that we use to map red/blue/green data series
+     *
+     * @param array $placeholder
+     * @return array
+     */
+    private function generateAreaSeqMapping(array $placeholder): array
+    {
+        return array_keys(array_values($placeholder)[0]);
     }
 
 

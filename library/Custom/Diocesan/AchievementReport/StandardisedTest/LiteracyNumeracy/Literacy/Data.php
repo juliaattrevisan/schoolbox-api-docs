@@ -9,6 +9,7 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Li
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
+use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Stars;
 
 /**
  * Class Data
@@ -85,12 +86,14 @@ class Data extends Base
 
         /* Mine out the stars' series
          */
-        $stars = $this->generateStars($groupData, $areaSeqMapping, $template);
+        $stars = new Stars();
+        $starsSeries = $stars->generate($groupData, $areaSeqMapping, $template, self::NUM_SERIES);
+        $this->hasData = $stars->hasData();
 
         $series = [Payload::RED_SERIES, Payload::BLUE_SERIES];
 
         for ($i = 0; $i < self::NUM_SERIES; $i++) {
-            $stack['series'][$series[$i]] = $stars[$i];
+            $stack['series'][$series[$i]] = $starsSeries[$i];
         }
 
         /* Mine out the grey squares
@@ -103,50 +106,6 @@ class Data extends Base
         $stack['series']['grey4'] = $greys[3];
 
         return $stack;
-    }
-
-
-    /**
-     * Mine out the stars as individual series
-     *
-     * @param array $groupData
-     * @param array $areaSeqMapping
-     * @param array $template
-     * @return array
-     */
-    private function generateStars(array $groupData, array $areaSeqMapping, array $template): array
-    {
-        $index = 0;
-
-        $payload = [];
-
-        foreach ($groupData as $category => $vals) {
-            for ($i = 0; $i < self::NUM_SERIES; $i++) {
-
-                /* Initialise with string 'null' for each x category
-                 */
-                if (!isset($payload[$i])) {
-                    $payload[$i] = $this->initialisePlaceholder($template);
-                }
-
-                /* Insert values algorithmically
-                 */
-                $payload[$i][$index+$i] = $vals[$areaSeqMapping[$i]];
-
-                /* Might as well do data detection here
-                 * If the student has a row with maskseq != 0, they have data
-                 */
-                if ($vals[$areaSeqMapping[$i]]) {
-                    $this->hasData = true;
-                }
-            }
-
-            /* Move to the next group of data points
-             */
-            $index += self::NUM_SERIES;
-        }
-
-        return $payload;
     }
 
 
