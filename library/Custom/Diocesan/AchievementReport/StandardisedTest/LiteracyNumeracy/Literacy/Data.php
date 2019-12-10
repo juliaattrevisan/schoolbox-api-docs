@@ -113,7 +113,6 @@ class Data extends Base
      */
     public function findData()
     {
-
         $stack = [
             'x' => [
                 'categories' => []
@@ -180,6 +179,8 @@ class Data extends Base
          */
         $areaSeqMapping = $this->generateAreaSeqMapping($groupData);
 
+        /* Mine out the stars' series
+         */
         $index = 0;
 
         foreach ($groupData as $category => $vals) {
@@ -201,31 +202,50 @@ class Data extends Base
         $stack['series'][self::RED_SERIES] = $red;
         $stack['series'][self::BLUE_SERIES] = $blue;
 
-//
-//        /* Mine out the grey squares
-//         */
-//        $greys = [];
-//
-//        foreach (['Line1', 'Line2', 'Line3', 'Line4'] as $line) {
-//            $grey = array_fill(0, \count($template), 'null');
-//
-//            $temp = $this->groupData($result, $line);
-//            $index = 0;
-//
-//            foreach ($temp as $category => $vals) {
-//                $grey[$index] = $vals[$areaSeqMapping[0]];
-//                $grey[$index+1] = $vals[$areaSeqMapping[1]];
-//
-//                /* Move to the next group of data points
-//                 */
-//                $index += self::NUM_SERIES;
-//            }
-//
-//            $greys[] = $grey;
-//        }
-//
-//        new \Alaress_Probe($result, $temp, $greys);
+        /* Mine out the grey squares
+         */
+        $greys = $this->generateGreySquares($result, $areaSeqMapping, $template);
+
+        $stack['series']['grey1'] = $greys[0];
+        $stack['series']['grey2'] = $greys[1];
+        $stack['series']['grey3'] = $greys[2];
+        $stack['series']['grey4'] = $greys[3];
+
         return $stack;
+    }
+
+
+    /**
+     * Mine out the grey squares as individual series
+     *
+     * @param array $result
+     * @param array $areaSeqMapping
+     * @param array $template
+     * @return array
+     */
+    private function generateGreySquares(array $result, array $areaSeqMapping, array $template): array
+    {
+        $greys = [];
+
+        foreach (['Line1', 'Line2', 'Line3', 'Line4'] as $line) {
+            $grey = $this->initialisePlaceholder($template);
+
+            $groupData = $this->groupData($result, $line);
+            $index = 0;
+
+            foreach ($groupData as $category => $vals) {
+                $grey[$index] = $vals[$areaSeqMapping[0]];
+                $grey[$index+1] = $vals[$areaSeqMapping[1]];
+
+                /* Move to the next group of data points
+                 */
+                $index += self::NUM_SERIES;
+            }
+
+            $greys[] = $grey;
+        }
+
+        return $greys;
     }
 
 
