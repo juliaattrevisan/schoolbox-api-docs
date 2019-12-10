@@ -125,13 +125,15 @@ class Navigation
 
         /* Conditional STAR report
          */
-        $availableNavigation[self::STANDARDISEDTEST_STAR_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestSTAR', [
-                'externalUserId' => $this->externalUser['StudentID'],
-                'year' => $this->year
-            ]),
-            'label' => 'STAR'
-        ];
+        if ((new STAR\ValidSTAR())->isSatisifiedBy($this->user)) {
+            $availableNavigation[self::STANDARDISEDTEST_STAR_KEY] = [
+                'url' => $this->router->generate('achievementreport.getStandardisedTestSTAR', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year' => $this->year
+                ]),
+                'label' => 'STAR'
+            ];
+        }
 
         /* Conditional Reading report
          */
