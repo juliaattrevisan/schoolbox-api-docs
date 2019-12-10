@@ -11,12 +11,5 @@ parameters:
         - dav
         - library
         - tools
-    ignoreErrors:
-        -
-            message: '#Using \$this outside a class.#'
-            path: %rootDir%/../../../www/*
-        -
-            message: '#Undefined variable: \$this#'
-            path: %rootDir%/../../../www/*
     excludes_analyse:
         -   %rootDir%/../../../library/Alaress/Twitter/Loader/oauth/twitteroauth.php
