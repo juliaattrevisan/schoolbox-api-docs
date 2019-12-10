@@ -163,15 +163,7 @@ class Data extends Base
         /* Group everything by xAxis, AreaSeq
          * This removes dupes because multiple series are in this dataset
          */
-        $temp = [];
-
-        foreach ($result as $row) {
-            $xAxis = $row['xAxis'];
-            $areaSeq = $row['AreaSeq'];
-            $y = $row['maskseq'] ?: 'null';
-
-            $temp[$xAxis][$areaSeq] = $y;
-        }
+        $temp = $this->generatePlaceholder($result, 'maskseq');
 
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
@@ -223,16 +215,8 @@ class Data extends Base
         foreach (['Line1', 'Line2', 'Line3', 'Line4'] as $line) {
             $grey = array_fill(0, \count($template), 'null');
 
-            $temp = [];
+            $temp = $this->generatePlaceholder($result, $line);
             $index = 0;
-
-            foreach ($result as $row) {
-                $xAxis = $row['xAxis'];
-                $areaSeq = $row['AreaSeq'];
-                $y = $row[$line] ?: 'null';
-
-                $temp[$xAxis][$areaSeq] = $y;
-            }
 
             foreach ($temp as $category => $vals) {
                 $grey[$index] = $vals[$areaSeqMapping[0]];
@@ -248,6 +232,30 @@ class Data extends Base
 
         new \Alaress_Probe($result, $temp, $greys);
         return $stack;
+    }
+
+
+    /**
+     * Generate a placeholder array, grouped by x-axis labels and AreaSeq value
+     * Placeholder array defaults to string 'null', for highcharts
+     *
+     * @param array  $result
+     * @param string $key
+     * @return array
+     */
+    private function generatePlaceholder(array $result, string $key): array
+    {
+        $temp = [];
+
+        foreach ($result as $row) {
+            $xAxis = $row['xAxis'];
+            $areaSeq = $row['AreaSeq'];
+            $y = $row[$key] ?: 'null';
+
+            $temp[$xAxis][$areaSeq] = $y;
+        }
+
+        return $temp;
     }
 
 
