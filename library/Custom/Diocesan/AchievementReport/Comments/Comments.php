@@ -109,8 +109,13 @@ class Comments extends Base
      */
     private function findJuniorSchoolData(?string $resultType): array
     {
-        $query = "
-            SELECT 
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->year
+        ];
+
+        $query = '
+            SELECT
                 StudentYear,
                 Term,
                 ClassCode,
@@ -124,19 +129,21 @@ class Comments extends Base
                 ClassTeacher3Email,
                 ResultType
             FROM dbo.uvSchoolBoxReportComments
-            WHERE id = '{$this->getExternalUserId()}'
-            AND StudentYear = '{$this->year}'
-        ";
+            WHERE id = :externalId
+            AND StudentYear = :year
+        ';
 
         if (null !== $resultType) {
-            $query .= " AND type = '{$resultType}' ";
+            $query .= ' AND ResultType = :resultType ';
+
+            $params['resultType'] = $resultType;
         }
 
         $query .= '
             ORDER BY SortOrder, CourseDescription, Term
         ';
 
-        $result = $this->getDb()->getAll($query) ?: [];
+        $result = $this->getDb()->getAll($query, $params) ?: [];
 
         return $this->formatData($result);
 
@@ -159,8 +166,13 @@ class Comments extends Base
      */
     private function findSeniorSchoolData(?string $resultType): array
     {
-        $query = "
-            SELECT 
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->year
+        ];
+
+        $query = '
+            SELECT
                 StudentYear,
                 Term,
                 ClassCode,
@@ -174,19 +186,21 @@ class Comments extends Base
                 ClassTeacher3Email,
                 ResultType
             FROM dbo.uvSchoolBoxReportComments
-            WHERE id = '{$this->getExternalUserId()}'
-            AND StudentYear = '{$this->year}'
-        ";
+            WHERE id = :externalId
+            AND StudentYear = :year
+        ';
 
         if (null !== $resultType) {
-            $query .= " AND ResultType = '{$resultType}' ";
+            $query .= ' AND ResultType = :resultType ';
+
+            $params['resultType'] = $resultType;
         }
 
         $query .= '
             ORDER BY CourseDescription, Term
         ';
 
-        $result = $this->getDb()->getAll($query) ?: [];
+        $result = $this->getDb()->getAll($query, $params) ?: [];
 
         return $this->formatData($result);
     }
