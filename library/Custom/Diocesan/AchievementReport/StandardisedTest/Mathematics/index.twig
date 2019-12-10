@@ -1,0 +1,207 @@
+{##
+ # Standardised Test
+ #
+ # @param array     externalUser
+ # @param int|null  year
+ #}
+{% include '@templates/Avatar.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: subnavigation
+} %}
+
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+
+<div class="achievement-report standardised-test">
+    {% if mathematics.visible %}
+        <script>
+            $(function () {
+                var chart = new Highcharts.Chart({
+                    chart: {
+                        height: 920,
+                        reflow: true,
+                        renderTo: 'mathematics',
+                        spacingBottom: 30
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        area: {
+                            fillOpacity: 0.2
+                        }
+                    },
+                    series: [
+                        {# First set of grey squares #}
+                        {
+                            data: [{{ mathematics.data.series.grey1|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+                        {# Second set of grey squares #}
+                        {
+                            data: [{{ mathematics.data.series.grey2|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+                        {# Third set of grey squares #}
+                        {
+                            data: [{{ mathematics.data.series.grey3|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+                        {# Fourth set of grey squares #}
+                        {
+                            data: [{{ mathematics.data.series.grey4|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+                        {# Student Data #}
+                        {
+                            data: [{{ mathematics.data.series.student|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                symbol: 'url(/custom/diocesan/achievementreport/img/star-red.png)'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        }
+                    ],
+                    subtitle: {
+                        text: 'Based on Diocesan PR1ME Mathematics Expectations for Year 0-6'
+                    },
+                    title: {
+                        text: 'Tracked Achievement Over Time'
+                    },
+                    tooltip: {
+                        enabled: false,
+                    },
+                    xAxis: {
+                        categories: [{{ mathematics.data.x.categories|purify }}],
+                        gridLineWidth: 1,
+                        title: {
+                            text: 'Time at school',
+                            y: 10
+                        }
+                    },
+                    yAxis: [
+                        {
+                            categories: ['null', {{ mathematics.data.y.stages|purify }}],
+                            max: 27,
+                            min: 1,
+                            title: {
+                                text: ''
+                            }
+                        },
+                        {
+                            categories: ['null', {{ mathematics.data.y.levelGroups|purify }}],
+                            gridLineWidth: 0,
+                            labels: {
+                                x: -100,
+                                y: 34
+                            },
+                            max: 27,
+                            min: 1,
+                            offset: 0,
+                            startOnTick: false,
+                            tickColor: '#dddddd',
+                            tickLength: 150,
+                            tickmarkPlacement: 'between',
+                            tickPositions: [3,6,9,12,15,18,21,24,27],
+                            tickWidth: 1,
+                            title: {
+                                text: ''
+                            }
+                        },
+                        {
+                            categories: ['null', {{ mathematics.data.y.lower|purify }}],
+                            gridLineWidth: 0,
+                            labels: {
+                                y: -7
+                            },
+                            max: 27,
+                            min: 1,
+                            offset: 0,
+                            title: {
+                                text: ''
+                            }
+                        },
+                    ],
+                });
+                chart.reflow();
+            });
+        </script>
+        <div class="row">
+            <div class="small-12 columns">
+                <div id="mathematics"></div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>
+                    Achievement and progress in mathematics is assessed using a range of tools. These include
+                    Overall Teacher Judgement, PR1ME reviews and summative tests. Analysis of the collected
+                    data assesses students' knowledge of number and problem solving abilities.
+                </p>
+            </section>
+        </div>
+    </div>
+</div>
