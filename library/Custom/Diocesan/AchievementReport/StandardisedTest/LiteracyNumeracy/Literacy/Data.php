@@ -108,6 +108,34 @@ class Data extends Base
     private function findSeries(int $areaSeq, string $externalId)
     {
 
+
+    }
+
+    /**
+     * Find all the data for Writing graph
+     */
+    public function findData()
+    {
+
+//        $stack = [
+//            'x' => [
+//                'categories' => []
+//            ],
+//            'y' => [
+//                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
+//                'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
+//            ],
+//            'series' => [
+//                'red' => [],
+//                'blue' => [],
+//                'grey1' => [],
+//                'grey2' => [],
+//                'grey3' => [],
+//                'grey4' => [],
+//            ]
+//        ];
+
+
         /* maskseq is what the student got
          * colour is the star colour (red for reading, blue for writing)
          * Seq is the order of the stars (red comes before blue)
@@ -129,60 +157,27 @@ class Data extends Base
                 maskseq
             FROM uvSchoolBoxLitNumSummary
             WHERE code='LiteracyNumeracyY7_8_Lit'
-            AND StudentID='{$externalId}'
-            AND AreaSeq = '{$areaSeq}'
+            AND StudentID='{$this->externalUser['StudentID']}'
             ORDER BY xAxisOrderSeq, Seq
         ";
 
-        return $this->getDb()->getAll($query);
-    }
+        $result = $this->getDb()->getAll($query);
 
-    /**
-     * Find all the data for Writing graph
-     */
-    public function findData()
-    {
-
-        $stack = [
-            'x' => [
-                'categories' => []
-            ],
-            'y' => [
-                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
-                'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
-            ],
-            'series' => [
-                'red' => [],
-                'blue' => [],
-                'grey1' => [],
-                'grey2' => [],
-                'grey3' => [],
-                'grey4' => [],
-            ]
-        ];
-
-        /* Series data for the red star
+        /* Group everything by xAxis, AreaSeq
+         * This removes dupes because multiple series are in this dataset
          */
-        $redResult = $this->findSeries(self::RED_SERIES_AREASEQ, $this->externalUser['StudentID']);
-new \Alaress_Probe($redResult);
-        foreach ($redResult as $row) {
-            $stack['series']['red'][] = $row['maskseq'] ?: 'null';
+        foreach ($result as $row) {
+            $xAxis = $row['xAxis'];
+            $areaSeq = $row['AreaSeq'];
+            $y = $row['maskseq'] ?: 'null';
 
-            /* Infer the x-categories from this stack
-             */
-            $stack['x']['categories'][] = $row['xAxis'];
-        }
-
-        /* Series data for the blue star
-         */
-        $blueResult = $this->findSeries(self::RED_SERIES_AREASEQ, $this->externalUser['StudentID']);
-
-        foreach ($redResult as $row) {
-            $stack['series']['blue'][] = $row['maskseq'] ?: 'null';
+            $temp[$xAxis][$areaSeq] = $y;
         }
 
 
-        new \Alaress_Probe($stack);
+
+
+        new \Alaress_Probe($result, $temp);
 
 
         /* If the student has stars, they have values
