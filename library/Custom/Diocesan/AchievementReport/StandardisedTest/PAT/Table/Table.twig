@@ -20,11 +20,11 @@
         {% for year, values in data %}
         <tr>
             <td class="centered">{{ year }}</td>
-            <td class="centered">{{ values.mathematics }}</td>
-            <td class="centered">{{ values.listeningComprehension }}</td>
-            <td class="centered">{{ values.readingVocabulary }}</td>
-            <td class="centered">{{ values.readingComprehension }}</td>
-            <td class="centered">{{ values.punctuationGrammar }}</td>
+            <td class="centered">{{ values.mathematics ?: 'No Result' }}</td>
+            <td class="centered">{{ values.listeningComprehension ?: 'No Result' }}</td>
+            <td class="centered">{{ values.readingVocabulary ?: 'No Result' }}</td>
+            <td class="centered">{{ values.readingComprehension ?: 'No Result' }}</td>
+            <td class="centered">{{ values.punctuationGrammar ?: 'No Result' }}</td>
         </tr>
         {% endfor %}
     </tbody>
