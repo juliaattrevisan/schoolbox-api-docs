@@ -163,12 +163,12 @@ class Data extends Base
         /* Group everything by xAxis, AreaSeq
          * This removes dupes because multiple series are in this dataset
          */
-        $temp = $this->groupData($result, 'maskseq');
+        $groupData = $this->groupData($result, 'maskseq');
 
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $template = $this->generateXCategories($temp);
+        $template = $this->generateXCategories($groupData);
 
         $stack['x']['categories'] = '"' . implode('","', $template) . '"';
 
@@ -178,11 +178,11 @@ class Data extends Base
 
         /* Map AreaSeq values to series' $index; AreaSeq values can be any sequenced integer
          */
-        $areaSeqMapping = array_keys(array_values($temp)[0]);
+        $areaSeqMapping = $this->generateAreaSeqMapping($groupData);
 
         $index = 0;
 
-        foreach ($temp as $category => $vals) {
+        foreach ($groupData as $category => $vals) {
             $red[$index] = $vals[$areaSeqMapping[0]];
             $blue[$index+1] = $vals[$areaSeqMapping[1]];
 
@@ -226,6 +226,18 @@ class Data extends Base
 //
 //        new \Alaress_Probe($result, $temp, $greys);
         return $stack;
+    }
+
+
+    /**
+     * Find the AreaSeq sequence that we use to map red/blue/green data series
+     *
+     * @param array $placeholder
+     * @return array
+     */
+    private function generateAreaSeqMapping(array $placeholder): array
+    {
+        return array_keys(array_values($placeholder)[0]);
     }
 
 
