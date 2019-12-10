@@ -115,7 +115,7 @@ class Controller extends Base
 
             case NavigationSelector::STANDARDISEDTEST_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.getStandardisedTest', [
+                    $this->getRouter()->generate('achievementreport.getStandardisedTests', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -158,7 +158,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTests(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
 
         /* TODO: Redirect to the first available section of the standardised test
@@ -166,7 +166,7 @@ class Controller extends Base
          */
 
         $this->getResponse()->redirect->to(
-            $this->getRouter()->generate('achievementreport.getStandardisedTestPAT', [
+            $this->getRouter()->generate('achievementreport.getStandardisedTestsPAT', [
                 'externalUserId' => $externalUser['StudentID'],
                 'year' => $year
             ])
@@ -183,7 +183,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestPAT(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsPAT(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -271,7 +271,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestSTAR(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsSTAR(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -329,7 +329,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestReading(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsReading(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -373,7 +373,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestWriting(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsWriting(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -417,7 +417,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestMathematics(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsMathematics(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -461,7 +461,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestLiteracyNumeracy(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsLiteracyNumeracy(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */

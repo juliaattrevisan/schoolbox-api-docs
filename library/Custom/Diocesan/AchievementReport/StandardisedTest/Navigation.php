@@ -115,7 +115,7 @@ class Navigation
          */
         if ((new PAT\ValidPAT($this->db))->isSatisifiedBy($this->user, $this->externalUser)) {
             $availableNavigation[self::STANDARDISEDTEST_PAT_KEY] = [
-                'url' => $this->router->generate('achievementreport.getStandardisedTestPAT', [
+                'url' => $this->router->generate('achievementreport.getStandardisedTestsPAT', [
                     'externalUserId' => $this->externalUser['StudentID'],
                     'year' => $this->year
                 ]),
@@ -127,7 +127,7 @@ class Navigation
          */
         if ((new STAR\ValidSTAR())->isSatisifiedBy($this->user)) {
             $availableNavigation[self::STANDARDISEDTEST_STAR_KEY] = [
-                'url' => $this->router->generate('achievementreport.getStandardisedTestSTAR', [
+                'url' => $this->router->generate('achievementreport.getStandardisedTestsSTAR', [
                     'externalUserId' => $this->externalUser['StudentID'],
                     'year' => $this->year
                 ]),
@@ -138,7 +138,7 @@ class Navigation
         /* Conditional Reading report
          */
         $availableNavigation[self::STANDARDISEDTEST_READING_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestReading', [
+            'url' => $this->router->generate('achievementreport.getStandardisedTestsReading', [
                 'externalUserId' => $this->externalUser['StudentID'],
                 'year' => $this->year
             ]),
@@ -148,7 +148,7 @@ class Navigation
         /* Conditional Writing report
          */
         $availableNavigation[self::STANDARDISEDTEST_WRITING_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestWriting', [
+            'url' => $this->router->generate('achievementreport.getStandardisedTestsWriting', [
                 'externalUserId' => $this->externalUser['StudentID'],
                 'year' => $this->year
             ]),
@@ -158,7 +158,7 @@ class Navigation
         /* Conditional Mathematics report
          */
         $availableNavigation[self::STANDARDISEDTEST_MATHEMATICS_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestMathematics', [
+            'url' => $this->router->generate('achievementreport.getStandardisedTestsMathematics', [
                 'externalUserId' => $this->externalUser['StudentID'],
                 'year' => $this->year
             ]),
@@ -168,7 +168,7 @@ class Navigation
         /* Conditional Literacy/Numeracy report
          */
         $availableNavigation[self::STANDARDISEDTEST_LITERACYNUMERACY_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestLiteracyNumeracy', [
+            'url' => $this->router->generate('achievementreport.getStandardisedTestsLiteracyNumeracy', [
                 'externalUserId' => $this->externalUser['StudentID'],
                 'year' => $this->year
             ]),

@@ -243,11 +243,11 @@ class NavigationSelector
          */
         if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
             $availableNavigation[self::STANDARDISEDTEST_KEY] = [
-                'url' => $this->router->generate('achievementreport.getStandardisedTest', [
+                'url' => $this->router->generate('achievementreport.getStandardisedTests', [
                     'externalUserId' => $this->externalUser['StudentID'],
                     'year' => $this->year
                 ]),
-                'label' => 'Standardised Test'
+                'label' => 'Standardised Tests'
             ];
         }
 
