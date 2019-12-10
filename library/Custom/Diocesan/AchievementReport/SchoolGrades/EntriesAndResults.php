@@ -1,18 +1,20 @@
 <?php
 /**
- * EntriesAndResultsTable
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 use Custom\Diocesan\AchievementReport\Comments\Comments;
 
-
-class EntriesAndResults extends Base {
+/**
+ * Class EntriesAndResults
+ *
+ * @package Custom\Diocesan\AchievementReport\SchoolGrades
+ */
+class EntriesAndResults extends Base
+{
 
     /**
      * Heading
@@ -34,7 +36,7 @@ class EntriesAndResults extends Base {
         /**
          * Rearrange everything into a nice order
          */
-        $finalStack = array();
+        $finalStack = [];
 
         foreach ($allEntries as $currentEntry) {
             $year = $currentEntry['Fileyear'];
@@ -49,10 +51,10 @@ class EntriesAndResults extends Base {
             /* List of teachers - uniquify and exclude empties
              */
             if (!is_array($finalStack[$year][$courseName][$assessArea]['teachers'])) {
-                $finalStack[$year][$courseName]['allTeachers'] = array();
+                $finalStack[$year][$courseName]['allTeachers'] = [];
             }
 
-            foreach(array(1, 2, 3) as $currentTeacherIndex) {
+            foreach([1, 2, 3] as $currentTeacherIndex) {
                 $key = "ClassTeacher{$currentTeacherIndex}";
                 $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 
@@ -67,12 +69,12 @@ class EntriesAndResults extends Base {
             /* Initialise marks for All Terms
              */
             if (!is_array($finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'])) {
-                $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'] = array(
+                $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'] = [
                     'term1' => '',
                     'term2' => '',
                     'term3' => '',
                     'term4' => ''
-                );
+                ];
             }
 
             /* Marks
@@ -82,7 +84,7 @@ class EntriesAndResults extends Base {
 
         /* Sort naturally, because mssql can't
          */
-        $processed = array();
+        $processed = [];
 
         foreach ($finalStack as $year => $allCourses) {
             $processed[$year] = $allCourses;
@@ -122,7 +124,12 @@ class EntriesAndResults extends Base {
      *
      * @return array
      */
-    private function findEntries() {
+    private function findEntries(): array
+    {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+        ];
+
         $query = "
             SELECT
                 Fileyear,
@@ -139,7 +146,7 @@ class EntriesAndResults extends Base {
             FROM
                 dbo.uvSchoolBoxSchoolGradeResults
             WHERE
-                ID = '{$this->getExternalUserId()}'
+                ID = :externalId
                 AND Result != 'SNA'
             GROUP BY
                 FileYear,
@@ -160,12 +167,12 @@ class EntriesAndResults extends Base {
                 AssessAreaHeading
         ";
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
         }
 
-        return array();
+        return [];
     }
 }
