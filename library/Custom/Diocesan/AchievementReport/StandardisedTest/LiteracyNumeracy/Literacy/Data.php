@@ -181,7 +181,17 @@ class Data extends Base
          */
         $categories = array_keys($temp);
 
-        new \Alaress_Probe($result, $categories, $temp);
+        /* Build result sets
+         */
+        $red = [];
+        $blue = [];
+
+        foreach ($temp as $category => $vals) {
+            $red[] = $vals[2];
+            $blue[] = $vals[3];
+        }
+
+        new \Alaress_Probe($result, $categories, $temp, $red, $blue);
 
 
         /* If the student has stars, they have values
