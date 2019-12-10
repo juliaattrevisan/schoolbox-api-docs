@@ -95,9 +95,9 @@ class Data extends Base
          */
         $stars = $this->generateStars($groupData, $areaSeqMapping, $template);
 
-        $stack['series'][Payload::RED_SERIES] = $stars['red'];
-        $stack['series'][Payload::BLUE_SERIES] = $stars['blue'];
-        $stack['series'][Payload::GREEN_SERIES] = $stars['green'];
+        $stack['series'][Payload::RED_SERIES] = $stars[Payload::RED_SERIES];
+        $stack['series'][Payload::BLUE_SERIES] = $stars[Payload::BLUE_SERIES];
+        $stack['series'][Payload::GREEN_SERIES] = $stars[Payload::GREEN_SERIES];
 
         /* Mine out the grey squares
          */
@@ -144,9 +144,9 @@ class Data extends Base
         }
 
         return [
-            'red' => $red,
-            'blue' => $blue,
-            'green' => $green
+            Payload::RED_SERIES => $red,
+            Payload::BLUE_SERIES => $blue,
+            Payload::GREEN_SERIES => $green
         ];
     }
 
