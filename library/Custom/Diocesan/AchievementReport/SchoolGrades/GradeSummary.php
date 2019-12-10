@@ -1,15 +1,18 @@
 <?php
 /**
- * GradeSummaryTable
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
-class GradeSummary extends Base {
+/**
+ * Class GradeSummary
+ *
+ * @package Custom\Diocesan\AchievementReport\SchoolGrades
+ */
+class GradeSummary extends Base
+{
 
     /**
      * Heading
@@ -21,13 +24,15 @@ class GradeSummary extends Base {
 
     /**
      * Obtain data
+     *
+     * @return mixed
      */
     public function findData() {
 
         /**
          * Rearrange everything into a nice order
          */
-        $finalStack = array();
+        $finalStack = [];
 
         /* Entered Grades
          */
@@ -36,7 +41,7 @@ class GradeSummary extends Base {
         foreach ($preprocessed as $year => $allCourses) {
             foreach ($allCourses as $courseName => $allAreas) {
                 foreach ($allAreas as $currentArea => $allTerms) {
-                    foreach (array('term4', 'term3', 'term2', 'term1') as $term) {
+                    foreach (['term4', 'term3', 'term2', 'term1'] as $term) {
                         if ($allTerms[$term] != '') {
                             $data = $allTerms[$term];
 
@@ -66,7 +71,7 @@ class GradeSummary extends Base {
 
                             /* Accumulate letter totals
                              */
-                            if (in_array($letter, $this->getLetterRegistry())) {
+                            if (in_array($letter, $this->getLetterRegistry(), false)) {
                                 $finalStack[$studentYearLevel]['letters'][$letter]++;
                             }
 
