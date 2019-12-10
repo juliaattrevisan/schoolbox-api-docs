@@ -171,16 +171,42 @@ class Data extends Base
 
         $stack['x']['categories'] = '"' . implode('","', $template) . '"';
 
-        /* Build result sets
-         */
-        $red = $blue = $this->initialisePlaceholder($template);
-
         /* Map AreaSeq values to series' $index; AreaSeq values can be any sequenced integer
          */
         $areaSeqMapping = $this->generateAreaSeqMapping($groupData);
 
         /* Mine out the stars' series
          */
+        $stars = $this->generateStars($groupData, $areaSeqMapping, $template);
+
+        $stack['series'][self::RED_SERIES] = $stars['red'];
+        $stack['series'][self::BLUE_SERIES] = $stars['blue'];
+
+        /* Mine out the grey squares
+         */
+        $greys = $this->generateGreySquares($result, $areaSeqMapping, $template);
+
+        $stack['series']['grey1'] = $greys[0];
+        $stack['series']['grey2'] = $greys[1];
+        $stack['series']['grey3'] = $greys[2];
+        $stack['series']['grey4'] = $greys[3];
+
+        return $stack;
+    }
+
+
+    /**
+     * Mine out the stars as individual series
+     *
+     * @param array $groupData
+     * @param array $areaSeqMapping
+     * @param array $template
+     * @return array
+     */
+    private function generateStars(array $groupData, array $areaSeqMapping, array $template): array
+    {
+        $red = $blue = $this->initialisePlaceholder($template);
+
         $index = 0;
 
         foreach ($groupData as $category => $vals) {
@@ -199,19 +225,10 @@ class Data extends Base
             }
         }
 
-        $stack['series'][self::RED_SERIES] = $red;
-        $stack['series'][self::BLUE_SERIES] = $blue;
-
-        /* Mine out the grey squares
-         */
-        $greys = $this->generateGreySquares($result, $areaSeqMapping, $template);
-
-        $stack['series']['grey1'] = $greys[0];
-        $stack['series']['grey2'] = $greys[1];
-        $stack['series']['grey3'] = $greys[2];
-        $stack['series']['grey4'] = $greys[3];
-
-        return $stack;
+        return [
+            'red' => $red,
+            'blue' => $blue
+        ];
     }
 
 
