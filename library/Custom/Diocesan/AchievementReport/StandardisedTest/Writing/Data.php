@@ -60,8 +60,11 @@ class Data extends Base
      */
     public function findData()
     {
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
 
-        $query = "
+        $query = '
             SELECT
                 xAxisOrderSeq,
                 xAxis,
@@ -71,11 +74,11 @@ class Data extends Base
                 Line4,
                 ActualMaskSeq
             FROM uSchoolBoxWritingSummary
-            WHERE StudentID='{$this->externalUser['StudentID']}'
+            WHERE StudentID = :externalId
             ORDER BY xAxisOrderSeq
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         $stack = [
             'x' => [
