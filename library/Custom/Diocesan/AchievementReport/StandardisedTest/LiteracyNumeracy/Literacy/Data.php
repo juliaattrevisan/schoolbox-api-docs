@@ -89,9 +89,6 @@ class Data extends Base
     /**
      * Indexes of each series
      */
-    private const RED_SERIES_AREASEQ = 2;
-    private const BLUE_SERIES_AREASEQ = 3;
-
     private const RED_SERIES = 'red';
     private const BLUE_SERIES = 'blue';
 
@@ -195,9 +192,13 @@ class Data extends Base
 
         $index = 0;
 
+        /* Map AreaSeq values to $index; AreaSeq values can be any sequenced integer
+         */
+        $areaSeqMapping = array_keys(array_values($temp)[0]);
+
         foreach ($temp as $category => $vals) {
-            $red[$index] = $vals[self::RED_SERIES_AREASEQ];
-            $blue[$index+1] = $vals[self::BLUE_SERIES_AREASEQ];
+            $red[$index] = $vals[$areaSeqMapping[0]];
+            $blue[$index+1] = $vals[$areaSeqMapping[1]];
 
             $index += self::NUM_SERIES;
         }
@@ -212,9 +213,6 @@ class Data extends Base
                 $this->hasData = true;
             }
         }
-
-        /* TODO: Mine out the grey squares
-         */
 
         return $stack;
     }
