@@ -3,8 +3,9 @@
  #
  # @param array     externalUser
  # @param int|null  year
+ # @param array     STARTable
+ # @param array     STARStanine
  #}
-
 {% include '@templates/Avatar.twig' %}
 
 {% include '@templates/Navigation.twig' with {
@@ -21,6 +22,46 @@
             {% include '@standardisedTest/STAR/Table/Table.twig' with {
                 data: STARTable.data
             } %}
+        </div>
+    </div>
+
+    {% include '@standardisedTest/STAR/Stanine/Navigation.twig' with {
+        elements: STARStanineNavigation
+    } %}
+
+    {% if STARStanine.visible %}
+        <div class="small-12 columns">
+            {% include '@standardisedTest/Stanine/Graph.twig' with {
+                identifier: 'STARStanine',
+                title: STARStanine.data.graph.title,
+                yAxis: STARStanine.data.graph.y,
+                series: STARStanine.data.series
+            } %}
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>
+                    <strong>STAR Test:</strong> There are four parts to the STAR Test which assess different reading
+                    skills including Word Recognition, Sentence Comprehension, Paragraph Comprehension, and Vocabulary
+                    Range. PAT Tests: Progressive Achievement Tests are a series of standardised tests developed
+                    specifically for New Zealand Schools. There are four different tests: Reading Comprehension, Reading
+                    Vocabulary, Listening Comprehension, and Mathematics.
+                </p>
+
+                <p>
+                    <strong>Stanines:</strong> Each set of year level results is depicted as a graph showing the
+                    percentage of students gaining stanine 1 to 9 on a national level compared to Diocesan Junior
+                    School. There is no notion of a pass or fail in these scores. They merely represent the ability of
+                    the student in comparison to other students of the same age in New Zealand at that point in time.
+                </p>
+
+                <p>
+                    Your daughter's results are indicated by the star.
+                </p>
+            </section>
         </div>
     </div>
 </div>
