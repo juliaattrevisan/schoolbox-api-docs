@@ -504,6 +504,15 @@ class Controller extends Base
             'visible' => (new LiteracyNumeracy\Literacy\ValidHasData())->isSatisfiedBy($user->getYear(), $literacyPayload->hasData())
         ];
 
+        /* Numeracy
+         */
+        $numeracyPayload = (new LiteracyNumeracy\Numeracy\Data($user, $externalUser, $db, $selectedYear));
+
+        $numeracy = [
+            'data' => $numeracyPayload->findData(),
+            'visible' => (new LiteracyNumeracy\Numeracy\ValidHasData())->isSatisfiedBy($user->getYear(), $numeracyPayload->hasData())
+        ];
+
         $this->getResponse()->content->set([
             'template' => '@standardisedTest/LiteracyNumeracy/index.twig',
             'data' => [
@@ -523,7 +532,8 @@ class Controller extends Base
                     'selected' => NavigationSelector::STANDARDISEDTEST_KEY
                 ],
 
-                'literacy' => $literacy
+                'literacy' => $literacy,
+                'numeracy' => $numeracy,
             ]
         ]);
     }

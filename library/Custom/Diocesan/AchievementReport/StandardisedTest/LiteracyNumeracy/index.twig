@@ -30,6 +30,12 @@
             {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
         </div>
         {% endif %}
+
+        {% if numeracy.visible %}
+            <div class="small-6 columns">
+                {% include '@standardisedTest/LiteracyNumeracy/Numeracy/graph.twig' with { numeracy: numeracy } %}
+            </div>
+        {% endif %}
     </div>
 
     <div class="row">
