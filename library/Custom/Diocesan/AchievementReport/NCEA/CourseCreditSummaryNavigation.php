@@ -1,17 +1,19 @@
 <?php
 /**
- * CourseCreditSummaryNavigation
- *
- * Decide whether there is any data for Course Credit Summary
- * year-specific section
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
+/**
+ * Class CourseCreditSummaryNavigation
+ *
+ * Decide whether there is any data for Course Credit Summary
+ * year-specific section
+ *
+ * @package Custom\Diocesan\AchievementReport\NCEA
+ */
 class CourseCreditSummaryNavigation extends Base
 {
 
@@ -32,22 +34,27 @@ class CourseCreditSummaryNavigation extends Base
      */
     public function findData()
     {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->getCurrentYear()
+        ];
+
         $query = "
             SELECT
                 StudentYear
             FROM
                 dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$this->getExternalUserId()}' AND
+                id = :externalId AND
                 WithdrawnFlag = 0 AND
-                NOT (StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX')
+                NOT (StudentYear = :year AND InternalorExternalAssessment = 'EX')
             GROUP BY StudentYear
             ORDER BY StudentYear DESC
         ";
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
-        $allYears = array();
+        $allYears = [];
 
         if (is_array($result)) {
             foreach ($result as $current) {
