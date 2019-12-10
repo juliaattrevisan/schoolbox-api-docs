@@ -24,17 +24,20 @@ class Data extends Base
 {
 
     /**
-     * Number of series to look for here
-     * These denote the number of x-categories per data group
-     */
-    private const NUM_SERIES = 3;
-
-
-    /**
      * Find all the data for Numeracy graph
      */
     public function findData()
     {
+
+        /* Number of series to look for here
+         * These denote the number of x-categories per data group
+         */
+        $series = [Payload::RED_SERIES, Payload::BLUE_SERIES, Payload::GREEN_SERIES];
+
+        $numSeries = \count($series);
+
+        /* Placeholder stack
+         */
         $stack = (new Payload())->generate();
 
         /* maskseq is what the student got
@@ -72,7 +75,7 @@ class Data extends Base
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $template = (new Categories())->generate($groupData, self::NUM_SERIES);
+        $template = (new Categories())->generate($groupData, $numSeries);
 
         $stack['x']['categories'] = '"' . implode('","', $template) . '"';
 
@@ -83,19 +86,17 @@ class Data extends Base
         /* Mine out the stars' series
          */
         $stars = new Stars();
-        $starsSeries = $stars->generate($groupData, $areaSeqMapping, $template, self::NUM_SERIES);
+        $starsSeries = $stars->generate($groupData, $areaSeqMapping, $template, $numSeries);
         $this->hasData = $stars->hasData();
 
-        $series = [Payload::RED_SERIES, Payload::BLUE_SERIES, Payload::GREEN_SERIES];
-
-        for ($i = 0; $i < self::NUM_SERIES; $i++) {
+        for ($i = 0; $i < $numSeries; $i++) {
             $stack['series'][$series[$i]] = $starsSeries[$i];
         }
 
         /* Mine out the grey squares
          */
         $squares = new Squares();
-        $squaresSeries = $squares->generate($result, $areaSeqMapping, $template, self::NUM_SERIES);
+        $squaresSeries = $squares->generate($result, $areaSeqMapping, $template, $numSeries);
 
         $stack['series']['grey1'] = $squaresSeries[0];
         $stack['series']['grey2'] = $squaresSeries[1];
