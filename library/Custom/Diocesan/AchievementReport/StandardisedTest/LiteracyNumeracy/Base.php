@@ -57,6 +57,12 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\StandardisedTest\
 
         $result = $this->getDb()->getAll($query);
 
+        /* No data? Exit early
+         */
+        if (!\count($result)) {
+            return $stack;
+        }
+
         /* Group everything by xAxis, AreaSeq
          * This removes dupes because multiple series are in this dataset
          */
