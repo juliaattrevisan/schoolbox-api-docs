@@ -25,7 +25,13 @@ class Data extends Base
      */
     public function findData(): Payload
     {
-        $query = "
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+            'year' => $this->year
+        ];
+
+
+        $query = '
             SELECT
                 YearLevel,
                 Seq,
@@ -34,12 +40,12 @@ class Data extends Base
                 DiocesanStarTestStaninePercentage,
                 NationalStarTestStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID='{$this->externalUser['StudentID']}'
-            AND Fileyear = '{$this->year}'
+            WHERE ThisStudentID = :externalId
+            AND Fileyear = :year
             ORDER BY Seq
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         /* Find data for each of the three series
          * Inspect the data to find out what Year Level this actually was, for the given student
@@ -72,14 +78,18 @@ class Data extends Base
      */
     public function hasDataFromAnyYear(): bool
     {
-        $query = "
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
+        $query = '
             SELECT COUNT(*) AS num
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            WHERE ThisStudentID = :externalId
             AND IndividualStarTestStanineMarker <> 0
-        ";
+        ';
 
-        $result = $this->getDb()->getOne($query);
+        $result = $this->getDb()->getOne($query, $params);
 
         return (bool)$result;
     }
