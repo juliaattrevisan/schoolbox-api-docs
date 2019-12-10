@@ -11,5 +11,3 @@ parameters:
         - dav
         - library
         - tools
-    excludes_analyse:
-        -   %rootDir%/../../../library/Alaress/Twitter/Loader/oauth/twitteroauth.php
