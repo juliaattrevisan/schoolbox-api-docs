@@ -56,14 +56,6 @@ class Data extends Base
 
 
     /**
-     * Whether there was any data found
-     *
-     * @var bool
-     */
-    private $hasData = false;
-
-
-    /**
      * Find all the data for Writing graph
      */
     public function findData()
@@ -129,25 +121,5 @@ class Data extends Base
         }
 
         return $stack;
-    }
-
-
-    /**
-     * Find out if this student has data from any year
-     *
-     * @return bool
-     */
-    public function hasDataFromAnyYear(): bool
-    {
-        return $this->findData()->hasData();
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function hasData(): bool
-    {
-        return $this->hasData;
     }
 }

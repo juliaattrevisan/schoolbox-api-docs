@@ -11,8 +11,6 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 /**
  * Class Base
  *
- * Used by Literacy/Numeracy section predominantly
- *
  * @package Custom\Diocesan\AchievementReport\StandardisedTest
  */
 abstract class Base extends \Custom\Diocesan\AchievementReport\Base
