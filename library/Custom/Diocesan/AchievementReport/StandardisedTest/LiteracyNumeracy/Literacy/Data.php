@@ -85,10 +85,7 @@ class Data extends Base
 
         /* Mine out the stars' series
          */
-        $stars = $this->generateStars($groupData, $areaSeqMapping, $template);
-
-        $stack['series'][Payload::RED_SERIES] = $stars[Payload::RED_SERIES];
-        $stack['series'][Payload::BLUE_SERIES] = $stars[Payload::BLUE_SERIES];
+        $stack['series'] = array_merge($stack['series'], $this->generateStars($groupData, $areaSeqMapping, $template));
 
         /* Mine out the grey squares
          */
