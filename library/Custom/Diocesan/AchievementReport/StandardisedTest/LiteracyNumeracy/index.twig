@@ -25,17 +25,23 @@
     </div>
 
     <div class="row">
-        {% if literacy.visible %}
-        <div class="small-6 columns">
-            {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
-        </div>
-        {% endif %}
+        <div class="small-12 island">
+            <section>
+                <div class="row">
+                    {% if literacy.visible %}
+                        <div class="small-6 columns">
+                            {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
+                        </div>
+                    {% endif %}
 
-        {% if numeracy.visible %}
-            <div class="small-6 columns">
-                {% include '@standardisedTest/LiteracyNumeracy/Numeracy/graph.twig' with { numeracy: numeracy } %}
-            </div>
-        {% endif %}
+                    {% if numeracy.visible %}
+                        <div class="small-6 columns">
+                            {% include '@standardisedTest/LiteracyNumeracy/Numeracy/graph.twig' with { numeracy: numeracy } %}
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
     </div>
 
     <div class="row">
