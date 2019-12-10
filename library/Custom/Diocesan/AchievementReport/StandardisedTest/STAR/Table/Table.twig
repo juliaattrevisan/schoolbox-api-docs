@@ -1,0 +1,29 @@
+{##
+ # STAR
+ #
+ # Table of data across all year levels for a particular student
+ #
+ # @param array data
+ #}
+{% if data|length %}
+<table>
+    <thead>
+        <tr>
+            <th class="centered">Year</th>
+            <th class="centered">STAR Stanine</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, values in data %}
+        <tr>
+            <td class="centered">{{ year }}</td>
+            <td class="centered">{{ values.STAR }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <div class="empty-state">
+        <p>No data available.</p>
+    </div>
+{% endif %}

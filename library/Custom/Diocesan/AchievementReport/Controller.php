@@ -12,6 +12,7 @@ use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Custom\Diocesan\AchievementReport\StandardisedTest;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
+use Custom\Diocesan\AchievementReport\StandardisedTest\STAR;
 use MSSQL;
 use Schoolbox\User;
 
@@ -145,7 +146,7 @@ class Controller extends Base
 
 
     /**
-     * Standardised Test placeholder
+     * Standardised Tests index
      *
      * @param MSSQL    $db
      * @param User     $user
@@ -156,6 +157,43 @@ class Controller extends Base
     public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
 
+        /* TODO: Redirect to the first available section of the standardised test
+         * PAT, STAR, Reading, Writing, Mathematics, Literacy/Numeracy
+         */
+        $this->getResponse()->content->set([
+            'template' => '@standardisedTest/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+
+                'subnavigation' => [
+                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+
+                    /* TODO: For each Standardised Test report piece
+                     */
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+            ]
+        ]);
+    }
+
+
+    /**
+     * PAT section of Standardised Test
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws RouteNotFound
+     */
+    public function getStandardisedTestPAT(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    {
         /* Default to this year if none specified
          */
         $selectedYear = $year ?? (int)date('Y');
@@ -202,7 +240,7 @@ class Controller extends Base
         $headingVisible = $PATMathematics['visible'] || $PATListeningComprehension['visible'] || $PATReadingVocabulary['visible'] || $PATReadingComprehension['visible'];
 
         $this->getResponse()->content->set(array(
-            'template' => '@standardisedTest/index.twig',
+            'template' => '@standardisedTest/PAT/index.twig',
             'data' => [
                 'navigation' => array(
                     'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
@@ -233,6 +271,53 @@ class Controller extends Base
                 'PATListeningComprehension' => $PATListeningComprehension,
                 'PATReadingVocabulary' => $PATReadingVocabulary,
                 'PATReadingComprehension' => $PATReadingComprehension
+            ]
+        ));
+    }
+
+
+    /**
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws RouteNotFound
+     */
+    public function getStandardisedTestSTAR(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    {
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? (int)date('Y');
+
+        /* Each graph's payload and visibility status
+         */
+        $tablePayload = new STAR\Table\Data($user, $externalUser, $db, $year);
+
+        $STARTable = [
+            'data' => $tablePayload->findData(),
+            'visible' => (new STAR\Table\ValidHasData())->isSatisfiedBy($user->getYear(), $tablePayload->hasData())
+        ];
+
+        $this->getResponse()->content->set(array(
+            'template' => '@standardisedTest/STAR/index.twig',
+            'data' => [
+                'navigation' => array(
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ),
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+
+                'subnavigation' => [
+                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+
+                    /* TODO: For each Standardised Test report piece
+                     */
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+
+                'STARTable' => $STARTable,
             ]
         ));
     }

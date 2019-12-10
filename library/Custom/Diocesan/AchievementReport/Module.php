@@ -59,6 +59,8 @@ class Module extends BaseModule
         $this->register('GET', '/ib/{externalUserId}{/year}', 'getIb', $getPerms, $preload);
         $this->register('GET', '/ncea/{externalUserId}{/year}', 'getNcea', $getPerms, $preload);
         $this->register('GET', '/comments/{externalUserId}{/year}', 'getComments', $getPerms, $preload);
+        $this->register('GET', '/standardisedTest/PAT/{externalUserId}{/year}', 'getStandardisedTestPAT', $getPerms, $preload);
+        $this->register('GET', '/standardisedTest/STAR/{externalUserId}{/year}', 'getStandardisedTestSTAR', $getPerms, $preload);
         $this->register('GET', '/standardisedTest/{externalUserId}{/year}', 'getStandardisedTest', $getPerms, $preload);
         $this->register('GET', '/coCurricular/{externalUserId}{/year}', 'getCoCurricular', $getPerms, $preload);
     }
