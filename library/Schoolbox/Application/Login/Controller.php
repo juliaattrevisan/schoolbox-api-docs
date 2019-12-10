@@ -57,6 +57,7 @@ class Controller extends Base
                 $redirectUrl .= '?page=' . rawurlencode($page);
             }
             $this->getResponse()->redirect->to($redirectUrl, 303);
+            return;
         }
 
         $getParams = ['samlAuth' => $samlAuth, 'page' => $page,];
