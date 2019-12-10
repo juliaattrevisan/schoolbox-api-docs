@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Literacy;
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
+use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Categories;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\GroupData;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Squares;
@@ -70,7 +71,7 @@ class Data extends Base
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
          */
-        $template = $this->generateXCategories($groupData, self::NUM_SERIES);
+        $template = (new Categories())->generate($groupData, self::NUM_SERIES);
 
         $stack['x']['categories'] = '"' . implode('","', $template) . '"';
 

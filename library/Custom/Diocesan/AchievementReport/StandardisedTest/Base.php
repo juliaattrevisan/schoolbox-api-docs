@@ -27,28 +27,6 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\Base
 
 
     /**
-     * Generate a template of x categories
-     *
-     * @param array $placeholder
-     * @param int   $numSeries
-     * @return array
-     */
-    protected function generateXCategories(array $placeholder, int $numSeries): array
-    {
-        $names = array_keys($placeholder);
-        $template = [];
-
-        foreach ($names as $category) {
-            for ($i = 0; $i < $numSeries; $i++) {
-                $template[] = $category;
-            }
-        }
-
-        return $template;
-    }
-
-
-    /**
      * Find out if this student has data from any year
      *
      * @return bool
