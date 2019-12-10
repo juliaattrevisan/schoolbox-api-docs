@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Numeracy;
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
+use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
 
 /**
  * Class Data
@@ -16,75 +17,6 @@ use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
  */
 class Data extends Base
 {
-
-    /**
-     * Y categories, Stages
-     */
-    private const Y_STAGES = [
-
-        /* Level 1
-         */
-        'Beginning',
-        'Proficient',
-        'Advanced',
-
-        /* Level 2
-         */
-        'Beginning',
-        'Proficient',
-        'Advanced',
-
-        /* Level 3
-         */
-        'Beginning',
-        'Proficient',
-        'Advanced',
-
-        /* Level 4
-         */
-        'Beginning',
-        'Proficient',
-        'Advanced',
-
-        /* Level 5
-         */
-        'Beginning',
-        'Proficient',
-        'Advanced',
-
-        /* Level 6
-         */
-        'Beginning',
-        'Proficient',
-        'Advanced',
-    ];
-
-
-    /**
-     * Y categories, Level Groups
-     */
-    private const Y_LEVEL_GROUPS = [
-
-        ' ',
-        ' ',
-        'Level 1',
-        ' ',
-        ' ',
-        'Level 2',
-        ' ',
-        ' ',
-        'Level 3',
-        ' ',
-        ' ',
-        'Level 4',
-        ' ',
-        ' ',
-        'Level 5',
-        ' ',
-        ' ',
-        'Level 6',
-    ];
-
 
     /**
      * Indexes of each series
@@ -114,25 +46,7 @@ class Data extends Base
      */
     public function findData()
     {
-        $stack = [
-            'x' => [
-                'categories' => []
-            ],
-            'y' => [
-                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
-                'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
-            ],
-            'series' => [
-                'red' => [],
-                'blue' => [],
-                'green' => [],
-                'grey1' => [],
-                'grey2' => [],
-                'grey3' => [],
-                'grey4' => [],
-            ]
-        ];
-
+        $stack = (new Payload())->generate();
 
         /* maskseq is what the student got
          * colour is the star colour (red for reading, blue for writing)
@@ -181,9 +95,9 @@ class Data extends Base
          */
         $stars = $this->generateStars($groupData, $areaSeqMapping, $template);
 
-        $stack['series'][self::RED_SERIES] = $stars['red'];
-        $stack['series'][self::BLUE_SERIES] = $stars['blue'];
-        $stack['series'][self::GREEN_SERIES] = $stars['green'];
+        $stack['series'][Payload::RED_SERIES] = $stars['red'];
+        $stack['series'][Payload::BLUE_SERIES] = $stars['blue'];
+        $stack['series'][Payload::GREEN_SERIES] = $stars['green'];
 
         /* Mine out the grey squares
          */
