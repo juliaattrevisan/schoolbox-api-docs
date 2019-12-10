@@ -18,13 +18,13 @@ class Categories
     /**
      * Generate a template of x categories
      *
-     * @param array $placeholder
+     * @param array $groupData
      * @param int   $numSeries
      * @return array
      */
-    public function generate(array $placeholder, int $numSeries): array
+    public function generate(array $groupData, int $numSeries): array
     {
-        $names = array_keys($placeholder);
+        $names = array_keys($groupData);
         $template = [];
 
         foreach ($names as $category) {
