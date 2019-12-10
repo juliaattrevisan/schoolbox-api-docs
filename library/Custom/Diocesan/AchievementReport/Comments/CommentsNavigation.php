@@ -21,15 +21,19 @@ class CommentsNavigation extends Base
      */
     public function findData()
     {
-        $query = "
+        $params = [
+            'externalId' => $this->getExternalUserId()
+        ];
+
+        $query = '
             SELECT StudentYear
             FROM dbo.uvSchoolBoxReportComments
-            WHERE id = '{$this->getExternalUserId()}'
+            WHERE id = :externalId
             GROUP BY StudentYear
             ORDER BY StudentYear DESC
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         $allYears = [];
 
