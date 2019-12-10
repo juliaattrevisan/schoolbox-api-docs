@@ -31,7 +31,12 @@ class Data extends Base
      */
     public function findData(): Payload
     {
-        $query = "
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+            'year' => $this->year
+        ];
+
+        $query = '
             SELECT
                 Seq,
                 ThisStudentStanine,
@@ -39,9 +44,9 @@ class Data extends Base
                 DiocesanMathsPATStaninePercentage,
                 NationalMathsPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
-            AND Fileyear = '{$this->year}'
-            ORDER BY seq";
+            WHERE ThisStudentID = :externalId
+            AND Fileyear = :year
+            ORDER BY seq';
 
         $result = $this->getDb()->getAll($query);
 
