@@ -163,7 +163,7 @@ class Data extends Base
         /* Group everything by xAxis, AreaSeq
          * This removes dupes because multiple series are in this dataset
          */
-        $temp = $this->generatePlaceholder($result, 'maskseq');
+        $temp = $this->groupData($result, 'maskseq');
 
         /* Mine out x-categories
          * There are two series data in here, displaying side by side on each x-axis tick
@@ -174,7 +174,7 @@ class Data extends Base
 
         /* Build result sets
          */
-        $red = $blue = array_fill(0, \count($template), 'null');
+        $red = $blue = $this->initialisePlaceholder($template);
 
         /* Map AreaSeq values to series' $index; AreaSeq values can be any sequenced integer
          */
@@ -209,7 +209,7 @@ class Data extends Base
 //        foreach (['Line1', 'Line2', 'Line3', 'Line4'] as $line) {
 //            $grey = array_fill(0, \count($template), 'null');
 //
-//            $temp = $this->generatePlaceholder($result, $line);
+//            $temp = $this->groupData($result, $line);
 //            $index = 0;
 //
 //            foreach ($temp as $category => $vals) {
@@ -226,6 +226,18 @@ class Data extends Base
 //
 //        new \Alaress_Probe($result, $temp, $greys);
         return $stack;
+    }
+
+
+    /**
+     * Initialise a stack of placeholder values for x categories
+     *
+     * @param array $template
+     * @return array
+     */
+    private function initialisePlaceholder(array $template): array
+    {
+        return array_fill(0, \count($template), 'null');
     }
 
 
@@ -257,7 +269,7 @@ class Data extends Base
      * @param string $key
      * @return array
      */
-    private function generatePlaceholder(array $result, string $key): array
+    private function groupData(array $result, string $key): array
     {
         $temp = [];
 
