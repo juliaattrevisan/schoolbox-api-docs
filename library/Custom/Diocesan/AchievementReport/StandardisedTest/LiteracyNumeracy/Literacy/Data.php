@@ -216,6 +216,37 @@ class Data extends Base
             }
         }
 
+        /* Mine out the grey squares
+         */
+        $greys = [];
+
+        foreach (['Line1', 'Line2', 'Line3', 'Line4'] as $line) {
+            $grey = array_fill(0, \count($template), 'null');
+
+            $temp = [];
+            $index = 0;
+
+            foreach ($result as $row) {
+                $xAxis = $row['xAxis'];
+                $areaSeq = $row['AreaSeq'];
+                $y = $row[$line] ?: 'null';
+
+                $temp[$xAxis][$areaSeq] = $y;
+            }
+
+            foreach ($temp as $category => $vals) {
+                $grey[$index] = $vals[$areaSeqMapping[0]];
+                $grey[$index+1] = $vals[$areaSeqMapping[1]];
+
+                /* Move to the next group of data points
+                 */
+                $index += self::NUM_SERIES;
+            }
+
+            $greys[] = $grey;
+        }
+
+        new \Alaress_Probe($result, $temp, $greys);
         return $stack;
     }
 
