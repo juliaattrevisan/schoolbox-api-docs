@@ -164,26 +164,13 @@ class Controller extends Base
         /* TODO: Redirect to the first available section of the standardised test
          * PAT, STAR, Reading, Writing, Mathematics, Literacy/Numeracy
          */
-        $this->getResponse()->content->set([
-            'template' => '@standardisedTest/index.twig',
-            'data' => [
-                'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
-                ],
-                'externalUser' => $externalUser,
-                'user' => $user,
-                'year' => $year,
 
-                'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
-                ],
-            ]
-        ]);
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('achievementreport.getStandardisedTestPAT', [
+                'externalUserId' => $externalUser['StudentID'],
+                'year' => $year
+            ])
+        );
     }
 
 
