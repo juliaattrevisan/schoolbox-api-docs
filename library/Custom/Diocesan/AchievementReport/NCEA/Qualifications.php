@@ -1,16 +1,18 @@
 <?php
 /**
- * Qualifications
- *
- * Because mssql won't let me do this in LiteracyNumeracy
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
+/**
+ * Class Qualifications
+ *
+ * Because mssql won't let me do this in LiteracyNumeracy
+ *
+ * @package Custom\Diocesan\AchievementReport\NCEA
+ */
 class Qualifications extends Base
 {
 
@@ -21,18 +23,18 @@ class Qualifications extends Base
      */
     public function findData()
     {
-        $query = "
-            SELECT
-                *
-            FROM
-                dbo.uvSchoolBoxNCEAResults
-            WHERE
-                id = '{$this->getExternalUserId()}'
-            ORDER BY
-                StudentYear DESC
-        ";
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+        ];
 
-        $result = $this->getDb()->getAll($query);
+        $query = '
+            SELECT *
+            FROM dbo.uvSchoolBoxNCEAResults
+            WHERE id = :externalId
+            ORDER BY StudentYear DESC
+        ';
+
+        $result = $this->getDb()->getAll($query, $params);
 
         /* Qualifications results are accumulated through each record in the
          * NCEA table. One record may have none; but as the student progresses
@@ -43,11 +45,11 @@ class Qualifications extends Base
          * So you have to get all the records, traverse all the records, then
          * dump all the dupes/empty values
          */
-        $keys = array(
+        $keys = [
             'NCEALevel1Description',
             'NCEALevel2Description',
             'NCEALevel3Description'
-        );
+        ];
 
         $qualifications = array_fill_keys($keys, '');
         $numQualifications = 0;
@@ -63,10 +65,10 @@ class Qualifications extends Base
             }
         }
 
-        $data = array(
+        $data = [
             'qualifications' => $qualifications,
             'num' => $numQualifications
-        );
+        ];
 
         return $data;
     }
