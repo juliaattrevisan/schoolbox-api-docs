@@ -24,7 +24,11 @@ class Data extends Base
      */
     public function findData(): array
     {
-        $query = "
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
+        $query = '
             SELECT
                 R.YEARLEVEL AS year,
                 MAX(R.STAR) AS STAR
@@ -33,13 +37,13 @@ class Data extends Base
                 select YearLevel,THISSTUDENTSTANINE,
                 CASE WHEN IndividualStarTestStanineMarker<>0 THEN THISSTUDENTSTANINE ELSE 0 END AS STAR
                 from uvSchoolBoxPATSTARSummary
-                where ThisStudentID='{$this->externalUser['StudentID']}' and IndividualStarTestStanineMarker<>0
+                where ThisStudentID = :externalId and IndividualStarTestStanineMarker<>0
             ) AS R
             GROUP BY R.YearLevel
             ORDER BY R.YearLevel DESC
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         /* Ensure everything is grouped by year
          */
@@ -48,6 +52,7 @@ class Data extends Base
         foreach ($result as $row) {
             $stack[$row['year']] = $row;
         }
+
         /* Decide if the table had any data
          */
         if (\count($stack)) {

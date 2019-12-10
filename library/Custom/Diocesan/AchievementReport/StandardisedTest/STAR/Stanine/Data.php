@@ -30,7 +30,6 @@ class Data extends Base
             'year' => $this->year
         ];
 
-
         $query = '
             SELECT
                 YearLevel,
