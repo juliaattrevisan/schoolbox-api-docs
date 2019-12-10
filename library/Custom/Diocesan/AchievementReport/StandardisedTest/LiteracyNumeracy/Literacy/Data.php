@@ -166,6 +166,8 @@ class Data extends Base
         /* Group everything by xAxis, AreaSeq
          * This removes dupes because multiple series are in this dataset
          */
+        $temp = [];
+
         foreach ($result as $row) {
             $xAxis = $row['xAxis'];
             $areaSeq = $row['AreaSeq'];
@@ -174,10 +176,12 @@ class Data extends Base
             $temp[$xAxis][$areaSeq] = $y;
         }
 
+        /* Mine out x-categories
+         * There are two series data in here, displaying side by side on each x-axis tick
+         */
+        $categories = array_keys($temp);
 
-
-
-        new \Alaress_Probe($result, $temp);
+        new \Alaress_Probe($result, $categories, $temp);
 
 
         /* If the student has stars, they have values
