@@ -51,6 +51,11 @@ try {
     $cache = new Alaress_Saml_Cache();
     $idpMetadata = $cache->init($idpMetadataUrl);
 
+    // if cache file exists but empty, try invalidating it.
+    if (file_exists($idpMetadata->getCachedFile()) && empty($idpMetadata->getStreamContents())) {
+        $idpMetadata->invalidateCache();
+    }
+
     // if cache exists, update $setting info from cache
     if (file_exists($idpMetadata->getCachedFile())) {
         try {
