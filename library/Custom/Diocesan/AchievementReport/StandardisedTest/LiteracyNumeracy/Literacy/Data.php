@@ -189,18 +189,18 @@ class Data extends Base
             /* Move to the next group of data points
              */
             $index += self::NUM_SERIES;
+
+            /* Might as well do data detection here
+             * If the student has a row with maskseq != 0, they have data
+             */
+            if ($vals[$areaSeqMapping[0]] || $vals[$areaSeqMapping[1]]) {
+                $this->hasData = true;
+            }
         }
 
         $stack['series'][self::RED_SERIES] = $red;
         $stack['series'][self::BLUE_SERIES] = $blue;
 
-        /* If the student has stars, they have values - one of the series must have data
-         */
-        foreach ([self::RED_SERIES, self::BLUE_SERIES] as $series) {
-            if (\count(array_filter($stack['series'][$series]))) {
-                $this->hasData = true;
-            }
-        }
 //
 //        /* Mine out the grey squares
 //         */
