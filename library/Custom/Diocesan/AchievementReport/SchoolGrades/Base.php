@@ -1,31 +1,35 @@
 <?php
 /**
- * Base
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
 
-abstract class Base extends AchievementReportBase {
+/**
+ * Class Base
+ *
+ * @package Custom\Diocesan\AchievementReport\SchoolGrades
+ */
+abstract class Base extends AchievementReportBase
+{
 
     /**
      * Rearrange into a meaningful structure
      *
      * @return array
      */
-    protected function recombination() {
+    protected function recombination(): array
+    {
 
         /**
          * Rearrange everything into a nice order
          *
          * $yearStack is the table data
          */
-        $yearStack = array();
+        $yearStack = [];
 
         /* Entered Grades
          */
@@ -43,12 +47,12 @@ abstract class Base extends AchievementReportBase {
             /* Initialise
              */
             if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear][$courseName][$assessArea] = array(
+                $yearStack[$studentYear][$courseName][$assessArea] = [
                     'term1' => '',
                     'term2' => '',
                     'term3' => '',
                     'term4' => '',
-                );
+                ];
             }
 
             /* Assign values
@@ -67,12 +71,12 @@ abstract class Base extends AchievementReportBase {
             /* Initialise
              */
             if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear][$courseName][$assessArea] = array(
+                $yearStack[$studentYear][$courseName][$assessArea] = [
                     'term1' => '',
                     'term2' => '',
                     'term3' => '',
                     'term4' => '',
-                );
+                ];
             }
 
             /* Assign values
@@ -83,6 +87,7 @@ abstract class Base extends AchievementReportBase {
         return $yearStack;
     }
 
+
     /**
      * Get counts for Entered Grades for the current year
      * for a particular student
@@ -90,7 +95,13 @@ abstract class Base extends AchievementReportBase {
      * @param $externalUserId
      * @return array
      */
-    private function findEnteredGradesCurrentYear($externalUserId) {
+    private function findEnteredGradesCurrentYear($externalUserId): array
+    {
+        $params = [
+            'externalId' => $externalUserId,
+            'year' => $this->getCurrentYear()
+        ];
+
         $query = "
             SELECT
                 classcode,
@@ -104,8 +115,8 @@ abstract class Base extends AchievementReportBase {
             FROM
                 dbo.uvSchoolBoxSchoolGradeResults
             WHERE
-                ID = '{$externalUserId}'
-                AND classyear = '{$this->getCurrentYear()}'
+                ID = :externalId
+                AND classyear = :year
                 AND Result != 'SNA'
             ORDER BY
                 StudentYearLevel DESC,
@@ -115,14 +126,15 @@ abstract class Base extends AchievementReportBase {
                 StrippedResult DESC
         ";
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
         }
 
-        return array();
+        return [];
     }
+
 
     /**
      * Get counts for Entered Grades for all previous years
@@ -135,7 +147,13 @@ abstract class Base extends AchievementReportBase {
      * @param $externalUserId
      * @return array
      */
-    private function findEnteredGradesPreviousYear($externalUserId) {
+    private function findEnteredGradesPreviousYear($externalUserId): array
+    {
+        $params = [
+            'externalId' => $externalUserId,
+            'year' => $this->getCurrentYear()
+        ];
+
         $query = "
             SELECT
                 classcode,
@@ -149,8 +167,8 @@ abstract class Base extends AchievementReportBase {
             FROM
                 dbo.uvSchoolBoxSchoolGradeResults
             WHERE
-                ID = '{$externalUserId}'
-                AND classyear < '{$this->getCurrentYear()}'
+                ID = :externalId
+                AND classyear < :year
                 AND Result != ''
                 AND Result != 'SNA'
             ORDER BY
@@ -161,14 +179,15 @@ abstract class Base extends AchievementReportBase {
                 StrippedResult DESC
         ";
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
         }
 
-        return array();
+        return [];
     }
+
 
     /**
      * Explorer, reporting!
