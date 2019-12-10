@@ -190,16 +190,18 @@ class Data extends Base
          */
         $red = $blue = array_fill(0, \count($template), 'null');
 
-        $index = 0;
-
-        /* Map AreaSeq values to $index; AreaSeq values can be any sequenced integer
+        /* Map AreaSeq values to series' $index; AreaSeq values can be any sequenced integer
          */
         $areaSeqMapping = array_keys(array_values($temp)[0]);
+
+        $index = 0;
 
         foreach ($temp as $category => $vals) {
             $red[$index] = $vals[$areaSeqMapping[0]];
             $blue[$index+1] = $vals[$areaSeqMapping[1]];
 
+            /* Move to the next group of data points
+             */
             $index += self::NUM_SERIES;
         }
 
