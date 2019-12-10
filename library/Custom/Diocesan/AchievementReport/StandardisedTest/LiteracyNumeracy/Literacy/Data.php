@@ -9,6 +9,7 @@ namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Li
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
+use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Squares;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy\Stars;
 
 /**
@@ -35,7 +36,7 @@ class Data extends Base
 
 
     /**
-     * Find all the data for Writing graph
+     * Find all the data for Literacy graph
      */
     public function findData()
     {
@@ -98,48 +99,15 @@ class Data extends Base
 
         /* Mine out the grey squares
          */
-        $greys = $this->generateGreySquares($result, $areaSeqMapping, $template);
+        $squares = new Squares();
+        $squaresSeries = $squares->generate($result, $areaSeqMapping, $template, self::NUM_SERIES);
 
-        $stack['series']['grey1'] = $greys[0];
-        $stack['series']['grey2'] = $greys[1];
-        $stack['series']['grey3'] = $greys[2];
-        $stack['series']['grey4'] = $greys[3];
+        $stack['series']['grey1'] = $squaresSeries[0];
+        $stack['series']['grey2'] = $squaresSeries[1];
+        $stack['series']['grey3'] = $squaresSeries[2];
+        $stack['series']['grey4'] = $squaresSeries[3];
 
         return $stack;
-    }
-
-
-    /**
-     * Mine out the grey squares as individual series
-     *
-     * @param array $result
-     * @param array $areaSeqMapping
-     * @param array $template
-     * @return array
-     */
-    private function generateGreySquares(array $result, array $areaSeqMapping, array $template): array
-    {
-        $greys = [];
-
-        foreach (['Line1', 'Line2', 'Line3', 'Line4'] as $line) {
-            $grey = $this->initialisePlaceholder($template);
-
-            $groupData = $this->groupData($result, $line);
-            $index = 0;
-
-            foreach ($groupData as $category => $vals) {
-                $grey[$index] = $vals[$areaSeqMapping[0]];
-                $grey[$index+1] = $vals[$areaSeqMapping[1]];
-
-                /* Move to the next group of data points
-                 */
-                $index += self::NUM_SERIES;
-            }
-
-            $greys[] = $grey;
-        }
-
-        return $greys;
     }
 
 
@@ -152,18 +120,6 @@ class Data extends Base
     private function generateAreaSeqMapping(array $placeholder): array
     {
         return array_keys(array_values($placeholder)[0]);
-    }
-
-
-    /**
-     * Initialise a stack of placeholder values for x categories
-     *
-     * @param array $template
-     * @return array
-     */
-    private function initialisePlaceholder(array $template): array
-    {
-        return array_fill(0, \count($template), 'null');
     }
 
 

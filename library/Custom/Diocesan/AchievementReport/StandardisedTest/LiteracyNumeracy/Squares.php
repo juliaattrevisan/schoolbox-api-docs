@@ -19,7 +19,7 @@ class Squares
      * @param int   $numSeries
      * @return array
      */
-    private function generate(array $result, array $areaSeqMapping, array $template, int $numSeries): array
+    public function generate(array $result, array $areaSeqMapping, array $template, int $numSeries): array
     {
         $greys = [];
 
@@ -45,6 +45,7 @@ class Squares
         return $greys;
     }
 
+
     /**
      * Initialise a stack of placeholder values for x categories
      *
@@ -54,5 +55,33 @@ class Squares
     private function initialisePlaceholder(array $template): array
     {
         return array_fill(0, \count($template), 'null');
+    }
+
+
+    /**
+     * Generate a placeholder array, grouped by x-axis labels and AreaSeq value
+     * Placeholder array defaults to string 'null', for highcharts
+     *
+     * @param array  $result
+     * @param string $key
+     * @return array
+     */
+    private function groupData(array $result, string $key): array
+    {
+        $temp = [];
+
+        foreach ($result as $row) {
+            $xAxis = $row['xAxis'];
+            $areaSeq = $row['AreaSeq'];
+            $y = $row[$key] ?: 'null';
+
+            /* Overwrite placeholder value
+             */
+            if (!isset($temp[$xAxis][$areaSeq]) || $temp[$xAxis][$areaSeq] === 'null') {
+                $temp[$xAxis][$areaSeq] = $y;
+            }
+        }
+
+        return $temp;
     }
 }
