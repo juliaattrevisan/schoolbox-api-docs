@@ -525,38 +525,38 @@ class Controller extends Base
         $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($user, $externalUser, $db, $year);
         $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($user, $externalUser, $db, $year);
 
-        $this->getResponse()->content->set(array(
+        $this->getResponse()->content->set([
             'template' => '@schoolGrades/index.twig',
-            'data' => array(
-                'navigation' => array(
+            'data' => [
+                'navigation' => [
                     'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::SCHOOLGRADES_KEY
-                ),
-                'footer' => array(
+                ],
+                'footer' => [
                     'data' => $footer->findData(),
-                ),
+                ],
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
 
-                'gradeSummary' => array(
+                'gradeSummary' => [
                     'heading' => $gradeSummaryTable->getHeading(),
                     'data' => $gradeSummaryTable->findData(),
-                    'columns' => array_merge($gradeSummaryTable->getLetterRegistry(), array('availableGrades'))
-                ),
+                    'columns' => array_merge($gradeSummaryTable->getLetterRegistry(), ['availableGrades'])
+                ],
 
-                'yearlyBreakdown' => array(
+                'yearlyBreakdown' => [
                     'heading' => $yearlyBreakdownTable->getHeading(),
                     'data' => $yearlyBreakdownTable->findData(),
-                ),
+                ],
 
-                'entriesAndResults' => array(
+                'entriesAndResults' => [
                     'heading' => $entriesAndResultsTable->getHeading(),
                     'data' => $entriesAndResultsTable->findData(),
                     'currentYear' => $entriesAndResultsTable->getCurrentYear()
-                )
-            )
-        ));
+                ]
+            ]
+        ]);
     }
 
 
@@ -633,16 +633,16 @@ class Controller extends Base
         $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null);
         $creditSummary = new NCEA\CreditSummary($user, $externalUser, $db, null);
 
-        $output = array(
+        $output = [
             'template' => '@ncea/index.twig',
-            'data' => array(
-                'navigation' => array(
+            'data' => [
+                'navigation' => [
                     'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
                     'selected' => NavigationSelector::NCEA_KEY
-                ),
-                'footer' => array(
+                ],
+                'footer' => [
                     'data' => $footer->findData(),
-                ),
+                ],
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
@@ -650,21 +650,21 @@ class Controller extends Base
 
                 /* That checkbox thing at the top
                  */
-                'literacyNumeracyCheckbox' => array(
+                'literacyNumeracyCheckbox' => [
                     'heading' => $literacyNumeracyCheckbox->getHeading(),
                     'data' => $literacyNumeracyCheckbox->findData()
-                ),
+                ],
 
                 /* Qualifications rating
                  */
-                'qualifications' => array(
+                'qualifications' => [
                     'heading' => $qualifications->getHeading(),
                     'data' => $qualifications->findData(),
-                ),
+                ],
 
                 /* Credit Summary graphs for all years combined
                  */
-                'creditSummary' => array(
+                'creditSummary' => [
                     'heading' => $creditSummary->getHeading(),
                     'data' => $creditSummary->findData(),
                     'allLetters' => $creditSummary->getLetterRegistry(),
@@ -673,9 +673,9 @@ class Controller extends Base
                     /* Suffix for graph div id's
                      */
                     'suffix' => 'all',
-                ),
-            )
-        );
+                ],
+            ]
+        ];
 
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -688,11 +688,11 @@ class Controller extends Base
 
             /* Course Credit Summary year selectors
              */
-            $output['data']['courseCreditSummaryNavigation'] = array(
+            $output['data']['courseCreditSummaryNavigation'] = [
                 'heading' => $navigation->getHeading(),
                 'all' => $allYears,
                 'selected' => $year
-            );
+            ];
 
             /* Conditionally, if a year was selected; do another round of
              * processing specific to that year. Otherwise skip all this
@@ -705,21 +705,21 @@ class Controller extends Base
 
                 /* Course Credit Summary graphs for a specific year
                  */
-                $output['data']['creditSummaryYear'] = array(
+                $output['data']['creditSummaryYear'] = [
                     'data' => $creditSummaryYear->findData(),
                     'allLetters' => $creditSummaryYear->getLetterRegistry(),
 
                     /* Suffix for graph div id's
                      */
                     'suffix' => "year{$year}",
-                );
+                ];
 
                 /* Course Credit Summary for a specific year
                  */
-                $output['data']['courseCreditSummary'] = array(
+                $output['data']['courseCreditSummary'] = [
                     'data' => $courseCreditSummary->findData(),
                     'allLetters' => $courseCreditSummary->getLetterRegistry(),
-                );
+                ];
 
                 /* Entries And Results for a specific year
                  */
@@ -727,14 +727,14 @@ class Controller extends Base
                 /* Get all the comments for $year for this user
                  * Then rearrange all the subjects
                  */
-                $output['data']['entriesAndResults'] = array(
+                $output['data']['entriesAndResults'] = [
                     'data' => $entriesAndResults->findData(),
                     'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findNCEAData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
                     'allTypes' => self::TYPES,
                     'year' => $year,
                     'currentYear' => $entriesAndResults->getCurrentYear()
-                );
+                ];
             }
         }
 
