@@ -39,7 +39,6 @@
                         }
                     },
                     series: [
-
                         {# First set of grey squares #}
                         {
                             data: [{{ mathematics.data.series.grey1|join(',') }}],
@@ -57,7 +56,6 @@
                             type: 'scatter',
                             yAxis: 1
                         },
-
                         {# Second set of grey squares #}
                         {
                             data: [{{ mathematics.data.series.grey2|join(',') }}],
@@ -75,7 +73,6 @@
                             type: 'scatter',
                             yAxis: 1
                         },
-
                         {# Third set of grey squares #}
                         {
                             data: [{{ mathematics.data.series.grey3|join(',') }}],
@@ -93,7 +90,6 @@
                             type: 'scatter',
                             yAxis: 1
                         },
-
                         {# Fourth set of grey squares #}
                         {
                             data: [{{ mathematics.data.series.grey4|join(',') }}],
@@ -111,7 +107,6 @@
                             type: 'scatter',
                             yAxis: 1
                         },
-
                         {# Student Data #}
                         {
                             data: [{{ mathematics.data.series.student|join(',') }}],
@@ -188,7 +183,6 @@
                         },
                     ],
                 });
-
                 chart.reflow();
             });
         </script>

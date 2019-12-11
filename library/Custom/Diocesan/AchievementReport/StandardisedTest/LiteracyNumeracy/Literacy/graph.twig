@@ -1,0 +1,185 @@
+{##
+ # Literacy Graph
+ #
+ # @param array literacy
+ #}
+<script>
+    $(function () {
+        var chart = new Highcharts.Chart({
+            chart: {
+                height: 720,
+                reflow: true,
+                renderTo: 'literacy',
+                spacingBottom: 30
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: true
+            },
+            plotOptions: {
+                area: {
+                    fillOpacity: 0.2
+                }
+            },
+            series: [
+
+                {# First set of grey squares #}
+                {
+                    data: [{{ literacy.data.series.grey1|join(',') }}],
+                    enableMouseTracking: false,
+                    marker: {
+                        radius: 13,
+                        fillColor: '#cccccc',
+                        symbol: 'square'
+                    },
+                    showInLegend: false,
+                    states: {
+                        inactive: {
+                            opacity: 1.0
+                        }
+                    },
+                    type: 'scatter',
+                    yAxis: 1
+                },
+
+                {# Second set of grey squares #}
+                {
+                    data: [{{ literacy.data.series.grey2|join(',') }}],
+                    enableMouseTracking: false,
+                    marker: {
+                        radius: 13,
+                        fillColor: '#cccccc',
+                        symbol: 'square'
+                    },
+                    showInLegend: false,
+                    states: {
+                        inactive: {
+                            opacity: 1.0
+                        }
+                    },
+                    type: 'scatter',
+                    yAxis: 1
+                },
+
+                {# Third set of grey squares #}
+                {
+                    data: [{{ literacy.data.series.grey3|join(',') }}],
+                    enableMouseTracking: false,
+                    marker: {
+                        radius: 13,
+                        fillColor: '#cccccc',
+                        symbol: 'square'
+                    },
+                    showInLegend: false,
+                    states: {
+                        inactive: {
+                            opacity: 1.0
+                        }
+                    },
+                    type: 'scatter',
+                    yAxis: 1
+                },
+
+                {# Fourth set of grey squares #}
+                {
+                    data: [{{ literacy.data.series.grey4|join(',') }}],
+                    enableMouseTracking: false,
+                    marker: {
+                        radius: 13,
+                        fillColor: '#cccccc',
+                        symbol: 'square'
+                    },
+                    showInLegend: false,
+                    states: {
+                        inactive: {
+                            opacity: 1.0
+                        }
+                    },
+                    type: 'scatter',
+                    yAxis: 1
+                },
+
+                {# Student Data: Red (Reading) #}
+                {
+                    data: [{{ literacy.data.series.red|join(',') }}],
+                    enableMouseTracking: false,
+                    marker: {
+                        symbol: 'url(/custom/diocesan/achievementreport/img/star-red.png)'
+                    },
+                    name: 'Reading',
+                    states: {
+                        inactive: {
+                            opacity: 1.0
+                        }
+                    },
+                    type: 'scatter',
+                },
+
+                {# Student Data: Blue (Writing) #}
+                {
+                    data: [{{ literacy.data.series.blue|join(',') }}],
+                    enableMouseTracking: false,
+                    marker: {
+                        symbol: 'url(/custom/diocesan/achievementreport/img/star-blue.png)'
+                    },
+                    name: 'Writing',
+                    states: {
+                        inactive: {
+                            opacity: 1.0
+                        }
+                    },
+                    type: 'scatter',
+                }
+            ],
+            title: {
+                text: 'Reading And Writing'
+            },
+            tooltip: {
+                enabled: false,
+            },
+            xAxis: {
+                categories: [{{ literacy.data.x.categories|purify }}],
+                gridLineWidth: 1,
+                title: {
+                    text: 'Time at school',
+                    y: 10
+                }
+            },
+            yAxis: [
+                {
+                    categories: ['null', {{ literacy.data.y.stages|purify }}],
+                    max: 18,
+                    min: 1,
+                    title: {
+                        text: ''
+                    }
+                },
+                {
+                    categories: ['null', {{ literacy.data.y.levelGroups|purify }}],
+                    gridLineWidth: 0,
+                    labels: {
+                        x: -100,
+                        y: 34
+                    },
+                    max: 18,
+                    min: 1,
+                    offset: 0,
+                    startOnTick: false,
+                    tickColor: '#dddddd',
+                    tickLength: 150,
+                    tickmarkPlacement: 'between',
+                    tickPositions: [3,6,9,12,15,18],
+                    tickWidth: 1,
+                    title: {
+                        text: ''
+                    }
+                }
+            ],
+        });
+
+        chart.reflow();
+    });
+</script>
+<div id="literacy"></div>
