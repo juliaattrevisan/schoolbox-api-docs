@@ -83,8 +83,6 @@ class Data extends Base
             AND IndividualReadingVocabularyPATStanineMarker <> 0
         ";
 
-        $result = $this->db->getRow($query, $params);
-
-        return (bool)$result['computed'];
+        return (bool)$this->db->getOne($query, $params);
     }
 }
