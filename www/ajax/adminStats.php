@@ -8,7 +8,6 @@
  */
 
 use External\IConnector;
-use Schoolbox\Database;
 use Schoolbox\Engagement\Login;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -16,7 +15,6 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage;
 $output = array();
-$now = new Alaress_Date_Format();
 
 if(!isset($_POST['module'])) {
     // don't bother returning anything
@@ -29,7 +27,7 @@ switch($_POST['module']) {
         /** @var IConnector $config */
         $config        = $kernel->get('config');
         $login         = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
-        $summary       = $login->userSummary($now);
+        $summary       = $login->userSummary(null);
         $totalUser     = 0;
         $totalLogin    = 0;
 

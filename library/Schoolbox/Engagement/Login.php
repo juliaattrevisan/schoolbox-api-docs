@@ -95,27 +95,35 @@ class Login
 
     /**
      * Returns a summary of total users in system, and number of active sessions
-     * @param Alaress_Date_Format $end
+     * @param null|Alaress_Date_Format $end
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function userSummary(Alaress_Date_Format $end): array
+    public function userSummary(?Alaress_Date_Format $end): array
     {
-        $start = clone $end;
-        $start->startOfMonth();
-        $query = '
+        if (null === $end) {
+            $userWhere = '`user`.deleted_at IS NULL';
+            $params    = [];
+        } else {
+            $start = clone $end;
+            $start->startOfMonth();
+            $userWhere = '`user`.created_at <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start)';
+            $params    = [
+                'start' => $start->getDatabase(),
+                'end'   => $end->getDatabase(),
+            ];
+        }
+
+        $query = "
                 SELECT groups.id, groups.`name`, COUNT(*) total
                 FROM groups
                 JOIN `user` ON groups.id=`user`.group_id 
-                WHERE `user`.created_at <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start) AND `groups`.deleted_at IS NULL
+                WHERE {$userWhere} AND `groups`.deleted_at IS NULL
                 GROUP BY groups.id
-                ORDER BY groups.`name`';
+                ORDER BY groups.`name`";
 
         $statement = $this->database->prepareQuery($query);
-        $statement->execute([
-            'start' => $start->getDatabase(),
-            'end'   => $end->getDatabase()
-        ]);
+        $statement->execute($params);
         $summary = new Collection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
