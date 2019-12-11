@@ -249,7 +249,7 @@ class Controller extends Base
                 'PATTable' => $PATTable,
                 'PATNavigation' => [
                     'all' => (new PAT\Navigation($user, $externalUser, $db, $selectedYear))->findData(),
-                    'selected' => $year ?? (int)date('Y')
+                    'selected' => $selectedYear
                 ],
                 'PATHeading' => [
                     'label' => (new PAT\Heading($user, $externalUser, $db, $selectedYear))->findData(),
@@ -315,7 +315,7 @@ class Controller extends Base
                 'STARStanine' => $STARStanine,
                 'STARStanineNavigation' => [
                     'all' => (new STAR\Stanine\Navigation($user, $externalUser, $db, $selectedYear))->findData(),
-                    'selected' => $year ?? (int)date('Y')
+                    'selected' => $selectedYear
                 ],
             ]
         ]);
