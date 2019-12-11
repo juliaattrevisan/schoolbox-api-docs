@@ -68,46 +68,6 @@ class NavigationSelector
 
 
     /**
-     * Has NCEA records
-     *
-     * @var bool
-     */
-    private $hasNcea = false;
-
-
-    /**
-     * Has IB records
-     *
-     * @var bool
-     */
-    private $hasIb = false;
-
-
-    /**
-     * Has School Grades
-     *
-     * @var bool
-     */
-    private $hasSchoolGrades = false;
-
-
-    /**
-     * Has Comments
-     *
-     * @var bool
-     */
-    private $hasComments = false;
-
-
-    /**
-     * Has Co-Curricular activities
-     *
-     * @var bool
-     */
-    private $hasCoCurricular = false;
-
-
-    /**
      * Available navigation options
      *
      * @var array
@@ -162,7 +122,7 @@ class NavigationSelector
 
             /* NCEA for year 11 specifically
              */
-            if ($this->hasNcea) {
+            if ($this->hasNcea()) {
                 $this->defaultReport = self::NCEA_KEY;
             } else {
                 $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
@@ -171,9 +131,9 @@ class NavigationSelector
 
             /* Need to decide whether this is an IB or an NCEA student
              */
-            if ($this->hasIb) {
+            if ($this->hasIb()) {
                 $this->defaultReport = self::IB_KEY;
-            } elseif ($this->hasNcea) {
+            } elseif ($this->hasNcea()) {
                 $this->defaultReport = self::NCEA_KEY;
             } else {
                 $this->defaultReport = ['error' => 'Year 12/13 student not in NCEA or IB.'];
@@ -200,8 +160,6 @@ class NavigationSelector
         /* Conditionally add NCEA option
          */
         if ($this->hasNcea()) {
-            $this->hasNcea = true;
-
             $availableNavigation[self::NCEA_KEY] = [
                 'url' => $this->router->generate('achievementreport.getNcea', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -214,8 +172,6 @@ class NavigationSelector
         /* Conditionally add IB option
          */
         if ($this->hasIb()) {
-            $this->hasIb = true;
-
             $availableNavigation[self::IB_KEY] = [
                 'url' => $this->router->generate('achievementreport.getIb', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -228,8 +184,6 @@ class NavigationSelector
         /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
-            $this->hasSchoolGrades = true;
-
             $availableNavigation[self::SCHOOLGRADES_KEY] = [
                 'url' => $this->router->generate('achievementreport.getSchoolGrades', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -254,8 +208,6 @@ class NavigationSelector
         /* Conditionally add Comment option
          */
         if ($this->hasComments()) {
-            $this->hasComments = true;
-
             $availableNavigation[self::COMMENTS_KEY] = [
                 'url' => $this->router->generate('achievementreport.getComments', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -276,8 +228,6 @@ class NavigationSelector
         /* Conditionally add CoCurricular option
          */
         if ($this->hasCoCurricular()) {
-            $this->hasCoCurricular = true;
-
             $availableNavigation[self::COCURRICULAR_KEY] = [
                 'url' => $this->router->generate('achievementreport.getCoCurricular', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -294,9 +244,9 @@ class NavigationSelector
     /**
      * Find out if they are in the Comments table
      *
-     * @return int
+     * @return bool
      */
-    private function hasComments(): int
+    private function hasComments(): bool
     {
         $params = [
             'externalId' => $this->externalUser['StudentID'],
@@ -308,18 +258,16 @@ class NavigationSelector
             WHERE id = :externalId
         ";
 
-        $count = $this->db->getRow($query, $params);
-
-        return (int)$count['computed'];
+        return (bool)$this->db->getOne($query, $params);
     }
 
 
     /**
      * Find out if they are in the School Grades table
      *
-     * @return int
+     * @return bool
      */
-    private function hasSchoolGrades(): int
+    private function hasSchoolGrades(): bool
     {
         $params = [
             'externalId' => $this->externalUser['StudentID'],
@@ -331,18 +279,16 @@ class NavigationSelector
             WHERE ID = :externalId
         ";
 
-        $count = $this->db->getRow($query, $params);
-
-        return (int)$count['computed'];
+        return (bool)$this->db->getOne($query, $params);
     }
 
 
     /**
      * Find out if they are in the NCEA table
      *
-     * @return int
+     * @return bool
      */
-    private function hasNcea(): int
+    private function hasNcea(): bool
     {
         $params = [
             'externalId' => $this->externalUser['StudentID'],
@@ -354,18 +300,16 @@ class NavigationSelector
             WHERE ID = :externalId
         ";
 
-        $count = $this->db->getRow($query, $params);
-
-        return (int)$count['computed'];
+        return (bool)$this->db->getOne($query, $params);
     }
 
 
     /**
      * Find out if they are in the IB table
      *
-     * @return int
+     * @return bool
      */
-    private function hasIb(): int
+    private function hasIb(): bool
     {
         $params = [
             'externalId' => $this->externalUser['StudentID'],
@@ -377,18 +321,16 @@ class NavigationSelector
             WHERE ID = :externalId
         ";
 
-        $count = $this->db->getRow($query, $params);
-
-        return (int)$count['computed'];
+        return (bool)$this->db->getOne($query, $params);
     }
 
 
     /**
      * Find out if they have any data in Co Curricular
      *
-     * @return int
+     * @return bool
      */
-    private function hasCoCurricular(): int
+    private function hasCoCurricular(): bool
     {
         $params = [
             'externalId' => $this->externalUser['StudentID'],
@@ -400,9 +342,7 @@ class NavigationSelector
             WHERE StudentID = :externalId
         ";
 
-        $count = $this->db->getRow($query, $params);
-
-        return (int)$count['computed'];
+        return (bool)$this->db->getOne($query, $params);
     }
 
 
