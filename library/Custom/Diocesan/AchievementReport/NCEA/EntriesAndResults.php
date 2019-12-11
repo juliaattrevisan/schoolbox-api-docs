@@ -63,7 +63,7 @@ class EntriesAndResults extends Base
              * with square brackets. This indicates that it is a progressive grade,
              * used specifically for Dio
              */
-            if (!in_array($result, $this->getExclusionLetterRegistry(), false)) {
+            if (!in_array($result, $this->exclusionLetterRegistry, false)) {
                 if (strlen($result) && ($internalExternal === 'EX') && ($studentYear == $this->getCurrentYear())) {
                     $result = "[{$strippedResult}]";
                 }
@@ -130,7 +130,7 @@ class EntriesAndResults extends Base
                         if ($letter === 'N') {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                         }
-                        elseif (in_array($letter, $this->getAchievementLetterRegistry(), false)) {
+                        elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                         }
@@ -141,7 +141,7 @@ class EntriesAndResults extends Base
                 if ($letter === 'N') {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                 }
-                elseif (in_array($letter, $this->getAchievementLetterRegistry(), false)) {
+                elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                 }

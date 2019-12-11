@@ -116,7 +116,7 @@ class CourseCreditSummary extends Base
 
                     /* Only accumulate A/M/E values
                      */
-                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry(), false)) {
+                    if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
                         $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
                         $finalStack['courses'][$courseName]['attempted'] += $current['ResultCredits'];
                         $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];

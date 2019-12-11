@@ -90,7 +90,7 @@ class YearlyBreakdown extends Base
                                     /* Achieved Grades only accumulate when student got an
                                      * achievement letter
                                      */
-                                    if (in_array($letter, $this->getAchievementLetterRegistry(), false)) {
+                                    if (in_array($letter, $this->achievementLetterRegistry, false)) {
                                         $yearStack[$year][$courseName]['achievedGrades']++;
                                         $totals[$year]['achievedGrades']++;
                                     }

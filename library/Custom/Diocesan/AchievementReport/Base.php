@@ -184,10 +184,14 @@ abstract class Base
      * Set db
      *
      * @param \MSSQL $db
+     *
+     * @return $this
      */
-    protected function setDb($db)
+    protected function setDb($db): self
     {
         $this->db = $db;
+
+        return $this;
     }
 
 
@@ -196,7 +200,7 @@ abstract class Base
      *
      * @return \MSSQL
      */
-    protected function getDb()
+    protected function getDb(): MSSQL
     {
         return $this->db;
     }
@@ -206,10 +210,14 @@ abstract class Base
      * Set heading
      *
      * @param string $heading
+     *
+     * @return $this
      */
-    protected function setHeading($heading)
+    protected function setHeading($heading): self
     {
         $this->heading = $heading;
+
+        return $this;
     }
 
 
@@ -218,7 +226,7 @@ abstract class Base
      *
      * @return string
      */
-    public function getHeading()
+    public function getHeading(): string
     {
         return $this->heading;
     }
@@ -228,10 +236,14 @@ abstract class Base
      * Set externalUser
      *
      * @param array $externalUser
+     *
+     * @return $this
      */
-    protected function setExternalUser($externalUser)
+    protected function setExternalUser($externalUser): self
     {
         $this->externalUser = $externalUser;
+
+        return $this;
     }
 
 
@@ -240,7 +252,7 @@ abstract class Base
      *
      * @return array
      */
-    protected function getExternalUser()
+    protected function getExternalUser(): array
     {
         return $this->externalUser;
     }
@@ -248,17 +260,21 @@ abstract class Base
 
     /**
      * @param string $year
+     *
+     * @return $this
      */
-    protected function setYear($year)
+    protected function setYear($year): self
     {
         $this->year = $year;
+
+        return $this;
     }
 
 
     /**
      * @return string
      */
-    protected function getYear()
+    protected function getYear(): string
     {
         return $this->year;
     }
@@ -268,10 +284,14 @@ abstract class Base
      * Set current year
      *
      * @param string $currentYear
+     *
+     * @return $this
      */
-    protected function setCurrentYear($currentYear)
+    protected function setCurrentYear($currentYear): self
     {
         $this->currentYear = $currentYear;
+
+        return $this;
     }
 
 
@@ -280,20 +300,9 @@ abstract class Base
      *
      * @return string
      */
-    public function getCurrentYear()
+    public function getCurrentYear(): string
     {
         return $this->currentYear;
-    }
-
-
-    /**
-     * Set letter registry
-     *
-     * @param array $letterRegistry
-     */
-    protected function setLetterRegistry($letterRegistry)
-    {
-        $this->letterRegistry = $letterRegistry;
     }
 
 
@@ -302,52 +311,8 @@ abstract class Base
      *
      * @return array
      */
-    public function getLetterRegistry()
+    public function getLetterRegistry(): array
     {
         return $this->letterRegistry;
-    }
-
-
-    /**
-     * Set achievement letter registry
-     *
-     * @param array $achievementLetterRegistry
-     */
-    protected function setAchievementLetterRegistry($achievementLetterRegistry)
-    {
-        $this->achievementLetterRegistry = $achievementLetterRegistry;
-    }
-
-
-    /**
-     * Get achievement letter registry
-     *
-     * @return array
-     */
-    public function getAchievementLetterRegistry()
-    {
-        return $this->achievementLetterRegistry;
-    }
-
-
-    /**
-     * Get exclusion letter registry
-     *
-     * @param array $exclusionLetterRegistry
-     */
-    protected function setExclusionLetterRegistry($exclusionLetterRegistry)
-    {
-        $this->exclusionLetterRegistry = $exclusionLetterRegistry;
-    }
-
-
-    /**
-     * Set exclusion letter registry
-     *
-     * @return array
-     */
-    public function getExclusionLetterRegistry()
-    {
-        return $this->exclusionLetterRegistry;
     }
 }
