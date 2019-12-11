@@ -77,16 +77,11 @@ class Data extends Base
         ];
 
         $query = "
-            SELECT TOP 1 COUNT(*) AS 'computed',
-                Seq,
-                ThisStudentStanine,
-                IndividualMathsPATStanineMarker,
-                DiocesanMathsPATStaninePercentage,
-                NationalMathsPATStaninePercentage
+            SELECT TOP 1 COUNT(*) AS 'computed'
             FROM uvSchoolBoxPATSTARSummary
             WHERE ThisStudentID = :externalId
             AND IndividualMathsPATStanineMarker <> 0
-            ORDER BY seq";
+        ";
 
         $result = $this->db->getRow($query, $params);
 
