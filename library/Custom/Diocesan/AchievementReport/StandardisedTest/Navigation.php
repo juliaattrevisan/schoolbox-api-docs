@@ -156,7 +156,10 @@ class Navigation
         /* Conditional Mathematics report
          */
         $availableNavigation[self::STANDARDISEDTEST_MATHEMATICS_KEY] = [
-            'url' => '',
+            'url' => $this->router->generate('achievementreport.getStandardisedTestMathematics', [
+                'externalUserId' => $this->externalUser['StudentID'],
+                'year' => $this->year
+            ]),
             'label' => 'Mathematics'
         ];
 

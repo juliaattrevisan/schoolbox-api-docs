@@ -15,6 +15,7 @@ use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 use Custom\Diocesan\AchievementReport\StandardisedTest\STAR;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Reading;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Writing;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Mathematics;
 use MSSQL;
 use Schoolbox\User;
 
@@ -428,6 +429,53 @@ class Controller extends Base
                 ],
 
                 'writing' => $writing
+            ]
+        ]);
+    }
+
+
+    /**
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws RouteNotFound
+     */
+    public function getStandardisedTestMathematics(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    {
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? (int)date('Y');
+
+        /* Mathematics
+         */
+        $mathematicsPayload = (new Mathematics\Data($user, $externalUser, $db, $selectedYear));
+
+        $mathematics = [
+            'data' => $mathematicsPayload->findData(),
+            'visible' => (new Mathematics\ValidHasData())->isSatisfiedBy($user->getYear(), $mathematicsPayload->hasData())
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => '@standardisedTest/Mathematics/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+
+                'subnavigation' => [
+                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+
+                    /* TODO: For each Standardised Test report piece
+                     */
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+
+                'mathematics' => $mathematics
             ]
         ]);
     }
