@@ -59,7 +59,7 @@ class Controller extends Base
      * @param int|null $year
      * @throws RouteNotFound
      */
-    public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
         $selector = new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year);
         $selector->determineDefaultReport();
