@@ -52,7 +52,7 @@ class Data extends Base
 
         /* Find data for each of the three series
          */
-        $payload = new Payload(self::GRAPH_TITLE, (int)$this->year);
+        $payload = new Payload(self::GRAPH_TITLE);
 
         foreach ($result as $row) {
             $payload

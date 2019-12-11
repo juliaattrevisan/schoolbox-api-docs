@@ -49,7 +49,7 @@ class Data extends Base
         /* Find data for each of the three series
          * Inspect the data to find out what Year Level this actually was, for the given student
          */
-        $payload = new Payload('', (int)$this->year);
+        $payload = new Payload('');
         $year = '';
 
         foreach ($result as $row) {
