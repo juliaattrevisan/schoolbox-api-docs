@@ -44,7 +44,7 @@ class EntriesAndResults extends Base
             /* Teachers
              * Trim empty teachers out for course teachers
              */
-            foreach(array(1, 2, 3) as $currentTeacherIndex) {
+            foreach([1, 2, 3] as $currentTeacherIndex) {
                 $key = "ClassTeacher{$currentTeacherIndex}";
                 $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 

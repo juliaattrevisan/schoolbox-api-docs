@@ -84,7 +84,7 @@ abstract class Base
      *
      * @var array
      */
-    protected $letterRegistry = array('N', 'A', 'M', 'E');
+    protected $letterRegistry = ['N', 'A', 'M', 'E'];
 
 
     /**
@@ -92,7 +92,7 @@ abstract class Base
      *
      * @var array
      */
-    protected $achievementLetterRegistry = array('A', 'M', 'E');
+    protected $achievementLetterRegistry = ['A', 'M', 'E'];
 
 
     /**
@@ -103,7 +103,7 @@ abstract class Base
      *
      * @var array
      */
-    protected $exclusionLetterRegistry = array('Y', 'V', 'Z');
+    protected $exclusionLetterRegistry = ['Y', 'V', 'Z'];
 
 
     /**
@@ -127,7 +127,8 @@ abstract class Base
     /**
      * Get a list of all the views with 'uv' as a prefix
      */
-    protected function debug() {
+    protected function debug(): void
+    {
         $query = "
             SELECT TABLE_CATALOG,
             TABLE_SCHEMA,
@@ -169,7 +170,8 @@ abstract class Base
      * @param $result
      * @return bool
      */
-    protected function isProgressive($result) {
+    protected function isProgressive($result): bool
+    {
         return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\d*\]/', $result);
     }
 
