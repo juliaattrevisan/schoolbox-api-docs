@@ -137,12 +137,12 @@ class Controller extends Base
              * at that, I guess
              */
             default:
-                $this->getResponse()->content->set(array(
+                $this->getResponse()->content->set([
                     'template' => '@achievementreport/Error.twig',
-                    'data' => array(
+                    'data' => [
                         'errorMessage' => $report['error']
-                    )
-                ));
+                    ]
+                ]);
 
                 break;
         }
