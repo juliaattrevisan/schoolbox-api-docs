@@ -22,6 +22,11 @@ class Data extends Base
      * Y categories, Stages
      */
     private const Y_STAGES = [
+
+        /* Offset node
+         */
+        'null',
+
         'Beginning',
         'Proficient',
         'Advanced',
@@ -41,6 +46,11 @@ class Data extends Base
      * Y categories, Curriculum Levels
      */
     private const Y_CURRICULUM_LEVELS = [
+
+        /* Offset node
+         */
+        'null',
+
         'a ',
         'b ',
         'Curriculum Level 1',
@@ -86,8 +96,8 @@ class Data extends Base
                 'categories' => []
             ],
             'y' => [
-                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
-                'curriculumLevels' => '"' . implode('","', self::Y_CURRICULUM_LEVELS) . '"'
+                'stages' => json_encode(self::Y_STAGES),
+                'curriculumLevels' => json_encode(self::Y_CURRICULUM_LEVELS),
             ],
             'series' => [
                 'student' => [],
@@ -102,7 +112,7 @@ class Data extends Base
 
             /* Accumulate the x-axis categories
              */
-            $stack['x']['categories'][] = "'{$row['xAxis']}'";
+            $stack['x']['categories'][] = $row['xAxis'];
 
             /* The stars (what the student got)
              */
@@ -116,7 +126,7 @@ class Data extends Base
             !$row['Line4'] ? $stack['series']['grey4'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey4'][] = $row['Line4'];
         }
 
-        $stack['x']['categories'] = implode(',', $stack['x']['categories']);
+        $stack['x']['categories'] = json_encode($stack['x']['categories']);
 
         /* If the student has stars, they have values
          */

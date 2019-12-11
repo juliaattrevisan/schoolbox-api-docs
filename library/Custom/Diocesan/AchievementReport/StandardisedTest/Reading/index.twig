@@ -149,7 +149,7 @@
                         enabled: false,
                     },
                     xAxis: {
-                        categories: [{{ reading.data.x.categories|purify }}],
+                        categories: {{ reading.data.x.categories|purify }},
                         gridLineWidth: 1,
                         title: {
                             text: 'Time at school',
@@ -158,7 +158,7 @@
                     },
                     yAxis: [
                         {
-                            categories: ['null', {{ reading.data.y.probeAge|purify }}],
+                            categories: {{ reading.data.y.probeAge|purify }},
                             max: 25,
                             min: 1,
                             title: {
@@ -167,7 +167,7 @@
                             }
                         },
                         {
-                            categories: ['null', {{ reading.data.y.colourWheel|purify }}],
+                            categories: {{ reading.data.y.colourWheel|purify }},
                             labels: {
                                 formatter: function() {
                                     if (this.value != ' ') {

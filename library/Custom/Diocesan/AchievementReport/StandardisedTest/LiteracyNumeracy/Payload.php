@@ -28,6 +28,10 @@ class Payload
      */
     private const Y_STAGES = [
 
+        /* Offset node
+         */
+        'null',
+
         /* Level 1
          */
         'Beginning',
@@ -71,6 +75,10 @@ class Payload
      */
     private const Y_LEVEL_GROUPS = [
 
+        /* Offset node
+         */
+        'null',
+
         ' ',
         ' ',
         'Level 1',
@@ -104,8 +112,8 @@ class Payload
                 'categories' => []
             ],
             'y' => [
-                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
-                'levelGroups' => '"' . implode('","', self::Y_LEVEL_GROUPS) . '"',
+                'stages' => json_encode(self::Y_STAGES),
+                'levelGroups' => json_encode(self::Y_LEVEL_GROUPS),
             ],
             'series' => [
                 'red' => [],

@@ -132,7 +132,7 @@
                         enabled: false,
                     },
                     xAxis: {
-                        categories: [{{ mathematics.data.x.categories|purify }}],
+                        categories: {{ mathematics.data.x.categories|purify }},
                         gridLineWidth: 1,
                         title: {
                             text: 'Time at school',
@@ -141,7 +141,7 @@
                     },
                     yAxis: [
                         {
-                            categories: ['null', {{ mathematics.data.y.stages|purify }}],
+                            categories: {{ mathematics.data.y.stages|purify }},
                             max: 27,
                             min: 1,
                             title: {
@@ -149,7 +149,7 @@
                             }
                         },
                         {
-                            categories: ['null', {{ mathematics.data.y.levelGroups|purify }}],
+                            categories: {{ mathematics.data.y.levelGroups|purify }},
                             gridLineWidth: 0,
                             labels: {
                                 x: -100,
@@ -169,7 +169,7 @@
                             }
                         },
                         {
-                            categories: ['null', {{ mathematics.data.y.lower|purify }}],
+                            categories: {{ mathematics.data.y.lower|purify }},
                             gridLineWidth: 0,
                             labels: {
                                 y: -7

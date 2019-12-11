@@ -78,7 +78,7 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\StandardisedTest\
          */
         $template = (new Categories())->generate($groupData, $numSeries);
 
-        $stack['x']['categories'] = '"' . implode('","', $template) . '"';
+        $stack['x']['categories'] = json_encode($template);
 
         /* Map AreaSeq values to series' $index; AreaSeq values can be any sequenced integer
          */
