@@ -164,26 +164,13 @@ class Controller extends Base
         /* TODO: Redirect to the first available section of the standardised test
          * PAT, STAR, Reading, Writing, Mathematics, Literacy/Numeracy
          */
-        $this->getResponse()->content->set([
-            'template' => '@standardisedTest/index.twig',
-            'data' => [
-                'navigation' => [
-                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
-                ],
-                'externalUser' => $externalUser,
-                'user' => $user,
-                'year' => $year,
 
-                'subnavigation' => [
-                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
-                ],
-            ]
-        ]);
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('achievementreport.getStandardisedTestPAT', [
+                'externalUserId' => $externalUser['StudentID'],
+                'year' => $year
+            ])
+        );
     }
 
 
@@ -256,10 +243,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_PAT_KEY
                 ],
 
                 'PATTable' => $PATTable,
@@ -324,10 +308,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_STAR_KEY
                 ],
 
                 'STARTable' => $STARTable,
@@ -376,10 +357,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_READING_KEY
                 ],
 
                 'reading' => $reading
@@ -423,10 +401,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_WRITING_KEY
                 ],
 
                 'writing' => $writing
@@ -470,10 +445,7 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_MATHEMATICS_KEY
                 ],
 
                 'mathematics' => $mathematics
@@ -504,6 +476,15 @@ class Controller extends Base
             'visible' => (new LiteracyNumeracy\Literacy\ValidHasData())->isSatisfiedBy($user->getYear(), $literacyPayload->hasData())
         ];
 
+        /* Numeracy
+         */
+        $numeracyPayload = (new LiteracyNumeracy\Numeracy\Data($user, $externalUser, $db, $selectedYear));
+
+        $numeracy = [
+            'data' => $numeracyPayload->findData(),
+            'visible' => (new LiteracyNumeracy\Numeracy\ValidHasData())->isSatisfiedBy($user->getYear(), $numeracyPayload->hasData())
+        ];
+
         $this->getResponse()->content->set([
             'template' => '@standardisedTest/LiteracyNumeracy/index.twig',
             'data' => [
@@ -517,13 +498,11 @@ class Controller extends Base
 
                 'subnavigation' => [
                     'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
-
-                    /* TODO: For each Standardised Test report piece
-                     */
-                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                    'selected' => StandardisedTest\Navigation::STANDARDISEDTEST_LITERACYNUMERACY_KEY
                 ],
 
-                'literacy' => $literacy
+                'literacy' => $literacy,
+                'numeracy' => $numeracy,
             ]
         ]);
     }

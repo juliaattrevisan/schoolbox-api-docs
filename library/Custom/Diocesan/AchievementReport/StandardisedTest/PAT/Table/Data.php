@@ -18,14 +18,6 @@ class Data extends Base
 {
 
     /**
-     * Whether there was any data found
-     *
-     * @var bool
-     */
-    private $hasData = false;
-
-
-    /**
      * I changed the SELECT aliases from the original, in the interest of posterity
      *
      * @return array
@@ -85,14 +77,5 @@ class Data extends Base
         $result = $this->findData();
 
         return (bool)\count($result);
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function hasData(): bool
-    {
-        return $this->hasData;
     }
 }

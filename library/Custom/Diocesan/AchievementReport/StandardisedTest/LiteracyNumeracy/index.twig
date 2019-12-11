@@ -25,15 +25,52 @@
     </div>
 
     <div class="row">
-        {% if literacy.visible %}
-        <div class="small-6 columns">
-            {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
+        <div class="small-12 island">
+            <section>
+                <div class="row">
+                    {% if literacy.visible %}
+                        <div class="small-6 columns">
+                            {% include '@standardisedTest/LiteracyNumeracy/Literacy/graph.twig' with { literacy: literacy } %}
+                        </div>
+                    {% endif %}
+
+                    {% if numeracy.visible %}
+                        <div class="small-6 columns">
+                            {% include '@standardisedTest/LiteracyNumeracy/Numeracy/graph.twig' with { numeracy: numeracy } %}
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
         </div>
-        {% endif %}
     </div>
 
     <div class="row">
         <div class="small-12 island">
+            <section class="content">
+                <div class="row">
+                    <div class="small-12 medium-4 columns">
+                        <dl>
+                            <dt>Beginning</dt>
+                            <dd>The initial stage of competence</dd>
+                        </dl>
+                    </div>
+
+                    <div class="small-12 medium-4 columns">
+                        <dl>
+                            <dt>Proficient</dt>
+                            <dd>Having a marked degree of competence</dd>
+                        </dl>
+                    </div>
+
+                    <div class="small-12 medium-4 columns">
+                        <dl>
+                            <dt>Advanced</dt>
+                            <dd>Beyond in complexity, knowledge and skill</dd>
+                        </dl>
+                    </div>
+                </div>
+            </section>
+
             <section class="content">
                 <p>
                     This literacy and numeracy progress report shows you where your daughter is achieving in relation
