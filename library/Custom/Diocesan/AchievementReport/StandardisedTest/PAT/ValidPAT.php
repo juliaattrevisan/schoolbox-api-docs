@@ -111,7 +111,7 @@ class ValidPAT
              * Then test what we found
              */
             foreach ($registry as $piece) {
-                if ($piece['test']->isSatisifiedBy((int)$this->user->getYear(), $piece['data']->hasDataFromAnyYear())) {
+                if ($piece['test']->isSatisfiedBy((int)$user->getYear(), $piece['data']->hasDataFromAnyYear())) {
                     return true;
                 }
             }

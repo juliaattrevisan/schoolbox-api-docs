@@ -77,7 +77,7 @@ class Data extends Base
         ];
 
         $query = "
-            SELECT TOP 1 COUNT(*) AS 'computed'
+            SELECT TOP 1 COUNT(*) AS 'computed',
                 Seq,
                 ThisStudentStanine,
                 IndividualReadingVocabularyPATStanineMarker,
