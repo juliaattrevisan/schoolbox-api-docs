@@ -129,7 +129,7 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/Comments', 'comments');
         $this->addTemplatePath($templateLoader, __DIR__ . '/StandardisedTest', 'standardisedTest');
         $this->addTemplatePath($templateLoader, __DIR__ . '/CoCurricular', 'coCurricular');
-        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates', 'templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates', 'achievementreport');
     }
 
 

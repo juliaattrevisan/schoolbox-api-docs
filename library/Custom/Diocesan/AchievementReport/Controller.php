@@ -138,7 +138,7 @@ class Controller extends Base
              */
             default:
                 $this->getResponse()->content->set(array(
-                    'template' => '@templates/Error.twig',
+                    'template' => '@achievementreport/Error.twig',
                     'data' => array(
                         'errorMessage' => $report['error']
                     )
