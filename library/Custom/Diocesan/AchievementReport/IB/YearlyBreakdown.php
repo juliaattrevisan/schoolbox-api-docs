@@ -37,7 +37,7 @@ class YearlyBreakdown extends Base
             ORDER BY Heading, AssessAreaSeq, Term
         ';
 
-        $results = $this->getDb()->getAll($query, $params) ?: [];
+        $results = $this->db->getAll($query, $params) ?: [];
 
         $finalStack = [];
 

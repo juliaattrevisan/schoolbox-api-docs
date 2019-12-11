@@ -52,7 +52,7 @@ class CourseCreditSummaryNavigation extends Base
             ORDER BY StudentYear DESC
         ";
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         $allYears = [];
 

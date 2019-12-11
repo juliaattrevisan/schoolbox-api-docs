@@ -52,7 +52,7 @@ class CourseCreditSummary extends Base
                 StudentYear = :year
         ';
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;

@@ -39,7 +39,7 @@ class Heading extends Base
             AND Fileyear = :year
         ';
 
-        $result = array_column($this->getDb()->getAll($query, $params), 'YearLevel');
+        $result = array_column($this->db->getAll($query, $params), 'YearLevel');
 
         $yearLevel = array_pop($result);
 

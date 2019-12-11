@@ -51,7 +51,7 @@ class Data extends Base
             ORDER BY R.YearLevel DESC
         ';
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         /* Ensure everything is grouped by year
          */

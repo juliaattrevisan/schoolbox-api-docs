@@ -69,7 +69,7 @@ class LiteracyNumeracyCheckbox extends Base
                 id = :id5
         ";
 
-        $result = $this->getDb()->getRow($query, $params);
+        $result = $this->db->getRow($query, $params);
 
         if (is_array($result)) {
 

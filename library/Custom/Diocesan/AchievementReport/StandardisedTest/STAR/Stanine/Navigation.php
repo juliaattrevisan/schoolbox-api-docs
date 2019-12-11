@@ -38,6 +38,6 @@ class Navigation extends Base
             ORDER BY Fileyear DESC
         ';
 
-        return array_column($this->getDb()->getAll($query, $params), 'Fileyear');
+        return array_column($this->db->getAll($query, $params), 'Fileyear');
     }
 }

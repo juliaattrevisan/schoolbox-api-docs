@@ -34,7 +34,7 @@ class Navigation extends Base
             ORDER BY fileyear DESC
         ';
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         $allYears = [];
 

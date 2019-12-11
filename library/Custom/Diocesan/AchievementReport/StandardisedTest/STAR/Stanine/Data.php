@@ -44,7 +44,7 @@ class Data extends Base
             ORDER BY Seq
         ';
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         /* Find data for each of the three series
          * Inspect the data to find out what Year Level this actually was, for the given student
@@ -88,7 +88,7 @@ class Data extends Base
             AND IndividualStarTestStanineMarker <> 0
         ';
 
-        $result = $this->getDb()->getOne($query, $params);
+        $result = $this->db->getOne($query, $params);
 
         return (bool)$result;
     }

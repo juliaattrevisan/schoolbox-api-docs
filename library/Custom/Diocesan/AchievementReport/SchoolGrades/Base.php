@@ -126,7 +126,7 @@ abstract class Base extends AchievementReportBase
                 StrippedResult DESC
         ";
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
@@ -179,7 +179,7 @@ abstract class Base extends AchievementReportBase
                 StrippedResult DESC
         ";
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
@@ -193,12 +193,12 @@ abstract class Base extends AchievementReportBase
      * Explorer, reporting!
      */
     protected function explorerReporting() {
-        $explorer = $this->getDb()->getAll("
+        $explorer = $this->db->getAll("
             SELECT TOP 5 *
             FROM dbo.uvSchoolBoxSchoolGradeResults
         ");
 
-//        $explorer = $this->getDb()->getAll("
+//        $explorer = $this->db->getAll("
 //            SELECT
 //                TABLE_CATALOG,
 //                TABLE_SCHEMA,

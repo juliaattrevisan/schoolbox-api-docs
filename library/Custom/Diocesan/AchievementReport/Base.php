@@ -116,7 +116,6 @@ abstract class Base
      */
     public function __construct(User $user, array $externalUser, MSSQL $db, $year) {
         $this->user = $user;
-
         $this->externalUser = $externalUser;
         $this->db = $db;
         $this->year = $year;
@@ -139,7 +138,7 @@ abstract class Base
             AND TABLE_TYPE = 'VIEW'
         ";
 
-        $stuff = $this->getDb()->getAll($query);
+        $stuff = $this->db->getAll($query);
 
         new \Alaress_Probe($stuff);
     }
@@ -178,18 +177,6 @@ abstract class Base
 
     /* Getters/Setters
      */
-
-
-    /**
-     * Get db
-     *
-     * @return \MSSQL
-     */
-    protected function getDb(): MSSQL
-    {
-        return $this->db;
-    }
-
 
     /**
      * Get heading

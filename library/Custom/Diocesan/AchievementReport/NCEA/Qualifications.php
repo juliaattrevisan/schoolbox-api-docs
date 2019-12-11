@@ -34,7 +34,7 @@ class Qualifications extends Base
             ORDER BY StudentYear DESC
         ';
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         /* Qualifications results are accumulated through each record in the
          * NCEA table. One record may have none; but as the student progresses

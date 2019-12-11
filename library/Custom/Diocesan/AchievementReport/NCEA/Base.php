@@ -19,12 +19,12 @@ abstract class Base extends AchievementReportBase {
      * Explorer, reporting!
      */
     protected function explorerReporting() {
-        $explorer = $this->getDb()->getAll("
+        $explorer = $this->db->getAll("
             SELECT TOP 10 *
             FROM dbo.uvSchoolBoxNCEAResults
         ");
 
-//        $explorer = $this->getDb()->getAll("
+//        $explorer = $this->db->getAll("
 //            SELECT
 //                TABLE_CATALOG,
 //                TABLE_SCHEMA,

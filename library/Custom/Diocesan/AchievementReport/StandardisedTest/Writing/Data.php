@@ -78,7 +78,7 @@ class Data extends Base
             ORDER BY xAxisOrderSeq
         ';
 
-        $result = $this->getDb()->getAll($query, $params);
+        $result = $this->db->getAll($query, $params);
 
         $stack = [
             'x' => [
