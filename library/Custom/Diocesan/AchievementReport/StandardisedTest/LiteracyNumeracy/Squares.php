@@ -11,6 +11,12 @@ class Squares
 {
 
     /**
+     * Columns denoting grey squares' data
+     */
+    private const GREY_SQUARES = ['Line1', 'Line2', 'Line3', 'Line4'];
+
+
+    /**
      * Mine out the grey squares as individual series
      *
      * @param array $result
@@ -23,7 +29,7 @@ class Squares
     {
         $greys = [];
 
-        foreach (['Line1', 'Line2', 'Line3', 'Line4'] as $line) {
+        foreach (self::GREY_SQUARES as $line) {
             $grey = $this->initialisePlaceholder($template);
 
             $groupData = (new GroupData())->generate($result, $line);
