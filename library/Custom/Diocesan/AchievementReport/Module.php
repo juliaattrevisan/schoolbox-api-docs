@@ -27,6 +27,7 @@ use Schoolbox\UserMapper;
  */
 class Module extends BaseModule
 {
+
     /**
      * @inheritdoc
      */

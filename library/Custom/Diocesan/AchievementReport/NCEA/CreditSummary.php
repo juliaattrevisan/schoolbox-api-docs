@@ -31,14 +31,17 @@ class CreditSummary extends Base
     {
         $allResults = $this->findValues();
 
-        $finalStack = [];
-        $finalStack['table']['creditSummary'] = $this->findTable($allResults);
-        $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
-        $finalStack['graph']['standardType'] = $this->findStandardType($allResults);
-        $finalStack['graph']['assessmentType'] = $this->findAssessmentType($allResults);
-        $finalStack['graph']['result'] = $this->findResult($allResults);
-
-        return $finalStack;
+        return [
+            'table' => [
+                'creditSummary' => $this->findTable($allResults)
+            ],
+            'graph' => [
+                'totalAchievedCredits' => $this->findTotalAchievedCredits($allResults),
+                'standardType' => $this->findStandardType($allResults),
+                'assessmentType' => $this->findAssessmentType($allResults),
+                'result' => $this->findResult($allResults)
+            ]
+        ];
     }
 
 
@@ -389,14 +392,15 @@ class CreditSummary extends Base
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
-                    /* Only accumulate some values
-                     */
                     if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry(), false)) {
+
+                        /* Only accumulate some values
+                         */
                         $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
-                    }
-                    /* Special treatment
-                     */
-                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry(), false) || in_array($current['StrippedResult'], array('N'))) {
+                    } elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry(), false) || in_array($current['StrippedResult'], array('N'))) {
+
+                        /* Special treatment
+                         */
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }
