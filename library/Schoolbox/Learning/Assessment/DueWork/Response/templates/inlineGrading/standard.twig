@@ -86,9 +86,9 @@ Usage:
     } only %}
 {% endblock %}
 
-{# A preview of the file currently selected, not displaying download as Files section includes the file #}
+{# A preview of the file currently selected #}
 {% block responseFilePreview %}
-    {% if response and file and not (subfragment.strategy == 'download.twig') %}
+    {% if response and file %}
         {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data is defined ? subfragment.data : null} %}
     {% endif %}
 {% endblock %}
