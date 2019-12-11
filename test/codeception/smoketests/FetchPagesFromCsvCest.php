@@ -96,6 +96,7 @@ class FetchPagesFromCsvCest
      * checks that all pages come back with a 200 ok response.
      *
      * @dataProvider urlProvider
+     * @skip
      * 
      */
     public function getOldAllThePages(IntegrationTester $i, \Codeception\Example $example)
@@ -157,15 +158,14 @@ class FetchPagesFromCsvCest
      * checks that all pages come back with a 200 ok response.
      *
      * @dataProvider newUrlProvider
-     * @skip
      * 
      */
     public function getAllThePages(IntegrationTester $i, $senario, \Codeception\Example $example)
     {
         #GIVEN
-        $persona      = $example[1];
-        $url          = $example[2];
-        $expected_result = $example[3];
+        $persona      = $example[2];
+        $url          = $example[3];
+        $expected_result = $example[4];
         
         if($expected_result=='IGNORE')
         {
