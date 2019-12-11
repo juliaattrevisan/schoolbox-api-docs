@@ -28,7 +28,7 @@ class Heading extends Base
     public function findData(): string
     {
         $params = [
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' => $this->getExternalUserId(),
             'year' => $this->year
         ];
 

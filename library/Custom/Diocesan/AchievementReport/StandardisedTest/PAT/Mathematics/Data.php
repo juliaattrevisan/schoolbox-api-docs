@@ -32,7 +32,7 @@ class Data extends Base
     public function findData(): Payload
     {
         $params = [
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' => $this->getExternalUserId(),
             'year' => $this->year
         ];
 
@@ -48,7 +48,7 @@ class Data extends Base
             AND Fileyear = :year
             ORDER BY seq';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         /* Find data for each of the three series
          */
@@ -72,7 +72,11 @@ class Data extends Base
      */
     public function hasDataFromAnyYear(): bool
     {
-        $query = "
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+        ];
+
+        $query = '
             SELECT
                 Seq,
                 ThisStudentStanine,
@@ -80,11 +84,11 @@ class Data extends Base
                 DiocesanMathsPATStaninePercentage,
                 NationalMathsPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            WHERE ThisStudentID = :externalId
             AND IndividualMathsPATStanineMarker <> 0
-            ORDER BY seq";
+            ORDER BY seq';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         return (bool)\count($result);
     }

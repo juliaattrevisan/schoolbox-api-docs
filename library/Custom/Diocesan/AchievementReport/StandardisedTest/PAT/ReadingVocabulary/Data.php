@@ -32,7 +32,7 @@ class Data extends Base
     public function findData(): Payload
     {
         $params = [
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' => $this->getExternalUserId(),
             'year' => $this->year
         ];
 
@@ -72,7 +72,11 @@ class Data extends Base
      */
     public function hasDataFromAnyYear(): bool
     {
-        $query = "
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+        ];
+
+        $query = '
             SELECT
                 Seq,
                 ThisStudentStanine,
@@ -80,11 +84,11 @@ class Data extends Base
                 DiocesanReadingVocabularyPATStaninePercentage,
                 NationalReadingVocabularyPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            WHERE ThisStudentID = :externalId
             AND IndividualReadingVocabularyPATStanineMarker <> 0
-            ORDER BY seq";
+            ORDER BY seq';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query, $params);
 
         return (bool)\count($result);
     }

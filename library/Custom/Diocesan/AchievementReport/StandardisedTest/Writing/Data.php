@@ -61,7 +61,7 @@ class Data extends Base
     public function findData()
     {
         $params = [
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' =>$this->getExternalUserId(),
         ];
 
         $query = '

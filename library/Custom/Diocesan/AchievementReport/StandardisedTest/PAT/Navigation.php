@@ -27,7 +27,7 @@ class Navigation extends Base
     public function findData(): array
     {
         $params = [
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' => $this->getExternalUserId(),
         ];
 
         $query = '

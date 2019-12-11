@@ -32,7 +32,7 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\StandardisedTest\
 
         $params = [
             'code' => $code,
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' => $this->getExternalUserId(),
         ];
 
         /* maskseq is what the student got

@@ -26,7 +26,7 @@ class Data extends Base
     public function findData(): Payload
     {
         $params = [
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' => $this->getExternalUserId(),
             'year' => $this->year
         ];
 
@@ -78,7 +78,7 @@ class Data extends Base
     public function hasDataFromAnyYear(): bool
     {
         $params = [
-            'externalId' => $this->externalUser['StudentID'],
+            'externalId' => $this->getExternalUserId(),
         ];
 
         $query = '
