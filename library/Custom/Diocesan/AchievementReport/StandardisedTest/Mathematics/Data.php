@@ -25,7 +25,7 @@ class Data extends Base
 
         /* Pre-number, K1, K2
          */
-        null, null, null,
+        ' ', ' ', ' ',
 
         /* 1A
          */
@@ -84,7 +84,7 @@ class Data extends Base
 
         /* Pre-number, K1, K2
          */
-        null, null, null,
+        ' ', ' ', ' ',
 
         ' ',
         ' ',
