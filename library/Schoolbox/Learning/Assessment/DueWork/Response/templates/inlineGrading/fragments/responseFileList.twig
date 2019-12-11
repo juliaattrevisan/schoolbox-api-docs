@@ -26,9 +26,7 @@
             <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2">
                 {% for currentFile in response.allFiles %}
                     {% set selected = '' %}
-                    {% if selectedFileHash is defined and currentFile.hash == selectedFileHash %}
-                        {% set selected = 'selected' %}
-                    {% elseif loop.index0 == 0 and not selectedFileHash %}
+                    {% if (selectedFileHash is defined and currentFile.hash == selectedFileHash) or (loop.index0 == 0 and not selectedFileHash) %}
                         {% set selected = 'selected' %}
                     {% endif %}
 
