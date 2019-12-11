@@ -36,51 +36,59 @@
     </div>
     {% endif %}
 
+    {% if PATMathematics.visible or PATListeningComprehension.visible or PATReadingVocabulary.visible or PATReadingComprehension.visible %}
     <div class="row">
-        {% if PATMathematics.visible %}
-            <div class="small-12 large-6 columns">
-                {% include '@standardisedTest/Stanine/Graph.twig' with {
-                    identifier: 'PATMathematics',
-                    title: PATMathematics.data.graph.title,
-                    yAxis: PATMathematics.data.graph.y,
-                    series: PATMathematics.data.series
-                } %}
-            </div>
-        {% endif %}
+        <div class="small-12 island">
+            <section>
+                <div class="row">
+                    {% if PATMathematics.visible %}
+                        <div class="small-12 large-6 columns">
+                            {% include '@standardisedTest/Stanine/Graph.twig' with {
+                                identifier: 'PATMathematics',
+                                title: PATMathematics.data.graph.title,
+                                yAxis: PATMathematics.data.graph.y,
+                                series: PATMathematics.data.series
+                            } %}
+                        </div>
+                    {% endif %}
 
-        {% if PATListeningComprehension.visible %}
-            <div class="small-12 large-6 columns">
-                {% include '@standardisedTest/Stanine/Graph.twig' with {
-                    identifier: 'PATListeningComprehension',
-                    title: PATListeningComprehension.data.graph.title,
-                    yAxis: PATListeningComprehension.data.graph.y,
-                    series: PATListeningComprehension.data.series
-                } %}
-            </div>
-        {% endif %}
+                    {% if PATListeningComprehension.visible %}
+                        <div class="small-12 large-6 columns">
+                            {% include '@standardisedTest/Stanine/Graph.twig' with {
+                                identifier: 'PATListeningComprehension',
+                                title: PATListeningComprehension.data.graph.title,
+                                yAxis: PATListeningComprehension.data.graph.y,
+                                series: PATListeningComprehension.data.series
+                            } %}
+                        </div>
+                    {% endif %}
 
-        {% if PATReadingVocabulary.visible %}
-            <div class="small-12 large-6 columns">
-                {% include '@standardisedTest/Stanine/Graph.twig' with {
-                    identifier: 'PATReadingVocabulary',
-                    title: PATReadingVocabulary.data.graph.title,
-                    yAxis: PATReadingVocabulary.data.graph.y,
-                    series: PATReadingVocabulary.data.series
-                } %}
-            </div>
-        {% endif %}
+                    {% if PATReadingVocabulary.visible %}
+                        <div class="small-12 large-6 columns">
+                            {% include '@standardisedTest/Stanine/Graph.twig' with {
+                                identifier: 'PATReadingVocabulary',
+                                title: PATReadingVocabulary.data.graph.title,
+                                yAxis: PATReadingVocabulary.data.graph.y,
+                                series: PATReadingVocabulary.data.series
+                            } %}
+                        </div>
+                    {% endif %}
 
-        {% if PATReadingComprehension.visible %}
-            <div class="small-12 large-6 columns">
-                {% include '@standardisedTest/Stanine/Graph.twig' with {
-                    identifier: 'PATReadingComprehension',
-                    title: PATReadingComprehension.data.graph.title,
-                    yAxis: PATReadingComprehension.data.graph.y,
-                    series: PATReadingComprehension.data.series
-                } %}
-            </div>
-        {% endif %}
+                    {% if PATReadingComprehension.visible %}
+                        <div class="small-12 large-6 columns">
+                            {% include '@standardisedTest/Stanine/Graph.twig' with {
+                                identifier: 'PATReadingComprehension',
+                                title: PATReadingComprehension.data.graph.title,
+                                yAxis: PATReadingComprehension.data.graph.y,
+                                series: PATReadingComprehension.data.series
+                            } %}
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
     </div>
+    {% endif %}
 
     <div class="row">
         <div class="small-12 island">
