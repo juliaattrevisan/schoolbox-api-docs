@@ -17,6 +17,12 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\Base
 {
 
     /**
+     * For highcharts, its default version of null is string 'null'
+     */
+    public const DEFAULT_NULL_VALUE = 'null';
+
+
+    /**
      * Whether there was any data found
      *
      * @var bool

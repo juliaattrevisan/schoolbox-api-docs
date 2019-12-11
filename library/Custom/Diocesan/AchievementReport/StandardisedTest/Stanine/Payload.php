@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\Stanine;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
+
 /**
  * Class Payload
  *
@@ -93,7 +95,7 @@ class Payload
              */
             $this->hasData = true;
         } else {
-            $this->stack['series']['student'][$x] = 'null';
+            $this->stack['series']['student'][$x] = StandardisedTestBase::DEFAULT_NULL_VALUE;
         }
 
         return $this;
