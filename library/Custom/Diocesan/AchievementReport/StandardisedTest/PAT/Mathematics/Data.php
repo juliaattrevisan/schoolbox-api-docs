@@ -76,8 +76,8 @@ class Data extends Base
             'externalId' => $this->getExternalUserId(),
         ];
 
-        $query = '
-            SELECT
+        $query = "
+            SELECT TOP 1 COUNT(*) AS 'computed'
                 Seq,
                 ThisStudentStanine,
                 IndividualMathsPATStanineMarker,
@@ -86,10 +86,10 @@ class Data extends Base
             FROM uvSchoolBoxPATSTARSummary
             WHERE ThisStudentID = :externalId
             AND IndividualMathsPATStanineMarker <> 0
-            ORDER BY seq';
+            ORDER BY seq";
 
-        $result = $this->db->getAll($query, $params);
+        $result = $this->db->getRow($query, $params);
 
-        return (bool)\count($result);
+        return (bool)$result['computed'];
     }
 }
