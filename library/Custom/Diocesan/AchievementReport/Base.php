@@ -117,10 +117,10 @@ abstract class Base
     public function __construct(User $user, array $externalUser, MSSQL $db, $year) {
         $this->user = $user;
 
-        $this->setExternalUser($externalUser);
-        $this->setDb($db);
-        $this->setYear($year);
-        $this->setCurrentYear(date('Y'));
+        $this->externalUser = $externalUser;
+        $this->db = $db;
+        $this->year = $year;
+        $this->currentYear = date('Y');
     }
 
 
@@ -181,21 +181,6 @@ abstract class Base
 
 
     /**
-     * Set db
-     *
-     * @param \MSSQL $db
-     *
-     * @return $this
-     */
-    protected function setDb($db): self
-    {
-        $this->db = $db;
-
-        return $this;
-    }
-
-
-    /**
      * Get db
      *
      * @return \MSSQL
@@ -203,21 +188,6 @@ abstract class Base
     protected function getDb(): MSSQL
     {
         return $this->db;
-    }
-
-
-    /**
-     * Set heading
-     *
-     * @param string $heading
-     *
-     * @return $this
-     */
-    protected function setHeading($heading): self
-    {
-        $this->heading = $heading;
-
-        return $this;
     }
 
 
@@ -233,21 +203,6 @@ abstract class Base
 
 
     /**
-     * Set externalUser
-     *
-     * @param array $externalUser
-     *
-     * @return $this
-     */
-    protected function setExternalUser($externalUser): self
-    {
-        $this->externalUser = $externalUser;
-
-        return $this;
-    }
-
-
-    /**
      * Get externalUser
      *
      * @return array
@@ -259,39 +214,11 @@ abstract class Base
 
 
     /**
-     * @param string $year
-     *
-     * @return $this
-     */
-    protected function setYear($year): self
-    {
-        $this->year = $year;
-
-        return $this;
-    }
-
-
-    /**
      * @return string
      */
     protected function getYear(): string
     {
         return $this->year;
-    }
-
-
-    /**
-     * Set current year
-     *
-     * @param string $currentYear
-     *
-     * @return $this
-     */
-    protected function setCurrentYear($currentYear): self
-    {
-        $this->currentYear = $currentYear;
-
-        return $this;
     }
 
 
