@@ -84,9 +84,11 @@ class DueWorkInitialCest
         $i->login('alaress', 'alaress');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Class Homepage");
-        $i->click("Test Class Homepage");
+        $testClassHomepage = Locator::contains('a.jstree-anchor', 'Test Class Homepage');
+        $i->click($testClassHomepage);
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
+        $i->waitForText("Due Work", 5);
         $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
