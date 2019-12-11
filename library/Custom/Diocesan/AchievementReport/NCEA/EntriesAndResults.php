@@ -171,7 +171,7 @@ class EntriesAndResults extends Base
     {
         $params = [
             'externalId' => $this->getExternalUserId(),
-            'year' => $this->getYear()
+            'year' => $this->year
         ];
 
         $query = '

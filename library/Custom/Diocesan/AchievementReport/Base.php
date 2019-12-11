@@ -190,26 +190,6 @@ abstract class Base
 
 
     /**
-     * Get externalUser
-     *
-     * @return array
-     */
-    protected function getExternalUser(): array
-    {
-        return $this->externalUser;
-    }
-
-
-    /**
-     * @return string
-     */
-    protected function getYear(): string
-    {
-        return $this->year;
-    }
-
-
-    /**
      * Get current year
      *
      * @return string

@@ -74,8 +74,8 @@ class CreditSummary extends Base
                 WithdrawnFlag = 0
         ';
 
-        if ($this->getYear()) {
-            $params['year'] = $this->getYear();
+        if ($this->year) {
+            $params['year'] = $this->year;
 
             $query .= '
                 AND StudentYear = :year
