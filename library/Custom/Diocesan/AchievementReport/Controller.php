@@ -14,6 +14,7 @@ use Custom\Diocesan\AchievementReport\StandardisedTest;
 use Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 use Custom\Diocesan\AchievementReport\StandardisedTest\STAR;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Reading;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Writing;
 use MSSQL;
 use Schoolbox\User;
 
@@ -380,6 +381,53 @@ class Controller extends Base
                 ],
 
                 'reading' => $reading
+            ]
+        ]);
+    }
+
+
+    /**
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws RouteNotFound
+     */
+    public function getStandardisedTestWriting(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    {
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? (int)date('Y');
+
+        /* Writing
+         */
+        $writingPayload = (new Writing\Data($user, $externalUser, $db, $selectedYear));
+
+        $writing = [
+            'data' => $writingPayload->findData(),
+            'visible' => (new Writing\ValidHasData())->isSatisfiedBy($user->getYear(), $writingPayload->hasData())
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => '@standardisedTest/Writing/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+
+                'subnavigation' => [
+                    'all' => (new StandardisedTest\Navigation($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+
+                    /* TODO: For each Standardised Test report piece
+                     */
+                    'selected' => NavigationSelector::STANDARDISEDTEST_KEY
+                ],
+
+                'writing' => $writing
             ]
         ]);
     }

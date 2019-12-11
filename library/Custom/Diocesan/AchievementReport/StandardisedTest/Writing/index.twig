@@ -1,0 +1,210 @@
+{##
+ # Standardised Test
+ #
+ # @param array     externalUser
+ # @param int|null  year
+ #}
+{% include '@templates/Avatar.twig' %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: navigation
+} %}
+
+{% include '@templates/Navigation.twig' with {
+    elements: subnavigation
+} %}
+
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+
+<div class="achievement-report standardised-test">
+    {% if writing.visible %}
+        <script>
+            $(function () {
+                var chart = new Highcharts.Chart({
+                    chart: {
+                        height: 600,
+                        reflow: true,
+                        renderTo: 'writing',
+                        spacingBottom: 30
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        area: {
+                            fillOpacity: 0.2
+                        }
+                    },
+                    series: [
+
+                        {# First set of grey squares #}
+                        {
+                            data: [{{ writing.data.series.grey1|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Second set of grey squares #}
+                        {
+                            data: [{{ writing.data.series.grey2|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Third set of grey squares #}
+                        {
+                            data: [{{ writing.data.series.grey3|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Fourth set of grey squares #}
+                        {
+                            data: [{{ writing.data.series.grey4|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                radius: 13,
+                                fillColor: '#cccccc',
+                                symbol: 'square'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                            yAxis: 1
+                        },
+
+                        {# Student Data #}
+                        {
+                            data: [{{ writing.data.series.student|join(',') }}],
+                            enableMouseTracking: false,
+                            marker: {
+                                symbol: 'url(/custom/diocesan/achievementreport/img/star-red.png)'
+                            },
+                            states: {
+                                inactive: {
+                                    opacity: 1.0
+                                }
+                            },
+                            type: 'scatter',
+                        }
+                    ],
+                    subtitle: {
+                        text: 'Based on Diocesan Writing Expectations for Year 0-6'
+                    },
+                    title: {
+                        text: 'Tracked Achievement Over Time'
+                    },
+                    tooltip: {
+                        enabled: false,
+                    },
+                    xAxis: {
+                        categories: [{{ writing.data.x.categories|purify }}],
+                        gridLineWidth: 1,
+                        title: {
+                            text: 'Time at school',
+                            y: 10
+                        }
+                    },
+                    yAxis: [
+                        {
+                            categories: ['null', {{ writing.data.y.stages|purify }}],
+                            max: 12,
+                            min: 1,
+                            title: {
+                                text: ''
+                            }
+                        },
+                        {
+                            categories: ['null', {{ writing.data.y.curriculumLevels|purify }}],
+                            gridLineWidth: 0,
+                            labels: {
+                                x: -100,
+                                y: 41
+                            },
+                            max: 12,
+                            min: 1,
+                            offset: 0,
+                            startOnTick: false,
+                            tickColor: '#dddddd',
+                            tickLength: 200,
+                            tickmarkPlacement: 'between',
+                            tickPositions: [3,6,9,12],
+                            tickWidth: 1,
+                            title: {
+                                text: ''
+                            }
+                        }
+                    ],
+                });
+
+                chart.reflow();
+            });
+        </script>
+        <div class="row">
+            <div class="small-12 columns">
+                <div id="writing"></div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>
+                    Achievement and progress in writing is assessed using both e-asTTle an online assessment
+                    tool designed to assess your daughter's progress in writing from Years 1-6 and overall
+                    teacher judgement. When assessing achievement and progress a series of levels are used.
+                    These levels go from 1 to 6 and are further broken down into three stages: beginning,
+                    proficient and advanced. In order the levels are 1B, 1P, 1A: 2B, 2P, 2A etc.
+                </p>
+
+                <p>
+                    Through this process teachers develop a rich picture of your daughter's strengths and next
+                    learning steps through analysing information from learning conversations, observations of
+                    learning tasks or the products of these tasks, and the use of the standardised assessment
+                    tool e-asTTle. These methods of assessment can be thought of as a "healthy triangle", with
+                    standardised tools (such as e-asTTle) being only a small part of the picture.
+                </p>
+            </section>
+        </div>
+    </div>
+</div>
