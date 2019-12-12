@@ -169,7 +169,7 @@
                             }
                         },
                         {
-                            categories: {{ mathematics.data.y.lower|purify }},
+                            categories: {{ mathematics.data.y.lower|json_encode|purify }},
                             gridLineWidth: 0,
                             labels: {
                                 y: -7
