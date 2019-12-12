@@ -137,7 +137,7 @@
                         enabled: false,
                     },
                     xAxis: {
-                        categories: {{ writing.data.x.categories|purify }},
+                        categories: {{ writing.data.x.categories|json_encode|purify }},
                         gridLineWidth: 1,
                         title: {
                             text: 'Time at school',
@@ -146,7 +146,7 @@
                     },
                     yAxis: [
                         {
-                            categories: {{ writing.data.y.stages|purify }},
+                            categories: {{ writing.data.y.stages|json_encode|purify }},
                             max: 12,
                             min: 1,
                             title: {
@@ -154,7 +154,7 @@
                             }
                         },
                         {
-                            categories: {{ writing.data.y.curriculumLevels|purify }},
+                            categories: {{ writing.data.y.curriculumLevels|json_encode|purify }},
                             gridLineWidth: 0,
                             labels: {
                                 x: -100,

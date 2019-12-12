@@ -96,8 +96,8 @@ class Data extends Base
                 'categories' => []
             ],
             'y' => [
-                'stages' => json_encode(self::Y_STAGES),
-                'curriculumLevels' => json_encode(self::Y_CURRICULUM_LEVELS),
+                'stages' => self::Y_STAGES,
+                'curriculumLevels' => self::Y_CURRICULUM_LEVELS,
             ],
             'series' => [
                 'student' => [],
@@ -125,8 +125,6 @@ class Data extends Base
             !$row['Line3'] ? $stack['series']['grey3'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey3'][] = $row['Line3'];
             !$row['Line4'] ? $stack['series']['grey4'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey4'][] = $row['Line4'];
         }
-
-        $stack['x']['categories'] = json_encode($stack['x']['categories']);
 
         /* If the student has stars, they have values
          */

@@ -112,8 +112,8 @@ class Payload
                 'categories' => []
             ],
             'y' => [
-                'stages' => json_encode(self::Y_STAGES),
-                'levelGroups' => json_encode(self::Y_LEVEL_GROUPS),
+                'stages' => self::Y_STAGES,
+                'levelGroups' => self::Y_LEVEL_GROUPS,
             ],
             'series' => [
                 'red' => [],

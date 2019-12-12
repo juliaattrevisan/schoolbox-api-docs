@@ -104,8 +104,8 @@ class Data extends Base
                 'categories' => []
             ],
             'y' => [
-                'colourWheel' => json_encode(self::Y_COLOURWHEEL),
-                'probeAge' => json_encode(self::Y_PROBEAGE),
+                'colourWheel' => self::Y_COLOURWHEEL,
+                'probeAge' => self::Y_PROBEAGE,
             ],
             'series' => [
                 'student' => [],
@@ -133,8 +133,6 @@ class Data extends Base
             !$row['Line3'] ? $stack['series']['grey3'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey3'][] = $row['Line3'];
             !$row['Line4'] ? $stack['series']['grey4'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey4'][] = $row['Line4'];
         }
-
-        $stack['x']['categories'] = json_encode($stack['x']['categories']);
 
         /* If the student has stars, they have values
          */
