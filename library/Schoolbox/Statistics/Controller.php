@@ -507,7 +507,7 @@ class Controller extends Base
 
         $results = $dataSource->getVisits($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
-        // Compile colors for each role
+        // Compile a series of hit counts for each role, as well as their colors
         $colours = [];
         foreach ($results as $result) {
             $time     = $result->getDate()->getDatabaseDate();
@@ -541,7 +541,8 @@ class Controller extends Base
             }
         }
 
-        // Sort or remove the series, depending on whether or not they were populated
+        // Sort or remove each series from $data,
+        // depending on whether or not they were populated
         foreach ($data as $group => &$d) {
             if (!isset($colours[$group])) {
                 unset($data[$group]);
@@ -551,23 +552,34 @@ class Controller extends Base
         }
         unset($d);
 
+        // Build the graph dataset
         $colorList = [];
         $graphData = [];
-        foreach ($data as $groupName => $series) {
+        foreach ($data as $roleType => $series) {
             $groupData = [];
-            $k         = array_keys($series);
-
-            $n = count($series);
-
-            for ($i = 0; $i < $n; ++$i) {
-                if ($series[$k[$i]] || $series[$k[$i + 1]] || $series[$k[$i - 1]]) {
-                    $groupData[] = [strtotime($k[$i] . ' 00:00:00Z') * 1000, (int)$series[$k[$i]]];
+            $dates     = array_keys($series);
+            foreach ($dates as $i => $currentDate) {
+                $addRoleTypeData = false;
+                $currentCount    = (int)($series[$currentDate] ?? 0);
+                if ($currentCount > 0) {
+                    $addRoleTypeData = true;
+                } else {
+                    $prevDate  = $dates[$i - 1] ?? null;
+                    $nextDate  = $dates[$i + 1] ?? null;
+                    $prevCount = $prevDate ? $series[$prevDate] ?? 0 : 0;
+                    $nextCount = $nextDate ? $series[$nextDate] ?? 0 : 0;
+                    if ($prevCount || $nextCount) {
+                        $addRoleTypeData = true;
+                    }
+                }
+                if ($addRoleTypeData) {
+                    $groupData[] = [strtotime($dates[$i] . ' 00:00:00Z') * 1000, $currentCount];
                 }
             }
 
-            $colorList[] = $colours[$groupName];
+            $colorList[] = $colours[$roleType];
             $graphData[] = [
-                'name' => ucfirst($groupName),
+                'name' => ucfirst($roleType),
                 'data' => $groupData,
             ];
         }
