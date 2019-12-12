@@ -795,8 +795,7 @@ class Mapper extends BaseMapper
         $this->addFilter($students, '`student_id`');
         $this->addFilter($years, '`s`.`year`');
         $this->addFilter($houses, '`s`.`house`');
-        $this->addFilter($types, '`type_id`');
-        $this->addFilter($subtypes, '`subtype_id`');
+        $this->addTypeFilter($types, $subtypes);
         $this->addFilter($authors, '`owner_id`');
 
         $orderParts = [];
@@ -911,5 +910,46 @@ class Mapper extends BaseMapper
         }
 
         return $resultsFiltered;
+    }
+
+
+    /**
+     * Add filters for types and subtypes.
+     *
+     * The following records will match the filter:
+     * * records with a subtype in `$subtypes`
+     * * records with a type in `$types`, if none of its subtypes are in
+     *   `$subtypes` (this is to allow users to select types without subtypes)
+     *
+     * @param Collection|Type\Model[]    $types
+     * @param Collection|SubType\Model[] $subtypes
+     */
+    private function addTypeFilter(Collection $types, Collection $subtypes): void
+    {
+        // Filter out types which have a subtype in $subtypes
+        /** @var Collection|Type\Model[] $typesWithoutSelectedSubtype */
+        $typesWithoutSelectedSubtype = $types->diff(
+            $subtypes->map(
+                static function (SubType\Model $subtype) {
+                    return $subtype->getPastoralType();
+                }
+            )
+        );
+
+        // Type and subtype filters: need to be joined with OR
+        $typeFilters = [];
+        $i           = 0;
+
+        foreach ($typesWithoutSelectedSubtype as $type) {
+            $typeFilters[]               = "type_id = :type_{$i}";
+            $this->bindings["type_{$i}"] = $type->getId();
+        }
+        foreach ($subtypes as $subtype) {
+            $typeFilters[]                  = "subtype_id = :subtype_{$i}";
+            $this->bindings["subtype_{$i}"] = $subtype->getId();
+        }
+        if (!empty($typeFilters)) {
+            $this->filters[] = '(' . implode(' OR ', $typeFilters) . ')';
+        }
     }
 }
