@@ -57,9 +57,13 @@ class Renderer extends Handler
                 try {
                     $folder = $folderMapper->findCheaplyById($blog['folder_id']);
 
+                    $html = [];
                     foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
-                        $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                        $html[] = "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
                     }
+                    $html[] = "<a href=\"/homepage/{$folder->getId()}\">" . Scrub::text($folder->getName()) . "</a>";
+
+                    $blog['breadcrumb'] = implode(' > ', $html);
 
                     $createdTime = new Alaress_Date_Format($blog['created_at'], 'Y-m-d H:i:s');
 
