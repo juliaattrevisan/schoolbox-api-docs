@@ -238,7 +238,7 @@ class Controller extends Base
             $groupData = [];
             $k = array_keys($series);
 
-            $n = \count($series);
+            $n = count($series);
 
             for ($i = 0; $i < $n; ++$i) {
                 if ($series[$k[$i]] || $series[$k[$i+1]] || $series[$k[$i-1]]) {
@@ -265,12 +265,7 @@ class Controller extends Base
         /**
          * Top visitors
          */
-        $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC', self::MAX_TOP_VISITORS);
-
-        $topVisitorsMore = false;
-        if ($visitorCount > self::MAX_TOP_VISITORS) {
-            $topVisitorsMore = true;
-        }
+        [$topVisitors, $topVisitorsMore] = $this->compileTopVisitorsData($folder, $dataSource, $visitorCount);
 
 
         /**
@@ -563,6 +558,28 @@ class Controller extends Base
 
 
     /**
+     * Compile data for top visitors.
+     *
+     * @param FolderModel $folder
+     * @param DataSource  $dataSource
+     * @param int         $visitorCount
+     * @return array [$topVisitors, $topVisitorsMore]
+     *               $topVisitors:     a list of `self::MAX_TOP_VISITORS` top visitors
+     *               $topVisitorsMore: are there more visitors?
+     */
+    private function compileTopVisitorsData(FolderModel $folder, DataSource $dataSource, int $visitorCount): array
+    {
+        $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC', self::MAX_TOP_VISITORS);
+
+        $topVisitorsMore = false;
+        if ($visitorCount > self::MAX_TOP_VISITORS) {
+            $topVisitorsMore = true;
+        }
+        return [$topVisitors, $topVisitorsMore];
+    }
+
+
+    /**
      * Compile data for top files accessed.
      *
      * @param FolderModel $folder
@@ -581,7 +598,7 @@ class Controller extends Base
         }
 
         $topFilesAll = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-        return [$topFiles, $topFileInfo, \count($topFilesAll) > self::MAX_TOP_FILES];
+        return [$topFiles, $topFileInfo, count($topFilesAll) > self::MAX_TOP_FILES];
     }
 
 
@@ -649,7 +666,7 @@ class Controller extends Base
         }
 
         $topLinksAll  = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-        return [$topLinks, $topLinkInfo, \count($topLinksAll) > self::MAX_TOP_LINKS];
+        return [$topLinks, $topLinkInfo, count($topLinksAll) > self::MAX_TOP_LINKS];
     }
 
 
