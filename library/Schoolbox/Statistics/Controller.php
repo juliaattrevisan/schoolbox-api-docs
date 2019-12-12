@@ -184,15 +184,17 @@ class Controller extends Base
         // create a template array for populating into to account for zero days
         $data = array();
         foreach ($this->roles as $role) {
-            for ($i = $start; $i <= $end; ++$i) {
-                $data[$role][$i] = 0;
+            $runningDate = (clone $this->getStartDate())->startOfDay();
+            while ($runningDate->lt($this->getEndDate())) {
+                $data[$role][$runningDate->getDatabaseDate()] = 0;
+                $runningDate = $runningDate->addDays(1);
             }
         }
 
         $results = $dataSource->getVisits($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
         foreach ($results as $result) {
-            $time = (int)($result->getDate()->getUnixTimestamp() / 86400);
+            $time     = $result->getDate()->getDatabaseDate();
             $roleName = $result->getRole()->getType();
 
             if (isset($data[$roleName][$time])) {
