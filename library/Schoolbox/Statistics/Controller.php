@@ -556,11 +556,14 @@ class Controller extends Base
         $colorList = [];
         $graphData = [];
         foreach ($data as $roleType => $series) {
-            $groupData = [];
-            $dates     = array_keys($series);
+            $roleTypeData = [];
+            $dates        = array_keys($series);
             foreach ($dates as $i => $currentDate) {
                 if ($this->isPointRendered($series, $dates, $i)) {
-                    $groupData[] = [
+                    // Point data for HighCharts:
+                    // Dates are the start of the day UTC
+                    // (x1000 as JS date timestamps are in milliseconds)
+                    $roleTypeData[] = [
                         strtotime($dates[$i] . ' 00:00:00Z') * 1000,
                         (int)$series[$currentDate]
                     ];
@@ -570,7 +573,7 @@ class Controller extends Base
             $colorList[] = $colours[$roleType];
             $graphData[] = [
                 'name' => ucfirst($roleType),
-                'data' => $groupData,
+                'data' => $roleTypeData,
             ];
         }
         return [$colorList, $graphData];
