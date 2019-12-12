@@ -61,9 +61,11 @@ class Controller extends Base
 
 
     /**
-     * @var array $roles
+     * A list of role types.
+     *
+     * @var array $roleTypes
      */
-    private $roles;
+    private $roleTypes;
 
 
     /**
@@ -107,7 +109,7 @@ class Controller extends Base
 
         /* A stack known role types
          */
-        $this->roles = Role::getRoleTypes();
+        $this->roleTypes = Role::getRoleTypes();
     }
 
 
@@ -227,7 +229,7 @@ class Controller extends Base
                     'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
                     'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roles,
+                    'roles'             => $this->roleTypes,
                     'roleFilter'        => $roleFilter,
 
                     'graphColours' => $colours,
@@ -294,7 +296,7 @@ class Controller extends Base
                     'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
                     'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roles,
+                    'roles'             => $this->roleTypes,
                     'roleFilter'        => $roleFilter,
                     'topVisitors'       => $topVisitors,
                     'topVisitorInfo'    => $topVisitors->first(),
@@ -340,7 +342,7 @@ class Controller extends Base
                     'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
                     'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roles,
+                    'roles'             => $this->roleTypes,
                     'roleFilter'        => $roleFilter,
                     'topFiles'          => $topFiles,
                 ],
@@ -383,7 +385,7 @@ class Controller extends Base
                     'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
                     'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roles,
+                    'roles'             => $this->roleTypes,
                     'roleFilter'        => $roleFilter,
                     'recentVisitors'    => $recentVisitors,
                 ],
@@ -426,7 +428,7 @@ class Controller extends Base
                     'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
                     'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roles,
+                    'roles'             => $this->roleTypes,
                     'roleFilter'        => $roleFilter,
                     'yetToVisitors'     => $yetToVisitors,
                 ],
@@ -471,7 +473,7 @@ class Controller extends Base
                     'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
                     'filterDateOptions' => $this->filterDateOptions,
-                    'roles'             => $this->roles,
+                    'roles'             => $this->roleTypes,
                     'roleFilter'        => $roleFilter,
                     'topLinks'          => $topLinks,
                 ],
@@ -495,11 +497,11 @@ class Controller extends Base
         // create a template array for populating into to account for zero days
         $data    = [];
         $endDate = (clone $this->getEndDate())->endOfDay();
-        foreach ($this->roles as $role) {
+        foreach ($this->roleTypes as $roleType) {
             $runningDate = (clone $this->getStartDate())->startOfDay();
             while ($runningDate->lt($endDate)) {
-                $data[$role][$runningDate->getDatabaseDate()] = 0;
-                $runningDate                                  = $runningDate->addDays(1);
+                $data[$roleType][$runningDate->getDatabaseDate()] = 0;
+                $runningDate                                      = $runningDate->addDays(1);
             }
         }
 
