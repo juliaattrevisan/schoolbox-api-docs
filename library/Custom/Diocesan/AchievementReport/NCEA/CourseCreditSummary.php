@@ -1,14 +1,16 @@
 <?php
 /**
- * CourseCreditSummary
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
+/**
+ * Class CourseCreditSummary
+ *
+ * @package Custom\Diocesan\AchievementReport\NCEA
+ */
 class CourseCreditSummary extends Base
 {
 
@@ -23,10 +25,16 @@ class CourseCreditSummary extends Base
     /**
      * Find data set
      *
-     * @return array|bool
+     * @return array
      */
-    private function findCourseCreditSummary() {
-        $query = "
+    private function findCourseCreditSummary(): array
+    {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->year
+        ];
+
+        $query = '
             SELECT
                 StudentYear,
                 CourseDescription,
@@ -39,19 +47,20 @@ class CourseCreditSummary extends Base
             FROM
                 dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$this->getExternalUserId()}' AND
+                id = :externalId AND
                 WithdrawnFlag = 0 AND
-                StudentYear = '{$this->getYear()}'
-        ";
+                StudentYear = :year
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
         }
 
-        return array();
+        return [];
     }
+
 
     /**
      * Returns data for twig rendering
@@ -60,15 +69,15 @@ class CourseCreditSummary extends Base
      */
     public function findData()
     {
-        $finalStack = array(
-            'courses' => array(),
-            'totals' => array(
+        $finalStack = [
+            'courses' => [],
+            'totals' => [
                 'enteredCredits' => 0,
                 'letters' => array_fill_keys($this->getLetterRegistry(), 0),
                 'achieved' => 0,
                 'attempted' => 0,
-            )
-        );
+            ]
+        ];
 
         $allResults = $this->findCourseCreditSummary();
 
@@ -79,13 +88,13 @@ class CourseCreditSummary extends Base
             $endorsement = $current['Endorsement'];
 
             if (!is_array($finalStack['courses'][$courseName])) {
-                $finalStack['courses'][$courseName] = array(
+                $finalStack['courses'][$courseName] = [
                     'enteredCredits' => 0,
                     'letters' => array_fill_keys($this->getLetterRegistry(), 0),
                     'achieved' => 0,
                     'attempted' => 0,
                     'endorsement' => '',
-                );
+                ];
             }
 
             /* Entered Credits accumulator
@@ -107,7 +116,7 @@ class CourseCreditSummary extends Base
 
                     /* Only accumulate A/M/E values
                      */
-                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
                         $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
                         $finalStack['courses'][$courseName]['attempted'] += $current['ResultCredits'];
                         $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
@@ -120,7 +129,7 @@ class CourseCreditSummary extends Base
                      * No achievements for N, V, Y, Z but their attempts should still
                      * be summated (ie. you tried and didn't get an achievement)
                      */
-                    elseif (in_array($letter, array('N', 'V', 'Y', 'Z'))) {
+                    elseif (in_array($letter, ['N', 'V', 'Y', 'Z'])) {
                         $finalStack['courses'][$courseName]['letters'][$letter] += $current['EnteredCredits'];
                         $finalStack['courses'][$courseName]['attempted'] += $current['EnteredCredits'];
 

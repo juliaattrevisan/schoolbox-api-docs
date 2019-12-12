@@ -1,14 +1,16 @@
 <?php
 /**
- * CommentsNavigation
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\Comments;
 
+/**
+ * Class CommentsNavigation
+ *
+ * @package Custom\Diocesan\AchievementReport\Comments
+ */
 class CommentsNavigation extends Base
 {
 
@@ -21,15 +23,19 @@ class CommentsNavigation extends Base
      */
     public function findData()
     {
-        $query = "
+        $params = [
+            'externalId' => $this->getExternalUserId()
+        ];
+
+        $query = '
             SELECT StudentYear
             FROM dbo.uvSchoolBoxReportComments
-            WHERE id = '{$this->getExternalUserId()}'
+            WHERE id = :externalId
             GROUP BY StudentYear
             ORDER BY StudentYear DESC
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         $allYears = [];
 

@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\Stanine;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
+
 /**
  * Class Payload
  *
@@ -45,10 +47,9 @@ class Payload
      * Stanine constructor.
      *
      * @param string      $title
-     * @param int         $year
      * @param string|null $yAxis
      */
-    public function __construct(string $title, int $year, ?string $yAxis = null)
+    public function __construct(string $title, ?string $yAxis = null)
     {
         $this->stack['graph']['title'] = $title;
 
@@ -93,7 +94,7 @@ class Payload
              */
             $this->hasData = true;
         } else {
-            $this->stack['series']['student'][$x] = 'null';
+            $this->stack['series']['student'][$x] = StandardisedTestBase::DEFAULT_NULL_VALUE;
         }
 
         return $this;

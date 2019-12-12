@@ -30,12 +30,17 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\StandardisedTest\
          */
         $stack = (new Payload())->generate();
 
+        $params = [
+            'code' => $code,
+            'externalId' => $this->getExternalUserId(),
+        ];
+
         /* maskseq is what the student got
          * colour is the star colour (red for reading, blue for writing)
          * Seq is the order of the stars (red comes before blue)
          * Each of the xaxis rows needs to be grouped by AreaSeq
          */
-        $query = "
+        $query = '
             SELECT
                 xAxis,
                 AreaSeq,
@@ -50,12 +55,12 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\StandardisedTest\
                 Line4,
                 maskseq
             FROM uvSchoolBoxLitNumSummary
-            WHERE code='{$code}'
-            AND StudentID='{$this->externalUser['StudentID']}'
+            WHERE code = :code
+            AND StudentID = :externalId
             ORDER BY xAxisOrderSeq, Seq
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         /* No data? Exit early
          */
@@ -73,7 +78,7 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\StandardisedTest\
          */
         $template = (new Categories())->generate($groupData, $numSeries);
 
-        $stack['x']['categories'] = '"' . implode('","', $template) . '"';
+        $stack['x']['categories'] = $template;
 
         /* Map AreaSeq values to series' $index; AreaSeq values can be any sequenced integer
          */

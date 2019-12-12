@@ -27,14 +27,19 @@ class Heading extends Base
      */
     public function findData(): string
     {
-        $query = "
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->year
+        ];
+
+        $query = '
             SELECT TOP 1 YearLevel
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
-            AND Fileyear = '{$this->year}'
-        ";
+            WHERE ThisStudentID = :externalId
+            AND Fileyear = :year
+        ';
 
-        $result = array_column($this->getDb()->getAll($query), 'YearLevel');
+        $result = array_column($this->db->getAll($query, $params), 'YearLevel');
 
         $yearLevel = array_pop($result);
 

@@ -10,7 +10,7 @@
         <ul class="sub-nav">
             {% for year in elements.all %}
                 <li {% if year == elements.selected %}class="active"{% endif %}>
-                    {% set standardisedTestRoute = routeLookupIfAuthorized('achievementreport.getStandardisedTestSTAR', {
+                    {% set standardisedTestRoute = routeLookupIfAuthorized('achievementreport.getStandardisedTestsSTAR', {
                         externalUserId: externalUser.StudentID,
                         year: year
                     }) %}

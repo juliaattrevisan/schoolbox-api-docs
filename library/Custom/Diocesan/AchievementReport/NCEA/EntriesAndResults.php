@@ -1,14 +1,16 @@
 <?php
 /**
- * EntriesAndResults
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
+/**
+ * Class EntriesAndResults
+ *
+ * @package Custom\Diocesan\AchievementReport\NCEA
+ */
 class EntriesAndResults extends Base
 {
 
@@ -27,8 +29,8 @@ class EntriesAndResults extends Base
      */
     public function findData()
     {
-        $finalStack = array();
-        $totalEnteredCredits = array();
+        $finalStack = [];
+        $totalEnteredCredits = [];
 
         $allResults = $this->findEntries();
 
@@ -44,7 +46,7 @@ class EntriesAndResults extends Base
             /* Teachers
              * Trim empty teachers out for course teachers
              */
-            foreach(array(1, 2, 3) as $currentTeacherIndex) {
+            foreach([1, 2, 3] as $currentTeacherIndex) {
                 $key = "ClassTeacher{$currentTeacherIndex}";
                 $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 
@@ -61,8 +63,8 @@ class EntriesAndResults extends Base
              * with square brackets. This indicates that it is a progressive grade,
              * used specifically for Dio
              */
-            if (!in_array($result, $this->getExclusionLetterRegistry())) {
-                if (strlen($result) && ($internalExternal == 'EX') && ($studentYear == $this->getCurrentYear())) {
+            if (!in_array($result, $this->exclusionLetterRegistry, false)) {
+                if (strlen($result) && ($internalExternal === 'EX') && ($studentYear == $this->getCurrentYear())) {
                     $result = "[{$strippedResult}]";
                 }
             }
@@ -73,7 +75,7 @@ class EntriesAndResults extends Base
 
             /* Entries
              */
-            $finalStack[$courseName]['allEntries'][] = array(
+            $finalStack[$courseName]['allEntries'][] = [
                 'NCEAStandardNumber' => $current['NCEAStandardNumber'],
                 'InternalorExternalAssessment' => $current['InternalorExternalAssessment'],
                 'StandardTitle' => $current['StandardTitle'],
@@ -82,32 +84,32 @@ class EntriesAndResults extends Base
                 'Result' => $result,
                 'StrippedResult' => $strippedResult,
                 'ResultBrackets' => $current['ResultBrackets']
-            );
+            ];
 
             /* Letter summary stuff
              */
             if (!is_array($finalStack[$courseName]['summary'])) {
-                $finalStack[$courseName]['summary'] = array(
+                $finalStack[$courseName]['summary'] = [
                     'level' => '',
                     'totalEnteredCredits' => 0,
-                    'type' => array(
-                        'IN' => array(
+                    'type' => [
+                        'IN' => [
                             'enteredCredits' => 0,
                             'letters' => array_fill_keys($this->getLetterRegistry(), 0),
                             'availableCredits' => 0
-                        ),
-                        'EX' => array(
+                        ],
+                        'EX' => [
                             'enteredCredits' => 0,
                             'letters' => array_fill_keys($this->getLetterRegistry(), 0),
                             'availableCredits' => 0
-                        )
-                    )
-                );
+                        ]
+                    ]
+                ];
 
-                $totalEnteredCredits[$level] = array(
+                $totalEnteredCredits[$level] = [
                     'IN' => 0,
                     'EX' => 0
-                );
+                ];
             }
 
             $totalEnteredCredits[$level][$internalExternal] += $current['EnteredCredits'];
@@ -124,11 +126,11 @@ class EntriesAndResults extends Base
 
                     /* Exclude N/A/M/E values for current year/external items
                      */
-                    if ($internalExternal != 'EX') {
-                        if (in_array($letter, array('N'))) {
+                    if ($internalExternal !== 'EX') {
+                        if ($letter === 'N') {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                         }
-                        elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
+                        elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                         }
@@ -136,10 +138,10 @@ class EntriesAndResults extends Base
                 }
             }
             else {
-                if (in_array($letter, array('N'))) {
+                if ($letter === 'N') {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                 }
-                elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
+                elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                 }
@@ -165,8 +167,14 @@ class EntriesAndResults extends Base
      *
      * @return array
      */
-    private function findEntries() {
-        $query = "
+    private function findEntries(): array
+    {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->year
+        ];
+
+        $query = '
             SELECT
                 CourseDescription,
                 ClassTeacher1,
@@ -187,17 +195,17 @@ class EntriesAndResults extends Base
             FROM
                 dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$this->getExternalUserId()}' AND
+                id = :externalId AND
                 WithdrawnFlag = 0
-                AND StudentYear = '{$this->getYear()}'
-        ";
+                AND StudentYear = :year
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
         }
 
-        return array();
+        return [];
     }
 }

@@ -1,15 +1,19 @@
 {##
- # PAT Graph
+ # Stanine Graph
  #
  # @param string identifier  the div in which to spawn the graph
- # @param array  data        series data for student, diocesan, national
+ # @param array  series      series data for student, diocesan, national
  # @param string title       graph title
  # @param string yAxis       y axis label
  #}
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script>
     $(function () {
-        $('#{{ identifier }}').highcharts({
+        var chart = new Highcharts.Chart({
+            chart: {
+                reflow: true,
+                renderTo: '{{ identifier }}',
+            },
             credits: {
                 enabled: false
             },
@@ -61,6 +65,8 @@
                 }
             }
         });
+
+        chart.reflow();
     });
 </script>
 

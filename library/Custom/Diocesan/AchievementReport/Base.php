@@ -84,7 +84,7 @@ abstract class Base
      *
      * @var array
      */
-    protected $letterRegistry = array('N', 'A', 'M', 'E');
+    protected $letterRegistry = ['N', 'A', 'M', 'E'];
 
 
     /**
@@ -92,7 +92,7 @@ abstract class Base
      *
      * @var array
      */
-    protected $achievementLetterRegistry = array('A', 'M', 'E');
+    protected $achievementLetterRegistry = ['A', 'M', 'E'];
 
 
     /**
@@ -103,7 +103,7 @@ abstract class Base
      *
      * @var array
      */
-    protected $exclusionLetterRegistry = array('Y', 'V', 'Z');
+    protected $exclusionLetterRegistry = ['Y', 'V', 'Z'];
 
 
     /**
@@ -116,18 +116,18 @@ abstract class Base
      */
     public function __construct(User $user, array $externalUser, MSSQL $db, $year) {
         $this->user = $user;
-
-        $this->setExternalUser($externalUser);
-        $this->setDb($db);
-        $this->setYear($year);
-        $this->setCurrentYear(date('Y'));
+        $this->externalUser = $externalUser;
+        $this->db = $db;
+        $this->year = $year;
+        $this->currentYear = date('Y');
     }
 
 
     /**
      * Get a list of all the views with 'uv' as a prefix
      */
-    protected function debug() {
+    protected function debug(): void
+    {
         $query = "
             SELECT TABLE_CATALOG,
             TABLE_SCHEMA,
@@ -138,7 +138,7 @@ abstract class Base
             AND TABLE_TYPE = 'VIEW'
         ";
 
-        $stuff = $this->getDb()->getAll($query);
+        $stuff = $this->db->getAll($query);
 
         new \Alaress_Probe($stuff);
     }
@@ -169,7 +169,8 @@ abstract class Base
      * @param $result
      * @return bool
      */
-    protected function isProgressive($result) {
+    protected function isProgressive($result): bool
+    {
         return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\d*\]/', $result);
     }
 
@@ -177,99 +178,14 @@ abstract class Base
     /* Getters/Setters
      */
 
-
-    /**
-     * Set db
-     *
-     * @param \MSSQL $db
-     */
-    protected function setDb($db)
-    {
-        $this->db = $db;
-    }
-
-
-    /**
-     * Get db
-     *
-     * @return \MSSQL
-     */
-    protected function getDb()
-    {
-        return $this->db;
-    }
-
-
-    /**
-     * Set heading
-     *
-     * @param string $heading
-     */
-    protected function setHeading($heading)
-    {
-        $this->heading = $heading;
-    }
-
-
     /**
      * Get heading
      *
      * @return string
      */
-    public function getHeading()
+    public function getHeading(): string
     {
         return $this->heading;
-    }
-
-
-    /**
-     * Set externalUser
-     *
-     * @param array $externalUser
-     */
-    protected function setExternalUser($externalUser)
-    {
-        $this->externalUser = $externalUser;
-    }
-
-
-    /**
-     * Get externalUser
-     *
-     * @return array
-     */
-    protected function getExternalUser()
-    {
-        return $this->externalUser;
-    }
-
-
-    /**
-     * @param string $year
-     */
-    protected function setYear($year)
-    {
-        $this->year = $year;
-    }
-
-
-    /**
-     * @return string
-     */
-    protected function getYear()
-    {
-        return $this->year;
-    }
-
-
-    /**
-     * Set current year
-     *
-     * @param string $currentYear
-     */
-    protected function setCurrentYear($currentYear)
-    {
-        $this->currentYear = $currentYear;
     }
 
 
@@ -278,20 +194,9 @@ abstract class Base
      *
      * @return string
      */
-    public function getCurrentYear()
+    public function getCurrentYear(): string
     {
         return $this->currentYear;
-    }
-
-
-    /**
-     * Set letter registry
-     *
-     * @param array $letterRegistry
-     */
-    protected function setLetterRegistry($letterRegistry)
-    {
-        $this->letterRegistry = $letterRegistry;
     }
 
 
@@ -300,52 +205,8 @@ abstract class Base
      *
      * @return array
      */
-    public function getLetterRegistry()
+    public function getLetterRegistry(): array
     {
         return $this->letterRegistry;
-    }
-
-
-    /**
-     * Set achievement letter registry
-     *
-     * @param array $achievementLetterRegistry
-     */
-    protected function setAchievementLetterRegistry($achievementLetterRegistry)
-    {
-        $this->achievementLetterRegistry = $achievementLetterRegistry;
-    }
-
-
-    /**
-     * Get achievement letter registry
-     *
-     * @return array
-     */
-    public function getAchievementLetterRegistry()
-    {
-        return $this->achievementLetterRegistry;
-    }
-
-
-    /**
-     * Get exclusion letter registry
-     *
-     * @param array $exclusionLetterRegistry
-     */
-    protected function setExclusionLetterRegistry($exclusionLetterRegistry)
-    {
-        $this->exclusionLetterRegistry = $exclusionLetterRegistry;
-    }
-
-
-    /**
-     * Set exclusion letter registry
-     *
-     * @return array
-     */
-    public function getExclusionLetterRegistry()
-    {
-        return $this->exclusionLetterRegistry;
     }
 }

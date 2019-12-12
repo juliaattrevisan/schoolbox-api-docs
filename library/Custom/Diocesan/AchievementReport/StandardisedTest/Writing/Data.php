@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\Writing;
 
 use Custom\Diocesan\AchievementReport\StandardisedTest\Base;
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
 /**
  * Class Data
@@ -21,6 +22,11 @@ class Data extends Base
      * Y categories, Stages
      */
     private const Y_STAGES = [
+
+        /* Offset node
+         */
+        'null',
+
         'Beginning',
         'Proficient',
         'Advanced',
@@ -40,6 +46,11 @@ class Data extends Base
      * Y categories, Curriculum Levels
      */
     private const Y_CURRICULUM_LEVELS = [
+
+        /* Offset node
+         */
+        'null',
+
         'a ',
         'b ',
         'Curriculum Level 1',
@@ -60,8 +71,11 @@ class Data extends Base
      */
     public function findData()
     {
+        $params = [
+            'externalId' =>$this->getExternalUserId(),
+        ];
 
-        $query = "
+        $query = '
             SELECT
                 xAxisOrderSeq,
                 xAxis,
@@ -71,19 +85,19 @@ class Data extends Base
                 Line4,
                 ActualMaskSeq
             FROM uSchoolBoxWritingSummary
-            WHERE StudentID='{$this->externalUser['StudentID']}'
+            WHERE StudentID = :externalId
             ORDER BY xAxisOrderSeq
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         $stack = [
             'x' => [
                 'categories' => []
             ],
             'y' => [
-                'stages' => '"' . implode('","', self::Y_STAGES) . '"',
-                'curriculumLevels' => '"' . implode('","', self::Y_CURRICULUM_LEVELS) . '"'
+                'stages' => self::Y_STAGES,
+                'curriculumLevels' => self::Y_CURRICULUM_LEVELS,
             ],
             'series' => [
                 'student' => [],
@@ -98,21 +112,19 @@ class Data extends Base
 
             /* Accumulate the x-axis categories
              */
-            $stack['x']['categories'][] = "'{$row['xAxis']}'";
+            $stack['x']['categories'][] = $row['xAxis'];
 
             /* The stars (what the student got)
              */
-            !$row['ActualMaskSeq'] ? $stack['series']['student'][] = 'null' : $stack['series']['student'][] = $row['ActualMaskSeq'];
+            !$row['ActualMaskSeq'] ? $stack['series']['student'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['student'][] = $row['ActualMaskSeq'];
 
             /* Grey squares
              */
-            !$row['Line1'] ? $stack['series']['grey1'][] = 'null' : $stack['series']['grey1'][] = $row['Line1'];
-            !$row['Line2'] ? $stack['series']['grey2'][] = 'null' : $stack['series']['grey2'][] = $row['Line2'];
-            !$row['Line3'] ? $stack['series']['grey3'][] = 'null' : $stack['series']['grey3'][] = $row['Line3'];
-            !$row['Line4'] ? $stack['series']['grey4'][] = 'null' : $stack['series']['grey4'][] = $row['Line4'];
+            !$row['Line1'] ? $stack['series']['grey1'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey1'][] = $row['Line1'];
+            !$row['Line2'] ? $stack['series']['grey2'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey2'][] = $row['Line2'];
+            !$row['Line3'] ? $stack['series']['grey3'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey3'][] = $row['Line3'];
+            !$row['Line4'] ? $stack['series']['grey4'][] = StandardisedTestBase::DEFAULT_NULL_VALUE : $stack['series']['grey4'][] = $row['Line4'];
         }
-
-        $stack['x']['categories'] = implode(',', $stack['x']['categories']);
 
         /* If the student has stars, they have values
          */

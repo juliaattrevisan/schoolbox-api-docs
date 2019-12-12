@@ -23,14 +23,18 @@ class Activities extends Base
      */
     public function findData(): array
     {
-        $query = "
-            SELECT * 
-            FROM dbo.uvSchoolBoxCoCurricularClasses 
-            WHERE StudentID = '{$this->getExternalUserId()}'
-            ORDER BY StudentID, StudentFileYear Desc, OrderSort, SubjectClassesDescription
-        ";
+        $params = [
+            'externalId' => $this->getExternalUserId()
+        ];
 
-        $result = $this->getDb()->getAll($query) ?: [];
+        $query = '
+            SELECT *
+            FROM dbo.uvSchoolBoxCoCurricularClasses
+            WHERE StudentID = :externalId
+            ORDER BY StudentID, StudentFileYear Desc, OrderSort, SubjectClassesDescription
+        ';
+
+        $result = $this->db->getAll($query, $params) ?: [];
 
         /* Group activities by year
          *

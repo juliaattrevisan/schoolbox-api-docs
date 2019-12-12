@@ -1,17 +1,18 @@
 <?php
 /**
- * Footer
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
-
-class Footer extends Base {
-
+/**
+ * Class Footer
+ *
+ * @package Custom\Diocesan\AchievementReport\SchoolGrades
+ */
+class Footer extends Base
+{
 
     /**
      * Returns data for twig rendering

@@ -1,14 +1,16 @@
 <?php
 /**
- * Navigation
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\IB;
 
+/**
+ * Class Navigation
+ *
+ * @package Custom\Diocesan\AchievementReport\IB
+ */
 class Navigation extends Base
 {
 
@@ -19,18 +21,20 @@ class Navigation extends Base
      */
     public function findData()
     {
-        $externalId = $this->getExternalUserId();
+        $params = [
+            'externalId' => $this->getExternalUserId()
+        ];
 
-        $query = "
+        $query = '
             SELECT fileyear
             FROM dbo.uvSchoolBoxIBResultsNEW
-            WHERE ID = '{$externalId}'
+            WHERE ID = :externalId
             AND studentibflag = 1
             GROUP BY fileyear
             ORDER BY fileyear DESC
-        ";
+        ';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         $allYears = [];
 

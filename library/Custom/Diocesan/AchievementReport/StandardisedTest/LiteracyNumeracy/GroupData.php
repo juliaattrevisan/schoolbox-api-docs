@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
+use Custom\Diocesan\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
+
 /**
  * Class GroupData
  *
@@ -30,11 +32,11 @@ class GroupData
         foreach ($result as $row) {
             $xAxis = $row['xAxis'];
             $areaSeq = $row['AreaSeq'];
-            $y = $row[$key] ?: 'null';
+            $y = $row[$key] ?: StandardisedTestBase::DEFAULT_NULL_VALUE;
 
             /* Overwrite placeholder value
              */
-            if (!isset($temp[$xAxis][$areaSeq]) || $temp[$xAxis][$areaSeq] === 'null') {
+            if (!isset($temp[$xAxis][$areaSeq]) || $temp[$xAxis][$areaSeq] === StandardisedTestBase::DEFAULT_NULL_VALUE) {
                 $temp[$xAxis][$areaSeq] = $y;
             }
         }

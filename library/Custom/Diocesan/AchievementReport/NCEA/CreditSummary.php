@@ -1,14 +1,16 @@
 <?php
 /**
- * CreditSummary
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
+/**
+ * Class CreditSummary
+ *
+ * @package Custom\Diocesan\AchievementReport\NCEA
+ */
 class CreditSummary extends Base
 {
 
@@ -29,24 +31,32 @@ class CreditSummary extends Base
     {
         $allResults = $this->findValues();
 
-        $finalStack = array();
-        $finalStack['table']['creditSummary'] = $this->findTable($allResults);
-        $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
-        $finalStack['graph']['standardType'] = $this->findStandardType($allResults);
-        $finalStack['graph']['assessmentType'] = $this->findAssessmentType($allResults);
-        $finalStack['graph']['result'] = $this->findResult($allResults);
-
-        return $finalStack;
+        return [
+            'table' => [
+                'creditSummary' => $this->findTable($allResults)
+            ],
+            'graph' => [
+                'totalAchievedCredits' => $this->findTotalAchievedCredits($allResults),
+                'standardType' => $this->findStandardType($allResults),
+                'assessmentType' => $this->findAssessmentType($allResults),
+                'result' => $this->findResult($allResults)
+            ]
+        ];
     }
 
 
     /**
      * Find all the numeric data to be used throughout this section
      *
-     * @return array|bool
+     * @return array
      */
-    private function findValues() {
-        $query = "
+    private function findValues(): array
+    {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+        ];
+
+        $query = '
             SELECT
                 id,
                 Level,
@@ -60,23 +70,25 @@ class CreditSummary extends Base
             FROM
                 dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$this->getExternalUserId()}' AND
+                id = :externalId AND
                 WithdrawnFlag = 0
-        ";
+        ';
 
-        if ($this->getYear()) {
-            $query .= "
-                AND StudentYear = '{$this->getYear()}'
-            ";
+        if ($this->year) {
+            $params['year'] = $this->year;
+
+            $query .= '
+                AND StudentYear = :year
+            ';
         }
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         if (is_array($result)) {
             return $result;
         }
 
-        return array();
+        return [];
     }
 
 
@@ -87,8 +99,9 @@ class CreditSummary extends Base
      * @param $allResults
      * @return array
      */
-    private function findTable($allResults) {
-        $finalStack = array();
+    private function findTable($allResults): array
+    {
+        $finalStack = [];
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
@@ -96,19 +109,19 @@ class CreditSummary extends Base
             $letter = $current['StrippedResult'];
 
             if (!is_array($finalStack[$level])) {
-                $finalStack[$level] = array(
+                $finalStack[$level] = [
                     'totalEnteredCredits' => 0,
-                    'IN' => array(
+                    'IN' => [
                         'enteredCredits' => 0,
                         'letters' => array_fill_keys($this->getLetterRegistry(), 0),
                         'availableCredits' => 0,
-                    ),
-                    'EX' => array(
+                    ],
+                    'EX' => [
                         'enteredCredits' => 0,
                         'letters' => array_fill_keys($this->getLetterRegistry(), 0),
                         'availableCredits' => 0,
-                    )
-                );
+                    ]
+                ];
             }
 
             /* Total Entered Credits = Internally Assessed Entered Credits + Externally Assessed Entered Credits
@@ -132,13 +145,13 @@ class CreditSummary extends Base
                      * N = sum of enteredcredits where strippedresult=N  [when result is not achieved
                      * the resultscredit data is 0, hence use entered credits]
                      */
-                    if (in_array($letter, array('N'))) {
+                    if ($letter === 'N') {
                         $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                         $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
                     }
                     /* Regular summation for A, M, E
                      */
-                    elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
+                    elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
                         $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                         $finalStack[$level][$internalExternal]['availableCredits'] -= $current['ResultCredits'];
                     }
@@ -149,7 +162,7 @@ class CreditSummary extends Base
                      * [when result of Y,V or Z is assigned due to absence or not attempting,
                      * it is no longer available for assessment]
                      */
-                    elseif (in_array($letter, $this->getExclusionLetterRegistry())) {
+                    elseif (in_array($letter, $this->exclusionLetterRegistry, false)) {
                         $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
                     }
                 }
@@ -168,9 +181,10 @@ class CreditSummary extends Base
      * @param $allResults
      * @return array
      */
-    private function findTotalAchievedCredits($allResults) {
-        $finalStack = array();
-        $totalEnteredCredits = array();
+    private function findTotalAchievedCredits($allResults): array
+    {
+        $finalStack = [];
+        $totalEnteredCredits = [];
 
         /* Accumulate "Achieved" values
          */
@@ -179,11 +193,11 @@ class CreditSummary extends Base
             $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack[$level])) {
-                $finalStack[$level] = array(
+                $finalStack[$level] = [
                     'achieved' => 0,
                     'available' => 0,
                     'exclusions' => 0,
-                );
+                ];
 
                 $totalEnteredCredits[$level] = 0;
             }
@@ -196,12 +210,12 @@ class CreditSummary extends Base
                     /* Sum of A, M, E values from both Internally Assessed
                      * and Externally Assessed types
                      */
-                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
                         $finalStack[$level]['achieved'] += $current['ResultCredits'];
                     }
                     /* Special treatment
                      */
-                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }
@@ -228,23 +242,24 @@ class CreditSummary extends Base
      * @param $allResults
      * @return array
      */
-    private function findStandardType($allResults) {
-        $finalStack = array();
-        $unitTypeList = array('U');
-        $achievementTypeList = array('A');
-        $totalEnteredCredits = array();
+    private function findStandardType($allResults): array
+    {
+        $finalStack = [];
+        $unitTypeList = ['U'];
+        $achievementTypeList = ['A'];
+        $totalEnteredCredits = [];
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
             $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack[$level])) {
-                $finalStack[$level] = array(
+                $finalStack[$level] = [
                     'unit' => 0,
                     'achievement' => 0,
                     'available' => 0,
                     'exclusions' => 0,
-                );
+                ];
 
                 $totalEnteredCredits[$level] = 0;
             }
@@ -256,17 +271,17 @@ class CreditSummary extends Base
 
                     /* Only accumulate some values
                      */
-                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                        if (in_array($current['StandardType'], $unitTypeList)) {
+                    if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
+                        if (in_array($current['StandardType'], $unitTypeList, false)) {
                             $finalStack[$level]['unit'] += $current['ResultCredits'];
                         }
-                        elseif (in_array($current['StandardType'], $achievementTypeList)) {
+                        elseif (in_array($current['StandardType'], $achievementTypeList, false)) {
                             $finalStack[$level]['achievement'] += $current['ResultCredits'];
                         }
                     }
                     /* Special treatment
                      */
-                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || $current['StrippedResult'] === 'N') {
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }
@@ -293,21 +308,22 @@ class CreditSummary extends Base
      * @param $allResults
      * @return array
      */
-    private function findAssessmentType($allResults) {
-        $finalStack = array();
-        $totalEnteredCredits = array();
+    private function findAssessmentType($allResults): array
+    {
+        $finalStack = [];
+        $totalEnteredCredits = [];
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
             $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack[$level])) {
-                $finalStack[$level] = array(
+                $finalStack[$level] = [
                     'IN' => 0,
                     'EX' => 0,
                     'available' => 0,
                     'exclusions' => 0,
-                );
+                ];
 
                 $totalEnteredCredits[$level] = 0;
             }
@@ -319,12 +335,12 @@ class CreditSummary extends Base
 
                     /* Only accumulate some values
                      */
-                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
                         $finalStack[$level][$internalExternal] += $current['ResultCredits'];
                     }
                     /* Special treatment
                      */
-                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }
@@ -351,16 +367,17 @@ class CreditSummary extends Base
      * @param $allResults
      * @return array
      */
-    private function findResult($allResults) {
-        $finalStack = array();
-        $totalEnteredCredits = array();
+    private function findResult($allResults): array
+    {
+        $finalStack = [];
+        $totalEnteredCredits = [];
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
             $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack[$level])) {
-                $finalStack[$level] = array_fill_keys($this->getAchievementLetterRegistry(), 0);
+                $finalStack[$level] = array_fill_keys($this->achievementLetterRegistry, 0);
 
                 $finalStack[$level]['available'] = 0;
                 $finalStack[$level]['exclusions'] = 0;
@@ -375,14 +392,15 @@ class CreditSummary extends Base
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
-                    /* Only accumulate some values
-                     */
-                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
+
+                        /* Only accumulate some values
+                         */
                         $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
-                    }
-                    /* Special treatment
-                     */
-                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    } elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
+
+                        /* Special treatment
+                         */
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }

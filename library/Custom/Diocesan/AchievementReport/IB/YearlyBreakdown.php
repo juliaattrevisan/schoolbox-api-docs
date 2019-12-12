@@ -1,17 +1,18 @@
 <?php
 /**
- * YearlyBreakdown
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Custom\Diocesan\AchievementReport\IB;
 
 use Custom\Diocesan\AchievementReport\NormaliseTeachers;
 
-
+/**
+ * Class YearlyBreakdown
+ *
+ * @package Custom\Diocesan\AchievementReport\IB
+ */
 class YearlyBreakdown extends Base
 {
 
@@ -22,18 +23,21 @@ class YearlyBreakdown extends Base
      */
     public function findData()
     {
-        $externalId = $this->getExternalUserId();
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->year
+        ];
 
-        $query = "
+        $query = '
             SELECT *
             FROM dbo.uvSchoolBoxIBResultsNEW
-            WHERE ID = '{$externalId}'
+            WHERE ID = :externalId
             AND studentibflag = 1
-            AND fileyear = '{$this->year}'
+            AND fileyear = :year
             ORDER BY Heading, AssessAreaSeq, Term
-        ";
+        ';
 
-        $results = $this->getDb()->getAll($query) ?: [];
+        $results = $this->db->getAll($query, $params) ?: [];
 
         $finalStack = [];
 

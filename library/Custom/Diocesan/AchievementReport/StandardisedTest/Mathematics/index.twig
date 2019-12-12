@@ -4,13 +4,13 @@
  # @param array     externalUser
  # @param int|null  year
  #}
-{% include '@templates/Avatar.twig' %}
+{% include '@achievementreport/Avatar.twig' %}
 
-{% include '@templates/Navigation.twig' with {
+{% include '@achievementreport/Navigation.twig' with {
     elements: navigation
 } %}
 
-{% include '@templates/Navigation.twig' with {
+{% include '@achievementreport/Navigation.twig' with {
     elements: subnavigation
 } %}
 
@@ -132,7 +132,7 @@
                         enabled: false,
                     },
                     xAxis: {
-                        categories: [{{ mathematics.data.x.categories|purify }}],
+                        categories: {{ mathematics.data.x.categories|json_encode|purify }},
                         gridLineWidth: 1,
                         title: {
                             text: 'Time at school',
@@ -141,7 +141,7 @@
                     },
                     yAxis: [
                         {
-                            categories: ['null', {{ mathematics.data.y.stages|purify }}],
+                            categories: {{ mathematics.data.y.stages|json_encode|purify }},
                             max: 27,
                             min: 1,
                             title: {
@@ -149,7 +149,7 @@
                             }
                         },
                         {
-                            categories: ['null', {{ mathematics.data.y.levelGroups|purify }}],
+                            categories: {{ mathematics.data.y.levelGroups|json_encode|purify }},
                             gridLineWidth: 0,
                             labels: {
                                 x: -100,
@@ -169,7 +169,7 @@
                             }
                         },
                         {
-                            categories: ['null', {{ mathematics.data.y.lower|purify }}],
+                            categories: {{ mathematics.data.y.lower|json_encode|purify }},
                             gridLineWidth: 0,
                             labels: {
                                 y: -7
@@ -189,6 +189,15 @@
         <div class="row">
             <div class="small-12 columns">
                 <div id="mathematics"></div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="empty-state">
+                    <i class="icon-progress"></i>
+                    <p>No data available.</p>
+                </div>
             </div>
         </div>
     {% endif %}

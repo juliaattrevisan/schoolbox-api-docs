@@ -31,7 +31,12 @@ class Data extends Base
      */
     public function findData(): Payload
     {
-        $query = "
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year' => $this->year
+        ];
+
+        $query = '
             SELECT
                 Seq,
                 ThisStudentStanine,
@@ -39,15 +44,15 @@ class Data extends Base
                 DiocesanReadingComprehensionPATStaninePercentage,
                 NationalReadingComprehensionPATStaninePercentage
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
-            AND Fileyear = '{$this->year}'
-            ORDER BY seq";
+            WHERE ThisStudentID = :externalId
+            AND Fileyear = :year
+            ORDER BY seq';
 
-        $result = $this->getDb()->getAll($query);
+        $result = $this->db->getAll($query, $params);
 
         /* Find data for each of the three series
          */
-        $payload = new Payload(self::GRAPH_TITLE, (int)$this->year);
+        $payload = new Payload(self::GRAPH_TITLE);
 
         foreach ($result as $row) {
             $payload
@@ -67,20 +72,17 @@ class Data extends Base
      */
     public function hasDataFromAnyYear(): bool
     {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+        ];
+
         $query = "
-            SELECT
-                Seq,
-                ThisStudentStanine,
-                IndividualReadingComprehensionPATStanineMarker,
-                DiocesanReadingComprehensionPATStaninePercentage,
-                NationalReadingComprehensionPATStaninePercentage
+            SELECT TOP 1 COUNT(*) AS 'computed'
             FROM uvSchoolBoxPATSTARSummary
-            WHERE ThisStudentID = '{$this->externalUser['StudentID']}'
+            WHERE ThisStudentID = :externalId
             AND IndividualReadingComprehensionPATStanineMarker <> 0
-            ORDER BY seq";
+        ";
 
-        $result = $this->getDb()->getAll($query);
-
-        return (bool)\count($result);
+        return (bool)$this->db->getOne($query, $params);
     }
 }

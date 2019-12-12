@@ -156,7 +156,7 @@
                 enabled: false,
             },
             xAxis: {
-                categories: [{{ numeracy.data.x.categories|purify }}],
+                categories: {{ numeracy.data.x.categories|purify }},
                 gridLineWidth: 1,
                 title: {
                     text: 'Time at school',
@@ -165,7 +165,7 @@
             },
             yAxis: [
                 {
-                    categories: ['null', {{ numeracy.data.y.stages|purify }}],
+                    categories: {{ numeracy.data.y.stages|purify }},
                     max: 18,
                     min: 1,
                     title: {
@@ -173,7 +173,7 @@
                     }
                 },
                 {
-                    categories: ['null', {{ numeracy.data.y.levelGroups|purify }}],
+                    categories: {{ numeracy.data.y.levelGroups|purify }},
                     gridLineWidth: 0,
                     labels: {
                         x: -100,

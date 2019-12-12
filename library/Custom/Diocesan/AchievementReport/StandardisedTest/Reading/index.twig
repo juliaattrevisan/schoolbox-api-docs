@@ -4,13 +4,13 @@
  # @param array     externalUser
  # @param int|null  year
  #}
-{% include '@templates/Avatar.twig' %}
+{% include '@achievementreport/Avatar.twig' %}
 
-{% include '@templates/Navigation.twig' with {
+{% include '@achievementreport/Navigation.twig' with {
     elements: navigation
 } %}
 
-{% include '@templates/Navigation.twig' with {
+{% include '@achievementreport/Navigation.twig' with {
     elements: subnavigation
 } %}
 
@@ -149,7 +149,7 @@
                         enabled: false,
                     },
                     xAxis: {
-                        categories: [{{ reading.data.x.categories|purify }}],
+                        categories: {{ reading.data.x.categories|json_encode|purify }},
                         gridLineWidth: 1,
                         title: {
                             text: 'Time at school',
@@ -158,7 +158,7 @@
                     },
                     yAxis: [
                         {
-                            categories: ['null', {{ reading.data.y.probeAge|purify }}],
+                            categories: {{ reading.data.y.probeAge|json_encode|purify }},
                             max: 25,
                             min: 1,
                             title: {
@@ -167,7 +167,7 @@
                             }
                         },
                         {
-                            categories: ['null', {{ reading.data.y.colourWheel|purify }}],
+                            categories: {{ reading.data.y.colourWheel|json_encode|purify }},
                             labels: {
                                 formatter: function() {
                                     if (this.value != ' ') {
@@ -194,6 +194,15 @@
         <div class="row">
             <div class="small-12 columns">
                 <div id="reading"></div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="empty-state">
+                    <i class="icon-progress"></i>
+                    <p>No data available.</p>
+                </div>
             </div>
         </div>
     {% endif %}

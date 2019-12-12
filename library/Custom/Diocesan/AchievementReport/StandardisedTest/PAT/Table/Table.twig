@@ -5,27 +5,42 @@
  #
  # @param array data
  #}
-<table>
-    <thead>
-        <tr>
-            <th class="centered">Year</th>
-            <th class="centered">PAT Mathematics</th>
-            <th class="centered">PAT Listening Comprehension</th>
-            <th class="centered">PAT Reading Vocabulary</th>
-            <th class="centered">PAT Reading Comprehension</th>
-            <th class="centered">PAT Punctuation And Grammar</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for year, values in data %}
-        <tr>
-            <td class="centered">{{ year }}</td>
-            <td class="centered">{{ values.mathematics }}</td>
-            <td class="centered">{{ values.listeningComprehension }}</td>
-            <td class="centered">{{ values.readingVocabulary }}</td>
-            <td class="centered">{{ values.readingComprehension }}</td>
-            <td class="centered">{{ values.punctuationGrammar }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% if data|length %}
+    <div class="row">
+        <div class="small-12 columns">
+            <table>
+                <thead>
+                <tr>
+                    <th class="centered">Year</th>
+                    <th class="centered">PAT Mathematics</th>
+                    <th class="centered">PAT Listening Comprehension</th>
+                    <th class="centered">PAT Reading Vocabulary</th>
+                    <th class="centered">PAT Reading Comprehension</th>
+                    <th class="centered">PAT Punctuation And Grammar</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for year, values in data %}
+                    <tr>
+                        <td class="centered">{{ year }}</td>
+                        <td class="centered">{{ values.mathematics ?: 'No Result' }}</td>
+                        <td class="centered">{{ values.listeningComprehension ?: 'No Result' }}</td>
+                        <td class="centered">{{ values.readingVocabulary ?: 'No Result' }}</td>
+                        <td class="centered">{{ values.readingComprehension ?: 'No Result' }}</td>
+                        <td class="centered">{{ values.punctuationGrammar ?: 'No Result' }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-progress"></i>
+                <p>No data available.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}

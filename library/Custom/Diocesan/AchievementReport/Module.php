@@ -27,6 +27,7 @@ use Schoolbox\UserMapper;
  */
 class Module extends BaseModule
 {
+
     /**
      * @inheritdoc
      */
@@ -59,13 +60,13 @@ class Module extends BaseModule
         $this->register('GET', '/ib/{externalUserId}{/year}', 'getIb', $getPerms, $preload);
         $this->register('GET', '/ncea/{externalUserId}{/year}', 'getNcea', $getPerms, $preload);
         $this->register('GET', '/comments/{externalUserId}{/year}', 'getComments', $getPerms, $preload);
-        $this->register('GET', '/standardisedTest/PAT/{externalUserId}{/year}', 'getStandardisedTestPAT', $getPerms, $preload);
-        $this->register('GET', '/standardisedTest/STAR/{externalUserId}{/year}', 'getStandardisedTestSTAR', $getPerms, $preload);
-        $this->register('GET', '/standardisedTest/reading/{externalUserId}{/year}', 'getStandardisedTestReading', $getPerms, $preload);
-        $this->register('GET', '/standardisedTest/writing/{externalUserId}{/year}', 'getStandardisedTestWriting', $getPerms, $preload);
-        $this->register('GET', '/standardisedTest/mathematics/{externalUserId}{/year}', 'getStandardisedTestMathematics', $getPerms, $preload);
-        $this->register('GET', '/standardisedTest/literacynumeracy/{externalUserId}{/year}', 'getStandardisedTestLiteracyNumeracy', $getPerms, $preload);
-        $this->register('GET', '/standardisedTest/{externalUserId}{/year}', 'getStandardisedTest', $getPerms, $preload);
+        $this->register('GET', '/standardisedTests/PAT/{externalUserId}{/year}', 'getStandardisedTestsPAT', $getPerms, $preload);
+        $this->register('GET', '/standardisedTests/STAR/{externalUserId}{/year}', 'getStandardisedTestsSTAR', $getPerms, $preload);
+        $this->register('GET', '/standardisedTests/reading/{externalUserId}{/year}', 'getStandardisedTestsReading', $getPerms, $preload);
+        $this->register('GET', '/standardisedTests/writing/{externalUserId}{/year}', 'getStandardisedTestsWriting', $getPerms, $preload);
+        $this->register('GET', '/standardisedTests/mathematics/{externalUserId}{/year}', 'getStandardisedTestsMathematics', $getPerms, $preload);
+        $this->register('GET', '/standardisedTests/literacynumeracy/{externalUserId}{/year}', 'getStandardisedTestsLiteracyNumeracy', $getPerms, $preload);
+        $this->register('GET', '/standardisedTests/{externalUserId}{/year}', 'getStandardisedTests', $getPerms, $preload);
         $this->register('GET', '/coCurricular/{externalUserId}{/year}', 'getCoCurricular', $getPerms, $preload);
     }
 
@@ -128,7 +129,7 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/Comments', 'comments');
         $this->addTemplatePath($templateLoader, __DIR__ . '/StandardisedTest', 'standardisedTest');
         $this->addTemplatePath($templateLoader, __DIR__ . '/CoCurricular', 'coCurricular');
-        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates', 'templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates', 'achievementreport');
     }
 
 
