@@ -122,9 +122,11 @@ class Module extends BaseModule
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
 
         // tokenised route chunks
-        $assRoute     = '/assessments/{assessmentId:\d+}';
-        $assListRoute = "/{contextType:$contextTypes}/{contextId:\\d+}/assessments";
-        $studentParam = '{studentId:\d+}';
+        $assRoute      = '/assessments/{assessmentId:\d+}';
+        $assWeight     = '/assessments/weight/{assessmentId:\d+}';
+        $assVisibility = '/assessments/visibility/{assessmentId:\d+}';
+        $assListRoute  = "/{contextType:$contextTypes}/{contextId:\\d+}/assessments";
+        $studentParam  = '{studentId:\d+}';
 
 
         // register the routes
@@ -135,6 +137,8 @@ class Module extends BaseModule
 
         $this->register('GET',   "$assRoute",                        'getAssessment',            $loggedIn,         $preloadAssessment);
         $this->register('POST',  "$assRoute",                        'postUpdateAssessment',     $canWrite,         $preloadAssessment); // a || c
+        $this->register('POST',  "$assWeight",                       'updateWeight',             $canWrite,         $preloadAssessment); // a || c
+        $this->register('POST',  "$assVisibility",                   'updateVisibility',         $canWrite,         $preloadAssessment); // a || c
         $this->register('PATCH', "$assRoute",                        'patchUpdateAssessment',    $canWrite,         $preloadAssessment); // a || c
         $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,        $preloadAssessment); // a || c
         $this->register('POST',  "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,        $preloadAssessment); // a || c
