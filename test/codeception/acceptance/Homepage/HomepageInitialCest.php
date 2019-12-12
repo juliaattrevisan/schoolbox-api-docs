@@ -11,16 +11,20 @@ use Codeception\Util\Locator;
 use Nette\Utils\Random;
 use Page\Common;
 use Page\Homepage;
+use Codeception\Lib\Interfaces\ElementLocator;
 
 /**
  * Test for attaching a textbox to a page.
  */
 class HomepageInitialCest
 {
+    
+    var $createFolderUrl='https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
+    
     public function createHomepageFail(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/create/0");
+        $i->amOnUrl($this->createFolderUrl);
         $i->selectOption("template", "Blank");
         $i->fillField(['name'=>'name'], 'Test Homepage');
         $i->click(['css'=>'label[class=radio-label][for=groupWrite1]']);
@@ -36,7 +40,7 @@ class HomepageInitialCest
     public function createHomepage(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/create/0");
+        $i->amOnUrl($this->createFolderUrl);
         $i->selectOption("template", "Blank");
         $i->fillField(['name'=>'name'], 'Test Homepage');
         $i->click(['css'=>'label[class=radio-label][for=groupWrite1]']);
@@ -55,7 +59,8 @@ class HomepageInitialCest
         $i->login("alaress", "alaress");
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Homepage");
-        $i->click("Test Homepage");
+        $testHomepage=Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
         $i->click(['css'=>'label[for=component-lock-toggle]']);
@@ -104,7 +109,7 @@ class HomepageInitialCest
         $i->click(['css'=>'input[type=submit]']);
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
-        sleep(2);
+        sleep(5);
         $i->click("Post a news article");
         $i->fillField("title","Test News Title");
         $i->fillCkEditorById('body', 'wow what interesting news');
@@ -134,7 +139,7 @@ class HomepageInitialCest
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
         $home_page_url=$i->getCurrentUrl();
-        $i->impersonate("Rachel Rhodes");
+        $i->impersonate("Mrs Jana Reed");
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
         sleep(2);
