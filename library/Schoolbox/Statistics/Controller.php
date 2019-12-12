@@ -177,10 +177,6 @@ class Controller extends Base
         /**
          * Graph data
          */
-        // list of epoch days included in this
-        $start = (int)($this->getStartDate()->getUnixTimeStamp() / 86400);
-        $end   = (int)($this->getEndDate()->getUnixTimeStamp() / 86400);
-
         // create a template array for populating into to account for zero days
         $data = array();
         foreach ($this->roles as $role) {
@@ -246,7 +242,7 @@ class Controller extends Base
 
             for ($i = 0; $i < $n; ++$i) {
                 if ($series[$k[$i]] || $series[$k[$i+1]] || $series[$k[$i-1]]) {
-                    $groupData[] = array($k[$i] * 86400000, (int)$series[$k[$i]]);
+                    $groupData[] = array(strtotime($k[$i]) * 1000, (int)$series[$k[$i]]);
                 }
             }
 
