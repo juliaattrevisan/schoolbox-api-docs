@@ -234,6 +234,7 @@ class Controller extends Base
                 ksort($d);
             }
         }
+        unset($d);
 
         $colorList = [];
         $graphData = [];
