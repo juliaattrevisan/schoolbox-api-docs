@@ -841,18 +841,22 @@ class Mapper extends BaseMapper
         if ($involved || !$this->isUserInPastoralService($user)) {
             $this->filters[] = "
                 (
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = {$user->getRole()->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = {$user->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = :user_role_id_0 AND `pastoral_id` = `pastoral`.`id`) > 0 OR
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = :user_id_0      AND `pastoral_id` = `pastoral`.`id`) > 0 OR
                     (
                         SELECT COUNT(*) FROM `pastoral_access` WHERE `group_id` IN (
-                            SELECT `group_id` 
-                            FROM `pastoral_group_member` 
-                            WHERE `user_id` = {$user->getId()}
+                            SELECT `group_id`
+                            FROM `pastoral_group_member`
+                            WHERE `user_id` = :user_id_1
                         ) AND `pastoral_id` = `pastoral`.`id`
                     ) > 0 OR
-                    `pastoral`.`owner_id` = {$user->getId()}
+                    `pastoral`.`owner_id` = :user_id_2
                 )
             ";
+            $this->bindings['user_role_id_0'] = $user->getRole()->getId();
+            $this->bindings['user_id_0']      = $user->getId();
+            $this->bindings['user_id_1']      = $user->getId();
+            $this->bindings['user_id_2']      = $user->getId();
         }
 
         $criteriaParts = [];
