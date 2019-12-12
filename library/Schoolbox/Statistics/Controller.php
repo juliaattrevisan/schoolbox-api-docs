@@ -242,7 +242,7 @@ class Controller extends Base
 
             for ($i = 0; $i < $n; ++$i) {
                 if ($series[$k[$i]] || $series[$k[$i+1]] || $series[$k[$i-1]]) {
-                    $groupData[] = array(strtotime($k[$i]) * 1000, (int)$series[$k[$i]]);
+                    $groupData[] = array(strtotime($k[$i] . ' 00:00:00Z') * 1000, (int)$series[$k[$i]]);
                 }
             }
 
