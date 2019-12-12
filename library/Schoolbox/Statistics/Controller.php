@@ -559,21 +559,11 @@ class Controller extends Base
             $groupData = [];
             $dates     = array_keys($series);
             foreach ($dates as $i => $currentDate) {
-                $addRoleTypeData = false;
-                $currentCount    = (int)($series[$currentDate] ?? 0);
-                if ($currentCount > 0) {
-                    $addRoleTypeData = true;
-                } else {
-                    $prevDate  = $dates[$i - 1] ?? null;
-                    $nextDate  = $dates[$i + 1] ?? null;
-                    $prevCount = $prevDate ? $series[$prevDate] ?? 0 : 0;
-                    $nextCount = $nextDate ? $series[$nextDate] ?? 0 : 0;
-                    if ($prevCount || $nextCount) {
-                        $addRoleTypeData = true;
-                    }
-                }
-                if ($addRoleTypeData) {
-                    $groupData[] = [strtotime($dates[$i] . ' 00:00:00Z') * 1000, $currentCount];
+                if ($this->isPointRendered($series, $dates, $i)) {
+                    $groupData[] = [
+                        strtotime($dates[$i] . ' 00:00:00Z') * 1000,
+                        (int)$series[$currentDate]
+                    ];
                 }
             }
 
@@ -584,6 +574,41 @@ class Controller extends Base
             ];
         }
         return [$colorList, $graphData];
+    }
+
+
+    /**
+     * Is the point in `$series` at date `$dates[$dateIndex]` rendered?
+     *
+     * It is if any of:
+     * * Current date has a visitor count greater than zero
+     * * Previous date has a visitor count greater than zero
+     * * Next date has a visitor count greater than zero
+     *
+     * @param array  $series    The data series
+     * @param array  $dates     The list of dates in the data series
+     * @param int    $dateIndex An index that matches an integer key in `$dates`
+     * @return bool
+     */
+    private function isPointRendered(array $series, array $dates, int $dateIndex): bool
+    {
+        // Check current date
+        $currentDate = $dates[$dateIndex] ?? null;
+        if ((int)($series[$currentDate] ?? 0) > 0) {
+            return true;
+        }
+
+        // Check previous date
+        $prevDate  = $dates[$dateIndex - 1] ?? null;
+        $prevCount = $prevDate ? $series[$prevDate] ?? 0 : 0;
+        if ($prevCount > 0) {
+            return true;
+        }
+
+        // Check next date
+        $nextDate  = $dates[$dateIndex + 1] ?? null;
+        $nextCount = $nextDate ? $series[$nextDate] ?? 0 : 0;
+        return $nextCount > 0;
     }
 
 
