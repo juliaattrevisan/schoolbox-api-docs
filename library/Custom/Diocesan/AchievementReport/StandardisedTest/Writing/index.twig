@@ -147,7 +147,7 @@
                     yAxis: [
                         {
                             categories: {{ writing.data.y.stages|json_encode|purify }},
-                            max: 12,
+                            max: {{ writing.data.y.stages|length - 1}},
                             min: 1,
                             title: {
                                 text: ''
@@ -160,14 +160,14 @@
                                 x: -100,
                                 y: 41
                             },
-                            max: 12,
+                            max: {{ writing.data.y.curriculumLevels|length - 1}},
                             min: 1,
                             offset: 0,
                             startOnTick: false,
                             tickColor: '#dddddd',
                             tickLength: 200,
                             tickmarkPlacement: 'between',
-                            tickPositions: [3,6,9,12],
+                            tickPositions: {{ range(3, writing.data.y.curriculumLevels|length - 1, 3)|json_encode }},
                             tickWidth: 1,
                             title: {
                                 text: ''

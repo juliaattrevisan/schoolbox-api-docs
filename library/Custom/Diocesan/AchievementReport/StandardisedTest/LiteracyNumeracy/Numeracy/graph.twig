@@ -156,7 +156,7 @@
                 enabled: false,
             },
             xAxis: {
-                categories: {{ numeracy.data.x.categories|purify }},
+                categories: {{ numeracy.data.x.categories|json_encode|purify }},
                 gridLineWidth: 1,
                 title: {
                     text: 'Time at school',
@@ -165,28 +165,28 @@
             },
             yAxis: [
                 {
-                    categories: {{ numeracy.data.y.stages|purify }},
-                    max: 18,
+                    categories: {{ numeracy.data.y.stages|json_encode|purify }},
+                    max: {{ numeracy.data.y.stages|length - 1}},
                     min: 1,
                     title: {
                         text: ''
                     }
                 },
                 {
-                    categories: {{ numeracy.data.y.levelGroups|purify }},
+                    categories: {{ numeracy.data.y.levelGroups|json_encode|purify }},
                     gridLineWidth: 0,
                     labels: {
                         x: -100,
                         y: 34
                     },
-                    max: 18,
+                    max: {{ numeracy.data.y.levelGroups|length - 1}},
                     min: 1,
                     offset: 0,
                     startOnTick: false,
                     tickColor: '#dddddd',
                     tickLength: 150,
                     tickmarkPlacement: 'between',
-                    tickPositions: [3,6,9,12,15,18],
+                    tickPositions: {{ range(3, numeracy.data.y.levelGroups|length - 1, 3)|json_encode }},
                     tickWidth: 1,
                     title: {
                         text: ''

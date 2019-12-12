@@ -159,7 +159,7 @@
                     yAxis: [
                         {
                             categories: {{ reading.data.y.probeAge|json_encode|purify }},
-                            max: 25,
+                            max: {{ reading.data.y.probeAge|length - 1}},
                             min: 1,
                             title: {
                                 text: 'PROBE Age',
@@ -177,7 +177,7 @@
                                     return this.value;
                                 }
                             },
-                            max: 25,
+                            max: {{ reading.data.y.colourWheel|length - 1}},
                             min: 1,
                             offset: 0,
                             title: {

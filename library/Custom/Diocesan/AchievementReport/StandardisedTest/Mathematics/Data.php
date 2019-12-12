@@ -78,6 +78,24 @@ class Data extends Base
         'Beginning',
         'Proficient',
         'Advanced',
+
+        /* 5A
+         */
+        'Beginning',
+        'Proficient',
+        'Advanced',
+
+        /* 5B
+         */
+        'Beginning',
+        'Proficient',
+        'Advanced',
+
+        /* 6A
+         */
+        'Beginning',
+        'Proficient',
+        'Advanced',
     ];
 
 
@@ -118,6 +136,15 @@ class Data extends Base
         ' ',
         ' ',
         '4B',
+        ' ',
+        ' ',
+        '5A',
+        ' ',
+        ' ',
+        '5B',
+        ' ',
+        ' ',
+        '6A',
     ];
 
 
@@ -141,28 +168,37 @@ class Data extends Base
 
         ' ',
         ' ',
+        ' ', // 1A
         ' ',
         ' ',
+        ' ', // 1B
         ' ',
         ' ',
+        ' ', // 2A
         ' ',
         ' ',
+        ' ', // 2B
         ' ',
         ' ',
+        ' ', // 3A
         ' ',
         ' ',
+        ' ', // 3B
         ' ',
         ' ',
+        ' ', // 4A
         ' ',
         ' ',
+        ' ', // 4B
         ' ',
         ' ',
+        ' ', // 5A
         ' ',
         ' ',
+        ' ', // 5B
         ' ',
         ' ',
-        ' ',
-        ' ',
+        ' ', // 6A
     ];
 
 
