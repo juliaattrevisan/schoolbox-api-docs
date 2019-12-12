@@ -162,7 +162,6 @@ class Controller extends Base
     public function getIndex($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {
         $dataSource = $this->getDataSource();
-        $colours = [];
 
         if ($startDate !== null) {
             $this->setStartDate($startDate);
@@ -174,85 +173,8 @@ class Controller extends Base
             $this->setRoleFilter($roleFilter);
         }
 
-        /**
-         * Graph data
-         */
-        // create a template array for populating into to account for zero days
-        $data = array();
-        foreach ($this->roles as $role) {
-            $runningDate = (clone $this->getStartDate())->startOfDay();
-            while ($runningDate->lt($this->getEndDate())) {
-                $data[$role][$runningDate->getDatabaseDate()] = 0;
-                $runningDate = $runningDate->addDays(1);
-            }
-        }
 
-        $results = $dataSource->getVisits($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-
-        foreach ($results as $result) {
-            $time     = $result->getDate()->getDatabaseDate();
-            $roleName = $result->getRole()->getType();
-
-            if (isset($data[$roleName][$time])) {
-                $data[$roleName][$time] += $result->getHitcount();
-            } else {
-                $data[$roleName][$time] = $result->getHitcount();
-            }
-
-            if (!isset($colours[$roleName])) {
-                switch ($roleName) {
-                    case Role::STAFF:
-                        $colours[$roleName] = self::STAFF_COLOUR;
-                        break;
-
-                    case Role::STUDENT:
-                        $colours[$roleName] = self::STUDENT_COLOUR;
-                        break;
-
-                    case Role::PARENT:
-                        $colours[$roleName] = self::PARENT_COLOUR;
-                        break;
-
-                    case Role::GUEST:
-                    default:
-                        $colours[$roleName] = self::GUEST_COLOUR;
-                        break;
-                }
-            }
-        }
-
-        // Sort or remove the series, depending on whether or not they were populated
-        foreach ($data as $group => &$d) {
-            if (!isset($colours[$group])) {
-                unset($data[$group]);
-            }
-            else {
-                ksort($d);
-            }
-        }
-        unset($d);
-
-        $colorList = [];
-        $graphData = [];
-        foreach ($data as $groupName => $series) {
-            $groupData = [];
-            $k = array_keys($series);
-
-            $n = count($series);
-
-            for ($i = 0; $i < $n; ++$i) {
-                if ($series[$k[$i]] || $series[$k[$i+1]] || $series[$k[$i-1]]) {
-                    $groupData[] = array(strtotime($k[$i] . ' 00:00:00Z') * 1000, (int)$series[$k[$i]]);
-                }
-            }
-
-            $colorList[] = $colours[$groupName];
-            $graphData[] = array(
-                'name' => ucfirst($groupName),
-                'data' => $groupData
-            );
-        }
-        $colours = $colorList;
+        [$colours, $graphData] = $this->compileVisitorGraphData($folder, $dataSource);
 
 
         /**
@@ -554,6 +476,99 @@ class Controller extends Base
                 ],
             )
         );
+    }
+
+
+    /**
+     * Compile the visitor data graph.
+     *
+     * @param FolderModel $folder
+     * @param DataSource  $dataSource
+     * @return array [$colorList, $graphData]
+     *               $colorList: The colors for each role's line in `$graphData`
+     *               $graphData: The points for each role's line:
+     *                           [$timestamp, $visitorCount]
+     */
+    private function compileVisitorGraphData(FolderModel $folder, DataSource $dataSource): array
+    {
+        // create a template array for populating into to account for zero days
+        $data    = [];
+        $endDate = (clone $this->getEndDate())->endOfDay();
+        foreach ($this->roles as $role) {
+            $runningDate = (clone $this->getStartDate())->startOfDay();
+            while ($runningDate->lt($endDate)) {
+                $data[$role][$runningDate->getDatabaseDate()] = 0;
+                $runningDate                                  = $runningDate->addDays(1);
+            }
+        }
+
+        $results = $dataSource->getVisits($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
+
+        // Compile colors for each role
+        $colours = [];
+        foreach ($results as $result) {
+            $time     = $result->getDate()->getDatabaseDate();
+            $roleName = $result->getRole()->getType();
+
+            if (isset($data[$roleName][$time])) {
+                $data[$roleName][$time] += $result->getHitcount();
+            } else {
+                $data[$roleName][$time] = $result->getHitcount();
+            }
+
+            if (!isset($colours[$roleName])) {
+                switch ($roleName) {
+                    case Role::STAFF:
+                        $colours[$roleName] = self::STAFF_COLOUR;
+                        break;
+
+                    case Role::STUDENT:
+                        $colours[$roleName] = self::STUDENT_COLOUR;
+                        break;
+
+                    case Role::PARENT:
+                        $colours[$roleName] = self::PARENT_COLOUR;
+                        break;
+
+                    case Role::GUEST:
+                    default:
+                        $colours[$roleName] = self::GUEST_COLOUR;
+                        break;
+                }
+            }
+        }
+
+        // Sort or remove the series, depending on whether or not they were populated
+        foreach ($data as $group => &$d) {
+            if (!isset($colours[$group])) {
+                unset($data[$group]);
+            } else {
+                ksort($d);
+            }
+        }
+        unset($d);
+
+        $colorList = [];
+        $graphData = [];
+        foreach ($data as $groupName => $series) {
+            $groupData = [];
+            $k         = array_keys($series);
+
+            $n = count($series);
+
+            for ($i = 0; $i < $n; ++$i) {
+                if ($series[$k[$i]] || $series[$k[$i + 1]] || $series[$k[$i - 1]]) {
+                    $groupData[] = [strtotime($k[$i] . ' 00:00:00Z') * 1000, (int)$series[$k[$i]]];
+                }
+            }
+
+            $colorList[] = $colours[$groupName];
+            $graphData[] = [
+                'name' => ucfirst($groupName),
+                'data' => $groupData
+            ];
+        }
+        return [$colorList, $graphData];
     }
 
 
