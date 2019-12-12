@@ -35,6 +35,7 @@
 <div class="row">
     <div class="small-12 island">
         {% if markbook.assessments|length > 0 %}
+        <form id="statistics" action="#">
         <table class="marksheet" data-mark-sheet>
             <thead>
                 <tr class="rotate-headers" data-headers data-hidable-columns>
@@ -79,14 +80,36 @@
 
             <tbody>
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
-                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight'} %}
-                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject'} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight', input: true} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject', input: true} %}
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Mean', key: 'mean'} %}
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
+                <tr class="sub-row">
+                    <td>Visibility</td>
+                    <td>&nbsp;</td>
+                    {% for assessment in markbook.assessments %}
+                        <td data-assessment="{{ assessment.id }}">
+                            {% if assessment.markvisibility is not null %}
+                                {% set selected = assessment.markvisibility %}
+                                {% set allOptions = {
+                                    0: 'Staff Only',
+                                    1: 'Staff and Students',
+                                    2: 'Staff, Students and their Parents'
+                                } %}
+                                <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
+                                    {% for currentOption, label in allOptions %}
+                                        <option value="{{ currentOption }}"
+                                                {% if currentOption == selected %}selected="selected"{% endif %}> {{ label }} </option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
                 {# Need all students that ever participated in any assessments #}
                 {% spaceless %}
                 {% for student in markbook.students %}
@@ -143,19 +166,7 @@
                                     {% endif %}
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(true) %}
-
-                                    {% if participant.hasSubmittedResponse and not participant.hasPublishedFeedback %}
-                                        {# Work submitted, but no feedback yet #}
-                                        {% set label= "Pending" %}
-                                    {% elseif participant.hasPublishedFeedback and not participant.humanReadableMark(true) %}
-                                        {# Feedback given with comment, but no mark #}
-                                        {% set label= "Reviewed" %}
-                                    {% elseif participant.humanReadableMark(true) %}
-                                        {# Feedback given, with mark #}
-                                        {% set label= participant.humanReadableMark(true) %}
-                                    {% else %}
-                                        {% set label= "-" %}
-                                    {% endif %}
+                                    {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback ? "Pending" : participant.humanReadableMark(true) | default('–') %}
 
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
@@ -165,10 +176,6 @@
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
-                            {% set feedback = participant.authoritativeFeedback(false) %}
-                            {% if feedback and feedback.isDraft %}
-                                <span class="indicator indicator-pending"  title="Unpublished Draft"></span>
-                            {% endif %}
                         </td>
                     {% endfor %}
                 </tr>
@@ -176,6 +183,7 @@
                 {% endspaceless %}
             </tbody>
             </table>
+        </form>
         {% else %}
         <div class="empty-state">
             <i class="icon-curriculum"></i>
