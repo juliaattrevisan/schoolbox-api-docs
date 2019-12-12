@@ -26,15 +26,7 @@
             <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2">
                 {% for currentFile in response.allFiles %}
                     {% set selected = '' %}
-                    {% if selecteFileHash is defined %}
-                        {% set defaultSelectedFile = selectedFileHash|length and length == 0 and loop.index0 == 0 %}
-                        {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
-                    {% else %}
-                        {% set defaultSelectedFile = null %}
-                        {% set hasSelectedFile = false %}
-                    {% endif %}
-
-                    {% if hasSelectedFile or defaultSelectedFile %}
+                    {% if (selectedFileHash is defined and currentFile.hash == selectedFileHash) or (loop.index0 == 0 and not selectedFileHash) %}
                         {% set selected = 'selected' %}
                     {% endif %}
 

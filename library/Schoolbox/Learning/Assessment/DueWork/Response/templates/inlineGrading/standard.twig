@@ -88,8 +88,8 @@ Usage:
 
 {# A preview of the file currently selected #}
 {% block responseFilePreview %}
-    {% if response and file and subfragment.data is defined %}
-        {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
+    {% if response and file %}
+        {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data is defined ? subfragment.data : null} %}
     {% endif %}
 {% endblock %}
 
@@ -101,7 +101,8 @@ Usage:
         response: response,
         latestFeedback: feedback,
         kamiEnabled: true,
-        plagscanEnabled: plagscanEnabled
+        plagscanEnabled: plagscanEnabled,
+        selectedFileHash: selectedFileHash
     } only %}
 {% endblock %}
 

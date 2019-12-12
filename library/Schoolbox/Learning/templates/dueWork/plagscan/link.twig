@@ -4,7 +4,7 @@
  # plagscan     a Plagscan\Model instance containing plagscan_id
  # participant  a Participant instance
  #}
-{% if plagscan.isComplete %}
+{% if plagscan and plagscan.isComplete %}
 <a href="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {
     assessmentId: assessment.id,
     assessment:   assessment,
