@@ -276,59 +276,25 @@ class Controller extends Base
         /**
          * Top files
          */
-        $topFiles = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_TOP_FILES, true);
-
-        $topFileInfo = '';
-        if (!empty($topFiles)) {
-            $topFileInfo = array_values($topFiles)[0];
-        }
-
-        $topFilesMore = false;
-        $topFilesAll = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-
-        if (\count($topFilesAll) > self::MAX_TOP_FILES) {
-            $topFilesMore = true;
-        }
+        [$topFiles, $topFileInfo, $topFilesMore] = $this->compileTopFilesData($folder, $dataSource);
 
 
         /**
          * Recent visitors
          */
-        $recentVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'datetime DESC', self::MAX_RECENT_VISITORS);
-
-        $recentVisitorsMore = false;
-        if ($visitorCount > self::MAX_RECENT_VISITORS) {
-            $recentVisitorsMore = true;
-        }
+        [$recentVisitors, $recentVisitorsMore] = $this->compileRecentVisitorsData($folder, $dataSource, $visitorCount);
 
 
         /**
          * Yet to visit
          */
-        $yetToVisitors = $dataSource->getYetToVisit($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_YET_TO_VISIT);
-
-        $yetToVisitCount = $dataSource->getYetToVisitCount($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-        if ($yetToVisitCount > self::MAX_YET_TO_VISIT) {
-            $yetToVisitMore = true;
-        }
+        [$yetToVisitors, $yetToVisitMore] = $this->compileNotYetVisitedData($folder, $dataSource);
 
 
         /**
          * Top links
          */
-        $topLinks = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_TOP_FILES, true);
-
-        $topLinkInfo = '';
-        if (!empty($topLinks)) {
-            $topLinkInfo = array_values($topLinks)[0];
-        }
-
-        $topLinksMore = false;
-        $topLinksAll = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-
-        if (\count($topLinksAll) > self::MAX_TOP_LINKS) {
-            $topLinksMore = true;
-        }
+        [$topLinks, $topLinkInfo, $topLinksMore] = $this->compileTopLinksData($folder, $dataSource);
 
 
         /**
@@ -593,6 +559,97 @@ class Controller extends Base
                 ],
             )
         );
+    }
+
+
+    /**
+     * Compile data for top files accessed.
+     *
+     * @param FolderModel $folder
+     * @param DataSource  $dataSource
+     * @return array [$topFiles, $topFileInfo, $topFilesMore]
+     *               $topFiles:     a list of `self::MAX_TOP_FILES` files accessed
+     *               $topFileInfo:  info about the most accessed file
+     *               $topFilesMore: are there more files?
+     */
+    private function compileTopFilesData(FolderModel $folder, DataSource $dataSource): array
+    {
+        $topFiles    = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_TOP_FILES, true);
+        $topFileInfo = '';
+        if (!empty($topFiles)) {
+            $topFileInfo = array_values($topFiles)[0];
+        }
+
+        $topFilesAll = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
+        return [$topFiles, $topFileInfo, \count($topFilesAll) > self::MAX_TOP_FILES];
+    }
+
+
+    /**
+     * Compile data for recent visitors.
+     *
+     * @param FolderModel $folder
+     * @param DataSource  $dataSource
+     * @param int         $visitorCount
+     * @return array [$recentVisitors, $recentVisitorsMore]
+     *               $recentVisitors:     a list of `self::MAX_RECENT_VISITORS` recent visitors
+     *               $recentVisitorsMore: are there more visitors?
+     */
+    private function compileRecentVisitorsData(FolderModel $folder, DataSource $dataSource, int $visitorCount): array
+    {
+        $recentVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'datetime DESC', self::MAX_RECENT_VISITORS);
+
+        $recentVisitorsMore = false;
+        if ($visitorCount > self::MAX_RECENT_VISITORS) {
+            $recentVisitorsMore = true;
+        }
+        return [$recentVisitors, $recentVisitorsMore];
+    }
+
+
+    /**
+     * Compile data for yet-to-visit users.
+     *
+     * @param FolderModel $folder
+     * @param DataSource  $dataSource
+     * @return array [$yetToVisitors, $yetToVisitMore]
+     *               $yetToVisitors:  a list of `self::MAX_YET_TO_VISIT` yet to visit
+     *               $yetToVisitMore: are there more yet to visit?
+     */
+    private function compileNotYetVisitedData(FolderModel $folder, DataSource $dataSource): array
+    {
+        $yetToVisitors = $dataSource->getYetToVisit($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_YET_TO_VISIT);
+
+        $yetToVisitMore = false;
+        $yetToVisitCount = $dataSource->getYetToVisitCount($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
+        if ($yetToVisitCount > self::MAX_YET_TO_VISIT) {
+            $yetToVisitMore = true;
+        }
+        return [$yetToVisitors, $yetToVisitMore];
+    }
+
+
+    /**
+     * Compile data for top links.
+     *
+     * @param FolderModel $folder
+     * @param DataSource  $dataSource
+     * @return array [$topLinks, $topLinkInfo, $topLinksMore]
+     *               $topLinks:     a list of `self::MAX_TOP_LINKS` links accessed
+     *               $topLinkInfo:  info about the most accessed link
+     *               $topLinksMore: are there more links?
+     */
+    private function compileTopLinksData(FolderModel $folder, DataSource $dataSource): array
+    {
+        $topLinks = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_TOP_FILES, true);
+
+        $topLinkInfo = '';
+        if (!empty($topLinks)) {
+            $topLinkInfo = array_values($topLinks)[0];
+        }
+
+        $topLinksAll  = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
+        return [$topLinks, $topLinkInfo, \count($topLinksAll) > self::MAX_TOP_LINKS];
     }
 
 
