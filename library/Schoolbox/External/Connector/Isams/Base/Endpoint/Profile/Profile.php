@@ -643,7 +643,7 @@ class Profile implements IStrategy
          * Otherwise make a new one for the given id
          */
         foreach ($parents as $parent) {
-            $externalId = trim((string)$parent->xpath('@Id')[0]);
+            $externalId = trim((string)$parent->xpath('@PersonId')[0]);
             $username = trim((string)$parent->EmailAddress);
             $firstname = trim((string)$parent->Forename);
             $lastname = trim((string)$parent->Surname);
