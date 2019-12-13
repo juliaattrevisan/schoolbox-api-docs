@@ -12,7 +12,7 @@ echo "operating in dir: `pwd`";
 echo "Creating artifact directory";
 mkdir -vp $initialdir/package-artifacts;
 
-ver=`curl https://www.johnvansickle.com/ffmpeg/ 2>/dev/null | grep 'release:' | awk '{print $2}'`;
+ver=`curl https://www.johnvansickle.com/ffmpeg/ 2>/dev/null | grep 'release:' | sed -e 's/<[^>]*>//g' | awk '{print $2}'`;
 if [ "$ver" == "" ];
 then
     echo "Error: unable to retrieve version";
@@ -23,15 +23,15 @@ echo "Packaging ffmpeg version: $ver";
 tardir="schoolbox-ffmpeg-$ver";
 mkdir -p $tardir;
 
-wget -c http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz;
+wget -c https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz;
 if [ $? -ne 0 ];
 then
   echo "An error occurred";
   exit 1;
 fi
 
-tar -xJvf ffmpeg-release-64bit-static.tar.xz;
-mv -v ffmpeg-$ver-64bit-static $tardir/ffmpeg;
+tar -xJvf ffmpeg-release-amd64-static.tar.xz;
+mv -v ffmpeg-$ver-amd64-static $tardir/ffmpeg;
 
 # Retar everything for the build process
 tar czf schoolbox-ffmpeg_$ver.orig.tar.gz $tardir;
