@@ -302,8 +302,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function refreshNotificationRedirects(Model $folder, $previous = null)
     {
-        if ((!$previous && $folder->getInherit()) || ($previous && $folder->getInherit() !== $previous->getInherit())) {
-            // folder is new AND inheritance is enabled OR inheritance has changed
+        if ($folder->getInherit() || ($previous && $previous->getInherit())) {
+            // folder inheritance is enabled OR inheritance has changed
 
             // TODO desingleton these
             $redis = Alaress\Redis::getClientInstance();
