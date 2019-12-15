@@ -63,21 +63,27 @@ class External_Synergetic_Class implements External_ClassInterface
      * @param int|null        $fileYearOverride
      * @param int|null        $fileSemesterOverride
      *
+     * @param string|null     $fileType
      * @return mixed
      */
-    public function getClass($classCode, \Schoolbox\User $user, int $fileYearOverride = null, int $fileSemesterOverride = null)
+    public function getClass($classCode, \Schoolbox\User $user, int $fileYearOverride = null, int $fileSemesterOverride = null, string $fileType = null)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
         $fileSemester = $this->database->quote($fileSemesterOverride ?? $this->externalUser->getCurrentSemester($user->getExternalId()));
         $fileYear = $this->database->quote($fileYearOverride ?? $this->externalUser->getCurrentYear($user->getExternalId()));
+
         $query = "
             SELECT *
             FROM dbo.SubjectClasses
-            WHERE $classQuery
-            AND FileYear='" . $fileYear . "'
-            AND FileSemester='" . $fileSemester . "'
-            ORDER BY ClassCampus
-        ";
+            WHERE {$classQuery}
+            AND FileYear='{$fileYear}'
+            AND FileSemester='{$fileSemester}'";
+
+        if (null !== $fileType) {
+            $query .= " AND FileType='{$this->database->quote($fileType)}'";
+        }
+
+        $query .= ' ORDER BY ClassCampus';
 
         return $this->getDatabase()->getRow($query);
     }

@@ -19,11 +19,12 @@ class Javascript extends Base
             $encodedClass  = urlencode(urlencode(urlencode($this->getEvent()->getCode())));
             $classLink     = $this->getEvent()->getCampus() ? $this->getEvent()->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
             $attendanceUrl = sprintf(
-                "/modules/attendance/modify/%s/%s/%s/%s",
+                "/modules/attendance/modify/%s/%s/%s/%s/%s",
                 $classLink,
                 $this->getEvent()->getStartTime()->getDatabaseDate(),
                 implode(',', $this->getEvent()->getAttendancePeriods()),
-                $this->getEvent()->getTimetableCode()
+                $this->getEvent()->getTimetableCode(),
+                $this->getEvent()->getFileType()
             );
         }
 

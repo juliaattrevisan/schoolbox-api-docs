@@ -461,7 +461,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string                 $externalUserId
+     * @param string              $externalUserId
      * @param int                 $userId
      * @param Campus              $campus
      * @param Alaress_Date_Format $date
@@ -521,6 +521,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     'PeriodNumber'              => $spRow['Period'],
                     'ClassCampus'               => $spRow['ClassCampus'],
                     'ClassCode'                 => $spRow['ClassCode'],
+                    'FileType'                  => $spRow['FileType'],
                     'SubstituteFlag'            => $spRow['SubstituteFlag'],
                     'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
                     'PeriodSequence'            => $sequenceId,
@@ -596,6 +597,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'campus'            => $desc['ClassCampus'],
                         'room'              => $desc['Room'],
                         'staffID'           => $desc['StaffID'],
+                        'FileType'          => $desc['FileType'],
                         'SubstituteFlag'    => $desc['SubstituteFlag'],
                         'SubstitutedFlag'   => $desc['SubstitutedFlag'],
                         'AttendanceMarked'  => $desc['AttendanceMarked'],

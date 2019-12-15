@@ -59,6 +59,15 @@ class Event extends Day\Event
     protected $attendancePeriods = [];
 
     /**
+     * The timetable day's file type.
+     *
+     * Another piece of what's required for rendering an attendance link now.
+     *
+     * @var string
+     */
+    private $fileType;
+
+    /**
      * @return string
      */
     public function getCode()
@@ -171,6 +180,26 @@ class Event extends Day\Event
     public function setAttendancePeriods(array $attendancePeriods): self
     {
         $this->attendancePeriods = $attendancePeriods;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getFileType(): string
+    {
+        return $this->fileType;
+    }
+
+
+    /**
+     * @param string $fileType
+     * @return static
+     */
+    public function setFileType(string $fileType): self
+    {
+        $this->fileType = $fileType;
         return $this;
     }
 

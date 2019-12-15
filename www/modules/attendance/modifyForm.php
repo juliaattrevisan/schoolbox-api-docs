@@ -14,7 +14,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 $externalClass = new External_Synergetic_Class();
 
-$class = $externalClass->getClass($_POST['classCode'], $_SESSION['user']);
+$class = $externalClass->getClass($_POST['classCode'], $_SESSION['user'], null, null, $_POST['fileType']);
 
 if (!$class) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);

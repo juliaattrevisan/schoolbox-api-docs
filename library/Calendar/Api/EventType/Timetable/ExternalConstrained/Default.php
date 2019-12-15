@@ -182,6 +182,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         $event->setPeriod($period['periodNumber']);
                         $event->setAttendancePeriods($period['AttendancePeriods'] ?? []);
                         $event->setPeriodName($period['periodName']);
+                        $event->setFileType($period['FileType'] ?? '');
 
                         // Load the color for this timetabled class
                         if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
