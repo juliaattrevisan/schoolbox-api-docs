@@ -436,7 +436,7 @@ class Controller extends Base\Base
         }
 
         try {
-            $this->validateCourseData(trim($post['name']), trim($post['parent']), null);
+            $this->validateCourseData(trim($post['name']), (int)trim($post['parent']), null);
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {

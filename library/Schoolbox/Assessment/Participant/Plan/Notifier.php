@@ -441,7 +441,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         /** @var IAssessable[] $assessments */
         // Write-users see all participants, others see only themselves
         $contextUser = $user;
-        if ($access->getFolderAccess($user, $context) >= UserAccess::ACCESS_WRITE) {
+        if ($access->getFolderAccess($user, (int)$context) >= UserAccess::ACCESS_WRITE) {
             $contextUser = null;
         }
         $assessments = $this->assessmentDataSource->findAllByFolderIdForReview($context, $contextUser)
