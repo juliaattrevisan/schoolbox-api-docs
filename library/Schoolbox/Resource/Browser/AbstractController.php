@@ -474,7 +474,8 @@ abstract class AbstractController extends BaseController
             $file
                 ->setOwner($this->getUser())
                 ->setFolder($folder)
-                ->setTitle($file->getStorage()->getFilename());
+                ->setTitle($file->getStorage()->getFilename())
+                ->setFilename($file->getStorage()->getFilename());
         }
         $this->fileMapper->save($results);
 
