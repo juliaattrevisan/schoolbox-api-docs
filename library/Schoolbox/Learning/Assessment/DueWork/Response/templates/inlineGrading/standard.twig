@@ -63,6 +63,7 @@ Usage:
         responseList: responseList,
         response: response,
         readonly: readonly,
+        summaryRoute: routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: participant.user.id}),
         deleteRoute: routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response })
     } only %}
 {% endblock %}
