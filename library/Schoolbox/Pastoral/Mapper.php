@@ -272,10 +272,10 @@ class Mapper extends BaseMapper
 
         if ($record->getParent() instanceof Model) {
             // This is a child item, find its parent and its other siblings
-            $query .= "                
+            $query .= "
                 WHERE (
-                    `pastoral`.`parent_id` = :parent_id_0 OR 
-                    `pastoral`.`id` = :parent_id_1 OR 
+                    `pastoral`.`parent_id` = :parent_id_0 OR
+                    `pastoral`.`id` = :parent_id_1 OR
                     `pastoral`.`parent_id` = :id_0
                 ) AND
                 `pastoral`.deleted_at IS NULL
@@ -291,7 +291,7 @@ class Mapper extends BaseMapper
                 WHERE   (
                             (`pastoral`.`parent_id` = :parent_id_0 AND `pastoral`.`student_id` <> :student_id) OR
                             (`pastoral`.`id` = :parent_id_1)
-                        ) 
+                        )
                         AND `pastoral`.`deleted_at` IS NULL
             ";
 
@@ -338,8 +338,8 @@ class Mapper extends BaseMapper
     public function findByTag(PastoralTag $tag)
     {
         $sql = $this->getSelectString() . "
-        
-            JOIN    `pastoral_tags` ON `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND 
+
+            JOIN    `pastoral_tags` ON `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND
                     `pastoral_tags`.`tag_id` = :tagId
         ";
 
@@ -361,15 +361,15 @@ class Mapper extends BaseMapper
     public function findLinked($student, $linkedStudent, $typeId = null)
     {
         $sql = $this->getSelectString() . "
-            WHERE 
-            
+            WHERE
+
             `pastoral`.`student_id` = :linkedStudentId AND `pastoral`.`parent_id` IN (
-                SELECT      `id` 
-                FROM        `pastoral` `pastoralLinked` 
+                SELECT      `id`
+                FROM        `pastoral` `pastoralLinked`
                 WHERE       `pastoralLinked`.`student_id` = :studentId
             ) OR `pastoral`.`id` IN (
-                SELECT      `parent_id` 
-                FROM        `pastoral` `pastoralLinked` 
+                SELECT      `parent_id`
+                FROM        `pastoral` `pastoralLinked`
                 WHERE       `pastoralLinked`.`student_id` = :studentId2
             )
         ";
@@ -489,8 +489,8 @@ class Mapper extends BaseMapper
 
         $commentPublicClause = "
             (
-                {$commentPublicClause} AND 
-                {$pbPublicCommentNotPrivateSearch->getWhere()[0]} AND 
+                {$commentPublicClause} AND
+                {$pbPublicCommentNotPrivateSearch->getWhere()[0]} AND
                 {$commentNotDeletedClause}
             )
         ";
@@ -511,8 +511,8 @@ class Mapper extends BaseMapper
 
         $commentPrivateClause = "
             (
-                {$commentPrivateClause} AND 
-                {$pbPrivateCommentIsPrivateSearch->getWhere()[0]} AND 
+                {$commentPrivateClause} AND
+                {$pbPrivateCommentIsPrivateSearch->getWhere()[0]} AND
                 {$commentNotDeletedClause}
             )
         ";
@@ -600,26 +600,26 @@ class Mapper extends BaseMapper
         $hasPublicAccess = "
             (
                 `pastoral`.`id` IN (
-                    SELECT  `pastoral_id` 
-                    FROM    `pastoral_access` 
+                    SELECT  `pastoral_id`
+                    FROM    `pastoral_access`
                     WHERE   {$recordPublicGroupClause} AND
                             `pastoral_access`.`group_id` IN (
                                 SELECT  `group_id`
                                 FROM    `pastoral_group_member`
                                 WHERE   {$recordGroupMemberClause}
-                            ) 
+                            )
                 ) OR
                 `pastoral`.`id` IN (
-                    SELECT  `pastoral_id` 
-                    FROM    `pastoral_access` 
+                    SELECT  `pastoral_id`
+                    FROM    `pastoral_access`
                     WHERE   {$recordPublicRoleClause}
                 ) OR
                 `pastoral`.`id` IN (
-                    SELECT  `pastoral_id` 
-                    FROM    `pastoral_access` 
+                    SELECT  `pastoral_id`
+                    FROM    `pastoral_access`
                     WHERE   {$recordPublicUserClause}
                 ) OR
-                {$recordOwnerClause}                    
+                {$recordOwnerClause}
             )
         ";
 
@@ -630,26 +630,26 @@ class Mapper extends BaseMapper
         $hasPrivateAccess = "
             (
                 `pastoral`.`id` IN (
-                    SELECT  `pastoral_id` 
-                    FROM    `pastoral_access` 
+                    SELECT  `pastoral_id`
+                    FROM    `pastoral_access`
                     WHERE   {$recordPrivateGroupClause} AND
                             `pastoral_access`.`group_id` IN (
                                 SELECT  `group_id`
                                 FROM    `pastoral_group_member`
                                 WHERE   {$recordGroupMemberClause}
-                            ) 
+                            )
                 ) OR
                 `pastoral`.`id` IN (
-                    SELECT  `pastoral_id` 
-                    FROM    `pastoral_access` 
+                    SELECT  `pastoral_id`
+                    FROM    `pastoral_access`
                     WHERE   {$recordPrivateRoleClause}
                 ) OR
                 `pastoral`.`id` IN (
-                    SELECT  `pastoral_id` 
-                    FROM    `pastoral_access` 
+                    SELECT  `pastoral_id`
+                    FROM    `pastoral_access`
                     WHERE   {$recordPrivateUserClause}
                 ) OR
-                {$recordOwnerClause}               
+                {$recordOwnerClause}
             )
         ";
 
@@ -659,19 +659,19 @@ class Mapper extends BaseMapper
 
         $sql = $this->getSelectString() . "
             LEFT JOIN `pastoral_comment` ON `pastoral_comment`.`pastoral_id` = `pastoral`.`id`
-            WHERE 
+            WHERE
             (
                 ({$recordNotDeletedClause}) AND
                 (
                     (
-                        ({$recordHeadingClause} OR {$recordPublicBodyClause} OR {$commentPublicClause}) AND 
+                        ({$recordHeadingClause} OR {$recordPublicBodyClause} OR {$commentPublicClause}) AND
                         ({$hasPublicAccess})
-                    ) 
-                    OR 
+                    )
+                    OR
                     (
-                        ({$recordHeadingClause} OR {$recordPrivateBodyClause} OR {$commentPrivateClause}) AND 
+                        ({$recordHeadingClause} OR {$recordPrivateBodyClause} OR {$commentPrivateClause}) AND
                         ({$hasPrivateAccess})
-                    ) 
+                    )
                 )
             )
         ";
@@ -795,8 +795,7 @@ class Mapper extends BaseMapper
         $this->addFilter($students, '`student_id`');
         $this->addFilter($years, '`s`.`year`');
         $this->addFilter($houses, '`s`.`house`');
-        $this->addFilter($types, '`type_id`');
-        $this->addFilter($subtypes, '`subtype_id`');
+        $this->addTypeFilter($types, $subtypes);
         $this->addFilter($authors, '`owner_id`');
 
         $orderParts = [];
@@ -841,18 +840,22 @@ class Mapper extends BaseMapper
         if ($involved || !$this->isUserInPastoralService($user)) {
             $this->filters[] = "
                 (
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = {$user->getRole()->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = {$user->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = :user_role_id_0 AND `pastoral_id` = `pastoral`.`id`) > 0 OR
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = :user_id_0      AND `pastoral_id` = `pastoral`.`id`) > 0 OR
                     (
                         SELECT COUNT(*) FROM `pastoral_access` WHERE `group_id` IN (
-                            SELECT `group_id` 
-                            FROM `pastoral_group_member` 
-                            WHERE `user_id` = {$user->getId()}
+                            SELECT `group_id`
+                            FROM `pastoral_group_member`
+                            WHERE `user_id` = :user_id_1
                         ) AND `pastoral_id` = `pastoral`.`id`
                     ) > 0 OR
-                    `pastoral`.`owner_id` = {$user->getId()}
+                    `pastoral`.`owner_id` = :user_id_2
                 )
             ";
+            $this->bindings['user_role_id_0'] = $user->getRole()->getId();
+            $this->bindings['user_id_0']      = $user->getId();
+            $this->bindings['user_id_1']      = $user->getId();
+            $this->bindings['user_id_2']      = $user->getId();
         }
 
         $criteriaParts = [];
@@ -907,5 +910,46 @@ class Mapper extends BaseMapper
         }
 
         return $resultsFiltered;
+    }
+
+
+    /**
+     * Add filters for types and subtypes.
+     *
+     * The following records will match the filter:
+     * * records with a subtype in `$subtypes`
+     * * records with a type in `$types`, if none of its subtypes are in
+     *   `$subtypes` (this is to allow users to select types without subtypes)
+     *
+     * @param Collection|Type\Model[]    $types
+     * @param Collection|SubType\Model[] $subtypes
+     */
+    private function addTypeFilter(Collection $types, Collection $subtypes): void
+    {
+        // Filter out types which have a subtype in $subtypes
+        /** @var Collection|Type\Model[] $typesWithoutSelectedSubtype */
+        $typesWithoutSelectedSubtype = $types->diff(
+            $subtypes->map(
+                static function (SubType\Model $subtype) {
+                    return $subtype->getPastoralType();
+                }
+            )
+        );
+
+        // Type and subtype filters: need to be joined with OR
+        $typeFilters = [];
+        $i           = 0;
+
+        foreach ($typesWithoutSelectedSubtype as $type) {
+            $typeFilters[]               = "type_id = :type_{$i}";
+            $this->bindings["type_{$i}"] = $type->getId();
+        }
+        foreach ($subtypes as $subtype) {
+            $typeFilters[]                  = "subtype_id = :subtype_{$i}";
+            $this->bindings["subtype_{$i}"] = $subtype->getId();
+        }
+        if (!empty($typeFilters)) {
+            $this->filters[] = '(' . implode(' OR ', $typeFilters) . ')';
+        }
     }
 }
