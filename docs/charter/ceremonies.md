@@ -1,54 +1,58 @@
 # Ceremonies
 
-Ceremonies are the regular meetings we have. Along with the four formal events prescribed by Scrum, we also have workshops that usually take the form of one of the defined UX sessions.
+Ceremonies are the regular meetings we have. Along with the four formal events prescribed by Scrum, we also have
+workshops that usually take the form of one of the defined UX sessions.
 
 > Block quotes taken from the [Scrum Guide](http://www.scrumguides.org/scrum-guide.html#events).
 
-## Retrospective
-* **When:** Last day of the Sprint at 1:30pm
-* **Timebox:** 1 hour
-* **Participants** Product Team
-
-> The purpose of the Sprint Retrospective is to:
-> * Inspect how the last Sprint went with regards to people, relationships, process, and tools;
-> * Identify and order the major items that went well and potential improvements; and,
-> * Create a plan for implementing improvements to the way the Scrum Team does its work.
-
-Prior to the Sprint Retrospective - any Product Team members may contact the Scrum Master to request items to be discussed in the Retrospective. The Scrum Master will prepare a general overview of how the last Sprint went, as well as collate all the items to be discussed in the meeting.
-
-All discussions that identify areas where the team should improve should involve a quick brainstorm by the team for potential solutions, and a plan should be agreed on for the team to follow up on during the next Sprint.
 
 ## Sprint Planning
 * **When:** First day of the Sprint at 11:00am
-* **Timebox:** 30 minutes
+* **Where:** A boardroom
+* **Timebox:** 60 minutes
 * **Participants** Product Team
 
 > Sprint Planning answers the following:
 > * What can be delivered in the Increment resulting from the upcoming Sprint?
 > * How will the work needed to deliver the Increment be achieved?
 
-Prior to the Sprint Planning meeting - the Product Owner and Scrum Master will work together to prepare a rough Sprint worth of work. In this meeting we go through this work to get everyone up to speed on the work, assigning out specific tickets to team members, and agreeing as a team on the unit of work that we plan to complete for the Sprint.
+Prior to the Sprint Planning meeting - the Product Owner will prepare a rough Sprint worth of work.
+This may be done on an ad-hoc basis in previous Sprints, or in a more formal meeting.
+
+In this meeting we go through this work to get everyone up to speed on the work, assigning out specific tickets to team
+members, and agreeing as a team on the unit of work that we plan to complete for the Sprint.
+
+This meeting will result in:
+* A Sprint populated with tickets, all of which meet the [Definition of Ready](definition-of-ready.md)
+
 
 ## Daily Standup / Scrum
 * **When:** 10:30am every day of the Sprint (excluding the first and last days of the sprint)
+* **Where:** Any convenient location. In practice, this ceremony is held at the Product Team's desk area, but may also
+  be held in the Glass Conference Room.
 * **Timebox:** 15 minutes
 * **Participants** Product Team
 
-> The Development Team plans work for the next 24 hours. The Development Team uses the Daily Scrum to inspect progress toward the Sprint Goal and to inspect how progress is trending toward completing the work in the Sprint Backlog.
+> The Development Team plans work for the next 24 hours. The Development Team uses the Daily Scrum to inspect progress
+> toward the Sprint Goal and to inspect how progress is trending toward completing the work in the Sprint Backlog.
 
-We meet in the Glass Conference Room, the last person to arrive starts and we move clockwise from there answering the following questions:
+The Scrum Master will give a quick summary of the current state of the Sprint and the Product Team (e.g. if there are
+any absent team members).
+
+From there, starting with the Scrum Master and moving clockwise from them, each team member will answer the following
+questions:
 * What have I been working on since the last Standup?
 * What am I planning on working on until the next Standup?
-* Do I see any impediments that will delay or block me from achieving what I need to achieve?
-* How likely am I to complete my sprint commitment on time?
-
-You may give a traffic light status (green, yellow, red) to give an indication of how you believe your work is going in regards to Sprint completion.
+* What and whose help will I need to finish my Sprint commitments?
 
 When impediments are identified by team members - the team should collaborate to work out how to remove any blockers.
 
-The Standup should be short and sweet, generally only high level details should be mentioned. Often in-depth discussion with relevant parties will happen soon after the Standup.
+The Standup should be short and sweet, generally only high level details should be mentioned. In-depth discussion
+required will be deferred until after the Standup.
 
-Often the Product Owner or Scrum Master will utilise the Daily Standup to ask the team to focus their efforts in a specific area where possible (eg. QA'ing a point release).
+Often the Product Owner or Scrum Master will utilise the Daily Standup to ask the team to focus their efforts in a
+specific area where possible (e.g. QA'ing a point release).
+
 
 ## Workshops
 * **When:** As required
@@ -60,6 +64,7 @@ Workshops will take the some form of a UX session, depending on what is required
 Some sessions will require the whole Product Team, and some will require just the Strike Team assigned to a particular problem space.
 
 See [workshops.md](workshops.md) for a list of the different types of workshops.
+
 
 ## Refinements
 * **When:** Monday, Tuesday and Wednesday of 2nd week of sprint at 11:00am, as required
@@ -74,6 +79,7 @@ In practise, this results in the refinements being split into:
 * Mon: ensure that Acceptance Criteria are in place for all tickets in this sprint and next
 * Tue: ensure that Story Points are in place for all tickets in this sprint and next
 * Wed: add AC and SP to any remaining tickets, if any were missed in the previous refinements (due to the timebox being exceeded)
+
 
 ## Showcase
 * **When:** Last day of Sprint at 11:00am
@@ -101,3 +107,17 @@ What the Showcase shouldn't include:
 * Changes that have no functional impact.
 
 As there will be non-technical people at the Showcase - we should always try to stay away from delving into technical details. These discussions should be parked and happen after the Showcase.
+
+## Retrospective
+* **When:** Last day of the Sprint at 1:30pm
+* **Timebox:** 1 hour
+* **Participants** Product Team
+
+> The purpose of the Sprint Retrospective is to:
+> * Inspect how the last Sprint went with regards to people, relationships, process, and tools;
+> * Identify and order the major items that went well and potential improvements; and,
+> * Create a plan for implementing improvements to the way the Scrum Team does its work.
+
+Prior to the Sprint Retrospective - any Product Team members may contact the Scrum Master to request items to be discussed in the Retrospective. The Scrum Master will prepare a general overview of how the last Sprint went, as well as collate all the items to be discussed in the meeting.
+
+All discussions that identify areas where the team should improve should involve a quick brainstorm by the team for potential solutions, and a plan should be agreed on for the team to follow up on during the next Sprint.
