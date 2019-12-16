@@ -24,6 +24,8 @@ class StateTransitionTest extends TestCase
 {
 
     /**
+     * Test we can transition an article through valid transitions
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -92,6 +94,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests the approved composite state
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -123,6 +127,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests approval transitions
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -154,6 +160,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot reject a draft article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -168,6 +176,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot reject an already-rejected article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -185,6 +195,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot un-submit a draft
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
@@ -198,6 +210,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive a draft
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
@@ -211,6 +225,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive an article awaiting moderation
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
@@ -225,6 +241,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive a rejected article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -241,6 +259,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive an already-archived article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -258,6 +278,9 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests that if we extend a publish date into the future, it automatically pushes out the expiry date
+     * so that no invalid data occurs (cannot have expiry < publish)
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -267,6 +290,8 @@ class StateTransitionTest extends TestCase
      */
     public function testPublishAfterExpiry(Model $article, User $moderator): void
     {
+        $article->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'));
+        $article->setExpiresAt(Alaress_Date_Format::newNaturalDate('14 days'));
         $article->submit();
         $article->approve($moderator);
         $article->publish(Alaress_Date_Format::newNaturalDate('20 days'));
