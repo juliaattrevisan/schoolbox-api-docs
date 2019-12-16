@@ -28,6 +28,7 @@ use TypeError;
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
     // The discrete, atomic states this article may be in.
+    // @see https://www.draw.io/#G1hgNAeuen61KzCzlIa0gEzYK5l0qsYtkw
     private const STATE_DRAFT                = 1;
     private const STATE_AWAITING_MODERATION  = 2;
     private const STATE_AWAITING_PUBLICATION = 4;
