@@ -496,7 +496,7 @@ class Controller extends Base\Base
      * @throws Base\Exception
      * @todo move route perm logic from controller to module (eg course parent folder access)
      */
-    protected function validateCourseData($folderName, $parentFolderId, $folderId = null)
+    protected function validateCourseData(string $folderName, ?int $parentFolderId, ?int $folderId = null): void
     {
         $errors = [];
         $parentFolder = null;
