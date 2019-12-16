@@ -787,7 +787,7 @@ class Mapper extends BaseMapper
             $this->filters[]              = '`pastoral`.`created_at` >= :afterDate';
         }
 
-        if (!empty($severity) && $this->getConfigLoader()->get('pastoral_severity')) {
+        if ($severity && $this->getConfigLoader()->get('pastoral_severity')) {
             $this->bindings[':severity'] = $severity->getId();
             $this->filters[]             = '`sv`.`order` >= :severity';
         }
@@ -943,10 +943,12 @@ class Mapper extends BaseMapper
         foreach ($typesWithoutSelectedSubtype as $type) {
             $typeFilters[]               = "type_id = :type_{$i}";
             $this->bindings["type_{$i}"] = $type->getId();
+            $i++;
         }
         foreach ($subtypes as $subtype) {
             $typeFilters[]                  = "subtype_id = :subtype_{$i}";
             $this->bindings["subtype_{$i}"] = $subtype->getId();
+            $i++;
         }
         if (!empty($typeFilters)) {
             $this->filters[] = '(' . implode(' OR ', $typeFilters) . ')';
