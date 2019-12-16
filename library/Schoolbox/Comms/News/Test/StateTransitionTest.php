@@ -13,8 +13,13 @@ use Schoolbox\User;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Exceptions\InvalidTransitionException;
+use PHPUnit\Framework;
 use PHPUnit\Framework\AssertionFailedError;
 
+/**
+ * @covers \Schoolbox\Comms\News\Model
+ * @codeCoverageIgnore
+ */
 class StateTransitionTest extends TestCase
 {
 
@@ -152,7 +157,7 @@ class StateTransitionTest extends TestCase
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionRejectDraft(Model $article, User $moderator): void
@@ -166,7 +171,7 @@ class StateTransitionTest extends TestCase
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionRejectReject(Model $article, User $moderator): void
@@ -182,7 +187,7 @@ class StateTransitionTest extends TestCase
     /**
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionUnSubmitDraft(Model $article): void
@@ -195,7 +200,7 @@ class StateTransitionTest extends TestCase
     /**
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionUnArchiveDraft(Model $article): void
@@ -208,7 +213,7 @@ class StateTransitionTest extends TestCase
     /**
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionUnArchiveAwaitingMod(Model $article): void
@@ -224,7 +229,7 @@ class StateTransitionTest extends TestCase
      * @param Model $article
      * @param User  $moderator
      * @throws InvalidTransitionException
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      */
     public function testInvalidTransitionUnArchiveRejected(Model $article, User $moderator): void
     {
@@ -240,7 +245,7 @@ class StateTransitionTest extends TestCase
      * @param Model $article
      * @param User  $moderator
      * @throws InvalidTransitionException
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      */
     public function testInvalidTransitionUnArchiveArchived(Model $article, User $moderator): void
     {
