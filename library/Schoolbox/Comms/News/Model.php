@@ -448,7 +448,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
         // Invalid operation
         if (!($currentState & self::VALID_STATES_TO_SUBMIT)) {
-            throw new InvalidTransitionException($currentState, 'Only draft and rejected articles may be submitted');
+            throw new InvalidTransitionException($currentState, "Only draft and rejected articles may be submitted. Found '{$this->getStatus($now)}'");
         }
 
         $this->submittedAt = $now;
@@ -471,7 +471,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
 
         if (!($currentState & self::VALID_STATES_TO_UN_SUBMIT)) {
-            throw new InvalidTransitionException($currentState, "Cannot un-submit article");
+            throw new InvalidTransitionException($currentState, "Cannot un-submit article. Found '{$this->getStatus()}'");
         }
 
         // Put back to draft state
@@ -505,7 +505,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
         // Ensure it is able to be approved
         if (!($currentState & self::VALID_STATES_TO_APPROVE)) {
-            throw new InvalidTransitionException($currentState, "Article was already approved by user {$this->acceptedBy->getId()} at {$this->acceptedAt->getDatabase()}");
+            throw new InvalidTransitionException($currentState, "Article state does not permit approval. Found '{$this->getStatus($now)}'");
         }
 
         // Ensure it is submitted
@@ -544,7 +544,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
         // Invalid operation
         if (!($currentState & self::VALID_STATES_TO_REJECT)) {
-            throw new InvalidTransitionException($currentState, "An article in draft state cannot be rejected");
+            throw new InvalidTransitionException($currentState, "Article state does not permit rejection. Found '{$this->getStatus($now)}'");
         }
 
         // Treat article as never being approved.
@@ -579,7 +579,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
         // Ensure transition is valid
         if (!($currentState & self::VALID_STATES_TO_PUBLISH)) {
-            throw new InvalidTransitionException($currentState, "Only articles awaiting publication may be published");
+            throw new InvalidTransitionException($currentState, "Article state does not permit publish. Found '{$this->getStatus($now)}'");
         }
 
         // Default to publish immediately
@@ -613,7 +613,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
         // Ensure transition is valid
         if (!($currentState & self::VALID_STATES_TO_ARCHIVE)) {
-            throw new InvalidTransitionException($currentState, "Only articles awaiting publication, or published, may be archived");
+            throw new InvalidTransitionException($currentState, "Article state does not permit archive. Found '{$this->getStatus($now)}'");
         }
 
         // Default to expiring now
