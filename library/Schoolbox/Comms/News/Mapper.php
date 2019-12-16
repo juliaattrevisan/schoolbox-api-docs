@@ -424,11 +424,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         ?int $month,
         ?int $folderId
     ): array {
-        /* Invalid combination of year/month params
-         */
-        if ($month && !$year) {
-            throw new \DomainException('Invalid year/month combination');
-        }
 
         /* This user can't see any articles
          */
