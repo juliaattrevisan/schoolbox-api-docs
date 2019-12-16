@@ -28,6 +28,8 @@ use TypeError;
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
     // The discrete, atomic states this article may be in.
+    // TODO these should be bit masks so they can be combined, eg 1,2,4,8,16,32.
+    //      This would enable composite states to be identified programmatically
     private const STATE_DRAFT                = 1;
     private const STATE_AWAITING_MODERATION  = 2;
     private const STATE_AWAITING_PUBLICATION = 3;
