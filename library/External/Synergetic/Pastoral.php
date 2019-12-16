@@ -121,40 +121,40 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $style = self::STYLE_ODBC_CANONICAL_WITH_MILLISECONDS;
 
         return "
-        SELECT        dbo.tPastoralCare.PastoralCareSeq, 
-                      dbo.tPastoralCare.ID, 
-                      dbo.tPastoralCare.ClassCode, 
-                      dbo.tPastoralCare.ItemDate, 
+        SELECT        dbo.tPastoralCare.PastoralCareSeq,
+                      dbo.tPastoralCare.ID,
+                      dbo.tPastoralCare.ClassCode,
+                      dbo.tPastoralCare.ItemDate,
                       dbo.tPastoralCare.MethodCode,
-                      dbo.tPastoralCare.Details, 
-                      dbo.tPastoralCare.PrivateDetails, 
-                      dbo.tPastoralCare.InitiatorCode, 
+                      dbo.tPastoralCare.Details,
+                      dbo.tPastoralCare.PrivateDetails,
+                      dbo.tPastoralCare.InitiatorCode,
                       dbo.tPastoralCare.TypeCode,
                       dbo.luPastoralCareType.Description AS TypeDescription,
                       dbo.tPastoralCare.CategoryCode,
                       dbo.luPastoralCareCategory.Description AS CategoryDescription,
-                      dbo.tPastoralCare.ClassificationCode, 
-                      dbo.tPastoralCare.IsFollowUpFlag, 
-                      dbo.tPastoralCare.FollowUpDate, 
+                      dbo.tPastoralCare.ClassificationCode,
+                      dbo.tPastoralCare.IsFollowUpFlag,
+                      dbo.tPastoralCare.FollowUpDate,
                       CONVERT(varchar, dbo.tPastoralCare.CreatedDate, {$style}) AS CreatedDate,
-                      dbo.tPastoralCare.CreatedByID, 
-                      CONVERT(varchar, dbo.tPastoralCare.ModifiedDate, {$style}) AS ModifiedDate, 
+                      dbo.tPastoralCare.CreatedByID,
+                      CONVERT(varchar, dbo.tPastoralCare.ModifiedDate, {$style}) AS ModifiedDate,
                       dbo.tPastoralCare.ModifiedByID,
-                      dbo.tPastoralCare.EmailSentDate, 
-                      dbo.tPastoralCare.EmailSentByID, 
-                      dbo.tPastoralCare.DuplicateFromSeq, 
+                      dbo.tPastoralCare.EmailSentDate,
+                      dbo.tPastoralCare.EmailSentByID,
+                      dbo.tPastoralCare.DuplicateFromSeq,
                       dbo.tPastoralCare.SubjectClassesSeq,
-                      Community_1.Surname AS StudentLastname, 
+                      Community_1.Surname AS StudentLastname,
                       Community_1.Given1 AS StudentFirstname,
-                      dbo.Community.Surname AS OwnerLastname, 
+                      dbo.Community.Surname AS OwnerLastname,
                       dbo.Community.Given1 AS OwnerFirstname
-        FROM          dbo.tPastoralCare 
+        FROM          dbo.tPastoralCare
         LEFT JOIN     dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code
         LEFT JOIN     dbo.luPastoralCareCategory ON dbo.tPastoralCare.CategoryCode = dbo.luPastoralCareCategory.Code
-        INNER JOIN    dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
+        INNER JOIN    dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID
         INNER JOIN    dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
         INNER JOIN    dbo.{$this->getStudentViewName()} ON dbo.{$this->getStudentViewName()}.ID = dbo.tPastoralCare.ID
-        INNER JOIN    dbo.FileSemesters ON 
+        INNER JOIN    dbo.FileSemesters ON
                           dbo.FileSemesters.FileYear = dbo.{$this->getStudentViewName()}.FileYear AND
                           dbo.FileSemesters.FileSemester = dbo.{$this->getStudentViewName()}.FileSemester AND
                           dbo.FileSemesters.SystemCurrentFlag = 1
@@ -495,8 +495,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             foreach ($pastoralRecordsCreated as $pastoralRecord) {
                 $queryAudience = $this->connector->executeQuery('
-                    SELECT  ID 
-                    FROM    PastoralCareContacts 
+                    SELECT  ID
+                    FROM    PastoralCareContacts
                     WHERE   PastoralCareSeq = :pastoralCareSeq
                 ',
                     ['pastoralCareSeq' => $pastoralRecord->getExternalId()]
@@ -588,7 +588,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     ClassificationCode,
                     ConfidentialFlag
                 ) VALUES (
-                    :studentExternalId, 
+                    :studentExternalId,
                     :itemDate,
                     :publicBody,
                     :privateBody,
@@ -612,7 +612,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
 
             $query = "
-                UPDATE      tPastoralCare 
+                UPDATE      tPastoralCare
                 SET         ID = :studentExternalId,
                             ItemDate = :itemDate,
                             Details = :publicBody,
@@ -670,7 +670,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Blow away any existing contacts in Synergetic
 
         $this->connector->executeQuery("
-                DELETE FROM     PastoralCareContacts 
+                DELETE FROM     PastoralCareContacts
                 WHERE           PastoralCareSeq = :externalId
             ",
             ['externalId' => $pastoral->getExternalId()]
@@ -721,11 +721,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * @param int $externalId
+     * @param int|null $externalId
      * @return boolean
      */
-    private function checkPastoralRecordExists(int $externalId) : bool
+    private function checkPastoralRecordExists(?int $externalId) : bool
     {
+        if(is_null($externalId)) {
+            return false;
+        }
+
         $query = "SELECT COUNT(*) FROM tPastoralCare WHERE PastoralCareSeq = :externalId";
         $result = $this->connector->executeQuery($query, ['externalId' => $externalId]);
         return (bool)$result->fetchColumn();
@@ -786,7 +790,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $query =
             "
-            INSERT INTO PastoralCareComments 
+            INSERT INTO PastoralCareComments
             (
                 PastoralCareSeq,
                 IndexOrder,
@@ -939,7 +943,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 Document,
                 DocumentCreatedDate,
                 DocumentModifiedDate,
-                SourceDate,           
+                SourceDate,
                 DocumentType
             )
             VALUES
@@ -953,7 +957,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 :modifiedDate,
                 :sourceDate,
                 :documentType
-            );            
+            );
         ";
 
         $query = $this->connector->prepareQuery($sql, [
@@ -977,7 +981,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Add a document reference to the student so it shows up on their normal community record
         $query = $this->connector->prepareQuery(
             "
-                INSERT INTO {$this->schemaMedia}.DocumentReferences (ID, DocumentReferencesSeq) 
+                INSERT INTO {$this->schemaMedia}.DocumentReferences (ID, DocumentReferencesSeq)
                 VALUES (:id, :documentReferencesSeq);
             ",
             [
@@ -1009,7 +1013,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     'SPC',
                     COALESCE(MAX(SortOrder) + 1, 0),
                     :pastoralExternalId
-            FROM    {$this->schemaMedia}.tDocumentReferences 
+            FROM    {$this->schemaMedia}.tDocumentReferences
             WHERE   tDocumentsSeq = :documentReferencesSeq2
         ";
 
