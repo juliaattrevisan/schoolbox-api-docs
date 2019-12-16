@@ -164,22 +164,13 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
                 $this->setVar('tweet_media_thumbnails_block', '');
             }
 
+            /* Build Twitter Search URL per component
+             */
+            $this->setVar('SEARCH_URL', $allTweets->getSearchUrl());
+
             $this->parse('twitter_feed_block', 'twitter_feed');
         }
 
-        /**
-         * Build Twitter Search URL
-         */
-        $q = 'https://twitter.com/search?q=';
-        $q .= urlencode($this->getConfig('username'));
-        if ($this->getConfig('username') && $this->getConfig('keywords')) {
-            $q .= '%20';
-        }
-        $q .= urlencode($this->getConfig('keywords'));
-
-        $this->setVar('SEARCH_URL', $q);
-
         return true;
     }
-
 }
