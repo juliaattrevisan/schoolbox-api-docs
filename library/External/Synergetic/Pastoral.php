@@ -726,7 +726,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     private function checkPastoralRecordExists(?int $externalId) : bool
     {
-        if(empty($externalId)) {
+        if(is_null($externalId)) {
             return false;
         }
 
