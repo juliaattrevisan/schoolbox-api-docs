@@ -431,12 +431,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             return [];
         }
 
-        /* This user can't see any articles
-         */
-        if (null === $folderId && \count($availableArticleIds) < 1) {
-            return [];
-        }
-
         /* If either year or month is specified, we're looking in the news archive
          * Look for expired items matching a certain year/month combination
          */
