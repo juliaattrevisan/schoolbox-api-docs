@@ -24,6 +24,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
+use function is_array;
 
 /**
  * Class Mapper
@@ -424,6 +425,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         ?int $month,
         ?int $folderId
     ): array {
+
+        // Short-circuit if searching for an empty set
+        if (is_array($availableArticleIds) && !count($availableArticleIds)) {
+            return [];
+        }
 
         /* This user can't see any articles
          */
