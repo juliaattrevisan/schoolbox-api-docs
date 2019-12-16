@@ -1,20 +1,24 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Zend\Uri\UriFactory;
 use \Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * Class Component_Homepage_TwitterController
+ */
 class Component_Homepage_TwitterController extends Component_Homepage_ControllerAbstract
 {
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
      * @return boolean
+     * @throws InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
     public function renderTemplate($templateHandle)
     {
@@ -69,7 +73,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
          * Show empty state or show content - that is the if statement
          */
         if ($emptyState) {
-
             $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
             $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
@@ -88,7 +91,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
             ]);
 
             if ($noApiKey) {
-
                 if ($this->getUser()->isSuperuser()) {
                     $this->parse('empty_api_admin_block', 'empty_api_admin');
                 } else {
@@ -96,7 +98,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 }
 
             } elseif ($noConfig) {
-
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->parse('empty_config_block', 'empty_config');
                 } else {
@@ -104,7 +105,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 }
 
             } else {
-
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->parse('empty_results_block', 'empty_results');
                 } else {
@@ -115,10 +115,8 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
-
             $this->setVar('empty_state_block', '');
 
-            $i = 0;
             foreach ($allResults as $currentTweet) {
                 $date  = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
 
