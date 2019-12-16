@@ -105,7 +105,7 @@ class Archive extends Base
             ));
         }
 
-        $articleIds = $this->newsMapper->findArticleIdsForTopic(
+        $articleIds = $this->newsMapper->findArticleIdsByFilters(
             $articleIdsForUser,
             $topicId,
             $params->getLimit(),
@@ -115,7 +115,7 @@ class Archive extends Base
             $folderId
         );
 
-        $availableIds = $this->newsMapper->findArticleIdsForTopic(
+        $availableIds = $this->newsMapper->findArticleIdsByFilters(
             $articleIdsForUser,
             $topicId,
             0,

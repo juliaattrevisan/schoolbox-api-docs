@@ -396,28 +396,34 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Find just the ids for the articles in a topic
-     * We generally use this for pagination counts where we need a count instead of hydrated things
+     * Returns a set of article ids that match the supplied parameters.
      *
-     * Pass null as $limit to disable it; beware the n-n join on articles-topics
+     * Each param is combined using intersection. Passing NULL for any param will cause it to be ignored.
      *
-     * Filters to the $availableArticleIds that can be seen
+     * $limit applies to the number of articles, rather than number of article-topic rows due to n-n join.
      *
-     * @param array    $availableArticleIds
-     * @param int      $topicId
-     * @param int|null $limit
-     * @param int|null $pageNum
-     * @param int|null $year
-     * @param int|null $month
-     * @param int|null $folderId
-     * @return array
+     * @param array|null $availableArticleIds If provided, do not return results outside this set
+     * @param int|null   $topicId             If provided, filter to articles that include this topic
+     * @param int|null   $limit               If provided, limit to this many article ids
+     * @param int|null   $pageNum             If provided, offset results by this many pages
+     * @param int|null   $year                If provided, filter to articles published in this year
+     * @param int|null   $month               If provided, filter to articles published in this month
+     * @param int|null   $folderId            If provided, filter to articles with a simple segment targeted at folder
+     * @return int[]
      * @throws InvalidColumnException
      * @throws \DomainException
      * @throws \UnderflowException
      * @throws \PDOException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
-    {
+    public function findArticleIdsByFilters(
+        ?array $availableArticleIds,
+        ?int $topicId,
+        ?int $limit,
+        ?int $pageNum,
+        ?int $year,
+        ?int $month,
+        ?int $folderId
+    ): array {
         /* Invalid combination of year/month params
          */
         if ($month && !$year) {

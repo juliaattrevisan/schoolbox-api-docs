@@ -67,7 +67,7 @@ class Index extends Base
         /* Push those article ids through the topic filter which also circumstantially happens to
          * restrict to published, but not expired, articles because we pass null as year and month values.
          */
-        return $this->newsMapper->findArticleIdsForTopic(
+        return $this->newsMapper->findArticleIdsByFilters(
             $relevantArticles,
             $topicId,
             0,
