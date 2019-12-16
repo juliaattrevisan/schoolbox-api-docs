@@ -54,20 +54,6 @@ Often the Product Owner or Scrum Master will utilise the Daily Standup to ask th
 specific area where possible (e.g. QA'ing a point release).
 
 
-## Workshops
-* **When:** As required
-* **Where:** Any convenient location
-* **Timebox:** Varies per session, 2 hours at most
-* **Participants** individual Product Team members, external stakeholders
-
-Workshops will take the some form of a UX session, depending on what is required most at the time.
-
-Some sessions will require the whole Product Team, and some will require just the Strike Team assigned to a particular
-problem space.
-
-See [workshops.md](workshops.md) for a list of the different types of workshops.
-
-
 ## Refinements
 * **When:** Monday, Tuesday and Wednesday of 2nd week of sprint at 11:00am, as required
 * **Where:** A boardroom
@@ -150,3 +136,20 @@ Generally, the Retrospective itself will consist of these activities:
   * Negative events (i.e. what the Team could improve on, emergencies that may have occurred)
 * The Team as a whole will discuss the events noted above, and consider plans of action to address issues raised
 * Collate plans of action into a set of action items to be addressed in the next Sprint
+
+
+## Workshops
+* **When:** As required
+* **Where:** Any convenient location
+* **Timebox:** Varies per session, 2 hours at most
+* **Participants** individual Product Team members, external stakeholders
+
+> Workshops are not a standard Scrum ceremony, as time is not reserved for them: they are scheduled as required.
+> They are intended for aligning the Product Team's understanding of a problem space with that of the Stakeholders.
+
+Workshops will take the some form of a UX session, depending on what is required most at the time.
+
+Some sessions will require the whole Product Team, and some will require just the Strike Team assigned to a particular
+problem space.
+
+See [workshops.md](workshops.md) for a list of the different types of workshops.
