@@ -23,7 +23,7 @@ In this meeting we go through this work to get everyone up to speed on the work,
 members, and agreeing as a team on the unit of work that we plan to complete for the Sprint.
 
 This meeting will result in:
-* A Sprint populated with tickets, all of which meet the [Definition of Ready](definition-of-ready.md)
+* A Sprint Backlog populated with tickets, all of which meet the [Definition of Ready](definition-of-ready.md)
 
 
 ## Daily Standup / Scrum
@@ -56,43 +56,53 @@ specific area where possible (e.g. QA'ing a point release).
 
 ## Workshops
 * **When:** As required
+* **Where:** Any convenient location
 * **Timebox:** Varies per session, 2 hours at most
 * **Participants** individual Product Team members, external stakeholders
 
 Workshops will take the some form of a UX session, depending on what is required most at the time.
 
-Some sessions will require the whole Product Team, and some will require just the Strike Team assigned to a particular problem space.
+Some sessions will require the whole Product Team, and some will require just the Strike Team assigned to a particular
+problem space.
 
 See [workshops.md](workshops.md) for a list of the different types of workshops.
 
 
 ## Refinements
 * **When:** Monday, Tuesday and Wednesday of 2nd week of sprint at 11:00am, as required
+* **Where:** A boardroom
 * **Timebox:** 1 hour
 * **Participants** Scrum Master, other Product Team members (two at most)
 
 > Product Backlog refinement is the act of adding detail, estimates, and order to items in the Product Backlog.
 
-During a refinement session, the Product Team endeavours to reach a shared understanding of the business requirements and technical implications of the tickets being examined.
+During a refinement session, the Product Team endeavours to reach a shared understanding of the business requirements
+and technical implications of the tickets being examined.
 
-In practise, this results in the refinements being split into:
+In practice, this results in the refinements being split into:
 * Mon: ensure that Acceptance Criteria are in place for all tickets in this sprint and next
 * Tue: ensure that Story Points are in place for all tickets in this sprint and next
-* Wed: add AC and SP to any remaining tickets, if any were missed in the previous refinements (due to the timebox being exceeded)
+* Wed: add AC and SP to any remaining tickets, if any were missed in the previous refinements (due to the timebox being
+  exceeded)
 
 
 ## Showcase
 * **When:** Last day of Sprint at 11:00am
+* **Where:** The large boardroom
 * **Timebox:** 1 hour
 * **Participants** Product Team, representatives from other Teams
 
-> Showcases are our chance to the whole company up to speed with where we're at with our development, and allow us to collaborate and get feedback on what we've got and where we're going.
+> Showcases are our chance to the whole company up to speed with where we're at with our development, and allow us to
+> collaborate and get feedback on what we've got and where we're going.
 
 Showcases will generally take the following form:
-* The Product Owner will open the meeting with a quick summary what our focus was for the Sprint, what we got "done" and what we didn't get "done".
-* The Product Team will showcase their work. Generally the people that did the work will be asked to present their work, but sometimes the Scrum Master will present other people's work.
+* The Product Owner will open the meeting with a quick summary what our focus was for the Sprint, what we got "done"
+  and what we didn't get "done".
+* The Product Team will showcase their work. Generally the people that did the work will be asked to present their work,
+  but sometimes the Scrum Master will present other people's work.
 * Feedback and questions will be asked by the audience at the end of each unit of work shown.
-* The Product Owner and Product Team will briefly talk about the plan for the next Sprint, giving the audience a chance to give feedback and ask questions around that.
+* The Product Owner and Product Team will briefly talk about the plan for the next Sprint, giving the audience a chance
+  to give feedback and ask questions around that.
 
 Work that may be presented:
 * Research insights
@@ -103,13 +113,23 @@ Work that may be presented:
 
 What the Showcase shouldn't include:
 * Bug fixes where there is no change to intended functionality - best left for the release notes.
-* Minor changes or additions to user interfaces and functionality - it is too hard for the audience to get context with these, best left to release notes and Jira.
+* Minor changes or additions to user interfaces and functionality - it is too hard for the audience to get context with
+  these, best left to release notes and Jira.
 * Changes that have no functional impact.
 
-As there will be non-technical people at the Showcase - we should always try to stay away from delving into technical details. These discussions should be parked and happen after the Showcase.
+As there will be non-technical people at the Showcase - we should always try to stay away from delving into technical
+details. These discussions should be parked and happen after the Showcase.
+
+> Note: the Showcase seems to be our adaptation of the
+> [Sprint Review](https://www.scrumguides.org/scrum-guide.html#events-review) event. Key differences include:
+> * less focus on the internals of this sprint: that isn't interesting to the company as a whole
+> * less focus on the content of next sprint: that is discussed between the Product Owner and stakeholders
+> * more focus on displaying the current business value that the Product Team is providing
+
 
 ## Retrospective
 * **When:** Last day of the Sprint at 1:30pm
+* **Where:** A boardroom
 * **Timebox:** 1 hour
 * **Participants** Product Team
 
@@ -118,6 +138,15 @@ As there will be non-technical people at the Showcase - we should always try to 
 > * Identify and order the major items that went well and potential improvements; and,
 > * Create a plan for implementing improvements to the way the Scrum Team does its work.
 
-Prior to the Sprint Retrospective - any Product Team members may contact the Scrum Master to request items to be discussed in the Retrospective. The Scrum Master will prepare a general overview of how the last Sprint went, as well as collate all the items to be discussed in the meeting.
+Prior to the Sprint Retrospective - any Product Team members may contact the Scrum Master to request items to be
+discussed in the Retrospective. The Scrum Master will prepare a general overview of how the last Sprint went, as well as
+collate all the items to be discussed in the meeting.
 
-All discussions that identify areas where the team should improve should involve a quick brainstorm by the team for potential solutions, and a plan should be agreed on for the team to follow up on during the next Sprint.
+Generally, the Retrospective itself will consist of these activities:
+* Any action items raised during the previous Retrospective will be reviewed, and progress on them briefly discussed
+* Each Product Team member reflects upon the Sprint just gone, and notes (generally on post-it notes):
+  * Positive events (i.e. what the Team did that went well, successes, milestones)
+  * Neutral events (i.e. contributing or mitigating factors for sprint performance, changes to roles within the Team)
+  * Negative events (i.e. what the Team could improve on, emergencies that may have occurred)
+* The Team as a whole will discuss the events noted above, and consider plans of action to address issues raised
+* Collate plans of action into a set of action items to be addressed in the next Sprint
