@@ -553,6 +553,16 @@ class Acceptance extends \Codeception\Module
         }
         return null;
     }
+    
+    /**
+     * Get current url from WebDriver
+     * @return mixed
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function getCurrentUrl()
+    {
+        return $this->getWebDriverModule()->_getCurrentUri();
+    }
 
     /**
      * Return DB module in a type-safe manner.
