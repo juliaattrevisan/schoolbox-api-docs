@@ -11,6 +11,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
@@ -55,7 +56,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function mapping()
     {
@@ -247,6 +248,27 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
+     * Returns a predicate for getting articles that are awaiting publication.
+     *
+     * Must be:
+     * * approved at
+     * * publish_at > now
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return Builder
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
+     */
+    public function getPredicateAwaitingPublication(Alaress_Date_Format $now = null): IBuilder
+    {
+        $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
+        return $this->getPredicateBuilder()
+                    ->notNull('accepted_at')
+                    ->greaterThan('publish_at', $nowDatabase);
+    }
+
+
+    /**
      * Returns a predicate for getting articles that are approved
      *
      * @return Builder
@@ -297,6 +319,55 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             ->notNull('accepted_at')
             ->lessThanOrEqualTo('publish_at', $nowDatabase)
             ->lessThan('expires_at', $nowDatabase);
+    }
+
+
+    /**
+     * Returns a predicate that will match articles in the specified state.
+     *
+     * @param int $state A bit-mask of atomic states
+     * @return Builder
+     * @throws InvalidColumnException
+     * @throws UnderflowException       If state indicates no articles can ever match
+     * @throws InvalidArgumentException If state is invalid
+     */
+    public function getPredicateForState(int $state): Builder
+    {
+        if($state === Model::STATE_NONE){
+            // We could generate a predicate that matches no articles (eg id=0) but that  would
+            // cause a wasted round trip to DB, better to force caller to test and short-circuit in code.
+            throw new UnderflowException("No articles can ever match an article with no state");
+        }
+
+        if($state < Model::STATE_NONE || $state > Model::STATE_MAX){
+            throw new InvalidArgumentException(sprintf(
+                "State must be between %d and %d, found %d",
+                Model::STATE_NONE ,
+                Model::STATE_MAX,
+                $state));
+        }
+
+        $pb = $this->getPredicateBuilder();
+
+        if($state & Model::STATE_DRAFT){
+            $pb->all($this->getPredicateDraft());
+        }
+        if($state & Model::STATE_AWAITING_MODERATION){
+            $pb->all($this->getPredicateAwaitingModeration());
+        }
+        if($state & Model::STATE_AWAITING_PUBLICATION){
+            $pb->all($this->getPredicateAwaitingPublication());
+        }
+        if($state & Model::STATE_REJECTED){
+            $pb->all($this->getPredicateRejected());
+        }
+        if($state & Model::STATE_PUBLISHED){
+            $pb->all($this->getPredicatePublished());
+        }
+        if($state & Model::STATE_EXPIRED){
+            $pb->all($this->getPredicateExpired());
+        }
+        return $pb->any($pb);
     }
 
 
@@ -405,22 +476,19 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * $limit applies to the number of articles, rather than number of rows due to *:N joins.
      *
-     * Note that "published" and "expired" are non-overlapping distinct states
-     *
      * @param array|null $availableArticleIds If provided, do not return results outside this set
      * @param int|null   $topicId             If provided, filter to articles that include this topic
      * @param int|null   $offset              If provided, offset results by this many
      * @param int|null   $limit               If provided, limit to this many article ids
      * @param int|null   $publishYear         If provided, filter to articles published in this year
      * @param int|null   $publishMonth        If provided, filter to articles published in this month
-     * @param bool       $publishedOnly       If true, filter to published articles only
-     * @param bool       $expiredOnly         If true, filter to expired articles only
+     * @param int        $temporalState       The article's state. A bit-mask of discrete/atomic states
      * @param int|null   $folderId            If provided, filter to articles with a simple segment targeted at folder
      * @return int[]
+     * @throws InvalidArgumentException
      * @throws InvalidColumnException
-     * @throws UnderflowException
      * @throws PDOException
-     * @todo Replace $publishedOnly + $expiredOnly with temporal state bitmask to maximise re-usability
+     * @throws UnderflowException
      */
     public function findArticleIdsByFilters(
         ?array $availableArticleIds,
@@ -429,8 +497,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         ?int $limit,
         ?int $publishYear,
         ?int $publishMonth,
-        bool $publishedOnly,
-        bool $expiredOnly,
+        int $temporalState,
         ?int $folderId
     ): array {
 
@@ -439,21 +506,17 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             return [];
         }
 
-        // Short-circuit if searching for articles that belong to non-overlapping temporal states
-        // @see https://www.draw.io/#G1hgNAeuen61KzCzlIa0gEzYK5l0qsYtkw for news temporal state diagram
-        // @todo replace these two booleans with temporal-state bitmask to maximise method re-usability
-        if ($publishedOnly && $expiredOnly) {
+        // Short-circuit if searching for articles without a state (all articles have a state)
+        // It's quite valid to generate this value programmatically using boolean logic, it's not
+        // an error at this point.
+        if ($temporalState === Model::STATE_NONE) {
             return [];
         }
 
         // Start building predicate - never return deleted articles.
-        $pb = $this->getPredicateBuilder()->isNull('deleted_at');
-
-        /** @var string[] $joins */
-        $joins = [];
-
-        /** @var bool $distinct Required if performing any *:N joins */
-        $distinct = false;
+        $pb = $this->getPredicateBuilder()
+                   ->isNull('deleted_at')
+                   ->all($this->getPredicateForState($temporalState));
 
         if ($availableArticleIds !== null) {
             $pb->in('id', $availableArticleIds);
@@ -468,21 +531,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $pb->like('publish_at', "%-{$publishMonth}-%");
         }
 
-        // Build temporal-state filter
-        if ($publishedOnly || $expiredOnly) {
-            $now = Alaress_Date_Format::now();
-            if ($publishedOnly) {
-                // Can we short-circuit without hitting db?
-                if ($publishYear !== null && $publishYear > $now->getYear()) {
-                    // eg, fetch 'published in future year' AND 'article is published' will always return empty set.
-                    return [];
-                }
-                $pb = $pb->all($this->getPredicatePublished($now));
-            }
-            if ($expiredOnly) {
-                $pb = $pb->all($this->getPredicateExpired($now));
-            }
-        }
+        /** @var string[] $joins */
+        $joins = [];
+        /** @var bool $distinct Required if performing any *:N joins */
+        $distinct = false;
 
         if ($topicId !== null) {
             $joins[] = "INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id";

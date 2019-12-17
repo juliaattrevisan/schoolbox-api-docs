@@ -29,12 +29,17 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 {
     // The discrete, atomic states this article may be in.
     // @see https://www.draw.io/#G1hgNAeuen61KzCzlIa0gEzYK5l0qsYtkw
-    private const STATE_DRAFT                = 1;
-    private const STATE_AWAITING_MODERATION  = 2;
-    private const STATE_AWAITING_PUBLICATION = 4;
-    private const STATE_REJECTED             = 8;
-    private const STATE_PUBLISHED            = 16;
-    private const STATE_EXPIRED              = 32;
+    public const STATE_DRAFT                = 1;
+    public const STATE_AWAITING_MODERATION  = 2;
+    public const STATE_AWAITING_PUBLICATION = 4;
+    public const STATE_REJECTED             = 8;
+    public const STATE_PUBLISHED            = 16;
+    public const STATE_EXPIRED              = 32;
+
+    public const STATE_NONE = 0;
+    public const STATE_MAX  =
+        self::STATE_DRAFT | self::STATE_AWAITING_MODERATION | self::STATE_AWAITING_PUBLICATION |
+        self::STATE_REJECTED | self::STATE_PUBLISHED | self::STATE_EXPIRED;
 
     // Composite states
     private const STATE_PUBLIC    = self::STATE_PUBLISHED | self::STATE_EXPIRED;
