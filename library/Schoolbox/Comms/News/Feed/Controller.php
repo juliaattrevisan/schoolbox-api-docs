@@ -13,16 +13,19 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Exception\InvalidComponent;
 use InvalidArgumentException;
 use PDOException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
 use function array_merge;
 use function array_unique;
-use function count;
+use function strtolower;
 use const PHP_URL_HOST;
 use const PHP_URL_SCHEME;
 
@@ -31,21 +34,25 @@ class Controller extends Base
     /** @var News\Mapper */
     private $newsMapper;
 
+    /** @var News\Topic\Mapper */
+    private $topicMapper;
+
     /** @var ArticleResolver */
     private $articleResolver;
 
 
     /**
-     * Controller constructor.
-     *
-     * @param News\Mapper     $newsMapper
-     * @param ArticleResolver $articleResolver
+     * @param News\Mapper       $newsMapper
+     * @param News\Topic\Mapper $topicMapper
+     * @param ArticleResolver   $articleResolver
      */
     public function __construct(
         News\Mapper $newsMapper,
+        News\Topic\Mapper $topicMapper,
         ArticleResolver $articleResolver
     ) {
         $this->newsMapper      = $newsMapper;
+        $this->topicMapper     = $topicMapper;
         $this->articleResolver = $articleResolver;
     }
 
@@ -66,6 +73,8 @@ class Controller extends Base
      * @throws PDOException
      * @throws UnderflowException
      * @throws UnexpectedValueException
+     * @throws DefinitionException
+     * @throws NotFound
      * @noinspection PhpUnused
      */
     public function getFeedForUser(User $user): void
@@ -77,24 +86,19 @@ class Controller extends Base
             )
         );
 
-        if (!count($relevantArticles)) {
-            $articleIds = [];
-        } else {
-            $topic = $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG);
-            if ($topic === News\Mapper::TOPIC_ALL_SLUG) {
-                $topic = null;
-            }
-            $articleIds = $this->newsMapper->findArticleIdsByFilters(
-                $relevantArticles,
-                $topic,
-                null,
-                null,
-                null,
-                null,
-                News\Model::STATE_PUBLIC,
-                null
-            );
-        }
+        $topicSlug = $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG);
+        $this->assertValidTopic($topicSlug);
+
+        $articleIds = $this->newsMapper->findArticleIdsByFilters(
+            $relevantArticles,
+            $topicSlug,
+            null,
+            null,
+            null,
+            null,
+            News\Model::STATE_PUBLIC,
+            null
+        );
 
         $this->renderArticlesAsXml($articleIds);
     }
@@ -113,6 +117,8 @@ class Controller extends Base
      * @throws PDOException
      * @throws ServiceNotFound
      * @throws UnderflowException
+     * @throws DefinitionException
+     * @throws NotFound
      * @noinspection PhpUnused
      */
     public function getFeedForFolder(Folder\Model $folder): void
@@ -123,22 +129,40 @@ class Controller extends Base
             News\Audience\Model::RELATIONSHIP_SELF
         );
 
-        if (!count($articlesForFolder)) {
-            $articleIds = [];
-        } else {
-            $articleIds = $this->newsMapper->findArticleIdsByFilters(
-                $articlesForFolder,
-                $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG),
-                null,
-                null,
-                null,
-                null,
-                News\Model::STATE_PUBLIC,
-                $folder->getId()
-            );
-        }
+        $topic = $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG);
+        $this->assertValidTopic($topic);
+
+        $articleIds = $this->newsMapper->findArticleIdsByFilters(
+            $articlesForFolder,
+            $topic,
+            null,
+            null,
+            null,
+            null,
+            News\Model::STATE_PUBLIC,
+            $folder->getId()
+        );
 
         $this->renderArticlesAsXml($articleIds, $folder);
+    }
+
+
+    /**
+     * Asserts that a topic is valid, throws 404 if not found
+     *
+     * @param string|null $topic
+     * @throws NotFound
+     */
+    private function assertValidTopic(?string $topic): void
+    {
+        if ($topic === null || strtolower($topic) === News\Mapper::TOPIC_ALL_SLUG) {
+            return;
+        }
+        try {
+            $this->topicMapper->findOneByColumn('name', $topic);
+        } catch (MapperException $e) {
+            throw new NotFound("No topic found with name '$topic'", $e->getCode(), $e);
+        }
     }
 
 

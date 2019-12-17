@@ -16,7 +16,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer;
-use Schoolbox\Discussion\Comment;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
@@ -149,14 +148,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'newsMapper'                 => $this->getMapperFactory()->getLazy(News\Mapper::class),
             'topicMapper'                => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
-            'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(News\SaveForLater\Mapper::class),
-            'statisticsMapper'           => $this->getMapperFactory()->getLazy(News\Statistics\Mapper::class),
-            'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(News\Statistics\Cumulative\Mapper::class),
-            'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
-            'access'                     => $this->getMapperFactory()->getLazy(Access::class),
-            'commentMapper'              => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
-            'audienceMapper'             => $this->getMapperFactory()->getLazy(News\Audience\Mapper::class),
         ];
     }
 
