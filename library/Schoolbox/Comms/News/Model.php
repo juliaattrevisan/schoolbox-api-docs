@@ -37,7 +37,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public const STATE_EXPIRED              = 32;
 
     public const STATE_NONE = 0;
-    public const STATE_MAX  =
+    public const STATE_ALL  =
         self::STATE_DRAFT | self::STATE_AWAITING_MODERATION | self::STATE_AWAITING_PUBLICATION |
         self::STATE_REJECTED | self::STATE_PUBLISHED | self::STATE_EXPIRED;
 
