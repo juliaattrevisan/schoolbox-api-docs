@@ -36,6 +36,9 @@ This meeting will result in:
 > The Development Team plans work for the next 24 hours. The Development Team uses the Daily Scrum to inspect progress
 > toward the Sprint Goal and to inspect how progress is trending toward completing the work in the Sprint Backlog.
 
+The Scrum Master will call in any [Distributed Team](distributed-teams.md) members who are working that day. Alternately
+they may give their Standup report in the team's Slack channel.
+
 The Scrum Master will give a quick summary of the current state of the Sprint and the Product Team (e.g. if there are
 any absent team members).
 
