@@ -4,6 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Feed;
 
 use Alaress\Authorizer\Rule;
@@ -21,6 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -37,41 +39,40 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $preloadUser   = function ($params) {
+        $preloadUser          = function ($params) {
             return $this->preloadUser($params);
         };
-        $preloadFolder = function ($params) {
-            return $this->preloadFolder($params);
+        $preloadFolderAndUser = function ($params) {
+            return array_merge(
+                $this->preloadUser($params),
+                $this->preloadFolder($params)
+            );
         };
 
-        // Route available if for self, or SU looking at another user
-        $selfOrSu = new Rule\LazyCallback(static function () {
-            return new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\IsUser('user')
-            );
-        });
-
         // Must be SU, or have News service READ+ perm, or READ+ access to folder
-        $canViewFolderArticles = new Rule\LazyCallback(static function () {
-            return new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_READ),
-                    new Rule\HasHomepageAccess(
-                        UserAccess::ACCESS_READ,
-                        static function (array $params): int {
-                            return (int)$params['folderId'];
-                        },
-                        Access::getInstance()
-                    )
-                )
-            );
+        $canReadFolderNews = new Rule\LazyCallback(static function () {
+            return new Rule\Callback(static function (array $params): bool {
+                /** @var User $user */
+                $user = $params['user'];
+                if ($user->isSuperuser()) {
+                    return true;
+                }
+                $userAccessMapper = UserAccessMapper::getInstance();
+                if ($userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_READ) {
+                    return true;
+                }
+                if (Access::getInstance()->getFolderAccess($user, (int)$params['folderId']) >= UserAccess::ACCESS_READ) {
+                    return true;
+                }
+                throw new Unauthorized("User with key '{$user->getKey()}' does not have access to news RSS for folder {$params['folderId']}");
+            });
         });
 
-        $this->register('GET', '/user/{key}', 'getFeedForUser', $selfOrSu, $preloadUser);
-        $this->register('GET', '/folder/{folderId:\d+}', 'getFeedForFolder', $canViewFolderArticles, $preloadFolder);
+        // Note there is no route auth here, it does not require a session, simply knowing a user.key suffices.
+        $this->register('GET', '/{key}', 'getFeedForUser', null, $preloadUser);
+
+        // User identified by 'key' (not session user), must be SU, or have News service READ+ perm, or READ+ access to folder
+        $this->register('GET', '/{key}/{folderId:\d+}', 'getFeedForFolder', $canReadFolderNews, $preloadFolderAndUser);
     }
 
 
@@ -85,7 +86,7 @@ class Module extends BaseModule
      */
     private function preloadUser(array $params): array
     {
-        if($params['user'] instanceof User){
+        if ($params['user'] instanceof User) {
             return ['user' => $params['user']];
         }
         try {
@@ -106,7 +107,7 @@ class Module extends BaseModule
      */
     private function preloadFolder(array $params): array
     {
-        if($params['folder'] instanceof Folder\Model){
+        if ($params['folder'] instanceof Folder\Model) {
             return ['folder' => $params['folder']];
         }
         try {

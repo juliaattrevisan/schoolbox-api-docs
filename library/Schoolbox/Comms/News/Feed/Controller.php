@@ -4,228 +4,163 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Feed;
 
-use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Web\Exception\InvalidComponent;
+use InvalidArgumentException;
+use PDOException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Comms\News\Topic;
+use Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
-use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use UnderflowException;
+use UnexpectedValueException;
+use function array_merge;
+use function array_unique;
+use function count;
+use const PHP_URL_HOST;
+use const PHP_URL_SCHEME;
 
 class Controller extends Base
 {
-    /**
-     * @var News\Mapper
-     */
+    /** @var News\Mapper */
     private $newsMapper;
 
-
-    /**
-     * @var Topic\Mapper
-     */
-    private $topicMapper;
-
-
-    /**
-     * @var News\SaveForLater\Mapper
-     */
-    private $saveForLaterMapper;
-
-
-    /**
-     * @var News\Statistics\Mapper
-     */
-    private $statisticsMapper;
-
-
-    /**
-     * @var News\Statistics\Cumulative\Mapper
-     */
-    private $statisticsCumulativeMapper;
-
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-
-    /**
-     * @var IConnector
-     */
-    private $databaseInternal;
-
-
-    /**
-     * @var ArticleResolver
-     */
+    /** @var ArticleResolver */
     private $articleResolver;
-
-
-    /**
-     * @var CommentMapper
-     */
-    private $commentMapper;
-
-    /**
-     * @var News\Audience\Mapper
-     */
-    private $audienceMapper;
 
 
     /**
      * Controller constructor.
      *
-     * @param News\Mapper                       $newsMapper
-     * @param Topic\Mapper                      $topicMapper
-     * @param News\SaveForLater\Mapper          $saveForLaterMapper
-     * @param News\Statistics\Mapper            $statisticsMapper
-     * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
-     * @param IConnector                        $databaseInternal
-     * @param ArticleResolver                   $articleResolver
-     * @param Access                            $access
-     * @param CommentMapper                     $commentMapper
-     * @param News\Audience\Mapper              $audienceMapper
+     * @param News\Mapper     $newsMapper
+     * @param ArticleResolver $articleResolver
      */
     public function __construct(
         News\Mapper $newsMapper,
-        Topic\Mapper $topicMapper,
-        News\SaveForLater\Mapper $saveForLaterMapper,
-        News\Statistics\Mapper $statisticsMapper,
-        News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
-        IConnector $databaseInternal,
-        ArticleResolver $articleResolver,
-        Access $access,
-        CommentMapper $commentMapper,
-        News\Audience\Mapper $audienceMapper
+        ArticleResolver $articleResolver
     ) {
-        $this->newsMapper                 = $newsMapper;
-        $this->topicMapper                = $topicMapper;
-        $this->saveForLaterMapper         = $saveForLaterMapper;
-        $this->statisticsMapper           = $statisticsMapper;
-        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
-        $this->databaseInternal           = $databaseInternal;
-        $this->articleResolver            = $articleResolver;
-        $this->access                     = $access;
-        $this->commentMapper              = $commentMapper;
-        $this->audienceMapper             = $audienceMapper;
+        $this->newsMapper      = $newsMapper;
+        $this->articleResolver = $articleResolver;
     }
 
 
     /**
-     * Generate RSS feed containing articles audienced to $user
-     * and optionally also audienced to $folder
+     * Generate RSS feed containing articles that are:
+     * * audienced either to the specified $user
+     * * authored by specified user, or
+     * * moderated by specified user
      *
-     * An optional ?topic= can be used to filter this
+     * @api          /news/feed/{key}?topic={slug}
      *
-     * @api /news/feed/{key}{/folderId}
-     *
-     * @param User              $user
-     * @param null|Folder\Model $folder
-     * @throws Unauthorized
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Web\Exception\InvalidComponent
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     * @throws \UnderflowException
+     * @param User $user
+     * @throws InvalidComponent
+     * @throws ServiceNotFound
+     * @throws InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     * @noinspection PhpUnused
      */
-    public function getFeed(User $user, ?Folder\Model $folder)
+    public function getFeedForUser(User $user): void
     {
-        /* Manufacture params
-         */
-        $args = [];
+        $relevantArticles = array_unique(
+            array_merge(
+                $this->articleResolver->findArticlesForUser($user),
+                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user)
+            )
+        );
 
-
-        /* If a folder was specified, get the feed for that folder
-         */
-        if (null !== $folder) {
-
-            // Look for this homepage's permission
-            $permission = $this->access->getFolderAccess($user, $folder->getId());
-            if ($permission < UserAccess::ACCESS_READ) {
-                throw new Unauthorized();
+        if (!count($relevantArticles)) {
+            $articleIds = [];
+        } else {
+            $topic = $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG);
+            if ($topic === News\Mapper::TOPIC_ALL_SLUG) {
+                $topic = null;
             }
-
-            $args[News\Querystring::FOLDER] = $folder->getId();
-            $params = new News\Querystring($args);
-
-            /* Get all the articles for the homepage
-             */
-            $articleData = (new News\Lists\Homepage(
-                (int)$this->getConfigLoader()->get('search_type_limit'),
-                $this->topicMapper,
-                $this->newsMapper,
-                $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-                $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-                $this->saveForLaterMapper,
-                $this->statisticsMapper,
-                $this->statisticsCumulativeMapper,
-                $this->databaseInternal,
-                $this->articleResolver,
-                $this->commentMapper,
-                $this->audienceMapper,
-                $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
-            ))->find($params, $user);
-            $articles = $articleData['articles'];
-        }
-        else {
-
-            /* If a topic slug exists, use it
-             * Otherwise, get articles across all topics
-             */
-            $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
-
-            $slug = (string)$this->getRequest()->query[News\Querystring::TOPIC_SLUG];
-
-            if ('' !== $slug) {
-                $args[News\Querystring::TOPIC_SLUG] = $slug;
-            }
-
-            $params = new News\Querystring($args);
-
-            /* Get all the articles across all topics
-             */
-            $articleIds = (new News\Lists\Index(
-                0,
-                $this->topicMapper,
-                $this->newsMapper,
-                $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-                $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-                $this->saveForLaterMapper,
-                $this->statisticsMapper,
-                $this->statisticsCumulativeMapper,
-                $this->databaseInternal,
-                $this->articleResolver,
-                $this->commentMapper,
-                $this->audienceMapper,
-                $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
-            ))->find($params, $user);
-
-            /* Hydrate the set
-             */
-            $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
+            $articleIds = $this->newsMapper->findArticleIdsByFilters(
+                $relevantArticles,
+                $topic,
+                null,
+                null,
+                null,
+                null,
+                News\Model::STATE_PUBLIC,
+                null
+            );
         }
 
-        /* I haven't seen an outputter for xml in Web/Output
-         */
+        $this->renderArticlesAsXml($articleIds);
+    }
+
+    /**
+     *
+     * Generate RSS feed containing articles audienced either to $folder, and which the user
+     * has permission to view.
+     *
+     * @api          /news/feed/{key}/{folderId:\d+}?topic={slug}
+     *
+     * @param Folder\Model $folder
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws InvalidComponent
+     * @throws PDOException
+     * @throws ServiceNotFound
+     * @throws UnderflowException
+     * @noinspection PhpUnused
+     */
+    public function getFeedForFolder(Folder\Model $folder): void
+    {
+        $articlesForFolder = $this->articleResolver->findArticlesForAudience(
+            Strategy\Folder::getEntityType(),
+            $folder->getId(),
+            News\Audience\Model::RELATIONSHIP_SELF
+        );
+
+        if (!count($articlesForFolder)) {
+            $articleIds = [];
+        } else {
+            $articleIds = $this->newsMapper->findArticleIdsByFilters(
+                $articlesForFolder,
+                $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG),
+                null,
+                null,
+                null,
+                null,
+                News\Model::STATE_PUBLIC,
+                $folder->getId()
+            );
+        }
+
+        $this->renderArticlesAsXml($articleIds, $folder);
+    }
+
+
+    /**
+     * Render the set of articles to an XML feed
+     *
+     * @param int[]             $articleIds
+     * @param Folder\Model|null $folder
+     * @throws ServiceNotFound
+     * @throws InvalidComponent
+     */
+    private function renderArticlesAsXml(array $articleIds, Folder\Model $folder = null): void
+    {
+        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order' => ['publish_at' => 'DESC']]);
+
         $this->getResponse()->content->set($this->buildXmlOutput('@commsNewsFeed/rss.twig', [
-            'folder' => $folder,
-            'title' => $this->getConfigLoader()->get('title'),
+            'folder'     => $folder,
+            'title'      => $this->getConfigLoader()->get('title'),
             'schoolName' => $this->getConfigLoader()->get('school_name'),
-            'baseUrl' => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
-            'url' => $this->getRequest()->url->get(),
-            'articles' => $articles
+            'baseUrl'    => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
+            'url'        => $this->getRequest()->url->get(),
+            'articles'   => $articles,
         ]));
     }
 }
