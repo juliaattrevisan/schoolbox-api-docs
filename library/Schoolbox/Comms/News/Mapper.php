@@ -339,12 +339,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             throw new UnderflowException("No articles can ever match an article with no state");
         }
 
-        if($state < Model::STATE_NONE || $state > Model::STATE_MAX){
+        if ($state < Model::STATE_NONE || $state > Model::STATE_ALL) {
             throw new InvalidArgumentException(sprintf(
                 "State must be between %d and %d, found %d",
-                Model::STATE_NONE ,
-                Model::STATE_MAX,
-                $state));
+                Model::STATE_NONE,
+                Model::STATE_ALL,
+                $state
+            ));
         }
 
         $pb = $this->getPredicateBuilder();
