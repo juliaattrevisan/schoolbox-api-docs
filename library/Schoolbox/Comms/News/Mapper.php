@@ -367,7 +367,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         if($state & Model::STATE_EXPIRED){
             $pb->all($this->getPredicateExpired());
         }
-        return $pb->any($pb);
+        return $this->getPredicateBuilder()->any($pb);
     }
 
 
