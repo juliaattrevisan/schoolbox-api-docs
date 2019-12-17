@@ -14,7 +14,7 @@
  #}
 {% extends '@commsNews/page-layout.twig' %}
 
-{% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
+{% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeedForUser', {key: key}) %}
 
 {% block newsTitle %}{{ locale.news.proper }} Feed{% endblock %}
 
