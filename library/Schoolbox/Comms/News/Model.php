@@ -42,9 +42,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         self::STATE_REJECTED | self::STATE_PUBLISHED | self::STATE_EXPIRED;
 
     // Composite states
-    private const STATE_PUBLIC    = self::STATE_PUBLISHED | self::STATE_EXPIRED;
-    private const STATE_APPROVED  = self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED | self::STATE_EXPIRED;
-    private const STATE_SUBMITTED = self::STATE_AWAITING_MODERATION | self::STATE_REJECTED | self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED | self::STATE_EXPIRED;
+    public const STATE_PUBLIC    = self::STATE_PUBLISHED | self::STATE_EXPIRED;
+    public const STATE_APPROVED  = self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED | self::STATE_EXPIRED;
+    public const STATE_SUBMITTED = self::STATE_AWAITING_MODERATION | self::STATE_REJECTED | self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED | self::STATE_EXPIRED;
 
     // Authoritative declaration of *possible* transitions.
     // *Permitted* (ie for some user) transitions are always a subset of these.
