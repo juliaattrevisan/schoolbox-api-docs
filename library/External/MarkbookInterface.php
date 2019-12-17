@@ -7,9 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 
 interface External_MarkbookInterface extends External\IConnector
 {
@@ -17,49 +16,49 @@ interface External_MarkbookInterface extends External\IConnector
     /**
      * Returns the assessment information if found in remote system
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      * @return array
      */
-    public function getAssessment(Activity $assessment): array;
+    public function getAssessment(IAssessable $assessment): array;
 
     /**
      * Indicates if assessment exists in external system's markbook
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      * @return bool
      */
-    public function hasAssessment(Activity $assessment): bool;
+    public function hasAssessment(IAssessable $assessment): bool;
 
     /**
      * Creates a new assessment item in the markbook
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      * @return bool
      */
-    public function createAssessment(Activity $assessment): bool;
+    public function createAssessment(IAssessable $assessment): bool;
 
     /**
      * Updates an existing markbook assessment
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      * @return bool
      */
-    public function updateAssessment(Activity $assessment): bool;
+    public function updateAssessment(IAssessable $assessment): bool;
 
     /**
      * Deletes an existing markbook assessment
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      * @return bool
      */
-    public function deleteAssessment(Activity $assessment): bool;
+    public function deleteAssessment(IAssessable $assessment): bool;
 
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param ReturnedWork|QuizAttempt $returnedWork
+     * @param IFeedback $returnedWork
      * @return bool
      */
-    public function setMark($returnedWork): bool;
+    public function setMark(IFeedback $returnedWork): bool;
 }
 
