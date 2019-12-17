@@ -20,13 +20,15 @@ class DueWorkInitialCest
         $i->click(['css'=>'label[class=radio-label][for=groupRead4]']);
         $i->click(['css'=>'label[class=radio-label][for=groupRead5]']);
         $i->click(['css'=>'input[type=submit]']);
+
+        // Navigate to the new folder, store its location for later tests
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Class Homepage");
         $i->click("Test Class Homepage");
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
         $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
-        echo $this->home_page_url;
+
         $i->click('a#all-actions.icon-more');
         $i->clickWithLeftButton('#tab-control > li a.icon-group');
         $i->waitForText("Manage Group", 5);
@@ -82,14 +84,6 @@ class DueWorkInitialCest
     {
         $teacher='Jack Coles';
         $i->login('alaress', 'alaress');
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
-        $i->canSee("Test Class Homepage");
-        $testClassHomepage = Locator::contains('a.jstree-anchor', 'Test Class Homepage');
-        $i->click($testClassHomepage);
-        $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
-        $i->waitForText("Due Work", 5);
-        $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work2');
@@ -106,13 +100,6 @@ class DueWorkInitialCest
     {
         $student='Eden Reed';
         $i->login('alaress', 'alaress');
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
-        $i->canSee("Test Class Homepage");
-        $testClassHomepage = Locator::contains('a.jstree-anchor', 'Test Class Homepage');
-        $i->click($testClassHomepage);
-        $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
-        $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
         $i->impersonate($student);
         $i->amOnUrl($this->home_page_url);
         $i->canSee('Test Due Work');
@@ -124,12 +111,6 @@ class DueWorkInitialCest
     {
         $student='Eden Reed';
         $i->login('alaress', 'alaress');
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
-        $i->canSee("Test Class Homepage");
-        $i->click("Test Class Homepage");
-        $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
-        $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
         $i->impersonate($student);
         $i->amOnUrl($this->home_page_url);
         $i->waitForText('Test Due Work', 5);
@@ -144,15 +125,8 @@ class DueWorkInitialCest
 
     public function viewSubmission(AcceptanceTester $i)
     {
-        
         $teacher='Jack Coles';
         $i->login('alaress', 'alaress');
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
-        $i->canSee("Test Class Homepage");
-        $i->click("Test Class Homepage");
-        $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
-        $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work');
@@ -171,12 +145,6 @@ class DueWorkInitialCest
     {
         $teacher='Jack Coles';
         $i->login('alaress', 'alaress');
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
-        $i->canSee("Test Class Homepage");
-        $i->click("Test Class Homepage");
-        $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
-        $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work');
