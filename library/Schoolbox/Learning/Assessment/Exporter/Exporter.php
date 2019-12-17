@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 class Exporter
 {
@@ -133,6 +134,7 @@ class Exporter
      * @return GenericCollection|IAssessable[]
      * @throws InvalidArgumentException If any filter keys not recognised
      * @throws BrokenFilterException If a injected filter is unable to be processed
+     * @throws UnexpectedValueException
      */
     private function findAssessments()
     {
@@ -149,6 +151,18 @@ class Exporter
         $ids           = $this->idFinder->findIdsByFilters($filters);
         $assessments   = $this->assessmentDataSource->findAllByIds($ids);
 
+        // Hydrate any required folder codes
+        $foldersRequiringCodeHydration = [];
+        foreach ($assessments as $assessment) {
+            $folder = $assessment->getContext()->getFolder();
+            if ($folder->getCodes() === null) {
+                $foldersRequiringCodeHydration[$folder->getId()] = $folder;
+            }
+        }
+        if (count($foldersRequiringCodeHydration)) {
+            $folderMapper = Folder\Code\Mapper::getInstance();
+            $folderMapper->applyCodesToCategories(new GenericCollection(Folder\Model::class, $foldersRequiringCodeHydration));
+        }
 
         // Filter out assessments that belong to folders without a folder code
         $classAssessments = $assessments->filter(function (IAssessable $assessment) {

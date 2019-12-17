@@ -13,7 +13,8 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
-
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
+use Schoolbox\Mapper;
 
 /**
  * Spawns an appropriate MarkScheme for a given Assessment
@@ -167,6 +168,7 @@ class Factory
      * @param Project $project
      * @return IMarkScheme
      * @throws \DomainException
+     * @throws Mapper\Exception
      */
     protected function spawnForProject(Project $project)
     {
@@ -176,6 +178,12 @@ class Factory
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_LETTER:
+                // Ensure project's grade group levels are hydrated
+                $gradeGroup = $project->getGradeGroup();
+                if ($gradeGroup && $gradeGroup->getGradeLevels() === null) {
+                    $mapper = Group\Mapper::getInstance();
+                    $project->setGradeGroup($mapper->findById($gradeGroup->getId()));
+                }
                 return new LetterGrade($project->getGradeGroup());
             default:
                 throw new \DomainException("Invalid MarkType for Project: " . $project->getMarkType()->getName());
