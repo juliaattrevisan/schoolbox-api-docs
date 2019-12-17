@@ -440,8 +440,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $pb = $this->getPredicateBuilder()
             ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
-            ->isNull('deleted_at')
-            ->in('id', $availableArticleIds);
+            ->isNull('deleted_at');
+
+        if(\count($availableArticleIds)) {
+            $pb->in('id', $availableArticleIds);
+        }
 
         if ($year || $month) {
             $paddedMonth = $month ? str_pad((string)$month, 2, '0', STR_PAD_LEFT) : '';
