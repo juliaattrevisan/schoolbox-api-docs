@@ -5,7 +5,7 @@ Data:
     componentInstanceId int
     compactMode         int
     limit               int
-    folderId            int
+    folder              Folder\Model
     key                 string
     referrer            string
  #}
@@ -16,13 +16,13 @@ Data:
     {% set querystringParams = [
         'c=' ~ compactMode,
         'l=' ~ limit,
-        'f=' ~ folderId,
+        'f=' ~ folder.id,
         'hp=1',
         'ref=' ~ referrer,
         'cid=' ~ componentInstanceId,
     ] |join('&') %}
 
-    {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folderId}) %}
+    {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folder.id}) %}
 
     $(function () {
         var $articleList = $('#news-container-{{ componentInstanceId }}'),
@@ -50,8 +50,8 @@ Data:
     <div class="loader"></div>
 </div>
 
-{% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key, folderId: folderId}) %}
-{% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folderId: folderId}) %}
+{% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeedForFolder', {folder: folder, folderId: folder.id}) %}
+{% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folder: folder, folderId: folderId}) %}
 {% if rssRoute or createRoute %}
 <div class="component-action hide" id="news-component-actions-{{ componentInstanceId }}">
     <section>
@@ -65,7 +65,7 @@ Data:
         {% endif %}
 
         {% set archiveQuerystringParams = [
-            'f=' ~ folderId,
+            'f=' ~ folder.id,
             'cid=' ~ componentInstanceId
         ] |join('&') %}
 
