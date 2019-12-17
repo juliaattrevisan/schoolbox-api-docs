@@ -80,8 +80,8 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
-                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_READ),
+                    new Authorizer\Rule\CanModerateAudience($strategyFactory),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
                         new Authorizer\Rule\IsPublishedOrExpired(),
