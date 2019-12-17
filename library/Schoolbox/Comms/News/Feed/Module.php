@@ -6,20 +6,23 @@
  */
 namespace Schoolbox\Comms\News\Feed;
 
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -31,17 +34,46 @@ class Module extends BaseModule
 
     /**
      * Hook method for setting up routes via self::register()
-     *
-     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
-        $preloadUserAndFolder = function ($params) {
-            return $this->preloadUserAndFolder($params);
+        $preloadUser   = function ($params) {
+            return $this->preloadUser($params);
+        };
+        $preloadFolder = function ($params) {
+            return $this->preloadFolder($params);
         };
 
-        $this->register('GET', '/{key}{/folderId}', 'getFeed', null, $preloadUserAndFolder);
+        // Route available if for self, or SU looking at another user
+        $selfOrSu = new Rule\LazyCallback(static function () {
+            return new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\IsUser('user')
+            );
+        });
+
+        // Must be SU, or have News service READ+ perm, or READ+ access to folder
+        $canViewFolderArticles = new Rule\LazyCallback(static function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_READ),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_READ,
+                        static function (array $params): int {
+                            return (int)$params['folderId'];
+                        },
+                        Access::getInstance()
+                    )
+                )
+            );
+        });
+
+        $this->register('GET', '/user/{key}', 'getFeedForUser', $selfOrSu, $preloadUser);
+        $this->register('GET', '/folder/{folderId:\d+}', 'getFeedForFolder', $canViewFolderArticles, $preloadFolder);
     }
+
 
     /**
      * Preload a User instance
@@ -49,27 +81,39 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws NotFound
+     * @throws Unauthorized
      */
-    private function preloadUserAndFolder(array $params): array
+    private function preloadUser(array $params): array
     {
+        if($params['user'] instanceof User){
+            return ['user' => $params['user']];
+        }
         try {
-            $user = $this->getUserMapper()->findOneByColumn('key', $params['key']);
-
-            $folder = null;
-
-            if ($params['folderId']) {
-                $folder = $this->getFolderMapper()->findOneByColumn('id', $params['folderId']);
-            }
+            return ['user' => $this->getUserMapper()->findOneByColumn('key', $params['key'])];
+        } catch (MapperException $e) {
+            throw new Unauthorized("No user found for key: '{$params['key']}'", $e->getCode(), $e);
         }
-        catch (MapperException $e) {
-            throw new Unauthorized();
-        }
+    }
 
-        return [
-            'user' => $user,
-            'folder' => $folder,
-        ];
+
+    /**
+     * Preload a Folder instance
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws Unauthorized
+     */
+    private function preloadFolder(array $params): array
+    {
+        if($params['folder'] instanceof Folder\Model){
+            return ['folder' => $params['folder']];
+        }
+        try {
+            return ['folder' => $this->getFolderMapper()->findOneByColumn('id', $params['folderId'])];
+        } catch (MapperException $e) {
+            throw new Unauthorized("No folder found for id: '{$params['folderId']}'", $e->getCode(), $e);
+        }
     }
 
     /**
