@@ -385,7 +385,7 @@ $this->setVar(array(
 
     /* Homepage rss feed
      */
-    'RSS' => $this->routeLookup('commsNewsFeed.getFeed', ['key' => $_SESSION['key'], 'folderId' => $folder->getId()]),
+    'RSS' => $this->routeLookup('commsNewsFeed.getFeedForFolder', ['folder' => $folder, 'folderId' => $folder->getId()]),
 ));
 
 // Colors (original)

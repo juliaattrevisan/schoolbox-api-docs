@@ -9,6 +9,7 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
+use Aura\Router\Router;
 use Schoolbox\Comms\News\Topic;
 
 $page = new SitePage(false);
@@ -28,8 +29,9 @@ $topicId = $matches[3];
 /* Redirect to new module
  */
 $di = $kernel->getDependencyInjector();
+/** @var Router $router */
 $router = $di->get('router');
-$baseUrl = $router->generate('commsNewsFeed.getFeed', ['key' => $userKey]);
+$baseUrl = $router->generate('commsNewsFeed.getFeedForUser', ['key' => $userKey]);
 
 if (\strlen($topicId)) {
     try {
