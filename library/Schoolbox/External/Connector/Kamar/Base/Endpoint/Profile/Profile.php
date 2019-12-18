@@ -196,7 +196,7 @@ class Profile implements IStrategy
             $campus = trim((string)$student->schoolindex);
             $dob = trim((string)$student->datebirth);
             $email = trim((string)$student->email);
-            $enrolmentDate = trim((string)$student->startingdate);
+            $enrolmentDate = trim((string)$student->enrolmentdate);
             $form = '';
             $gender = trim((string)$student->genderpreferred);
             $academicHouse = trim((string)$student->house);
