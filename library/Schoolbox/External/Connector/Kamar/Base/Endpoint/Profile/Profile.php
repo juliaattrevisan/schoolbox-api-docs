@@ -202,6 +202,7 @@ class Profile implements IStrategy
             $lastname = trim((string)$student->lastname);
             $dob = trim((string)$student->datebirth);
             $email = trim((string)$student->email);
+            $enrolmentDate = trim((string)$student->startingdate);
             $form = '';
             $gender = trim((string)$student->genderpreferred);
             $academicHouse = trim((string)$student->house);
@@ -281,6 +282,11 @@ class Profile implements IStrategy
 //             */
 //            $messages = $this->importParentsOfStudent($externalId, $studentBaseProfile);
 
+            /* Dates
+             */
+            $enrolment = $this->traverser->findEnrolmentDate($enrolmentDate);
+
+
             /* Smoosh it all together
              */
             $studentProfile
@@ -292,7 +298,7 @@ class Profile implements IStrategy
 //                ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
 
                 ->setEmail($email)
-//                ->setEnrolmentDate($this->findEnrolmentDate(trim((string)$student->EnrolmentDate)))
+                ->setEnrolmentDate($enrolment)
                 ->setFormName($form)
                 ->setFormTeacherId($formTeacher['id'])
                 ->setFormTeacherName($formTeacher['name'])

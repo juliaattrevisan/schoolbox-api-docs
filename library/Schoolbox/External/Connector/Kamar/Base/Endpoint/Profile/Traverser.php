@@ -39,6 +39,24 @@ class Traverser
 
 
     /**
+     * Find the enrolment date for student
+     *
+     * @param string $date
+     * @return \Alaress_Date_Format|null
+     */
+    public function findEnrolmentDate(string $date): ?\Alaress_Date_Format
+    {
+        $enrolmentDate = null;
+
+        if ($date) {
+            $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime($date));
+        }
+
+        return $enrolmentDate;
+    }
+
+
+    /**
      * Find a tutor from their id
      *
      * @param string $id
