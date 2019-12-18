@@ -21,7 +21,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -56,8 +55,7 @@ class Module extends BaseModule
                 if ($user->isSuperuser()) {
                     return true;
                 }
-                $userAccessMapper = UserAccessMapper::getInstance();
-                if ($userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_READ) {
+                if (Access::getInstance()->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_READ) {
                     return true;
                 }
                 if (Access::getInstance()->getFolderAccess($user, (int)$params['folderId']) >= UserAccess::ACCESS_READ) {
