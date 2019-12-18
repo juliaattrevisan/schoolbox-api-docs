@@ -508,7 +508,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /** @var bool $distinct Required if performing any *:N joins */
         $distinct = false;
 
-        if ($topicSlug !== null && strtolower($topicSlug) !== self::TOPIC_ALL_SLUG) {
+        if (($topicSlug ?? '') !== '' && strtolower($topicSlug) !== self::TOPIC_ALL_SLUG) {
             $joins[] = "INNER JOIN {$this->getJoinSql('comms_news_article_topic')}";
             $pb->equals('newsTopic.name', $topicSlug);
             $distinct = true;
