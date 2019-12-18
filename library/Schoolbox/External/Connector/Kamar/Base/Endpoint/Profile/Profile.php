@@ -88,6 +88,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var string
+     */
+    private $campus;
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -141,6 +147,10 @@ class Profile implements IStrategy
             $this->relationshipMapper->truncate();
         }
 
+        /* Remember the one and only campus identifier
+         */
+        $this->campus = (string)$this->batchxml->fetchXml('/SMSDirectoryData/schools/school')[0]->xpath('@index')[0];
+
         /* Import students' profile data
          * Import their specific parents' profile data
          */
@@ -193,7 +203,7 @@ class Profile implements IStrategy
             $title = '';
             $firstname = trim((string)$student->firstname);
             $lastname = trim((string)$student->lastname);
-            $campus = trim((string)$student->schoolindex);
+            $campus = $this->campus;
             $dob = trim((string)$student->datebirth);
             $email = trim((string)$student->email);
             $enrolmentDate = trim((string)$student->enrolmentdate);
@@ -501,7 +511,7 @@ class Profile implements IStrategy
             $title = trim((string)$staff->title);
             $firstname = trim((string)$staff->firstname);
             $lastname = trim((string)$staff->lastname);
-            $campusName = trim((string)$staff->schoolindex);
+            $campus = $this->campus;
             $email = trim((string)$staff->email);
             $phone = trim((string)$staff->mobile);
             $position = trim((string)$staff->position);
@@ -562,7 +572,7 @@ class Profile implements IStrategy
 
             $staffProfile
                 ->setBuilding(null)
-                ->setCampusName($campusName)
+                ->setCampusName($campus)
                 ->setCategory(null)
                 ->setDepartment(implode(', ', $departments))
                 ->setEmail($email)
