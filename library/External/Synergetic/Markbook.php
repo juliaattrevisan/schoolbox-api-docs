@@ -322,64 +322,31 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function setMark(IFeedback $feedback): bool
     {
-        $mark     = null;
-        $markText = null;
-        $activity = $feedback->getAssessable();
+        $student = $feedback->getReviewee();
+        $marker  = $feedback->getReviewer();
 
-        if ($feedback instanceof ReturnedWork) {
-            // Handle submission box result
-            $box = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
-//            $activity = $this->buildActivityFromSubmissionBox($box);
-            try {
-                $marker = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                $marker = $e->getDeletedObject();
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                return false;
-            }
-            try {
-                $student = UserMapper::getInstance()->findById($feedback->getOwner()->getId());
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                return false;
-            }
-
-            // If the mark type is set to none then we shouldn't be saving a normalised mark
-            if ($box->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
-                $mark     = $feedback->getNormalizedMark();
-                $markText = $feedback->getHumanReadableMark();
-            }
-            $comment = $feedback->getComment();
-
-        } elseif ($feedback instanceof QuizAttempt) {
-            // Handle quiz attempt
-            $quiz = QuizMapper::getInstance()->findById($feedback->getQuiz()->getId());
-//            $activity = $this->buildActivityFromQuiz($quiz);
-            $student = UserMapper::getInstance()->findById($feedback->getUser()->getId());
-            $marker  = $activity->getAssessment()->getUser();
-
-            // TODO: Some old handler action needs to be deprecated
-            $evAttempt = new Assess_Attempt();
-            $total     = (float)$evAttempt->getTotalMarks($feedback->getQuiz()->getId(), $feedback->getId());
-            $actual    = (float)$evAttempt->getMarksForAttempt($feedback->getId());
-            if ($total > 0) {
-                $mark = ($actual / $total) * 100;
-            } else {
-                $mark = 0;
-            }
-            $comment = '';
-
-        } else {
-            throw new Exception('Unknown object passed');
+        // Don't sync marks if:
+        // * Student is deleted
+        // * Student's ID is invalid
+        // * Marker's ID is invalid
+        if ($student->isDeleted()) {
+            return false;
         }
-
-        if (!(
-            $this->isExternalIdValid($student->getExternalId())
-            && $this->isExternalIdValid($marker->getExternalId())
-        )) {
+        if (!$this->isExternalIdValid($student->getExternalId())) {
+            return false;
+        }
+        if (!$this->isExternalIdValid($marker->getExternalId())) {
             return false;
         }
 
-        return $this->setActivityMark($activity, $marker, $student, $mark, $markText, $comment);
+        return $this->setActivityMark(
+            $feedback->getAssessable(),
+            $feedback->getReviewer(),
+            $feedback->getReviewee(),
+            $feedback->getNormalisedMark(),
+            $feedback->getHumanReadableMark(),
+            $feedback->getComment()
+        );
     }
 
 
