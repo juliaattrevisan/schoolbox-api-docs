@@ -7,20 +7,15 @@
  */
 
 use Alaress\Database\Predicate;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * Synergetic Markbook Connector
@@ -125,7 +120,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function hasAssessment(IAssessable $activity): bool
     {
         $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
-        if (!\count($folderCodes)) {
+        if (!count($folderCodes)) {
             return false;
         }
 
@@ -141,7 +136,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       ClassCode IN ({$folderCodeBindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
+        $params = array_merge([
             'markbookIdentifier' => $assessmentFieldValues["HdgAbbrev2"],
             'fileYear'           => $this->getSystemFileYear(),
             'fileSemester'       => $this->getSystemFileSemester(),
@@ -209,7 +204,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function updateAssessment(IAssessable $assessment): bool
     {
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
-        if (!\count($folderCodes)) {
+        if (!count($folderCodes)) {
             return false;
         }
 
@@ -237,7 +232,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     ClassCode IN ({$bindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
+        $params = array_merge([
             'heading'              => $assessmentFieldValues["Heading"],
             'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
             'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
@@ -259,7 +254,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function deleteAssessment(IAssessable $assessment): bool
     {
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
-        if (!\count($folderCodes)) {
+        if (!count($folderCodes)) {
             return false;
         }
 
@@ -285,7 +280,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         staffBook.ClassCode IN ({$bindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
+        $params = array_merge([
             $headingAbbreviation2 => $this->getMarkbookIdentifier($assessment),
             $fileYear             => $this->getSystemFileYear(),
             $fileSemester         => $this->getSystemFileSemester(),
@@ -919,7 +914,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private function getSynergeticMarkbookList(IAssessable $activity, int $fileYear, int $fileSemester): array
     {
         $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
-        if (!\count($folderCodes)) {
+        if (!count($folderCodes)) {
             return [];
         }
 
@@ -946,7 +941,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       ClassCode IN ({$folderCodeBindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
+        $params = array_merge([
             'markbookIdentifier' => $this->getMarkbookIdentifier($activity),
             'fileYear'           => $fileYear,
             'fileSemester'       => $fileSemester,
