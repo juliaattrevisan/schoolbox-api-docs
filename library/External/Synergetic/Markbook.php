@@ -374,24 +374,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
-     * Assert that this assessment can be synced by this markbook.
-     *
-     * @param IAssessable $assessment
-     */
-    private function assertAssessmentType(IAssessable $assessment): void
-    {
-        if (!($assessment instanceof Quiz || $assessment instanceof DueWork)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Synergetic Markbook only syncs Quiz or Due work assessments: attempted to sync a %s',
-                    $assessment::getDefaultTypeName()
-                )
-            );
-        }
-    }
-
-
-    /**
      * Creates a staff markbook in synergetic for this assessment
      *
      * Supports creating the markbook in a file year/semester other than the globally-configured values.
