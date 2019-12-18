@@ -175,6 +175,7 @@ class Factory
      *
      * @param string|null $file
      * @return GenericCollection
+     * @throws UnexpectedValueException
      */
     private function produceKamar(?string $file): GenericCollection
     {
@@ -184,5 +185,7 @@ class Factory
         /* Connect and shank data
          */
         $batchxml = new KamarBatchxml($api);
+
+        return (new GenericCollection(IStrategy::class));
     }
 }
