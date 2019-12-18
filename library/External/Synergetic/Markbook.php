@@ -442,7 +442,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @return array
      */
-    protected function getAssessmentFieldValues(IAssessable $assessment): array
+    private function getAssessmentFieldValues(IAssessable $assessment): array
     {
         $weight = $assessment->getWeight();
 
