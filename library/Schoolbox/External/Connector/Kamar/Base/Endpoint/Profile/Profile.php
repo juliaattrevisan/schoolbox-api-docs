@@ -183,6 +183,154 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+        $students = $this->batchxml->fetchXml('/SMSDirectoryData/students/user');
+
+        foreach ($students as $student) {
+            $externalId = trim((string)$student->uniqueid);
+            $username = trim((string)$student->username);
+            $title = '';
+            $firstname = trim((string)$student->firstname);
+            $lastname = trim((string)$student->lastname);
+            $dob = trim((string)$student->datebirth);
+            $email = trim((string)$student->email);
+            $gender = trim((string)$student->genderpreferred);
+            $academicHouse = trim((string)$student->house);
+            $mobile = trim((string)$student->mobile);
+            $nsn = trim((string)$student->nsn);
+            $tutorGroup = trim((string)$student->tutor);
+            $yearLevel = trim((string)$student->yearlevel);
+
+            /* Flags
+             */
+            $boardingStatus = trim((string)$student->boarder) === 'Full';
+            $esl = (bool)trim((string)$student->esol);
+
+            /* Students without usernames are skipped
+             */
+            if (!\strlen($username)) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for student %s - no username detected',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
+
+            /* Find out if this externalId already has a student profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            try {
+                $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
+                $studentBaseProfile = $studentProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $studentProfile = $this->studentProfileMapper->createModel();
+                $studentBaseProfile = $this->baseProfileMapper->createModel();
+
+                $studentProfile->setBaseProfile($studentBaseProfile);
+            }
+
+            $studentBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($studentBaseProfile);
+            }
+
+            /* Fish out a staff member via their user code
+             */
+//            $tutor = $this->findTutor((string)$student->Tutor);
+//
+//            /* Fish out a staff member via their user code
+//             */
+//            $housemaster = $this->findHousemaster($academicHouse);
+//
+//            /* Find out a staff member via their user code
+//             */
+//            $formTeacher = $this->findFormTeacher($form);
+//
+//            /* Find out a staff member via their user code
+//             */
+//            $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
+//
+//            /* Add their parents' profile data
+//             * Messages come from parents' nodes
+//             */
+//            $messages = $this->importParentsOfStudent($externalId, $studentBaseProfile);
+
+            /* Smoosh it all together
+             */
+            $studentProfile
+                ->setUsername($username)
+//                ->setAlertComment($this->findComments($studentId))
+//                ->setAlertLegal(null)
+//                ->setAlertMedical($this->findMedicalAlert($studentId))
+//                ->setAlertMessage($messages)
+//                ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
+
+                ->setEmail($email)
+//                ->setEnrolmentDate($this->findEnrolmentDate(trim((string)$student->EnrolmentDate)))
+//                ->setFormName($form)
+//                ->setFormTeacherId($formTeacher['id'])
+//                ->setFormTeacherName($formTeacher['name'])
+                ->setGender($gender)
+//                ->setHeadOfHouseId($housemaster['id'])
+//                ->setHeadOfHouseName($housemaster['name'])
+                ->setHouseName($academicHouse)
+//                ->setLeavingDate(null)
+                ->setMobile($mobile)
+                ->setStudiesCode($nsn)
+                ->setTutorGroup($tutorGroup)
+//                ->setTutorTeacherId($tutor['id'])
+//                ->setTutorTeacherName($tutor['name'])
+                ->setYearLevel($yearLevel)
+//                ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
+//                ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+                ;
+
+            /* Date of birth requires special treatment as ADF doesn't deal with nulls well
+             */
+            if ($dob) {
+                $studentProfile
+                    ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime($dob)));
+            }
+
+            /**
+             * Flags
+             */
+            $studentProfile
+                ->setBoardingStatus($boardingStatus)
+                ->setEsl($esl)
+                ->setIb(null)
+                ->setIndividualLearningPlans(null)
+//                ->setSpecialNeeds($this->findSpecialNeeds($studentId))
+                ;
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding student profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->studentProfileMapper->save($studentProfile);
+            }
+        }
     }
 
 
