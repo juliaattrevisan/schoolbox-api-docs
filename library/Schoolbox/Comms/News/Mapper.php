@@ -29,6 +29,7 @@ use Alaress_Date_Format;
 use UnderflowException;
 use function implode;
 use function is_array;
+use function number_format;
 use function strtolower;
 
 /**
@@ -494,13 +495,14 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $pb->in('id', $availableArticleIds);
         }
 
-        // Build publish date predicate
-        if ($publishYear !== null && $publishMonth !== null) {
-            $pb->like('publish_at', "{$publishYear}-{$publishMonth}-%");
+        // Build publish date predicate (ensure leading 0s for month)
+        $publishMonthString = $publishMonth === null ? null : sprintf('%02d', $publishMonth);
+        if ($publishYear !== null && $publishMonthString !== null) {
+            $pb->like('publish_at', "{$publishYear}-{$publishMonthString}-%");
         } elseif ($publishYear !== null) {
             $pb->like('publish_at', "{$publishYear}-%");
         } elseif ($publishYear !== null) {
-            $pb->like('publish_at', "%-{$publishMonth}-%");
+            $pb->like('publish_at', "%-{$publishMonthString}-%");
         }
 
         /** @var string[] $joins */
