@@ -86,6 +86,9 @@ class StudentAttributes
     /** @var bool */
     private $isHistorical;
 
+    /** @var Alaress_Date_Format */
+    private $reportDate;
+
 
     /**
      * @param IConfigLoader $config
@@ -122,10 +125,19 @@ class StudentAttributes
         $this->isIb           = (bool)$ibFlag;
         $this->reportDateYear = (int)$reportDate->getYear();
         $this->isHistorical   = $reportDate->lt($now);
+        $this->reportDate     = $reportDate;
 
         $this->calculateDerivedAttributes($config, (int)$user->getYear(), $reportDate, $now);
     }
 
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getReportDate(): Alaress_Date_Format
+    {
+        return $this->reportDate;
+    }
 
 
     /**
