@@ -124,8 +124,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $folderCodeBindings    = Predicate\Builder::getBindings($folderCodes, 'code');
-        $assessmentFieldValues = $this->getAssessmentFieldValues($activity);
+        $markbookId = $this->getMarkbookIdentifier($activity);
+        if (!isset($markbookId)) {
+            return false;
+        }
+
+        $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
 
         $sql = "
             SELECT    COUNT(*) AS result
@@ -137,7 +141,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ";
 
         $params = array_merge([
-            'markbookIdentifier' => $assessmentFieldValues["HdgAbbrev2"],
+            'markbookIdentifier' => $markbookId,
             'fileYear'           => $this->getSystemFileYear(),
             'fileSemester'       => $this->getSystemFileSemester(),
         ], $folderCodeBindings->getParams());
@@ -208,6 +212,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
+            return false;
+        }
+
         $this->insertMarkbooksIfNotExists(
             $assessment,
             $folderCodes,
@@ -235,7 +244,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $params = array_merge([
             'heading'              => $assessmentFieldValues["Heading"],
             'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
-            'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
+            'headingAbbreviation2' => $markbookId,
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
             'resultType'           => $resultType,
             'fileYear'             => $this->getSystemFileYear(),
@@ -255,6 +264,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     {
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!count($folderCodes)) {
+            return false;
+        }
+
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
             return false;
         }
 
@@ -281,7 +295,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ";
 
         $params = array_merge([
-            $headingAbbreviation2 => $this->getMarkbookIdentifier($assessment),
+            $headingAbbreviation2 => $markbookId,
             $fileYear             => $this->getSystemFileYear(),
             $fileSemester         => $this->getSystemFileSemester(),
         ], $bindings->getParams());
@@ -346,6 +360,24 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
+     * Assert that this assessment can be synced by this markbook.
+     *
+     * @param IAssessable $assessment
+     */
+    private function assertAssessmentType(IAssessable $assessment): void
+    {
+        if (!($assessment instanceof Quiz || $assessment instanceof DueWork)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Synergetic Markbook only syncs Quiz or Due work assessments: attempted to sync a %s',
+                    $assessment::getDefaultTypeName()
+                )
+            );
+        }
+    }
+
+
+    /**
      * Creates a staff markbook in synergetic for this assessment
      *
      * Supports creating the markbook in a file year/semester other than the globally-configured values.
@@ -367,6 +399,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         int $fileYear,
         int $fileSemester
     ): bool {
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
+            return false;
+        }
+
         $externalClass = new External_Synergetic_Class();
         $class         = $externalClass->getClass($classCode, $owner, $fileYear, $fileSemester);
 
@@ -421,7 +458,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'classCode'            => $class['ClassCode'],
             'heading'              => $assessmentFieldValues["Heading"],
             'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
-            'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
+            'headingAbbreviation2' => $markbookId,
             'resultType'           => $resultType,
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
             'dueDate'              => $assessment->getDueAt()->getDatabase(),
@@ -435,7 +472,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Gets database field values out of an assessment. Gets the following fields:
      * * Heading
      * * HdgAbbrev1
-     * * HdgAbbrev2 (used as the identifier for this row)
      * * WeightingFactor
      *
      * @param IAssessable $assessment
@@ -448,12 +484,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         // DB-level limits:
         // Heading: 255 chars
-        // HdgAbbrev1, HdgAbbrev2: 10 chars
+        // HdgAbbrev1: 10 chars
         // WeightingFactor: 0-9999
         return [
             'Heading'         => $this->truncateForDatabase($assessment->getTitle(), 255),
             'HdgAbbrev1'      => $this->truncateForDatabase($assessment->getTitle(), 10),
-            'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => max(0, min($weight, 9999)),
         ];
     }
@@ -789,9 +824,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Returns the string used to identify this assessment in the markbook.
      *
      * @param IAssessable $assessment
-     * @return string
+     * @return string|null
      */
-    private function getMarkbookIdentifier(IAssessable $assessment): string
+    private function getMarkbookIdentifier(IAssessable $assessment): ?string
     {
         // This column is limited to 10 characters
         // Need the original ID as well here?
@@ -807,7 +842,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         // Must be exactly one item
         if (count($syncIds) !== 1) {
-            return '';
+            return null;
         }
 
         return $this->truncateForDatabase($prefix . $syncIds[0], 10);
@@ -918,6 +953,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return [];
         }
 
+        $markbookId = $this->getMarkbookIdentifier($activity);
+        if (!isset($markbookId)) {
+            return [];
+        }
+
         $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
 
         $sql = "
@@ -942,7 +982,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ";
 
         $params = array_merge([
-            'markbookIdentifier' => $this->getMarkbookIdentifier($activity),
+            'markbookIdentifier' => $markbookId,
             'fileYear'           => $fileYear,
             'fileSemester'       => $fileSemester,
         ], $folderCodeBindings->getParams());
