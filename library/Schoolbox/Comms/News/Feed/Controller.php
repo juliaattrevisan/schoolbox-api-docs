@@ -19,12 +19,10 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\ValidTopic;
 use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
-use function strtolower;
 use const PHP_URL_HOST;
 use const PHP_URL_SCHEME;
 
