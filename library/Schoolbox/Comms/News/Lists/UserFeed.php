@@ -43,7 +43,7 @@ class UserFeed
 
 
     /**
-     * Returns the set of published (not expired) article ids where user:
+     * Returns the set of published (not expired) article ids where user either:
      * * authored article
      * * approved article
      * * is in article audience
