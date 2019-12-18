@@ -518,7 +518,7 @@ class Profile implements IStrategy
 
             /* Staff without usernames are skipped
              */
-            if (!\strlen($username)) {
+            if ('' === $username) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for staff %s - no username detected',
                     trim("{$firstname} {$lastname}")
