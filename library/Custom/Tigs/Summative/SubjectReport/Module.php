@@ -18,6 +18,7 @@ use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Mapper;
@@ -87,8 +88,11 @@ class Module extends Alaress\Module\Module
     {
         $injector->params[Controller::class] = [
             'externalUser'          => $injector->lazyGet('externalUser'),
+            'externalClass'         => $injector->lazyGet('externalClass'),
             'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
+            'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'assessmentMapper'      => $this->getMapperFactory()->getLazy(Assessment\Mapper::class),
             'textboxMapper'         => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
             'visibility'            => $injector->lazy(function () {
                 /** @var Access $access */
@@ -136,6 +140,7 @@ class Module extends Alaress\Module\Module
      * @throws InvalidArgumentException
      * @throws InvalidPath
      * @throws UnexpectedValueException
+     * @throws Mapper\DefinitionException
      */
     private function preloadUserAndFolder(array $params): array
     {

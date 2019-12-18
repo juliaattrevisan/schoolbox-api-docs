@@ -12,6 +12,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use External_ClassInterface;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Filter\Filters;
@@ -23,6 +24,7 @@ use Schoolbox\Role;
 use Schoolbox\Resource\Textbox;
 use Schoolbox\User;
 use External_UserInterface;
+use Schoolbox\UserMapper;
 use function array_merge;
 
 class Controller extends Web\Controller\Base
@@ -30,6 +32,9 @@ class Controller extends Web\Controller\Base
 
     /** @var External_UserInterface */
     private $externalUser;
+
+    /** @var External_ClassInterface */
+    private $externalClass;
 
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
@@ -39,6 +44,12 @@ class Controller extends Web\Controller\Base
 
     /** @var RubricDataSource */
     private $rubricMapper;
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var Assessment\Mapper */
+    private $assessmentMapper;
 
     /** @var Textbox\Mapper */
     private $textBoxMapper;
@@ -51,27 +62,36 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * @param External_UserInterface $externalUser
-     * @param CourseImpl\Mapper      $courseImplMapper
-     * @param Assessment\MapperProxy $assessmentMapperProxy
-     * @param RubricDataSource       $rubricMapper
-     * @param Textbox\Mapper         $textboxMapper
-     * @param Visibility             $visibility
-     * @param IConnector             $database
+     * @param External_UserInterface  $externalUser
+     * @param External_ClassInterface $externalClass
+     * @param CourseImpl\Mapper       $courseImplMapper
+     * @param Assessment\MapperProxy  $assessmentMapperProxy
+     * @param RubricDataSource        $rubricMapper
+     * @param UserMapper              $userMapper
+     * @param Assessment\Mapper       $assessmentMapper
+     * @param Textbox\Mapper          $textboxMapper
+     * @param Visibility              $visibility
+     * @param IConnector              $database
      */
     public function __construct(
         External_UserInterface $externalUser,
+        External_ClassInterface $externalClass,
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         RubricDataSource $rubricMapper,
+        UserMapper $userMapper,
+        Assessment\Mapper $assessmentMapper,
         Textbox\Mapper $textboxMapper,
         Visibility $visibility,
         IConnector $database
     ) {
         $this->externalUser          = $externalUser;
+        $this->externalClass         = $externalClass;
         $this->courseImplMapper      = $courseImplMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricMapper          = $rubricMapper;
+        $this->userMapper            = $userMapper;
+        $this->assessmentMapper      = $assessmentMapper;
         $this->textBoxMapper         = $textboxMapper;
         $this->visibility            = $visibility;
         $this->database              = $database;
@@ -112,9 +132,12 @@ class Controller extends Web\Controller\Base
         $report = new Report(
             $this->getConfigLoader(),
             $this->externalUser,
+            $this->externalClass,
             $this->courseImplMapper,
             $this->assessmentMapperProxy,
             $this->rubricMapper,
+            $this->userMapper,
+            $this->assessmentMapper,
             $this->textBoxMapper,
             $this->visibility,
             $this->database,

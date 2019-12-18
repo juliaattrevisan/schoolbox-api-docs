@@ -87,6 +87,7 @@ class Module extends Alaress\Module\Module
         $injector->params[Controller::class] = [
             'database'              => $injector->lazyGet('databaseInternal'),
             'externalUser'          => $injector->lazyGet('externalUser'),
+            'externalClass'         => $injector->lazyGet('externalClass'),
             'courseImplMapper'      => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
             'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
             'pastoralMapper'        => $this->getMapperFactory()->getLazy(PastoralMapper::class),
