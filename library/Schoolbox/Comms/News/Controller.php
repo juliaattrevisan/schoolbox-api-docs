@@ -49,7 +49,6 @@ use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use function array_merge;
-use function array_unique;
 use function strtolower;
 
 class Controller extends Base
