@@ -1,11 +1,15 @@
 <?php
 /**
- * This file provides access to synergetic class info
- *
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate;
+use Alaress\Database\Quoter\Sqlsrv\Quoter;
+
+/**
+ * This file provides access to synergetic class info
+ */
 class External_Synergetic_Class implements External_ClassInterface
 {
 
@@ -108,11 +112,11 @@ class External_Synergetic_Class implements External_ClassInterface
         $fileYear = $this->getDatabase()->quote($this->getExternalUser()->getCurrentYear($userExternalId));
 
         $query = "
-        SELECT DISTINCT vStudentsAll.StudentSurname as lastname, 
+        SELECT DISTINCT vStudentsAll.StudentSurname as lastname,
                         vStudentsAll.StudentPreferred as firstname,
                         vStudentsAll.StudentYearLevelDescription as yearlevel,
                         vStudentsAll.StudentHouseDescription as house,
-                        CASE WHEN vStudentsAll.StudentMedicalAlertFlag= 1 THEN vStudentsAll.StudentMedicalAlert ELSE '' END as StudentMedicalAlert,  
+                        CASE WHEN vStudentsAll.StudentMedicalAlertFlag= 1 THEN vStudentsAll.StudentMedicalAlert ELSE '' END as StudentMedicalAlert,
                         vStudentsAll.EnglishSecondFlag,
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.StudentTutorDescription,
@@ -143,8 +147,10 @@ class External_Synergetic_Class implements External_ClassInterface
 
     /**
      * @inheritdoc
+     * @param Alaress_Date_Format|null $date
+     * @throws Predicate\InvalidColumnException
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
@@ -156,18 +162,35 @@ class External_Synergetic_Class implements External_ClassInterface
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
         /** @var Schoolbox\User $sessionUser */
-        $sessionUser = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+        $sessionUser = $_SESSION['user'] ?? null;
         $userExternalId = $sessionUser instanceof \Schoolbox\User ? $sessionUser->getExternalId() : null;
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
-        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
+
+        if ($date === null) {
+            $join = '';
+            $pb   = (new Predicate\Builder(new Quoter(), 'vSubjectClassesStaff'))
+                ->equals('FileYear', $this->externalUser->getCurrentYear($userExternalId))
+                ->equals('FileSemester', $this->externalUser->getCurrentSemester($userExternalId));
+        } else {
+            $join       = "
+                JOIN FileSemesters ON
+                    FileSemesters.FileYear = vSubjectClassesStaff.FileYear AND
+                    FileSemesters.FileSemester = vSubjectClassesStaff.FileSemester
+                ";
+            $dateString = $date->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT);
+            $pb         = (new Predicate\Builder(new Quoter(), 'FileSemesters'))
+                ->lessThanOrEqualTo('StartDate', $dateString)
+                ->greaterThanOrEqualTo('EndDate', $dateString);
+        }
+
+        $fileYearWhere = implode(' AND ', $pb->getWhere());
 
         $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
+                    {$join}
                     WHERE $classQuery
-                    AND FileYear='{$fileYear}'
-                    AND FileSemester='{$fileSemester}'
+                    AND $fileYearWhere
                     ORDER BY StaffSeq";
 
-        $statement = $this->getDatabase()->query($msQuery);
+        $statement = $this->getDatabase()->query($msQuery, $pb->getParams());
 
         while ($synrow = $statement->fetch()) {
             if (is_numeric($synrow['StaffID'])) {
@@ -237,7 +260,7 @@ class External_Synergetic_Class implements External_ClassInterface
     private function queryStringWithoutTimeTableCode(): string
     {
         return "
-            SELECT 
+            SELECT
                 DISTINCT ClassCode,
                 CASE WHEN ClassCampus != '' THEN CONCAT(ClassCampus, '/', ClassCode) ELSE ClassCode END AS ClassCodeValue
                 FROM dbo.StudentClasses
