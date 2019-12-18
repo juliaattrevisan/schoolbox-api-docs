@@ -187,8 +187,6 @@ class Profile implements IStrategy
      * @throws PDOException
      * @throws RuntimeException
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function importStudents(): void
     {
@@ -200,6 +198,7 @@ class Profile implements IStrategy
             $title = '';
             $firstname = trim((string)$student->firstname);
             $lastname = trim((string)$student->lastname);
+            $campus = trim((string)$student->schoolindex);
             $dob = trim((string)$student->datebirth);
             $email = trim((string)$student->email);
             $enrolmentDate = trim((string)$student->startingdate);
@@ -293,8 +292,7 @@ class Profile implements IStrategy
                 ->setAlertLegal(null)
                 ->setAlertMedical($medicalAlert)
                 ->setAlertMessage(null)
-//                ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
-
+                ->setCampusName($campus)
                 ->setEmail($email)
                 ->setEnrolmentDate($enrolment)
                 ->setFormName($form)
