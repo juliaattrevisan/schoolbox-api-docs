@@ -134,8 +134,6 @@ class Profile implements IStrategy
      * @throws PDOException
      * @throws RuntimeException
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function import(): void
     {
