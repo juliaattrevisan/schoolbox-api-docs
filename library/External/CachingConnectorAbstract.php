@@ -138,4 +138,13 @@ class CachingConnectorAbstract
     {
         return $this->timeout;
     }
+
+
+    /**
+     * @return IConnector
+     */
+    protected function getDatabase(): IConnector
+    {
+        return $this->database;
+    }
 }
