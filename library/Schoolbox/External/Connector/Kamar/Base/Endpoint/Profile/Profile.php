@@ -280,11 +280,6 @@ class Profile implements IStrategy
              */
             $yearLevelCoordinator = $this->traverser->findYearLevelCoordinator($yearLevel);
 
-//            /* Add their parents' profile data
-//             * Messages come from parents' nodes
-//             */
-//            $messages = $this->importParentsOfStudent($externalId, $studentBaseProfile);
-
             /* Dates
              */
             $enrolment = $this->traverser->findDate($enrolmentDate);
@@ -295,9 +290,9 @@ class Profile implements IStrategy
             $studentProfile
                 ->setUsername($username)
                 ->setAlertComment($comments)
-//                ->setAlertLegal(null)
+                ->setAlertLegal(null)
                 ->setAlertMedical($medicalAlert)
-//                ->setAlertMessage($messages)
+                ->setAlertMessage(null)
 //                ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
 
                 ->setEmail($email)
