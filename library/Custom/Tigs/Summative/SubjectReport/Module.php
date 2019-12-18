@@ -18,7 +18,6 @@ use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Mapper;
@@ -278,15 +277,6 @@ class Module extends Alaress\Module\Module
     private function getFolderMapper(): Folder\Mapper
     {
         return $this->getMapperFactory()->get(Folder\Mapper::class);
-    }
-
-    /**
-     * @return TermMapper|Mapper
-     * @throws InvalidArgumentException
-     */
-    private function getTermMapper(): TermMapper
-    {
-        return $this->getMapperFactory()->get(TermMapper::class);
     }
 }
 
