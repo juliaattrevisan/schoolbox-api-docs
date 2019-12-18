@@ -493,5 +493,96 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
+        $staffs = $this->batchxml->fetchXml('/SMSDirectoryData/staff/user');
+
+        foreach ($staffs as $staff) {
+            $externalId = trim((string)$staff->uniqueid);
+            $username = trim((string)$staff->username);
+            $title = trim((string)$staff->title);
+            $firstname = trim((string)$staff->firstname);
+            $lastname = trim((string)$staff->lastname);
+            $campusName = trim((string)$staff->schoolindex);
+            $email = trim((string)$staff->email);
+            $phone = trim((string)$staff->mobile);
+            $position = trim((string)$staff->position);
+
+            /* Staff without usernames are skipped
+             */
+            if (!\strlen($username)) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for staff %s - no username detected',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
+
+            /* Find out if this externalId already has a staff profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            try {
+                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                $staffBaseProfile = $staffProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $staffProfile = $this->staffProfileMapper->createModel();
+                $staffBaseProfile = $this->baseProfileMapper->createModel();
+
+                $staffProfile->setBaseProfile($staffBaseProfile);
+            }
+
+            $staffBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($staffBaseProfile);
+            }
+
+            /* Concat all the Department titles, I guess
+             */
+            $departments = [];
+
+            if ($staff->groups) {
+                foreach ($staff->groups->department as $currentDepartment) {
+                    $departments[] = trim((string)$currentDepartment->name);
+                }
+            }
+
+            $staffProfile
+                ->setBuilding(null)
+                ->setCampusName($campusName)
+                ->setCategory(null)
+                ->setDepartment(implode(', ', $departments))
+                ->setEmail($email)
+                ->setPhone($phone)
+                ->setPositionTitle($position)
+                ->setRoom(null)
+                ->setUsername($username);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding staff profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->staffProfileMapper->save($staffProfile);
+            }
+        }
     }
 }
