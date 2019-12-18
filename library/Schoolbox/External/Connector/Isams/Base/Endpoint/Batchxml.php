@@ -97,7 +97,7 @@ class Batchxml
     /**
      * Use this to print a vaguely-formatted version to a file for manual inspection
      *
-     * e.g. php profileImporter.php > test.xml
+     * e.g. php sisImporter.php > test.xml
      */
     private function printXml(): void
     {
