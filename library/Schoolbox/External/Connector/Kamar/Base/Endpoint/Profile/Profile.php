@@ -206,6 +206,7 @@ class Profile implements IStrategy
             $form = '';
             $gender = trim((string)$student->genderpreferred);
             $academicHouse = trim((string)$student->house);
+            $leavingDate = trim((string)$student->leavingdate);
             $mobile = trim((string)$student->mobile);
             $nsn = trim((string)$student->nsn);
             $tutorGroup = trim((string)$student->tutor);
@@ -285,6 +286,7 @@ class Profile implements IStrategy
             /* Dates
              */
             $enrolment = $this->traverser->findEnrolmentDate($enrolmentDate);
+            $leaving = $this->traverser->findLeavingDate($leavingDate);
 
 
             /* Smoosh it all together
@@ -306,7 +308,7 @@ class Profile implements IStrategy
                 ->setHeadOfHouseId($housemaster['id'])
                 ->setHeadOfHouseName($housemaster['name'])
                 ->setHouseName($academicHouse)
-//                ->setLeavingDate(null)
+                ->setLeavingDate($leaving)
                 ->setMobile($mobile)
                 ->setStudiesCode($nsn)
                 ->setTutorGroup($tutorGroup)
