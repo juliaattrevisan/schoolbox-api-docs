@@ -17,14 +17,13 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
+use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
-use function array_merge;
-use function array_unique;
 use function strtolower;
 use const PHP_URL_HOST;
 use const PHP_URL_SCHEME;
@@ -79,28 +78,10 @@ class Controller extends Base
      */
     public function getFeedForUser(User $user): void
     {
-        $relevantArticles = array_unique(
-            array_merge(
-                $this->articleResolver->findArticlesForUser($user),
-                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user)
-            )
-        );
-
-        $topicSlug = $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG);
+        $userFeed  = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
+        $topicSlug = $this->getRequest()->query->get(Querystring::TOPIC_SLUG);
         $this->assertValidTopic($topicSlug);
-
-        $articleIds = $this->newsMapper->findArticleIdsByFilters(
-            $relevantArticles,
-            $topicSlug,
-            null,
-            null,
-            null,
-            null,
-            News\Model::STATE_PUBLIC,
-            null
-        );
-
-        $this->renderArticlesAsXml($articleIds);
+        $this->renderArticlesAsXml($userFeed->find($user, $topicSlug));
     }
 
     /**
@@ -148,25 +129,6 @@ class Controller extends Base
 
 
     /**
-     * Asserts that a topic is valid, throws 404 if not found
-     *
-     * @param string|null $topic
-     * @throws NotFound
-     */
-    private function assertValidTopic(?string $topic): void
-    {
-        if ($topic === null || strtolower($topic) === News\Mapper::TOPIC_ALL_SLUG) {
-            return;
-        }
-        try {
-            $this->topicMapper->findOneByColumn('name', $topic);
-        } catch (MapperException $e) {
-            throw new NotFound("No topic found with name '$topic'", $e->getCode(), $e);
-        }
-    }
-
-
-    /**
      * Render the set of articles to an XML feed
      *
      * @param int[]             $articleIds
@@ -186,5 +148,24 @@ class Controller extends Base
             'url'        => $this->getRequest()->url->get(),
             'articles'   => $articles,
         ]));
+    }
+
+
+    /**
+     * Asserts that a topic is valid, throws 404 if not found
+     *
+     * @param string|null $topic
+     * @throws NotFound
+     */
+    private function assertValidTopic(?string $topic): void
+    {
+        if ($topic === null || strtolower($topic) === News\Mapper::TOPIC_ALL_SLUG) {
+            return;
+        }
+        try {
+            $this->topicMapper->findOneByColumn('name', $topic);
+        } catch (MapperException $e) {
+            throw new NotFound("No topic found with name '$topic'", $e->getCode(), $e);
+        }
     }
 }
