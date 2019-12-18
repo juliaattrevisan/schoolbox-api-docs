@@ -21,7 +21,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -29,7 +28,6 @@ use Alaress_Date_Format;
 use UnderflowException;
 use function implode;
 use function is_array;
-use function number_format;
 use function strtolower;
 
 /**

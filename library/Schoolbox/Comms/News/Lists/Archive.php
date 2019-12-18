@@ -12,7 +12,6 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Paginator\Paginator as BasePaginator;
 use InvalidArgumentException;
 use OutOfRangeException;
-use PDO;
 use PDOException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Model;
@@ -25,7 +24,6 @@ use UnderflowException;
 use UnexpectedValueException;
 use function array_slice;
 use function count;
-use function implode;
 use function in_array;
 
 /**
