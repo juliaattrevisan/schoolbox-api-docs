@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -120,7 +121,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function hasAssessment(IAssessable $activity): bool
     {
-        $folderCodes = $activity->getCategory()->getCodes()->getPropertyValues('code');
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
         if (!\count($folderCodes)) {
             return false;
         }
@@ -205,14 +206,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function updateAssessment(IAssessable $assessment): bool
     {
-        $folderCodes = $assessment->getCategory()->getCodes()->getPropertyValues('code');
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!\count($folderCodes)) {
             return false;
         }
 
         $this->insertMarkbooksIfNotExists(
             $assessment,
-            $assessment->getCategory()->getCodes()->getPropertyValues('code'),
+            $folderCodes,
             $this->getSystemFileYear(),
             $this->getSystemFileSemester()
         );
@@ -255,7 +256,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function deleteAssessment(IAssessable $assessment): bool
     {
-        $folderCodes = $assessment->getCategory()->getCodes()->getPropertyValues('code');
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!\count($folderCodes)) {
             return false;
         }
@@ -599,7 +600,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          * In this case, the student's marks should only be written to the markbooks for folder codes that the student is enrolled in.
          */
         /** @var string[] $folderCodes */
-        $folderCodes = $activity->getCategory()->getCodes()->getPropertyValues('code');
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
         $classCodes  = \array_column($this->externalUser->getSubjectList($student), 'code');
 
         // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
@@ -963,7 +964,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function getSynergeticMarkbookList(IAssessable $activity, int $fileYear, int $fileSemester): array
     {
-        $folderCodes = $activity->getCategory()->getCodes()->getPropertyValues('code');
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
         if (!\count($folderCodes)) {
             return [];
         }
@@ -998,5 +999,25 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ], $folderCodeBindings->getParams());
 
         return $this->getConnector()->executeQuery($sql, $params)->fetchAll();
+    }
+
+
+    /**
+     * Retrieve folder codes out of the assessment
+     *
+     * @param IAssessable $assessment
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function retrieveFolderCodesFromAssessment(IAssessable $assessment): array
+    {
+        $folder      = $assessment->getBaseContext()->getFolder();
+        $folderCodes = $folder->getCodes();
+        if (!isset($folderCodes)) {
+            // Need to actually load folder codes
+            $folderCodes = FolderMapper::getInstance()->findById($folder->getId());
+        }
+        return $folderCodes->getPropertyValues('code');
     }
 }
