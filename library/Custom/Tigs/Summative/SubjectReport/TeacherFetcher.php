@@ -9,6 +9,7 @@ namespace Custom\Tigs\Summative\SubjectReport;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Custom\Tigs\Summative\StudentAttributes;
+use External\CachingConnectorAbstract;
 use External_ClassInterface;
 use External_Synergetic_Class;
 use PDO;
@@ -80,11 +81,19 @@ class TeacherFetcher
             return $this->getStaffUsers($this->externalClass->getTeachers($folder->getCodeString()));
         }
 
-        if ($this->externalClass instanceof External_Synergetic_Class) {
-            return $this->getStaffUsers($this->externalClass->getTeachers(
-                $folder->getCodeString(),
-                $attributes->getReportDate()
-            ));
+        // Bypass encapsulation to extract the underlying external class connection
+        if ($this->externalClass instanceof CachingConnectorAbstract) {
+            $extractExternalClassInner = function () {
+                /** @var CachingConnectorAbstract $this */
+                return $this->getDatabase();
+            };
+            $externalClassInner        = $extractExternalClassInner->call($this->externalClass);
+            if ($externalClassInner instanceof External_Synergetic_Class) {
+                return $this->getStaffUsers($externalClassInner->getTeachers(
+                    $folder->getCodeString(),
+                    $attributes->getReportDate()
+                ));
+            }
         }
 
         return $this->getStaffWhoGaveFeedback($folder, $attributes);
