@@ -453,7 +453,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param int|null    $publishYear         If provided, filter to articles published in this year
      * @param int|null    $publishMonth        If provided, filter to articles published in this month
      * @param int|null    $temporalState       The article's state. A bit-mask of discrete/atomic states
-     * @param int|null    $folderId            If provided, filter to articles with a simple segment targeted at folder
      * @return int[]
      * @throws InvalidArgumentException
      * @throws InvalidColumnException
@@ -468,8 +467,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         ?int $limit,
         ?int $publishYear,
         ?int $publishMonth,
-        ?int $temporalState,
-        ?int $folderId
+        ?int $temporalState
     ): array {
 
         // Short-circuit if searching for an empty set
@@ -513,14 +511,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         if ($topicSlug !== null && strtolower($topicSlug) !== self::TOPIC_ALL_SLUG) {
             $joins[] = "INNER JOIN {$this->getJoinSql('comms_news_article_topic')}";
             $pb->equals('newsTopic.name', $topicSlug);
-            $distinct = true;
-        }
-
-        if (null !== $folderId) {
-            $joins[] = "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id";
-            $pb
-                ->equals('cnau.entity_type', Folder::getEntityType())
-                ->equals('cnau.entity_value', $folderId);
             $distinct = true;
         }
 
