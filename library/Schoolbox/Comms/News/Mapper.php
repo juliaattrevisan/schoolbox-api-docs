@@ -18,6 +18,7 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\Access;
@@ -28,6 +29,7 @@ use Alaress_Date_Format;
 use UnderflowException;
 use function implode;
 use function is_array;
+use function strtolower;
 
 /**
  * Class Mapper
@@ -424,49 +426,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
      *
      * @param User $user
-     * @param bool $active        non-expired articles (expiry date not yet reached)
      * @return array
      * @throws InvalidColumnException
-     * @throws PDOException
      */
-    public function findAuthoredOrAcceptedArticleIds(User $user, bool $active = true): array
+    public function findAuthoredOrAcceptedArticleIds(User $user): array
     {
         $pb = $this->getPredicateBuilder()
-            ->equals('author_id', $user->getId());
+                   ->equals('author_id', $user->getId())
+                   ->equals('accepted_by', $user->getId());
 
-        if ((new ValidNewsModerator(Access::getInstance()))->isSatisfiedBy($user)) {
-            $pb->equals('accepted_by', $user->getId());
-        }
-
-        $where  = implode("\nOR ", $pb->getWhere());
-        $params = $pb->getParams();
-
-        /* Only include published articles
-         */
-        $query = "SELECT id FROM {$this->table} WHERE ({$where}) ";
-
-        /* If it's published and active
-         * publish_at < now and expires_at > now
-         *
-         * If it's published and inactive
-         * publish_at < now and expires_at < now
-         */
-        if ($active) {
-            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
-        } else {
-            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicateExpired());
-        }
-
-        $publishedWhere = implode(' AND ', $publishedPb->getWhere());
-
-        $query .= " AND {$publishedWhere}";
-        $params = array_merge($params, $publishedPb->getParams());
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        $hydrator = $this->getColumnScalarHydrator('id');
-        return array_map([$hydrator, 'hydrate'], $statement->fetchAll(PDO::FETCH_COLUMN));
+        return $this->findIdsByPredicates($this->getPredicateBuilder()->any($pb));
     }
 
 
@@ -477,28 +446,29 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * $limit applies to the number of articles, rather than number of rows due to *:N joins.
      *
-     * @param array|null $availableArticleIds If provided, do not return results outside this set
-     * @param int|null   $topicId             If provided, filter to articles that include this topic
-     * @param int|null   $offset              If provided, offset results by this many
-     * @param int|null   $limit               If provided, limit to this many article ids
-     * @param int|null   $publishYear         If provided, filter to articles published in this year
-     * @param int|null   $publishMonth        If provided, filter to articles published in this month
-     * @param int        $temporalState       The article's state. A bit-mask of discrete/atomic states
-     * @param int|null   $folderId            If provided, filter to articles with a simple segment targeted at folder
+     * @param array|null  $availableArticleIds If provided, do not return results outside this set
+     * @param string|null $topicSlug           If provided, filter to articles that include this topic. 'all' => no filter
+     * @param int|null    $offset              If provided, offset results by this many
+     * @param int|null    $limit               If provided, limit to this many article ids
+     * @param int|null    $publishYear         If provided, filter to articles published in this year
+     * @param int|null    $publishMonth        If provided, filter to articles published in this month
+     * @param int|null    $temporalState       The article's state. A bit-mask of discrete/atomic states
+     * @param int|null    $folderId            If provided, filter to articles with a simple segment targeted at folder
      * @return int[]
      * @throws InvalidArgumentException
      * @throws InvalidColumnException
      * @throws PDOException
      * @throws UnderflowException
+     * @throws DefinitionException
      */
     public function findArticleIdsByFilters(
         ?array $availableArticleIds,
-        ?int $topicId,
+        ?string $topicSlug,
         ?int $offset,
         ?int $limit,
         ?int $publishYear,
         ?int $publishMonth,
-        int $temporalState,
+        ?int $temporalState,
         ?int $folderId
     ): array {
 
@@ -516,8 +486,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         // Start building predicate - never return deleted articles.
         $pb = $this->getPredicateBuilder()
-                   ->isNull('deleted_at')
-                   ->all($this->getPredicateForState($temporalState));
+                   ->isNull('deleted_at');
+
+        if($temporalState !== null && $temporalState !== Model::STATE_ALL){
+            $pb->all($this->getPredicateForState($temporalState));
+        }
 
         if ($availableArticleIds !== null) {
             $pb->in('id', $availableArticleIds);
@@ -537,9 +510,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /** @var bool $distinct Required if performing any *:N joins */
         $distinct = false;
 
-        if ($topicId !== null) {
-            $joins[] = "INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id";
-            $pb->equals('cnat.topic_id', $topicId);
+        if ($topicSlug !== null && strtolower($topicSlug) !== self::TOPIC_ALL_SLUG) {
+            $joins[] = "INNER JOIN {$this->getJoinSql('comms_news_article_topic')}";
+            $pb->equals('newsTopic.name', $topicSlug);
             $distinct = true;
         }
 
