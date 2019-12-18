@@ -216,6 +216,7 @@ class Profile implements IStrategy
              */
             $boardingStatus = trim((string)$student->boarder) === 'Full';
             $esl = (bool)trim((string)$student->esol);
+            $medicalAlert = trim((string)$student->flags->conditions);
             $specialNeeds = (bool)trim((string)$student->flags->specialneeds);
 
             /* Students without usernames are skipped
@@ -294,7 +295,7 @@ class Profile implements IStrategy
                 ->setUsername($username)
 //                ->setAlertComment($this->findComments($studentId))
 //                ->setAlertLegal(null)
-//                ->setAlertMedical($this->findMedicalAlert($studentId))
+                ->setAlertMedical($medicalAlert)
 //                ->setAlertMessage($messages)
 //                ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
 
