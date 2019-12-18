@@ -214,10 +214,11 @@ class Profile implements IStrategy
              */
             $boardingStatus = trim((string)$student->boarder) === 'Full';
             $esl = (bool)trim((string)$student->esol);
+            $specialNeeds = (bool)trim((string)$student->flags->specialneeds);
 
             /* Students without usernames are skipped
              */
-            if (!\strlen($username)) {
+            if ('' === $username) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for student %s - no username detected',
                     trim("{$firstname} {$lastname}")
@@ -325,7 +326,7 @@ class Profile implements IStrategy
                 ->setEsl($esl)
                 ->setIb(null)
                 ->setIndividualLearningPlans(null)
-//                ->setSpecialNeeds($this->findSpecialNeeds($studentId))
+                ->setSpecialNeeds($specialNeeds)
                 ;
 
             /* Log it
