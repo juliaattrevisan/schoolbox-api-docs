@@ -8,14 +8,26 @@
  */
 namespace Schoolbox\Comms\News\Lists;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Paginator\Paginator as BasePaginator;
-use Schoolbox\Collection;
+use InvalidArgumentException;
+use OutOfRangeException;
+use PDOException;
+use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
-use Schoolbox\Comms\News\Topic\Model as Topic;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
+use UnderflowException;
+use UnexpectedValueException;
+use function array_slice;
+use function count;
+use function in_array;
 
+/**
+ * Responsible for generating data to populate the news archive.
+ */
 class Archive extends Base
 {
 
@@ -41,94 +53,41 @@ class Archive extends Base
      *    - you're the author
      *    - you're in the audience
      *
-     * The n-n relational between articles and topics precludes proper usage of findAll()
-     * with a limit - it doesn't count properly
-     *
      * @param string             $urlPrefix
      * @param Querystring        $params
      * @param User               $user
-     * @param Collection|Topic[] $topics
      * @param int|null           $year
      * @param int|null           $month
-     *
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws OutOfRangeException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     * @throws DefinitionException
      */
-    public function find(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
+    public function find(string $urlPrefix, Querystring $params, User $user, ?int $year, ?int $month): array
     {
-        /* News Topics were never obtainable by slug
-         * We always fetched everything, then manually sorted by slug
-         * Inherit this situation, improvise and adapt (or just use ids...)
-         */
-        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
-
-        /* $articleIds:   Articles in $topicId that were audienced to $user
-         * $availableIds: The total available articles that were audienced to user
-         * $articleIdsForUser: Article id's that were audienced to user and the ones that the user has created (if any)
-         *
-         * Component config can set "All" as its limit, filtered to the list of articles that can be seen
-         */
-        $articleIdsForUser = [];
-
-        $folderId = $params->getFolderId();
-
-        /* No folder specified: you're getting all the archived news
-         * for the News Archive list
-         */
-        if (null === $folderId) {
-
-            /* If the user is a superuser or a news moderator
-             *
-             * Article must be published
-             * and one of the following conditions must be met:
-             *    - you're the author
-             *    - you approved the article
-             *    - you're in the audience
-             *
-             * Everyone else
-             *
-             * Article must be published
-             * and one of the following conditions must be met:
-             *    - you're the author
-             *    - you're in the audience
-             */
-            $articleIdsForUser = array_unique(array_merge(
-                $this->articleResolver->findArticlesForUser($user),
-                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, false)
-            ));
+        if($params->getFolderId()) {
+            $folderFeed = new FolderFeed($this->articleResolver);
+            $articleIdFilter = $folderFeed->find($params->getFolderId());
+        } else {
+            $userFeed = new UserFeed($this->newsMapper, $this->articleResolver);
+            $articleIdFilter = $userFeed->find($user);
         }
 
-        $articleIds = $this->newsMapper->findArticleIdsByFilters(
-            $articleIdsForUser,
-            $topicId,
-            $params->getLimit(),
-            $params->getPageNum(),
-            $year,
-            $month,
-            $folderId
-        );
-
         $availableIds = $this->newsMapper->findArticleIdsByFilters(
-            $articleIdsForUser,
-            $topicId,
-            0,
-            0,
+            $articleIdFilter,
+            $params->getSlug(),
+            null,
+            null,
             $year,
             $month,
-            $folderId
+            News\Model::STATE_PUBLIC
         );
 
-        $articles = $this->loadArticleByIds($articleIds);
-
-        /* Get an accompanying paginator
-         */
+        // Get an accompanying paginator
         $url = "{$urlPrefix}?{$params}";
 
         /* Limits and offsets
@@ -138,28 +97,26 @@ class Archive extends Base
          *     $limit === null: use system default for number of items per page
          *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
          */
-        $paginator = null;
-
-        if ($params->getLimit()) {
+        $articleIds = $availableIds;
+        if((string)$params->getLimit() === '0'){
+            $paginator = null;
+        } else {
+            $limit   = $params->getLimit() ?? $this->defaultLimit;
+            $pageNum = in_array($params->getPageNum(), [null, '', 0, '0', 1, '1'], true) ? 1 : $params->getPageNum();
+            $articleIds = array_slice($articleIds, ($pageNum - 1) * $limit, $limit);
             $paginator = $this->generatePaginator(
                 $url,
-                $params->getLimit(),
-                \count($availableIds)
-            );
-        } elseif ($params->getLimit() === null) {
-            $paginator = $this->generatePaginator(
-                $url,
-                $this->defaultLimit,
-                \count($availableIds)
+                $limit,
+                count($availableIds)
             );
         }
 
-        /* Figure out the articles that this user has saved for later
-         */
+        $articles = $this->loadArticleByIds($articleIds);
+
+        // Figure out the articles that this user has saved for later
         $savedArticleIds = $this->findSavedArticles($user, $this->saveForLaterEnabled);
 
-        /* These pieces are needed to represent an article, due to Save For Later
-         */
+        // These pieces are needed to represent an article, due to Save For Later
         return [
             'articles' => $this->populateMetadata($articles),
             'readMore' => $this->readMoreText,
@@ -169,7 +126,7 @@ class Archive extends Base
 
             /* Because this is really convenient
              */
-            'articleIdsForUser' => $articleIdsForUser,
+            'articleIdsForUser' => $availableIds,
 
             /* For the paginator
              */
@@ -186,7 +143,7 @@ class Archive extends Base
      * @param int    $limit
      * @param int    $total
      * @return Paginator|null
-     * @throws \OutOfRangeException
+     * @throws OutOfRangeException
      */
     private function generatePaginator(string $url, int $limit, int $total): ?Paginator
     {
@@ -200,11 +157,9 @@ class Archive extends Base
             ->setPageSize($limit)
             ->setTotal($total);
 
-        $urlPaginator = (new Paginator())
+       return (new Paginator())
             ->setPaginator($paginator)
             ->setUrl($url)
             ->setParam(Querystring::PAGE_NUMBER);
-
-        return $urlPaginator;
     }
 }

@@ -16,7 +16,6 @@ use PDOException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
-use Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -78,11 +77,11 @@ class Controller extends Base
      */
     public function getFeedForUser(User $user): void
     {
-        $userFeed  = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
-        $topicSlug = $this->getRequest()->query->get(Querystring::TOPIC_SLUG);
-        $this->assertValidTopic($topicSlug);
-        $this->renderArticlesAsXml($userFeed->find($user, $topicSlug));
+        $userFeed = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
+
+        $this->renderArticlesAsXml($userFeed->find($user), $this->getRequest()->query->get(Querystring::TOPIC_SLUG));
     }
+
 
     /**
      *
@@ -104,41 +103,45 @@ class Controller extends Base
      */
     public function getFeedForFolder(Folder\Model $folder): void
     {
-        $articlesForFolder = $this->articleResolver->findArticlesForAudience(
-            Strategy\Folder::getEntityType(),
-            $folder->getId(),
-            News\Audience\Model::RELATIONSHIP_SELF
+        $folderFeed = new News\Lists\FolderFeed($this->articleResolver);
+
+        $this->renderArticlesAsXml(
+            $folderFeed->find($folder->getId()),
+            $this->getRequest()->query->get(Querystring::TOPIC_SLUG)
         );
-
-        $topic = $this->getRequest()->query->get(News\Querystring::TOPIC_SLUG);
-        $this->assertValidTopic($topic);
-
-        $articleIds = $this->newsMapper->findArticleIdsByFilters(
-            $articlesForFolder,
-            $topic,
-            null,
-            null,
-            null,
-            null,
-            News\Model::STATE_PUBLIC,
-            $folder->getId()
-        );
-
-        $this->renderArticlesAsXml($articleIds, $folder);
     }
 
 
     /**
      * Render the set of articles to an XML feed
      *
-     * @param int[]             $articleIds
+     * @param int[]             $articleIdFilter
+     * @param string|null       $topicSlug
      * @param Folder\Model|null $folder
-     * @throws ServiceNotFound
+     * @throws DefinitionException
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
      * @throws InvalidComponent
+     * @throws NotFound
+     * @throws PDOException
+     * @throws ServiceNotFound
+     * @throws UnderflowException
      */
-    private function renderArticlesAsXml(array $articleIds, Folder\Model $folder = null): void
+    private function renderArticlesAsXml(array $articleIdFilter, ?string $topicSlug, Folder\Model $folder = null): void
     {
-        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order' => ['publish_at' => 'DESC']]);
+        $this->assertValidTopic($topicSlug);
+
+        $availableIds = $this->newsMapper->findArticleIdsByFilters(
+            $articleIdFilter,
+            $topicSlug,
+            null,
+            null,
+            null,
+            null,
+            News\Model::STATE_PUBLISHED
+        );
+
+        $articles = $this->newsMapper->findByColumn('id', $availableIds, ['order' => ['publish_at' => 'DESC']]);
 
         $this->getResponse()->content->set($this->buildXmlOutput('@commsNewsFeed/rss.twig', [
             'folder'     => $folder,

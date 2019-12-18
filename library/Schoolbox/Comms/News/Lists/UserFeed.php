@@ -8,12 +8,9 @@
 namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-use InvalidArgumentException;
-use PDOException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
@@ -43,7 +40,7 @@ class UserFeed
 
 
     /**
-     * Returns the set of published (not expired) article ids where user either:
+     * Returns the set of article ids where user either:
      * * authored article
      * * approved article
      * * is in article audience
@@ -51,33 +48,18 @@ class UserFeed
      * Optionally filters to a topic
      *
      * @param User        $user
-     * @param string|null $topicSlug
      * @return array
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
-     * @throws PDOException
-     * @throws DefinitionException
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    public function find(User $user, ?string $topicSlug): array
+    public function find(User $user): array
     {
-        $relevantArticles = array_unique(
+        return array_unique(
             array_merge(
                 $this->articleResolver->findArticlesForUser($user),
                 $this->newsMapper->findAuthoredOrAcceptedArticleIds($user)
             )
-        );
-
-        return $this->newsMapper->findArticleIdsByFilters(
-            $relevantArticles,
-            $topicSlug,
-            null,
-            null,
-            null,
-            null,
-            News\Model::STATE_PUBLISHED,
-            null
         );
     }
 }
