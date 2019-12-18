@@ -21,7 +21,7 @@ use function array_merge;
 use function array_unique;
 
 /**
- * Responsible for finding a set of article's for a user's feed
+ * Responsible for consistently finding a set of articles for a user's feed
  */
 class UserFeed
 {
@@ -43,7 +43,7 @@ class UserFeed
 
 
     /**
-     * Returns the set of published+expired article ids where user:
+     * Returns the set of published (not expired) article ids where user:
      * * authored article
      * * approved article
      * * is in article audience
@@ -76,7 +76,7 @@ class UserFeed
             null,
             null,
             null,
-            News\Model::STATE_PUBLIC,
+            News\Model::STATE_PUBLISHED,
             null
         );
     }
