@@ -336,6 +336,20 @@ ul.az-error-list {
         .dz-upload {
             background-color: $attachzone-error-background;
         }
+        .card {
+            padding: 0.5rem 1rem;
+        }
+
+        // All error messages are in this colour
+        // component drag and drop uses data-dz-status as a second line of info
+        // but other attachzones use data-dz-name in one line of info
+        [data-dz-name], [data-dz-status] {
+            color: $alert-color;
+        }
+        .close-button {
+            line-height: 0;
+            position: absolute;
+        }
     }
     .dz-success {
         img[data-dz-thumbnail] {
@@ -796,17 +810,3 @@ ul.az-error-list {
     width: 0%;
     height: 100%;
 }
-
-.dz-error {
-  .card {
-    padding: 0.5rem 1rem;
-  }
-
-  // All error messages are in this colour
-  // component drag and drop uses data-dz-status as a second line of info
-  // but other attachzones use data-dz-name in one line of info
-  [data-dz-name], [data-dz-status] {
-    color: $alert-color;
-  }
-}
-
