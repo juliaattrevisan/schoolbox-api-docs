@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -16,7 +17,6 @@ use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\UserMapper;
-use Alaress\Database\Predicate;
 
 /**
  * Synergetic Markbook Connector
@@ -242,7 +242,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'resultType'           => $resultType,
             'fileYear'             => $this->getSystemFileYear(),
             'fileSemester'         => $this->getSystemFileSemester(),
-            'dueDate'              => $assessment->getDate()->getDatabase()
+            'dueDate'              => $assessment->getDate()->getDatabase(),
         ], $bindings->getParams());
 
         return $this->getConnector()->prepareQuery($sql, $params)->execute();
@@ -319,13 +319,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function setMark(IFeedback $feedback): bool
     {
-        $mark = null;
+        $mark     = null;
         $markText = null;
         $activity = $feedback->getAssessable();
 
         if ($feedback instanceof ReturnedWork) {
             // Handle submission box result
-            $box      = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
+            $box = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
 //            $activity = $this->buildActivityFromSubmissionBox($box);
             try {
                 $marker = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
@@ -342,17 +342,17 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
             // If the mark type is set to none then we shouldn't be saving a normalised mark
             if ($box->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
-                $mark = $feedback->getNormalizedMark();
+                $mark     = $feedback->getNormalizedMark();
                 $markText = $feedback->getHumanReadableMark();
             }
             $comment = $feedback->getComment();
 
         } elseif ($feedback instanceof QuizAttempt) {
             // Handle quiz attempt
-            $quiz     = QuizMapper::getInstance()->findById($feedback->getQuiz()->getId());
+            $quiz = QuizMapper::getInstance()->findById($feedback->getQuiz()->getId());
 //            $activity = $this->buildActivityFromQuiz($quiz);
-            $student  = UserMapper::getInstance()->findById($feedback->getUser()->getId());
-            $marker   = $activity->getAssessment()->getUser();
+            $student = UserMapper::getInstance()->findById($feedback->getUser()->getId());
+            $marker  = $activity->getAssessment()->getUser();
 
             // TODO: Some old handler action needs to be deprecated
             $evAttempt = new Assess_Attempt();
@@ -385,7 +385,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * Supports creating the markbook in a file year/semester other than the globally-configured values.
      *
-     * @param IAssessable        $assessment
+     * @param IAssessable     $assessment
      * @param \Schoolbox\User $owner
      * @param string          $classCode
      * @param string          $resultType
@@ -459,7 +459,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
             'resultType'           => $resultType,
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
-            'dueDate'              => $assessment->getDate()->getDatabase()
+            'dueDate'              => $assessment->getDate()->getDatabase(),
         ]);
 
         return $statement->execute();
@@ -615,9 +615,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          */
         $markValue = null === $mark
             ? self::NO_MARK_GIVEN
-            : round($mark,2);
+            : round($mark, 2);
 
-        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText)) ;
+        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText));
 
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
