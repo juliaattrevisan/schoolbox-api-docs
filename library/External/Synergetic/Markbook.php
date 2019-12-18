@@ -108,12 +108,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Note this matches Synergetic's globally-configured year and semester,
      * rather than in the context of a specific user.
      *
-     * @param IAssessable $activity
+     * @param IAssessable $assessment
      * @return array
      */
-    public function getAssessment(IAssessable $activity): array
+    public function getAssessment(IAssessable $assessment): array
     {
-        return $this->getSynergeticMarkbookList($activity, $this->getSystemFileYear(), $this->getSystemFileSemester());
+        if (!$this->isSyncable($assessment)) {
+            return [];
+        }
+
+        return $this->getSynergeticMarkbookList($assessment, $this->getSystemFileYear(), $this->getSystemFileSemester());
     }
 
     /**
@@ -131,14 +135,18 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @inheritdoc
      */
-    public function hasAssessment(IAssessable $activity): bool
+    public function hasAssessment(IAssessable $assessment): bool
     {
-        $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
+
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!count($folderCodes)) {
             return false;
         }
 
-        $markbookId = $this->getMarkbookIdentifier($activity);
+        $markbookId = $this->getMarkbookIdentifier($assessment);
         if (!isset($markbookId)) {
             return false;
         }
@@ -185,9 +193,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function createAssessment(IAssessable $assessment): bool
     {
-        $owner = $this->retrieveOwnerFromAssessment($assessment);
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
 
-        if (!$this->isExternalIdValid($owner->getExternalId())) {
+        $owner = $this->retrieveOwnerFromAssessment($assessment);
+        if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
             return false;
         }
 
@@ -221,6 +232,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function updateAssessment(IAssessable $assessment): bool
     {
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
+
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!count($folderCodes)) {
             return false;
@@ -276,6 +291,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function deleteAssessment(IAssessable $assessment): bool
     {
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
+
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!count($folderCodes)) {
             return false;
@@ -345,6 +364,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function setMark(IFeedback $feedback): bool
     {
+        if (!$this->isSyncable($feedback->getAssessable())) {
+            return false;
+        }
+
         $student = $feedback->getReviewee();
         $marker  = $feedback->getReviewer();
 
@@ -865,6 +888,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
+        $owner = $this->retrieveOwnerFromAssessment($activity);
+        if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
+            return false;
+        }
+
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
         $remoteFolderCodes    = array_column($remoteAssessmentList, 'ClassCode');
         $codesNotInRemote     = array_diff($folderCodes, $remoteFolderCodes);
@@ -872,9 +900,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $isCreated = false;
         foreach ($codesNotInRemote as $folderCode) {
+
             if ($this->insertStaffMarkbook(
                 $activity,
-                $this->retrieveOwnerFromAssessment($activity),
+                $owner,
                 $folderCode,
                 $resultType,
                 $fileYear,
