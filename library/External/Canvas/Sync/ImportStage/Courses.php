@@ -153,7 +153,7 @@ class Courses
         $courseFilterPb = (new Builder($this->canvasDb, ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
         $sql       = "
-        SELECT 
+        SELECT
                account.canvas_id           'account.canvas_id',
                course.name                 'course.name',
                course.canvas_id            'course.canvas_id',
@@ -173,7 +173,9 @@ class Courses
         JOIN account_dim account ON course.account_id = account.id
         LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state = 'published'
         LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
+        LEFT JOIN quiz_dim quiz ON quiz.assignment_id = assignment.id
         WHERE $courseFilterWhere
+        AND quiz.id IS NULL
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment_group.position, assignment.position
         ";
         $statement = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
@@ -733,7 +735,7 @@ class Courses
         $this->schoolboxDb->executeQuery($sql, ['assessmentId' => $assessment->getId(), 'unitSpecId' => $unitSpecFolder->getUnitSpecification()->getId()]);
 
         $sql = "
-            INSERT INTO submission_box (assessment_id, category, owner, accept_submission, multi_submission, mark_type, max_mark, mark_visibility, self_reviewability, external_id) 
+            INSERT INTO submission_box (assessment_id, category, owner, accept_submission, multi_submission, mark_type, max_mark, mark_visibility, self_reviewability, external_id)
             VALUES (:assessment_id, :category, :owner, :accept_submission, :multi_submission, :mark_type, :max_mark, :mark_visibility, :self_reviewability, :external_id)
         ";
 
