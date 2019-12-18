@@ -1042,10 +1042,10 @@ class Controller extends Base
      * This is now used only in News Archive with a topic
      * This is the central piece of the puzzle
      *
-     * @api        GET /news/list
-     * @since      18.1
+     * @api          GET /news/list
+     * @since        18.1
      *
-     * @deprecated Article lists should now be done on the front-end, with an XHR calls
+     * @deprecated   Article lists should now be done on the front-end, with an XHR calls
      *
      * @param int|null $year
      * @param int|null $month
@@ -1060,6 +1060,8 @@ class Controller extends Base
      * @throws UnderflowException
      * @throws UnexpectedValueException
      * @throws NotFound
+     * @throws AccessDenied
+     * @noinspection PhpUnused
      */
     public function getListByTopic(?int $year, ?int $month): void
     {
