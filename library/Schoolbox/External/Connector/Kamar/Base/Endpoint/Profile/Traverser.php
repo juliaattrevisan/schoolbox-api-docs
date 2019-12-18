@@ -9,6 +9,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
 
 use RuntimeException;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
+use SimpleXMLElement;
 
 /**
  * Class Traverser
@@ -20,6 +21,11 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
  */
 class Traverser
 {
+
+    /**
+     * Maximum number of emergency contacts we've permitted (3 by default)
+     */
+    private const MAX_EMERGENCY_CONTACTS = 3;
 
     /**
      * @var Batchxml
@@ -140,5 +146,45 @@ class Traverser
             'id' => $id,
             'name' => $name
         ];
+    }
+
+
+    /**
+     * Find all the meaningful emergency contacts for a student
+     *
+     * @param SimpleXMLElement $student
+     * @return array
+     */
+    public function findEmergencyContacts(SimpleXMLElement $student): array
+    {
+        $contacts = [];
+        $n = 0;
+
+        foreach ($student->emergencycontacts->contact as $emergencyContact) {
+            if ($n < self::MAX_EMERGENCY_CONTACTS) {
+                $fullname = trim((string)$emergencyContact->name);
+                $relation = trim((string)$emergencyContact->relationship);
+                $phone = trim((string)$emergencyContact->mobile);
+
+                /* Suffix the $relation if provided
+                 */
+                if ('' !== $relation) {
+                    $fullname .= " ({$relation})";
+                }
+
+                /* Aggregate them if we have a name
+                 */
+                if ('' !== $fullname) {
+                    $contacts[] = [
+                        'name' => $fullname,
+                        'phone' => $phone
+                    ];
+                }
+            }
+
+            $n++;
+        }
+
+        return $contacts;
     }
 }

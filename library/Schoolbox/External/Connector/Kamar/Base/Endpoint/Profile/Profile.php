@@ -279,6 +279,10 @@ class Profile implements IStrategy
             $enrolment = $this->traverser->findDate($enrolmentDate);
             $leaving = $this->traverser->findDate($leavingDate);
 
+            /* Emergency Contacts
+             */
+            $emergencyContacts = $this->traverser->findEmergencyContacts($student);
+
             /* Smoosh it all together
              */
             $studentProfile
@@ -325,6 +329,28 @@ class Profile implements IStrategy
                 ->setIndividualLearningPlans(null)
                 ->setSpecialNeeds($specialNeeds)
                 ;
+
+            /**
+             * Emergency Contacts
+             * ...because we didn't normalise it, I'm hardcoding these
+             */
+            if (\count($emergencyContacts) && isset($emergencyContacts[0])) {
+                $studentProfile
+                    ->setEmergencyContactName1($emergencyContacts[0]['name'])
+                    ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
+
+                if (isset($emergencyContacts[1])) {
+                    $studentProfile
+                        ->setEmergencyContactName2($emergencyContacts[1]['name'])
+                        ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
+
+                    if (isset($emergencyContacts[2])) {
+                        $studentProfile
+                            ->setEmergencyContactName3($emergencyContacts[2]['name'])
+                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
+                    }
+                }
+            }
 
             /* Log it
              */
