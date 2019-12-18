@@ -15,7 +15,6 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
@@ -480,21 +479,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     protected function getAssessmentFieldValues(IAssessable $assessment): array
     {
-        $weight = 0;
-
-        if ($assessment->getSubmissionBox() instanceof Schoolbox\Assessment\Component\SubmissionBox) {
-            $weight = $assessment->getSubmissionBox()->getWeight();
-        } elseif ($assessment->getAssessment() instanceof Quiz) {
-            $weight = $assessment->getAssessment()->getWeight();
-        }
+        $weight = $assessment->getWeight();
 
         // DB-level limits:
         // Heading: 255 chars
         // HdgAbbrev1, HdgAbbrev2: 10 chars
         // WeightingFactor: 0-9999
         return [
-            'Heading'         => $this->truncateForDatabase($assessment->getName(), 255),
-            'HdgAbbrev1'      => $this->truncateForDatabase($assessment->getName(), 10),
+            'Heading'         => $this->truncateForDatabase($assessment->getTitle(), 255),
+            'HdgAbbrev1'      => $this->truncateForDatabase($assessment->getTitle(), 10),
             'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => max(0, min($weight, 9999)),
         ];
@@ -867,8 +860,23 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private function getMarkbookIdentifier(IAssessable $assessment): string
     {
         // This column is limited to 10 characters
-        $id = ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
-        return $this->truncateForDatabase($id, 10);
+        // Need the original ID as well here?
+        $prefix  = '';
+        $syncIds = [];
+        if ($assessment instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+            $prefix  = self::SUBMISSION_PREFIX;
+            $syncIds = SubmissionBoxMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
+        } elseif ($assessment instanceof Schoolbox\Learning\Assessment\Quiz\Model) {
+            $prefix  = self::ASSESSMENT_PREFIX;
+            $syncIds = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
+        }
+
+        // Must be exactly one item
+        if (count($syncIds) !== 1) {
+            return '';
+        }
+
+        return $this->truncateForDatabase($prefix . $syncIds[0], 10);
     }
 
 
