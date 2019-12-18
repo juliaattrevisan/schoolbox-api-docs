@@ -277,7 +277,7 @@ class Profile implements IStrategy
             /* Find out a staff member via their user code
              */
             $yearLevelCoordinator = $this->traverser->findYearLevelCoordinator($yearLevel);
-//
+
 //            /* Add their parents' profile data
 //             * Messages come from parents' nodes
 //             */
@@ -285,9 +285,8 @@ class Profile implements IStrategy
 
             /* Dates
              */
-            $enrolment = $this->traverser->findEnrolmentDate($enrolmentDate);
-            $leaving = $this->traverser->findLeavingDate($leavingDate);
-
+            $enrolment = $this->traverser->findDate($enrolmentDate);
+            $leaving = $this->traverser->findDate($leavingDate);
 
             /* Smoosh it all together
              */

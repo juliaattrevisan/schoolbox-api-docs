@@ -39,42 +39,22 @@ class Traverser
 
 
     /**
-     * Find the enrolment date for student
+     * Convert a date from possibly null/empty value in xml
      *
      * @param string $date
      * @return \Alaress_Date_Format|null
      */
-    public function findEnrolmentDate(string $date): ?\Alaress_Date_Format
+    public function findDate(string $date): ?\Alaress_Date_Format
     {
-        $enrolmentDate = null;
-
         if ($date) {
-            $enrolmentDate = \Alaress_Date_Format::newFromTimestamp(strtotime($date));
+            return \Alaress_Date_Format::newFromTimestamp(strtotime($date));
         }
 
-        return $enrolmentDate;
+        return null;
     }
 
 
-    /**
-     * Find the leaving date for student
-     *
-     * @param string $date
-     * @return \Alaress_Date_Format|null
-     */
-    public function findLeavingDate(string $date): ?\Alaress_Date_Format
-    {
-        $leavingDate = null;
-
-        if ($date) {
-            $leavingDate = \Alaress_Date_Format::newFromTimestamp(strtotime($date));
-        }
-
-        return $leavingDate;
-    }
-
-
-    /**
+     /**
      * Find a tutor from their id
      *
      * @param string $id
