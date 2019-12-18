@@ -85,6 +85,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Traverser
+     */
+    private $traverser;
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -115,6 +121,8 @@ class Profile implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+
+        $this->traverser = new Traverser($batchxml);
     }
 
 
@@ -131,6 +139,7 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
+
         /* Purge old relations before re-inserting them
          */
         if ($this->perform) {
@@ -193,6 +202,7 @@ class Profile implements IStrategy
             $lastname = trim((string)$student->lastname);
             $dob = trim((string)$student->datebirth);
             $email = trim((string)$student->email);
+            $form = '';
             $gender = trim((string)$student->genderpreferred);
             $academicHouse = trim((string)$student->house);
             $mobile = trim((string)$student->mobile);
@@ -251,19 +261,19 @@ class Profile implements IStrategy
 
             /* Fish out a staff member via their user code
              */
-//            $tutor = $this->findTutor((string)$student->Tutor);
-//
-//            /* Fish out a staff member via their user code
-//             */
-//            $housemaster = $this->findHousemaster($academicHouse);
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $formTeacher = $this->findFormTeacher($form);
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
+            $tutor = $this->traverser->findTutor((string)$student->Tutor);
+
+            /* Fish out a staff member via their user code
+             */
+            $housemaster = $this->traverser->findHousemaster($academicHouse);
+
+            /* Find out a staff member via their user code
+             */
+            $formTeacher = $this->traverser->findFormTeacher($form);
+
+            /* Find out a staff member via their user code
+             */
+            $yearLevelCoordinator = $this->traverser->findYearLevelCoordinator($yearLevel);
 //
 //            /* Add their parents' profile data
 //             * Messages come from parents' nodes
@@ -282,22 +292,22 @@ class Profile implements IStrategy
 
                 ->setEmail($email)
 //                ->setEnrolmentDate($this->findEnrolmentDate(trim((string)$student->EnrolmentDate)))
-//                ->setFormName($form)
-//                ->setFormTeacherId($formTeacher['id'])
-//                ->setFormTeacherName($formTeacher['name'])
+                ->setFormName($form)
+                ->setFormTeacherId($formTeacher['id'])
+                ->setFormTeacherName($formTeacher['name'])
                 ->setGender($gender)
-//                ->setHeadOfHouseId($housemaster['id'])
-//                ->setHeadOfHouseName($housemaster['name'])
+                ->setHeadOfHouseId($housemaster['id'])
+                ->setHeadOfHouseName($housemaster['name'])
                 ->setHouseName($academicHouse)
 //                ->setLeavingDate(null)
                 ->setMobile($mobile)
                 ->setStudiesCode($nsn)
                 ->setTutorGroup($tutorGroup)
-//                ->setTutorTeacherId($tutor['id'])
-//                ->setTutorTeacherName($tutor['name'])
+                ->setTutorTeacherId($tutor['id'])
+                ->setTutorTeacherName($tutor['name'])
                 ->setYearLevel($yearLevel)
-//                ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
-//                ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+                ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
+                ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
                 ;
 
             /* Date of birth requires special treatment as ADF doesn't deal with nulls well
