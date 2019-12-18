@@ -218,6 +218,7 @@ class Profile implements IStrategy
             $esl = (bool)trim((string)$student->esol);
             $medicalAlert = trim((string)$student->flags->conditions);
             $specialNeeds = (bool)trim((string)$student->flags->specialneeds);
+            $comments = trim((string)$student->flags->notes);
 
             /* Students without usernames are skipped
              */
@@ -293,7 +294,7 @@ class Profile implements IStrategy
              */
             $studentProfile
                 ->setUsername($username)
-//                ->setAlertComment($this->findComments($studentId))
+                ->setAlertComment($comments)
 //                ->setAlertLegal(null)
                 ->setAlertMedical($medicalAlert)
 //                ->setAlertMessage($messages)
