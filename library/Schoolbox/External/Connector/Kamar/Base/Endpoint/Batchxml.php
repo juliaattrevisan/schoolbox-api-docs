@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use RuntimeException;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\IApi;
 use SimpleXMLElement;
 
 /**
@@ -16,8 +15,9 @@ use SimpleXMLElement;
  */
 class Batchxml
 {
+
     /**
-     * @var Api
+     * @var IApi
      */
     private $api;
 
@@ -29,6 +29,7 @@ class Batchxml
      * @var SimpleXMLElement
      */
     private $nodes;
+
 
     /**
      * Batchxml constructor.

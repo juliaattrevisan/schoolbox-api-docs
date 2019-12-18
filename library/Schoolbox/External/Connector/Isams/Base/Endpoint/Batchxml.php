@@ -29,7 +29,7 @@ class Batchxml
 {
 
     /**
-     * @var Api
+     * @var IApi
      */
     private $api;
 
