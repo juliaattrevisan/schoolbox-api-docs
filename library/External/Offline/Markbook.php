@@ -18,6 +18,16 @@ use Schoolbox\Learning\Assessment\IFeedback;
 class External_Offline_Markbook implements External_MarkbookInterface, IOfflineConnector
 {
     /**
+     * The offline markbook doesn't sync anything.
+     *
+     * @inheritDoc
+     */
+    public function isSyncable(IAssessable $assessment): bool
+    {
+        return false;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getAssessment(IAssessable $assessment): array

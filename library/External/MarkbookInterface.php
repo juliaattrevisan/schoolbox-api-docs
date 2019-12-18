@@ -12,6 +12,13 @@ use Schoolbox\Learning\Assessment\IFeedback;
 
 interface External_MarkbookInterface extends External\IConnector
 {
+    /**
+     * Is this assessment syncable to this external markbook?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    public function isSyncable(IAssessable $assessment): bool;
 
     /**
      * Returns the assessment information if found in remote system

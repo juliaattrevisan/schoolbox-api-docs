@@ -89,6 +89,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
     /**
+     * The Synergetic markbook syncs due works and quizzes, so long as they are
+     * not spec assessments.
+     *
+     * @inheritDoc
+     */
+    public function isSyncable(IAssessable $assessment): bool
+    {
+        if ($assessment->isSpecification()) {
+            return false;
+        }
+        return $assessment instanceof Quiz || $assessment instanceof DueWork;
+    }
+
+    /**
      * Returns the assessment information if found in remote system
      *
      * Note this matches Synergetic's globally-configured year and semester,
