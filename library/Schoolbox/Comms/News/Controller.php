@@ -48,6 +48,7 @@ use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use function array_keys;
 use function array_merge;
 
 class Controller extends Base
@@ -917,17 +918,15 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
-        // Find the years and months that have any articles (some may not contain any visible articles; thats ok)
-        $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles();
+        $this->assertValidTopic($params->getSlug());
 
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, false, $year, $month, true);
+
+        $availableYearsAndMonths = $partialData['yearsAndMonths'];
         // Default to filtering by the most recent year if none is provided
         if (null === $year) {
             $year = array_keys($availableYearsAndMonths)[0];
         }
-
-        $this->assertValidTopic($params->getSlug());
-
-        $partialData = $this->generatePartialForArchive($urlPrefix, $params, false, $year, $month);
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
@@ -942,9 +941,6 @@ class Controller extends Base
             'referrer' => $params->getReferrer(),
             'page' => $this->getRequest()->query['page'],
             'pageWithoutParams' => $this->getRouter()->generate('commsNews.getArchive'),
-
-            /* Archive-specific vars that don't appear anywhere else
-             */
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
@@ -986,6 +982,7 @@ class Controller extends Base
      * @param bool               $hidePaginator
      * @param int|null           $year
      * @param int|null           $month
+     * @param bool               $getYearsAndMonths Whether to include data regarding which years/months have data
      * @throws InvalidArgumentException
      * @throws MapperException
      * @throws UnexpectedValueException
@@ -996,7 +993,7 @@ class Controller extends Base
      * @throws UnderflowException
      * @return array
      */
-    private function generatePartialForArchive(string $urlPrefix, Querystring $params, bool $hidePaginator, ?int $year, ?int $month): array
+    private function generatePartialForArchive(string $urlPrefix, Querystring $params, bool $hidePaginator, ?int $year, ?int $month, bool $getYearsAndMonths): array
     {
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
@@ -1020,7 +1017,8 @@ class Controller extends Base
             $params,
             $this->getUser(),
             $year,
-            $month
+            $month,
+            $getYearsAndMonths
         );
 
         /* Always provide paginator from this context
@@ -1077,7 +1075,7 @@ class Controller extends Base
 
         $this->assertValidTopic($params->getSlug());
         $this->assertValidFolder($params->getFolderId());
-        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $params->getHidePaginator(), $year, $month);
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $params->getHidePaginator(), $year, $month, false);
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version

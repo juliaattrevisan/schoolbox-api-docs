@@ -12,8 +12,10 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Paginator\Paginator as BasePaginator;
 use InvalidArgumentException;
 use OutOfRangeException;
+use PDO;
 use PDOException;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
@@ -23,6 +25,7 @@ use UnderflowException;
 use UnexpectedValueException;
 use function array_slice;
 use function count;
+use function implode;
 use function in_array;
 
 /**
@@ -58,6 +61,7 @@ class Archive extends Base
      * @param User               $user
      * @param int|null           $year
      * @param int|null           $month
+     * @param bool               $getYearsAndMonths Whether to include data re: which years/months have articles
      * @return array
      * @throws InvalidColumnException
      * @throws InvalidArgumentException
@@ -67,7 +71,7 @@ class Archive extends Base
      * @throws UnexpectedValueException
      * @throws DefinitionException
      */
-    public function find(string $urlPrefix, Querystring $params, User $user, ?int $year, ?int $month): array
+    public function find(string $urlPrefix, Querystring $params, User $user, ?int $year, ?int $month, bool $getYearsAndMonths): array
     {
         if($params->getFolderId() !== null) {
             $folderFeed = new FolderFeed($this->articleResolver);
@@ -76,6 +80,11 @@ class Archive extends Base
             $userFeed = new UserFeed($this->newsMapper, $this->articleResolver);
             $articleIdFilter = $userFeed->find($user);
         }
+
+        // Find all years and months that have articles so we can populate the sidebar
+        $yearsAndMonths = $getYearsAndMonths
+            ? $this->newsMapper->findYearsAndMonthsWithArticles($articleIdFilter, Model::STATE_PUBLIC)
+            : null;
 
         $availableIds = $this->newsMapper->findArticleIdsByFilters(
             $articleIdFilter,
@@ -132,6 +141,7 @@ class Archive extends Base
              */
             'currentUrl' => $url,
             'paginator' => $paginator,
+            'yearsAndMonths' => $yearsAndMonths,
         ];
     }
 

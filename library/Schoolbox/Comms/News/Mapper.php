@@ -376,18 +376,28 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Get a list of years and months that have articles
+     * Get a list of years and months that have non-deleted articles matching the specified args
      *
-     * @throws InvalidColumnException
-     * @throws UnderflowException
-     * @throws PDOException
+     * @param int[]|null $articleIdFilter
+     * @param int|null   $state
+     * @return array
      * @throws InvalidArgumentException
-     * @return bool[][]
+     * @throws InvalidColumnException
+     * @throws PDOException
+     * @throws UnderflowException
      */
-    public function findYearsAndMonthsWithArticles(): array
+    public function findYearsAndMonthsWithArticles(?array $articleIdFilter, ?int $state): array
     {
-        $pb = $this->getPredicateForState(Model::STATE_PUBLIC)
-            ->isNull('deleted_at');
+        if ($articleIdFilter !== null && !count($articleIdFilter)) {
+            return [];
+        }
+        $pb = $this->getPredicateBuilder()->isNull('deleted_at');
+        if ($articleIdFilter !== null) {
+            $pb->in('id', $articleIdFilter);
+        }
+        if ($state !== null && $state !== Model::STATE_ALL) {
+            $pb->all($this->getPredicateForState($state));
+        }
 
         $where = implode("\nAND ", $pb->getWhere());
 
