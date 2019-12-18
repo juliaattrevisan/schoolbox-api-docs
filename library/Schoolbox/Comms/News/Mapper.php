@@ -376,22 +376,17 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Get a list of years that have article(s) that were audienced to a user
+     * Get a list of years and months that have articles
      *
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnderflowException
      * @throws PDOException
-     * @return array
+     * @throws InvalidArgumentException
+     * @return bool[][]
      */
     public function findYearsAndMonthsWithArticles(): array
     {
-        /* Dates - must be accepted, published and not deleted
-         */
-        $now = \Alaress_Date_Format::now()->getDatabase();
-
-        $pb = $this->getPredicateBuilder()
-            ->lessThan('publish_at', $now)
-            ->notNull('accepted_at')
+        $pb = $this->getPredicateForState(Model::STATE_PUBLIC)
             ->isNull('deleted_at');
 
         $where = implode("\nAND ", $pb->getWhere());
