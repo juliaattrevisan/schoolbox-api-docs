@@ -51,7 +51,7 @@ Data:
 </div>
 
 {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeedForFolder', {user: USER, key: key, folder: folder, folderId: folder.id}) %}
-{% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folder: folder, folderId: folderId}) %}
+{% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folder: folder, folderId: folder.Id}) %}
 {% if rssRoute or createRoute %}
 <div class="component-action hide" id="news-component-actions-{{ componentInstanceId }}">
     <section>
