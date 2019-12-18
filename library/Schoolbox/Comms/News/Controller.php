@@ -18,6 +18,7 @@ use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use PDOException;
+use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
@@ -923,7 +924,10 @@ class Controller extends Base
             $year = array_keys($availableYearsAndMonths)[0];
         }
 
-        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $topics, false, $year, $month);
+        $this->assertValidTopic($params->getSlug());
+        $this->assertValidFolder($params->getFolderId());
+
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, false, $year, $month);
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
@@ -979,7 +983,6 @@ class Controller extends Base
      *
      * @param string             $urlPrefix
      * @param Querystring        $params
-     * @param Collection|Topic[] $topics
      * @param bool               $hidePaginator
      * @param int|null           $year
      * @param int|null           $month
@@ -993,7 +996,7 @@ class Controller extends Base
      * @throws UnderflowException
      * @return array
      */
-    private function generatePartialForArchive(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
+    private function generatePartialForArchive(string $urlPrefix, Querystring $params, bool $hidePaginator, ?int $year, ?int $month): array
     {
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
@@ -1016,7 +1019,6 @@ class Controller extends Base
             $urlPrefix,
             $params,
             $this->getUser(),
-            $topics,
             $year,
             $month
         );
@@ -1040,8 +1042,8 @@ class Controller extends Base
      * This is now used only in News Archive with a topic
      * This is the central piece of the puzzle
      *
-     * @api GET /news/list
-     * @since 18.1
+     * @api        GET /news/list
+     * @since      18.1
      *
      * @deprecated Article lists should now be done on the front-end, with an XHR calls
      *
@@ -1057,11 +1059,11 @@ class Controller extends Base
      * @throws PDOException
      * @throws UnderflowException
      * @throws UnexpectedValueException
+     * @throws NotFound
      */
     public function getListByTopic(?int $year, ?int $month): void
     {
         $params = new Querystring($this->getRequest()->query);
-        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
         /* The requested data set to load, given the params provided
          */
@@ -1071,7 +1073,9 @@ class Controller extends Base
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 
-        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
+        $this->assertValidTopic($params->getSlug());
+        $this->assertValidFolder($params->getFolderId());
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $params->getHidePaginator(), $year, $month);
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
@@ -1593,6 +1597,24 @@ class Controller extends Base
             $this->topicMapper->findOneByColumn('name', $topic);
         } catch (MapperException $e) {
             throw new NotFound("No topic found with name '$topic'", $e->getCode(), $e);
+        }
+    }
+
+
+    /**
+     * Asserts that a folder param is valid, throws 401 if not authorised
+     *
+     * @param string|null $folderId
+     * @throws AccessDenied
+     */
+    private function assertValidFolder(?string $folderId): void
+    {
+        if ($folderId === null) {
+            return;
+        }
+
+        if (Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId) === UserAccess::ACCESS_DENY) {
+            throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
     }
 }
