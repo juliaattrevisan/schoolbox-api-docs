@@ -10,12 +10,16 @@ use Alaress\Database\Predicate;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -168,8 +172,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function createAssessment(IAssessable $assessment): bool
     {
-        $folder = $assessment->getCategory();
-        $owner  = $assessment->getOwner();
+        $owner = $this->retrieveOwnerFromAssessment($assessment);
 
         if (!$this->isExternalIdValid($owner->getExternalId())) {
             return false;
@@ -181,8 +184,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $semester   = $this->getSystemFileSemester();
 
         $result = false;
-        foreach ($folder->getCodes() as $code) {
-            if ($this->insertStaffMarkbook($assessment, $owner, $code->getCode(), $resultType, $year, $semester)) {
+        foreach ($this->retrieveFolderCodesFromAssessment($assessment) as $code) {
+            if ($this->insertStaffMarkbook($assessment, $owner, $code, $resultType, $year, $semester)) {
                 $result = true;
             }
         }
@@ -385,18 +388,18 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * Supports creating the markbook in a file year/semester other than the globally-configured values.
      *
-     * @param IAssessable     $assessment
-     * @param \Schoolbox\User $owner
-     * @param string          $classCode
-     * @param string          $resultType
-     * @param int             $fileYear
-     * @param int             $fileSemester
+     * @param IAssessable $assessment
+     * @param User        $owner
+     * @param string      $classCode
+     * @param string      $resultType
+     * @param int         $fileYear
+     * @param int         $fileSemester
      * @return bool
      * @throws \Alaress\Database\Exception
      */
     private function insertStaffMarkbook(
         IAssessable $assessment,
-        \Schoolbox\User $owner,
+        User $owner,
         string $classCode,
         string $resultType,
         int $fileYear,
@@ -571,12 +574,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * Returns whether any changes were made to the remote system.
      *
-     * @param IAssessable     $activity
-     * @param \Schoolbox\User $marker
-     * @param \Schoolbox\User $student
-     * @param null|float      $mark
-     * @param null|string     $markText
-     * @param string          $comment
+     * @param IAssessable $activity
+     * @param User        $marker
+     * @param User        $student
+     * @param null|float  $mark
+     * @param null|string $markText
+     * @param string      $comment
      * @return bool
      * @throws \Alaress\Database\Exception
      * @throws \Schoolbox\Mapper\Exception
@@ -654,7 +657,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Update a student's existing mark/comment in synergetic
      *
      * @param array           $assessmentRemote
-     * @param \Schoolbox\User $student
+     * @param User            $student
      * @param                 $markValue
      * @param                 $comment
      * @return bool
@@ -697,8 +700,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Delete a student's mark/comment from synergetic
      *
-     * @param array           $assessmentRemote
-     * @param \Schoolbox\User $student
+     * @param array $assessmentRemote
+     * @param User  $student
      * @return bool
      * @throws \Alaress\Database\Exception
      */
@@ -731,12 +734,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Insert a student's mark/comment into Synergetic
      *
-     * @param IAssessable     $activity
-     * @param array           $assessmentRemote
-     * @param \Schoolbox\User $marker
-     * @param \Schoolbox\User $student
-     * @param int             $markValue
-     * @param string          $comment
+     * @param IAssessable $activity
+     * @param array       $assessmentRemote
+     * @param User        $marker
+     * @param User        $student
+     * @param int         $markValue
+     * @param string      $comment
      * @return bool
      * @throws \Alaress\Database\Exception
      */
@@ -863,10 +866,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // Need the original ID as well here?
         $prefix  = '';
         $syncIds = [];
-        if ($assessment instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+        if ($assessment instanceof DueWork) {
             $prefix  = self::SUBMISSION_PREFIX;
             $syncIds = SubmissionBoxMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
-        } elseif ($assessment instanceof Schoolbox\Learning\Assessment\Quiz\Model) {
+        } elseif ($assessment instanceof Quiz) {
             $prefix  = self::ASSESSMENT_PREFIX;
             $syncIds = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
         }
@@ -907,7 +910,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $isCreated = false;
         foreach ($codesNotInRemote as $folderCode) {
-            if ($this->insertStaffMarkbook($activity, $activity->getOwner(), $folderCode, $resultType, $fileYear, $fileSemester)) {
+            if ($this->insertStaffMarkbook(
+                $activity,
+                $this->retrieveOwnerFromAssessment($activity),
+                $folderCode,
+                $resultType,
+                $fileYear,
+                $fileSemester
+            )) {
                 $isCreated = true;
             }
         }
@@ -1011,6 +1021,43 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
+     * Retrieve the owner from the assessment.
+     *
+     * IAssessable objects do not have the concept of an owner: only the
+     * underlying due work or quiz store this.
+     *
+     * @param IAssessable $assessment
+     * @return User|null
+     */
+    private function retrieveOwnerFromAssessment(IAssessable $assessment): ?User
+    {
+        $mapper = null;
+        if ($assessment instanceof DueWork) {
+            $mapper = SubmissionBoxMapper::getInstance();
+        }
+        if ($assessment instanceof Quiz) {
+            $mapper = QuizMapper::getInstance();
+        }
+        if ($mapper) {
+            return $mapper->findOneByColumn('assessment_id', $assessment->getId())->getOwner();
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieve the folder from the assessment
+     *
+     * @param IAssessable $assessment
+     * @return FolderModel
+     */
+    private function retrieveFolderFromAssessment(IAssessable $assessment): FolderModel
+    {
+        return $assessment->getBaseContext()->getFolder();
+    }
+
+
+    /**
      * Retrieve folder codes out of the assessment
      *
      * @param IAssessable $assessment
@@ -1020,7 +1067,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function retrieveFolderCodesFromAssessment(IAssessable $assessment): array
     {
-        $folder      = $assessment->getBaseContext()->getFolder();
+        $folder      = $this->retrieveFolderFromAssessment($assessment);
         $folderCodes = $folder->getCodes();
         if (!isset($folderCodes)) {
             // Need to actually load folder codes
