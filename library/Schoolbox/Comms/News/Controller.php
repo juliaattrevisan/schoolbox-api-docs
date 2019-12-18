@@ -805,10 +805,8 @@ class Controller extends Base
      * @throws InvalidColumnException
      * @throws UnderflowException
      * @throws UnexpectedValueException
-     * @throws PDOException
      * @throws InvalidArgumentException
      * @throws NotFound
-     * @throws DefinitionException
      * @noinspection PhpUnused
      */
     public function getListForIndex(): void
@@ -821,7 +819,12 @@ class Controller extends Base
 
         $commentCounts = [];
 
-        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
+        if (count($articleIds)) {
+            $pb       = $this->newsMapper->getPredicatePublished()->in('id', $articleIds);
+            $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['publish_at' => 'DESC']]);
+        } else {
+            $articles = $this->newsMapper->createCollection();
+        }
 
         $map = [
             'id',
