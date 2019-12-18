@@ -52,7 +52,7 @@ try {
     $idpMetadata = $cache->init($idpMetadataUrl);
 
     // if cache exists, update $setting info from cache
-    if (file_exists($idpMetadata->getCachedFile())) {
+    if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents()) ) {
         try {
             $settingsInfo = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
         } catch (Exception $e) {
