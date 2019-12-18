@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Querystring;
+use Schoolbox\Comms\News\ValidTopic;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
@@ -162,13 +163,8 @@ class Controller extends Base
      */
     private function assertValidTopic(?string $topic): void
     {
-        if ($topic === null || strtolower($topic) === News\Mapper::TOPIC_ALL_SLUG) {
-            return;
-        }
-        try {
-            $this->topicMapper->findOneByColumn('name', $topic);
-        } catch (MapperException $e) {
-            throw new NotFound("No topic found with name '$topic'", $e->getCode(), $e);
+        if(!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)){
+            throw new NotFound("No topic found with name '$topic'");
         }
     }
 }

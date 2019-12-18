@@ -1592,13 +1592,8 @@ class Controller extends Base
      */
     private function assertValidTopic(?string $topic): void
     {
-        if ($topic === null || strtolower($topic) === Mapper::TOPIC_ALL_SLUG) {
-            return;
-        }
-        try {
-            $this->topicMapper->findOneByColumn('name', $topic);
-        } catch (MapperException $e) {
-            throw new NotFound("No topic found with name '$topic'", $e->getCode(), $e);
+        if(!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)){
+            throw new NotFound("No topic found with name '$topic'");
         }
     }
 
