@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
 
-use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Json\Decorator\PropertyDecorator;
@@ -22,7 +21,6 @@ use PDOException;
 use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
@@ -51,7 +49,6 @@ use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use function array_merge;
-use function strtolower;
 
 class Controller extends Base
 {
@@ -1256,7 +1253,7 @@ class Controller extends Base
             return
                 $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
                 $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
+                Access::getInstance()->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ;
         }
 
         // Recursive Case:
