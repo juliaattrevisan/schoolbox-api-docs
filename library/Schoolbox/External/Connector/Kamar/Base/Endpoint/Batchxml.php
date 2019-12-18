@@ -11,7 +11,16 @@ use RuntimeException;
 use SimpleXMLElement;
 
 /**
- * Class Xml
+ * Class Batchxml
+ *
+ * Kamar Batch File processor. Reads from a local filesystem endpoint, eats the xml there,
+ * then caches a xpath-traversable which you can repeatedly call without having
+ * to incur the cost of re-consuming the xml.
+ *
+ * The cached xpath-traversable lives for runtime duration, it doesn't write it
+ * to disk or anything like that.
+ *
+ * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
 class Batchxml
 {
