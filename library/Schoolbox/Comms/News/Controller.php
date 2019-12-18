@@ -10,17 +10,21 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
+use PDOException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
+use Schoolbox\Comms\News\Lists\UserFeed;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\Interactions;
 use Schoolbox\Comms\News\Validation\Factory;
@@ -40,9 +44,13 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
+use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use function array_merge;
+use function array_unique;
+use function strtolower;
 
 class Controller extends Base
 {
@@ -184,7 +192,7 @@ class Controller extends Base
      *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws UnknownEntityTypeException
      * @throws RouteNotFound
@@ -299,9 +307,9 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws RouteNotFound
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Resource\Exception
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws \DomainException
      */
     public function postCreate(): void
@@ -326,7 +334,7 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws MapperException\InsufficientHydrationException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws RouteNotFound
      */
     public function getUpdate(Model $article): void
@@ -370,9 +378,9 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws RouteNotFound
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Resource\Exception
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws UnknownEntityTypeException
      * @throws InvalidArgumentException
@@ -478,9 +486,9 @@ class Controller extends Base
      * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postDelete(Model $article): void
@@ -518,7 +526,7 @@ class Controller extends Base
                 $this->getResponse()->redirect->to($nextStep);
             }
 
-        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
+        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|PDOException|DefinitionException|UnexpectedValueException|Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -554,8 +562,8 @@ class Controller extends Base
      *
      * @param Model $article
      * @throws MapperException
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
+     * @throws UnexpectedValueException
+     * @throws PDOException
      * @throws RouteNotFound
      * @throws UnknownEntityTypeException
      * @throws MapperException\InsufficientHydrationException
@@ -655,9 +663,9 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws InvalidArgumentException
-     * @throws \UnderflowException
+     * @throws UnderflowException
      */
     public function getListForHomepage() :void
     {
@@ -692,9 +700,9 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws InvalidArgumentException
-     * @throws \UnderflowException
+     * @throws UnderflowException
      */
     private function generatePartialForHomepage(Querystring $params): array
     {
@@ -784,36 +792,33 @@ class Controller extends Base
 
 
     /**
-     * Get a list of articles that are audienced to me from anywhere and are published and not expired
-     * This is only returns data as JSON
+     * Get a list of published (not expired) articles that are:
+     * * Audienced to session user
+     * * Authored by session user, OR
+     * * Moderated by session user
      *
-     * @api GET /news/lists/feed
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
+     * Returns data as JSON
+     *
+     * @api          GET /news/lists/feed?topic={topicSlug}
+     *
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     * @throws PDOException
      * @throws InvalidArgumentException
-     * @throws \DomainException
+     * @throws NotFound
+     * @throws DefinitionException
+     * @noinspection PhpUnused
      */
-    public function getListForIndex() :void
+    public function getListForIndex(): void
     {
-        $commentCounts = [];
+        $topicSlug = $this->getRequest()->query->get(Querystring::TOPIC_SLUG);
+        $this->assertValidTopic($topicSlug);
 
-        $articleIds = (new Lists\Index(
-            0,
-            $this->topicMapper,
-            $this->newsMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-            $this->saveForLaterMapper,
-            $this->statisticsMapper,
-            $this->statisticsCumulativeMapper,
-            $this->databaseInternal,
-            $this->articleResolver,
-            $this->commentMapper,
-            $this->audienceMapper,
-            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
-        ))->find(new Querystring([]), $this->getUser());
+        $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);
+        $articleIds = $userFeed->find($this->getUser(), $topicSlug);
+
+        $commentCounts = [];
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
@@ -879,9 +884,9 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      * @throws Exception
      * @throws Unauthorized
      * @api   GET /news/archive{/year,month}
@@ -985,8 +990,8 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
+     * @throws PDOException
+     * @throws UnderflowException
      * @return array
      */
     private function generatePartialForArchive(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
@@ -1050,9 +1055,9 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function getListByTopic(?int $year, ?int $month): void
     {
@@ -1265,8 +1270,8 @@ class Controller extends Base
      *
      * @param Model $article
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function getRecipients(Model $article): void
     {
@@ -1570,6 +1575,25 @@ class Controller extends Base
                     ? $audiencesPerArticle->getOffset($articlesId)
                     : new GenericCollection(Audience\Model::class)
             );
+        }
+    }
+
+
+    /**
+     * Asserts that a topic is valid, throws 404 if not found
+     *
+     * @param string|null $topic
+     * @throws NotFound
+     */
+    private function assertValidTopic(?string $topic): void
+    {
+        if ($topic === null || strtolower($topic) === Mapper::TOPIC_ALL_SLUG) {
+            return;
+        }
+        try {
+            $this->topicMapper->findOneByColumn('name', $topic);
+        } catch (MapperException $e) {
+            throw new NotFound("No topic found with name '$topic'", $e->getCode(), $e);
         }
     }
 }
