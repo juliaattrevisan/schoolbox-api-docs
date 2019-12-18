@@ -539,36 +539,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
 
-//    /**
-//     * @param SubmissionBox $submissionBox
-//     * @return Activity
-//     */
-//    private function buildActivityFromSubmissionBox(SubmissionBox $submissionBox): Activity
-//    {
-//        $activity = new Activity();
-//        $activity->setSubmissionBox($submissionBox)
-//            ->setOwner($submissionBox->getOwner())
-//            ->setCategory($submissionBox->getCategory())
-//            ->setDate($submissionBox->getDueDate());
-//        return $activity;
-//    }
-//
-//
-//    /**
-//     * @param Quiz $quiz
-//     * @return Activity
-//     */
-//    private function buildActivityFromQuiz(Quiz $quiz): Activity
-//    {
-//        $activity = new Activity();
-//        $activity->setAssessment($quiz)
-//            ->setOwner($quiz->getUser())
-//            ->setCategory($quiz->getCategory())
-//            ->setDate($quiz->getFinish());
-//        return $activity;
-//    }
-
-
     /**
      * Inserts/Updates/Deletes a student's mark and comment in Synergetic
      *
@@ -597,10 +567,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          */
         /** @var string[] $folderCodes */
         $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
-        $classCodes  = \array_column($this->externalUser->getSubjectList($student), 'code');
+        $classCodes  = array_column($this->externalUser->getSubjectList($student), 'code');
 
         // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
-        $markbookFolderCodes = \array_intersect($folderCodes, $classCodes);
+        $markbookFolderCodes = array_intersect($folderCodes, $classCodes);
 
         // In this context, we need to ensure the fileYear etc match the student, not the marker
         $this->insertMarkbooksIfNotExists($activity, $markbookFolderCodes, $studentFileYear, $studentFileSemester);
@@ -619,7 +589,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
             // Ignore markbooks if the student is not involved in them
-            if (!\in_array($assessmentRemote['ClassCode'], $markbookFolderCodes, true)) {
+            if (!in_array($assessmentRemote['ClassCode'], $markbookFolderCodes, true)) {
                 continue;
             }
 
@@ -813,9 +783,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $defaultType = 'OGRaw';
 
         // Does this assessment have a work type with an external result type?
-        if (null !== $assessment->getType()) {
-            $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
-            $resultType = $workType->getExternalResultType();
+        if (null !== $assessment->getWorkType()) {
+            $resultType = $assessment->getWorkType()->getExternalResultType();
         }
 
         // We know OGRaw is in the DB, and if it's not there's bigger problems
@@ -899,13 +868,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function insertMarkbooksIfNotExists(IAssessable $activity, array $folderCodes, int $fileYear, int $fileSemester): bool
     {
-        if (!\count($folderCodes)) {
+        if (!count($folderCodes)) {
             return false;
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
-        $remoteFolderCodes    = \array_column($remoteAssessmentList, 'ClassCode');
-        $codesNotInRemote     = \array_diff($folderCodes, $remoteFolderCodes);
+        $remoteFolderCodes    = array_column($remoteAssessmentList, 'ClassCode');
+        $codesNotInRemote     = array_diff($folderCodes, $remoteFolderCodes);
         $resultType           = $this->getResultType($activity);
 
         $isCreated = false;
