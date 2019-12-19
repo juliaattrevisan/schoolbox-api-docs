@@ -106,8 +106,9 @@ class Codec implements ICodec
 
             /** @var Selection\Model[] $filterSelections */
             foreach ($filterSelections as $selection) {
-                $selected       = $selection->getSelected() ? '1' : '0';
-                $queryStrings[] = "{$filterId}[{$selection->getKey()}]={$selected}";
+                if ($selection->getSelected()) {
+                    $queryStrings[] = "{$filterId}[{$selection->getKey()}]=1";
+                }
             }
         }
 
