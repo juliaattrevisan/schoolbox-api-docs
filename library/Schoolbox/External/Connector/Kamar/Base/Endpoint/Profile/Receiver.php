@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
 
-use http\Exception\RuntimeException;
+use \RuntimeException;
 use SimpleXMLElement;
 
 /**
