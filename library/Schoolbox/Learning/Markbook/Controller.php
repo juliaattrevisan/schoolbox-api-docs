@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Filter\Codec;
 use function func_get_args;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -128,7 +129,7 @@ class Controller extends Base
             }
         }
 
-        $codec        = $this->filterFactoryFactory->buildCodec();
+        $codec        = new Codec(Filter\Mapper::getInstance(), Filter\Selection\Mapper::getInstance());
         $getArgString = $codec->convertSelectionsToQueryString($selections);
 
         $this->getResponse()->redirect->to("{$route}?{$getArgString}");
@@ -216,7 +217,7 @@ class Controller extends Base
              * @var Filter\Codec               $codec
              * @var Filter\Selection\Model[][] $selectionsPerFilter
              */
-            list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, $viewee, true);
+            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, $viewee, true);
 
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds);
@@ -268,7 +269,7 @@ class Controller extends Base
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
         $page            = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
-        $codec           = $this->filterFactoryFactory->buildCodec();
+        $codec           = new Codec(Filter\Mapper::getInstance(), Filter\Selection\Mapper::getInstance());
 
         // Convert Request to Selection models
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
@@ -307,7 +308,7 @@ class Controller extends Base
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 
-        list($filters) = $this->convertRequestToFilters($filtersArray, $viewee, false);
+        [$filters] = $this->convertRequestToFilters($filtersArray, $viewee, false);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds);

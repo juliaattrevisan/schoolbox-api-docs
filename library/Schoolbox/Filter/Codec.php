@@ -19,7 +19,7 @@ use Schoolbox\User;
  * TODO - for now there is no compression. Need to add this in SA-3201
  * TODO - This is placeholder. All server-side URL compression/decompression + encoding/decoding will happen inside here
  */
-class Codec implements ICodec
+class Codec
 {
 
     /**

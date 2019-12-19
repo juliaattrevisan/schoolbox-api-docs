@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use Schoolbox\Filter\Codec;
 use function array_combine;
 use function func_get_args;
 use Schoolbox\Assessment\Course\Task\Completion;
@@ -128,7 +129,7 @@ class Controller extends WebController\Base
                 $selections[$folderFilter->getId()]            = $this->filterSelectionMapper->createCollection();
                 $selections[$folderFilter->getId()][$folderId] = $this->createSelectionModel($folderFilter, (string)$folderId, true);
             }
-            $getArgString = '?' . $this->filterFactoryFactory->buildCodec()->convertSelectionsToQueryString($selections);
+            $getArgString = '?' . (new Codec($this->filterMapper, $this->filterSelectionMapper))->convertSelectionsToQueryString($selections);
         }
 
         $route = $this->getRouter()->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
@@ -252,7 +253,7 @@ class Controller extends WebController\Base
     private function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
     {
         $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
-        $codec           = $this->filterFactoryFactory->buildCodec();
+        $codec           = new Codec($this->filterMapper, $this->filterSelectionMapper);
 
         // Convert Request to Selection models
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);

@@ -21,6 +21,7 @@ use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
@@ -431,7 +432,7 @@ class Controller extends Base
         $request         = $this->request->post['filter_selection'] ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;
 
-        $codec           = $this->filterFactoryFactory->buildCodec();
+        $codec           = new Codec(Filter\Mapper::getInstance(), Filter\Selection\Mapper::getInstance());
         $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         // TODO don't save selections for non user-configurable page filters

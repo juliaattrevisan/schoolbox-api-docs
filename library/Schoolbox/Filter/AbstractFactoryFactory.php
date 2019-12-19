@@ -37,16 +37,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     }
 
 
-
-    /**
-     * @return CompositeCodec
-     */
-    public function buildCodec(): ICodec
-    {
-        return new Codec($this->getFilterMapper(), $this->getSelectionMapper());
-    }
-
-
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException             If unable to find the filter mapper class
@@ -191,7 +181,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         // We cannot merely replace userSelections here. That must happen later.
         // This is because overrideSelections can insert options, but userSelections cannot
-        $codec      = $this->buildCodec();
+        $codec      = new Codec($this->getFilterMapper(), $this->getSelectionMapper());
         $overrides  = $codec->convertRequestToSelections($user, $page, $request);
         $selections = $this->findUserSelections($overrides, $userConfigurablePageFilters, $user, $page);
 

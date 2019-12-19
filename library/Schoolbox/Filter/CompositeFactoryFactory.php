@@ -64,19 +64,6 @@ class CompositeFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @return CompositeCodec
-     */
-    public function buildCodec(): ICodec
-    {
-        $codecs = [];
-        foreach ($this->factoryFactories as $factoryFactory) {
-            $codecs[] = $factoryFactory->buildCodec();
-        }
-        return new CompositeCodec(...$codecs);
-    }
-
-
-    /**
      * The composite's key converters are a union of the converters for all of
      * its contained factory factories.
      *

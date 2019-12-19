@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Filter\Codec;
 use function array_key_exists;
 use function array_keys;
 use function array_merge;
@@ -265,7 +266,7 @@ class Controller extends Base
     private function getAssessmentIds(int $folderId, array $request): array
     {
         $page                = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
-        $codec               = $this->filterFactoryFactory->buildCodec();
+        $codec               = new Codec($this->filterMapper, $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
