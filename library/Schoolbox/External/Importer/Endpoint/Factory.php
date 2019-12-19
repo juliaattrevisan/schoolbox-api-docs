@@ -12,11 +12,14 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Api;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Api as IsamsApi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml as IsamsBatchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi as IsamsMockApi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile as IsamsProfile;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
@@ -104,6 +107,8 @@ class Factory
                 return $this->produceIsams($file);
 
             case self::KAMAR:
+                return $this->produceKamar($file);
+
             case self::SENTRAL:
             default:
                 // Use manual csv imports
@@ -124,15 +129,15 @@ class Factory
     {
         if ($file) {
             $this->logger->info("Loading from locally-cached xml file: {$file}");
-            $api = new MockApi($file);
+            $api = new IsamsMockApi($file);
         } else {
             $this->logger->info('Accessing api endpoint');
-            $api = new Api($this->host, $this->key);
+            $api = new IsamsApi($this->host, $this->key);
         }
 
         /* Connect and shank data
          */
-        $batchxml = new Batchxml($api);
+        $batchxml = new IsamsBatchxml($api);
 
         /* Import each piece of the puzzle: Profiles and Timetable
          *
@@ -140,7 +145,7 @@ class Factory
          * do them in sequence, which gives me more dexterity later
          */
         return (new GenericCollection(IStrategy::class))
-            ->add(new Profile\Composite(
+            ->add(new IsamsProfile\Composite(
                 $this->logger,
                 $this->perform,
                 $batchxml,
@@ -150,7 +155,7 @@ class Factory
                 UserProfile\Staff\Mapper::getInstance(),
                 UserProfile\Relationship\Mapper::getInstance()
             ))
-            ->add(new Timetable\Composite(
+            ->add(new IsamsTimetable\Composite(
                 $this->logger,
                 $this->perform,
                 $batchxml,
@@ -162,6 +167,36 @@ class Factory
                 ClassEntryMapper::getInstance(),
                 ClassInvolvementMapper::getInstance(),
                 ClassPeriodMapper::getInstance()
+            ));
+    }
+
+
+    /**
+     * We never reach out to kamar so we technically don't need the $file option
+     *
+     * @param string|null $file
+     * @return GenericCollection
+     * @throws UnexpectedValueException
+     */
+    private function produceKamar(?string $file): GenericCollection
+    {
+        $this->logger->info('Accessing local xml endpoint');
+        $api = new KamarApi($this->host);
+
+        /* Connect and shank data
+         */
+        $batchxml = new KamarBatchxml($api);
+
+        return (new GenericCollection(IStrategy::class))
+            ->add(new KamarProfile\Composite(
+                $this->logger,
+                $this->perform,
+                $batchxml,
+                UserProfile\Mapper::getInstance(),
+                UserProfile\Student\Mapper::getInstance(),
+                UserProfile\Parent\Mapper::getInstance(),
+                UserProfile\Staff\Mapper::getInstance(),
+                UserProfile\Relationship\Mapper::getInstance()
             ));
     }
 }
