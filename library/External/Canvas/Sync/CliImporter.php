@@ -12,6 +12,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress_Byte_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
+use External_ClassInterface;
+use External_UserInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
@@ -285,7 +287,9 @@ class CliImporter extends CliTool\App
 
         /** @var MapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
+        /** @var External_ClassInterface $externalClass */
         $externalClass = $this->getDi()->get('externalClass');
+        /** @var External_UserInterface $externalUser */
         $externalUser  = $this->getDi()->get('externalUser');
         /** @var MarkTypeMapper */
         $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
