@@ -316,7 +316,7 @@ class Profile implements IStrategy
              */
             if ($dob) {
                 $studentProfile
-                    ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime($dob)));
+                    ->setDateOfBirth(new \Alaress_Date_Format($dob, 'Ymd'));
             }
 
             /**
