@@ -16,8 +16,12 @@ header('Content-type: application/xml');
 /* Consume data from stream
  */
 $data = file_get_contents('php://input');
-$data = file_get_contents('/vagrant/data/cache/stream/20191217133402.xml');
 
+/* Testing independently of a Kamar push
+ *
+ * You can test Receiver's processing by loading from a local xml
+ * $data = file_get_contents('/vagrant/data/cache/stream/20191217133402.xml');
+ */
 (new Receiver(Loader::getInstance()->get('stream_dir')))->receive($data);
 
 exit();
