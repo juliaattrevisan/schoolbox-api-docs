@@ -49,7 +49,8 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper())
+                new Rule\IsExternalUser('externalUserId'),
+                new Rule\IsParentOfExternalUser($this->getExternalUser(), $this->getUserMapper(),'externalUserId')
             )
         );
 
