@@ -189,7 +189,7 @@ class DataSync
             $accountBridge
         ))->synchronise();
 
-        // Import Canvas Courses => Schoolbox CourseSpec/UnitSpec
+        // Import Canvas Courses => Schoolbox CourseSpec/UnitSpec/AssessmentSpec
         (new ImportStage\Courses(
             $this->canvasDb,
             $this->schoolboxDb,
