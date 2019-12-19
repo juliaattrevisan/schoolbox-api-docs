@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Quiz;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -50,6 +51,9 @@ class DataSync
 
     /** @var MarkTypeMapper */
     private $markTypeMapper;
+
+    /** @var Quiz\Mapper */
+    private $quizMapper;
 
     /** @var SubmissionBoxMapper */
     private $submissionBoxMapper;
@@ -97,6 +101,7 @@ class DataSync
      * @param External_ClassInterface $externalClass
      * @param External_UserInterface  $externalUser
      * @param MarkTypeMapper          $markTypeMapper
+     * @param Quiz\Mapper             $quizMapper
      * @param SubmissionBoxMapper     $submissionBoxMapper
      * @param Assessment\Mapper       $assessmentMapper
      * @param Participant\Plan\Mapper $planMapper
@@ -117,6 +122,7 @@ class DataSync
         External_ClassInterface $externalClass,
         External_UserInterface $externalUser,
         MarkTypeMapper $markTypeMapper,
+        Quiz\Mapper $quizMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         Participant\Plan\Mapper $planMapper,
@@ -136,6 +142,7 @@ class DataSync
         $this->externalClass       = $externalClass;
         $this->externalUser        = $externalUser;
         $this->markTypeMapper      = $markTypeMapper;
+        $this->quizMapper          = $quizMapper;
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->assessmentMapper    = $assessmentMapper;
         $this->planMapper          = $planMapper;
@@ -193,6 +200,7 @@ class DataSync
         (new ImportStage\Courses(
             $this->canvasDb,
             $this->schoolboxDb,
+            $this->quizMapper,
             $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->folderMapper,

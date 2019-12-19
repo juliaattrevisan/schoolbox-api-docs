@@ -31,6 +31,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Quiz;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use RuntimeException;
@@ -293,6 +294,8 @@ class CliImporter extends CliTool\App
         $externalUser  = $this->getDi()->get('externalUser');
         /** @var MarkTypeMapper */
         $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
+        /** @var Quiz\Mapper */
+        $quizMapper = $mapperFactory->get(Quiz\Mapper::class);
         /** @var SubmissionBoxMapper */
         $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
         /** @var Assessment\Mapper */
@@ -318,6 +321,7 @@ class CliImporter extends CliTool\App
             $externalClass,
             $externalUser,
             $markTypeMapper,
+            $quizMapper,
             $submissionBoxMapper,
             $assessmentMapper,
             $planMapper,

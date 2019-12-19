@@ -21,6 +21,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Quiz;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
@@ -65,6 +66,9 @@ class Courses
     /** @var Bridge\Assignment */
     private $assignmentBridge;
 
+    /** @var Quiz\Mapper */
+    private $quizMapper;
+
     /** @var SubmissionBoxMapper */
     private $submissionBoxMapper;
 
@@ -95,22 +99,26 @@ class Courses
     private $countSubmissionBoxMoved;
     private $countSubmissionBoxDeleted;
 
+    private $countQuizDeleted;
+
 
     /**
      * @param IConnector          $canvasDb
      * @param IConnector          $schoolboxDb
-     * @param Bridge\Assignment   $assignmentBridge
+     * @param Quiz\Mapper         $quizMapper
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param Assessment\Mapper   $assessmentMapper
      * @param Folder\Mapper       $folderMapper
      * @param LoggerInterface     $log
      * @param Bridge\Account      $accountBridge
+     * @param Bridge\Assignment   $assignmentBridge
      * @param Bridge\Course       $courseBridge
      * @param Bridge\CourseGroup  $courseGroupBridge
      */
     public function __construct(
         IConnector $canvasDb,
         IConnector $schoolboxDb,
+        Quiz\Mapper $quizMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         Folder\Mapper $folderMapper,
@@ -124,6 +132,7 @@ class Courses
         $this->schoolboxDb         = $schoolboxDb;
         $this->log                 = $log;
         $this->assignmentBridge    = $assignmentBridge;
+        $this->quizMapper          = $quizMapper;
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->assessmentMapper    = $assessmentMapper;
         $this->folderMapper        = $folderMapper;
@@ -263,6 +272,7 @@ class Courses
         $synchronizedCourseGroupFolderIds = [];
         $synchronizedCourseFolderIds      = [];
         $synchronizedSubmissionBoxIds     = [];
+        $synchronizedQuizIds              = [];
 
         // Fall back to setting SubmissionBoxSpec.owner to Schoolbox Admin if no course teacher found
         $schoolboxAdminUserId = $this->getSchoolboxAdminUserId();
@@ -299,6 +309,7 @@ class Courses
             }
         }
 
+        $this->deleteUnSynchronizedQuizzes($synchronizedQuizIds);
         $this->deleteUnSynchronizedSubmissionBoxes($synchronizedSubmissionBoxIds);
         $this->deleteUnSynchronizedCourses($synchronizedCourseFolderIds);
         $this->deleteUnSynchronizedCourseGroups($synchronizedCourseGroupFolderIds);
@@ -1022,6 +1033,28 @@ class Courses
         }
     }
 
+
+    /**
+     * @param array $synchronizedQuizIds
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws UnderflowException
+     */
+    private function deleteUnSynchronizedQuizzes(array $synchronizedQuizIds): void
+    {
+        $pb = $this->quizMapper->getPredicateBuilder()
+                               ->notNull('external_id')
+                               ->isNull('am.deleted_at');
+        if (count($synchronizedQuizIds)) {
+            $pb->notIn('id', $synchronizedQuizIds);
+        }
+
+        foreach ($this->quizMapper->findByPredicates($pb) as $quiz) {
+            $this->log->debug("Deleting un-synchronised assignment '{$quiz->getAssessmentModel()->getTitle()}' (quizId: {$quiz->getId()})");
+            $this->quizMapper->delete($quiz);
+            $this->countQuizDeleted++;
+        }
+    }
 
     /**
      * @param array $synchronizedSubmissionBoxIds
