@@ -364,6 +364,10 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->studentProfileMapper->save($studentProfile);
             }
+
+            /* Add their parents + relationships too
+             */
+            $this->importParentsOfStudent($student, $studentBaseProfile);
         }
     }
 
@@ -371,21 +375,116 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * $studentExternalId came from a node in the CurrentPupils node so I make the assumption that
-     * we're only getting parents of current pupils and therefore only getting current parents
-     *
-     * @param string            $studentExternalId
+     * @param \SimpleXMLElement $student
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws PDOException
      * @throws RuntimeException
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile)
+    private function importParentsOfStudent(\SimpleXMLElement $student, UserProfile\Model $studentBaseProfile): void
     {
+
+        /** @var \SimpleXMLElement $parent */
+        foreach ($student->caregivers->caregiver as $parent) {
+
+            /* Parents don't have an external unique identifier; therefore we manufacture them
+             * Parents also don't have separate first/last names, just a fullname
+             */
+            $externalId = trim((string)$student->uniqueid) . '-' . $parent->xpath('@index')[0];
+            $username = $email = trim((string)$parent->email);
+            $firstname = trim((string)$parent->name);
+            $lastname = '';
+            $phoneHome = '';
+            $phoneWork = '';
+            $phoneMobile = trim((string)$parent->mobile);
+            $relationship = trim((string)$parent->relationship);
+            $title = '';
+
+            /* Parents without usernames are skipped
+             */
+            if ('' === $username) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for parent %s - no username detected',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
+
+            try {
+                $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                $parentBaseProfile = $parentProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $parentProfile = $this->parentProfileMapper->createModel();
+                $parentBaseProfile = $this->baseProfileMapper->createModel();
+
+                $parentProfile->setBaseProfile($parentBaseProfile);
+            }
+
+            $parentBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($parentBaseProfile);
+            }
+
+            $parentProfile
+                ->setPhoneHome($phoneHome)
+                ->setPhoneWork($phoneWork)
+                ->setMobile($phoneMobile)
+                ->setEmail($email)
+                ->setUsername($username);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding parent profile for %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->parentProfileMapper->save($parentProfile);
+            }
+
+            /* Manufacture relations
+             */
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding relation between %s, the %s of %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                trim($relationship),
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $relationship = $this->relationshipMapper->createModel()
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
+                    ->setType($relationship);
+
+                $this->relationshipMapper->save($relationship);
+            }
+        }
     }
 
 
