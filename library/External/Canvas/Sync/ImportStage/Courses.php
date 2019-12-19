@@ -176,7 +176,10 @@ class Courses
                assignment.submission_types 'assignment.submission_types',
                assignment.created_at       'assignment.created_at',
                assignment.updated_at       'assignment.updated_at',
-               assignment.muted            'assignment.muted'
+               assignment.muted            'assignment.muted',
+               quiz.id                     'quiz.id',
+               quiz.quiz_type              'quiz.quiz_type',
+               quiz.anonymous_submissions  'quiz.anonymous_submissions'
         FROM course_dim course
         JOIN enrollment_term_dim enrollment_term ON enrollment_term.id = course.enrollment_term_id
         JOIN account_dim account ON course.account_id = account.id
@@ -184,7 +187,6 @@ class Courses
         LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
         LEFT JOIN quiz_dim quiz ON quiz.assignment_id = assignment.id
         WHERE $courseFilterWhere
-        AND quiz.id IS NULL
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment_group.position, assignment.position
         ";
         $statement = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
@@ -221,15 +223,18 @@ class Courses
             // Did we get assignment data?
             if ($assignmentCanvasId !== null) {
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['assignments'][$assignmentCanvasId] = [
-                    'title'            => $row['assignment.title'],
-                    'description'      => $row['assignment.description'],
-                    'points_possible'  => $row['assignment.points_possible'] === null ? null : (float)$row['assignment.points_possible'],
-                    'grading_type'     => $row['assignment.grading_type'],
-                    'submission_types' => $row['assignment.submission_types'],
-                    'created_at'       => $row['assignment.created_at'],
-                    'updated_at'       => $row['assignment.updated_at'],
-                    'muted'            => $row['assignment.muted'] === 'true',
-                    'position'         => $assessmentSequence++,
+                    'title'                 => $row['assignment.title'],
+                    'description'           => $row['assignment.description'],
+                    'points_possible'       => $row['assignment.points_possible'] === null ? null : (float)$row['assignment.points_possible'],
+                    'grading_type'          => $row['assignment.grading_type'],
+                    'submission_types'      => $row['assignment.submission_types'],
+                    'created_at'            => $row['assignment.created_at'],
+                    'updated_at'            => $row['assignment.updated_at'],
+                    'muted'                 => $row['assignment.muted'] === 'true',
+                    'isQuiz'                => (bool)$row['quiz.id'],
+                    'quiz_type'             => $row['quiz.quiz_type'],
+                    'anonymous_submissions' => $row['quiz.anonymous_submissions'],
+                    'position'              => $assessmentSequence++,
                 ];
             }
         }
