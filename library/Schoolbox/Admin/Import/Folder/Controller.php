@@ -144,7 +144,8 @@ class Controller extends Base
             (bool)$post->get('inherit')
         );
 
-        $allFolders = $bulkHandler->addFolders();
+        $performMode = (bool)$post->get('perform');
+        $allFolders = $bulkHandler->addFolders($performMode);
 
         // Render this thing out
         $this->getResponse()->content->set(
@@ -152,7 +153,8 @@ class Controller extends Base
                 'template' => '@adminImportFolder/importResults.twig',
                 'data' => [
                     'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
-                    'folders' => $allFolders,
+                    'results'        => $allFolders,
+                    'perform'        => $performMode,
                 ],
             ]
         );

@@ -1,3 +1,8 @@
+{#
+    array allBreadcrumbs
+    array results
+    bool  perform
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -8,6 +13,17 @@
 </div>
 
 <div class="row">
+    <div class="large-12 columns">
+        {% if not perform %}
+            <div data-alert="" class="alert-box warning">
+                Dry run results. Repeat with 'Live Run' checkbox checked to persist changes.
+            </div>
+        {% else %}
+            <div data-alert="" class="alert-box success">
+                Live run results. Changes have been persisted to database..
+            </div>
+        {% endif %}
+    </div>
     <div class="large-12 columns">
         <table>
             <thead>
@@ -26,7 +42,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for result in folders %}
+                {% for result in results %}
                     <tr>
                         <td>{{ result.row }}</td>
                         <td>

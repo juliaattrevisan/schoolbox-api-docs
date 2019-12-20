@@ -94,15 +94,16 @@ class Bulk_Folder
     /**
      * Adds folders via csv
      *
+     * @param bool $perform
      * @return array
+     * @throws DefinitionException
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws InvalidColumnException
-     * @throws DefinitionException
-     * @throws InvalidArgumentException
      */
-    public function addFolders(): array
+    public function addFolders(bool $perform): array
     {
         $results = [];
 
@@ -129,7 +130,8 @@ class Bulk_Folder
                 $folderNameColumn,
                 $folderCodeColumns,
                 $yearLevelColumns,
-                $yearLevels
+                $yearLevels,
+                $perform
             );
         }
 
@@ -147,6 +149,7 @@ class Bulk_Folder
      * @param int[]                               $folderCodeColumnIndexes
      * @param int[]                               $yearLevelColumnIndexes
      * @param GenericCollection|YearLevel\Model[] $yearLevels Indexed by yearLevel.name
+     * @param bool                                $perform
      * @return array
      * @throws DefinitionException
      * @throws InvalidColumnException
@@ -161,7 +164,8 @@ class Bulk_Folder
         int $folderNameColumnIndex,
         array $folderCodeColumnIndexes,
         array $yearLevelColumnIndexes,
-        GenericCollection $yearLevels
+        GenericCollection $yearLevels,
+        bool $perform
     ): array {
 
         $parentId   = trim($row[$parentColumnIndex]);
@@ -203,6 +207,10 @@ class Bulk_Folder
 
         // Persist models to DB.
         $newFolder->setInherit($this->inherit && count($newFolder->getCodes()) === 0);
+        if (!$perform) {
+            return $this->buildRowResult($rowIdx, '', $newFolder->getNameWithCodes(), 'Would Add', 'OK');
+        }
+
         try {
             $this->folderMapper->save($newFolder);
         } catch (Throwable $e) {
@@ -210,7 +218,6 @@ class Bulk_Folder
             trigger_error($e->getMessage(), E_USER_WARNING);
             return $this->buildRowResult($rowIdx, '', $newFolder->getName(), 'Error', $e->getMessage());
         }
-
         $this->saveHomepageConfig($newFolder->getHomepage());
         $this->saveRolePermissions($newFolder);
 
