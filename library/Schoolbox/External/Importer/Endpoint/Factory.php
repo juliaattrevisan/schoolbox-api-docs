@@ -183,6 +183,15 @@ class Factory
     private function produceKamar(?string $file): GenericCollection
     {
         $this->logger->info('Accessing local xml endpoint');
+
+        /* TODO: Timetable Composite requires access across multiple xml files
+         * Pass it multiple $batchxml instances that have their $this->host vars
+         * set to hardcoded filenames; $this->host becomes a dir, not a file
+         *
+         * $profileBatchXml = new KamarBatchxml(new KamarApi($this->host . '/profile.xml'));
+         * $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/timetable.xml'));
+         */
+
         $api = new KamarApi($this->host);
 
         /* Connect and shank data
