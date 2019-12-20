@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -39,10 +40,17 @@ class Definition implements IStrategy
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
 
+
     /**
      * Kamar has hardcoded 10 "slots" per day
      */
     private const MAX_PERIODS = 10;
+
+
+    /**
+     * There appears to be five days per cycle
+     */
+    private const DAYS_PER_CYCLE = 5;
 
 
     /**
@@ -152,6 +160,24 @@ class Definition implements IStrategy
 
 
     /**
+     * MASSIVE CAVEAT
+     * Assume there's one campus set up in schoolbox instance
+     *
+     * @throws RuntimeException
+     */
+    private function findFirstCampus(): Campus
+    {
+        $campuses = $this->campusMapper->findAll();
+
+        if (!\count($campuses)) {
+            throw new RuntimeException('No campuses found during xml import.');
+        }
+
+        return $campuses->first();
+    }
+
+
+    /**
      * Import data from xml into local schema
      */
     public function import(): void
@@ -161,113 +187,79 @@ class Definition implements IStrategy
             $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
         }
 
-        /* MASSIVE CAVEAT
-         * Assume there's one campus set up in schoolbox instance
-         */
-        $campuses = $this->campusMapper->findAll();
+        $campus = $this->findFirstCampus();
 
-        if (!\count($campuses)) {
-            throw new RuntimeException('No campuses found during xml import.');
+        /** @var TimetableCycle $timetableCycle */
+        $timetableCycle = $this->timetableCycleMapper->createModel()
+            ->setId($campus->getId())
+            ->setTitle('Week ' . date('W'))
+            ->setCycleLength(self::DAYS_PER_CYCLE)
+            ->setDayLength(self::MAX_PERIODS)
+
+            /* What is this?
+             */
+            ->setRegular(1);
+
+        /** @var TimetableCampus $timetableCampus */
+        $timetableCampus = $this->timetableCampusMapper->createModel()
+            ->setCycle($timetableCycle)
+            ->setCampus($campus)
+            ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
+            ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
+            ->setStartDay(1);
+
+        $this->log->info(sprintf(
+            'Creating timetable cycle %s (%s) with day length %s',
+            $timetableCycle->getId(),
+            $timetableCycle->getTitle(),
+            $timetableCycle->getDayLength()
+        ));
+
+        if ($this->perform) {
+            $this->timetableCycleMapper->save($timetableCycle);
         }
 
-        $campus = $campuses->first();
+        $this->log->info(sprintf(
+            'Associating timetable cycle %s (%s) with campus %s',
+            $timetableCycle->getId(),
+            $timetableCycle->getTitle(),
+            $campus->getName()
+        ));
 
-        /* Each student has their own set of timetables
-         */
-        $timetables = $this->batchxml->fetchXml('/SMSDirectoryData/timetables/timetable');
-
-        foreach ($timetables as $timetable) {
-            $studentId = (string)$timetable->xpath('@student')[0];
-
-            /* Find the cycles for this student
-             */
-            $cycles = $timetable->xpath('week');
-
-            /* TODO: Find the most recent week, I guess?
-             * This probably needs to be based on their <term> node instead though
-             * I need to see an actual school's data to help decide how the tool is used
-             */
-            $cycle = $this->findCurrentCycle($cycles);
-
-            /** @var TimetableCycle $timetableCycle */
-            $timetableCycle = $this->timetableCycleMapper->createModel()
-                ->setId($campus->getId())
-                ->setTitle('Week ' . $cycle->xpath('@index')[0])
-                ->setCycleLength(\count($cycle->xpath('days/day')))
-                ->setDayLength(self::MAX_PERIODS)
-
-                /* What is this?
-                 */
-                ->setRegular(1);
-
-            $days = $cycle->xpath('days');
-
-            /** @var TimetableCampus $timetableCampus */
-            $timetableCampus = $this->timetableCampusMapper->createModel()
-                ->setCycle($timetableCycle)
-                ->setCampus($campus)
-                ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
-                ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
-                ->setStartDay(1);
-
-            $this->log->info(sprintf(
-                'Creating timetable cycle %s (%s) with day length %s',
-                $timetableCycle->getId(),
-                $timetableCycle->getTitle(),
-                $timetableCycle->getDayLength()
-            ));
-
-            if ($this->perform) {
-                $this->timetableCycleMapper->save($timetableCycle);
-            }
-
-            $this->log->info(sprintf(
-                'Associating timetable cycle %s (%s) with campus %s',
-                $timetableCycle->getId(),
-                $timetableCycle->getTitle(),
-                $campus->getName()
-            ));
-
-            if ($this->perform) {
-                $this->timetableCampusMapper->save($timetableCampus);
-            }
-
-            /* Save all the periods and associate them with a cycle
-             */
-            foreach ($days as $day) {
-            }
-
-//            /** @var array $days */
-//            $days = $dayData['days'];
-//
-//            foreach ($days as $day => $periods) {
-//
-//                /** @var array $periods */
-//                /** @var TimetablePeriod $period */
-//                foreach ($periods as $period) {
-//                    $period->setDay($day);
-//                    $period->setCycle($timetableCycle);
-//
-//                    $this->log->info(sprintf(
-//                        'Creating period %s (%s-%s) in timetable cycle %s (%s) for campus %s',
-//                        $period->getTitle(),
-//                        $period->getStart(),
-//                        $period->getFinish(),
-//                        $timetableCycle->getId(),
-//                        $timetableCycle->getTitle(),
-//                        $campus->getName()
-//                    ));
-//
-//                    if ($this->perform) {
-//                        $this->timetablePeriodMapper->save($period);
-//                    }
-//                }
-//            }
-//        }
+        if ($this->perform) {
+            $this->timetableCampusMapper->save($timetableCampus);
         }
 
+        /* Save all the periods and associate them with a cycle
+         */
+        for ($i = 1; $i <= self::DAYS_PER_CYCLE; $i++) {
+            for ($j = 1; $j <= self::MAX_PERIODS; $j++) {
 
+                /** @var TimetablePeriod $timetablePeriod */
+                $timetablePeriod = $this->timetablePeriodMapper->createModel()
+                    ->setTitle("Period {$j}")
+                    ->setDay($i)
+                    ->setSequence($j)
+                    ->setStart(null)
+                    ->setFinish(null)
+                    ->setCycle($timetableCycle);
 
+                $this->log->info(sprintf(
+                    'Creating period %s (%s-%s) for day %s in timetable cycle %s (%s) for campus %s',
+                    $timetablePeriod->getTitle(),
+                    $timetablePeriod->getStart(),
+                    $timetablePeriod->getFinish(),
+                    $timetablePeriod->getDay(),
+                    $timetableCycle->getId(),
+                    $timetableCycle->getTitle(),
+                    $campus->getName()
+                ));
+
+                if ($this->perform) {
+                    $this->timetablePeriodMapper->save($timetablePeriod);
+                }
+            }
+        }
 
         if (!$this->perform) {
             $this->log->info('Planning finished.');
