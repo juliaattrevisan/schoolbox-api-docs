@@ -291,6 +291,10 @@ class Classes implements IStrategy
                      */
                     $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['period']);
 
+                    if (null === $timetablePeriod) {
+                        continue;
+                    }
+
                     $this->log->info(sprintf(
                         'Looking for ext_timetable_code %s, day %s, period %s',
                         $ext,
@@ -298,10 +302,11 @@ class Classes implements IStrategy
                         $subject['period']
                     ));
 
+                    /* Assemble the pieces
+                     */
                     try {
                         $timetableClass = $this->createTimetableClass($subject);
                     } catch(UnexpectedValueException $e) {
-
                         $this->log->info(sprintf(
                             'No classes found for student %s, day %s, period %s',
                             $studentId,
@@ -311,6 +316,8 @@ class Classes implements IStrategy
 
                         continue;
                     }
+
+                    $this->createTimetableClassPeriod($users, $subject, $ext, $timetablePeriod, $timetableClass);
                 }
             }
 
@@ -386,7 +393,7 @@ class Classes implements IStrategy
      * Create a Timetable Class Period
      *
      * @param array           $users
-     * @param array           $class
+     * @param array           $subject
      * @param string          $ext
      * @param TimetablePeriod $period
      * @param ClassEntry      $timetableClass
@@ -395,12 +402,12 @@ class Classes implements IStrategy
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
+    private function createTimetableClassPeriod(array $users, array $subject, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
          *
-         * - room comes from $class['period']['room']['name']
+         * - room comes from $subject['room']
          * - teacherExternalIdId is the staff's external_id
          * - period_id is a schoolbox sis_timetable_period via lookup of Day and Period Name
          * - class_id comes from $timetableClass->getId()
@@ -410,35 +417,26 @@ class Classes implements IStrategy
         $timetableClassPeriod = $this->classPeriodMapper->createModel()
             ->setClass($timetableClass)
             ->setPeriod($period)
-            ->setRoom($class['period']['room']['name']);
+            ->setRoom($subject['room']['name']);
 
         /* Throw warning, but assign them anyway
          */
-        if (!isset($users[$class['teachers']['username']])) {
+        if (!isset($users[$subject['teachers']['username']])) {
             $this->log->warning(sprintf(
                 'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s',
-                $class['teachers']['username'],
+                $subject['teachers']['username'],
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
         }
 
-        $timetableClassPeriod->setTeacher($class['teachers']['username']);
+        $timetableClassPeriod->setTeacher($subject['teachers']['username']);
 
         $this->log->info(sprintf(
             'Creating class period relation for teacher %s %s in room %s',
-            $class['teachers']['firstname'],
-            $class['teachers']['surname'],
-            $class['period']['room']['name']
-        ));
-
-        $this->log->info(sprintf(
-            'This occurs on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',
-            $class['period']['day'],
-            $class['period']['sequence'],
-            $class['period']['start'],
-            $class['period']['end'],
-            $ext
+            $subject['teachers']['firstname'],
+            $subject['teachers']['surname'],
+            $subject['room']['name']
         ));
 
         if ($this->perform) {
