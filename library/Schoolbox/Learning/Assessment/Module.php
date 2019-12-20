@@ -137,8 +137,8 @@ class Module extends BaseModule
 
         $this->register('GET',   "$assRoute",                        'getAssessment',            $loggedIn,         $preloadAssessment);
         $this->register('POST',  "$assRoute",                        'postUpdateAssessment',     $canWrite,         $preloadAssessment); // a || c
-        $this->register('POST',  "$assWeight",                       'updateWeight',             $canWrite,         $preloadAssessment); // a || c
-        $this->register('POST',  "$assVisibility",                   'updateVisibility',         $canWrite,         $preloadAssessment); // a || c
+        $this->register('POST',  "$assWeight",                       'updateWeight',             $canModify,         $preloadAssessment); // a || c
+        $this->register('POST',  "$assVisibility",                   'updateVisibility',         $canModify,         $preloadAssessment); // a || c
         $this->register('PATCH', "$assRoute",                        'patchUpdateAssessment',    $canWrite,         $preloadAssessment); // a || c
         $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,        $preloadAssessment); // a || c
         $this->register('POST',  "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,        $preloadAssessment); // a || c
