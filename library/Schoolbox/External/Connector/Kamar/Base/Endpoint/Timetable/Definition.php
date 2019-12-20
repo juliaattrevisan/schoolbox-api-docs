@@ -193,54 +193,41 @@ class Definition implements IStrategy
 
         $days = $cycle->xpath('days');
 
+        /** @var TimetableCampus $timetableCampus */
+        $timetableCampus = $this->timetableCampusMapper->createModel()
+            ->setCycle($timetableCycle)
+            ->setCampus($campus)
+            ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
+            ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
+            ->setStartDay(1);
+
+        $this->log->info(sprintf(
+            'Creating timetable cycle %s (%s) with day length %s',
+            $timetableCycle->getId(),
+            $timetableCycle->getTitle(),
+            $timetableCycle->getDayLength()
+        ));
+
+        if ($this->perform) {
+            $this->timetableCycleMapper->save($timetableCycle);
+        }
+
+        $this->log->info(sprintf(
+            'Associating timetable cycle %s (%s) with campus %s',
+            $timetableCycle->getId(),
+            $timetableCycle->getTitle(),
+            $campus->getName()
+        ));
+
+        if ($this->perform) {
+            $this->timetableCampusMapper->save($timetableCampus);
+        }
+
+        /* Save all the periods and associate them with a cycle
+         */
         foreach ($days as $day) {
         }
 
-//            $dayData = $this->findDays($cycle);
-//
-//            /** @var TimetableCycle $timetableCycle */
-//            $timetableCycle = $this->timetableCycleMapper->createModel()
-//                ->setId($campus->getId())
-//                ->setTitle(trim((string)$cycle->Name))
-//                ->setCycleLength(\count($cycle->xpath('Days/Day')))
-//                ->setDayLength($dayData['maxPeriods'])
-//
-//                /* What is this?
-//                 */
-//                ->setRegular(1);
-//
-//            /** @var TimetableCampus $timetableCampus */
-//            $timetableCampus = $this->timetableCampusMapper->createModel()
-//                ->setCycle($timetableCycle)
-//                ->setCampus($campus)
-//                ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
-//                ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
-//                ->setStartDay(1);
-//
-//            $this->log->info(sprintf(
-//                'Creating timetable cycle %s (%s) with day length %s',
-//                $timetableCycle->getId(),
-//                $timetableCycle->getTitle(),
-//                $timetableCycle->getDayLength()
-//            ));
-//
-//            if ($this->perform) {
-//                $this->timetableCycleMapper->save($timetableCycle);
-//            }
-//
-//            $this->log->info(sprintf(
-//                'Associating timetable cycle %s (%s) with campus %s',
-//                $timetableCycle->getId(),
-//                $timetableCycle->getTitle(),
-//                $campus->getName()
-//            ));
-//
-//            if ($this->perform) {
-//                $this->timetableCampusMapper->save($timetableCampus);
-//            }
-//
-//            /* Save all the periods and associate them with a cycle
-//             */
 //            /** @var array $days */
 //            $days = $dayData['days'];
 //
