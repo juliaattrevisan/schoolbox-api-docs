@@ -665,13 +665,6 @@ class Courses
         $row        = $rows[0];
         $assessment = $this->assessmentMapper->hydrate($row, 'a');
 
-        // TODO remove mapper hydration bug compensation in 19.1
-        // Start bug compensation
-        $assessment->setTask();
-        $assessment->setProject();
-        $assessment->setQuiz();
-        // End bug compensation
-
         $submissionBox = $this->submissionBoxMapper->hydrate($row, 'sb');
         $submissionBox->setAssessmentModel($assessment);
         $assessment->setSubObject($submissionBox);
