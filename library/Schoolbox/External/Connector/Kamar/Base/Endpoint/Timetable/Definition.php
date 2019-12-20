@@ -39,6 +39,11 @@ class Definition implements IStrategy
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
 
+    /**
+     * Kamar has hardcoded 10 "slots" per day
+     */
+    private const MAX_PERIODS = 10;
+
 
     /**
      * @var LoggerInterface
@@ -175,6 +180,21 @@ class Definition implements IStrategy
          */
         $cycle = $this->findCurrentCycle($cycles);
 
+        /** @var TimetableCycle $timetableCycle */
+        $timetableCycle = $this->timetableCycleMapper->createModel()
+            ->setId($campus->getId())
+            ->setTitle('Week ' . $cycle->xpath('@index')[0])
+            ->setCycleLength(\count($cycle->xpath('days/day')))
+            ->setDayLength(self::MAX_PERIODS)
+
+            /* What is this?
+             */
+            ->setRegular(1);
+
+        $days = $cycle->xpath('days');
+
+        foreach ($days as $day) {
+        }
 
 //            $dayData = $this->findDays($cycle);
 //
