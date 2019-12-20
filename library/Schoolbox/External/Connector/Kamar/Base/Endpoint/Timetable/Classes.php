@@ -313,7 +313,7 @@ class Classes implements IStrategy
                         continue;
                     }
 
-                    $this->createTimetableClassPeriod($users, $subject, $ext, $timetablePeriod, $timetableClass);
+                    $this->createTimetableClassPeriod($users, $subject, $timetablePeriod, $timetableClass);
 
                     /* Process students
                      */
@@ -379,7 +379,6 @@ class Classes implements IStrategy
      *
      * @param array           $users
      * @param array           $subject
-     * @param string          $ext
      * @param TimetablePeriod $period
      * @param ClassEntry      $timetableClass
      * @return ClassPeriod
@@ -387,7 +386,7 @@ class Classes implements IStrategy
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassPeriod(array $users, array $subject, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
+    private function createTimetableClassPeriod(array $users, array $subject, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
