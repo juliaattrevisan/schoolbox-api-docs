@@ -240,7 +240,14 @@ class Bulk_Folder
                 continue;
             }
             $lowerCaseCode = strtolower($folderCode);
-            if (in_array($lowerCaseCode, $lowerCaseCodes, true) && !in_array($folderCode, $codes, true)) {
+
+            // Have we seen this code before (ignoring case)?
+            if (in_array($lowerCaseCode, $lowerCaseCodes, true)) {
+                // If a case-sensitive duplicate, we can ignore the duplicate
+                if (in_array($folderCode, $codes, true)) {
+                    continue;
+                }
+                // Otherwise if differ only in case, we cannot be sure which one to persist
                 $error = "Ambiguous folder code. Same characters but different capitalisation ({$folderCode})";
                 return $this->buildRowResult($rowIdx, '', $newFolder->getName(), 'Skipped', $error);
             }
