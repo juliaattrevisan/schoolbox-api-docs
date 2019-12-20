@@ -161,8 +161,6 @@ class Definition implements IStrategy
             $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
         }
 
-        $cycles = $this->batchxml->fetchXml('/SMSDirectoryData/timetables/timetable/week');
-
         /* MASSIVE CAVEAT
          * Assume there's one campus set up in schoolbox instance
          */
@@ -174,59 +172,70 @@ class Definition implements IStrategy
 
         $campus = $campuses->first();
 
-        /* TODO: Find the most recent week, I guess?
-         * This probably needs to be based on their <term> node instead though
-         * I need to see an actual school's data to help decide how the tool is used
+        /* Each student has their own set of timetables
          */
-        $cycle = $this->findCurrentCycle($cycles);
+        $timetables = $this->batchxml->fetchXml('/SMSDirectoryData/timetables/timetable');
 
-        /** @var TimetableCycle $timetableCycle */
-        $timetableCycle = $this->timetableCycleMapper->createModel()
-            ->setId($campus->getId())
-            ->setTitle('Week ' . $cycle->xpath('@index')[0])
-            ->setCycleLength(\count($cycle->xpath('days/day')))
-            ->setDayLength(self::MAX_PERIODS)
+        foreach ($timetables as $timetable) {
+            $studentId = (string)$timetable->xpath('@student')[0];
 
-            /* What is this?
+            /* Find the cycles for this student
              */
-            ->setRegular(1);
+            $cycles = $timetable->xpath('week');
 
-        $days = $cycle->xpath('days');
+            /* TODO: Find the most recent week, I guess?
+             * This probably needs to be based on their <term> node instead though
+             * I need to see an actual school's data to help decide how the tool is used
+             */
+            $cycle = $this->findCurrentCycle($cycles);
 
-        /** @var TimetableCampus $timetableCampus */
-        $timetableCampus = $this->timetableCampusMapper->createModel()
-            ->setCycle($timetableCycle)
-            ->setCampus($campus)
-            ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
-            ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
-            ->setStartDay(1);
+            /** @var TimetableCycle $timetableCycle */
+            $timetableCycle = $this->timetableCycleMapper->createModel()
+                ->setId($campus->getId())
+                ->setTitle('Week ' . $cycle->xpath('@index')[0])
+                ->setCycleLength(\count($cycle->xpath('days/day')))
+                ->setDayLength(self::MAX_PERIODS)
 
-        $this->log->info(sprintf(
-            'Creating timetable cycle %s (%s) with day length %s',
-            $timetableCycle->getId(),
-            $timetableCycle->getTitle(),
-            $timetableCycle->getDayLength()
-        ));
+                /* What is this?
+                 */
+                ->setRegular(1);
 
-        if ($this->perform) {
-            $this->timetableCycleMapper->save($timetableCycle);
-        }
+            $days = $cycle->xpath('days');
 
-        $this->log->info(sprintf(
-            'Associating timetable cycle %s (%s) with campus %s',
-            $timetableCycle->getId(),
-            $timetableCycle->getTitle(),
-            $campus->getName()
-        ));
+            /** @var TimetableCampus $timetableCampus */
+            $timetableCampus = $this->timetableCampusMapper->createModel()
+                ->setCycle($timetableCycle)
+                ->setCampus($campus)
+                ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
+                ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
+                ->setStartDay(1);
 
-        if ($this->perform) {
-            $this->timetableCampusMapper->save($timetableCampus);
-        }
+            $this->log->info(sprintf(
+                'Creating timetable cycle %s (%s) with day length %s',
+                $timetableCycle->getId(),
+                $timetableCycle->getTitle(),
+                $timetableCycle->getDayLength()
+            ));
 
-        /* Save all the periods and associate them with a cycle
-         */
-        foreach ($days as $day) {
-        }
+            if ($this->perform) {
+                $this->timetableCycleMapper->save($timetableCycle);
+            }
+
+            $this->log->info(sprintf(
+                'Associating timetable cycle %s (%s) with campus %s',
+                $timetableCycle->getId(),
+                $timetableCycle->getTitle(),
+                $campus->getName()
+            ));
+
+            if ($this->perform) {
+                $this->timetableCampusMapper->save($timetableCampus);
+            }
+
+            /* Save all the periods and associate them with a cycle
+             */
+            foreach ($days as $day) {
+            }
 
 //            /** @var array $days */
 //            $days = $dayData['days'];
@@ -255,6 +264,9 @@ class Definition implements IStrategy
 //                }
 //            }
 //        }
+        }
+
+
 
 
         if (!$this->perform) {
