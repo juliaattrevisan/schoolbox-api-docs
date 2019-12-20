@@ -278,50 +278,52 @@ class Classes implements IStrategy
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
 
-                foreach ($day->xpath('slots/subjects') as $subject) {
+                $subjects = new SubjectIterator($this->batchxml, $studentId, $day);
 
-                    /* TODO: Unify with usage in Definition.php
-                     */
-                    $periodName = 'Period ' . (int)$subject->xpath('@slot')[0];
-
-                    /* Look up the period instance by (name, day)
-                     *
-                     * If the period doesn't correspond to something in our timetable definition,
-                     * we can't process it anyway, so skip it
-                     */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $periodName);
-
-                    $this->log->info(sprintf(
-                        'Looking for ext_timetable_code %s, day %s, period %s',
-                        $ext,
-                        $dayNum,
-                        $periodName
-                    ));
-
-                    if (null === $timetablePeriod) {
-                        $this->log->warning(sprintf(
-                            'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
-                            $dayNum,
-                            $periodName,
-                            $ext
-                        ));
-
-                        continue;
-                    }
-
-                    try {
-                        $timetableClass = $this->createTimetableClass($subject->subject);
-                    } catch(UnexpectedValueException $e) {
-
-                        $this->log->info(sprintf(
-                            'No classes found for student %s, day %s, period %s',
-                            $studentId,
-                            $dayNum,
-                            $periodName
-                        ));
-
-                        continue;
-                    }
+                foreach ($subjects as $subject) {
+print_r($subject);
+//                    /* TODO: Unify with usage in Definition.php
+//                     */
+//                    $periodName = 'Period ' . (int)$subject->xpath('@slot')[0];
+//
+//                    /* Look up the period instance by (name, day)
+//                     *
+//                     * If the period doesn't correspond to something in our timetable definition,
+//                     * we can't process it anyway, so skip it
+//                     */
+//                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $periodName);
+//
+//                    $this->log->info(sprintf(
+//                        'Looking for ext_timetable_code %s, day %s, period %s',
+//                        $ext,
+//                        $dayNum,
+//                        $periodName
+//                    ));
+//
+//                    if (null === $timetablePeriod) {
+//                        $this->log->warning(sprintf(
+//                            'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
+//                            $dayNum,
+//                            $periodName,
+//                            $ext
+//                        ));
+//
+//                        continue;
+//                    }
+//
+//                    try {
+//                        $timetableClass = $this->createTimetableClass($subject->subject);
+//                    } catch(UnexpectedValueException $e) {
+//
+//                        $this->log->info(sprintf(
+//                            'No classes found for student %s, day %s, period %s',
+//                            $studentId,
+//                            $dayNum,
+//                            $periodName
+//                        ));
+//
+//                        continue;
+//                    }
 
                 }
             }
