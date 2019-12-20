@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use PDOException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -22,6 +23,7 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
+use SimpleXMLElement;
 use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
@@ -204,9 +206,27 @@ class Classes implements IStrategy
 
 
     /**
+     * Find the current week node for a given $studentId
+     *
+     * @param SimpleXMLElement $timetable
+     * @return SimpleXMLElement
+     */
+    private function findCurrentCycle(SimpleXMLElement $timetable): SimpleXMLElement
+    {
+        $weekNum = date('W');
+
+        /* TODO: Unluck when there's real data
+         */
+        $weekNum = 40;
+
+        return $timetable->xpath("week[@index='{$weekNum}']")[0];
+    }
+
+
+    /**
      * Import data from xml into local schema
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws InvalidUriPartException
      * @throws InvalidArgumentException
      * @throws Exception
@@ -230,19 +250,17 @@ class Classes implements IStrategy
 
         /* Get a list of all the timetables to process
          */
-        $timetables = $this->batchxml->fetchXml('/Kamar/TimetableManager/PublishedTimetables/Timetable');
+        $timetables = $this->batchxml->fetchXml('/SMSDirectoryData/timetables/timetable');
 
         /* If there aren't any timetables, log it and exit
          */
         if (!\count($timetables)) {
-            $this->log->warning('No PublishedTimetables detected.');
+            $this->log->warning('No timetables detected.');
             return;
         }
 
         foreach ($timetables as $timetable) {
-            $ext = trim((string)$timetable->xpath('@Id')[0]->Id);
-
-            $currentTimetable = $this->batchxml->fetchXml("/Kamar/TimetableManager/PublishedTimetables/Timetable[@Id='{$ext}']")[0];
+            $studentId = trim((string)$timetable->xpath('@student')[0]);
 
             /* Find all the classes and their details as best we can
              *
@@ -250,58 +268,61 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            $classes = new ScheduleIterator($this->batchxml, $currentTimetable);
+            $cycle = $this->findCurrentCycle($timetable);
 
-            foreach ($classes as $class) {
 
-                /* Look up the period instance by (name, day)
-                 *
-                 * If the period doesn't correspond to something in our timetable definition,
-                 * we can't process it anyway, so skip it
-                 */
-                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
-                $this->log->info(sprintf(
-                    'Looking for ext_timetable_code %s, day %s, period %s',
-                    $ext,
-                    $class['period']['day'],
-                    $class['period']['name']
-                ));
-
-                if (null === $timetablePeriod) {
-                    $this->log->warning(sprintf(
-                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
-                        $class['period']['name'],
-                        $class['period']['day'],
-                        $ext
-                    ));
-
-                    continue;
-                }
-
-                /* Assemble the pieces
-                 */
-                $timetableClass = $this->createTimetableClass($class);
-                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
-
-                /* Process students
-                 */
-                foreach ($class['students'] as $student) {
-
-                    /* Throw warning, but assign them anyway
-                     */
-                    if (!isset($users[$student['username']])) {
-                        $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox account %s to class %s %s',
-                            $student['username'],
-                            $timetableClass->getName(),
-                            $timetableClass->getCode()
-                        ));
-                    }
-
-                    $this->createTimetableClassInvolvement($student, $timetableClass);
-                }
-            }
+//
+//            foreach ($classes as $class) {
+//
+//                /* Look up the period instance by (name, day)
+//                 *
+//                 * If the period doesn't correspond to something in our timetable definition,
+//                 * we can't process it anyway, so skip it
+//                 */
+//                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
+//
+//                $this->log->info(sprintf(
+//                    'Looking for ext_timetable_code %s, day %s, period %s',
+//                    $ext,
+//                    $class['period']['day'],
+//                    $class['period']['name']
+//                ));
+//
+//                if (null === $timetablePeriod) {
+//                    $this->log->warning(sprintf(
+//                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
+//                        $class['period']['name'],
+//                        $class['period']['day'],
+//                        $ext
+//                    ));
+//
+//                    continue;
+//                }
+//
+//                /* Assemble the pieces
+//                 */
+//                $timetableClass = $this->createTimetableClass($class);
+//                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+//
+//                /* Process students
+//                 */
+//                foreach ($class['students'] as $student) {
+//
+//                    /* Throw warning, but assign them anyway
+//                     */
+//                    if (!isset($users[$student['username']])) {
+//                        $this->log->warning(sprintf(
+//                            'Tried to assign nonexistent schoolbox account %s to class %s %s',
+//                            $student['username'],
+//                            $timetableClass->getName(),
+//                            $timetableClass->getCode()
+//                        ));
+//                    }
+//
+//                    $this->createTimetableClassInvolvement($student, $timetableClass);
+//                }
+//            }
         }
 
         if (!$this->perform) {
