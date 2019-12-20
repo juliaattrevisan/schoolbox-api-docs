@@ -306,6 +306,9 @@ class Courses
                             $assignmentData['created_at'],
                             $assignmentData['updated_at'],
                             $assignmentData['muted'],
+                            $assignmentData['isQuiz'],
+                            $assignmentData['quiz_type'],
+                            $assignmentData['anonymous_submissions'],
                             $assignmentData['position']
                         );
                         $synchronizedSubmissionBoxIds[] = $submissionBox->getId();
@@ -503,6 +506,9 @@ class Courses
      * @param string       $createdAt
      * @param string       $updatedAt
      * @param bool         $muted
+     * @param bool         $isQuiz
+     * @param string       $quizType
+     * @param string       $anonymousSubmissions
      * @param int          $position
      * @return SubmissionBox
      * @throws Database\Exception
@@ -522,6 +528,9 @@ class Courses
         string $createdAt,
         string $updatedAt,
         bool $muted,
+        bool $isQuiz,
+        string $quizType,
+        string $anonymousSubmissions,
         int $position
     ): SubmissionBox {
         $this->countAssignmentsSynchronised++;
