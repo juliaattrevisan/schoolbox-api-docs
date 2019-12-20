@@ -128,38 +128,6 @@ class Definition implements IStrategy
 
 
     /**
-     * Find the most recent week
-     *
-     * @param array $cycles
-     * @return SimpleXMLElement
-     * @throws RuntimeException
-     */
-    private function findCurrentCycle(array $cycles): SimpleXMLElement
-    {
-        $n = \count($cycles);
-
-        if (!$n) {
-            throw new RuntimeException('No week nodes provided.');
-        }
-
-        $max = 0;
-
-        for ($i = 0; $i < $n; $i++) {
-            $cycle = $cycles[$i];
-
-            if ((int)$cycle->xpath('@index')[0] > $max) {
-                $max = $i;
-            }
-        }
-
-        /** @var SimpleXMLElement $cycle */
-        $cycle = $cycles[$max];
-
-        return $cycle;
-    }
-
-
-    /**
      * MASSIVE CAVEAT
      * Assume there's one campus set up in schoolbox instance
      *
@@ -264,75 +232,5 @@ class Definition implements IStrategy
         if (!$this->perform) {
             $this->log->info('Planning finished.');
         }
-    }
-
-
-    /**
-     * Find all the Days in a given $cycle and the longest Day of them all
-     *
-     * @param SimpleXMLElement $cycle
-     * @return array
-     * @throws Exception
-     */
-    private function findDays(SimpleXMLElement $cycle): array
-    {
-        $struct = [
-
-            /* Each cycle has the potential for different Period structs
-             * We only support a rectangular representation (every day must have the same number of periods)
-             * Find the day with the most number of periods and assume that to be canonical
-             * (some days have no period data)
-             */
-            'maxPeriods' => 0,
-
-            /* Store all the periods here, indexed by Day
-              */
-            'days' => []
-        ];
-
-        /* Explore all the Period data
-         */
-        $days = $cycle->xpath('Days/Day');
-
-        foreach ($days as $day) {
-            $periods = $day->xpath('Periods/Period');
-            $dayIndex = trim((string)$day->Day);
-
-            /* Figure out which day has the most periods
-             * Consider this value and scheme canonical
-             */
-            $numPeriods = \count($periods);
-
-            if ($numPeriods > $struct['maxPeriods']) {
-                $struct['maxPeriods'] = $numPeriods;
-            }
-
-            $struct['days'][$dayIndex] = [];
-
-            /** @var TimetablePeriod $period */
-            foreach ($periods as $period) {
-                $timetablePeriod = $this->timetablePeriodMapper->createModel()
-                    ->setTitle(trim((string)$period->Name))
-                    ->setDay($dayIndex)
-                    ->setSequence(trim((string)$period->Ordinal))
-                    ->setStart(trim((string)$period->StartTime . ':00'))
-                    ->setFinish(trim((string)$period->EndTime . ':00'));
-
-                $struct['days'][$dayIndex][] = $timetablePeriod;
-            }
-
-            /* Do a quick analysis in case there might be something amiss
-             */
-            if (!\count($struct['days'][$dayIndex])) {
-                $this->log->warning(sprintf(
-                    'Cycle %s (%s), Day %s has no periods.',
-                    trim((string)$cycle->xpath('@Id')[0]),
-                    trim((string)$cycle->Name),
-                    $dayIndex
-                ));
-            }
-        }
-
-        return $struct;
     }
 }
