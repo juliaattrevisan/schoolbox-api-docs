@@ -22,6 +22,6 @@ $data = file_get_contents('php://input');
  * You can test Receiver's processing by loading from a local xml
  * $data = file_get_contents('/vagrant/data/cache/stream/20191217133402.xml');
  */
-(new Receiver(Loader::getInstance()->get('stream_dir')))->receive($data);
+(new Receiver(Loader::getInstance()->get('stream_dir')))->receive((string)$data);
 
 exit();

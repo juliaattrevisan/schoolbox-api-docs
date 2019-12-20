@@ -53,7 +53,7 @@ class Receiver
         /* file_get_contents returns mixed data string|bool
          * Interpret that and respond accordingly
          */
-        if (false === $data) {
+        if ('' === $data) {
             $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <SMSDirectoryData>
@@ -83,14 +83,14 @@ XML;
         /* Figure out the prefix for this payload's filename
          */
         $prefix = (string)$nodes->xpath('/SMSDirectoryData/@sync')[0];
-        $file   = "{$this->dir}/{$prefix}_$this->suffix";
+        $path = "{$this->dir}/{$prefix}_{$this->suffix}";
 
         /* Write xml file
          */
-        $file = @fopen($file, 'w');
+        $file = @fopen($path, 'w');
 
         if (!$file) {
-            throw new RuntimeException("Unable to open file {$file} for local caching.");
+            throw new RuntimeException("Unable to open file {$path} for local caching.");
         }
 
         fwrite($file, $data);
