@@ -51,6 +51,12 @@ class SubjectIterator implements Iterator
 
 
     /**
+     * @var string
+     */
+    private $day;
+
+
+    /**
      * SubjectIterator constructor.
      *
      * @param Batchxml         $batchxml
@@ -62,6 +68,7 @@ class SubjectIterator implements Iterator
         $this->batchxml = $batchxml;
         $this->studentId = $studentId;
         $this->subjects = $day->xpath('slots/subjects');
+        $this->day = trim((string)$day->xpath('@index')[0]);
     }
 
 
@@ -78,6 +85,12 @@ class SubjectIterator implements Iterator
     {
         $subjectNode = $this->subjects[$this->position];
 
+        /* Skip empty slots that don't have any subject in them
+         */
+        if (null === $subjectNode->subject->code) {
+            return null;
+        }
+
         /* Class
          */
         $subject = $this->findSubject($subjectNode->subject);
@@ -85,7 +98,7 @@ class SubjectIterator implements Iterator
         /* Teacher
          * (I've only seen one per class in the xml so far...but there could be many?)
          */
-        $teachers = $this->findTeacher($subjectNode);
+        $teachers = $this->findTeacher($subjectNode->subject);
 
         /* Students
          */
@@ -93,11 +106,18 @@ class SubjectIterator implements Iterator
 
         /* Room
          */
-        $room = $this->findRoom($subjectNode);
+        $room = $this->findRoom($subjectNode->subject);
+
+        /* Period Name
+         * TODO: Unify with usage in Definition.php
+         */
+        $period = 'Period ' . (int)$subjectNode->xpath('@slot')[0];
 
         /* Basic TimetableClass data
          */
         $class = [
+            'day' => $this->day,
+            'period' => $period,
             'class' => $subject,
             'room' => $room,
             'teachers' => $teachers,
@@ -113,17 +133,21 @@ class SubjectIterator implements Iterator
      * It can be either in the Core node or the Option node
      *
      * @param SimpleXMLElement $subjectNode
-     * @return array
+     * @return array|null
      */
-    private function findSubject(SimpleXMLElement $subjectNode): array
+    private function findSubject(SimpleXMLElement $subjectNode): ?array
     {
         $code = null;
-        $name = null;
 
         if (isset($subjectNode->core)) {
-            $name = '' !== trim((string)$subjectNode->core);
+            $name = trim((string)$subjectNode->core);
         } elseif (isset($subjectNode->option)) {
-            $name = '' !== trim((string)$subjectNode->option);
+            $name = trim((string)$subjectNode->option);
+        } else {
+
+            /* No subjects in this slot
+             */
+            return null;
         }
 
         if (isset($subjectNode->code)) {

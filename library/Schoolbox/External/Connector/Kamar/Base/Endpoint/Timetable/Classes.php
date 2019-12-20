@@ -192,16 +192,12 @@ class Classes implements IStrategy
      * @param string $ext
      * @param array  $periods
      * @param string $day
-     * @param string $periodName
+     * @param string|null $periodName
      * @return TimetablePeriod|null
      */
-    private function findPeriod(string $ext, array $periods, string $day, string $periodName): ?TimetablePeriod
+    private function findPeriod(string $ext, array $periods, string $day, ?string $periodName): ?TimetablePeriod
     {
-        if (isset($periods['ext'][$ext]['day'][$day]['period'][$periodName])) {
-            return $periods['ext'][$ext]['day'][$day]['period'][$periodName];
-        }
-
-        return null;
+        return $periods['ext'][$ext]['day'][$day]['period'][$periodName] ?? null;
     }
 
 
@@ -281,50 +277,40 @@ class Classes implements IStrategy
                 $subjects = new SubjectIterator($this->batchxml, $studentId, $day);
 
                 foreach ($subjects as $subject) {
-print_r($subject);
-//                    /* TODO: Unify with usage in Definition.php
-//                     */
-//                    $periodName = 'Period ' . (int)$subject->xpath('@slot')[0];
-//
-//                    /* Look up the period instance by (name, day)
-//                     *
-//                     * If the period doesn't correspond to something in our timetable definition,
-//                     * we can't process it anyway, so skip it
-//                     */
-//                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $periodName);
-//
-//                    $this->log->info(sprintf(
-//                        'Looking for ext_timetable_code %s, day %s, period %s',
-//                        $ext,
-//                        $dayNum,
-//                        $periodName
-//                    ));
-//
-//                    if (null === $timetablePeriod) {
-//                        $this->log->warning(sprintf(
-//                            'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
-//                            $dayNum,
-//                            $periodName,
-//                            $ext
-//                        ));
-//
-//                        continue;
-//                    }
-//
-//                    try {
-//                        $timetableClass = $this->createTimetableClass($subject->subject);
-//                    } catch(UnexpectedValueException $e) {
-//
-//                        $this->log->info(sprintf(
-//                            'No classes found for student %s, day %s, period %s',
-//                            $studentId,
-//                            $dayNum,
-//                            $periodName
-//                        ));
-//
-//                        continue;
-//                    }
 
+                    /* Subject doesn't exist in this slot
+                     */
+                    if (null === $subject) {
+                        continue;
+                    }
+
+                    /* Look up the period instance by (name, day)
+                     *
+                     * If the period doesn't correspond to something in our timetable definition,
+                     * we can't process it anyway, so skip it
+                     */
+                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['period']);
+
+                    $this->log->info(sprintf(
+                        'Looking for ext_timetable_code %s, day %s, period %s',
+                        $ext,
+                        $dayNum,
+                        $subject['period']
+                    ));
+
+                    try {
+                        $timetableClass = $this->createTimetableClass($subject);
+                    } catch(UnexpectedValueException $e) {
+
+                        $this->log->info(sprintf(
+                            'No classes found for student %s, day %s, period %s',
+                            $studentId,
+                            $dayNum,
+                            $subject['period']
+                        ));
+
+                        continue;
+                    }
                 }
             }
 
@@ -367,37 +353,20 @@ print_r($subject);
     /**
      * Create a Timetable Class
      *
-     * @param SimpleXMLElement $subject
+     * @param array $subject
      * @return ClassEntry
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClass(SimpleXMLElement $subject): ClassEntry
+    private function createTimetableClass(array $subject): ClassEntry
     {
-        $code = trim((string)$subject->code);
-        $defaultName = 'Unknown subject';
-
-        /* Subjects are either option or core, supplying different nodes
-         * as a consequence. Why they didn't just make it all the same
-         * will remain a kamar mystery
-         */
-        if (isset($subject->core)) {
-            $name = '' !== trim((string)$subject->core) ?: $defaultName;
-        } elseif (isset($subject->option)) {
-            $name = '' !== trim((string)$subject->option) ?: $defaultName ;
-        } else {
-
-            /* Slots 1-10 are always provided; subjects may not exist inside them
-             */
-            throw new UnexpectedValueException('No subjects in this slot.');
-        }
 
         /** @var ClassEntry $timetableClass */
         $timetableClass = $this->classEntryMapper->createModel()
-            ->setCode($code)
-            ->setName($name)
-            ->setDescription($name);
+            ->setCode($subject['class']['code'])
+            ->setName($subject['class']['name'])
+            ->setDescription($subject['class']['name']);
 
         $this->log->info(sprintf(
             'Creating new class %s %s',
