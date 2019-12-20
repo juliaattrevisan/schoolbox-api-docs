@@ -20,6 +20,8 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable as KamarTimetable;
+
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
@@ -188,15 +190,28 @@ class Factory
         $batchxml = new KamarBatchxml($api);
 
         return (new GenericCollection(IStrategy::class))
-            ->add(new KamarProfile\Composite(
+//            ->add(new KamarProfile\Composite(
+//                $this->logger,
+//                $this->perform,
+//                $batchxml,
+//                UserProfile\Mapper::getInstance(),
+//                UserProfile\Student\Mapper::getInstance(),
+//                UserProfile\Parent\Mapper::getInstance(),
+//                UserProfile\Staff\Mapper::getInstance(),
+//                UserProfile\Relationship\Mapper::getInstance()
+//            ))
+            ->add(new KamarTimetable\Composite(
                 $this->logger,
                 $this->perform,
                 $batchxml,
-                UserProfile\Mapper::getInstance(),
-                UserProfile\Student\Mapper::getInstance(),
-                UserProfile\Parent\Mapper::getInstance(),
-                UserProfile\Staff\Mapper::getInstance(),
-                UserProfile\Relationship\Mapper::getInstance()
+                CampusMapper::getInstance(),
+                UserMapper::getInstance(),
+                TimetableCampusMapper::getInstance(),
+                TimetableCycleMapper::getInstance(),
+                TimetablePeriodMapper::getInstance(),
+                ClassEntryMapper::getInstance(),
+                ClassInvolvementMapper::getInstance(),
+                ClassPeriodMapper::getInstance()
             ));
     }
 }
