@@ -25,8 +25,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use SimpleXMLElement;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Classes
@@ -223,8 +221,6 @@ class Classes implements IStrategy
      * Import data from xml into local schema
      *
      * @throws RuntimeException
-     * @throws InvalidUriPartException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     public function import(): void
