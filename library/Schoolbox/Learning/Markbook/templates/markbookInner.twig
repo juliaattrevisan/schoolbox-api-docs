@@ -36,7 +36,7 @@
     <div class="small-12 island">
         {% if markbook.assessments|length > 0 %}
         <form id="statistics" action="#">
-        <table class="marksheet" data-mark-sheet>
+        <table id="marksheet-styles" class="marksheet" data-mark-sheet>
             <thead>
                 <tr class="rotate-headers" data-headers data-hidable-columns>
                     <th>&nbsp;</th>
@@ -96,14 +96,14 @@
                             {% if assessment.markvisibility is not null %}
                                 {% set selected = assessment.markvisibility %}
                                 {% set allOptions = {
-                                    0: 'Staff Only',
-                                    1: 'Staff and Students',
-                                    2: 'Staff, Students and their Parents'
+                                    0: '&#xe63e; Staff Only',
+                                    1: '&#xe667; Staff and Students',
+                                    2: '&#xe666; Staff, Students and their Parents'
                                 } %}
                                 <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
                                     {% for currentOption, label in allOptions %}
                                         <option value="{{ currentOption }}"
-                                                {% if currentOption == selected %}selected="selected"{% endif %}> {{ label }} </option>
+                                                {% if currentOption == selected %}selected="selected"{% endif %}> {{ label|raw }} </option>
                                     {% endfor %}
                                 </select>
                             {% endif %}
