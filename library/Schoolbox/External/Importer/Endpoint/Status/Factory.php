@@ -57,6 +57,8 @@ class Factory
                 return new Connector\Isams\Base\Endpoint\Status($this->host, $this->key);
 
             case Endpoint\Factory::KAMAR:
+                return new Connector\Kamar\Base\Endpoint\Status($this->host);
+
             case Endpoint\Factory::SENTRAL:
             default:
                 // Use manual csv imports
