@@ -12,6 +12,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>Line</th>
                     <th>Folder<em></em>
                         <span data-tooltip class="hint has-tip tip-right" title="The name of the folder, indicated from reading the rows in the CSV file.">?</span>
                     </th>
@@ -27,7 +28,7 @@
             <tbody>
                 {% for result in folders %}
                     <tr>
-                        <td>Row {{ result.row }}</td>
+                        <td>{{ result.row }}</td>
                         <td>
                         {% if result.id %}
                             <a href="/homepage/{{ result.id }}">{{ result.name }}</a>
