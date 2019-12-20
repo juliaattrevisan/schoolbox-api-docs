@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
@@ -294,7 +295,7 @@ class Courses
                     $synchronizedCourseFolderIds[] = $unitSpecFolder->getId();
 
                     foreach ($courseData['assignments'] as $assignmentCanvasId => $assignmentData) {
-                        $submissionBox                  = $this->processCanvasAssignment(
+                        $assessment                  = $this->processCanvasAssignment(
                             $unitSpecFolder,
                             $assignmentCanvasId,
                             $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
@@ -311,7 +312,11 @@ class Courses
                             $assignmentData['anonymous_submissions'],
                             $assignmentData['position']
                         );
-                        $synchronizedSubmissionBoxIds[] = $submissionBox->getId();
+                        if ($assignmentData['isQuiz']) {
+                            $synchronizedQuizIds[] = $assessment->getId();
+                        } else {
+                            $synchronizedSubmissionBoxIds[] = $assessment->getId();
+                        }
                     }
                 }
             }
@@ -493,7 +498,7 @@ class Courses
 
 
     /**
-     * Sync a Canvas Assignment with Schoolbox SubmissionBox Spec
+     * Sync a Canvas Assignment with Schoolbox SubmissionBoxSpec or QuizSpec
      *
      * @param Folder\Model $unitSpecFolder
      * @param int          $canvasId
@@ -532,8 +537,80 @@ class Courses
         string $quizType,
         string $anonymousSubmissions,
         int $position
-    ): SubmissionBox {
+    ): IAssessableDataModel
+    {
         $this->countAssignmentsSynchronised++;
+
+        return $isQuiz
+            ? $this->syncWithQuiz(
+                $unitSpecFolder,
+                $canvasId,
+                $courseTeacherSchoolboxUserId,
+                $title,
+                $description,
+                $pointsPossible,
+                $gradingType,
+                $submissionTypes,
+                $createdAt,
+                $updatedAt,
+                $muted,
+                $isQuiz,
+                $quizType,
+                $anonymousSubmissions,
+                $position
+            )
+            : $this->syncWithSubmissionBox(
+                $unitSpecFolder,
+                $canvasId,
+                $courseTeacherSchoolboxUserId,
+                $title,
+                $description,
+                $pointsPossible,
+                $gradingType,
+                $submissionTypes,
+                $createdAt,
+                $updatedAt,
+                $muted,
+                $position
+            );
+    }
+
+    /**
+     * Synchronises a Canvas Assignment to a Schoolbox SubmissionBox
+     *
+     * @param Folder\Model $unitSpecFolder
+     * @param int          $canvasId
+     * @param int          $courseTeacherSchoolboxUserId
+     * @param string       $title
+     * @param string|null  $description
+     * @param float|null   $pointsPossible
+     * @param string       $gradingType
+     * @param string       $submissionTypes
+     * @param string       $createdAt
+     * @param string       $updatedAt
+     * @param bool         $muted
+     * @param int          $position
+     * @return SubmissionBox
+     * @throws Database\Exception
+     * @throws InvalidArgumentException
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     */
+    private function syncWithSubmissionBox(
+        Folder\Model $unitSpecFolder,
+        int $canvasId,
+        int $courseTeacherSchoolboxUserId,
+        string $title,
+        ?string $description,
+        ?float $pointsPossible,
+        string $gradingType,
+        string $submissionTypes,
+        string $createdAt,
+        string $updatedAt,
+        bool $muted,
+        int $position
+    ): SubmissionBox
+    {
         $submissionBox = $this->findSubmissionBoxSpec($canvasId);
 
         // Translate Canvas attributes to SB attributes if not a 1:1 between systems
@@ -628,6 +705,48 @@ class Courses
             );
         }
         return $submissionBox;
+    }
+
+
+    /**
+     * Synchronises a Canvas Quiz to a Schoolbox SubmissionBox
+     *
+     * @param Folder\Model $unitSpecFolder
+     * @param int          $canvasId
+     * @param int          $courseTeacherSchoolboxUserId
+     * @param string       $title
+     * @param string|null  $description
+     * @param float|null   $pointsPossible
+     * @param string       $gradingType
+     * @param string       $submissionTypes
+     * @param string       $createdAt
+     * @param string       $updatedAt
+     * @param bool         $muted
+     * @param bool         $isQuiz
+     * @param string       $quizType
+     * @param string       $anonymousSubmissions
+     * @param int          $position
+     * @return Quiz\Model
+     */
+    private function syncWithQuiz(
+        Folder\Model $unitSpecFolder,
+        int $canvasId,
+        int $courseTeacherSchoolboxUserId,
+        string $title,
+        ?string $description,
+        ?float $pointsPossible,
+        string $gradingType,
+        string $submissionTypes,
+        string $createdAt,
+        string $updatedAt,
+        bool $muted,
+        bool $isQuiz,
+        string $quizType,
+        string $anonymousSubmissions,
+        int $position
+    ): Quiz\Model
+    {
+        return null;
     }
 
 
