@@ -593,8 +593,8 @@ class Courses
             $submissionBox->getSelfReviewability() !== $selfReviewability ||
             $assessmentModel->getCreatedAt()->getDatabase() !== $createdAt ||
             $assessmentModel->getUpdatedAt()->getDatabase() !== $updatedAt ||
-            (int)$submissionBox->getCategory()->getId() !== (int)$unitSpecFolder->getId() || // TODO remove hydration bug compensation in 19.1
-            (int)$submissionBox->getMarkType()->getId() !== (int)$markType->getId()
+            $submissionBox->getCategory()->getId() !== $unitSpecFolder->getId() ||
+            $submissionBox->getMarkType()->getId() !== $markType->getId()
         ) {
             // Update all attributes and update
             $this->log->debug("SubmissionBox '$title' (canvasId: $canvasId) updated");

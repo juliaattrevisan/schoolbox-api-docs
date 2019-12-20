@@ -253,7 +253,7 @@ class CourseSections
             $sectionSisSourceIdBindings = Builder::getBindings($sectionSisSourceIds, 's_cid');
 
             $sql       = "
-                SELECT 
+                SELECT
                     account.canvas_id                                   'account.canvas_id',
                     course.code                                         'course.code',
                     course.canvas_id                                    'course.canvas_id',
@@ -306,12 +306,12 @@ class CourseSections
                 LEFT JOIN course_section_dim override_section ON override.course_section_id = override_section.id AND override.set_type = 'course_section'
                 -- course groups
                 LEFT JOIN group_dim override_group ON override_group.id = override.group_id AND override.set_type = 'group'
-                LEFT JOIN group_membership_fact group_membership ON group_membership.group_id = override_group.id 
+                LEFT JOIN group_membership_fact group_membership ON group_membership.group_id = override_group.id
                 LEFT JOIN pseudonym_dim group_pseudonym ON group_pseudonym.user_id = group_membership.user_id
                 -- individual assignees
                 LEFT JOIN assignment_override_user_dim override_user ON override_user.assignment_override_id = override.id AND override.set_type = 'adhoc'
                 LEFT JOIN pseudonym_dim user_pseudonym ON user_pseudonym.user_id = override_user.user_id
-                WHERE 
+                WHERE
                     assignment.canvas_id IN ({$assignmentCanvasIdBindings->getPlaceholder()}) AND
                     section.sis_source_id IN ({$sectionSisSourceIdBindings->getPlaceholder()})
                 ORDER BY account.canvas_id, course.code, course.canvas_id, section.canvas_id, assignment.canvas_id, override.canvas_id
@@ -1053,10 +1053,9 @@ class CourseSections
             $submissionBoxImpl->getAcceptMultiple() !== $submissionBoxSpec->getAcceptMultiple() ||
             $submissionBoxImpl->getMarkVisibility() !== $submissionBoxSpec->getMarkVisibility() ||
             $submissionBoxImpl->getSelfReviewability() !== $submissionBoxSpec->getSelfReviewability() ||
-            (int)$submissionBoxImpl->getOwner()->getId() !== (int)$owner->getId() ||
-            (int)$submissionBoxImpl->getCategory()->getId() !== (int)$unitImpl->getFolder()->getId() ||
-            (int)$submissionBoxImpl->getMarkType()->getId() !== (int)$submissionBoxSpec->getMarkType()
-                                                                                       ->getId()  // TODO remove hydration bug compensation in 19.1
+            $submissionBoxImpl->getOwner()->getId() !== $owner->getId() ||
+            $submissionBoxImpl->getCategory()->getId() !== $unitImpl->getFolder()->getId() ||
+            $submissionBoxImpl->getMarkType()->getId() !== $submissionBoxSpec->getMarkType()->getId()
         ) {
             $this->log->debug("Updating SubmissionBoxImpl for Canvas Assignment (canvasId: $assignmentCanvasId)");
             $updated = true;
@@ -1333,11 +1332,6 @@ class CourseSections
 
             $submissionBox->setAssessmentModel($assessment);
             $assessment->setDueWork($submissionBox);
-            // TODO remove hydration bug compensation fix in 19.1.
-            $assessment
-                ->setQuiz()
-                ->setTask()
-                ->setProject();
             $this->submissionBoxSpecCache[$assignmentCanvasId] = $submissionBox;
         }
 
@@ -1366,15 +1360,15 @@ class CourseSections
         // which belongs to a CourseSpec that relates to a CanvasCourse.
         // Any Schoolbox CourseImpl whose CourseSpec does not relate to a Canvas CourseGroup can be ignored.
         $sql = "
-            SELECT 
+            SELECT
                    {$this->courseImplMapper->getColumnString('ci')},
                    {$this->courseSpecMapper->getColumnString('cs')}
             FROM course_implementation ci
             JOIN course_specification cs on ci.course_specification_id = cs.id
             JOIN folder csf ON csf.id = cs.folder_id
-            WHERE 
+            WHERE
                 ci.deleted_at IS NULL AND
-                csf.deleted_at IS NULL AND 
+                csf.deleted_at IS NULL AND
                 ci.folder_id = :ciFolderId AND
                 $courseSpecFolderWhere
         ";
@@ -1415,12 +1409,12 @@ class CourseSections
     {
         // A Canvas CourseSection is mapped to a 1:1:1:1 of SB CourseSpec:CourseImpl:UnitImpl:ClassFolder.
         $sql = "
-            SELECT 
+            SELECT
                    {$this->unitImplMapper->getColumnString('ui')},
                    {$this->unitSpecMapper->getColumnString('us')}
             FROM course_unit_implementation ui
             JOIN course_unit_specification us on ui.course_unit_specification_id = us.id
-            WHERE 
+            WHERE
                   ui.course_implementation_id = :ciId AND
                   ui.deleted_at IS NULL
         ";
