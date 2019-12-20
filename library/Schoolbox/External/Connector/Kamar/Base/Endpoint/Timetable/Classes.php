@@ -308,6 +308,21 @@ class Classes implements IStrategy
 
                         continue;
                     }
+
+                    try {
+                        $timetableClass = $this->createTimetableClass($subject->subject);
+                    } catch(UnexpectedValueException $e) {
+
+                        $this->log->info(sprintf(
+                            'No classes found for student %s, day %s, period %s',
+                            $studentId,
+                            $dayNum,
+                            $periodName
+                        ));
+
+                        continue;
+                    }
+
                 }
             }
 
@@ -350,19 +365,37 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class
      *
-     * @param array $class
+     * @param SimpleXMLElement $subject
      * @return ClassEntry
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClass(array $class): ClassEntry
+    private function createTimetableClass(SimpleXMLElement $subject): ClassEntry
     {
+        $code = trim((string)$subject->code);
+        $defaultName = 'Unknown subject';
+
+        /* Subjects are either option or core, supplying different nodes
+         * as a consequence. Why they didn't just make it all the same
+         * will remain a kamar mystery
+         */
+        if (isset($subject->core)) {
+            $name = '' !== trim((string)$subject->core) ?: $defaultName;
+        } elseif (isset($subject->option)) {
+            $name = '' !== trim((string)$subject->option) ?: $defaultName ;
+        } else {
+
+            /* Slots 1-10 are always provided; subjects may not exist inside them
+             */
+            throw new UnexpectedValueException('No subjects in this slot.');
+        }
+
         /** @var ClassEntry $timetableClass */
         $timetableClass = $this->classEntryMapper->createModel()
-            ->setCode($class['class']['code'])
-            ->setName($class['class']['name'])
-            ->setDescription($class['class']['name']);
+            ->setCode($code)
+            ->setName($name)
+            ->setDescription($name);
 
         $this->log->info(sprintf(
             'Creating new class %s %s',
