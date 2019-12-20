@@ -79,6 +79,7 @@ XML;
         $nodes = new SimpleXMLElement($data);
 
         /* Figure out the prefix for this payload's filename
+         * TODO: Timetable xml payload may not have this node attribute
          */
         $prefix = (string)$nodes->xpath('/SMSDirectoryData/@sync')[0];
         $path = "{$this->dir}/{$prefix}_{$this->suffix}";
