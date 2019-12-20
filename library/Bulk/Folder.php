@@ -152,7 +152,6 @@ class Bulk_Folder
      * @throws InvalidColumnException
      * @throws MapperException
      * @throws PDOException
-     * @throws Throwable
      * @throws UnexpectedValueException
      */
     private function processCsvRow(
@@ -204,7 +203,14 @@ class Bulk_Folder
 
         // Persist models to DB.
         $newFolder->setInherit($this->inherit && count($newFolder->getCodes()) === 0);
-        $this->folderMapper->save($newFolder);
+        try {
+            $this->folderMapper->save($newFolder);
+        } catch (Throwable $e) {
+            // This should never happen, but if it does, log it and try to continue
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return $this->buildRowResult($rowIdx, '', $newFolder->getName(), 'Error', $e->getMessage());
+        }
+
         $this->saveHomepageConfig($newFolder->getHomepage());
         $this->saveRolePermissions($newFolder);
 
