@@ -25,17 +25,18 @@
                 </tr>
             </thead>
             <tbody>
-                {% for folder in folders %}
+                {% for result in folders %}
                     <tr>
+                        <td>Row {{ result.row }}</td>
                         <td>
-                        {% if folder.id %}
-                            <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
+                        {% if result.id %}
+                            <a href="/homepage/{{ result.id }}">{{ result.name }}</a>
                         {% else %}
-                            {{ folder.name }}
+                            {{ result.name }}
                         {% endif %}
                         </td>
-                        <td>{{ folder.status }}</td>
-                        <td>{{ folder.error }}</td>
+                        <td>{{ result.status }}</td>
+                        <td>{{ result.error }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

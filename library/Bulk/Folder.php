@@ -120,8 +120,10 @@ class Bulk_Folder
 
         $yearLevels = $this->getAllYearLevels();
 
+        $rowIdx = 2; // We have already processed the header in row 1
         while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
             $results[] = $this->processCsvRow(
+                $rowIdx++,
                 $row,
                 $parentColumn,
                 $folderNameColumn,
@@ -138,6 +140,7 @@ class Bulk_Folder
     /**
      * Process a single row from the CSV and returns an array describing the processing results.
      *
+     * @param int                                 $rowIdx
      * @param array                               $row
      * @param int                                 $parentColumnIndex
      * @param int                                 $folderNameColumnIndex
@@ -149,9 +152,11 @@ class Bulk_Folder
      * @throws InvalidColumnException
      * @throws MapperException
      * @throws PDOException
+     * @throws Throwable
      * @throws UnexpectedValueException
      */
     private function processCsvRow(
+        int $rowIdx,
         array $row,
         int $parentColumnIndex,
         int $folderNameColumnIndex,
@@ -166,14 +171,14 @@ class Bulk_Folder
         // Parent folder and Import Folder name must exist
         if (($parentId === '') || ($folderName === '')) {
             $error = "Parent id and folder name must be provided. Found: parent='$parentId', folderName='$folderName'";
-            return $this->buildRowResult('', '', 'Not Added', $error);
+            return $this->buildRowResult($rowIdx, '', '', 'Not Added', $error);
         }
 
         // Check parent exists
         try {
             $parent = $this->folderMapper->findById($parentId);
         } catch (MapperException $e) {
-            return $this->buildRowResult('', $folderName, 'Not Added', "Could not find parent folder {$parentId}");
+            return $this->buildRowResult($rowIdx, '', $folderName, 'Not Added', "Could not find parent folder {$parentId}");
         }
 
         $homepageConfig = (new HomepageConfig())->setTemplate((new HomepageTemplate())->setId($this->templateID));
@@ -186,13 +191,13 @@ class Bulk_Folder
         $homepageConfig->setCategory($newFolder);
 
         // Folder Codes
-        $result = $this->processFolderCodes($row, $newFolder, $folderCodeColumnIndexes);
+        $result = $this->processFolderCodes($rowIdx, $row, $newFolder, $folderCodeColumnIndexes);
         if ($result) {
             return $result;
         }
 
         // Year Levels
-        $result = $this->processYearLevels($row, $newFolder, $yearLevels, $yearLevelColumnIndexes);
+        $result = $this->processYearLevels($rowIdx, $row, $newFolder, $yearLevels, $yearLevelColumnIndexes);
         if ($result) {
             return $result;
         }
@@ -203,7 +208,7 @@ class Bulk_Folder
         $this->saveHomepageConfig($newFolder->getHomepage());
         $this->saveRolePermissions($newFolder);
 
-        return $this->buildRowResult((string)$newFolder->getId(), $newFolder->getNameWithCodes(), 'Added', 'OK');
+        return $this->buildRowResult($rowIdx, (string)$newFolder->getId(), $newFolder->getNameWithCodes(), 'Added', 'OK');
     }
 
 
@@ -212,6 +217,7 @@ class Bulk_Folder
      *
      * If an error is detected, returns an array describing the issue.
      *
+     * @param int          $rowIdx
      * @param array        $row
      * @param Folder\Model $newFolder
      * @param array        $folderCodeColumnIndexes
@@ -219,7 +225,7 @@ class Bulk_Folder
      * @throws InvalidColumnException
      * @throws PDOException
      */
-    private function processFolderCodes(array $row, Folder\Model $newFolder, array $folderCodeColumnIndexes): ?array
+    private function processFolderCodes(int $rowIdx, array $row, Folder\Model $newFolder, array $folderCodeColumnIndexes): ?array
     {
         $codes = $lowerCaseCodes = [];
         foreach ($folderCodeColumnIndexes as $i) {
@@ -230,19 +236,19 @@ class Bulk_Folder
             $lowerCaseCode = strtolower($folderCode);
             if (in_array($lowerCaseCode, $lowerCaseCodes, true) && !in_array($folderCode, $codes, true)) {
                 $error = "Ambiguous folder code. Same characters but different capitalisation ({$folderCode})";
-                return $this->buildRowResult('', $newFolder->getName(), 'Skipped', $error);
+                return $this->buildRowResult($rowIdx, '', $newFolder->getName(), 'Skipped', $error);
             }
 
             // Check if code too long
             if (strlen($folderCode) > Folder\Code\Model::CODE_LENGTH_MAX) {
                 $error = sprintf("Folder code exceeds %d characters ({$folderCode})", Folder\Code\Model::CODE_LENGTH_MAX);
-                return $this->buildRowResult('', $newFolder->getName(), 'Skipped', $error);
+                return $this->buildRowResult($rowIdx, '', $newFolder->getName(), 'Skipped', $error);
             }
 
             // Check if folder code already exists
             try {
                 $this->folderMapper->findByCode($folderCode);
-                return $this->buildRowResult('', $folderCode, 'Skipped', "Folder code already exists ({$folderCode})");
+                return $this->buildRowResult($rowIdx, '', $folderCode, 'Skipped', "Folder code already exists ({$folderCode})");
             } catch (MapperException $e) {
                 // noop - folder doesn't exist
                 $codes[]          = $folderCode;
@@ -268,6 +274,7 @@ class Bulk_Folder
      *
      * If an error is detected, returns an array describing the issue.
      *
+     * @param int               $rowIdx
      * @param array             $row
      * @param Folder\Model      $newFolder
      * @param GenericCollection $yearLevels
@@ -275,6 +282,7 @@ class Bulk_Folder
      * @return array|null
      */
     private function processYearLevels(
+        int $rowIdx,
         array $row,
         Folder\Model $newFolder,
         GenericCollection $yearLevels,
@@ -289,7 +297,7 @@ class Bulk_Folder
 
             $yearLevel = $yearLevels->getOffset($yearLevelName);
             if (!$yearLevel) {
-                return $this->buildRowResult('', $newFolder->getName(), 'Skipped', "Year Level '$yearLevelName' not found");
+                return $this->buildRowResult($rowIdx, '', $newFolder->getName(), 'Skipped', "Year Level '$yearLevelName' not found");
             }
             $folderYearLevels->add($yearLevel);
         }
@@ -344,15 +352,17 @@ class Bulk_Folder
     /**
      * Consistently build an array that describes the result of a row's processing.
      *
+     * @param int    $rowIdx
      * @param string $id
      * @param string $folderName
      * @param string $status
      * @param string $error
      * @return array
      */
-    private function buildRowResult(string $id, string $folderName, string $status, string $error): array
+    private function buildRowResult(int $rowIdx, string $id, string $folderName, string $status, string $error): array
     {
         return [
+            'row'    => $rowIdx,
             'id'     => $id,
             'name'   => $folderName,
             'status' => $status,
