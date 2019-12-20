@@ -318,37 +318,26 @@ class Classes implements IStrategy
                     }
 
                     $this->createTimetableClassPeriod($users, $subject, $ext, $timetablePeriod, $timetableClass);
+
+                    /* Process students
+                     */
+                    foreach ($subject['students'] as $student) {
+
+                        /* Throw warning, but assign them anyway
+                         */
+                        if (!isset($users[$student['username']])) {
+                            $this->log->warning(sprintf(
+                                'Tried to assign nonexistent schoolbox account %s to class %s %s',
+                                $student['username'],
+                                $timetableClass->getName(),
+                                $timetableClass->getCode()
+                            ));
+                        }
+
+                        $this->createTimetableClassInvolvement($student, $timetableClass);
+                    }
                 }
             }
-
-
-//
-//            foreach ($classes as $class) {
-//
-//
-//                /* Assemble the pieces
-//                 */
-//                $timetableClass = $this->createTimetableClass($class);
-//                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
-//
-//                /* Process students
-//                 */
-//                foreach ($class['students'] as $student) {
-//
-//                    /* Throw warning, but assign them anyway
-//                     */
-//                    if (!isset($users[$student['username']])) {
-//                        $this->log->warning(sprintf(
-//                            'Tried to assign nonexistent schoolbox account %s to class %s %s',
-//                            $student['username'],
-//                            $timetableClass->getName(),
-//                            $timetableClass->getCode()
-//                        ));
-//                    }
-//
-//                    $this->createTimetableClassInvolvement($student, $timetableClass);
-//                }
-//            }
         }
 
         if (!$this->perform) {
