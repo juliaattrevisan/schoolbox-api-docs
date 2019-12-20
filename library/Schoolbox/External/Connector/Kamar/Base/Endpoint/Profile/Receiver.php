@@ -50,9 +50,7 @@ class Receiver
      */
     public function receive(string $data): void
     {
-        /* file_get_contents returns mixed data string|bool
-         * Interpret that and respond accordingly
-         */
+
         if ('' === $data) {
             $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
