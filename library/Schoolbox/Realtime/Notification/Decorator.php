@@ -307,7 +307,7 @@ class Decorator extends NotificationBundle
                         case ParameterInterface::STACKING_IGNORE:
                         default:
                             // ignore? ok, ignored.
-                            continue;
+                            break;
                     }
                 }
 
@@ -428,4 +428,4 @@ class Decorator extends NotificationBundle
         return $notification->getIcon();
     }
 
-} 
+}
