@@ -24,7 +24,7 @@ use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Session\Session;
-use Alaress\Twig\Filter as TwigFilter;
+use Alaress\Twig\Filter as AlaressFilter;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Request\IsJson;
@@ -80,11 +80,12 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SitePage;
-use Twig_Extension_Debug;
+use Twig\Extension\DebugExtension;
 use Twig_Extensions_Extension_Text;
-use Twig_Loader_Filesystem;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
+use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\Environment;
 use Alaress_Date_Format;
 use Alaress\Database\Connector\IConnector;
 use External_Class;
@@ -130,7 +131,6 @@ use Schoolbox\Sync\Provisioner\Provisioner;
 use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
-use Twig_Environment;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
@@ -658,7 +658,7 @@ abstract class Kernel
             /** @var Predis\ClientInterface $redis */
             /** @var TourMapper $tourMapper */
             /** @var StepMapper $tourStepMapper */
-            /** @var Twig_Environment $templateEngine */
+            /** @var Environment $templateEngine */
             /** @var TopMenuMapper $topMenuMapper */
             /** @var SideMenuSectionMapper $sideMenuSectionMapper */
             /** @var SideMenuMapper $sideMenuMapper */
@@ -736,7 +736,7 @@ abstract class Kernel
                 function () use ($di) {
                     $config      = $di->get('config');
                     $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
-                    $baseLoader  = new Twig_Loader_Filesystem(array());
+                    $baseLoader  = new FilesystemLoader(array());
                     // Paths: prefer templates/{site_location} over templates/core
                     $basePath     = SITE_root.'/templates/';
                     $overridePath = $basePath.$config->get('site_location');
@@ -793,7 +793,7 @@ abstract class Kernel
                         $options['base_template_class'] = $twigClass;
                     }
 
-                    $twig = new Twig_Environment($di->get('templateEngine:loader'), $options);
+                    $twig = new Environment($di->get('templateEngine:loader'), $options);
 
 //                    if($this->debugEnabled) {
 //                        $twig = new TraceableTwigEnvironment($twig);
@@ -803,7 +803,7 @@ abstract class Kernel
                     // HTML Purifier filter - known to output safe HTML
 
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'purify',
                             array('Scrub', 'html'),
                             array('is_safe' => array('html'))
@@ -812,7 +812,7 @@ abstract class Kernel
 
                     // HTML2Text filter
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'html2text',
                             array('Scrub', 'html2text')
                         )
@@ -820,7 +820,7 @@ abstract class Kernel
 
                     // Cut sentence filter
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'cutSentence',
                             array('TextFormatter', 'cutSentence')
                         )
@@ -828,14 +828,14 @@ abstract class Kernel
 
                     // Bytes to string filter
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'bytes',
                             array('Alaress_Byte_Format', 'bytesToString')
                         )
                     );
 
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'column',
                             [ Collection::class, 'array_column' ]
                         )
@@ -843,7 +843,7 @@ abstract class Kernel
 
                     // MomentJsFormat filter
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'momentJsFormat',
                             [ \Alaress_Date_Format_Converter::class, 'toMomentJs' ]
                         )
@@ -851,7 +851,7 @@ abstract class Kernel
 
                     // Case insenstive replace function
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'ireplace',
                             function($string, array $tokens = []) {
                                 return str_ireplace(array_keys($tokens), array_values($tokens), $string);
@@ -860,7 +860,7 @@ abstract class Kernel
                     );
 
                     // Relative date function
-                    $twig->addFilter(new Twig_SimpleFilter('relativeDate', new TwigFilter\RelativeDate()));
+                    $twig->addFilter(new TwigFilter('relativeDate', new AlaressFilter\RelativeDate()));
 
                     // Global access to config object and localisation
                     // TODO capitalize globals
@@ -885,25 +885,25 @@ abstract class Kernel
 
                     // Define modules that are required by a template
                     $twig->addFunction(
-                        new Twig_SimpleFunction('requireModule', $di->get('templateEngine:requireModule'))
+                        new TwigFunction('requireModule', $di->get('templateEngine:requireModule'))
                     );
 
                     // Add the route lookup and authorization methods
                     $twig->addFunction(
-                        new Twig_SimpleFunction(
+                        new TwigFunction(
                             'routeLookup',
                             array($di->get('templateEngine:routeLookup'), 'execute')
                         )
                     );
                     $twig->addFunction(
-                        new Twig_SimpleFunction(
+                        new TwigFunction(
                             'isRouteAuthorized',
                             array($di->get('templateEngine:isRouteAuthorized'), 'execute')
                         )
                     );
 
                     $twig->addFunction(
-                        new Twig_SimpleFunction(
+                        new TwigFunction(
                             'getGuid',
                             function() {
                                 mt_srand((double)microtime() * 10000);
@@ -912,10 +912,10 @@ abstract class Kernel
                         )
                     );
 
-                    $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
+                    $twig->addFunction(new TwigFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
 
                     $twig->addFunction(
-                        new Twig_SimpleFunction(
+                        new TwigFunction(
                             'generateHiddenInputs',
                             new TwigMethod\GenerateHiddenInputs(),
                             ['is_safe' => ['html']]
@@ -925,7 +925,7 @@ abstract class Kernel
                     // Add extensions after everything else.
                     // According to https://twig.symfony.com/doc/1.x/deprecated.html#globals
                     // globals must be loaded before extensions.
-                    $twig->addExtension(new Twig_Extension_Debug());
+                    $twig->addExtension(new DebugExtension());
                     $twig->addExtension(new Twig_Extensions_Extension_Text());
                     $twig->addExtension(new AdminNavigationRenderer());
                     $twig->addExtension(new LearningRenderer());
