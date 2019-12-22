@@ -106,7 +106,7 @@ class Base extends BaseStatement
 
                         // Length was not specified, if the parameter is a string, use its length- otherwise pass NULL
 
-                        $this->getDataType($value, $value['type']) == PDO::PARAM_STR ? strlen($value['value']) : null,
+                        ($this->getDataType($value, $value['type']) == PDO::PARAM_STR ? strlen($value['value']) : null),
                 ];
             } else {
                 $this->parameters['input'][$key] = [
@@ -120,11 +120,11 @@ class Base extends BaseStatement
 
                         // Length was not specified, if the parameter is a string, use its length- otherwise pass NULL
 
-                        $this->getDataType($value) == PDO::PARAM_STR ? strlen($value) : null,
+                        ($this->getDataType($value) == PDO::PARAM_STR ? strlen($value) : null),
                 ];
             }
         }
-        
+
         return $this;
     }
 

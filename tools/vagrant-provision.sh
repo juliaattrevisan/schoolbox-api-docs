@@ -53,9 +53,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
-if [ "$phpversion" != "7.1" ];
+if [ "$phpversion" != "7.4" ];
 then
-    /usr/bin/update-alternatives --set php /usr/bin/php7.1;
+    /usr/bin/update-alternatives --set php /usr/bin/php7.4;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
