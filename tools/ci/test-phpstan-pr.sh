@@ -52,16 +52,9 @@ else
 	fi
 fi
 
-echo "Preparing conf.php"
-cp -f www/conf/conf.php www/conf/conf.php.bak;
-cp -f www/conf/tarball.conf.php www/conf/conf.php;
-
 echo "Running phpstan checks"
 
 vendor/phpstan/phpstan/phpstan analyze
-
-echo "Restoring original conf.php"
-mv -f www/conf/conf.php.bak www/conf/conf.php;
 
 phpstanResult=$?
 
