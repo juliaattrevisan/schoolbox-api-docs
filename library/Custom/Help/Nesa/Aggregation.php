@@ -16,6 +16,11 @@ use Schoolbox\User;
 class Aggregation
 {
     /**
+     * @var array
+     */
+    private $dataSet;
+
+    /**
      * Aggregation constructor.
      *
      * @param array $dataSet an array of investigation results from Acquisition
