@@ -14,7 +14,7 @@ use \Schoolbox\Resource\File;
 class ZipFolder
 {
     /**
-     * @var bool|DeprecatedDatabase
+     * @var DeprecatedDatabase
      */
     private $db;
     /**

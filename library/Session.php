@@ -26,6 +26,10 @@ class Session
      * @var Access
      */
     private $access;
+    /**
+     * @var DeprecatedDatabase
+     */
+    private $db;
 
     /**
      * @param Access|null $access

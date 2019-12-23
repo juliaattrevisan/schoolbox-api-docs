@@ -13,6 +13,10 @@ use Schoolbox\Resource\Storage;
 
 class FileExists implements Check
 {
+    /**
+     * @var Storage\Mapper
+     */
+    private $mapper;
 
     /**
      * @param Storage\Mapper $mapper

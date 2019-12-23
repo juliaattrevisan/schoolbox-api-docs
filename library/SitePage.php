@@ -32,9 +32,6 @@ class SitePage extends Page
     /** @var string $currentTab */
     private $currentTab;
 
-    /** @var string $pageName */
-    private $pageName;
-
     /** @var bool $ajax */
     private $ajax;
 
@@ -151,14 +148,10 @@ class SitePage extends Page
      */
     public function loadContent($pageFile, $execute = true)
     {
-        $this->pageName = $pageFile;
-
         /* sanitise data, force all 404s through pageNotFound() */
         if (!preg_match("/^[a-zA-Z0-9\/\-\_\.]+/", $pageFile) || $pageFile == 'common/404') {
             $this->pageNotFound();
         }
-
-
 
         $this->arg = array();
         $path = explode('/', trim($pageFile, '/'));

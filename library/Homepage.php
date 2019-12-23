@@ -11,10 +11,15 @@ class Homepage
 	 */
     const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
     const KEEP_EXISTING_HOMEPAGE      = 0;
+
     /**
-     * @var bool|DeprecatedDatabase
+     * @var DeprecatedDatabase
      */
     private $db;
+
+    /**
+     * @var int
+     */
     private $cid;
 
     public function __construct($cid)
