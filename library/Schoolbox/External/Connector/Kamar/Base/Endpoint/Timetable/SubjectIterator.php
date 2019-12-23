@@ -192,23 +192,38 @@ class SubjectIterator implements Iterator
      */
     private function findTeacher(SimpleXMLElement $subject): array
     {
-        $teacherId = trim((string)$subject->teachers);
 
-        $teacherNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/staff/user[@id='{$teacherId}']");
+        /* Accumulate all the teachers here
+         * Assign one to be the authoritative teacher
+         * Add the others as class attendees
+         */
+        $teachers = [];
 
-        if (!$teacherNode) {
-            throw new InvalidArgumentException("Teacher {$teacherId} profile not found");
+        /* For some reason Kamar is comma-separating multiple teachers per class
+         * Why wouldn't they just give me multiple <teacher> nodes instead?
+         * That's the point of using xml for this sort of stuff...?
+         */
+        $teacherIds = explode(',', trim((string)$subject->teachers));
+
+        foreach ($teacherIds as $teacherId) {
+            $teacherNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/staff/user[@id='{$teacherId}']");
+
+            if (!$teacherNode) {
+                throw new InvalidArgumentException("Teacher {$teacherId} profile not found");
+            }
+
+            $teacher = $teacherNode[0];
+
+            $teachers[] = [
+                'externalId' => trim((string)$teacher->uniqueid),
+                'title' => trim((string)$teacher->title),
+                'firstname' => trim((string)$teacher->firstname),
+                'surname' => trim((string)$teacher->lastname),
+                'username' => trim((string)$teacher->username),
+            ];
         }
 
-        $teacher = $teacherNode[0];
-
-        return [
-            'externalId' => trim((string)$teacher->uniqueid),
-            'title' => trim((string)$teacher->title),
-            'firstname' => trim((string)$teacher->firstname),
-            'surname' => trim((string)$teacher->lastname),
-            'username' => trim((string)$teacher->username),
-        ];
+        return $teachers;
     }
 
 

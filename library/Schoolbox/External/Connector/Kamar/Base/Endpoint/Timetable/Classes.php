@@ -419,24 +419,32 @@ class Classes implements IStrategy
 
         /* Throw warning, but assign them anyway
          */
-        if (!isset($users[$subject['teachers']['username']])) {
+        if (\count($subject['teachers'])) {
+            if (!isset($users[$subject['teachers'][0]['username']])) {
+                $this->log->warning(sprintf(
+                    'Tried to assign nonexistent schoolbox account %s (%s) as teacher to class %s %s',
+                    $subject['teachers'][0]['username'],
+                    $subject['teachers'][0]['externalId'],
+                    $timetableClass->getName(),
+                    $timetableClass->getCode()
+                ));
+            }
+
+            $timetableClassPeriod->setTeacher($subject['teachers'][0]['username']);
+
+            $this->log->info(sprintf(
+                'Creating class period relation for teacher %s %s in room %s',
+                $subject['teachers'][0]['firstname'],
+                $subject['teachers'][0]['surname'],
+                $subject['room']['name']
+            ));
+        } else {
             $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox account %s (%s) as teacher to class %s %s',
-                $subject['teachers']['username'],
-                $subject['teachers']['externalId'],
+                'No teachers found for class %s %s',
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
         }
-
-        $timetableClassPeriod->setTeacher($subject['teachers']['username']);
-
-        $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s',
-            $subject['teachers']['firstname'],
-            $subject['teachers']['surname'],
-            $subject['room']['name']
-        ));
 
         if ($this->perform) {
             $this->classPeriodMapper->save($timetableClassPeriod);
