@@ -5,12 +5,70 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Resource\Folder;
+use \Schoolbox\Resource\File;
 
 /**
  * Puts all resources from a folder into a zip
  */
 class ZipFolder
 {
+    /**
+     * @var bool|DeprecatedDatabase
+     */
+    private $db;
+    /**
+     * @var int
+     */
+    private $folder;
+    /**
+     * @var false|string
+     */
+    private $tmpName;
+    /**
+     * @var string
+     */
+    private $tmpFolder;
+    /**
+     * @var string
+     */
+    private $tmpZip;
+    /**
+     * @var string
+     */
+    private $allowedChars = "[^0-9a-zA-Z()_-]";
+    /**
+     * @var int
+     */
+    private $size = 0;
+    /**
+     * Max folder depth of zip
+     * @var int
+     */
+    private $maxDepth = 5;
+    /**
+     * Max size of zip file 1GB
+     *
+     * @var int
+     */
+    private $maxSize = 1073741824;
+    /**
+     * @var Group
+     */
+    private $groupHandler;
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+    /**
+     * @var File\Mapper
+     */
+    private $fileMapper;
+    /**
+     * @var Folder\Model
+     */
+    private $folderDetails;
+
     function __construct($folder)
     {
         $this->db = DeprecatedDatabase::getInstance();
@@ -18,14 +76,10 @@ class ZipFolder
         $this->tmpName = tempnam(Config::get('zip_dir'), 'zip');
         $this->tmpFolder = $this->tmpName . 'dir';
         $this->tmpZip = $this->tmpName . '.zip';
-        $this->allowedChars = "[^0-9a-zA-Z()_-]";
-        $this->size = 0;
-        $this->maxDepth = 5;
-        $this->maxSize = 1073741824; //1GB
 
         $this->groupHandler = new Group;
-        $this->folderMapper = new \Schoolbox\Resource\Folder\Mapper();
-        $this->fileMapper = new \Schoolbox\Resource\File\Mapper();
+        $this->folderMapper = new Folder\Mapper();
+        $this->fileMapper = new File\Mapper();
         $this->folderDetails = $this->getFolderDetails($folder);
 
         if (is_numeric($this->folderDetails->getId())) {
@@ -205,14 +259,13 @@ class ZipFolder
     /**
      * Gets a db row representing the given category id
      *
-     * @param $folder_id
-     * @return array|bool
+     * @param int $folder_id
+     * @return Folder\Model
      */
     protected function getFolderDetails($folder_id)
     {
         try {
-            $category = $this->folderMapper->findById($folder_id);
-            return $category;
+            return $this->folderMapper->findById($folder_id);
         } catch (\Exception $e) {
         }
     }
