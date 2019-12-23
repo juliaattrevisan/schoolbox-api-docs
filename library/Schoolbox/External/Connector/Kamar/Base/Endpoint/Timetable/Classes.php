@@ -448,7 +448,7 @@ class Classes implements IStrategy
                 ));
             }
 
-            $timetableClassPeriod->setTeacher($subject['teachers'][0]['username']);
+            $timetableClassPeriod->setTeacher($subject['teachers'][0]['externalId']);
 
             $this->log->info(sprintf(
                 'Creating class period relation for teacher %s %s in room %s',
@@ -486,7 +486,7 @@ class Classes implements IStrategy
     {
         /** @var ClassInvolvement $timetableClassInvolvement */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-            ->setExternalId($person['username'])
+            ->setExternalId($person['externalId'])
             ->setClass($timetableClass);
 
         $this->log->info(sprintf(
