@@ -182,27 +182,20 @@ class Factory
      */
     private function produceKamar(?string $file): GenericCollection
     {
-        $this->logger->info('Accessing local xml endpoint');
+        $this->logger->info('Accessing local xml endpoints');
 
-        /* TODO: Timetable Composite requires access across multiple xml files
+        /* Timetable Composite requires access across multiple xml files
          * Pass it multiple $batchxml instances that have their $this->host vars
          * set to hardcoded filenames; $this->host becomes a dir, not a file
-         *
-         * $profileBatchXml = new KamarBatchxml(new KamarApi($this->host . '/profile.xml'));
-         * $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/timetable.xml'));
          */
-
-        $api = new KamarApi($this->host);
-
-        /* Connect and shank data
-         */
-        $batchxml = new KamarBatchxml($api);
+        $profileBatchXml = new KamarBatchxml(new KamarApi($this->host . '/profile.xml'));
+        $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/timetable.xml'));
 
         return (new GenericCollection(IStrategy::class))
 //            ->add(new KamarProfile\Composite(
 //                $this->logger,
 //                $this->perform,
-//                $batchxml,
+//                $profileBatchXml,
 //                UserProfile\Mapper::getInstance(),
 //                UserProfile\Student\Mapper::getInstance(),
 //                UserProfile\Parent\Mapper::getInstance(),
@@ -212,7 +205,8 @@ class Factory
             ->add(new KamarTimetable\Composite(
                 $this->logger,
                 $this->perform,
-                $batchxml,
+                $profileBatchXml,
+                $timetableBatchXml,
                 CampusMapper::getInstance(),
                 UserMapper::getInstance(),
                 TimetableCampusMapper::getInstance(),

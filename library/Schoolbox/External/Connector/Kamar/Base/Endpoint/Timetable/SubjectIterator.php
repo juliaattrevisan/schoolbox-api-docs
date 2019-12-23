@@ -9,12 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Iterator;
-use RuntimeException;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use SimpleXMLElement;
-use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class SubjectIterator
@@ -35,7 +31,13 @@ class SubjectIterator implements Iterator
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private $profileBatchXml;
+
+
+    /**
+     * @var Batchxml
+     */
+    private $timetableBatchXml;
 
 
     /**
@@ -59,13 +61,13 @@ class SubjectIterator implements Iterator
     /**
      * SubjectIterator constructor.
      *
-     * @param Batchxml         $batchxml
+     * @param Batchxml         $profileBatchXml
      * @param string           $studentId
      * @param SimpleXMLElement $day
      */
-    public function __construct(Batchxml $batchxml, string $studentId, SimpleXMLElement $day)
+    public function __construct(Batchxml $profileBatchXml, string $studentId, SimpleXMLElement $day)
     {
-        $this->batchxml = $batchxml;
+        $this->profileBatchXml = $profileBatchXml;
         $this->studentId = $studentId;
         $this->subjects = $day->xpath('slots/subjects');
         $this->day = trim((string)$day->xpath('@index')[0]);

@@ -53,7 +53,13 @@ class Classes implements IStrategy
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private $profileBatchXml;
+
+
+    /**
+     * @var Batchxml
+     */
+    private $timetableBatchXml;
 
 
     /**
@@ -91,7 +97,8 @@ class Classes implements IStrategy
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Batchxml               $batchxml
+     * @param Batchxml               $profileBatchXml
+     * @param Batchxml               $timetableBatchXml
      * @param TimetablePeriodMapper  $timetablePeriodMapper
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
@@ -101,7 +108,8 @@ class Classes implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml,
+        Batchxml $profileBatchXml,
+        Batchxml $timetableBatchXml,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
@@ -110,7 +118,8 @@ class Classes implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->batchxml = $batchxml;
+        $this->profileBatchXml = $profileBatchXml;
+        $this->timetableBatchXml = $timetableBatchXml;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -242,12 +251,12 @@ class Classes implements IStrategy
 
         /* Get a list of all the timetables to process
          */
-        $timetables = $this->batchxml->fetchXml('/SMSDirectoryData/timetables/timetable');
+        $timetables = $this->timetableBatchXml->fetchXml('/SMSDirectoryData/timetables/timetable');
 
         /* Remember the one and only campus identifier
          * TODO: Unify this with usage in Profile.php
          */
-        $ext = (string)$this->batchxml->fetchXml('/SMSDirectoryData/schools/school')[0]->xpath('@index')[0];
+        $ext = (string)$this->timetableBatchXml->fetchXml('/SMSDirectoryData/schools/school')[0]->xpath('@index')[0];
 
         /* If there aren't any timetables, log it and exit
          */
@@ -270,7 +279,7 @@ class Classes implements IStrategy
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
 
-                $subjects = new SubjectIterator($this->batchxml, $studentId, $day);
+                $subjects = new SubjectIterator($this->profileBatchXml, $studentId, $day);
 
                 foreach ($subjects as $subject) {
 
@@ -443,7 +452,6 @@ class Classes implements IStrategy
      */
     private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
     {
-
         /** @var ClassInvolvement $timetableClassInvolvement */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
             ->setExternalId($student['username'])
