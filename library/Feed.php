@@ -57,7 +57,6 @@ class Feed
         is_array($files) ? 0 : $files = [];
         is_array($links) ? 0 : $links = [];
         is_array($folders) ? 0 : $folders = [];
-        is_array($news) ? 0 : $news = [];
         is_array($wiki) ? 0 : $wiki = [];
         is_array($forum) ? 0 : $forum = [];
         is_array($blog) ? 0 : $blog = [];
@@ -67,7 +66,7 @@ class Feed
 
         //get each of the areas
         $feedList = array_merge(
-            $files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys
+            $files, $links, $folders, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys
         );
 
 

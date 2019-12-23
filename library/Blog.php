@@ -10,7 +10,6 @@ class Blog extends DeprecatedModel
     {
         $this->_table  = "blog";
         $this->_index  = "id";
-        $this->_config = [];
 
         parent::__construct();
     }
