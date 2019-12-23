@@ -45,12 +45,13 @@ class Receiver
 
 
     /**
+     * Kamar sends their payload data to this endpoint
+     *
      * @param string $data
      * @throws RuntimeException
      */
     public function receive(string $data): void
     {
-
         if ('' === $data) {
             $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -71,6 +72,9 @@ XML;
 
 
     /**
+     * Process the payload data that kamar sent to us, caching it to a local file
+     * named after an xml attribute's value
+     *
      * @param string $data
      * @throws RuntimeException
      */
