@@ -137,7 +137,7 @@ class Classes implements IStrategy
     private function initUserLookup(): array
     {
         $userStatement = $this->userMapper->getDatabase()->query("
-            SELECT u.`id`, synergy_id
+            SELECT u.`id`, username
             FROM {$this->userMapper->getTable()} u
             INNER JOIN `groups` g ON u.`group_id` = g.id
             WHERE synergy_id IS NOT NULL
@@ -146,7 +146,7 @@ class Classes implements IStrategy
         $users = [];
 
         foreach ($userStatement as $row) {
-            $users[$row['synergy_id']] = $row['id'];
+            $users[$row['username']] = $row['id'];
         }
 
         return $users;
