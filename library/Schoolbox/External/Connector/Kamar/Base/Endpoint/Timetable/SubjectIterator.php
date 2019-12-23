@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Iterator;
+use RuntimeException;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use SimpleXMLElement;
 
@@ -199,23 +200,29 @@ class SubjectIterator implements Iterator
 
     /**
      * Find the students who were in subject $setCode
+     * Cross-reference with another xml document to find the student's name
      *
      * @param string $studentId
      * @return array
+     * @throws RuntimeException
      */
     private function findStudents(string $studentId): array
     {
+        $studentNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/students/user[@id='{$studentId}']");
 
-        /* TODO: Cross-reference with another xml document...
-         */
-        $students[] = [
+        if (!$studentNode) {
+            throw new RuntimeException("Student {$studentId} not found in profile xml");
+        }
+
+        $student = $studentNode[0];
+
+        return [
+            'externalId' => trim((string)$student->uniqueid),
             'title' => '',
-            'firstname' => $studentId,
-            'surname' => $studentId,
-            'username' => $studentId,
+            'firstname' => trim((string)$student->firstname),
+            'surname' => trim((string)$student->lastname),
+            'username' => trim((string)$student->username),
         ];
-
-        return $students;
     }
 
 

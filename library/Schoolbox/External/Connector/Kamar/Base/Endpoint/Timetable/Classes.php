@@ -326,21 +326,21 @@ class Classes implements IStrategy
 
                     /* Process students
                      */
-                    foreach ($subject['students'] as $student) {
+                    $student = $subject['students'];
 
-                        /* Throw warning, but assign them anyway
-                         */
-                        if (!isset($users[$student['username']])) {
-                            $this->log->warning(sprintf(
-                                'Tried to assign nonexistent schoolbox account %s to class %s %s',
-                                $student['username'],
-                                $timetableClass->getName(),
-                                $timetableClass->getCode()
-                            ));
-                        }
-
-                        $this->createTimetableClassInvolvement($student, $timetableClass);
+                    /* Throw warning, but assign them anyway
+                     */
+                    if (!isset($users[$student['username']])) {
+                        $this->log->warning(sprintf(
+                            'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s',
+                            $student['username'],
+                            $student['externalId'],
+                            $timetableClass->getName(),
+                            $timetableClass->getCode()
+                        ));
                     }
+
+                    $this->createTimetableClassInvolvement($student, $timetableClass);
                 }
             }
         }
