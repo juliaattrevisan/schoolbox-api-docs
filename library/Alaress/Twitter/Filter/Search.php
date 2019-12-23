@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Alaress_Twitter_Filter_Search
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 class Alaress_Twitter_Filter_Search implements Alaress_Twitter_Filter_Interface
 {
