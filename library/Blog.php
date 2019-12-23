@@ -2,15 +2,13 @@
 
 class Blog extends DeprecatedModel {
 
-	/**
+    /**
 	 * @deprecated
 	 */
 	function __construct() {
 		$this->_table = "blog";
 		$this->_index = "id";
 		$this->_config = array();
-
-		$this->group = new Group();
 
 		parent::__construct();
 	}
