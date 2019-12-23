@@ -46,7 +46,10 @@ class Campus extends Base
     public function generate(): self
     {
         $this->data = $this->format(
-            $this->campusMapper->findCampusInvolvement($this->user)->sortBy('name', 'ASC')
+            $this->campusMapper->findCampusInvolvement($this->user)
+                               ->merge($this->campusMapper->getAvailableCampusesForUser($this->user))
+                               ->indexBy('id')
+                               ->sortBy('name', 'ASC')
         );
 
         return $this;
