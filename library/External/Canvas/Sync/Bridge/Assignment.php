@@ -75,7 +75,7 @@ class Assignment
     {
         return (new Builder(new Quoter(), ''))
             ->equals('assess_luQuestionType.filename', 'short')
-            ->equals('assess_luQuestionType.availability', Quiz\Model::AVAILABILITY_ASSESS)
+            ->equals('assess_luQuestionType.availability', Quiz\Model::AVAILABILITY_ASSESS);
     }
 
 
