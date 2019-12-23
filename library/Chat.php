@@ -1,6 +1,12 @@
 <?php
 
 class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
+
+    /**
+     * @var Group
+     */
+    private $group;
+
     function __construct () {
             $this->_table = "chat";
             $this->_index = "id";
@@ -32,7 +38,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 			$userHandler = new User();
 
             foreach ($logs as &$log) {
-                $log_time = new DateTime($log['time']);
+                try {
+                    $log_time = new DateTime($log['time']);
+                } catch (Exception $e) {
+                    continue;
+                }
 
                 $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
                 $log['stamp'] = $log_time->format('Y-m-d H:i:s');
