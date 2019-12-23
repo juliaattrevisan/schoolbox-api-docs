@@ -44,7 +44,7 @@
         "mtdowling/cron-expression": "~2.0.0",
         "tijsverkoyen/css-to-inline-styles": "2.2.0",
         "html2text/html2text": "~4.1.0",
-        "browscap/browscap-php": "~4.2.0",
+        "wolfcast/browser-detection": "~2.9.0",
         "aura/di": "~2.2.3",
         "aura/router": "~2.3.0",
         "aura/web": "~2.1.0",

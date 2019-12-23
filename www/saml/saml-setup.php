@@ -1,10 +1,11 @@
 <?php
 
-use BrowscapPHP\Browscap;
-use Psr\Log\NullLogger;
-use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
+use Wolfcast\BrowserDetection;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Alaress\Saml\CacheReader;
+use OneLogin\Saml2\Constants;
+use OneLogin\Saml2\IdPMetadataParser;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -38,7 +39,7 @@ $settingsInfo = array (
 
 // requestedAuthnContext
 if (Config::get('saml_auth_context') !== 'unspecified') {
-    $settingsInfo['security']['requestedAuthnContext'] = [useSAMLKerberos() ? OneLogin_Saml2_Constants::AC_WINDOWS : OneLogin_Saml2_Constants::AC_PASSWORD_PROTECTED];
+    $settingsInfo['security']['requestedAuthnContext'] = [useSAMLKerberos() ? Constants::AC_WINDOWS : Constants::AC_PASSWORD_PROTECTED];
     $settingsInfo['security']['requestedAuthnContextComparison'] = Config::get('saml_auth_comparison');
 }
 
@@ -54,7 +55,7 @@ try {
     // if cache exists, update $setting info from cache
     if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents()) ) {
         try {
-            $settingsInfo = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
+            $settingsInfo = IdPMetadataParser::injectIntoSettings($settingsInfo, IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
         } catch (Exception $e) {
             $cache->invalidateCache();
             SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
@@ -78,14 +79,14 @@ $settingsInfo['sp'] = [
         'entityId' => $spBaseUrl,
         'assertionConsumerService' => [
             'url' => $spBaseUrl.'/saml/consume.php',
-            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
+            'binding' => Constants::BINDING_HTTP_POST,
 
         ],
         'singleLogoutService' => [
             'url' => $spBaseUrl.'/saml/consume.php?sls',
-            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
+            'binding' => Constants::BINDING_HTTP_REDIRECT,
         ],
-        'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
+        'NameIDFormat' => Constants::NAMEID_UNSPECIFIED,
         'x509cert' => Config::get('saml_public_cert'),
         'privateKey' => $privateKey ? $privateKey : Config::get('saml_public_cert'),
     ];
@@ -127,31 +128,25 @@ function useSAMLKerberos() {
      */
     SAMLDebugLog("IP in kerberos whitelist, attempting browser/platform check");
 
-    $bc = new Browscap(
-        new SimpleCacheAdapter(
-            new CacheReader(__DIR__ . '/../../tools/browscap')
-        ),
-        new NullLogger()
-    );
+    $browser = new BrowserDetection();
 
-    $current_browser = $bc->getBrowser();
-    SAMLDebugLog(json_encode($current_browser));
-    if ($current_browser->device_type == 'Desktop' || $current_browser->device_type == 'Tablet') {
-        if (substr($current_browser->platform,0,3)=='Win' || $current_browser->platform == 'MacOSX') {
-            switch($current_browser->browser) {
-                case 'IE':
+    SAMLDebugLog(json_encode($browser->getUserAgent()));
+    if (!$browser->isMobile()) {
+        if ($browser->getPlatform() == BrowserDetection::PLATFORM_WINDOWS || $browser->getPlatform() == BrowserDetection::PLATFORM_MACINTOSH) {
+            switch($browser->getName()) {
+                case BrowserDetection::BROWSER_IE:
                     return true;
 
-                case 'Edge':
+                case BrowserDetection::BROWSER_EDGE:
                     return true;
 
-                case 'Chrome':
+                case BrowserDetection::BROWSER_CHROME:
                     if (Config::get('saml_krb_chrome')) { return true; } else { return false; }
 
-                case 'Safari':
+                case BrowserDetection::BROWSER_SAFARI:
                     if (Config::get('saml_krb_safari')) { return true; } else { return false; }
 
-                case 'Firefox':
+                case BrowserDetection::BROWSER_FIREFOX:
                     if (Config::get('saml_krb_firefox')) { return true; } else { return false; }
 
                 default:

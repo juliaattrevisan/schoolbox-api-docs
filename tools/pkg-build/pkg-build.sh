@@ -48,9 +48,6 @@ then
 		git checkout $1;
 		git branch -D master;
 		git checkout -b master;
-		# Download and include the cache file for browsercap
-		mkdir -p tools/browscap;
-		touch tools/browscap/browscap.ini;
 		cachedir='/home/vagrant/buildcache';
 		mkdir -p $cachedir;
 		cd $cachedir;
@@ -81,8 +78,6 @@ then
 			fi
 		done < buildcache-sha1-cached.txt;
 		cd ~/schoolbox;
-		cp -vf $cachedir/cache-2016-01-14.txt tools/browscap/cache.php;
-		git add -f tools/browscap;
 		git commit -a -m "update changelog for building";
 		git branch -D upstream;
 		git branch upstream;

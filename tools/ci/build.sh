@@ -53,20 +53,6 @@ then
         exit 1;
 fi
 
-if [ ! -f ../browscap-cache/"$branch"-browscap-cache.tar.gz ];
-then
-	echo "Unable to locate browscap cache artifact: ../browscap-cache/"$branch"-browscap-cache.php.gz";
-	exit 1;
-fi
-
-echo "Unpacking browscap cache";
-tar xzf ../browscap-cache/"$branch"-browscap-cache.tar.gz;
-if [ $? -ne 0 ];
-then
-	echo "Unable to extract browscap cache";
-	exit 1;
-fi
-
 if [ ! -f ../bower-artifact/"$branch"-bower.tar.gz ];
 then
 	echo "Unable to locate bower artifact: ../bower-artifact/"$branch"-bower.tar.gz";
