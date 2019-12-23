@@ -79,6 +79,23 @@ XML;
         $nodes = new SimpleXMLElement($data);
 
         /* Figure out the prefix for this payload's filename
+         *
+         * Kamar sends profile data and timetable data separately. They're not in the same file.
+         * The payloads arrive one after the other, but not in any prescribed order so the timetable
+         * data could come before profile data, or vice versa, at any given moment.
+         *
+         * We need a way to conclusively determine which payload was sent to us. We could inspect nodes
+         * or we can just use a uniquely identifying attribute in the root node which must always be
+         * supplied. The @sync attribute seems to be identifying payloads and for our purposes will be
+         * either 'full' or 'studenttimetables' if the docs are to be believed. The value of @sync is
+         * stored in $prefix.
+         *
+         * For now, while we're testing,
+         *   Profile data will end up in /mnt/data/schoolbox/cache/stream/full_YYYMMDD_HHIISS.xml
+         *   Timetable data will end up in /mnt/data/schoolbox/cache/stream/studenttimetables_YYYMMDD_HHIISS.xml
+         *
+         * I'll probably have to remove the datetime later (reasons will become clear) but we need to record
+         * each push attempt that the school makes while we're figuring out this integration.
          */
         $prefix = (string)$nodes->xpath('/SMSDirectoryData/@sync')[0];
         $path = "{$this->dir}/{$prefix}_{$this->suffix}";
