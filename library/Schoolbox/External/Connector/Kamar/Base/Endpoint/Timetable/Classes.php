@@ -325,9 +325,12 @@ class Classes implements IStrategy
 
                     $this->createTimetableClassPeriod($users, $subject, $timetablePeriod, $timetableClass);
 
-                    /* Process students
+                    /* Process student
+                     *
+                     * kamar sends each student's timetable individually so there's only one student
+                     * per timetable class instance
                      */
-                    $student = $subject['students'];
+                    $student = $subject['student'];
 
                     /* Throw warning, but assign them anyway
                      */
@@ -343,7 +346,6 @@ class Classes implements IStrategy
 
                     $this->createTimetableClassInvolvement($student, $timetableClass);
                 }
-
             }
         }
 

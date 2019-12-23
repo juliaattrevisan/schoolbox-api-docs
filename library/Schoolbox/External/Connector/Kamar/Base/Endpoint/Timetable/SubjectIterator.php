@@ -131,7 +131,7 @@ class SubjectIterator implements Iterator
             'class' => $subject,
             'room' => $room,
             'teachers' => $teachers,
-            'students' => $students
+            'student' => $students
         ];
 
         return $class;
