@@ -26,6 +26,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -294,6 +295,8 @@ class CliImporter extends CliTool\App
         $externalUser  = $this->getDi()->get('externalUser');
         /** @var MarkTypeMapper */
         $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
+        /** @var WorkType\Mapper */
+        $workTypeMapper = $mapperFactory->get(WorkType\Mapper::class);
         /** @var Quiz\Mapper */
         $quizMapper = $mapperFactory->get(Quiz\Mapper::class);
         /** @var SubmissionBoxMapper */
@@ -321,6 +324,7 @@ class CliImporter extends CliTool\App
             $externalClass,
             $externalUser,
             $markTypeMapper,
+            $workTypeMapper,
             $quizMapper,
             $submissionBoxMapper,
             $assessmentMapper,

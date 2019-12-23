@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -51,6 +52,9 @@ class DataSync
 
     /** @var MarkTypeMapper */
     private $markTypeMapper;
+
+    /** @var WorkType\Mapper */
+    private $workTypeMapper;
 
     /** @var Quiz\Mapper */
     private $quizMapper;
@@ -101,6 +105,7 @@ class DataSync
      * @param External_ClassInterface $externalClass
      * @param External_UserInterface  $externalUser
      * @param MarkTypeMapper          $markTypeMapper
+     * @param WorkType\Mapper         $workTypeMapper
      * @param Quiz\Mapper             $quizMapper
      * @param SubmissionBoxMapper     $submissionBoxMapper
      * @param Assessment\Mapper       $assessmentMapper
@@ -122,6 +127,7 @@ class DataSync
         External_ClassInterface $externalClass,
         External_UserInterface $externalUser,
         MarkTypeMapper $markTypeMapper,
+        WorkType\Mapper $workTypeMapper,
         Quiz\Mapper $quizMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
@@ -142,6 +148,7 @@ class DataSync
         $this->externalClass       = $externalClass;
         $this->externalUser        = $externalUser;
         $this->markTypeMapper      = $markTypeMapper;
+        $this->workTypeMapper      = $workTypeMapper;
         $this->quizMapper          = $quizMapper;
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->assessmentMapper    = $assessmentMapper;
@@ -182,7 +189,7 @@ class DataSync
 
         $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge     = new Bridge\Account($this->schoolboxDb);
-        $assignmentBridge  = new Bridge\Assignment($this->markTypeMapper->findAll());
+        $assignmentBridge  = new Bridge\Assignment($this->markTypeMapper->findAll(), $this->workTypeMapper->findAll());
         $courseBridge      = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
 
