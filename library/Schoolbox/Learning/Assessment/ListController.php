@@ -15,7 +15,6 @@ use InvalidArgumentException;
 use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -25,6 +24,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Mapper;
 use Schoolbox\Assessment\Participant\Model as ParticipantModel;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
@@ -152,8 +153,8 @@ class ListController extends Web\Controller\Base
      *
      * @param AssessmentContext $context
      * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
+     * @throws Exception
+     * @throws Deleted
      * @throws UnexpectedValueException
      * @throws Web\Controller\Exception
      * @throws \LogicException
@@ -265,6 +266,38 @@ class ListController extends Web\Controller\Base
         return $this->getDi()->get("controller:learningAssessment/$type");
     }
 
+    /**
+     * Updates assessment's weight
+     *
+     * @api   POST /learning/weight/:assessmentId
+     *
+     * @throws Exception
+     * @throws Deleted
+     */
+    public function updateWeight(IAssessable $assessment): void
+    {
+        $weight = $this->getRequest()->post['weight'];
+        $assessment->setWeight($weight);
+        $this->getAssessmentMapper()->save($assessment);
+        $this->getResponse()->content->set($this->buildJsonOutput(['message'=>'Success!']));
+    }
+
+    /**
+     * Updates assessment's visibility
+     *
+     * @api   POST /learning/visibility/:assessmentId
+     *
+     * @param IAssessable $assessment
+     * @throws Exception
+     * @throws Deleted
+     */
+    public function updateVisibility(IAssessable $assessment): void
+    {
+        $visibility = $this->getRequest()->post['visibility'];
+        $assessment->setMarkVisibility($visibility);
+        $this->getAssessmentMapper()->save($assessment);
+        $this->getResponse()->content->set($this->buildJsonOutput(['message'=>'Success!']));
+    }
 
     /**
      * Get the form for creating a new assessment in a particular context
@@ -332,8 +365,8 @@ class ListController extends Web\Controller\Base
      * @return array
      * @throws DomainException
      * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
+     * @throws Exception
+     * @throws Deleted
      * @throws \LogicException
      */
     protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
@@ -373,7 +406,7 @@ class ListController extends Web\Controller\Base
             // And send notifications
             $notifier->notify($assessment, $this->getUser(), $before);
         }
-        catch (Mapper\Exception|RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
+        catch (Exception|RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
@@ -388,7 +421,7 @@ class ListController extends Web\Controller\Base
      * @param array                         $userPlanIndices userId => planId
      * @throws DomainException
      * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
+     * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
@@ -520,7 +553,7 @@ class ListController extends Web\Controller\Base
      * @return GenericCollection|ParticipantModels\Plan\Model[]
      * @throws UnexpectedValueException
      * @throws PDOException
-     * @throws Mapper\Exception
+     * @throws Exception
      * @throws InvalidArgumentException
      */
     private function savePlanData(IAssessable $assessment, array $postPlans = [])

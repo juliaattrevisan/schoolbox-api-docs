@@ -3,14 +3,14 @@
     <td>&nbsp;</td>
     {% for assessment in markbook.assessments  %}
     <td data-assessment="{{ assessment.id }}">
-        {% if markbook.assessmentStatistics[assessment.id][key] %}
-            {% if round %}
+        {% if markbook.assessmentStatistics[assessment.id][key] is defined %}
+            {% if input and assessment is not task %}
+                <input type="number" name="weight" data-weight value="{{ assessment.weight }}" min=0 max=100 data-assessment="{{ assessment.id }}">
+            {% elseif round %}
                 {{ markbook.assessmentStatistics[assessment.id][key] | round(round) }}
             {% else %}
                 {{ markbook.assessmentStatistics[assessment.id][key] }}
             {% endif %}
-        {% else %}
-            –
         {% endif %}
     </td>
     {% endfor %}

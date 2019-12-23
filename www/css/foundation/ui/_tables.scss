@@ -2,3 +2,7 @@ table td,
 table th {
   position: relative; // This is to stop the user's viewport from jumping when there's a checkbox inside of a cell
 }
+
+#marksheet-styles tr td {
+  vertical-align: middle;
+}
