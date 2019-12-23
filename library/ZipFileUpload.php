@@ -53,7 +53,6 @@ class ZipFileUpload extends DeprecatedModel
      */
     private $errorFiles = array();
 
-
     /**
      * Constructor
      * Set up paths and clean up any existing junk
@@ -71,7 +70,6 @@ class ZipFileUpload extends DeprecatedModel
         }
 
         $this->path = $this->extractTo . '/' . $this->prefix . uniqid();
-        $this->allowedFileHandler = new AllowedFile();
 
         /* Prepare folder: if folder already exists, unlink all the stuff in it
 		 * and start it again
@@ -179,7 +177,7 @@ class ZipFileUpload extends DeprecatedModel
                 }
 
                 if ($this->verbose) {
-                    echo "Creating $currentPath with {$category->getId()}, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
+                    echo "Creating $currentPath with {$category->getId()}, corresponding to $obj<br>";
                 }
 
                 /* If it's a directory, create a Category for it and remember
