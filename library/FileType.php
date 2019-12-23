@@ -7,18 +7,31 @@
  * @link        https://schoolbox.com.au/
  */
 class FileType extends DeprecatedModel {
-	public $_table = 'allowedFileTypes';
-	public $_index = 'fileTypeId';
+	public  $_table = 'allowedFileTypes';
+	public  $_index = 'fileTypeId';
 
-	/**
+    /**
+     * Filename
+     * @var string
+     */
+	private $path;
+
+    /**
+     * This is used to determine whether a file is audio or video
+     * based, and should be extended if necessary
+     * @var string null
+     */
+    private $mime;
+
+    /**
 	 * Constructor
 	 *
 	 * @param $path
 	 * @param null $mime
 	 */
 	public function __construct($path, $mime = null) {
-		$this->setPath($path);
-		$this->setMime($mime);
+		$this->path = $path;
+		$this->mime = $mime;
 
 		parent::__construct();
 	}
@@ -30,20 +43,7 @@ class FileType extends DeprecatedModel {
 	 * @return string
 	 */
 	public function getExtension() {
-		return strtolower(substr(strrchr($this->getPath(), '.'), 1));
-	}
-
-	/**
-	 * Determine if $path has an valid image extension
-	 *
-	 * @return bool
-	 */
-	public function isImageExtension() {
-		if (in_array($this->getExtension(), array('jpg', 'jpeg', 'gif', 'png'))) {
-			return true;
-		}
-
-		return false;
+		return strtolower(substr(strrchr($this->path, '.'), 1));
 	}
 
 	/**
@@ -52,7 +52,7 @@ class FileType extends DeprecatedModel {
 	 * @return bool
 	 */
 	public function isAudio() {
-		if (strstr($this->getMime(), 'audio')) {
+		if (strstr($this->mime, 'audio')) {
 			return true;
 		}
 
@@ -65,7 +65,7 @@ class FileType extends DeprecatedModel {
 	 * @return bool
 	 */
 	public function isVideo() {
-		if (strstr($this->getMime(), 'video')) {
+		if (strstr($this->mime, 'video')) {
 			return true;
 		}
 
@@ -78,7 +78,7 @@ class FileType extends DeprecatedModel {
 	 * @return bool
 	 */
 	public function isImage() {
-		if (strstr($this->getMime(), 'image')) {
+		if (strstr($this->mime, 'image')) {
 			return true;
 		}
 
@@ -102,47 +102,5 @@ class FileType extends DeprecatedModel {
 		$mimeType = $this->db->getRow($query);
 
 		return $mimeType['iconFile'];
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set path
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setPath($val) {
-		$this->path = $val;
-	}
-
-	/**
-	 * Get path
-	 *
-	 * @return null
-	 */
-	private function getPath() {
-		return $this->path;
-	}
-
-	/**
-	 * Set mime. This is used to determine whether a file is audio or video
-	 * based, and should be extended if necessary
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setMime($val) {
-		$this->mime = $val;
-	}
-
-	/**
-	 * Get mime
-	 *
-	 * @return null
-	 */
-	private function getMime() {
-		return $this->mime;
 	}
 }
