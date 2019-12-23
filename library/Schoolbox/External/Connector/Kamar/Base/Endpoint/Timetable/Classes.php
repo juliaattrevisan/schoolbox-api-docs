@@ -416,8 +416,9 @@ class Classes implements IStrategy
          */
         if (!isset($users[$subject['teachers']['username']])) {
             $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s',
+                'Tried to assign nonexistent schoolbox account %s (%s) as teacher to class %s %s',
                 $subject['teachers']['username'],
+                $subject['teachers']['externalId'],
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));

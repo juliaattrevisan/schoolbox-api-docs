@@ -180,20 +180,30 @@ class SubjectIterator implements Iterator
 
     /**
      * Find a teacher's details
+     * Cross-reference with another xml document to find the teacher's name
      *
      * @param SimpleXMLElement $subject
      * @return array
+     * @throws RuntimeException
      */
     private function findTeacher(SimpleXMLElement $subject): array
     {
+        $teacherId = trim((string)$subject->teachers);
 
-        /* TODO: Cross-reference with another xml document...
-         */
+        $teacherNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/staff/user[@id='{$teacherId}']");
+
+        if (!$teacherNode) {
+            throw new RuntimeException("Teacher {$teacherId} not found in profile xml");
+        }
+
+        $teacher = $teacherNode[0];
+
         return [
-            'title' => '',
-            'firstname' => trim((string)$subject->teachers),
-            'surname' => trim((string)$subject->teachers),
-            'username' => trim((string)$subject->teachers),
+            'externalId' => trim((string)$teacher->uniqueid),
+            'title' => trim((string)$teacher->title),
+            'firstname' => trim((string)$teacher->firstname),
+            'surname' => trim((string)$teacher->lastname),
+            'username' => trim((string)$teacher->username),
         ];
     }
 
