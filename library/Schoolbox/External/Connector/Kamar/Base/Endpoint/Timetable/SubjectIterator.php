@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use InvalidArgumentException;
 use Iterator;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use SimpleXMLElement;
@@ -24,22 +25,17 @@ use SimpleXMLElement;
  */
 class SubjectIterator implements Iterator
 {
+
     /**
-     * @var int
+     * @var LoggerInterface
      */
-    private $position = 0;
+    private $log;
 
 
     /**
      * @var Batchxml
      */
     private $profileBatchXml;
-
-
-    /**
-     * @var Batchxml
-     */
-    private $timetableBatchXml;
 
 
     /**
@@ -61,14 +57,22 @@ class SubjectIterator implements Iterator
 
 
     /**
+     * @var int
+     */
+    private $position = 0;
+
+
+    /**
      * SubjectIterator constructor.
      *
+     * @param LoggerInterface  $log
      * @param Batchxml         $profileBatchXml
      * @param string           $studentId
      * @param SimpleXMLElement $day
      */
-    public function __construct(Batchxml $profileBatchXml, string $studentId, SimpleXMLElement $day)
+    public function __construct(LoggerInterface $log, Batchxml $profileBatchXml, string $studentId, SimpleXMLElement $day)
     {
+        $this->log = $log;
         $this->profileBatchXml = $profileBatchXml;
         $this->studentId = $studentId;
         $this->subjects = $day->xpath('slots/subjects');
@@ -209,7 +213,12 @@ class SubjectIterator implements Iterator
             $teacherNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/staff/user[@id='{$teacherId}']");
 
             if (!$teacherNode) {
-                throw new InvalidArgumentException("Teacher {$teacherId} profile not found");
+                $this->log->warning(sprintf(
+                    'Teacher %s profile not found',
+                    $teacherId
+                ));
+
+                continue;
             }
 
             $teacher = $teacherNode[0];
@@ -232,16 +241,20 @@ class SubjectIterator implements Iterator
      * Cross-reference with another xml document to find the student's name
      *
      * @param string $studentId
-     * @return array
+     * @return array|null
      * @throws RuntimeException
-     * @throws InvalidArgumentException
      */
-    private function findStudents(string $studentId): array
+    private function findStudents(string $studentId): ?array
     {
         $studentNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/students/user[@id='{$studentId}']");
 
         if (!$studentNode) {
-            throw new InvalidArgumentException("Student {$studentId} profile not found");
+            $this->log->warning(sprintf(
+                'Student %s profile not found',
+                $studentId
+            ));
+
+            return null;
         }
 
         $student = $studentNode[0];

@@ -280,73 +280,70 @@ class Classes implements IStrategy
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
 
-                $subjects = new SubjectIterator($this->profileBatchXml, $studentId, $day);
+                $subjects = new SubjectIterator($this->log, $this->profileBatchXml, $studentId, $day);
 
-                try {
-                    foreach ($subjects as $subject) {
+                foreach ($subjects as $subject) {
 
-                        /* Subject doesn't exist in this slot
-                         */
-                        if (null === $subject) {
-                            continue;
-                        }
+                    /* Subject doesn't exist in this slot
+                     */
+                    if (null === $subject) {
+                        continue;
+                    }
 
-                        /* Look up the period instance by (name, day)
-                         *
-                         * If the period doesn't correspond to something in our timetable definition,
-                         * we can't process it anyway, so skip it
-                         */
-                        $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['period']);
+                    /* Look up the period instance by (name, day)
+                     *
+                     * If the period doesn't correspond to something in our timetable definition,
+                     * we can't process it anyway, so skip it
+                     */
+                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['period']);
 
-                        if (null === $timetablePeriod) {
-                            continue;
-                        }
+                    if (null === $timetablePeriod) {
+                        continue;
+                    }
 
+                    $this->log->info(sprintf(
+                        'Looking for ext_timetable_code %s, day %s, period %s',
+                        $ext,
+                        $dayNum,
+                        $subject['period']
+                    ));
+
+                    /* Assemble the pieces
+                     */
+                    try {
+                        $timetableClass = $this->createTimetableClass($subject);
+                    } catch(UnexpectedValueException $e) {
                         $this->log->info(sprintf(
-                            'Looking for ext_timetable_code %s, day %s, period %s',
-                            $ext,
+                            'No classes found for student %s, day %s, period %s',
+                            $studentId,
                             $dayNum,
                             $subject['period']
                         ));
 
-                        /* Assemble the pieces
-                         */
-                        try {
-                            $timetableClass = $this->createTimetableClass($subject);
-                        } catch(UnexpectedValueException $e) {
-                            $this->log->info(sprintf(
-                                'No classes found for student %s, day %s, period %s',
-                                $studentId,
-                                $dayNum,
-                                $subject['period']
-                            ));
-
-                            continue;
-                        }
-
-                        $this->createTimetableClassPeriod($users, $subject, $timetablePeriod, $timetableClass);
-
-                        /* Process students
-                         */
-                        $student = $subject['students'];
-
-                        /* Throw warning, but assign them anyway
-                         */
-                        if (!isset($users[$student['username']])) {
-                            $this->log->warning(sprintf(
-                                'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s',
-                                $student['username'],
-                                $student['externalId'],
-                                $timetableClass->getName(),
-                                $timetableClass->getCode()
-                            ));
-                        }
-
-                        $this->createTimetableClassInvolvement($student, $timetableClass);
+                        continue;
                     }
-                } catch (InvalidArgumentException $e) {
-                    $this->log->warning($e->getMessage());
+
+                    $this->createTimetableClassPeriod($users, $subject, $timetablePeriod, $timetableClass);
+
+                    /* Process students
+                     */
+                    $student = $subject['students'];
+
+                    /* Throw warning, but assign them anyway
+                     */
+                    if (null === $student || !isset($users[$student['username']])) {
+                        $this->log->warning(sprintf(
+                            'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s',
+                            $student['username'],
+                            $student['externalId'],
+                            $timetableClass->getName(),
+                            $timetableClass->getCode()
+                        ));
+                    }
+
+                    $this->createTimetableClassInvolvement($student, $timetableClass);
                 }
+
             }
         }
 
