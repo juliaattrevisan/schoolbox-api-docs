@@ -83,6 +83,7 @@ class SubjectIterator implements Iterator
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @since 5.0.0
+     * @throws RuntimeException
      */
     public function current()
     {
