@@ -7,10 +7,14 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Learning\Quiz;
 use function array_filter;
 use function array_map;
 use function explode;
@@ -62,6 +66,20 @@ class Assignment
 
 
     /**
+     * Returns a predicate for finding a suitable question type
+     *
+     * @return Builder
+     * @throws InvalidColumnException
+     */
+    public function getQuizQuestionTypePredicate(): Builder
+    {
+        return (new Builder(new Quoter(), ''))
+            ->equals('assess_luQuestionType.filename', 'short')
+            ->equals('assess_luQuestionType.availability', Quiz\Model::AVAILABILITY_ASSESS)
+    }
+
+
+    /**
      * Returns a SubmissionBox mark visibility
      *
      * 'Muted' canvas assignments can be submitted to, but grades are not visible to students, and they
@@ -98,6 +116,28 @@ class Assignment
     public function getSubmissionBoxWorkType(): ?WorkType\Model
     {
         return null;
+    }
+
+
+    /**
+     * Returns the weight to assign to Submission Boxes
+     *
+     * @return int
+     */
+    public function getSubmissionBoxWeight(): int
+    {
+        return 1;
+    }
+
+
+    /**
+     * Returns the weight to assign to Quizzes
+     *
+     * @return int
+     */
+    public function getQuizWeight(): int
+    {
+        return 1;
     }
 
 
