@@ -32,6 +32,7 @@ use UnexpectedValueException;
 
 /**
  * @method Model createModel($id = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
