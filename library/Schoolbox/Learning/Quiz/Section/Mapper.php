@@ -17,12 +17,14 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
  */
 class Mapper extends BaseMapper
 {
+    public const COL_ASSESS_ID = 'assess_id';
+
     protected function mapping()
     {
         $this->hasTable('assess_section');
         $this->hasModel(QuizSection::class);
         $this->uses('section_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->joins('assess_id', QuizMapper::class, 'assess_id', null, null, 'quiz', 'quiz');
+        $this->joins(self::COL_ASSESS_ID, QuizMapper::class, 'assess_id', null, null, 'quiz', 'quiz');
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
