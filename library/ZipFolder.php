@@ -69,17 +69,17 @@ class ZipFolder
      */
     private $folderDetails;
 
-    function __construct($folder)
+    public function __construct($folder)
     {
-        $this->db = DeprecatedDatabase::getInstance();
-        $this->folder = $folder;
-        $this->tmpName = tempnam(Config::get('zip_dir'), 'zip');
+        $this->db        = DeprecatedDatabase::getInstance();
+        $this->folder    = $folder;
+        $this->tmpName   = tempnam(Config::get('zip_dir'), 'zip');
         $this->tmpFolder = $this->tmpName . 'dir';
-        $this->tmpZip = $this->tmpName . '.zip';
+        $this->tmpZip    = $this->tmpName . '.zip';
 
-        $this->groupHandler = new Group;
-        $this->folderMapper = new Folder\Mapper();
-        $this->fileMapper = new File\Mapper();
+        $this->groupHandler  = new Group;
+        $this->folderMapper  = new Folder\Mapper();
+        $this->fileMapper    = new File\Mapper();
         $this->folderDetails = $this->getFolderDetails($folder);
 
         if (is_numeric($this->folderDetails->getId())) {
@@ -98,11 +98,11 @@ class ZipFolder
         $this->cleanUp();
     }
 
-    function getResources($folder, $permission)
+    private function getResources($folder, $permission)
     {
         return $this->fileMapper->findForFolders(
-            array($folder),
-            array('getHidden' => ($permission >= UserAccess::ACCESS_WRITE))
+            [$folder],
+            ['getHidden' => ($permission >= UserAccess::ACCESS_WRITE)]
         );
     }
 
@@ -111,24 +111,24 @@ class ZipFolder
         return $this->folderMapper->findByParent($folderId);
     }
 
-    function cleanName($name)
+    private function cleanName($name)
     {
         $filename = preg_replace("/{$this->allowedChars}/", "_", $name);
         return $filename;
     }
 
-    function uniqueFileName($fileName, $depth = 1)
+    private function uniqueFileName($fileName, $depth = 1)
     {
         if (is_file($fileName)) {
             $pathParts = pathinfo($fileName);
-            $newName = $pathParts['dirname'] . '/' . $pathParts['filename'] . '_' . $depth . '.' . $pathParts['extension'];
+            $newName   = $pathParts['dirname'] . '/' . $pathParts['filename'] . '_' . $depth . '.' . $pathParts['extension'];
             return $this->uniqueFileName($newName, ++$depth);
         } else {
             return $fileName;
         }
     }
 
-    function sendZip()
+    public function sendZip()
     {
         if ($this->createZip()) {
             $filename = $this->cleanName($this->folderDetails->getName());
@@ -147,7 +147,7 @@ class ZipFolder
         }
     }
 
-    function createDirectory($currentDir, $parentFolder, $permission, $depth = 0)
+    private function createDirectory($currentDir, $parentFolder, $permission, $depth = 0)
     {
         //populate dir with files
         $fileList = $this->getResources($parentFolder->getId(), $permission);
@@ -157,12 +157,12 @@ class ZipFolder
                 $nextSize = $this->size + $file->getSize();
                 if ($this->maxSize > $nextSize) {
                     $this->size = $this->size + $file->getSize();
-                    $fileName = $this->getTargetPath($currentDir, $file->getBasename());
-                    $fp = fopen($fileName, 'wb');
+                    $fileName   = $this->getTargetPath($currentDir, $file->getBasename());
+                    $fp         = fopen($fileName, 'wb');
                     stream_copy_to_stream($file->getStorage()->readStream(), $fp);
                     fclose($fp);
                 } else {
-                   error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is '.\Alaress_Byte_Format::bytesToString($this->maxSize).'.');
+                    error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is ' . \Alaress_Byte_Format::bytesToString($this->maxSize) . '.');
                 }
             }
         }
@@ -175,16 +175,16 @@ class ZipFolder
             foreach ($folderList as $folder) {
                 $permission = $this->getPermission($folder->getId());
                 if ($permission > UserAccess::ACCESS_DENY) {
-                    $folderName = $this->cleanName($folder->getName());
+                    $folderName     = $this->cleanName($folder->getName());
                     $folderLocation = $currentDir . '/' . $folderName;
                     mkdir($folderLocation);
-                    $this->createDirectory($folderLocation, $folder, $permission, $depth+1);
+                    $this->createDirectory($folderLocation, $folder, $permission, $depth + 1);
                 }
             }
         }
     }
 
-    function createZip()
+    public function createZip()
     {
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
@@ -200,7 +200,7 @@ class ZipFolder
         $ulimit = 250;
         foreach (new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // Close/open archive after 250 additions, to avoid ulimit issues
-            if ($i++ % $ulimit === ($ulimit-1)) {
+            if ($i++ % $ulimit === ($ulimit - 1)) {
                 $archive->close();
                 $archive->open($this->tmpZip);
             }
@@ -208,7 +208,7 @@ class ZipFolder
             /** @var SplFileInfo $file */
             // Chop parts of path that match $this->tmpFolder
             $filePath = $file->getPath() . '/' . $file->getFilename();
-            $zipPath  = substr($filePath, strlen($this->tmpFolder)+1);
+            $zipPath  = substr($filePath, strlen($this->tmpFolder) + 1);
             if ($file->isDir()) {
                 $archive->addEmptyDir($zipPath);
             } elseif ($file->isFile()) {
@@ -235,7 +235,7 @@ class ZipFolder
         }
     }
 
-    function removeDir($path)
+    private function removeDir($path)
     {
         // Add trailing slash to $path if one is not there
         if (substr($path, -1, 1) != "/") {
@@ -286,7 +286,7 @@ class ZipFolder
      * Gets a target path the file should be copied to
      *
      * @param string $currentDir Parent directory the file should be copied to
-     * @param string $file Real full filename
+     * @param string $file       Real full filename
      * @return string
      */
     protected function getTargetPath($currentDir, $file)
