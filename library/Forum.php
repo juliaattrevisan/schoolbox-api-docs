@@ -3,32 +3,37 @@
 define('FORUM_THREADS_PER_PAGE', 30);
 define('FORUM_POSTS_PER_PAGE', 15);
 
-class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
+class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
+{
 
     /**
      * @var string
      */
     private $_postTable;
 
-    function __construct() {
+    function __construct()
+    {
 
-        $this->_table = "forumThread";
-        $this->_index = "threadID";
+        $this->_table     = "forumThread";
+        $this->_index     = "threadID";
         $this->_postTable = "forumPost";
 
         parent::__construct();
     }
 
-    function getRecentThreadList($categoryID, $config) {
+    function getRecentThreadList($categoryID, $config)
+    {
 
         /* Set default sorting to threads, but leave options for other sort fields
          */
         if ($config['sort'] == 'Posts') {
             $sortField = 't.last_post_date';
-        } else if ($config['sort'] == 'Threads') {
-            $sortField = 't.date';
         } else {
-            $sortField = 't.date';
+            if ($config['sort'] == 'Threads') {
+                $sortField = 't.date';
+            } else {
+                $sortField = 't.date';
+            }
         }
 
         $query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id
@@ -45,7 +50,8 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->getAll($query);
     }
 
-    function getThreadList($categoryID, $index = 0, $limit = 0) {
+    function getThreadList($categoryID, $index = 0, $limit = 0)
+    {
         $query = "SELECT t.*,u.id userID, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id userSynID, u.deleted_at authorDeletedAt,
                       u2.title last_post_title, u2.firstname last_post_firstname, u2.lastname last_post_surname, u2.synergy_id last_post_external_id,
                     COUNT(DISTINCT p.postID) - 1 replies
@@ -64,14 +70,16 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->getAll($query);
     }
 
-    function getThread($threadID) {
+    function getThread($threadID)
+    {
         $query = "SELECT t.*, p.postID, p.body FROM forumThread t, forumPost p
 				  WHERE t.threadID = p.threadID AND t.threadID = $threadID AND t.deleted = 'false'
 				  ORDER BY p.date ASC LIMIT 1";
         return $this->db->getRow($query);
     }
 
-    function getPostList($threadID, $index = 0, $limit = 0) {
+    function getPostList($threadID, $index = 0, $limit = 0)
+    {
         $query = "SELECT p.*, u.synergy_id, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, g.name userGroup FROM forumPost p
 				  LEFT JOIN user u ON u.id = p.userID
 				  LEFT JOIN groups g ON g.id = u.group_id
@@ -83,7 +91,8 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->getAll($query);
     }
 
-    function getPost($postID) {
+    function getPost($postID)
+    {
         $query = "SELECT p.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname
 				  FROM " . $this->_postTable . " p
 				  LEFT JOIN user u ON u.id = p.userID
@@ -91,9 +100,10 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->getRow($query);
     }
 
-    function hasForum($categoryID) {
+    function hasForum($categoryID)
+    {
 
-        $query = "SELECT ci.id FROM component_instance ci JOIN component_definition cd ON ci.`component_definition_id`=cd.`id` WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage' AND identifier = $categoryID";
+        $query  = "SELECT ci.id FROM component_instance ci JOIN component_definition cd ON ci.`component_definition_id`=cd.`id` WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage' AND identifier = $categoryID";
         $result = $this->db->getOne($query);
         if (isset($result)) {
             return true;
@@ -102,17 +112,19 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         }
     }
 
-    function lockThread($threadID) {
-        $data = array(
+    function lockThread($threadID)
+    {
+        $data = [
             'threadID' => $threadID,
-            'locked' => 'true',
-        );
+            'locked'   => 'true',
+        ];
         $this->update($data);
     }
 
-    function uniqueView($threadID) {
+    function uniqueView($threadID)
+    {
         if (!isset($_SESSION['threads_viewed'])) {
-            $_SESSION['threads_viewed'] = array();
+            $_SESSION['threads_viewed'] = [];
         }
 
         if (!isset($_SESSION['threads_viewed'][$threadID])) {
@@ -125,13 +137,14 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return;
     }
 
-    function getPageNumber($postID) {
-        $query = "SELECT o.* FROM " . $this->_postTable . " p
+    function getPageNumber($postID)
+    {
+        $query      = "SELECT o.* FROM " . $this->_postTable . " p
 				  LEFT JOIN " . $this->_postTable . " o ON o.threadID = p.threadID AND o.deleted = 'false'
 				  WHERE p.postID = $postID AND p.deleted = 'false'";
-        $i = 0;
+        $i          = 0;
         $postNumber = 0;
-        $postList = $this->db->getAll($query);
+        $postList   = $this->db->getAll($query);
         if (is_array($postList)) {
             foreach ($postList as $post) {
                 $i++;
@@ -146,37 +159,41 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
     }
 
-    function parseBB($text) {
-        $find = array(
+    function parseBB($text)
+    {
+        $find    = [
             '%\[quote\](.+)\[/quote\]%',
-            '%\[quote(="([^"]+)")?\](.+)\[/quote\]%'
-        );
-        $replace = array(
+            '%\[quote(="([^"]+)")?\](.+)\[/quote\]%',
+        ];
+        $replace = [
             '<blockquote><p>$1</p></blockquote>',
-            '<cite>$2</cite><blockquote><p>$3</p></blockquote>'
-        );
+            '<cite>$2</cite><blockquote><p>$3</p></blockquote>',
+        ];
 
         return preg_replace($find, $replace, html_entity_decode($text));
 
     }
 
-    function create($data) {
+    function create($data)
+    {
         $data['date'] = 'NOW()';
         return parent::create($data);
     }
 
-    function delete($threadID) {
-        $data = array(
+    function delete($threadID)
+    {
+        $data = [
             'threadID' => $threadID,
-            'deleted' => 'true',
-        );
+            'deleted'  => 'true',
+        ];
         return $this->update($data);
     }
 
     /**
      * @deprecated
      */
-    function createPost($data) {
+    function createPost($data)
+    {
         $data['date'] = 'NOW()';
         $this->db->insert($this->_postTable, $data);
         $data['postID'] = $this->db->insertID();
@@ -184,15 +201,15 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
         /* update thread */
         $userHandler = new User();
-        $user = $userHandler->getByID($_SESSION['id']);
+        $user        = $userHandler->getByID($_SESSION['id']);
 
-        $thread = array(
-            'threadID' => $data['threadID'],
-            'last_post_id' => $data['postID'],
-            'last_post_date' => 'NOW()',
+        $thread = [
+            'threadID'          => $data['threadID'],
+            'last_post_id'      => $data['postID'],
+            'last_post_date'    => 'NOW()',
             'last_post_user_id' => $_SESSION['id'],
-            'last_post_user' => $userHandler->formatName($user),
-        );
+            'last_post_user'    => $userHandler->formatName($user),
+        ];
 
         $this->update($thread);
 
@@ -202,7 +219,8 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     /**
      * @deprecated
      */
-    function updatePost($data) {
+    function updatePost($data)
+    {
         $data['modified'] = 'NOW()';
 
         unset($data['threadID']);
@@ -216,17 +234,19 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->update($this->_postTable, 'postID', $data);
     }
 
-    function deletePost($postID) {
+    function deletePost($postID)
+    {
 
-        $data = array(
-            'postID' => $postID,
+        $data = [
+            'postID'  => $postID,
             'deleted' => 'true',
-        );
+        ];
         return $this->updatePost($data);
     }
 
-    function homepageClean($cid) {
-        $query = "UPDATE {$this->_table}, {$this->_postTable} 
+    function homepageClean($cid)
+    {
+        $query = "UPDATE {$this->_table}, {$this->_postTable}
             SET {$this->_table}.deleted=true, {$this->_postTable}.deleted=true
             WHERE {$this->_table}.{$this->_index} = {$this->_postTable}.{$this->_index}
             AND {$this->_table}.categoryID = $cid";
@@ -234,9 +254,10 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->query($query);
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score_title', $sort_dir = 'desc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score_title', $sort_dir = 'desc')
+    {
 
-        $keyword = $this->db->quote($keyword);
+        $keyword       = $this->db->quote($keyword);
         $sort_by_quote = $this->db->quoteIdentifier($sort_by);
 
         $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
@@ -255,7 +276,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND (
-                                MATCH(`body`) AGAINST ('$keyword') OR 
+                                MATCH(`body`) AGAINST ('$keyword') OR
                                 MATCH(`forumThread`.`title`) AGAINST ('$keyword')
                             )
                             AND `forumThread`.`deleted` = 'false'
@@ -277,7 +298,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND (
-                                MATCH(`body`) AGAINST ('$keyword') OR 
+                                MATCH(`body`) AGAINST ('$keyword') OR
                                 MATCH(`forumThread`.`title`) AGAINST ('$keyword')
                             )
                             AND `forumThread`.`deleted` = 'false'
