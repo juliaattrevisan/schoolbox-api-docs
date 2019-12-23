@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
+use InvalidArgumentException;
 use Iterator;
 use RuntimeException;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
@@ -84,6 +85,7 @@ class SubjectIterator implements Iterator
      * @return mixed Can return any type.
      * @since 5.0.0
      * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     public function current()
     {
@@ -186,6 +188,7 @@ class SubjectIterator implements Iterator
      * @param SimpleXMLElement $subject
      * @return array
      * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     private function findTeacher(SimpleXMLElement $subject): array
     {
@@ -194,7 +197,7 @@ class SubjectIterator implements Iterator
         $teacherNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/staff/user[@id='{$teacherId}']");
 
         if (!$teacherNode) {
-            throw new RuntimeException("Teacher {$teacherId} profile not found");
+            throw new InvalidArgumentException("Teacher {$teacherId} profile not found");
         }
 
         $teacher = $teacherNode[0];
@@ -216,13 +219,14 @@ class SubjectIterator implements Iterator
      * @param string $studentId
      * @return array
      * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     private function findStudents(string $studentId): array
     {
         $studentNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/students/user[@id='{$studentId}']");
 
         if (!$studentNode) {
-            throw new RuntimeException("Student {$studentId} profile not found");
+            throw new InvalidArgumentException("Student {$studentId} profile not found");
         }
 
         $student = $studentNode[0];

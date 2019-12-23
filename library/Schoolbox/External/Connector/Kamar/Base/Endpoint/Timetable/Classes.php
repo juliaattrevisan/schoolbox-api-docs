@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
+use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -343,7 +344,7 @@ class Classes implements IStrategy
 
                         $this->createTimetableClassInvolvement($student, $timetableClass);
                     }
-                } catch (RuntimeException $e) {
+                } catch (InvalidArgumentException $e) {
                     $this->log->warning($e->getMessage());
                 }
             }
