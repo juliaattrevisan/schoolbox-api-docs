@@ -38,6 +38,11 @@ class Worker extends PipeWriter
     /** @var Task */
     protected $task;
 
+    /**
+     * @var DispatchStrategyInterface
+     */
+    private $strat;
+
 
     /**
      * @param string                    $cmd
@@ -246,4 +251,4 @@ class Worker extends PipeWriter
         return $this;
     }
 
-} 
+}
