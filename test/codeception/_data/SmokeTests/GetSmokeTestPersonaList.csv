@@ -1,7 +1,7 @@
-Superuser, alaress, alaress,ALL
-Admin, alaress, alaress',ALL
-Teacher, jcoles, password,ALL
-Student, jreed, password,ALL
-Pastoral Moderator, jcoles, password,Pastoral
-Fixtures Administrator, jcoles, password,Fixtures
-News Moderator, rwhite, password,News
+Superuser,alaress,alaress,ALL
+Teacher,jcoles,password,ALL
+Student,jreed,password,ALL
+Parent,jennireed01,password,ALL
+Pastoral Moderator,jcoles, password,Pastoral
+Fixtures Administrator,jcoles, password,Fixtures
+News Moderator,rwhite,password,News
