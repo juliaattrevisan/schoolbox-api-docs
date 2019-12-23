@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,7 +13,13 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use SitePage;
 
-abstract class NavigatorController extends AbstractController {
+abstract class NavigatorController extends AbstractController
+{
+
+    /**
+     * @var string
+     */
+    private $template;
 
     /**
      * @param bool          $multi
@@ -34,10 +40,10 @@ abstract class NavigatorController extends AbstractController {
      */
     protected function pparse(SitePage $page)
     {
-        $page->setVar(array(
+        $page->setVar([
             'MIME_FILTER' => is_null($this->mimeFilter) ? 'null' : "'{$this->mimeFilter}'",
-            'SOURCE_SLUG' => substr($this->getSlug(), strpos($this->getSlug(), '/') + 1)
-        ));
+            'SOURCE_SLUG' => substr($this->getSlug(), strpos($this->getSlug(), '/') + 1),
+        ]);
     }
 
 }
