@@ -80,7 +80,7 @@ abstract class Evaluation_Export_CSV {
 
 	/**
 	 * Hook method
-	 * 
+	 *
 	 * @return mixed
 	 */
 	abstract protected function setup();
@@ -92,7 +92,7 @@ abstract class Evaluation_Export_CSV {
 	 *
 	 * Support chainable method
 	 *
-	 * @return \Evaluation_ExporterV2
+	 * @return self
 	 */
 	public function generate() {
 
@@ -434,39 +434,12 @@ abstract class Evaluation_Export_CSV {
 	}
 
 	/**
-	 * Set mandatory columns
-	 *
-	 * @param $mandatoryColumns
-	 */
-	private function setMandatoryColumns($mandatoryColumns) {
-		$this->mandatoryColumns = $mandatoryColumns;
-	}
-
-	/**
 	 * Get mandatory columns
 	 *
 	 * @return array
 	 */
 	private function getMandatoryColumns() {
 		return $this->mandatoryColumns;
-	}
-
-	/**
-	 * Set response handler
-	 *
-	 * @param $responseHandler
-	 */
-	private function setResponseHandler($responseHandler) {
-		$this->responseHandler = $responseHandler;
-	}
-
-	/**
-	 * Get response handler
-	 *
-	 * @return null
-	 */
-	private function getResponseHandler() {
-		return $this->responseHandler;
 	}
 
 	/**
@@ -485,17 +458,6 @@ abstract class Evaluation_Export_CSV {
 	 */
 	private function getAllAttempts() {
 		return $this->allAttempts;
-	}
-
-	/**
-	 * Sets legendHTML
-	 *
-	 * @param $legendHTML
-	 *
-	 * @return bool
-	 */
-	public function setLegendHTML($legendHTML) {
-		$this->legendHTML = $legendHTML;
 	}
 
 	/**
@@ -550,15 +512,6 @@ abstract class Evaluation_Export_CSV {
 	 */
 	private function getAdditionalColumns() {
 		return $this->additionalColumns;
-	}
-
-	/**
-	 * Set includeExternalId
-	 *
-	 * @param $includeExternalId
-	 */
-	protected function setIncludeExternalId($includeExternalId) {
-		$this->includeExternalId = $includeExternalId;
 	}
 
 	/**
