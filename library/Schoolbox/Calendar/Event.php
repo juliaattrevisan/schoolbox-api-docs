@@ -106,7 +106,7 @@ class Event implements ISoftDeletable
      *
      * @var string
      */
-    protected $note = '';
+    protected $title = '';
 
     /**
      * A description of the event
