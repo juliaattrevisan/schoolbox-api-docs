@@ -18,6 +18,11 @@ class StreamEvent
     /** @var mixed */
     protected $data;
 
+    /**
+     * @var array
+     */
+    protected $meta;
+
 
     /**
      * @param resource $stream

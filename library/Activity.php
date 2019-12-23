@@ -7,6 +7,12 @@
 //display what has change since the last login for the user
 
 class Activity {
+
+    /**
+     * @var DeprecatedDatabase
+     */
+    private $db;
+
     function __construct() {
         //setup db
 	    $this->db = DeprecatedDatabase::getInstance();
@@ -44,7 +50,7 @@ class Activity {
         $count['news'] = $result['newscount'];
 
         //check if any new blogs has been submitted
-        $query = "SELECT COUNT(*) AS blogcount FROM blog 
+        $query = "SELECT COUNT(*) AS blogcount FROM blog
                   WHERE deleted_at IS NULL AND folder_id = $id AND created_at >= '$lastcatvisit'";
         $result = $this->db->getRow($query);
 
