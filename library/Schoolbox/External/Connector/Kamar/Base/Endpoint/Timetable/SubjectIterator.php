@@ -194,7 +194,7 @@ class SubjectIterator implements Iterator
         $teacherNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/staff/user[@id='{$teacherId}']");
 
         if (!$teacherNode) {
-            throw new RuntimeException("Teacher {$teacherId} not found in profile xml");
+            throw new RuntimeException("Teacher {$teacherId} profile not found");
         }
 
         $teacher = $teacherNode[0];
@@ -222,7 +222,7 @@ class SubjectIterator implements Iterator
         $studentNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/students/user[@id='{$studentId}']");
 
         if (!$studentNode) {
-            throw new RuntimeException("Student {$studentId} not found in profile xml");
+            throw new RuntimeException("Student {$studentId} profile not found");
         }
 
         $student = $studentNode[0];
