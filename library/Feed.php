@@ -12,6 +12,11 @@ class Feed {
     /** @var Schoolbox\User */
     private $user;
 
+    /**
+     * @var DeprecatedDatabase
+     */
+    private $db;
+
 
     /**
      * @deprecated use \Schoolbox\Feed
@@ -320,7 +325,7 @@ class Feed {
 					JOIN folder pc ON pc.id = c.parent
 					WHERE c.parent $where AND object = 'folder' AND action = 'create'
 					ORDER BY time DESC LIMIT 0, $limit";
-        
+
         $this->db->query($query);
 
         $userHandler = new User();
