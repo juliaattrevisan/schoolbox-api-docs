@@ -13,6 +13,10 @@ use Database;
 
 class Component
 {
+    /**
+     * @var Database
+     */
+    private $database;
 
     /**
      * Constructor - sets up database

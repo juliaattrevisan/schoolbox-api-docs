@@ -13,6 +13,10 @@ use Database;
 
 class Mobile
 {
+    /**
+     * @var Database
+     */
+    private $database;
 
     /**
      * Constructor - sets up database
