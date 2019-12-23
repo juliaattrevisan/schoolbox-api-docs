@@ -102,7 +102,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         // Short circuit if no assessments match filters
         if (!count($taughtAssessmentIds)) {
-            $this->assessments = $this->assessmentMapperProxy->createCollection();
+            $this->results = [];
             return false;
         }
 
