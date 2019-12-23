@@ -5,6 +5,11 @@ define('FORUM_POSTS_PER_PAGE', 15);
 
 class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
+    /**
+     * @var string
+     */
+    private $_postTable;
+
     function __construct() {
 
         $this->_table = "forumThread";
