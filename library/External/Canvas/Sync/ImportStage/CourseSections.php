@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use DomainException;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use External_ClassInterface;
 use PDO;
 use PDOException;
@@ -21,7 +22,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -55,6 +55,7 @@ use function reset;
  */
 class CourseSections
 {
+    use ModelSaveTrait;
 
     /** @var IConnector */
     private $canvasDb;
@@ -1613,44 +1614,6 @@ class CourseSections
     }
 
 
-    /**
-     * Saves (either INSERT or UPDATE) a model's attributes.
-     * - Does not save joins.
-     * - Populates the model's identifier if it has one, and this is an INSERT
-     *
-     * We need this, rather than the Mapper::save() method, because we don't want to use a transaction, and
-     * we want to by-pass pre/post save hooks, eg auto-creation of Assessment's dynamic plan.
-     *
-     * @param IMapper $mapper
-     * @param         $model
-     * @return mixed
-     * @throws Database\Exception
-     */
-    private function saveModel(IMapper $mapper, $model)
-    {
-        $hasId     = (bool)$mapper->getIdentifier();
-        $currentId = $hasId ? $mapper->getModelProperty($model, $mapper->getIdentifierProperty()) : null;
-
-        // These mapper methods are not public, so need to use a closure to bypass encapsulation.
-        $collection       = $mapper->getModelAsCollection($model);
-        $populateFunction = function () use ($collection) {
-            /** @noinspection PhpUndefinedMethodInspection */
-            return $this->populateUuids($this->populateSaveTimestamps($collection));
-        };
-        $populateFunction->call($mapper);
-
-        $statement = $this->schoolboxDb->prepareQuery("
-            INSERT INTO `{$mapper->getTable()}` ({$mapper->getColumnString()})
-            VALUES ({$mapper->getPlaceholderString()})
-            ON DUPLICATE KEY UPDATE {$mapper->getUpdateString()};
-        ");
-        $statement->execute($mapper->dehydrate($model));
-
-        if ($hasId && !$currentId) {
-            $mapper->setModelProperty($model, $mapper->getIdentifierProperty(), $this->schoolboxDb->lastInsertId());
-        }
-        return $model;
-    }
 
 
     /**
