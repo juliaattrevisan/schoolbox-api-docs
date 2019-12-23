@@ -41,6 +41,11 @@ class Alaress_Rss_Stream
     private $rssStrategy;
 
     /**
+     * @var Xml
+     */
+    private $input;
+
+    /**
      * Constructor
      *
      * Optionally takes a source url as an input. You can override
