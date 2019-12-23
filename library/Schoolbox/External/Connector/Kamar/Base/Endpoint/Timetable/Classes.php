@@ -345,6 +345,25 @@ class Classes implements IStrategy
                     }
 
                     $this->createTimetableClassInvolvement($student, $timetableClass);
+
+                    /* Process additional teachers (we already dealt with the first one)
+                     */
+                    array_shift($subject['teachers']);
+
+                    foreach ($subject['teachers'] as $teacher) {
+
+                        /* Throw warning, but assign them anyway
+                         */
+                        if (null === $teacher || !isset($users[$teacher['username']])) {
+                            $this->log->warning(sprintf(
+                                'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s',
+                                $teacher['username'],
+                                $teacher['externalId'],
+                                $timetableClass->getName(),
+                                $timetableClass->getCode()
+                            ));
+                        }
+                    }
                 }
             }
         }
@@ -456,25 +475,25 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class Involvement
      *
-     * @param array      $student
+     * @param array      $person
      * @param ClassEntry $timetableClass
      * @return ClassInvolvement
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
+    private function createTimetableClassInvolvement(array $person, ClassEntry $timetableClass): ClassInvolvement
     {
         /** @var ClassInvolvement $timetableClassInvolvement */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-            ->setExternalId($student['username'])
+            ->setExternalId($person['username'])
             ->setClass($timetableClass);
 
         $this->log->info(sprintf(
-            'Creating class involvement %s %s for student %s (user %s)',
+            'Creating class involvement %s %s for %s (user %s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
-            $student['firstname'] . ' ' . $student['surname'],
+            "{$person['firstname']} {$person['surname']}",
             $timetableClassInvolvement->getExternalId()
         ));
 
