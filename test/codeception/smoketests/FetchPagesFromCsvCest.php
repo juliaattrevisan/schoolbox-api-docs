@@ -21,6 +21,8 @@ class FetchPagesFromCsvCest
         'News Moderator'         => ['username' => 'rwhite', 'password' => 'password'],
     ];
 
+    protected $users = [];
+
     /**
      * @param IntegrationTester $i
      */
@@ -171,12 +173,19 @@ class FetchPagesFromCsvCest
         {
             $senario->skip('Test ignored');
         }
-        
-        $user_details = $this->personas[$persona];
+
+        if(!isset($this->users[$persona]))
+        {
+            $session = $i->getSessionCookie();
+            $this->users[$persona]=[$session];
+            $user_details = $this->personas[$persona];
+            $this->loginUser($i, $user_details['username'], $user_details['password']);
+
+        } else {
+            $i->getSessionCookie($this->users[$persona]);
+        }
         
         #Need to login to the right user
-        $this->loginUser($i, $user_details['username'], $user_details['password']);
-        
         #proceed to test the url which is below.
         $getPayload = new Payload\Base('GET', '/', $url);
         
