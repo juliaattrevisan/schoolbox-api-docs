@@ -93,7 +93,7 @@
                     <td>&nbsp;</td>
                     {% for assessment in markbook.assessments %}
                         <td data-assessment="{{ assessment.id }}">
-                            {% if assessment.markvisibility is not null %}
+                            {% if assessment is not task %}
                                 {% set selected = assessment.markvisibility %}
                                 {% set allOptions = {
                                     0: '&#xe63e; Staff Only',
