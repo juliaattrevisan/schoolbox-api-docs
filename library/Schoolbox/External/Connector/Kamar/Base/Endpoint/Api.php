@@ -39,9 +39,10 @@ class Api implements IApi
 
 
     /**
-     * Cache a url definition then return its value
+     * Find out if the xml file exists on the server
+     * If it doesn't exist we can't do much with it
      */
-    public function isXmlFileExists(): bool
+    public function isXmlFileExtant(): bool
     {
         return file_exists($this->path) && is_readable($this->path);
     }
@@ -55,7 +56,7 @@ class Api implements IApi
      */
     public function retrieveDocument(): ?string
     {
-        if ($this->isXmlFileExists()) {
+        if ($this->isXmlFileExtant()) {
             return file_get_contents($this->path);
         }
 

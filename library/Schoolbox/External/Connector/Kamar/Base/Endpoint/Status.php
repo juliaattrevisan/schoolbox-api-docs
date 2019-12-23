@@ -44,7 +44,7 @@ class Status implements IStatus
         /* We cached the file locally so if it exists, then it's reachable
          * Whether or not it contains valid data is a different question altogether
          */
-        return $this->api->isXmlFileExists();
+        return $this->api->isXmlFileExtant();
     }
 
 
