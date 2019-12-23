@@ -23,7 +23,6 @@ class StreamEvent
      */
     protected $meta;
 
-
     /**
      * @param resource $stream
      * @param mixed    $data
