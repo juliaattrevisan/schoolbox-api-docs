@@ -9,6 +9,13 @@
  */
 class Alaress_Twitter_Search
 {
+
+    /**
+     * Twitter search equivalent of the provided (username, keyword) configuration
+     * This links to twitter.com for more results
+     */
+    private const SEARCH_URL = 'https://twitter.com/search';
+
     private $apiUrl = 'https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended';
     private $user = '';
     private $keywords = '';
@@ -126,6 +133,27 @@ class Alaress_Twitter_Search
 
         $this->setTweets($processed);
     }
+
+
+    /**
+     * Get the Twitter search url representing to the current request's configuration
+     * of (username, keyword)
+     *
+     * @return string
+     */
+    public function getSearchUrl(): string
+    {
+        $q = self::SEARCH_URL . '?q=' . urlencode($this->user);
+
+        if ($this->user && $this->keywords) {
+            $q .= '%20';
+        }
+
+        $q .= urlencode($this->keywords);
+
+        return $q;
+    }
+
 
     /* Getters/Setters
      */
