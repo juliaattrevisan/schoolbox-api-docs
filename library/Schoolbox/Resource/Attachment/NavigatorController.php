@@ -19,7 +19,7 @@ abstract class NavigatorController extends AbstractController
     /**
      * @var string
      */
-    private $template;
+    protected $template;
 
     /**
      * @param bool          $multi

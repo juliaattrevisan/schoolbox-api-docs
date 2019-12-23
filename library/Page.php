@@ -13,7 +13,7 @@ class Page
     /**
      * @var Template
      */
-    protected $template;
+    public $template;
 
     public function __construct($error = false)
     {
