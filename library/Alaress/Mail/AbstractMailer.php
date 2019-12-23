@@ -64,7 +64,6 @@ abstract class AbstractMailer implements IMailer
     /** @var LoggerInterface */
     protected $log;
 
-
     /**
      * Construct the basics of a new Mailer
      *
@@ -113,7 +112,6 @@ abstract class AbstractMailer implements IMailer
             }
             else {
                 //Assume two dimensional array
-                $this->to = '';
                 foreach ($to as $email) {
                     $this->email->addTo($email['email'], $email['name'] ?? null);
                 }
@@ -390,7 +388,7 @@ abstract class AbstractMailer implements IMailer
      */
     public static function buildAddress($address, $name = '')
     {
-        list($mailbox, $host) = explode('@', $address, 2);
+        [$mailbox, $host] = explode('@', $address, 2);
 
         return imap_rfc822_write_address($mailbox, $host, $name);
     }
