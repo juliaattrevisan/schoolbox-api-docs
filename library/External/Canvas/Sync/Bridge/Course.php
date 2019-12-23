@@ -15,10 +15,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
 use UnderflowException;
 use UnexpectedValueException;
-use function array_map;
 use function count;
 use function date;
-use function implode;
 use function preg_match;
 
 /**
@@ -26,7 +24,6 @@ use function preg_match;
  */
 class Course
 {
-
     /** @var IConnector */
     private $canvasDb;
 
@@ -129,16 +126,16 @@ class Course
         $canvasCourseFolderPb    = $this->equalsCanvasCourse($courseCanvasId, 'f');
         $canvasCourseFolderWhere = $canvasCourseFolderPb->getWhere()[0];
         $sql                     = "
-            SELECT 
-                   f.id 'f.id', 
-                   f.name 'f.name', 
+            SELECT
+                   f.id 'f.id',
+                   f.name 'f.name',
                    f.parent 'f.parent',
                    us.id 'us.id'
-            FROM folder f 
+            FROM folder f
             JOIN course_unit_specification us on f.id = us.folder_id
-            WHERE 
-                  $canvasCourseFolderWhere AND 
-                  f.deleted_at IS NULL AND 
+            WHERE
+                  $canvasCourseFolderWhere AND
+                  f.deleted_at IS NULL AND
                   us.deleted_at IS NULL
         ";
 
