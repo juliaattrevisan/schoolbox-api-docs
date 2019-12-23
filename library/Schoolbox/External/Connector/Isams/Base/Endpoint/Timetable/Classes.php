@@ -135,6 +135,9 @@ class Classes implements IStrategy
 
         $users = [];
 
+        /* TODO: synergy_id happens to match externalId? Maybe this array key is wrong
+         * TODO: Found while building kamar
+         */
         foreach ($userStatement as $row) {
             $users[$row['synergy_id']] = $row['id'];
         }
