@@ -29,6 +29,8 @@ class Model implements ISoftDeletable
     private $section;
 
     /**
+     * 1-based
+     *
      * @var int
      */
     private $sequence;
