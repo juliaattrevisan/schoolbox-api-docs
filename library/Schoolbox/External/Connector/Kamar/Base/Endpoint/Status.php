@@ -19,6 +19,7 @@ class Status implements IStatus
 
     /**
      * Expected xml files
+     * These correspond to the @sync attribute in the root xml node SMSDirectoryData
      */
     private const EXPECTED_PROFILE_XML = 'profile.xml';
     private const EXPECTED_TIMETABLE_XML = 'studenttimetables.xml';
