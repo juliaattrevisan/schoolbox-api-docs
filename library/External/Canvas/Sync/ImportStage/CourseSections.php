@@ -150,6 +150,11 @@ class CourseSections
     private $countSubmissionBoxUpdated;
     private $countSubmissionBoxDeleted;
 
+    private $countQuizCreated;
+    private $countQuizMoved;
+    private $countQuizUpdated;
+    private $countQuizDeleted;
+
     private $countPlansCreated;
     private $countPlansUpdated;
     private $countPlansDeleted;
@@ -1661,6 +1666,11 @@ class CourseSections
         $this->countSubmissionBoxUpdated = 0;
         $this->countSubmissionBoxDeleted = 0;
 
+        $this->countQuizCreated = 0;
+        $this->countQuizMoved   = 0;
+        $this->countQuizUpdated = 0;
+        $this->countQuizDeleted = 0;
+
         $this->countPlansCreated = 0;
         $this->countPlansUpdated = 0;
         $this->countPlansDeleted = 0;
@@ -1844,6 +1854,11 @@ class CourseSections
         $this->log->notice($this->countSubmissionBoxMoved . ' Schoolbox SubmissionBoxImpl moved');
         $this->log->notice($this->countSubmissionBoxUpdated . ' Schoolbox SubmissionBoxImpl updated');
         $this->log->notice($this->countSubmissionBoxDeleted . ' Schoolbox SubmissionBoxImpl deleted');
+
+        $this->log->notice($this->countQuizCreated . ' Schoolbox QuizImpl created');
+        $this->log->notice($this->countQuizMoved . ' Schoolbox QuizImpl moved');
+        $this->log->notice($this->countQuizUpdated . ' Schoolbox QuizImpl updated');
+        $this->log->notice($this->countQuizDeleted . ' Schoolbox QuizImpl deleted');
 
         $this->log->notice($this->countPlansCreated . ' Schoolbox Plans created');
         $this->log->notice($this->countPlansUpdated . ' Schoolbox Plans updated');
