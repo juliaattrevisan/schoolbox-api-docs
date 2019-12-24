@@ -18,9 +18,21 @@ class Status implements IStatus
 {
 
     /**
-     * @var Api
+     * Expected xml files
      */
-    private $api;
+    private const EXPECTED_PROFILE_XML = 'profile.xml';
+    private const EXPECTED_TIMETABLE_XML = 'studenttimetables.xml';
+
+    private const EXPECTED_XML = [
+        self::EXPECTED_PROFILE_XML,
+        self::EXPECTED_TIMETABLE_XML
+    ];
+
+
+    /**
+     * @var string
+     */
+    private $path;
 
 
     /**
@@ -30,7 +42,7 @@ class Status implements IStatus
      */
     public function __construct(string $path)
     {
-        $this->api = new Api($path);
+        $this->path = $path;
     }
 
 
@@ -41,10 +53,19 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
+
         /* We cached the file locally so if it exists, then it's reachable
          * Whether or not it contains valid data is a different question altogether
          */
-        return $this->api->isXmlFileExtant();
+        foreach (self::EXPECTED_XML as $xml) {
+            $api = new Api("{$this->path}/{$xml}");
+
+            if (!$api->isXmlFileExtant()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -55,12 +76,14 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
-        $specification = new Specification(null, new Batchxml($this->api));
+//        $specification = new Specification(null, new Batchxml($this->api));
+//
+//        try {
+//            return implode("\n", $specification->check());
+//        } catch (\RuntimeException $e) {
+//            return "Cannot access api endpoint: {$e->getMessage()}";
+//        }
 
-        try {
-            return implode("\n", $specification->check());
-        } catch (\RuntimeException $e) {
-            return "Cannot access api endpoint: {$e->getMessage()}";
-        }
+        return '';
     }
 }
