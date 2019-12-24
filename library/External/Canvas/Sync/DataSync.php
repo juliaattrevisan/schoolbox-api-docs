@@ -21,6 +21,10 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\Learning\Quiz\Section as QuizSection;
+use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
+use Schoolbox\Learning\Quiz\Section\Question\QuestionType;
+use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -58,6 +62,18 @@ class DataSync
 
     /** @var Quiz\Mapper */
     private $quizMapper;
+
+    /** @var QuizSection\Mapper */
+    private $quizSectionMapper;
+
+    /** @var QuizQuestion\Mapper */
+    private $quizQuestionMapper;
+
+    /** @var QuestionType\Mapper */
+    private $quizQuestionTypeMapper;
+
+    /** @var QuizSolution\Mapper */
+    private $quizSolutionMapper;
 
     /** @var SubmissionBoxMapper */
     private $submissionBoxMapper;
@@ -107,6 +123,10 @@ class DataSync
      * @param MarkTypeMapper          $markTypeMapper
      * @param WorkType\Mapper         $workTypeMapper
      * @param Quiz\Mapper             $quizMapper
+     * @param QuizSection\Mapper      $quizSectionMapper
+     * @param QuizQuestion\Mapper     $quizQuestionMapper
+     * @param QuestionType\Mapper     $quizQuestionTypeMapper
+     * @param QuizSolution\Mapper     $quizSolutionMapper
      * @param SubmissionBoxMapper     $submissionBoxMapper
      * @param Assessment\Mapper       $assessmentMapper
      * @param Participant\Plan\Mapper $planMapper
@@ -129,6 +149,10 @@ class DataSync
         MarkTypeMapper $markTypeMapper,
         WorkType\Mapper $workTypeMapper,
         Quiz\Mapper $quizMapper,
+        QuizSection\Mapper $quizSectionMapper,
+        QuizQuestion\Mapper $quizQuestionMapper,
+        QuestionType\Mapper $quizQuestionTypeMapper,
+        QuizSolution\Mapper $quizSolutionMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         Participant\Plan\Mapper $planMapper,
@@ -143,26 +167,30 @@ class DataSync
         bool $persist,
         LoggerInterface $log
     ) {
-        $this->canvasDb            = $canvasDb;
-        $this->schoolboxDb         = $schoolboxDb;
-        $this->externalClass       = $externalClass;
-        $this->externalUser        = $externalUser;
-        $this->markTypeMapper      = $markTypeMapper;
-        $this->workTypeMapper      = $workTypeMapper;
-        $this->quizMapper          = $quizMapper;
-        $this->submissionBoxMapper = $submissionBoxMapper;
-        $this->assessmentMapper    = $assessmentMapper;
-        $this->planMapper          = $planMapper;
-        $this->participantMapper   = $participantMapper;
-        $this->folderMapper        = $folderMapper;
-        $this->userMapper          = $userMapper;
-        $this->courseImplMapper    = $courseImplMapper;
-        $this->courseSpecMapper    = $courseSpecMapper;
-        $this->unitImplMapper      = $unitImplMapper;
-        $this->unitSpecMapper      = $unitSpecMapper;
-        $this->config              = $config;
-        $this->persist             = $persist;
-        $this->log                 = $log;
+        $this->canvasDb               = $canvasDb;
+        $this->schoolboxDb            = $schoolboxDb;
+        $this->externalClass          = $externalClass;
+        $this->externalUser           = $externalUser;
+        $this->markTypeMapper         = $markTypeMapper;
+        $this->workTypeMapper         = $workTypeMapper;
+        $this->quizMapper             = $quizMapper;
+        $this->quizSectionMapper      = $quizSectionMapper;
+        $this->quizQuestionMapper     = $quizQuestionMapper;
+        $this->quizQuestionTypeMapper = $quizQuestionTypeMapper;
+        $this->quizSolutionMapper     = $quizSolutionMapper;
+        $this->submissionBoxMapper    = $submissionBoxMapper;
+        $this->assessmentMapper       = $assessmentMapper;
+        $this->planMapper             = $planMapper;
+        $this->participantMapper      = $participantMapper;
+        $this->folderMapper           = $folderMapper;
+        $this->userMapper             = $userMapper;
+        $this->courseImplMapper       = $courseImplMapper;
+        $this->courseSpecMapper       = $courseSpecMapper;
+        $this->unitImplMapper         = $unitImplMapper;
+        $this->unitSpecMapper         = $unitSpecMapper;
+        $this->config                 = $config;
+        $this->persist                = $persist;
+        $this->log                    = $log;
     }
 
 
@@ -179,6 +207,7 @@ class DataSync
      * @throws UnderflowException
      * @throws InvalidArgumentException
      * @throws DomainException
+     * @throws Mapper\DefinitionException
      */
     public function synchronise(): void
     {
@@ -189,7 +218,11 @@ class DataSync
 
         $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge     = new Bridge\Account($this->schoolboxDb);
-        $assignmentBridge  = new Bridge\Assignment($this->markTypeMapper->findAll(), $this->workTypeMapper->findAll());
+        $assignmentBridge  = new Bridge\Assignment(
+            $this->configMapper->get('site_location'),
+            $this->markTypeMapper->findAll(),
+            $this->workTypeMapper->findAll()
+        );
         $courseBridge      = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
 
@@ -208,6 +241,10 @@ class DataSync
             $this->canvasDb,
             $this->schoolboxDb,
             $this->quizMapper,
+            $this->quizSectionMapper,
+            $this->quizQuestionMapper,
+            $this->quizQuestionTypeMapper,
+            $this->quizSolutionMapper,
             $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->folderMapper,

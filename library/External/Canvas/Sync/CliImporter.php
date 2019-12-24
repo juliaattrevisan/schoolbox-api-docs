@@ -33,6 +33,10 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\Learning\Quiz\Section as QuizSection;
+use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
+use Schoolbox\Learning\Quiz\Section\Question\QuestionType;
+use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use RuntimeException;
@@ -299,6 +303,14 @@ class CliImporter extends CliTool\App
         $workTypeMapper = $mapperFactory->get(WorkType\Mapper::class);
         /** @var Quiz\Mapper */
         $quizMapper = $mapperFactory->get(Quiz\Mapper::class);
+        /** @var QuizSection\Mapper */
+        $quizSectionMapper = $mapperFactory->get(QuizSection\Mapper::class);
+        /** @var QuizQuestion\Mapper */
+        $quizQuestionMapper = $mapperFactory->get(QuizQuestion\Mapper::class);
+        /** @var QuestionType\Mapper */
+        $quizQuestionTypeMapper = $mapperFactory->get(QuestionType\Mapper::class);
+        /** @var QuizSolution\Mapper */
+        $quizSolutionMapper = $mapperFactory->get(QuizSolution\Mapper::class);
         /** @var SubmissionBoxMapper */
         $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
         /** @var Assessment\Mapper */
@@ -326,6 +338,10 @@ class CliImporter extends CliTool\App
             $markTypeMapper,
             $workTypeMapper,
             $quizMapper,
+            $quizSectionMapper,
+            $quizQuestionMapper,
+            $quizQuestionTypeMapper,
+            $quizSolutionMapper,
             $submissionBoxMapper,
             $assessmentMapper,
             $planMapper,

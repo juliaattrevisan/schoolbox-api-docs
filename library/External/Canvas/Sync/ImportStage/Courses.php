@@ -12,17 +12,23 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
+use Evaluation_Section;
 use External\Canvas\Sync\Bridge;
+use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use InvalidArgumentException;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\Learning\Quiz\Section as QuizSection;
+use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
+use Schoolbox\Learning\Quiz\Section\Question\QuestionType;
+use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
@@ -45,6 +51,7 @@ use function count;
  */
 class Courses
 {
+    use ModelSaveTrait;
 
     /** @var IConnector */
     private $canvasDb;
@@ -69,6 +76,18 @@ class Courses
 
     /** @var Quiz\Mapper */
     private $quizMapper;
+
+    /** @var QuizSection\Mapper */
+    private $quizSectionMapper;
+
+    /** @var QuizQuestion\Mapper */
+    private $quizQuestionMapper;
+
+    /** @var QuestionType\Mapper */
+    private $questionTypeMapper;
+
+    /** @var QuizSolution\Mapper */
+    private $quizSolutionMapper;
 
     /** @var SubmissionBoxMapper */
     private $submissionBoxMapper;
@@ -100,6 +119,11 @@ class Courses
     private $countSubmissionBoxMoved;
     private $countSubmissionBoxDeleted;
 
+    // Quiz => Quiz
+    private $countQuizSynchronised;
+    private $countQuizCreated;
+    private $countQuizUpdated;
+    private $countQuizMoved;
     private $countQuizDeleted;
 
 
@@ -107,6 +131,10 @@ class Courses
      * @param IConnector          $canvasDb
      * @param IConnector          $schoolboxDb
      * @param Quiz\Mapper         $quizMapper
+     * @param QuizSection\Mapper  $quizSectionMapper
+     * @param QuizQuestion\Mapper $quizQuestionMapper
+     * @param QuestionType\Mapper $quizQuestionTypeMapper
+     * @param QuizSolution\Mapper $quizSolutionMapper
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param Assessment\Mapper   $assessmentMapper
      * @param Folder\Mapper       $folderMapper
@@ -120,6 +148,10 @@ class Courses
         IConnector $canvasDb,
         IConnector $schoolboxDb,
         Quiz\Mapper $quizMapper,
+        QuizSection\Mapper $quizSectionMapper,
+        QuizQuestion\Mapper $quizQuestionMapper,
+        QuestionType\Mapper $quizQuestionTypeMapper,
+        QuizSolution\Mapper $quizSolutionMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         Folder\Mapper $folderMapper,
@@ -134,6 +166,10 @@ class Courses
         $this->log                 = $log;
         $this->assignmentBridge    = $assignmentBridge;
         $this->quizMapper          = $quizMapper;
+        $this->quizSectionMapper   = $quizSectionMapper;
+        $this->quizQuestionMapper  = $quizQuestionMapper;
+        $this->questionTypeMapper  = $quizQuestionTypeMapper;
+        $this->quizSolutionMapper  = $quizSolutionMapper;
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->assessmentMapper    = $assessmentMapper;
         $this->folderMapper        = $folderMapper;
@@ -150,6 +186,7 @@ class Courses
      * @throws Mapper\Exception
      * @throws UnderflowException
      * @throws UnexpectedValueException
+     * @throws Mapper\DefinitionException
      */
     public function synchronise(): void
     {
@@ -178,16 +215,20 @@ class Courses
                assignment.created_at       'assignment.created_at',
                assignment.updated_at       'assignment.updated_at',
                assignment.muted            'assignment.muted',
-               quiz.id                     'quiz.id',
+               quiz.canvas_id              'quiz.canvas_id',
                quiz.quiz_type              'quiz.quiz_type',
-               quiz.anonymous_submissions  'quiz.anonymous_submissions'
+               quiz.anonymous_submissions  'quiz.anonymous_submissions',
+               quiz_fact.time_limit        'quiz_fact.time_limit',
+               quiz_fact.allowed_attempts  'quiz_fact.allowed_attempts'
         FROM course_dim course
         JOIN enrollment_term_dim enrollment_term ON enrollment_term.id = course.enrollment_term_id
         JOIN account_dim account ON course.account_id = account.id
         LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state = 'published'
         LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
         LEFT JOIN quiz_dim quiz ON quiz.assignment_id = assignment.id
+        LEFT JOIN quiz_fact ON quiz_fact.quiz_id = quiz.id
         WHERE $courseFilterWhere
+        -- TODO cater for quiz/assignment positioning
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment_group.position, assignment.position
         ";
         $statement = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
@@ -200,6 +241,7 @@ class Courses
             $courseCode         = $row['course.code'];
             $courseCanvasId     = (int)$row['course.canvas_id'];
             $assignmentCanvasId = $row['assignment.canvas_id'] === null ? null : (int)$row['assignment.canvas_id'];
+            $quizCanvasId       = $row['quiz.canvas_id'] === null ? null : (int)$row['quiz.canvas_id'];
 
             // First time we've seen this account?
             if (!array_key_exists($accountCanvasId, $accountsData)) {
@@ -218,11 +260,30 @@ class Courses
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId] = [
                     'name'        => $row['course.name'],
                     'termName'    => $row['enrollment_term.name'],
+                    'quizzes'     => [],
                     'assignments' => [],
                 ];
             }
-            // Did we get assignment data?
-            if ($assignmentCanvasId !== null) {
+            // Did we get quiz data?
+            if($quizCanvasId !== null){
+                $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['quizzes'][$quizCanvasId] = [
+                    'title'                 => $row['assignment.title'],
+                    'description'           => $row['assignment.description'],
+                    'points_possible'       => $row['assignment.points_possible'] === null ? null : (float)$row['assignment.points_possible'],
+                    'grading_type'          => $row['assignment.grading_type'],
+                    'submission_types'      => $row['assignment.submission_types'],
+                    'created_at'            => $row['assignment.created_at'],
+                    'updated_at'            => $row['assignment.updated_at'],
+                    'muted'                 => $row['assignment.muted'] === 'true',
+                    'quiz_type'             => $row['quiz.quiz_type'],
+                    'anonymous_submissions' => $row['quiz.anonymous_submissions'] === 'allow_anonymous_submissions',
+                    'time_limit'            => $row['quiz_fact.time_limit'] === null ? null : (int)$row['quiz_fact.time_limit'],
+                    'allowed_attempts'      => (int)$row['quiz_fact.allowed_attempts'],
+                    'position'              => $assessmentSequence++,
+                ];
+            }
+            // Did we get assignment w/o quiz data?
+            elseif ($assignmentCanvasId !== null) {
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['assignments'][$assignmentCanvasId] = [
                     'title'                 => $row['assignment.title'],
                     'description'           => $row['assignment.description'],
@@ -232,9 +293,6 @@ class Courses
                     'created_at'            => $row['assignment.created_at'],
                     'updated_at'            => $row['assignment.updated_at'],
                     'muted'                 => $row['assignment.muted'] === 'true',
-                    'isQuiz'                => (bool)$row['quiz.id'],
-                    'quiz_type'             => $row['quiz.quiz_type'],
-                    'anonymous_submissions' => $row['quiz.anonymous_submissions'],
                     'position'              => $assessmentSequence++,
                 ];
             }
@@ -294,8 +352,28 @@ class Courses
                     $unitSpecFolder                = $this->processCanvasCourse($courseSpecFolder, $courseCanvasId, $courseData['termName']);
                     $synchronizedCourseFolderIds[] = $unitSpecFolder->getId();
 
+                    foreach ($courseData['quizzes'] as $quizCanvasId => $quizData) {
+                        $quiz                  = $this->syncWithCompositeQuiz(
+                            $unitSpecFolder,
+                            $quizCanvasId,
+                            $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
+                            $quizData['title'],
+                            $quizData['description'],
+                            $quizData['points_possible'],
+                            $quizData['created_at'],
+                            $quizData['updated_at'],
+                            $quizData['muted'],
+                            $quizData['quiz_type'],
+                            $quizData['anonymous_submissions'],
+                            $quizData['time_limit'],
+                            $quizData['allowed_attempts'],
+                            $quizData['position']
+                        );
+                        $synchronizedQuizIds[] = $quiz->getId();
+                    }
+
                     foreach ($courseData['assignments'] as $assignmentCanvasId => $assignmentData) {
-                        $assessment                  = $this->processCanvasAssignment(
+                        $submissionBox  = $this->syncWithSubmissionBox(
                             $unitSpecFolder,
                             $assignmentCanvasId,
                             $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
@@ -307,16 +385,9 @@ class Courses
                             $assignmentData['created_at'],
                             $assignmentData['updated_at'],
                             $assignmentData['muted'],
-                            $assignmentData['isQuiz'],
-                            $assignmentData['quiz_type'],
-                            $assignmentData['anonymous_submissions'],
                             $assignmentData['position']
                         );
-                        if ($assignmentData['isQuiz']) {
-                            $synchronizedQuizIds[] = $assessment->getId();
-                        } else {
-                            $synchronizedSubmissionBoxIds[] = $assessment->getId();
-                        }
+                        $synchronizedSubmissionBoxIds[] = $submissionBox->getId();
                     }
                 }
             }
@@ -498,84 +569,6 @@ class Courses
 
 
     /**
-     * Sync a Canvas Assignment with Schoolbox SubmissionBoxSpec or QuizSpec
-     *
-     * @param Folder\Model $unitSpecFolder
-     * @param int          $canvasId
-     * @param int          $courseTeacherSchoolboxUserId
-     * @param string       $title
-     * @param string|null  $description
-     * @param int|float    $pointsPossible
-     * @param string       $gradingType
-     * @param string       $submissionTypes
-     * @param string       $createdAt
-     * @param string       $updatedAt
-     * @param bool         $muted
-     * @param bool         $isQuiz
-     * @param string       $quizType
-     * @param string       $anonymousSubmissions
-     * @param int          $position
-     * @return SubmissionBox
-     * @throws Database\Exception
-     * @throws InvalidArgumentException
-     * @throws Mapper\Exception
-     * @throws UnexpectedValueException
-     */
-    private function processCanvasAssignment(
-        Folder\Model $unitSpecFolder,
-        int $canvasId,
-        int $courseTeacherSchoolboxUserId,
-        string $title,
-        ?string $description,
-        ?float $pointsPossible,
-        string $gradingType,
-        string $submissionTypes,
-        string $createdAt,
-        string $updatedAt,
-        bool $muted,
-        bool $isQuiz,
-        string $quizType,
-        string $anonymousSubmissions,
-        int $position
-    ): IAssessableDataModel
-    {
-        $this->countAssignmentsSynchronised++;
-
-        return $isQuiz
-            ? $this->syncWithQuiz(
-                $unitSpecFolder,
-                $canvasId,
-                $courseTeacherSchoolboxUserId,
-                $title,
-                $description,
-                $pointsPossible,
-                $gradingType,
-                $submissionTypes,
-                $createdAt,
-                $updatedAt,
-                $muted,
-                $isQuiz,
-                $quizType,
-                $anonymousSubmissions,
-                $position
-            )
-            : $this->syncWithSubmissionBox(
-                $unitSpecFolder,
-                $canvasId,
-                $courseTeacherSchoolboxUserId,
-                $title,
-                $description,
-                $pointsPossible,
-                $gradingType,
-                $submissionTypes,
-                $createdAt,
-                $updatedAt,
-                $muted,
-                $position
-            );
-    }
-
-    /**
      * Synchronises a Canvas Assignment to a Schoolbox SubmissionBox
      *
      * @param Folder\Model $unitSpecFolder
@@ -609,10 +602,7 @@ class Courses
         string $updatedAt,
         bool $muted,
         int $position
-    ): SubmissionBox
-    {
-        $submissionBox = $this->findSubmissionBoxSpec($canvasId);
-
+    ): SubmissionBox {
         // Translate Canvas attributes to SB attributes if not a 1:1 between systems
         $maxMark           = $this->assignmentBridge->getMaxMark($pointsPossible);
         $markType          = $this->assignmentBridge->getMarkType($gradingType, $pointsPossible);
@@ -620,6 +610,9 @@ class Courses
         $acceptMultiple    = $this->assignmentBridge->getAcceptMultiple($submissionTypes);
         $markVisibility    = $this->assignmentBridge->getMarkVisibility($muted);
         $selfReviewability = $this->assignmentBridge->getSelfReviewability();
+        $workType          = $this->assignmentBridge->getSubmissionBoxWorkType();
+        $weight            = $this->assignmentBridge->getSubmissionBoxWeight();
+        $submissionBox = $this->findSubmissionBoxSpec($canvasId);
 
         // Not found in SB?
         if (!$submissionBox) {
@@ -636,117 +629,411 @@ class Courses
                 $markType,
                 $acceptOnline,
                 $acceptMultiple,
+                $weight,
                 $createdAt,
                 $updatedAt,
                 $markVisibility,
                 $position,
-                $selfReviewability
+                $selfReviewability,
+                $workType
             );
         }
 
         $this->log->debug("Synchronising Canvas Assignment(canvasId: $canvasId) with SubmissionBoxSpec (id: {$submissionBox->getId()})");
 
         // Already exists in SB. Do we need to update it?
-        $assessmentModel = $submissionBox->getAssessmentModel();
-        // Check if any updates are required (including moving to new context)
-        if ($assessmentModel->getContextUnitSpecification()->getId() !== $unitSpecFolder->getUnitSpecification()->getId()) {
+        if($this->checkAssessmentBelongsToUnitSpec($submissionBox->getAssessmentModel(), $unitSpecFolder->getUnitSpecification() )){
             $this->countSubmissionBoxMoved++;
-            $oldUnitSpecId = $assessmentModel->getContextUnitSpecification()->getId();
-            $newUnitSpecId = $unitSpecFolder->getUnitSpecification()->getId();
-            $this->log->debug("SubmissionBox Spec moved from (unitSpecId: $oldUnitSpecId) to (unitSpecId: $newUnitSpecId)");
-            $this->moveAssessmentSpec($assessmentModel->getId(), $unitSpecFolder->getUnitSpecification()->getId());
-            $assessmentModel->setContextUnitSpecification($unitSpecFolder->getUnitSpecification());
         }
 
+        $isAssessmentUpdated = $this->checkAssessmentForChanges(
+            $submissionBox->getAssessmentModel(),
+            $title,
+            $description,
+            $position,
+            $workType,
+            $createdAt,
+            $updatedAt
+        );
+
+        $isBoxUpdated = false;
         if (
             // Does any attribute no longer align?
-            $assessmentModel->getTitle() !== $title ||
-            $assessmentModel->getDescription() !== $description ||
+            $submissionBox->getWeight() !== $weight ||
             $submissionBox->getMaxMark() !== $maxMark ||
             $submissionBox->getAcceptOnline() !== $acceptOnline ||
             $submissionBox->getAcceptMultiple() !== $acceptMultiple ||
             $submissionBox->getMarkVisibility() !== $markVisibility ||
-            $assessmentModel->getSequence() !== $position ||
             $submissionBox->getSelfReviewability() !== $selfReviewability ||
-            $assessmentModel->getCreatedAt()->getDatabase() !== $createdAt ||
-            $assessmentModel->getUpdatedAt()->getDatabase() !== $updatedAt ||
             $submissionBox->getCategory()->getId() !== $unitSpecFolder->getId() ||
             $submissionBox->getMarkType()->getId() !== $markType->getId()
         ) {
             // Update all attributes and update
-            $this->log->debug("SubmissionBox '$title' (canvasId: $canvasId) updated");
+            $submissionBox
+                ->setCategory($unitSpecFolder)
+                ->setMaxMark($maxMark)
+                ->setMarkType($markType)
+                ->setAcceptOnline($acceptOnline)
+                ->setAcceptMultiple($acceptMultiple)
+                ->setWeight($weight)
+                ->setMarkVisibility($markVisibility)
+                ->setSelfReviewability($selfReviewability);
+            $this->saveModel($this->submissionBoxMapper, $submissionBox);
+            $isBoxUpdated = true;
+        }
+        if ($isAssessmentUpdated || $isBoxUpdated) {
             $this->countSubmissionBoxUpdated++;
-            $submissionBox->setCategory($unitSpecFolder);
-            $assessmentModel->setTitle($title);
-            $assessmentModel->setDescription($description);
-            $submissionBox->setMaxMark($maxMark);
-            $submissionBox->setMarkType($markType);
-            $submissionBox->setAcceptOnline($acceptOnline);
-            $submissionBox->setAcceptMultiple($acceptMultiple);
-            $assessmentModel->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt));
-            $assessmentModel->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt));
-            $submissionBox->setMarkVisibility($markVisibility);
-            $assessmentModel->setSequence($position);
-            $submissionBox->setSelfReviewability($selfReviewability);
-            $this->updateSubmissionBox(
-                $assessmentModel->getId(),
-                $title,
-                $description,
-                $submissionBox->getCategory()->getId(),
-                $maxMark,
-                $markType->getId(),
-                $acceptOnline,
-                $acceptMultiple,
-                $createdAt,
-                $updatedAt,
-                $markVisibility,
-                $position,
-                $selfReviewability
-            );
+            $this->log->debug("SubmissionBox '$title' (canvasId: $canvasId) updated");
         }
         return $submissionBox;
     }
 
 
     /**
-     * Synchronises a Canvas Quiz to a Schoolbox SubmissionBox
+     * Synchronises a Canvas Quiz to a Schoolbox Quiz/Section/Question/Answer
      *
      * @param Folder\Model $unitSpecFolder
-     * @param int          $canvasId
-     * @param int          $courseTeacherSchoolboxUserId
+     * @param int          $quizCanvasId
+     * @param int          $quizOwnerId
      * @param string       $title
      * @param string|null  $description
      * @param float|null   $pointsPossible
-     * @param string       $gradingType
-     * @param string       $submissionTypes
      * @param string       $createdAt
      * @param string       $updatedAt
      * @param bool         $muted
-     * @param bool         $isQuiz
      * @param string       $quizType
-     * @param string       $anonymousSubmissions
+     * @param bool         $anonymousSubmissions
+     * @param int          $timeLimitMinutes
+     * @param int          $allowedAttempts
      * @param int          $position
      * @return Quiz\Model
+     * @throws Database\Exception
+     * @throws InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
      */
-    private function syncWithQuiz(
+    private function syncWithCompositeQuiz(
         Folder\Model $unitSpecFolder,
-        int $canvasId,
-        int $courseTeacherSchoolboxUserId,
+        int $quizCanvasId,
+        int $quizOwnerId,
         string $title,
         ?string $description,
         ?float $pointsPossible,
-        string $gradingType,
-        string $submissionTypes,
         string $createdAt,
         string $updatedAt,
         bool $muted,
-        bool $isQuiz,
         string $quizType,
-        string $anonymousSubmissions,
+        bool $anonymousSubmissions,
+        int $timeLimitMinutes,
+        int $allowedAttempts,
         int $position
-    ): Quiz\Model
+    ): Quiz\Model {
+        $quiz = $this->syncWithQuiz(
+            $unitSpecFolder,
+            $quizCanvasId,
+            $quizOwnerId,
+            $title,
+            $description,
+            $createdAt,
+            $updatedAt,
+            $muted,
+            $quizType,
+            $anonymousSubmissions,
+            $timeLimitMinutes,
+            $allowedAttempts,
+            $position
+        );
+        $section  = $this->syncWithSection($quiz);
+        $question = $this->syncWithQuestion($section, $pointsPossible);
+        $this->syncWithSolution($question);
+
+        return $quiz;
+    }
+
+
+    /**
+     * Sync Canvas Data with a Schoolbox Quiz+Assessment
+     *
+     * @param Folder\Model $unitSpecFolder
+     * @param int          $quizCanvasId
+     * @param int          $quizOwnerId
+     * @param string       $title
+     * @param string|null  $description
+     * @param string       $createdAt
+     * @param string       $updatedAt
+     * @param bool         $muted
+     * @param string       $quizType
+     * @param bool         $anonymousSubmissions
+     * @param int          $timeLimitMinutes
+     * @param int          $allowedAttempts
+     * @param int          $position
+     * @return Quiz\Model
+     * @throws Database\Exception
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     */
+    private function syncWithQuiz(
+        Folder\Model $unitSpecFolder,
+        int $quizCanvasId,
+        int $quizOwnerId,
+        string $title,
+        ?string $description,
+        string $createdAt,
+        string $updatedAt,
+        bool $muted,
+        string $quizType,
+        bool $anonymousSubmissions,
+        int $timeLimitMinutes,
+        int $allowedAttempts,
+        int $position
+    ): Quiz\Model {
+        // Translate Canvas attributes to SB attributes if not a 1:1 between systems
+        $markVisibility    = $this->assignmentBridge->getMarkVisibility($muted);
+        $workType          = $this->assignmentBridge->getQuizWorkType($quizType);
+        $duration          = $timeLimitMinutes === -1 ? -1 : $timeLimitMinutes * 60;
+        $maxAttempts       = $allowedAttempts === -1 ? 0 : $allowedAttempts;
+        $weight            = $this->assignmentBridge->getQuizWeight();
+
+        $quiz = $this->findQuizSpec($quizCanvasId);
+        if (!$quiz) {
+            // Not found in SB? Create and return it.
+            $this->log->debug("Created new QuizSpec for Canvas Assignment '$title' (canvasId: $quizCanvasId)");
+            $this->countQuizCreated++;
+            return $this->createQuizSpec(
+                $unitSpecFolder,
+                $quizOwnerId,
+                $workType,
+                $title,
+                $description,
+                $createdAt,
+                $updatedAt,
+                $quizCanvasId,
+                $anonymousSubmissions,
+                $duration,
+                $maxAttempts,
+                $weight,
+                $position,
+                $markVisibility
+            );
+        }
+
+        $this->log->debug("Synchronising Canvas Assignment(canvasId: $quizCanvasId) with QuizSpec (id: {$quiz->getId()})");
+
+        if($this->checkAssessmentBelongsToUnitSpec($quiz->getAssessmentModel(), $unitSpecFolder->getUnitSpecification() )){
+            $this->countSubmissionBoxMoved++;
+        }
+
+        $isAssessmentUpdated = $this->checkAssessmentForChanges(
+            $quiz->getAssessmentModel(),
+            $title,
+            $description,
+            $position,
+            $workType,
+            $createdAt,
+            $updatedAt
+        );
+
+        $isQuizUpdated = false;
+        if (
+            // Does any attribute no longer align?
+            ($quiz->getWorkType() === null xor $workType === null) ||
+            $quiz->getTitle() !== $title ||
+            $quiz->getDescription() !== $description ||
+            $quiz->getDuration() !== $duration ||
+            $quiz->getMaxAttempts() !== $maxAttempts ||
+            $quiz->getWeight() !== $weight ||
+            $quiz->getAvailability() !== Quiz\Model::AVAILABILITY_ASSESS ||
+            $quiz->getAnonymousResult() !== $anonymousSubmissions ||
+            $quiz->getMarkVisibility() !== $markVisibility ||
+            $quiz->getCreated()->getDatabase() !== $createdAt ||
+            $quiz->getUser()->getId() !== $quizOwnerId ||
+            $quiz->getCategory()->getId() !== $unitSpecFolder->getId() ||
+            ($quiz->getWorkType() && $workType && $quiz->getWorkType()->getId() !== $workType->getId())
+        ) {
+            // Update all attributes and update
+            $quiz
+                ->setCategory($unitSpecFolder)
+                ->setUser((new User())->setId($quizOwnerId))
+                ->setWorkType($workType)
+                ->setTitle($title)
+                ->setDescription($description)
+                ->setDuration($duration)
+                ->setMaxAttempts($maxAttempts)
+                ->setWeight($weight)
+                ->setAvailability(Quiz\Model::AVAILABILITY_ASSESS)
+                ->setAnonymousResult($anonymousSubmissions)
+                ->setMarkVisibility($markVisibility)
+                ->setExternalId((string)$quizCanvasId)
+                ->setCreated(Alaress_Date_Format::newDatabaseDate($createdAt));
+
+            $this->saveModel($this->quizMapper, $quiz);
+
+            $isQuizUpdated = true;
+        }
+        if ($isAssessmentUpdated || $isQuizUpdated) {
+            $this->countQuizUpdated++;
+            $this->log->debug("Quiz '$title' (canvasId: $quizCanvasId) updated");
+        }
+        return $quiz;
+
+    }
+
+    /**
+     * Sync Canvas data with SB Quiz section
+     *
+     * @param Quiz\Model $quiz
+     * @return QuizSection\Model
+     * @throws Database\Exception
+     * @throws UnexpectedValueException
+     */
+    private function syncWithSection(Quiz\Model $quiz): QuizSection\Model
     {
-        return null;
+        $sequence    = 1;
+        $title       = "Canvas Quiz section";
+        $description = "Imported from Canvas LMS";
+        $random      = false;
+        $pool        = Evaluation_Section::POOL_SIZE_ALL;
+
+        // Do a section already exist in SB?
+        $sections = $this->quizSectionMapper->findByColumn(QuizSection\Mapper::COL_ASSESS_ID, $quiz->getId());
+        if($sections->count() > 1){
+            throw new UnexpectedValueException("Multiple sections found for quiz {$quiz->getId()}");
+        }
+        /** @var null|QuizSection\Model $section */
+        $section = $sections->first();
+
+        // If not exist, create and return.
+        if(!$section){
+            $section = (new QuizSection\Model())
+                ->setQuiz($quiz)
+                ->setSequence($sequence)
+                ->setTitle($title)
+                ->setDescription($description)
+                ->setRandom($random)
+                ->setPool($pool);
+            return $this->saveModel($this->quizSectionMapper, $section);
+        }
+
+        // If already exists, and has changed, update it
+        if(
+            $section->getSequence() !== $sequence ||
+            $section->getTitle() !== $title ||
+            $section->getDescription() !== $description ||
+            $section->getRandom() !== $random ||
+            $section->getPool() !== $pool
+        ) {
+            $section
+                ->setSequence($sequence)
+                ->setTitle($title)
+                ->setDescription($description)
+                ->setRandom($random)
+                ->setPool($pool);
+            $this->saveModel($this->quizSectionMapper, $section);
+        }
+        return $section;
+    }
+
+
+    /**
+     * Sync canvas data with a single Schoolbox Quiz Question
+     *
+     * @param QuizSection\Model $section
+     * @param float|null         $pointsPossible
+     * @return QuizQuestion\Model
+     * @throws Database\Exception
+     * @throws InvalidColumnException
+     * @throws UnexpectedValueException
+     */
+    private function syncWithQuestion(QuizSection\Model $section, ?float $pointsPossible): QuizQuestion\Model
+    {
+        /** @var QuestionType\Model $questionType */
+        $questionType = $this->questionTypeMapper->findByPredicates($this->assignmentBridge->getQuizQuestionTypePredicate())->first();
+        $maxMark      = $this->assignmentBridge->getMaxMark($pointsPossible);
+        $questionText = "Canvas aggregate question";
+        $config       = null;
+        $sequence     = 1;
+
+        // Do a question already exist in SB?
+        $questions = $this->quizQuestionMapper->findByColumn(QuizQuestion\Mapper::COL_SECTION_ID, $section->getId());
+        if($questions->count() > 1){
+            throw new UnexpectedValueException("Multiple questions found for section {$section->getId()}");
+        }
+        /** @var null|QuizQuestion\Model $question */
+        $question = $questions->first();
+
+        // If not exist, create and return.
+        if(!$question){
+            $question = (new QuizQuestion\Model())
+                ->setSection($section)
+                ->setSequence($sequence)
+                ->setType($questionType)
+                ->setMarks($maxMark)
+                ->setQuestion($questionText)
+                ->setConfig($config);
+            return $this->saveModel($this->quizQuestionMapper, $question);
+        }
+
+        // If already exists, and has changed, update it
+        if(
+            $question->getSequence() !== $sequence ||
+            $question->getMarks() !==$maxMark ||
+            $question->getQuestion() !== $questionText ||
+            $question->getConfig() !==$config ||
+            $question->getType()->getId() !== $questionType->getId()
+        ) {
+            $question
+                ->setSequence($sequence)
+                ->setType($questionType)
+                ->setMarks($maxMark)
+                ->setQuestion($questionText)
+                ->setConfig($config);
+            $this->saveModel($this->quizQuestionMapper, $question);
+        }
+        return $question;
+    }
+
+
+    /**
+     * Sync Canvas data w/ Schoolbox Quiz Solution
+     *
+     * @param QuizQuestion\Model $question
+     * @return QuizSolution\Model
+     * @throws Database\Exception
+     * @throws UnexpectedValueException
+     */
+    private function syncWithSolution(QuizQuestion\Model $question): QuizSolution\Model
+    {
+        $sequence     = 1;
+        $solutionText = '';
+
+        // Do a question already exist in SB?
+        $solutions = $this->quizSolutionMapper->findByColumn(QuizSolution\Mapper::COL_QUESTION_ID, $question->getId());
+        if ($solutions->count() > 1) {
+            throw new UnexpectedValueException("Multiple solutions found for question {$question->getId()}");
+        }
+        /** @var null|QuizSolution\Model $solution */
+        $solution = $solutions->first();
+
+        // If not exist, create and return.
+        if (!$solution) {
+            $solution = (new QuizSolution\Model())
+                ->setQuestion($question)
+                ->setSequence($sequence)
+                ->setSolution($solutionText);
+            return $this->saveModel($this->quizSolutionMapper, $solution);
+        }
+
+        // If already exists, and has changed, update it
+        if (
+            $solution->getSequence() !== $sequence ||
+            $solution->getSolution() !== $solutionText
+        ) {
+            $solution
+                ->setSequence($sequence)
+                ->setSolution($solutionText);
+            $this->saveModel($this->quizSolutionMapper, $solution);
+        }
+        return $solution;
     }
 
 
@@ -794,6 +1081,49 @@ class Courses
 
 
     /**
+     * Find a Quiz Spec for specified Canvas quiz.canvas_id
+     *
+     * @param int $quizCanvasId
+     * @return Quiz\Model|null
+     * @throws Database\Exception
+     * @throws UnexpectedValueException
+     * @throws Mapper\Exception
+     */
+    private function findQuizSpec(int $quizCanvasId): ?Quiz\Model
+    {
+        // Hydrate Quiz + Assessment + link to UnitSpec (so we can check if moved)
+        $sql = "
+            SELECT
+                {$this->quizMapper->getColumnString('q')},
+                {$this->assessmentMapper->getColumnString('a')},
+                acus.course_unit_specification_id
+            FROM assess q
+            JOIN assessment a ON a.id = q.assessment_id
+            JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
+            WHERE a.deleted_at IS NULL AND q.external_id = :externalId
+        ";
+
+        $rows = $this->schoolboxDb->executeQuery($sql, ['externalId' => $quizCanvasId])->fetchAll();
+        if (!count($rows)) {
+            return null;
+        }
+        if (count($rows) > 1) {
+            throw new UnexpectedValueException("Unable to uniquely identify a Quiz spec for canvas id '$quizCanvasId'");
+        }
+
+        $row        = $rows[0];
+        $assessment = $this->assessmentMapper->hydrate($row, 'a');
+
+        $quiz = $this->quizMapper->hydrate($row, 'q');
+        $quiz->setAssessmentModel($assessment);
+        $assessment->setSubObject($quiz);
+        $assessment->setContextUnitSpecification((new UnitSpec\Model())->setId((int)$row['course_unit_specification_id']));
+
+        return $quiz;
+    }
+
+
+    /**
      * Creates and returns a SubmissionBox spec.
      *
      * @param Folder\Model           $unitSpecFolder
@@ -805,14 +1135,15 @@ class Courses
      * @param SubmissionBox\MarkType $markType
      * @param bool                   $acceptOnline
      * @param bool                   $acceptMultiple
+     * @param int                    $weight
      * @param string                 $createdAt
      * @param string                 $updatedAt
      * @param int                    $markVisibility
      * @param int                    $position
      * @param string                 $selfReviewability
+     * @param WorkType\Model|null    $workType
      * @return SubmissionBox
      * @throws Database\Exception
-     * @throws UnexpectedValueException
      */
     private function createSubmissionBoxSpec(
         Folder\Model $unitSpecFolder,
@@ -824,19 +1155,23 @@ class Courses
         SubmissionBox\MarkType $markType,
         bool $acceptOnline,
         bool $acceptMultiple,
+        int $weight,
         string $createdAt,
         string $updatedAt,
         int $markVisibility,
         int $position,
-        string $selfReviewability
+        string $selfReviewability,
+        ?WorkType\Model $workType
     ): SubmissionBox {
-        $assessment = (new Assessment\Model())
-            ->setContextUnitSpecification($unitSpecFolder->getUnitSpecification())
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
-            ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
-            ->setSequence($position);
+        $assessment = $this->createAssessment(
+            $unitSpecFolder->getUnitSpecification(),
+            $title,
+            $description,
+            $workType,
+            $createdAt,
+            $updatedAt,
+            $position
+        );
 
         $submissionBox = (new SubmissionBox())
             ->setAssessmentModel($assessment)
@@ -846,133 +1181,213 @@ class Courses
             ->setMarkType($markType)
             ->setAcceptOnline($acceptOnline)
             ->setAcceptMultiple($acceptMultiple)
+            ->setWeight($weight)
             ->setMarkVisibility($markVisibility)
             ->setSelfReviewability($selfReviewability)
             ->setExternalId((string)$canvasId);
+
+        $this->saveModel($this->submissionBoxMapper, $submissionBox);
+
+        return $submissionBox;
+    }
+
+    /**
+     * Create a new QuizSpec model (including assessment model)
+     *
+     * @param Folder\Model        $unitSpecFolder
+     * @param int                 $quizOwnerId
+     * @param WorkType\Model|null $workType
+     * @param string              $title
+     * @param string|null         $description
+     * @param string              $createdAt
+     * @param string              $updatedAt
+     * @param int                 $quizCanvasId
+     * @param bool                $anonymousSubmissions
+     * @param int                 $duration
+     * @param int                 $maxAttempts
+     * @param int                 $weight
+     * @param int                 $position
+     * @param int                 $markVisibility
+     * @return Quiz\Model
+     * @throws Database\Exception
+     */
+    private function createQuizSpec(
+        Folder\Model $unitSpecFolder,
+        int $quizOwnerId,
+        ?WorkType\Model $workType,
+        string $title,
+        ?string $description,
+        string $createdAt,
+        string $updatedAt,
+        int $quizCanvasId,
+        bool $anonymousSubmissions,
+        int $duration,
+        int $maxAttempts,
+        int $weight,
+        int $position,
+        int $markVisibility
+    ): Quiz\Model {
+        $assessment = $this->createAssessment(
+            $unitSpecFolder->getUnitSpecification(),
+            $title,
+            $description,
+            $workType,
+            $createdAt,
+            $updatedAt,
+            $position
+        );
+
+        $quiz = (new Quiz\Model())
+            ->setCategory($unitSpecFolder)
+            ->setAssessmentModel($assessment)
+            ->setUser((new User())->setId($quizOwnerId))
+            ->setWorkType($workType)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setDuration($duration)
+            ->setMaxAttempts($maxAttempts)
+            ->setWeight($weight)
+            ->setAvailability(Quiz\Model::AVAILABILITY_ASSESS)
+            ->setAnonymousResult($anonymousSubmissions)
+            ->setMarkVisibility($markVisibility)
+            ->setExternalId((string)$quizCanvasId)
+            ->setCreated($assessment->getCreatedAt());
+
+        $this->saveModel($this->quizMapper, $quiz);
+
+        return $quiz;
+    }
+
+
+    /**
+     * Create an assessment model, linked to the specified UnitSpec
+     *
+     * @param UnitSpec\Model      $unitSpec
+     * @param string              $title
+     * @param string|null         $description
+     * @param WorkType\Model|null $workType
+     * @param string              $createdAt
+     * @param string              $updatedAt
+     * @param int                 $position
+     * @return Assessment\Model
+     * @throws Database\Exception
+     */
+    private function createAssessment(
+        UnitSpec\Model $unitSpec,
+        string $title,
+        ?string $description,
+        ?WorkType\Model $workType,
+        string $createdAt,
+        string $updatedAt,
+        int $position
+    ): Assessment\Model {
+        $assessment = (new Assessment\Model())
+            ->setContextUnitSpecification($unitSpec)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setWorkType($workType)
+            ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
+            ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
+            ->setSequence($position);
 
         /* Cannot use mappers here to save because:
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
          * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
          */
-
-        $sql = "
-            INSERT INTO assessment (title, description, sequence, created_at, updated_at)
-            VALUES (:title, :description, :sequence, :created_at, :updated_at)
-        ";
-        $this->schoolboxDb->executeQuery($sql, [
-            'title'       => $assessment->getTitle(),
-            'description' => $assessment->getDescription(),
-            'sequence'    => $assessment->getSequence(),
-            'created_at'  => $assessment->getCreatedAt()->getDatabase(),
-            'updated_at'  => $assessment->getUpdatedAt()->getDatabase(),
-        ]);
-        $assessment->setId((int)$this->schoolboxDb->lastInsertId());
+        $this->saveModel($this->assessmentMapper, $assessment);
 
         $sql = "INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id) VALUES (:assessmentId, :unitSpecId)";
-        $this->schoolboxDb->executeQuery($sql, ['assessmentId' => $assessment->getId(), 'unitSpecId' => $unitSpecFolder->getUnitSpecification()->getId()]);
-
-        $sql = "
-            INSERT INTO submission_box (assessment_id, category, owner, accept_submission, multi_submission, mark_type, max_mark, mark_visibility, self_reviewability, external_id)
-            VALUES (:assessment_id, :category, :owner, :accept_submission, :multi_submission, :mark_type, :max_mark, :mark_visibility, :self_reviewability, :external_id)
-        ";
-
         $this->schoolboxDb->executeQuery($sql, [
-            'assessment_id'      => $assessment->getId(),
-            'category'           => $unitSpecFolder->getId(),
-            'owner'              => $submissionBox->getOwner()->getId(),
-            'accept_submission'  => $submissionBox->getAcceptOnline(),
-            'multi_submission'   => $submissionBox->getAcceptMultiple(),
-            'mark_type'          => $submissionBox->getMarkType()->getId(),
-            'max_mark'           => $submissionBox->getMaxMark(),
-            'mark_visibility'    => $submissionBox->getMarkVisibility(),
-            'self_reviewability' => $submissionBox->getSelfReviewability(),
-            'external_id'        => $submissionBox->getExternalId(),
+            'assessmentId' => $assessment->getId(),
+            'unitSpecId'   => $unitSpec->getId(),
         ]);
-        $submissionBox->setId((int)$this->schoolboxDb->lastInsertId());
 
-        return $submissionBox;
+        return $assessment;
     }
 
 
     /**
-     * Updates a Schoolbox submission_box/assessment
+     * Checks an assessment belongs to specified UnitSpec, moving it if required.
      *
-     * @param int        $assessmentId
-     * @param string     $title
-     * @param string     $description
-     * @param int        $folderId Old `submission_box`.`category` value
-     * @param float|null $maxMark
-     * @param int        $markTypeId
-     * @param bool       $acceptOnline
-     * @param bool       $acceptMultiple
-     * @param string     $createdAt
-     * @param string     $updatedAt
-     * @param int        $markVisibility
-     * @param int        $position
-     * @param string     $selfReviewability
+     * @param Assessment\Model $assessment
+     * @param UnitSpec\Model   $unitSpec
+     * @return bool
      * @throws Database\Exception
      */
-    private function updateSubmissionBox(
-        int $assessmentId,
+    private function checkAssessmentBelongsToUnitSpec(Assessment\Model $assessment, UnitSpec\Model $unitSpec): bool
+    {
+        // Check if any updates are required (including moving to new context)
+        if ($assessment->getContextUnitSpecification()->getId() === $unitSpec->getId()) {
+            return false;
+        }
+
+        $oldUnitSpecId = $assessment->getContextUnitSpecification()->getId();
+        $newUnitSpecId = $unitSpec->getId();
+        $this->log->debug("Assessment Spec moved from (unitSpecId: $oldUnitSpecId) to (unitSpecId: $newUnitSpecId)");
+        $this->moveAssessmentToUnitSpec($assessment->getId(), $unitSpec->getId());
+        $assessment->setContextUnitSpecification($unitSpec);
+
+        return true;
+    }
+
+    /**
+     * Check if an assessment has changed, and update it in the DB if it has.
+     *
+     * Returns whether any changes were made.
+     *
+     * @param Assessment\Model    $assessment
+     * @param string              $title
+     * @param string|null         $description
+     * @param int                 $position
+     * @param WorkType\Model|null $workType
+     * @param string              $createdAt
+     * @param string              $updatedAt
+     * @return bool
+     * @throws Database\Exception
+     */
+    private function checkAssessmentForChanges(
+        Assessment\Model $assessment,
         string $title,
         ?string $description,
-        int $folderId,
-        ?float $maxMark,
-        int $markTypeId,
-        bool $acceptOnline,
-        bool $acceptMultiple,
-        string $createdAt,
-        string $updatedAt,
-        int $markVisibility,
         int $position,
-        string $selfReviewability
-    ): void {
-        $sql = "
-            UPDATE assessment a
-            JOIN submission_box sb ON sb.assessment_id = a.id
-            SET
-                a.title = :title,
-                a.description = :description,
-                sb.category = :category,
-                sb.max_mark = :maxMark,
-                sb.mark_type = :markType,
-                sb.accept_submission = :acceptOnline,
-                sb.multi_submission = :acceptMulti,
-                sb.mark_visibility = :markVisibility,
-                sb.self_reviewability = :selfReviewability,
-                a.created_at = :createdAt,
-                a.updated_at = :updatedAt,
-                a.sequence = :sequence
-            WHERE a.id = :assessmentId
-        ";
+        ?WorkType\Model $workType,
+        string $createdAt,
+        string $updatedAt
+    ): bool {
+        // Do all attributes align?
+        if (
+            $assessment->getTitle() === $title &&
+            $assessment->getDescription() === $description &&
+            $assessment->getSequence() === $position &&
+            (($assessment->getWorkType() === null) === ($workType === null)) &&
+            $assessment->getCreatedAt()->getDatabase() === $createdAt &&
+            $assessment->getUpdatedAt()->getDatabase() === $updatedAt &&
+            (!$assessment->getWorkType() || !$workType || $assessment->getWorkType()->getId() === $workType->getId())
+        ) {
+            return false;
+        }
 
-        // Use raw query to ensure create/update dateTimes align to Canvas
-        $this->schoolboxDb->executeQuery($sql, [
-            'title'             => $title,
-            'description'       => $description,
-            'category'          => $folderId,
-            'maxMark'           => $maxMark,
-            'markType'          => $markTypeId,
-            'acceptOnline'      => $acceptOnline,
-            'acceptMulti'       => $acceptMultiple,
-            'markVisibility'    => $markVisibility,
-            'selfReviewability' => $selfReviewability,
-            'createdAt'         => $createdAt,
-            'updatedAt'         => $updatedAt,
-            'sequence'          => $position,
-            'assessmentId'      => $assessmentId,
-        ]);
+        $assessment->setTitle($title)
+                   ->setDescription($description)
+                   ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
+                   ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
+                   ->setSequence($position)
+                   ->setWorkType($workType);
+
+        $this->saveModel($this->assessmentMapper, $assessment);
+
+        return true;
     }
 
 
     /**
-     * Moves an assessment spec from its current unitSpec ot the specified unitSpec
+     * Moves an assessment from its current unitSpec to the specified unitSpec
      *
      * @param int $assessmentId
      * @param int $unitSpecId
      * @throws Database\Exception
      */
-    private function moveAssessmentSpec(int $assessmentId, int $unitSpecId): void
+    private function moveAssessmentToUnitSpec(int $assessmentId, int $unitSpecId): void
     {
         $sql = "
             UPDATE assessment_course_unit_specification
@@ -1172,7 +1587,7 @@ class Courses
                                ->notNull('external_id')
                                ->isNull('am.deleted_at');
         if (count($synchronizedQuizIds)) {
-            $pb->notIn('id', $synchronizedQuizIds);
+            $pb->notIn('assess_id', $synchronizedQuizIds);
         }
 
         foreach ($this->quizMapper->findByPredicates($pb) as $quiz) {
@@ -1227,6 +1642,12 @@ class Courses
         $this->countSubmissionBoxUpdated    = 0;
         $this->countSubmissionBoxMoved      = 0;
         $this->countSubmissionBoxDeleted    = 0;
+
+        $this->countQuizSynchronised = 0;
+        $this->countQuizCreated    = 0;
+        $this->countQuizUpdated    = 0;
+        $this->countQuizMoved      = 0;
+        $this->countQuizDeleted    = 0;
     }
 
 
@@ -1252,5 +1673,11 @@ class Courses
         $this->log->notice($this->countSubmissionBoxUpdated . ' Schoolbox SubmissionBox Specs updated');
         $this->log->notice($this->countSubmissionBoxMoved . ' Schoolbox SubmissionBox Specs moved');
         $this->log->notice($this->countSubmissionBoxDeleted . ' Schoolbox SubmissionBox Specs deleted');
+
+        $this->log->notice($this->countQuizSynchronised . ' Canvas quizzes synchronised');
+        $this->log->notice($this->countQuizCreated . ' Schoolbox Quiz Specs created');
+        $this->log->notice($this->countQuizUpdated . ' Schoolbox Quiz Specs updated');
+        $this->log->notice($this->countQuizMoved . ' Schoolbox Quiz Specs moved');
+        $this->log->notice($this->countQuizDeleted . ' Schoolbox Quiz Specs deleted');
     }
 }
