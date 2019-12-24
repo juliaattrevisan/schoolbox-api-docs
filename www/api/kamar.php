@@ -20,7 +20,10 @@ $data = file_get_contents('php://input');
 /* Testing independently of a Kamar push
  *
  * You can test Receiver's processing by loading from a local xml
- * $data = file_get_contents('/vagrant/data/cache/stream/20191217133402.xml');
+ * $data = file_get_contents('/vagrant/data/cache/stream/temp.xml');
+ *
+ * Or you can do it via the cli:
+ * clear;curl --data-binary "@/vagrant/tools/synchronise/temp.xml" -k https://vagrant.dev.schoolbox.cloud/api/kamar.php
  *
  * TODO: Consider a kamar-specific folder
  * That'll become available to all schools but only NZ schools can use it.
