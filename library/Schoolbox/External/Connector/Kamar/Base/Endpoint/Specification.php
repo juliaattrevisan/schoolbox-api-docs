@@ -32,7 +32,7 @@ abstract class Specification
     /**
      * Number of spaces for output formatting
      */
-    protected const PADDING = 20;
+    protected const PADDING = 10;
 
 
     /**
