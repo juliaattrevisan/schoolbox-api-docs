@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 /**
  * Class Specification
@@ -70,13 +71,19 @@ abstract class Specification
      *
      * @return array
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function check(): array
     {
-        $paddedLength = max(array_map('\strlen', $this->paths)) + self::PADDING;
-
         $messages = [];
+
+        /* No paths, no trabajo
+         */
+        if (!\count($this->paths)) {
+            return $messages;
+        }
+
+        $paddedLength = max(array_map('\strlen', $this->paths)) + self::PADDING;
 
         foreach ($this->paths as $path) {
             $paddedPath = str_pad($path, $paddedLength);

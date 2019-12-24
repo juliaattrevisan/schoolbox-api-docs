@@ -76,14 +76,21 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
-//        $specification = new Specification(null, new Batchxml($this->api));
-//
-//        try {
-//            return implode("\n", $specification->check());
-//        } catch (\RuntimeException $e) {
-//            return "Cannot access api endpoint: {$e->getMessage()}";
-//        }
+        $specifications = [
+            new Profile\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_PROFILE_XML))),
+            new Timetable\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_TIMETABLE_XML))),
+        ];
 
-        return '';
+        $result = [];
+
+        foreach ($specifications as $specification) {
+            try {
+                $result[] = implode("\n", $specification->check());
+            } catch (\RuntimeException $e) {
+                $result[] = "Cannot access api endpoint: {$e->getMessage()}";
+            }
+        }
+
+        return implode("\n", $result);
     }
 }
