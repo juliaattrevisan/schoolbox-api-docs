@@ -16,6 +16,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Quiz;
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function explode;
 use function strtolower;
@@ -152,20 +153,32 @@ class Assignment
         switch (strtolower($this->siteLocation)) {
             // Hard-coded for now to the staloy/demo dataset
             case 'staloy':
+                $config = [
+                    self::QUIZ_TYPE_PRACTICE      => 5,
+                    self::QUIZ_TYPE_ASSIGNMENT    => 5,
+                    self::QUIZ_TYPE_SURVEY        => 5,
+                    self::QUIZ_TYPE_GRADED_SURVEY => 5,
+                ];
+                break;
             case 'demo':
-                $staloyConfig = [
+                $config = [
                     self::QUIZ_TYPE_PRACTICE      => 11,
                     self::QUIZ_TYPE_ASSIGNMENT    => 11,
                     self::QUIZ_TYPE_SURVEY        => 11,
                     self::QUIZ_TYPE_GRADED_SURVEY => 11,
                 ];
-                $workTypeId   = $staloyConfig[$quizType];
-                foreach ($this->workTypes as $workType) {
-                    if ($workType->getId() === $workTypeId) {
-                        return $workType;
-                    }
-                }
                 break;
+            default:
+                $config = [];
+        }
+        if (!array_key_exists($quizType, $config)) {
+            return null;
+        }
+        $workTypeId = $config[$quizType];
+        foreach ($this->workTypes as $workType) {
+            if ($workType->getId() === $workTypeId) {
+                return $workType;
+            }
         }
         return null;
     }
