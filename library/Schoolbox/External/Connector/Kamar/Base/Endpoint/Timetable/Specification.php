@@ -25,5 +25,17 @@ class Specification extends BaseSpecification
      * @var array
      */
     protected $paths = [
+        '/SMSDirectoryData/timetables',
+        '/SMSDirectoryData/timetables/timetable',
+        '/SMSDirectoryData/timetables/timetable/week',
+        '/SMSDirectoryData/timetables/timetable/week/days',
+        '/SMSDirectoryData/timetables/timetable/week/days/day',
+        '/SMSDirectoryData/timetables/timetable/week/days/day/slots',
+        '/SMSDirectoryData/timetables/timetable/week/days/day/slots/subjects',
+        '/SMSDirectoryData/timetables/timetable/week/days/day/slots/subjects/subject',
+        '/SMSDirectoryData/timetables/timetable/week/days/day/slots/subjects/subject/code',
+        '/SMSDirectoryData/timetables/timetable/week/days/day/slots/subjects/subject/teachers',
+        '/SMSDirectoryData/timetables/timetable/week/days/day/slots/subjects/subject/rooms',
     ];
 }
+
