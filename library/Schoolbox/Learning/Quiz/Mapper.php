@@ -150,6 +150,20 @@ class Mapper extends BaseMapper
     }
 
 
+
+    /** @inheritDoc */
+    public function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('am', 'am')}
+            FROM {$this->getTable()}
+            JOIN {$this->getJoinSql('am', '', 'am', true)}
+        ";
+    }
+
+
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
