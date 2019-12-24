@@ -196,6 +196,9 @@ class Courses
         // Fetch all relevant courses and their assignments
         // If multiple courses with same code over multiple years, split into timeless courseSpec + per-time unitSpec
 
+        // Note that we need to fetch similar columns from both `assignment` + `quiz` because a quiz may or may not
+        // have an assignment, and an assignment may or may not have a quiz.
+
         $canvasCourseIds = $this->getCanvasCourseIdsToImport();
         $courseFilterPb = (new Builder($this->canvasDb, ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
@@ -216,6 +219,11 @@ class Courses
                assignment.updated_at       'assignment.updated_at',
                assignment.muted            'assignment.muted',
                quiz.canvas_id              'quiz.canvas_id',
+               quiz.name                   'quiz.name',
+               quiz.description            'quiz.description',
+               quiz.created_at             'quiz.created_at',
+               quiz.updated_at             'quiz.updated_at',
+               quiz_fact.points_possible   'quiz.points_possible',
                quiz.quiz_type              'quiz.quiz_type',
                quiz.anonymous_submissions  'quiz.anonymous_submissions',
                quiz_fact.time_limit        'quiz_fact.time_limit',
@@ -267,14 +275,12 @@ class Courses
             // Did we get quiz data?
             if($quizCanvasId !== null){
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['quizzes'][$quizCanvasId] = [
-                    'title'                 => $row['assignment.title'],
-                    'description'           => $row['assignment.description'],
-                    'points_possible'       => $row['assignment.points_possible'] === null ? null : (float)$row['assignment.points_possible'],
-                    'grading_type'          => $row['assignment.grading_type'],
-                    'submission_types'      => $row['assignment.submission_types'],
-                    'created_at'            => $row['assignment.created_at'],
-                    'updated_at'            => $row['assignment.updated_at'],
-                    'muted'                 => $row['assignment.muted'] === 'true',
+                    'name'                  => $row['quiz.name'],
+                    'description'           => $row['quiz.description'],
+                    'points_possible'       => $row['quiz.points_possible'] === null ? null : (float)$row['quiz.points_possible'],
+                    'created_at'            => $row['quiz.created_at'],
+                    'updated_at'            => $row['quiz.updated_at'],
+                    'muted'                 => $row['assignment.muted'] === 'true', // TODO this has been deprecated by Canvas, will always be NULL
                     'quiz_type'             => $row['quiz.quiz_type'],
                     'anonymous_submissions' => $row['quiz.anonymous_submissions'] === 'allow_anonymous_submissions',
                     'time_limit'            => $row['quiz_fact.time_limit'] === null ? null : (int)$row['quiz_fact.time_limit'],
@@ -292,7 +298,7 @@ class Courses
                     'submission_types'      => $row['assignment.submission_types'],
                     'created_at'            => $row['assignment.created_at'],
                     'updated_at'            => $row['assignment.updated_at'],
-                    'muted'                 => $row['assignment.muted'] === 'true',
+                    'muted'                 => $row['assignment.muted'] === 'true',  // TODO this has been deprecated by Canvas, will always be NULL
                     'position'              => $assessmentSequence++,
                 ];
             }
@@ -357,7 +363,7 @@ class Courses
                             $unitSpecFolder,
                             $quizCanvasId,
                             $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
-                            $quizData['title'],
+                            $quizData['name'],
                             $quizData['description'],
                             $quizData['points_possible'],
                             $quizData['created_at'],
