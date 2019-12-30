@@ -47,7 +47,7 @@ use function count;
  * Creates the following Schoolbox entities:
  * * CourseSpec + CourseSpec.Folder
  * * UnitSpec + UnitSpec.Folder
- * * AssessmentSpec
+ * * SubmissionBox/Quiz + AssessmentSpec
  */
 class Courses
 {
@@ -98,6 +98,12 @@ class Courses
     /** @var Folder\Mapper */
     private $folderMapper;
 
+    /** @var CourseSpec\Mapper */
+    private $courseSpecMapper;
+
+    /** @var UnitSpec\Mapper */
+    private $unitSpecMapper;
+
     // CourseGroups => CourseSpec
     private $countCourseGroupsSynchronised;
     private $countCourseGroupsCreated;
@@ -138,6 +144,8 @@ class Courses
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param Assessment\Mapper   $assessmentMapper
      * @param Folder\Mapper       $folderMapper
+     * @param CourseSpec\Mapper   $courseSpecMapper
+     * @param UnitSpec\Mapper     $unitSpecMapper
      * @param LoggerInterface     $log
      * @param Bridge\Account      $accountBridge
      * @param Bridge\Assignment   $assignmentBridge
@@ -155,6 +163,8 @@ class Courses
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         Folder\Mapper $folderMapper,
+        CourseSpec\Mapper $courseSpecMapper,
+        UnitSpec\Mapper $unitSpecMapper,
         LoggerInterface $log,
         Bridge\Account $accountBridge,
         Bridge\Assignment $assignmentBridge,
@@ -173,6 +183,8 @@ class Courses
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->assessmentMapper    = $assessmentMapper;
         $this->folderMapper        = $folderMapper;
+        $this->courseSpecMapper    = $courseSpecMapper;
+        $this->unitSpecMapper      = $unitSpecMapper;
         $this->accountBridge       = $accountBridge;
         $this->courseGroupBridge   = $courseGroupBridge;
         $this->courseBridge        = $courseBridge;
@@ -186,7 +198,6 @@ class Courses
      * @throws Mapper\Exception
      * @throws UnderflowException
      * @throws UnexpectedValueException
-     * @throws Mapper\DefinitionException
      */
     public function synchronise(): void
     {
@@ -233,9 +244,9 @@ class Courses
         JOIN account_dim account ON course.account_id = account.id
         LEFT JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state = 'published'
         LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
-        LEFT JOIN quiz_dim quiz ON quiz.assignment_id = assignment.id
+        LEFT JOIN quiz_dim quiz ON quiz.course_id = course.id AND quiz.workflow_state = 'published'
         LEFT JOIN quiz_fact ON quiz_fact.quiz_id = quiz.id
-        WHERE $courseFilterWhere
+        WHERE {$courseFilterWhere} AND (assignment.canvas_id = quiz.canvas_id || assignment.canvas_id IS NULL || quiz.canvas_id IS NULL)
         -- TODO cater for quiz/assignment positioning
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment_group.position, assignment.position
         ";
@@ -272,7 +283,7 @@ class Courses
                     'assignments' => [],
                 ];
             }
-            // Did we get quiz data?
+            // Did we get quiz data? (If we have both quiz + assignment data, treat as quiz)
             if($quizCanvasId !== null){
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['quizzes'][$quizCanvasId] = [
                     'name'                  => $row['quiz.name'],
@@ -522,7 +533,7 @@ class Courses
                 $updateRequired = true;
             }
             if ($updateRequired) {
-                $this->updateFolder($courseFolder->getId(), $courseFolder->getName(), $courseFolder->getParent()->getId());
+                $this->saveModel($this->folderMapper, $courseFolder);
             }
         }
         return $courseFolder;
@@ -567,7 +578,7 @@ class Courses
                 $unitSpecFolder->setName($unitSpecFolderName);
             }
             if ($updateRequired) {
-                $this->updateFolder($unitSpecFolder->getId(), $unitSpecFolder->getName(), $unitSpecFolder->getParent()->getId());
+                $this->saveModel($this->folderMapper, $unitSpecFolder);
             }
         }
         return $unitSpecFolder;
@@ -1437,14 +1448,16 @@ class Courses
     {
         $folderName = $this->getCourseSpecFolderName($courseName, $courseCode);
 
-        $folder = $this->createFolder($folderName, $accountFolder->getId())->setParent($accountFolder);
+        $folder = $this->createFolder($folderName, $accountFolder);
 
-        $sql = "INSERT INTO course_specification(folder_id, created_at, updated_at) VALUES (:folder_id, NOW(), NOW())";
-        $this->schoolboxDb->executeQuery($sql, ['folder_id' => $folder->getId()]);
+        $courseSpec = (new CourseSpec\Model())->setFolder($folder);
+        $folder->setCourseSpecification($courseSpec);
+
+        $this->saveModel($this->courseSpecMapper, $courseSpec);
 
         $this->log->debug("Created Schoolbox CourseSpec+Folder '$folderName' for Canvas CourseGroup (courseCode: '$courseCode')");
 
-        return $folder->setCourseSpecification((new CourseSpec\Model())->setId((int)$this->schoolboxDb->lastInsertId()));
+        return $folder;
     }
 
 
@@ -1460,33 +1473,29 @@ class Courses
     private function createUnitSpecFolder(Folder\Model $courseSpecFolder, int $courseCanvasId, string $termName): Folder\Model
     {
         $folderName = $this->getUnitSpecFolderName($termName, $courseCanvasId);
-        $folder     = $this->createFolder($folderName, $courseSpecFolder->getId())->setParent($courseSpecFolder);
-
-        $sql = "INSERT INTO course_unit_specification(folder_id, course_specification_id, created_at, updated_at) VALUES (:folderId, :courseSpecId, NOW(), NOW())";
-        $this->schoolboxDb->executeQuery($sql, ['folderId' => $folder->getId(), 'courseSpecId' => $courseSpecFolder->getCourseSpecification()->getId()]);
-
+        $folder     = $this->createFolder($folderName, $courseSpecFolder);
+        $unitSpec   = (new UnitSpec\Model())->setFolder($folder);
+        $folder->setUnitSpecification($unitSpec);
+        $this->saveModel($this->unitSpecMapper, $unitSpec);
         $this->log->debug("Created Schoolbox UnitSpec+Folder '$folderName' for Canvas Course (canvasId: $courseCanvasId)");
-
-        return $folder->setUnitSpecification((new UnitSpec\Model())->setId((int)$this->schoolboxDb->lastInsertId()));
+        return $folder;
     }
 
 
     /**
      * Insert new folder and return new Folder model
      *
-     * @param string $name
-     * @param int    $parentId
+     * @param string       $name
+     * @param Folder\Model $parent
      * @return Folder\Model
      * @throws Database\Exception
      */
-    private function createFolder(string $name, int $parentId): Folder\Model
+    private function createFolder(string $name, Folder\Model $parent): Folder\Model
     {
-        $sql = "INSERT INTO folder(name, parent, inherit) VALUES (:name, :parent, 1)";
-        $this->schoolboxDb->executeQuery($sql, ['name' => $name, 'parent' => $parentId]);
-
-        return (new Folder\Model())
-            ->setId((int)$this->schoolboxDb->lastInsertId())
-            ->setName($name);
+        $folder = (new Folder\Model())
+            ->setName($name)
+            ->setParent($parent);
+        return $this->saveModel($this->folderMapper, $folder);
     }
 
 
