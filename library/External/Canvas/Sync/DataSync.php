@@ -207,7 +207,6 @@ class DataSync
      * @throws UnderflowException
      * @throws InvalidArgumentException
      * @throws DomainException
-     * @throws Mapper\DefinitionException
      */
     public function synchronise(): void
     {
@@ -248,6 +247,8 @@ class DataSync
             $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->folderMapper,
+            $this->courseSpecMapper,
+            $this->unitSpecMapper,
             $this->log,
             $accountBridge,
             $assignmentBridge,
