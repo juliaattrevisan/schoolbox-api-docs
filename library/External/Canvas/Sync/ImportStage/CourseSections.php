@@ -248,15 +248,29 @@ class CourseSections
         $this->log->notice("Synchronising Canvas CourseSections + Assignments => CourseImpl, UnitImpl, AssessmentImpl...");
         $this->resetCounts();
 
-        // all submissionBox.externalId
-        $assignmentCanvasIds = $this->getAssignmentCanvasIds();
-        // All sections.canvasId that match a SchoolboxId
+        // All sections.canvasId that map to a Schoolbox folder
         $sectionSisSourceIds = $this->courseSectionBridge->getMappedSisSourceIds();
+        $assignmentCanvasIds = $this->getAssignmentCanvasIds();
+        $quizCanvasIds       = $this->getQuizCanvasIds();
 
         $data = [];
-        if (count($assignmentCanvasIds) && count($sectionSisSourceIds)) {
-            $assignmentCanvasIdBindings = Builder::getBindings($assignmentCanvasIds, 'a_cid');
-            $sectionSisSourceIdBindings = Builder::getBindings($sectionSisSourceIds, 's_cid');
+        if (count($sectionSisSourceIds) && (count($assignmentCanvasIds) || count($quizCanvasIds))) {
+            $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
+            $innerPb     = new Builder($mySqlQuoter, '');
+            // WHERE
+            //  (a.canvasId IN (...) || q.canvasId IN (...)) AND
+            //  section.sisSourceId IN (...) AND
+            //  (a.canvasId = q.canvasId || a.canvasId IS NULL || q.canvasId IS NULL)
+            if (count($assignmentCanvasIds)) {
+                $innerPb->in('assignment.canvas_id', $assignmentCanvasIds);
+            }
+            if (count($quizCanvasIds)) {
+                $innerPb->in('quiz.canvas_id', $quizCanvasIds);
+            }
+            $pb          = (new Builder($mySqlQuoter, ''))
+                ->any($innerPb)
+                ->in('section.sis_source_id', $sectionSisSourceIds);
+            $whereClause = implode(' AND ', $pb->getWhere());
 
             $sql       = "
                 SELECT
@@ -284,6 +298,18 @@ class CourseSections
                     CONVERT_TZ(assignment.due_at, 'UTC', 'SYSTEM')      'assignment.due_at',
                     assignment.all_day                                  'assignment.all_day',
                     assignment.all_day_date                             'assignment.all_day_date',
+
+quiz.canvas_id                                      'quiz.canvas_id',
+quiz.name                                           'quiz.name',
+CONVERT_TZ(quiz.unlock_at, 'UTC', 'SYSTEM')         'quiz.unlock_at',
+CONVERT_TZ(quiz.lock_at, 'UTC', 'SYSTEM')           'quiz.lock_at',
+CONVERT_TZ(quiz.due_at, 'UTC', 'SYSTEM')            'quiz.due_at',
+-- These next columns do not exist for quiz. So we'll just copy them from
+-- the linked assignment if available to simplify later processing.
+assignment.visibility                               'quiz.visibility',
+assignment.all_day                                  'quiz.all_day',
+assignment.all_day_date                             'quiz.all_day_date',
+
                     override.canvas_id                                  'override.canvas_id',
                     override.title                                      'override.title',
                     CONVERT_TZ(override.unlock_at, 'UTC', 'SYSTEM')     'override.unlock_at',
@@ -302,7 +328,8 @@ class CourseSections
                 FROM course_section_dim section
                 LEFT JOIN enrollment_dim enrollment ON enrollment.course_section_id = section.id AND enrollment.type = 'StudentEnrollment' AND enrollment.workflow_state = 'active'
                 LEFT JOIN pseudonym_dim section_student ON section_student.user_id = enrollment.user_id AND section_student.sis_user_id IS NOT NULL
-                JOIN assignment_dim assignment ON assignment.course_id = section.course_id
+                LEFT JOIN assignment_dim assignment ON assignment.course_id = section.course_id
+                LEFT JOIN quiz_dim quiz ON quiz.course_id = section.course_id
                 JOIN course_dim course ON course.id = section.course_id
                 JOIN account_dim account ON account.id = course.account_id
                 LEFT JOIN enrollment_term_dim sectionTerm ON section.enrollment_term_id = sectionTerm.id
@@ -317,19 +344,17 @@ class CourseSections
                 -- individual assignees
                 LEFT JOIN assignment_override_user_dim override_user ON override_user.assignment_override_id = override.id AND override.set_type = 'adhoc'
                 LEFT JOIN pseudonym_dim user_pseudonym ON user_pseudonym.user_id = override_user.user_id
-                WHERE
-                    assignment.canvas_id IN ({$assignmentCanvasIdBindings->getPlaceholder()}) AND
-                    section.sis_source_id IN ({$sectionSisSourceIdBindings->getPlaceholder()})
+                WHERE {$whereClause} AND (assignment.canvas_id = quiz.canvas_id OR assignment.canvas_id IS NULL OR quiz.canvas_id IS NULL)
                 ORDER BY account.canvas_id, course.code, course.canvas_id, section.canvas_id, assignment.canvas_id, override.canvas_id
             ";
-            $params    = array_merge($assignmentCanvasIdBindings->getParams(), $sectionSisSourceIdBindings->getParams());
-            $statement = $this->canvasDb->executeQuery($sql, $params);
+            $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
             while ($row = $statement->fetch()) {
                 $accountCanvasId             = $row['account.canvas_id'];
                 $courseGroupCode             = $row['course.code'];
                 $courseCanvasId              = $row['course.canvas_id'];
                 $sectionCanvasId             = $row['section.canvas_id'];
                 $sectionStudentCanvasId      = $row['section_student.canvas_id'];
+                $quizCanvasId                = $row['quiz.canvas_id'];
                 $assignmentCanvasId          = $row['assignment.canvas_id'];
                 $overrideCanvasId            = $row['override.canvas_id'];
                 $overrideSectionCanvasId     = $row['override_section.canvas_id'];
@@ -351,6 +376,7 @@ class CourseSections
                         'term_date_end'   => $row['courseTerm.date_end'],
                         'sections'        => [],
                         'assignments'     => [],
+                        'quizzes'         => [],
                     ];
                 }
                 if (!array_key_exists($sectionCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['sections'])) {
@@ -364,14 +390,38 @@ class CourseSections
                         'students'        => [],
                     ];
                 }
-                if ($sectionStudentCanvasId !== null && !array_key_exists($sectionStudentCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['sections'][$sectionCanvasId]['students'])) {
+                if (
+                    $sectionStudentCanvasId !== null &&
+                    !array_key_exists($sectionStudentCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['sections'][$sectionCanvasId]['students'])
+                ) {
                     $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['sections'][$sectionCanvasId]['students'][$sectionStudentCanvasId] = [
                         'sis_user_id' => $row['section_student.sis_user_id'],
                     ];
                 }
 
-                // First time we've seen this assignment?
-                if (!array_key_exists($assignmentCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'])) {
+                // First time we've seen this quiz? (if quiz has assignment, treat as SB quiz)
+                if (
+                    $quizCanvasId !== null &&
+                    !array_key_exists($assignmentCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['quizzes'])
+                ) {
+                    $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['quizzes'][$quizCanvasId] = [
+                        'unlock_at'    => $row['quiz.unlock_at'],
+                        'title'        => $row['quiz.title'],
+                        'lock_at'      => $row['quiz.lock_at'],
+                        'due_at'       => $row['quiz.due_at'],
+                        'all_day'      => $row['quiz.all_day'] === 'true',
+                        'all_day_date' => $row['quiz.all_day_date'],
+                        'visibility'   => $row['quiz.visibility'],
+                        'overrides'    => [],
+                    ];
+                }
+
+                // First time we've seen this assignment? (if assignment has quiz, do not sync to subBox)
+                if (
+                    $assignmentCanvasId !== null &&
+                    $quizCanvasId === null &&
+                    !array_key_exists($assignmentCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'])
+                ) {
                     $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId] = [
                         'unlock_at'    => $row['assignment.unlock_at'],
                         'title'        => $row['assignment.title'],
@@ -384,9 +434,16 @@ class CourseSections
                     ];
                 }
 
+                // Get a pointer to the quiz or assignment data so we can insert overrides
+                if($quizCanvasId !== null){
+                    $quizOrAssignmentData = &$data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['quizzes'][$quizCanvasId];
+                } else {
+                    $quizOrAssignmentData = &$data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId];
+                }
+
                 // First time we've see this override?
-                if (($overrideCanvasId !== null) && !array_key_exists($overrideCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'])) {
-                    $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId] = [
+                if (($overrideCanvasId !== null) && !array_key_exists($overrideCanvasId, $quizOrAssignmentData['overrides'])) {
+                    $quizOrAssignmentData['overrides'][$overrideCanvasId] = [
                         'title'        => $row['override.title'],
                         'unlock_at'    => $row['override.unlock_at'],
                         'lock_at'      => $row['override.lock_at'],
@@ -400,30 +457,36 @@ class CourseSections
                 }
 
                 // Is this a section override row?
-                if (($overrideSectionCanvasId !== null) && !array_key_exists($overrideSectionCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['sections'])) {
-                    $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['sections'][$overrideSectionCanvasId] = [
+                if (($overrideSectionCanvasId !== null) && !array_key_exists($overrideSectionCanvasId, $quizOrAssignmentData['overrides'][$overrideCanvasId]['sections'])) {
+                    $quizOrAssignmentData['overrides'][$overrideCanvasId]['sections'][$overrideSectionCanvasId] = [
                         'sis_source_id' => $row['override_section.sis_source_id'],
                     ];
                 }
 
                 // Is this a group override row?
-                if (($overrideGroupCanvasId !== null) && !array_key_exists($overrideGroupCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['groups'])) {
-                    $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['groups'][$overrideGroupCanvasId] = [
+                if (($overrideGroupCanvasId !== null) && !array_key_exists($overrideGroupCanvasId, $quizOrAssignmentData['overrides'][$overrideCanvasId]['groups'])) {
+                    $quizOrAssignmentData['overrides'][$overrideCanvasId]['groups'][$overrideGroupCanvasId] = [
                         'name'    => $row['override_group.name'],
                         'members' => [],
                     ];
                 }
 
                 // Is this a override group member?
-                if (($overrideGroupMemberCanvasId !== null) && !array_key_exists($overrideGroupMemberCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['groups'][$overrideGroupCanvasId]['members'])) {
-                    $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['groups'][$overrideGroupCanvasId]['members'][$overrideGroupMemberCanvasId] = [
+                if (
+                    $overrideGroupMemberCanvasId !== null &&
+                    !array_key_exists($overrideGroupMemberCanvasId, $quizOrAssignmentData['overrides'][$overrideCanvasId]['groups'][$overrideGroupCanvasId]['members'])
+                ) {
+                    $quizOrAssignmentData['overrides'][$overrideCanvasId]['groups'][$overrideGroupCanvasId]['members'][$overrideGroupMemberCanvasId] = [
                         'sis_user_id' => $row['group_pseudonym.sis_user_id'],
                     ];
                 }
 
                 // Is this an ad_hoc (individual users) override?
-                if (($overrideAdHocUserCanvasId !== null) && !array_key_exists($overrideAdHocUserCanvasId, $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['ad_hoc_users'])) {
-                    $data[$accountCanvasId][$courseGroupCode][$courseCanvasId]['assignments'][$assignmentCanvasId]['overrides'][$overrideCanvasId]['ad_hoc_users'][$overrideAdHocUserCanvasId] = [
+                if (
+                    $overrideAdHocUserCanvasId !== null &&
+                    !array_key_exists($overrideAdHocUserCanvasId, $quizOrAssignmentData['overrides'][$overrideCanvasId]['ad_hoc_users'])
+                ) {
+                    $quizOrAssignmentData['overrides'][$overrideCanvasId]['ad_hoc_users'][$overrideAdHocUserCanvasId] = [
                         'sis_user_id' => $row['user_pseudonym.sis_user_id'],
                     ];
                 }
@@ -1619,8 +1682,6 @@ class CourseSections
     }
 
 
-
-
     /**
      * Returns all submissionBox.externalId
      *
@@ -1634,6 +1695,27 @@ class CourseSections
             FROM assessment a
             JOIN submission_box sb on a.id = sb.assessment_id
             WHERE sb.external_id IS NOT NULL AND a.deleted_at IS NULL;
+        ";
+        $callback = static function (string $externalId): int {
+            return (int)$externalId;
+        };
+        return array_map($callback, $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+
+    /**
+     * Returns all relevant assess.externalId
+     *
+     * @return int[]
+     * @throws Database\Exception
+     */
+    private function getQuizCanvasIds(): array
+    {
+        $sql      = "
+            SELECT q.external_id
+            FROM assessment a
+            JOIN assess q on a.id = q.assessment_id
+            WHERE q.external_id IS NOT NULL AND a.deleted_at IS NULL;
         ";
         $callback = static function (string $externalId): int {
             return (int)$externalId;

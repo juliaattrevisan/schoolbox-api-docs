@@ -38,16 +38,16 @@ use UnexpectedValueException;
 use function array_key_exists;
 use function array_map;
 use function count;
+use function in_array;
 
 /**
  * Responsible for importing Canvas Courses + Assignments
  *
  * Note this stage can execute prior to class folders being created in Schoolbox
  *
- * Creates the following Schoolbox entities:
- * * CourseSpec + CourseSpec.Folder
- * * UnitSpec + UnitSpec.Folder
- * * SubmissionBox/Quiz + AssessmentSpec
+ * Maps the following entities from Canvas to Schoolbox:
+ * * Courses are grouped by code into 'CourseGroups' => CourseSpec + UnitSpec
+ * * Quiz/Assignment                                 => Quiz/SubmissionBox Spec
  */
 class Courses
 {
@@ -246,7 +246,7 @@ class Courses
         LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
         LEFT JOIN quiz_dim quiz ON quiz.course_id = course.id AND quiz.workflow_state = 'published'
         LEFT JOIN quiz_fact ON quiz_fact.quiz_id = quiz.id
-        WHERE {$courseFilterWhere} AND (assignment.canvas_id = quiz.canvas_id || assignment.canvas_id IS NULL || quiz.canvas_id IS NULL)
+        WHERE {$courseFilterWhere}
         -- TODO cater for quiz/assignment positioning
         ORDER BY account.canvas_id, course.code, enrollment_term.date_start, course.canvas_id, assignment_group.position, assignment.position
         ";
@@ -284,7 +284,10 @@ class Courses
                 ];
             }
             // Did we get quiz data? (If we have both quiz + assignment data, treat as quiz)
-            if($quizCanvasId !== null){
+            if(
+                $quizCanvasId !== null &&
+                !array_key_exists($quizCanvasId, $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['quizzes'])
+            ){
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['quizzes'][$quizCanvasId] = [
                     'name'                  => $row['quiz.name'],
                     'description'           => $row['quiz.description'],
@@ -300,7 +303,11 @@ class Courses
                 ];
             }
             // Did we get assignment w/o quiz data?
-            elseif ($assignmentCanvasId !== null) {
+            if (
+                $assignmentCanvasId !== null &&
+//                !$quizCanvasId &&
+                !array_key_exists($assignmentCanvasId, $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['assignments'])
+            ) {
                 $accountsData[$accountCanvasId]['courseGroups'][$courseCode]['courses'][$courseCanvasId]['assignments'][$assignmentCanvasId] = [
                     'title'                 => $row['assignment.title'],
                     'description'           => $row['assignment.description'],
@@ -331,7 +338,7 @@ class Courses
                 JOIN account_dim account ON course.account_id = account.id
                 JOIN enrollment_dim enrollment ON enrollment.course_id = course.id
                 JOIN pseudonym_dim pseudonym ON pseudonym.user_id = enrollment.user_id
-                WHERE $courseFilterWhere AND
+                WHERE {$courseFilterWhere} AND
                       enrollment.type = 'TeacherEnrollment' AND
                       pseudonym.sis_user_id IN ({$bindings->getPlaceholder()})
                 GROUP BY course.id
@@ -361,6 +368,9 @@ class Courses
         foreach ($accountsData as $accountCanvasId => $accountData) {
             foreach ($accountData['courseGroups'] as $courseGroupCode => $courseGroupData) {
                 $mostRecentCourse                   = end($courseGroupData['courses']);
+                if(!array_key_exists('name', $mostRecentCourse)){
+                    $test = 1;
+                }
                 $mostRecentCourseName               = $mostRecentCourse['name'];
                 $courseSpecFolder                   = $this->processCanvasCourseGroup($accountCanvasId, $mostRecentCourseName, $courseGroupCode);
                 $synchronizedCourseGroupFolderIds[] = $courseSpecFolder->getId();
