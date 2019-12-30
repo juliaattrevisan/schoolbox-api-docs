@@ -8,8 +8,10 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage\Traits;
 
 use Alaress\Database;
+use ICollection;
 use PDOException;
 use Schoolbox\IMapper;
+use Schoolbox\Mapper;
 
 /**
  * Enables Model save via a mapper without invoking a transaction or calling pre/post save hooks
@@ -26,19 +28,24 @@ trait ModelSaveTrait
      *
      * @param IMapper $mapper
      * @param         $model
+     * @param bool    $populateTimestamps
      * @return mixed
      * @throws Database\Exception
      */
-    private function saveModel(IMapper $mapper, $model)
+    private function saveModel(IMapper $mapper, $model, bool $populateTimestamps = true)
     {
         $hasId     = (bool)$mapper->getIdentifier();
         $currentId = $hasId ? $mapper->getModelProperty($model, $mapper->getIdentifierProperty()) : null;
 
         // These mapper methods are not public, so need to use a closure to bypass encapsulation.
         $collection       = $mapper->getModelAsCollection($model);
-        $populateFunction = function () use ($collection) {
-            /** @noinspection PhpUndefinedMethodInspection */
-            return $this->populateUuids($this->populateSaveTimestamps($collection));
+        $populateFunction = function () use ($collection, $populateTimestamps): ICollection {
+            /** @var Mapper $newThis */
+            $newThis = $this;
+            if ($populateTimestamps) {
+                $collection = $newThis->populateSaveTimestamps($collection);
+            }
+            return $newThis->populateUuids($collection);
         };
         $populateFunction->call($mapper);
 
@@ -52,7 +59,6 @@ trait ModelSaveTrait
         } catch (PDOException $e) {
             throw new Database\Exception("Could not save model", 0, $e);
         }
-
 
         if ($hasId && !$currentId) {
             $mapper->setModelProperty($model, $mapper->getIdentifierProperty(), $mapper->getDatabase()->lastInsertId());
