@@ -2,18 +2,23 @@
 /**
  * Validates whether the user is the given ID.
  *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
+ * @author    Steve Chan <steve.chan@alaress.com.au>
+ * @copyright Copyright 2020, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
-namespace Alaress\Authorizer\Rule;
+namespace Custom\Diocesan\AchievementReport\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
+/**
+ * Class IsExternalUser
+ *
+ * @package Custom\Diocesan\AchievementReport\Authorizer\Rule
+ */
 class IsExternalUser implements IAuthorizationRule
 {
     /**
@@ -40,7 +45,7 @@ class IsExternalUser implements IAuthorizationRule
      * @param  User  $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      * @return true If the request is authorized.
-     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
+     * @throws Base if the request isn't authorized.
      */
     public function authorize(array $params = array(), User $user = null)
     {
