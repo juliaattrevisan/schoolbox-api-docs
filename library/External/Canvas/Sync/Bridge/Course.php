@@ -54,17 +54,17 @@ class Course
 
 
     /**
-     * Return a predicate that can find a Schoolbox folder for specified Canvas Account
+     * Return a predicate that can find a Schoolbox folder for specified Canvas Course
      *
-     * @param int         $accountCanvasId
+     * @param int         $courseCanvasId
      * @param string|null $folderTableAlias
      * @return Builder
      * @throws InvalidColumnException
      */
-    public function equalsCanvasCourse(int $accountCanvasId, string $folderTableAlias = null): Builder
+    public function equalsCanvasCourse(int $courseCanvasId, string $folderTableAlias = null): Builder
     {
         return (new Builder($this->schoolboxDb, $folderTableAlias ?? 'folder'))
-            ->regex('name', "^.+\\({$this::canvasIdPrefix()}-{$accountCanvasId}\\)$");
+            ->regex('name', "^.+\\({$this::canvasIdPrefix()}-{$courseCanvasId}\\)$");
     }
 
 
@@ -121,7 +121,7 @@ class Course
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function findUnitSpecFolder(int $courseCanvasId): ?Folder\Model
+    public function findUnitSpecFolder(int $courseCanvasId): Folder\Model
     {
         $canvasCourseFolderPb    = $this->equalsCanvasCourse($courseCanvasId, 'f');
         $canvasCourseFolderWhere = $canvasCourseFolderPb->getWhere()[0];
