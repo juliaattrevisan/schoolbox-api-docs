@@ -62,7 +62,7 @@ class Assignment
      */
     public function getMaxMark(?float $pointsPossible): ?float
     {
-        return $pointsPossible;
+        return $pointsPossible ?? 0.0; // TODO think about this some more, and upgrade to documented constant
     }
 
 

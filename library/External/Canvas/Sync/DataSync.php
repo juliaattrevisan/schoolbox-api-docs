@@ -225,18 +225,95 @@ class DataSync
         $courseBridge      = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
 
-        // Import Canvas Accounts => Schoolbox Faculty folders
+        $this->syncAccounts($accountBridge);
+        $this->syncCourses($accountBridge, $courseBridge, $courseGroupBridge);
+        $this->syncCourseAssignments($assignmentBridge, $courseBridge);
+        $this->syncCourseQuiz($assignmentBridge, $courseBridge);
+        $this->syncCourseSections();
+        $this->syncClassAssignments();
+        $this->syncClassQuiz();
+    }
+
+    /**
+     * @param Bridge\Account $accountBridge
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    private function syncAccounts(Bridge\Account $accountBridge): void
+    {
         (new ImportStage\CourseAccounts(
             $this->canvasDb,
-            $this->schoolboxDb,
             $this->folderMapper,
             $this->config,
             $this->log,
             $accountBridge
         ))->synchronise();
+    }
 
-        // Import Canvas Courses => Schoolbox CourseSpec/UnitSpec/AssessmentSpec
+    /**
+     * @param Bridge\Account     $accountBridge
+     * @param Bridge\Course      $courseBridge
+     * @param Bridge\CourseGroup $courseGroupBridge
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    private function syncCourses(
+        Bridge\Account $accountBridge,
+        Bridge\Course $courseBridge,
+        Bridge\CourseGroup $courseGroupBridge
+    ): void  {
         (new ImportStage\Courses(
+            $this->canvasDb,
+            $this->folderMapper,
+            $this->courseSpecMapper,
+            $this->unitSpecMapper,
+            $this->log,
+            $accountBridge,
+            $courseBridge,
+            $courseGroupBridge
+        ))->synchronise();
+    }
+
+    /**
+     * @param Bridge\Assignment $assignmentBridge
+     * @param Bridge\Course     $courseBridge
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    private function syncCourseAssignments(Bridge\Assignment $assignmentBridge, Bridge\Course $courseBridge): void {
+        (new ImportStage\CourseAssignments(
+            $this->canvasDb,
+            $this->schoolboxDb,
+            $this->submissionBoxMapper,
+            $this->assessmentMapper,
+            $this->log,
+            $assignmentBridge,
+            $courseBridge,
+            $this->folderMapper
+        ))->synchronise();
+    }
+
+    /**
+     * @param Bridge\Assignment $assignmentBridge
+     * @param Bridge\Course     $courseBridge
+     * @return void
+     * @throws Mapper\Exception
+     */
+    private function syncCourseQuiz(Bridge\Assignment $assignmentBridge, Bridge\Course $courseBridge): void {
+        (new ImportStage\CourseQuiz(
             $this->canvasDb,
             $this->schoolboxDb,
             $this->quizMapper,
@@ -244,18 +321,24 @@ class DataSync
             $this->quizQuestionMapper,
             $this->quizQuestionTypeMapper,
             $this->quizSolutionMapper,
-            $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->folderMapper,
-            $this->courseSpecMapper,
-            $this->unitSpecMapper,
             $this->log,
-            $accountBridge,
             $assignmentBridge,
-            $courseBridge,
-            $courseGroupBridge
+            $courseBridge
         ))->synchronise();
+    }
+    private function syncCourseSections(): void { }
+    private function syncClassAssignments(): void { }
+    private function syncClassQuiz(): void { }
 
+
+
+
+    private function syncAccountss(): void{
+
+
+die('todo');
         // Delay building this one, it takes a while.
         $sectionBridge = new Bridge\CourseSection(
             $this->canvasDb,
