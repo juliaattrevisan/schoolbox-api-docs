@@ -198,6 +198,7 @@ class Mapper extends BaseMapper
     /**
      * Pre-save callback.
      *
+     * If not explicitly set to something else
      * Ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
      *
      * @param  Model $object
@@ -205,7 +206,9 @@ class Mapper extends BaseMapper
      */
     protected function setWorkType(Model $object)
     {
-        $object->setWorkType((new WorkType())->setId(self::WORK_TYPE_QUIZ));
+        if (!$object->getWorkType()) {
+            $object->setWorkType((new WorkType())->setId(self::WORK_TYPE_QUIZ));
+        }
         return true;
     }
 
