@@ -13,57 +13,70 @@ use \Schoolbox\Resource\File;
  */
 class ZipFolder
 {
-    /**
-     * @var DeprecatedDatabase
-     */
-    private $db;
-    /**
-     * @var int
-     */
-    private $folder;
+
     /**
      * @var false|string
      */
     private $tmpName;
+
+
     /**
      * @var string
      */
     private $tmpFolder;
+
+
     /**
      * @var string
      */
     private $tmpZip;
+
+
     /**
      * @var string
      */
     private $allowedChars = "[^0-9a-zA-Z()_-]";
+
+
     /**
      * @var int
      */
     private $size = 0;
+
+
     /**
      * Max folder depth of zip
      * @var int
      */
     private $maxDepth = 5;
+
+
     /**
      * Max size of zip file 1GB
      *
      * @var int
      */
     private $maxSize = 1073741824;
+
+
     /**
      * @var Group
      */
     private $groupHandler;
+
+
     /**
      * @var Folder\Mapper
      */
     private $folderMapper;
+
+
     /**
      * @var File\Mapper
      */
     private $fileMapper;
+
+
     /**
      * @var Folder\Model|null
      */
@@ -77,8 +90,6 @@ class ZipFolder
      */
     public function __construct($folder)
     {
-        $this->db        = DeprecatedDatabase::getInstance();
-        $this->folder    = $folder;
         $this->tmpName   = tempnam(Config::get('zip_dir'), 'zip');
         $this->tmpFolder = $this->tmpName . 'dir';
         $this->tmpZip    = $this->tmpName . '.zip';
