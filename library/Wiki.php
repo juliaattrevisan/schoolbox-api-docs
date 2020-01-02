@@ -12,7 +12,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 
     /**
-     *
+     * @inheritDoc
      */
     public function __construct()
     {
@@ -275,22 +275,6 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $count = $this->db->getOne($count_query);
 
         return $this->db->getAll($query);
-    }
-
-
-    /**
-     * Get a wiki ID for the prescribed heading.
-     *
-     * @deprecated use \Schoolbox\Wiki\RevisionMapper::findOneByColumn('heading')
-     * @param  $heading
-     * @return array|bool
-     */
-    public function getWikiByHeading($heading) {
-        $query = "SELECT wiki.wikiID FROM wiki
-                    LEFT JOIN wikiRevision ON wiki.latestRevision = wikiRevision.revisionID
-                    WHERE heading = \"{$this->db->quote($heading)}\"";
-
-        return $this->db->getRow($query);
     }
 
 
