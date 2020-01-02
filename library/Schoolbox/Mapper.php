@@ -548,7 +548,7 @@ abstract class Mapper implements IMapper, Serializable
                         $columnName = "$alias.$columnName";
                     }
 
-                    $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+                    $columnValue = $row[$columnName] ?? null;
 
                     $mapper->setModelProperty($model, $propertyName, $columnValue);
                 }
