@@ -195,15 +195,13 @@ class NavigationSelector
 
         /* Conditionally add Standardised Test option
          */
-        if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
-            $availableNavigation[self::STANDARDISEDTEST_KEY] = [
-                'url' => $this->router->generate('achievementreport.getStandardisedTests', [
-                    'externalUserId' => $this->externalUser['StudentID'],
-                    'year' => $this->year
-                ]),
-                'label' => 'Standardised Tests'
-            ];
-        }
+        $availableNavigation[self::STANDARDISEDTEST_KEY] = [
+            'url' => $this->router->generate('achievementreport.getStandardisedTests', [
+                'externalUserId' => $this->externalUser['StudentID'],
+                'year' => $this->year
+            ]),
+            'label' => 'Standardised Tests'
+        ];
 
         /* Conditionally add Comment option
          */

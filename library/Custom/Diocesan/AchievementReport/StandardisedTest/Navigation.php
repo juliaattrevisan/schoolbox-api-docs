@@ -167,13 +167,15 @@ class Navigation
 
         /* Conditional Literacy/Numeracy report
          */
-        $availableNavigation[self::STANDARDISEDTEST_LITERACYNUMERACY_KEY] = [
-            'url' => $this->router->generate('achievementreport.getStandardisedTestsLiteracyNumeracy', [
-                'externalUserId' => $this->externalUser['StudentID'],
-                'year' => $this->year
-            ]),
-            'label' => 'Literacy/Numeracy'
-        ];
+        if ((new ValidHasLiteracyNumeracy())->isSatisfiedBy((int)$this->user->getYear())) {
+            $availableNavigation[self::STANDARDISEDTEST_LITERACYNUMERACY_KEY] = [
+                'url'   => $this->router->generate('achievementreport.getStandardisedTestsLiteracyNumeracy', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                    'year'           => $this->year
+                ]),
+                'label' => 'Literacy/Numeracy'
+            ];
+        }
 
         $this->availableNavigation = $availableNavigation;
     }
