@@ -42,120 +42,88 @@ class LinkMapper extends Mapper implements ILocator, Searchable
     {
         $this->hasTable('link');
         $this->hasModel(Link::class);
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'category',
-                'property' => 'folder',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'folder'
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'owner',
-                'property' => 'owner',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'user',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'url',
-                'property' => 'url',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'comment',
-                'property' => 'comment',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'description',
-                'property' => 'description',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'hidden',
-                'property' => 'hidden',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'target',
-                'property' => 'target',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'            => 'submitted',
-                'property'          => 'submitted',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'            => 'modified',
-                'property'          => 'modified',
-                'type'              => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasJoin(
-            'user', array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'owner',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'folder', array(
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-                'this_key'  => 'category',
-                'other_key' => 'id'
-            )
-        );
+        $this->hasMap([
+            'column'     => 'id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true,
+        ]);
+        $this->hasMap([
+            'column'   => 'category',
+            'property' => 'folder',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'folder'
+        ]);
+        $this->hasMap([
+            'column'   => 'owner',
+            'property' => 'owner',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'user',
+        ]);
+        $this->hasMap([
+            'column'   => 'url',
+            'property' => 'url',
+            'type'     => self::TYPE_STRING,
+        ]);
+        $this->hasMap([
+            'column'   => 'comment',
+            'property' => 'comment',
+            'type'     => self::TYPE_STRING,
+        ]);
+        $this->hasMap([
+            'column'   => 'description',
+            'property' => 'description',
+            'type'     => self::TYPE_STRING,
+        ]);
+        $this->hasMap([
+            'column'   => 'hidden',
+            'property' => 'hidden',
+            'type'     => self::TYPE_STRING,
+        ]);
+        $this->hasMap([
+            'column'   => 'target',
+            'property' => 'target',
+            'type'     => self::TYPE_STRING,
+        ]);
+        $this->hasMap([
+            'column'            => 'submitted',
+            'property'          => 'submitted',
+            'type'              => self::TYPE_DATETIME,
+            'created_timestamp' => true,
+        ]);
+        $this->hasMap([
+            'column'            => 'modified',
+            'property'          => 'modified',
+            'type'              => self::TYPE_DATETIME,
+            'updated_timestamp' => true,
+        ]);
+        $this->hasMap([
+            'column'   => 'deleted_at',
+            'property' => 'deletedAt',
+            'type'     => self::TYPE_DATETIME,
+        ]);
+        $this->hasJoin('user', [
+            'mapper'    => '\\Schoolbox\\UserMapper',
+            'this_key'  => 'owner',
+            'other_key' => 'id',
+        ]);
+        $this->hasJoin('folder', [
+            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
+            'this_key'  => 'category',
+            'other_key' => 'id'
+        ]);
 
-        $this->hasJoin(
-            'perms',
-            array(
-                'mapper' => '\\Schoolbox\\Permission\\Access\\RoleAccessMapper',
-                'this_key' => 'category',
-                'other_key' => 'cid'
-            )
-        );
+        $this->hasJoin('perms', [
+            'mapper' => '\\Schoolbox\\Permission\\Access\\RoleAccessMapper',
+            'this_key' => 'category',
+            'other_key' => 'cid'
+        ]);
 
-        $this->hasJoin(
-            'userAccess',
-            array(
-                'mapper' => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
-                'this_key' => 'category',
-                'other_key' => 'sid'
-            )
-        );
+        $this->hasJoin('userAccess', [
+            'mapper' => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
+            'this_key' => 'category',
+            'other_key' => 'sid'
+        ]);
 
         $this->hasSoftDeleteDateField('deleted_at');
     }
@@ -165,7 +133,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
      * @return string
      * @throws Mapper\DefinitionException
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         // much join.
         $table = $this->getTable();
@@ -216,13 +184,13 @@ class LinkMapper extends Mapper implements ILocator, Searchable
 
         /* Special case misrepresentations in db
          */
-        if ($options['sort'] == 'Date') {
+        if ($options['sort'] === 'Date') {
             $sort = 'submitted';
         } else {
             $sort = 'description';
         }
 
-        $sortDir = strtoupper($options['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
+        $sortDir = strtoupper($options['sortdir']) === 'DESC' ? 'DESC' : 'ASC';
 
         $limit = (int)$options['size'];
 
@@ -230,9 +198,9 @@ class LinkMapper extends Mapper implements ILocator, Searchable
 
         $query = "
             SELECT
-            	{$this->getColumnString('l')},
-            	{$folderMapper->getColumnString('c')},
-            	{$userMapper->getColumnString('o')}
+                {$this->getColumnString('l')},
+                {$folderMapper->getColumnString('c')},
+                {$userMapper->getColumnString('o')}
             FROM `{$this->table}` l
             LEFT JOIN {$this->getJoinSql('folder', 'l', 'c')}
             LEFT JOIN {$this->getJoinSql('user', 'l', 'o', true)}
@@ -240,7 +208,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
             AND l.deleted_at IS NULL
             $hiddenClause
             ORDER BY l.{$sort} {$sortDir}
-		";
+        ";
 
         if ($options['size']) {
             $query .= "LIMIT {$limit}";
@@ -289,7 +257,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         );
 
         $notif = Notifactory::create(Notif::TOPIC_CMS);
-        $notif->notice("CRUD", $logEntry);
+        $notif->notice('CRUD', $logEntry);
     }
 
 
@@ -310,7 +278,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
      */
     public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
-        if ($limit == 0) {
+        if ($limit === 0) {
             $limit = self::DEFAULT_LIMIT;
         }
 
@@ -344,11 +312,11 @@ class LinkMapper extends Mapper implements ILocator, Searchable
     private function getNaturalSortCallback(string $direction = 'ASC'): callable
     {
         if ($direction === 'ASC') {
-            $callback = function (Link $a, Link $b) {
+            $callback = static function (Link $a, Link $b) {
                 return strnatcmp($a->getDescription(), $b->getDescription());
             };
         } else {
-            $callback = function (Link $a, Link $b) {
+            $callback = static function (Link $a, Link $b) {
                 return strnatcmp($b->getDescription(), $a->getDescription());
             };
         }
