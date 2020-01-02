@@ -291,18 +291,18 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         preg_match_all($pattern, $body, $allMatches, PREG_SET_ORDER);
 
-        if (count($allMatches)) {
-            for ($i=0; $i < count($allMatches); $i++) {
-                $currentMatch = $allMatches[$i];
+        $n = \count($allMatches);
 
-                $wiki = $this->getByCategoryAndSlug($currentMatch[1], $currentMatch[2]);
+        for ($i = 0; $i < $n; $i++) {
+            $currentMatch = $allMatches[$i];
 
-                /* Append a link class to change link colour
-                 */
-                if (!$wiki) {
-                    $link = str_replace('<a', '<a class="red"', $allMatches[$i][0]);
-                    $body = str_replace($allMatches[$i][0], $link, $body);
-                }
+            $wiki = $this->getByCategoryAndSlug($currentMatch[1], $currentMatch[2]);
+
+            /* Append a link class to change link colour
+             */
+            if (!$wiki) {
+                $link = str_replace('<a', '<a class="red"', $allMatches[$i][0]);
+                $body = str_replace($allMatches[$i][0], $link, $body);
             }
         }
 
