@@ -65,10 +65,16 @@ class ZipFolder
      */
     private $fileMapper;
     /**
-     * @var Folder\Model
+     * @var Folder\Model|null
      */
     private $folderDetails;
 
+
+    /**
+     * ZipFolder constructor.
+     * @param $folder
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
     public function __construct($folder)
     {
         $this->db        = DeprecatedDatabase::getInstance();
@@ -81,6 +87,13 @@ class ZipFolder
         $this->folderMapper  = new Folder\Mapper();
         $this->fileMapper    = new File\Mapper();
         $this->folderDetails = $this->getFolderDetails($folder);
+
+        /* If you can't get details about $folder (it might not exist/be deleted)
+         * then folderDetails will be null; prevent NPE in following statements
+         */
+        if (null === $this->folderDetails) {
+            error(13);
+        }
 
         if (is_numeric($this->folderDetails->getId())) {
             if ($this->getPermission($this->folderDetails->getId()) < UserAccess::ACCESS_READ) {
@@ -261,13 +274,16 @@ class ZipFolder
      *
      * @param int $folder_id
      * @return Folder\Model
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getFolderDetails($folder_id)
+    protected function getFolderDetails($folder_id): ?\Schoolbox\Resource\Folder\Model
     {
         try {
             return $this->folderMapper->findById($folder_id);
-        } catch (\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
         }
+
+        return null;
     }
 
     /**
