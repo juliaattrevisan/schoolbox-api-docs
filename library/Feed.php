@@ -318,7 +318,7 @@ class Feed
         return $surveys;
     }
 
-    function getFolders($folderId, $limit)
+    public function getFolders($folderId, $limit)
     {
 
         $where = $this->getFilterFromCategoryId($folderId);
@@ -357,7 +357,7 @@ class Feed
         return $folder;
     }
 
-    function getForum($folderId, $limit)
+    public function getForum($folderId, $limit)
     {
 
         $where = $this->getFilterFromCategoryId($folderId);
@@ -403,7 +403,7 @@ class Feed
      * @param $limit
      * @return array
      */
-    function getWiki($folderId, $limit)
+    public function getWiki($folderId, $limit)
     {
 
         $where = $this->getFilterFromCategoryId($folderId);
@@ -549,7 +549,7 @@ class Feed
 
     // TODO: text box updates
 
-    function timecmp($a, $b)
+    private function timecmp($a, $b)
     {
         //just a quick function to enable sorting of news based on time
         if ($a['date'] == $b['date']) {
