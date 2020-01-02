@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\UserMapper;
+
 /**
  * Report_Staff_Department
  *
@@ -103,6 +105,7 @@ class Report_StaffDepartment extends Report_Abstract
         );
 
         if (is_array($allStaff) && count($allStaff)) {
+            $userMapper = UserMapper::getInstance();
             $previousDepartment = '';
 
             foreach ($allStaff as $key => $currentStaff) {
@@ -147,7 +150,7 @@ class Report_StaffDepartment extends Report_Abstract
                 // Find the match schoolbox user so we can link to their profile page
 
                 try {
-                    $userId = \Schoolbox\UserMapper::getInstance()->findByExternalId($currentStaff['StaffID'])->getId();
+                    $userId = $userMapper->findByExternalId($currentStaff['StaffID'])->getId();
                 } catch (Exception $e) {
                     $userId = -1;
                 }
