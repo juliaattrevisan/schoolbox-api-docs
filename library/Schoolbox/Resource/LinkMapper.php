@@ -6,7 +6,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource;
 
 use PDO;
@@ -23,7 +22,11 @@ use Schoolbox\User;
 use Schoolbox\Resource\Link\Search\Result;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
+
 /**
+ * Class LinkMapper
+ *
+ * @package Schoolbox\Resource
  * @method Link hydrate(array $row, $alias = '', $callback = null)
  * @method Link createModel($idValue = null)
  */
@@ -33,8 +36,9 @@ class LinkMapper extends Mapper implements ILocator, Searchable
      * Mapping
      *
      * @return void
+     * @throws Mapper\DefinitionException
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('link');
         $this->hasModel(Link::class);
@@ -156,8 +160,10 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         $this->hasSoftDeleteDateField('deleted_at');
     }
 
+
     /**
      * @return string
+     * @throws Mapper\DefinitionException
      */
     protected function getSelectString()
     {
@@ -173,9 +179,11 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         ";
     }
 
+
     /**
      * @param PDOStatement $statement
      * @return Link[]|Collection
+     * @throws Mapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -189,16 +197,19 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         return $c;
     }
 
+
     /**
      * Find all the links in a given category
      *
      * @param FolderModel $folder
-     * @param             $options
+     * @param array       $options
      * @param bool        $includeHidden
      * @return Collection
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
+     * @throws \PDOException
      */
-    public function findAllInCategory(FolderModel $folder, $options, $includeHidden = true)
+    public function findAllInCategory(FolderModel $folder, $options, $includeHidden = true): Collection
     {
         $folderMapper = $this->getJoinMapper('folder');
         $userMapper     = $this->getJoinMapper('user');
@@ -239,7 +250,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         $statement->bindParam(':categoryId', $folder->getId());
         $statement->execute();
 
-        /* Manually construct hierarchy of blog items and their comments
+        /* Manually construct hierarchy of link items and their comments
          */
         $collection = new Collection();
 
@@ -259,6 +270,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
 
         return $collection;
     }
+
 
     /**
      * Log action
@@ -308,6 +320,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         return $searcher;
     }
 
+
     /**
      * Return the files contained within the folder with the given ID
      *
@@ -322,12 +335,13 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         return $collection->sortByCallback($this->getNaturalSortCallback(), true);
     }
 
+
     /**
      * Gets callback for link natural sorting
      * @param string $direction
      * @return \Closure
      */
-    private function getNaturalSortCallback(string $direction = 'ASC')
+    private function getNaturalSortCallback(string $direction = 'ASC'): callable
     {
         if ($direction === 'ASC') {
             $callback = function (Link $a, Link $b) {
