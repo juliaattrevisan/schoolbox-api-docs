@@ -396,10 +396,6 @@ class Feed
         return $forum;
     }
 
-    function getPoll($limit)
-    {
-
-    }
 
     /**
      * @deprecated use \Schoolbox\Wiki\WikiNotifier::getFeed()
@@ -577,5 +573,3 @@ class Feed
             : $userHandler->formatName($row);
     }
 }
-
-?>
