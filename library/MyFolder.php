@@ -3,6 +3,9 @@
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 
+/**
+ * Class MyFolder
+ */
 class MyFolder extends DeprecatedModel
 {
 
@@ -11,7 +14,12 @@ class MyFolder extends DeprecatedModel
      */
     private $owner;
 
-    function __construct($owner = 0)
+
+    /**
+     * MyFolder constructor.
+     * @param int $owner
+     */
+    public function __construct($owner = 0)
     {
         if ($owner == 0) {
             $this->owner = $_SESSION['id'];
@@ -25,23 +33,38 @@ class MyFolder extends DeprecatedModel
         parent::__construct();
     }
 
-    function getFolderList($parent = 0)
+
+    /**
+     * @param int $parent
+     * @return array|bool
+     */
+    public function getFolderList($parent = 0)
     {
         $fields = [
             'owner'  => $this->owner,
             'parent' => $parent,
         ];
-        return $this->getByArray($fields);
 
+        return $this->getByArray($fields);
     }
 
-    function getParent($id)
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function getParent($id)
     {
         $query = "SELECT parent FROM " . $this->_table . " WHERE id = " . (int)$id;
         return $this->db->getOne($query);
     }
 
-    function getFolderNode($folderID = 0)
+
+    /**
+     * @param int $folderID
+     * @return array|bool
+     */
+    public function getFolderNode($folderID = 0)
     {
 
         // get folder contents
@@ -69,7 +92,14 @@ class MyFolder extends DeprecatedModel
         }
     }
 
-    function getFolderTree($folderID = 0, $depth = 0, $ignore = false)
+
+    /**
+     * @param int  $folderID
+     * @param int  $depth
+     * @param bool $ignore
+     * @return array|bool
+     */
+    public function getFolderTree($folderID = 0, $depth = 0, $ignore = false)
     {
 
         $folderList = $this->getFolderList($folderID);
@@ -103,17 +133,26 @@ class MyFolder extends DeprecatedModel
     }
 
 
-    function hasChildren($folderID)
+    /**
+     * @param $folderID
+     * @return mixed
+     */
+    public function hasChildren($folderID)
     {
         $query = "SELECT f.id as children
-				  FROM myFolder f
-				  WHERE parent = {$this->db->quote($folderID)}
-				  LIMIT 1";
+                  FROM myFolder f
+                  WHERE parent = {$this->db->quote($folderID)}
+                  LIMIT 1";
 
         return $this->db->getOne($query);
     }
 
-    function logAction($folderID, $action)
+
+    /**
+     * @param $folderID
+     * @param $action
+     */
+    public function logAction($folderID, $action)
     {
         $logEntry = [
             'object'   => 'myfolder',
@@ -126,7 +165,12 @@ class MyFolder extends DeprecatedModel
         $notif->info("CRUD", $logEntry);
     }
 
-    function create($data)
+
+    /**
+     * @param $data
+     * @return int|string
+     */
+    public function create($data)
     {
         $data['owner'] = $this->owner;
         $folderID      = parent::create($data);
@@ -136,15 +180,24 @@ class MyFolder extends DeprecatedModel
         return $folderID;
     }
 
-    function update($data)
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    public function update($data)
     {
         $this->logAction($data['id'], "modify");
         return parent::update($data);
     }
 
-    function delete($folderID)
-    {
 
+    /**
+     * @param $folderID
+     * @return bool
+     */
+    public function delete($folderID)
+    {
         // delete files
         $fileHandler = new MyFile;
         $fileHandler->deleteByParent($folderID);
@@ -152,8 +205,4 @@ class MyFolder extends DeprecatedModel
         $this->logAction($folderID, "delete");
         return parent::delete($folderID);
     }
-
-
 }
-
-?>
