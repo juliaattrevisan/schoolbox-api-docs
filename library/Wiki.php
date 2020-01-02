@@ -26,10 +26,10 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     /**
      * Gets the latest revision record for the specified wiki.
-     *
      * @deprecated use \Schoolbox\Wiki\Wiki::getLatestRevision()
-     * @param <type> $wikiID
-     * @return <type>
+     *
+     * @param $wikiID
+     * @return array|bool
      */
     public function getLatestRevision($wikiID)
     {
@@ -38,27 +38,6 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $latestRevisionID = $this->db->getOne($query);
 
         return $this->getByID($wikiID, $latestRevisionID);
-    }
-
-
-    /**
-     * Locates the previous revision without needing to rely on a -1 offset.
-     *
-     * @param <type> $wikiID
-     * @param <type> $revisionID
-     * @return <type>
-     */
-    public function getPreviousRevision($wikiID, $revisionID)
-    {
-        $query = 'SELECT revisionID
-                  FROM ' . $this->_revisionTable . "
-                  WHERE wikiID = '{$this->db->quote($wikiID)}'
-                  AND revisionID < '{$this->db->quote($revisionID)}'
-                  ORDER BY revisionID DESC";
-
-        $previousRevision = $this->db->getRow($query);
-
-        return $this->getByID($wikiID, $previousRevision['revisionID']);
     }
 
 
@@ -107,9 +86,10 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * Get a wiki for a category
      *
      * @deprecated use \Schoolbox\Wiki\WikiMapper::findByColumn('categoryID')
-     * @param  $categoryID
+     * @param        $categoryID
      * @param string $orderBy
      * @param string $sortDir
+     * @param bool   $limit
      * @return array|bool
      */
     public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false) {
@@ -164,25 +144,6 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $this->db->insertID();
     }
 
-
-    /**
-     * @param $slug
-     * @return string
-     */
-    protected function makeUnique($slug) {
-        $query = "SELECT slug FROM `" . $this->_table. "` WHERE slug LIKE ".$this->db->smartQuote($slug . '%')." ORDER BY slug DESC LIMIT 1";
-
-        $row = $this->db->getOne($query);
-        if (!$row) {
-            return $slug;
-        }
-
-        if (preg_match('/(\d+)$/', $row, $matches)) {
-            return $slug .'-'. ($matches[1] + 1);
-        }
-
-        return $slug . '-1';
-    }
 
     /**
      * Updates a wiki's data with the latest revision if applicable
@@ -314,54 +275,6 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $count = $this->db->getOne($count_query);
 
         return $this->db->getAll($query);
-    }
-
-
-    /**
-     * Figure out if there are any empty links - these are assumed to be stubs.
-     * If a title attribute is provided, use that as the stub wiki heading
-     *
-     * @deprecated use \Schoolbox\Wiki\RevisionMapper::createStubLinks()
-     * @param  $data
-     * @return
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     */
-    public function createStubLinks($data) {
-        $allMatches = array();
-
-        preg_match_all('/<a title="([^"]*)">/', $data['body'], $allMatches);
-
-        if (count($allMatches[1])) {
-            $pattern = array();
-            $replace = array();
-
-            for ($i=0; $i < count($allMatches[1]); $i++) {
-                $currentMatch = $allMatches[1][$i];
-
-                /* Try using title attribute as a heading
-                 * Otherwise ignore creation of empty stubs
-                 */
-                if (strlen(trim($currentMatch))) {
-
-                    /* Generate a slug for a new article that wonn't exist
-                     */
-                    $url = new Url($currentMatch);
-                    $slug = $url->getSlug();
-
-                    $pattern[] = $allMatches[0][$i];
-                    $replace[] = "<a href='/wiki/{$data['categoryID']}/{$slug}'>";
-                }
-            }
-        }
-
-        /* Perform replacements if required
-         */
-        if (count($pattern)) {
-            $data['body'] = str_replace($pattern, $replace, $data['body']);
-        }
-
-        return $data;
     }
 
 
