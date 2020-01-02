@@ -110,8 +110,6 @@ class Report_StaffDepartment extends Report_Abstract
                 $role = trim(Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])));
 
                 // Remove staff with unknown departments
-
-
                 if ($department === '' || $role === '' || strtolower($department) === 'not selected') {
                     unset($allStaff[$key]);
                 } else {
@@ -171,7 +169,7 @@ class Report_StaffDepartment extends Report_Abstract
                     'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail']),
                 ]);
 
-                if ($user_id != -1) {
+                if ($userId !== -1) {
                     $this->getPage()->parse('link_block', 'link', true);
                 } else {
                     $this->getPage()->parse('nolink_block', 'nolink', true);
