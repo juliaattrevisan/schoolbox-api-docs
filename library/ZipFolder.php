@@ -115,6 +115,10 @@ class ZipFolder
         }
     }
 
+
+    /**
+     *
+     */
     public function __destruct()
     {
         // Might be a bit redundant, but can't hurt anything
@@ -122,6 +126,12 @@ class ZipFolder
         $this->cleanUp();
     }
 
+
+    /**
+     * @param $folder
+     * @param $permission
+     * @return \Schoolbox\Collection|File\Model[]
+     */
     private function getResources($folder, $permission)
     {
         return $this->fileMapper->findForFolders(
@@ -130,17 +140,32 @@ class ZipFolder
         );
     }
 
+
+    /**
+     * @param $folderId
+     * @return \Schoolbox\GenericCollection|Folder\Model[]
+     */
     private function getFolders($folderId)
     {
         return $this->folderMapper->findByParent($folderId);
     }
 
+
+    /**
+     * @param $name
+     * @return string|string[]|null
+     */
     private function cleanName($name)
     {
-        $filename = preg_replace("/{$this->allowedChars}/", "_", $name);
-        return $filename;
+        return preg_replace("/{$this->allowedChars}/", '_', $name);
     }
 
+
+    /**
+     * @param     $fileName
+     * @param int $depth
+     * @return mixed
+     */
     private function uniqueFileName($fileName, $depth = 1)
     {
         if (is_file($fileName)) {
@@ -152,6 +177,10 @@ class ZipFolder
         }
     }
 
+
+    /**
+     * @throws UnexpectedValueException
+     */
     public function sendZip()
     {
         if ($this->createZip()) {
@@ -171,6 +200,14 @@ class ZipFolder
         }
     }
 
+
+    /**
+     * @param     $currentDir
+     * @param     $parentFolder
+     * @param     $permission
+     * @param int $depth
+     * @throws Exception
+     */
     private function createDirectory($currentDir, $parentFolder, $permission, $depth = 0)
     {
         //populate dir with files
@@ -208,20 +245,28 @@ class ZipFolder
         }
     }
 
+
+    /**
+     * @return bool
+     * @throws UnexpectedValueException
+     */
     public function createZip()
     {
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
+
         $this->createDirectory(
             $this->tmpFolder,
             $this->folderDetails,
             $this->getPermission($this->folderDetails->getId())
         );
+
         $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
 
         $i      = 0;
         $ulimit = 250;
+
         foreach (new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // Close/open archive after 250 additions, to avoid ulimit issues
             if ($i++ % $ulimit === ($ulimit - 1)) {
@@ -239,11 +284,16 @@ class ZipFolder
                 $archive->addFile($filePath, $zipPath);
             }
         }
-        $archive->close();
-        return true;
 
+        $archive->close();
+
+        return true;
     }
 
+
+    /**
+     *
+     */
     public function cleanUp()
     {
         if (file_exists($this->tmpName)) {
@@ -259,6 +309,10 @@ class ZipFolder
         }
     }
 
+
+    /**
+     * @param $path
+     */
     private function removeDir($path)
     {
         // Add trailing slash to $path if one is not there
@@ -301,7 +355,7 @@ class ZipFolder
      * Gets a Group permission level for the given folder
      *
      * @param $folder_id
-     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
+     * @return int UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
      */
     protected function getPermission($folder_id)
     {
