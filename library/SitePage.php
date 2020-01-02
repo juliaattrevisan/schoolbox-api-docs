@@ -193,23 +193,7 @@ class SitePage extends Page
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAjax()
-    {
-        return $this->ajax;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getLite()
-    {
-        return $this->lite;
-    }
-
-    /**
+        /**
      * @param bool $state
      */
     public function setAjax($state = true)
