@@ -197,7 +197,7 @@ OR ml.name        LIKE :keyword
         $joins = "
             LEFT JOIN `user` u    ON u.id = cl.user
             LEFT JOIN folder c  ON cl.objectID = c.id  AND cl.object = 'folder'
-            LEFT JOIN folder cfolder ON c.parent = cfolder.id 
+            LEFT JOIN folder cfolder ON c.parent = cfolder.id
             LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
             LEFT JOIN folder cfile ON f.category = cfile.id
             LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
@@ -256,7 +256,11 @@ OR ml.name        LIKE :keyword
         return $this->dataCount;
     }
 
-    public function render()
+
+    /**
+     * @throws Exception
+     */
+    public function render(): void
     {
         // the group and the dataset must both not be null
         if ($this->getIndexID() == null || empty($this->dataSet)) {
