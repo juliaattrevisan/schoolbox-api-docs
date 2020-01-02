@@ -6,10 +6,10 @@ class Blog extends DeprecatedModel
     /**
      * @deprecated
      */
-    function __construct()
+    public function __construct()
     {
-        $this->_table  = "blog";
-        $this->_index  = "id";
+        $this->_table  = 'blog';
+        $this->_index  = 'id';
 
         parent::__construct();
     }
@@ -24,7 +24,7 @@ class Blog extends DeprecatedModel
      * @param string $sort_dir
      * @return array|bool
      */
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
     {
         $keyword = $this->db->quote($keyword);
 
