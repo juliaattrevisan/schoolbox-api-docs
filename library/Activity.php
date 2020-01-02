@@ -6,6 +6,9 @@
 
 //display what has change since the last login for the user
 
+/**
+ * Class Activity
+ */
 class Activity
 {
 
@@ -14,29 +17,41 @@ class Activity
      */
     private $db;
 
-    function __construct()
+
+    /**
+     * Activity constructor.
+     */
+    public function __construct()
     {
         //setup db
         $this->db = DeprecatedDatabase::getInstance();
     }
 
 
-    function lastCatVisit($id)
+    /**
+     * @param $id
+     * @return mixed|string
+     */
+    public function lastCatVisit($id)
     {
         //get last visit to category
         $query  = "SELECT datetime FROM homepage_log WHERE folder_id = '$id' AND user_id = '" . $_SESSION['id'] . "'";
         $result = $this->db->getRow($query);
+
         if ($result['datetime']) {
             return $result['datetime'];
-        } else {
-            return "0000-00-00";
         }
+
+        return '0000-00-00';
     }
 
 
-    function newCategory($id)
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function newCategory($id)
     {
-
         $lastcatvisit = $this->lastCatVisit($id);
 
         //check if any new news has been submitted
@@ -62,35 +77,34 @@ class Activity
 
         //check if any new files have been submitted
         $query  = "SELECT COUNT(*) AS filecount FROM file WHERE
-			deleted_at IS NULL AND category = $id AND submitted >= '$lastcatvisit'";
+            deleted_at IS NULL AND category = $id AND submitted >= '$lastcatvisit'";
         $result = $this->db->getRow($query);
 
         $count['files'] = $result['filecount'];
 
         //check if any new links have been submitted
         $query  = "SELECT COUNT(*) AS linkcount FROM link WHERE category = $id
-			AND submitted >= '$lastcatvisit'";
+            AND submitted >= '$lastcatvisit'";
         $result = $this->db->getRow($query);
 
         $count['links'] = $result['linkcount'];
 
         //check if any new forum posts have been made
         $query  = "SELECT COUNT(*) AS forumcount
-			FROM forumThread INNER JOIN forumPost ON forumThread.threadID = forumPost.threadID
-			WHERE forumThread.categoryID = $id AND forumThread.deleted != true AND forumPost.deleted != true AND forumPost.date >= '$lastcatvisit'";
+            FROM forumThread INNER JOIN forumPost ON forumThread.threadID = forumPost.threadID
+            WHERE forumThread.categoryID = $id AND forumThread.deleted != true AND forumPost.deleted != true AND forumPost.date >= '$lastcatvisit'";
         $result = $this->db->getRow($query);
 
         $count['forum'] = $result['forumcount'];
 
         //check if any new wiki revisions have been made
         $query  = "SELECT COUNT(*) AS wikicount
-			FROM wiki INNER JOIN wikiRevision ON wiki.wikiID = wikiRevision.wikiID
-			WHERE wiki.categoryID = $id AND wiki.deleted != true AND wikiRevision.created >= '$lastcatvisit'";
+            FROM wiki INNER JOIN wikiRevision ON wiki.wikiID = wikiRevision.wikiID
+            WHERE wiki.categoryID = $id AND wiki.deleted != true AND wikiRevision.created >= '$lastcatvisit'";
         $result = $this->db->getRow($query);
 
         $count['wiki'] = $result['wikicount'];
 
         return $count;
     }
-
 }
