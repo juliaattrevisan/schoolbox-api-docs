@@ -443,7 +443,7 @@ class Mapper extends BaseMapper
 
         $quiz = null;
         $curriculumNodes = [];
-        foreach ($stmt as $row) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if (!($quiz instanceof Model)) {
                 $quiz = $this->hydrate($row, 'a');
                 $quiz->setCategory($this->hydrateJoin($row, 'category', 'c'));
