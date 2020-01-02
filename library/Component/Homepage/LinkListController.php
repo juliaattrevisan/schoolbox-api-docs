@@ -36,7 +36,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
-        
+
         return true;
     }
 
@@ -68,6 +68,8 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             'LINK_CATEGORY_ID'          => Scrub::text($this->getSource()->getId()),
         ]);
 
+        $includeHiddenLinks = $this->getContentPermission() > UserAccess::ACCESS_READ;
+
         /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->linkMapper->findAllInCategory(
             $this->getSource(), [
@@ -75,14 +77,15 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
             ],
-            $this->getContentPermission() > UserAccess::ACCESS_READ
+            $includeHiddenLinks
         );
 
         // Get total number of links available for the user
         $countParams = [
             'category' => $this->getSource()->getId(),
         ];
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+
+        if (!$includeHiddenLinks) {
             // If readonly user, do not count hidden links
             $countParams['hidden'] = 0;
         }
