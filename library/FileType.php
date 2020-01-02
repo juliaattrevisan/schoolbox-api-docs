@@ -7,8 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 class FileType extends DeprecatedModel {
-	public  $_table = 'allowedFileTypes';
-	public  $_index = 'fileTypeId';
+    public $_table = 'allowedFileTypes';
+    public $_index = 'fileTypeId';
 
     /**
      * Filename
@@ -19,7 +19,8 @@ class FileType extends DeprecatedModel {
     /**
      * This is used to determine whether a file is audio or video
      * based, and should be extended if necessary
-     * @var string null
+     *
+     * @var string|null
      */
     private $mime;
 
