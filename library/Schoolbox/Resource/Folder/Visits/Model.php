@@ -23,6 +23,11 @@ class Model
     protected $folder;
 
     /**
+     * @var Role
+     */
+    private $role;
+
+    /**
      * @param int $hitcount
      * @return self
      */

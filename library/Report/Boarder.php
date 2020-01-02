@@ -22,7 +22,7 @@ class Report_Boarder extends Report_Parent {
 		else {
 			$this->setPage($page);
 
-			$this->setExternalUserHandler(new External_User());			
+			$this->setExternalUserHandler(new External_User());
 
 			$this->setup();
 
@@ -57,7 +57,7 @@ class Report_Boarder extends Report_Parent {
      *
      * @return bool
      */
-    protected function checkPermissions() {
+    protected function checkPermissions(): bool {
         if ($this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
             return true;
         }

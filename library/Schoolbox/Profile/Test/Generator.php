@@ -1,4 +1,10 @@
 <?php
+/**
+ * Used to generate a truth table of all possible combinations
+ *
+ * Copy it to a test.php to run it
+ */
+
 // viewer, viewee, visibility
 use Schoolbox\Role;
 use Schoolbox\User;

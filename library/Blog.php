@@ -1,34 +1,34 @@
 <?php
 
-class Blog extends DeprecatedModel {
+class Blog extends DeprecatedModel
+{
 
-	/**
-	 * @deprecated
-	 */
-	function __construct() {
-		$this->_table = "blog";
-		$this->_index = "id";
-		$this->_config = array();
+    /**
+     * @deprecated
+     */
+    public function __construct()
+    {
+        $this->_table  = 'blog';
+        $this->_index  = 'id';
 
-		$this->group = new Group();
+        parent::__construct();
+    }
 
-		parent::__construct();
-	}
+    /**
+     *
+     * @param        $keyword
+     * @param int    $offset
+     * @param int    $limit
+     * @param null   $count
+     * @param string $sort_by
+     * @param string $sort_dir
+     * @return array|bool
+     */
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
+    {
+        $keyword = $this->db->quote($keyword);
 
-	/**
-	 *
-	 * @param $keyword
-	 * @param int $offset
-	 * @param int $limit
-	 * @param null $count
-	 * @param string $sort_by
-	 * @param string $sort_dir
-	 * @return array|bool
-	 */
-	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-            $keyword = $this->db->quote($keyword);
-
-            $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+        $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `blog`
                         JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
@@ -46,7 +46,7 @@ class Blog extends DeprecatedModel {
                         LIMIT $offset, $limit;
             ";
 
-            $count_query = "SELECT COUNT(*)
+        $count_query = "SELECT COUNT(*)
                             FROM `blog`
                             JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
                             LEFT JOIN `user` ON `blog`.owner_id = `user`.id
@@ -61,8 +61,8 @@ class Blog extends DeprecatedModel {
                                 AND `blog`.`deleted_at` IS NULL
             ";
 
-            $count = $this->db->getOne($count_query);
+        $count = $this->db->getOne($count_query);
 
-            return $this->db->getAll($query);
-        }
+        return $this->db->getAll($query);
+    }
 }

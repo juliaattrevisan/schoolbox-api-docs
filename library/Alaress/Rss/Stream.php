@@ -41,6 +41,11 @@ class Alaress_Rss_Stream
     private $rssStrategy;
 
     /**
+     * @var Xml
+     */
+    private $input;
+
+    /**
      * Constructor
      *
      * Optionally takes a source url as an input. You can override
@@ -178,7 +183,7 @@ class Alaress_Rss_Stream
     /**
      * Set RSS handling class
      *
-     * @param  Alaress_Rss_Strategy_Interface $val
+     * @param Alaress_Rss_Strategy_Interface $val
      */
     private function setRssStrategy(Alaress_Rss_Strategy_Interface $val)
     {
@@ -198,7 +203,7 @@ class Alaress_Rss_Stream
     /**
      * Set the limit
      *
-     * @param  int $val
+     * @param int $val
      */
     public function setLimit($val)
     {
@@ -220,7 +225,7 @@ class Alaress_Rss_Stream
      *
      * Silently enforce http:// protocol
      *
-     * @param  string $val
+     * @param string $val
      */
     public function setSource($val)
     {
@@ -242,7 +247,7 @@ class Alaress_Rss_Stream
     /**
      * Set the contents of the input rss stream
      *
-     * @param  \Xml $val
+     * @param \Xml $val
      */
     private function setInput(\Xml $val)
     {

@@ -7,10 +7,16 @@
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
 
-class Feed {
+class Feed
+{
 
     /** @var Schoolbox\User */
     private $user;
+
+    /**
+     * @var DeprecatedDatabase
+     */
+    private $db;
 
 
     /**
@@ -23,49 +29,49 @@ class Feed {
         $this->user = $user;
     }
 
-	/**
-	 * @deprecated use \Schoolbox\Feed::aggregate()
-	 * @param $folderId
-	 * @param $limit
-	 * @return array
-	 */
-	function getFeed($folderId, $limit) {
+    /**
+     * @deprecated use \Schoolbox\Feed::aggregate()
+     * @param $folderId
+     * @param $limit
+     * @return array
+     */
+    public function getFeed($folderId, $limit)
+    {
 
         if ($limit == 0 || $limit > 50) {
             $limit = 50;
         }
 
-		/* ALL THESE HELPER FUNCTIONS TO BE SYSTEMATICALLY DEPRECATED */
+        /* ALL THESE HELPER FUNCTIONS TO BE SYSTEMATICALLY DEPRECATED */
 
-        $files = $this->getFiles($folderId, $limit);
-        $links = $this->getLinks($folderId, $limit);
-        $folders = $this->getFolders($folderId, $limit);
-        $wiki = $this->getWiki($folderId, $limit);
-        $forum = $this->getForum($folderId, $limit);
-        $blog = $this->getBlog($folderId, $limit);
-        $blogComments = $this->getBlogComments($folderId, $limit);
+        $files             = $this->getFiles($folderId, $limit);
+        $links             = $this->getLinks($folderId, $limit);
+        $folders           = $this->getFolders($folderId, $limit);
+        $wiki              = $this->getWiki($folderId, $limit);
+        $forum             = $this->getForum($folderId, $limit);
+        $blog              = $this->getBlog($folderId, $limit);
+        $blogComments      = $this->getBlogComments($folderId, $limit);
         $onlineAssessments = $this->getOnlineAssessments($folderId, $limit);
-        $surveys = $this->getSurveys($folderId, $limit);
+        $surveys           = $this->getSurveys($folderId, $limit);
 
-        is_array($files) ? 0 : $files = array();
-        is_array($links) ? 0 : $links = array();
-        is_array($folders) ? 0 : $folders = array();
-        is_array($news) ? 0 : $news = array();
-        is_array($wiki) ? 0 : $wiki = array();
-        is_array($forum) ? 0 : $forum = array();
-        is_array($blog) ? 0 : $blog = array();
-        is_array($blogComments) ? 0 : $blogComments = array();
-        is_array($onlineAssessments) ? 0 : $onlineAssessments = array();
-        is_array($surveys) ? 0 : $surveys = array();
+        is_array($files) ? 0 : $files = [];
+        is_array($links) ? 0 : $links = [];
+        is_array($folders) ? 0 : $folders = [];
+        is_array($wiki) ? 0 : $wiki = [];
+        is_array($forum) ? 0 : $forum = [];
+        is_array($blog) ? 0 : $blog = [];
+        is_array($blogComments) ? 0 : $blogComments = [];
+        is_array($onlineAssessments) ? 0 : $onlineAssessments = [];
+        is_array($surveys) ? 0 : $surveys = [];
 
         //get each of the areas
         $feedList = array_merge(
-            $files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys
+            $files, $links, $folders, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys
         );
 
 
         //sort them
-        usort($feedList, array($this, "timecmp"));
+        usort($feedList, [$this, "timecmp"]);
 
         //cut off over limit
         $feedList = array_slice($feedList, 0, $limit);
@@ -76,19 +82,20 @@ class Feed {
     /**
      * Generic filter function for get* methods.
      *
-     * @param  mixed  $folderId Either a number string, or an array of IDs
+     * @param mixed $folderId Either a number string, or an array of IDs
      * @return string
      */
-    protected function getFilterFromCategoryId($folderId) {
+    protected function getFilterFromCategoryId($folderId)
+    {
         if (is_array($folderId) && !empty($folderId)) {
             return ' IN (' . implode(',', array_map('intval', $folderId)) . ') ';
-        }
-        else {
-            return " = ".intval($folderId);
+        } else {
+            return " = " . intval($folderId);
         }
     }
 
-    function getFiles($folderId, $limit) {
+    public function getFiles($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -110,33 +117,34 @@ class Feed {
         while ($row = $this->db->getNextArray()) {
             $link = null;
             if ($row['realname'] != '') {
-                $url = '<a href="/send.php?id=' . $row['id'] . '" rel="external">' . Scrub::text($row['name']) . '</a>';
+                $url  = '<a href="/send.php?id=' . $row['id'] . '" rel="external">' . Scrub::text($row['name']) . '</a>';
                 $link = '/send.php?id=' . $row['id'];
             } else {
                 $url = Scrub::text($row['name']);
             }
 
-            $file[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-files',
-                'message' => $userHandler->formatName($row) . ' uploaded the file ' . Scrub::text($row['name']),
+            $file[] = [
+                'date'        => $row['submitted'],
+                'type'        => 'icon-files',
+                'message'     => $userHandler->formatName($row) . ' uploaded the file ' . Scrub::text($row['name']),
                 'messageHTML' => "{$this->buildUsernameHTML($row, $row['uid'], $userHandler)} uploaded the file  $url",
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
 
                 'user_id' => $row['uid'],
                 'link'    => $link,
                 'name'    => $row['name'],
                 'action'  => 'uploaded the file',
-            );
+            ];
         }
 
         return $file;
     }
 
-    function getLinks($folderId, $limit) {
+    public function getLinks($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -155,30 +163,30 @@ class Feed {
 
             $url = new Url($row['url']);
             if ($url->isLocalUrl()) {
-                $linkUrl = $url->getRelativeURL();
+                $linkUrl    = $url->getRelativeURL();
                 $linkTarget = '';
             } else {
-                $linkUrl = $url->getBase64EncodedRedirect();
+                $linkUrl    = $url->getBase64EncodedRedirect();
                 $linkTarget = 'external';
             }
 
-            $link[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-link',
-                'message' => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) .' submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
-                    $row['name']
-                ) . '</a>',
+            $link[] = [
+                'date'        => $row['submitted'],
+                'type'        => 'icon-link',
+                'message'     => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
+                        $row['name']
+                    ) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
 
                 'user_id' => $row['uid'],
                 'link'    => $linkUrl,
                 'name'    => $row['name'],
                 'action'  => 'submitted the link',
-            );
+            ];
         }
         return $link;
     }
@@ -234,23 +242,23 @@ class Feed {
 
         $onlineAssessments = [];
         while ($row = $this->db->getNextArray()) {
-            $onlineAssessments[] = array(
-                'date' => $row['start'],
-                'type' => 'icon-quiz',
-                'message' => $userHandler->formatName($row)
+            $onlineAssessments[] = [
+                'date'        => $row['start'],
+                'type'        => 'icon-quiz',
+                'message'     => $userHandler->formatName($row)
                     . ' opened the quiz '
-                    . Scrub::text( $row['heading']),
+                    . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
                     . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => '/assess/intro/' . $row['assess_id'],
-                'name'    => $row['heading'],
-                'action'  => 'opened the quiz',
-            );
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
+                'user_id'     => $row['uid'],
+                'link'        => '/assess/intro/' . $row['assess_id'],
+                'name'        => $row['heading'],
+                'action'      => 'opened the quiz',
+            ];
         }
 
         return $onlineAssessments;
@@ -263,7 +271,8 @@ class Feed {
      * @param  $limit
      * @return
      */
-    public function getSurveys($folderId, $limit) {
+    public function getSurveys($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -287,29 +296,30 @@ class Feed {
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-            $surveys[] = array(
-                'date' => $row['start'],
-                'type' => 'icon-surveys',
-                'message' => $userHandler->formatName($row)
+            $surveys[] = [
+                'date'        => $row['start'],
+                'type'        => 'icon-surveys',
+                'message'     => $userHandler->formatName($row)
                     . ' opened the survey '
                     . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the survey <a href="/survey/intro/' . $row['assess_id'] . '">'
                     . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => '/survey/intro/' . $row['assess_id'],
-                'name'    => $row['heading'],
-                'action'  => 'opened the survey',
-            );
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
+                'user_id'     => $row['uid'],
+                'link'        => '/survey/intro/' . $row['assess_id'],
+                'name'        => $row['heading'],
+                'action'      => 'opened the survey',
+            ];
         }
 
         return $surveys;
     }
 
-    function getFolders($folderId, $limit) {
+    public function getFolders($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -320,34 +330,35 @@ class Feed {
 					JOIN folder pc ON pc.id = c.parent
 					WHERE c.parent $where AND object = 'folder' AND action = 'create'
 					ORDER BY time DESC LIMIT 0, $limit";
-        
+
         $this->db->query($query);
 
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-            $folder[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-folder',
-                'message' => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
+            $folder[] = [
+                'date'        => $row['submitted'],
+                'type'        => 'icon-folder',
+                'message'     => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
-                    $row['name']
-                ) . '</a>',
+                        $row['name']
+                    ) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => '/homepage/' . $row['id'],
-                'name'    => $row['name'],
-                'action'  => 'created the folder',
-            );
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
+                'user_id'     => $row['uid'],
+                'link'        => '/homepage/' . $row['id'],
+                'name'        => $row['name'],
+                'action'      => 'created the folder',
+            ];
         }
 
         return $folder;
     }
 
-    function getForum($folderId, $limit) {
+    public function getForum($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -364,38 +375,36 @@ class Feed {
 
         while ($row = $this->db->getNextArray()) {
 
-            $forum[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-forum',
-                'message' => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) .' started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
-                    $row['heading']
-                ) . '</a>',
+            $forum[] = [
+                'date'        => $row['submitted'],
+                'type'        => 'icon-forum',
+                'message'     => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
+                        $row['heading']
+                    ) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => '/forum/thread/' . $row['threadID'],
-                'name'    => $row['heading'],
-                'action'  => 'started the thread',
-            );
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
+                'user_id'     => $row['uid'],
+                'link'        => '/forum/thread/' . $row['threadID'],
+                'name'        => $row['heading'],
+                'action'      => 'started the thread',
+            ];
         }
 
         return $forum;
     }
 
-    function getPoll($limit) {
 
-    }
-
-	/**
-	 * @deprecated use \Schoolbox\Wiki\WikiNotifier::getFeed()
-	 * @param $folderId
-	 * @param $limit
-	 * @return array
-	 */
-	function getWiki($folderId, $limit) {
+    /**
+     * @deprecated use \Schoolbox\Wiki\WikiNotifier::getFeed()
+     * @param $folderId
+     * @param $limit
+     * @return array
+     */
+    public function getWiki($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -412,22 +421,22 @@ class Feed {
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-            $wiki[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-wiki',
-                'message' => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
+            $wiki[] = [
+                'date'        => $row['submitted'],
+                'type'        => 'icon-wiki',
+                'message'     => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text(
-                    $row['heading']
-                ) . '</a>',
+                        $row['heading']
+                    ) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => '/wiki/' . $row['categoryID'] . '/' . $row['slug'],
-                'name'    => $row['heading'],
-                'action'  => 'updated the wiki',
-            );
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
+                'user_id'     => $row['uid'],
+                'link'        => '/wiki/' . $row['categoryID'] . '/' . $row['slug'],
+                'name'        => $row['heading'],
+                'action'      => 'updated the wiki',
+            ];
         }
 
         return $wiki;
@@ -441,7 +450,8 @@ class Feed {
      * @param  $limit
      * @return
      */
-    public function getBlog($folderId, $limit) {
+    public function getBlog($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -459,22 +469,22 @@ class Feed {
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-            $blog[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-blog',
-                'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) .' updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
-                    $row['heading']
-                ) . '</a>',
+            $blog[] = [
+                'date'        => $row['submitted'],
+                'type'        => 'icon-blog',
+                'message'     => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
+                        $row['heading']
+                    ) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => '/blog/' . $row['blogID'],
-                'name'    => $row['heading'],
-                'action'  => 'updated the blog',
-            );
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
+                'user_id'     => $row['uid'],
+                'link'        => '/blog/' . $row['blogID'],
+                'name'        => $row['heading'],
+                'action'      => 'updated the blog',
+            ];
         }
 
         return $blog;
@@ -488,7 +498,8 @@ class Feed {
      * @param  $limit
      * @return
      */
-    public function getBlogComments($folderId, $limit) {
+    public function getBlogComments($folderId, $limit)
+    {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -507,22 +518,22 @@ class Feed {
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-            $blogComments[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-blog',
-                'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
+            $blogComments[] = [
+                'date'        => $row['submitted'],
+                'type'        => 'icon-blog',
+                'message'     => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
-                    $row['heading']
-                ) . '</a>',
+                        $row['heading']
+                    ) . '</a>',
                 'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => '/blog/' . $row['blogID'],
-                'name'    => $row['heading'],
-                'action'  => 'commented on the blog',
-            );
+                'user_name'   => $userHandler->formatName($row),
+                'cat_name'    => $row['cat_name'],
+                'cat_id'      => $row['cat_id'],
+                'user_id'     => $row['uid'],
+                'link'        => '/blog/' . $row['blogID'],
+                'name'        => $row['heading'],
+                'action'      => 'commented on the blog',
+            ];
         }
 
         return $blogComments;
@@ -538,7 +549,8 @@ class Feed {
 
     // TODO: text box updates
 
-    function timecmp($a, $b) {
+    private function timecmp($a, $b)
+    {
         //just a quick function to enable sorting of news based on time
         if ($a['date'] == $b['date']) {
             return 0;
@@ -561,5 +573,3 @@ class Feed {
             : $userHandler->formatName($row);
     }
 }
-
-?>

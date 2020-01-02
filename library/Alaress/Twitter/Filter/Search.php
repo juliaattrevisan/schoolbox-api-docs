@@ -1,32 +1,32 @@
 <?php
+
 /**
  * Alaress_Twitter_Filter_Search
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
-class Alaress_Twitter_Filter_Search implements Alaress_Twitter_Filter_Interface {
-	private $dateFormat = 'F jS Y, H:i';
+class Alaress_Twitter_Filter_Search implements Alaress_Twitter_Filter_Interface
+{
+    /**
+     * @var string
+     */
+    private $dateFormat = 'F jS Y, H:i';
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
-
-	/**
-	 * Replacements to perform on each tweet
-	 *
-	 * @param  $text
-	 * @return mixed|string
-	 */
-	public function filterText($text) {
+    /**
+     * Replacements to perform on each tweet
+     *
+     * @param  $text
+     * @return mixed|string
+     */
+    public function filterText($text)
+    {
 
         /* Set up regular expressions
         */
-        $pattern = array();
-        $replace = array();
+        $pattern = [];
+        $replace = [];
 
         /* External urls in tweets
          */
@@ -43,48 +43,17 @@ class Alaress_Twitter_Filter_Search implements Alaress_Twitter_Filter_Interface 
         $pattern[] = '/(^|\s)#([a-zA-Z0-9-_\.]+)/s';
         $replace[] = '\1<a href="http://twitter.com/search?q=%23\2&src=hash&tweet_mode=extended">#\2</a>';
 
-        $finalText = preg_replace($pattern, $replace, $text);
+        return preg_replace($pattern, $replace, $text);
+    }
 
-		return $finalText;
-	}
-
-	/**
-	 * Change the date format of the tweet's publication date
-	 *
-	 * @param  $date
-	 * @return string
-	 */
-	public function filterDate($date) {
-		return gmdate($this->getDateFormat(), strtotime($date));
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Find out what date format to use for tweet dates
-	 *
-	 * @return string
-	 */
-	private function getDateFormat() {
-		return $this->dateFormat;
-	}
-
-	/**
-	 * Set keyword to search for
-	 *
-	 * @param $keyword
-	 */
-	private function setKeyword($keyword) {
-		$this->keyword = $keyword;
-	}
-
-	/**
-	 * Get keyword to search for
-	 *
-	 * @return string
-	 */
-	private function getKeyword() {
-		return $this->keyword;
-	}
+    /**
+     * Change the date format of the tweet's publication date
+     *
+     * @param  $date
+     * @return string
+     */
+    public function filterDate($date)
+    {
+        return gmdate($this->dateFormat, strtotime($date));
+    }
 }

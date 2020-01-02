@@ -13,6 +13,10 @@ use Database;
 
 class Blog
 {
+    /**
+     * @var Database
+     */
+    private $database;
 
     /**
      * Constructor - sets up database

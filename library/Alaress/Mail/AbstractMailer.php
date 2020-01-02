@@ -31,9 +31,9 @@ abstract class AbstractMailer implements IMailer
     // These two const are just a key for an array structure that will separate valid and invalid email addresses
     // As of the moment, these keys are being used here and in createMail.php::45 only
     public const KEY_INVALID = 'invalid';
-    public const KEY_VALID = 'valid';
+    public const KEY_VALID   = 'valid';
 
-    private const MAX_RETRIES = 4;
+    private const MAX_RETRIES   = 4;
     private const RETRY_TIMEOUT = 1;
 
     public const EMAIL_SEPARATOR_CODE = 0x1E;
@@ -63,7 +63,6 @@ abstract class AbstractMailer implements IMailer
 
     /** @var LoggerInterface */
     protected $log;
-
 
     /**
      * Construct the basics of a new Mailer
@@ -107,15 +106,15 @@ abstract class AbstractMailer implements IMailer
             if ($to['email']) {
                 //Assume one dimensional array
                 $this->email->addTo($to['email'], $to['name'] ?? null);
-            } else if ($to['name']) {
-                //Name only, can't send email
-                throw new Swift_RfcComplianceException("No email address supplied.");
-            }
-            else {
-                //Assume two dimensional array
-                $this->to = '';
-                foreach ($to as $email) {
-                    $this->email->addTo($email['email'], $email['name'] ?? null);
+            } else {
+                if ($to['name']) {
+                    //Name only, can't send email
+                    throw new Swift_RfcComplianceException("No email address supplied.");
+                } else {
+                    //Assume two dimensional array
+                    foreach ($to as $email) {
+                        $this->email->addTo($email['email'], $email['name'] ?? null);
+                    }
                 }
             }
         } else {
@@ -145,7 +144,7 @@ abstract class AbstractMailer implements IMailer
      * Set the reply-to header
      *
      * @param string|array $email
-     * @param string $name
+     * @param string       $name
      */
     public function setReplyTo($email, string $name = '')
     {
@@ -289,7 +288,7 @@ abstract class AbstractMailer implements IMailer
             // this means "mail server went away"
             $errMsg = sprintf('Internal Mailing %s occurred (%d %s): %s', \get_class($e), $retries, $retriesMsg, $e->getMessage());
 
-            $this->log->error($errMsg, ['exception'=>$e]);
+            $this->log->error($errMsg, ['exception' => $e]);
 
             if ($retries <= 0) {
                 throw $e;
@@ -361,7 +360,7 @@ abstract class AbstractMailer implements IMailer
     public static function parseAddressString(string $emailAddresses): array
     {
         $return_list = [
-            self::KEY_VALID => [],
+            self::KEY_VALID   => [],
             self::KEY_INVALID => [],
         ];
 
@@ -371,8 +370,8 @@ abstract class AbstractMailer implements IMailer
         $address_list = self::parseAddressList($emailAddresses);
 
         foreach ($address_list[self::KEY_VALID] as $address) {
-            $to = $address->mailbox . '@' . $address->host;
-            $alias = property_exists($address, 'personal') ? $address->personal : null;
+            $to                                = $address->mailbox . '@' . $address->host;
+            $alias                             = property_exists($address, 'personal') ? $address->personal : null;
             $return_list[self::KEY_VALID][$to] = $alias;
         }
 
@@ -390,7 +389,7 @@ abstract class AbstractMailer implements IMailer
      */
     public static function buildAddress($address, $name = '')
     {
-        list($mailbox, $host) = explode('@', $address, 2);
+        [$mailbox, $host] = explode('@', $address, 2);
 
         return imap_rfc822_write_address($mailbox, $host, $name);
     }
@@ -435,7 +434,7 @@ abstract class AbstractMailer implements IMailer
         }
 
         return [
-            self::KEY_VALID => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID]) : [],
+            self::KEY_VALID   => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID]) : [],
             self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],
         ];
     }
@@ -503,7 +502,7 @@ abstract class AbstractMailer implements IMailer
      * Implode glue to join email addresses array
      * @return string
      */
-    public static function implodeGlue() :string
+    public static function implodeGlue(): string
     {
         return \chr(self::EMAIL_SEPARATOR_CODE);
     }

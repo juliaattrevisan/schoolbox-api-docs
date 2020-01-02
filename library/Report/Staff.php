@@ -36,7 +36,7 @@ class Report_Staff extends Report_Abstract
      *
      * @return bool
      */
-    protected function checkPermissions()
+    protected function checkPermissions(): bool
     {
         if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff() || $this->getGroupHandler()->isParent()) {
             return true;
@@ -95,7 +95,7 @@ class Report_Staff extends Report_Abstract
     /**
      * Render data
      */
-    public function render()
+    public function render(): void
     {
         // Agglutinate multiple JobPositionDescription
         $allStaff = array_reduce(

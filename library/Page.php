@@ -5,6 +5,16 @@ require_once(WEB_root . '/include/stdfuncs.php');
 class Page
 {
 
+    /**
+     * @var string
+     */
+    protected $templateRoot;
+
+    /**
+     * @var Template
+     */
+    public $template;
+
     public function __construct($error = false)
     {
         $this->templateRoot = Config::get('template_dir');
@@ -13,8 +23,6 @@ class Page
 
     public function loadContent($pageFile, $execute = true)
     {
-        $this->pageName = $pageFile;
-
         //max dir depth is 2 so anything after that must be arguments being passed to the script
         if (!preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile)) {
             $this->pageNotFound();
@@ -52,11 +60,6 @@ class Page
     public function setVar($var, $value = '')
     {
         $this->template->setVar($var, $value);
-    }
-
-    public function setUnknowns($unknowns)
-    {
-        $this->template->setUnknowns($unknowns);
     }
 
     public function setBlock($parent, $handle, $name = '')

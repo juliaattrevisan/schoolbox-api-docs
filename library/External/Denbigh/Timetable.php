@@ -32,6 +32,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     private $userMapper;
 
     /** @var array|bool[] $userCache */
+    private $userCache = [];
+
+    /** @var array|bool[] $userStaffCache */
     private $userStaffCache = [];
 
     /**

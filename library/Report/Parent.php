@@ -130,7 +130,7 @@ class Report_Parent extends Report_Abstract
      *
      * @return bool
      */
-    protected function checkPermissions()
+    protected function checkPermissions(): bool
     {
         if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
             return true;
@@ -342,7 +342,7 @@ class Report_Parent extends Report_Abstract
     /**
      * Render data
      */
-    public function render()
+    public function render(): void
     {
         $allContacts = $this->getAllRecords();
 

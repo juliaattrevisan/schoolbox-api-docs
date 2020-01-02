@@ -13,6 +13,10 @@ use Database;
 
 class Poll
 {
+    /**
+     * @var Database
+     */
+    private $database;
 
     /**
      * Constructor - sets up database

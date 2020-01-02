@@ -150,6 +150,6 @@ if (isset($options['user']) || isset($options['enrolment'])) {
         $cache = $kernel->get('subscriptionCache');
         $cache->cacheAllUsers(INSTANCE_ID);
     } catch (\RuntimeException|\Aura\Di\Exception $e) {
-        $userMapper->log($e->getMessage(), [ 'exception'=>$e ]);
+        $logger->error($e->getMessage(), [ 'exception'=>$e ]);
     }
 }

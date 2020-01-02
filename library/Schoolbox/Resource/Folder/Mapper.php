@@ -1815,8 +1815,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         foreach ($folderMapper->findParents($parentFolder) as $ancestor) {
             if ($ancestor->getId() == $movedFolder->getId()) {
-                /** @var SchoolboxException $e */
-                throw $errorMapper->generateException(ErrorMapper::ERROR_DATABASE, $e);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_DATABASE);
             }
         }
 

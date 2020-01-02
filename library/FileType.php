@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FileType
  *
@@ -6,143 +7,105 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class FileType extends DeprecatedModel {
-	public $_table = 'allowedFileTypes';
-	public $_index = 'fileTypeId';
+class FileType extends DeprecatedModel
+{
+    public $_table = 'allowedFileTypes';
+    public $_index = 'fileTypeId';
 
-	/**
-	 * Constructor
-	 *
-	 * @param $path
-	 * @param null $mime
-	 */
-	public function __construct($path, $mime = null) {
-		$this->setPath($path);
-		$this->setMime($mime);
 
-		parent::__construct();
-	}
+    /**
+     * Filename
+     * @var string
+     */
+    private $path;
 
-	/**
-	 * Determine the file extension for a given filename/path
-	 * without dot
-	 *
-	 * @return string
-	 */
-	public function getExtension() {
-		return strtolower(substr(strrchr($this->getPath(), '.'), 1));
-	}
 
-	/**
-	 * Determine if $path has an valid image extension
-	 *
-	 * @return bool
-	 */
-	public function isImageExtension() {
-		if (in_array($this->getExtension(), array('jpg', 'jpeg', 'gif', 'png'))) {
-			return true;
-		}
+    /**
+     * This is used to determine whether a file is audio or video
+     * based, and should be extended if necessary
+     *
+     * @var string|null
+     */
+    private $mime;
 
-		return false;
-	}
 
-	/**
-	 * Determine if a file is audio
-	 *
-	 * @return bool
-	 */
-	public function isAudio() {
-		if (strstr($this->getMime(), 'audio')) {
-			return true;
-		}
+    /**
+     * Constructor
+     *
+     * @param      $path
+     * @param null $mime
+     */
+    public function __construct($path, $mime = null)
+    {
+        $this->path = $path;
+        $this->mime = $mime;
 
-		return false;
-	}
+        parent::__construct();
+    }
 
-	/**
-	 * Determine if a file is video
-	 *
-	 * @return bool
-	 */
-	public function isVideo() {
-		if (strstr($this->getMime(), 'video')) {
-			return true;
-		}
 
-		return false;
-	}
+    /**
+     * Determine the file extension for a given filename/path
+     * without dot
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return strtolower(substr(strrchr($this->path, '.'), 1));
+    }
 
-	/**
-	 * Determine if a file is an image
-	 *
-	 * @return bool
-	 */
-	public function isImage() {
-		if (strstr($this->getMime(), 'image')) {
-			return true;
-		}
 
-		return false;
-	}
+    /**
+     * Determine if a file is audio
+     *
+     * @return bool
+     */
+    public function isAudio()
+    {
+        return strpos($this->mime, 'audio') !== false;
+    }
 
-	/**
-	 * Find out what the iconFile for a particular mime type is
-	 *
-	 * @param $mimeType
-	 * @return mixed
-	 */
-	public function getIconFile($mimeType) {
-		$query = "
-			SELECT iconFile
-			FROM {$this->_table}
-			WHERE mime = '{$mimeType}'
-			LIMIT 1
-		";
 
-		$mimeType = $this->db->getRow($query);
+    /**
+     * Determine if a file is video
+     *
+     * @return bool
+     */
+    public function isVideo()
+    {
+        return strpos($this->mime, 'video') !== false;
+    }
 
-		return $mimeType['iconFile'];
-	}
 
-	/* Getters/Setters
-	 */
+    /**
+     * Determine if a file is an image
+     *
+     * @return bool
+     */
+    public function isImage()
+    {
+        return strpos($this->mime, 'image') !== false;
+    }
 
-	/**
-	 * Set path
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setPath($val) {
-		$this->path = $val;
-	}
 
-	/**
-	 * Get path
-	 *
-	 * @return null
-	 */
-	private function getPath() {
-		return $this->path;
-	}
+    /**
+     * Find out what the iconFile for a particular mime type is
+     *
+     * @param $mimeType
+     * @return mixed
+     */
+    public function getIconFile($mimeType)
+    {
+        $query = "
+            SELECT iconFile
+            FROM {$this->_table}
+            WHERE mime = '{$mimeType}'
+            LIMIT 1
+        ";
 
-	/**
-	 * Set mime. This is used to determine whether a file is audio or video
-	 * based, and should be extended if necessary
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setMime($val) {
-		$this->mime = $val;
-	}
+        $mimeType = $this->db->getRow($query);
 
-	/**
-	 * Get mime
-	 *
-	 * @return null
-	 */
-	private function getMime() {
-		return $this->mime;
-	}
+        return $mimeType['iconFile'];
+    }
 }

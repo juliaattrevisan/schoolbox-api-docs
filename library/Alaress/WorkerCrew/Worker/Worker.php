@@ -8,9 +8,7 @@
 
 namespace Alaress\WorkerCrew\Worker;
 
-
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Exception;
 use Psr\Log\LoggerInterface;
 use RangeException;
 
@@ -38,6 +36,11 @@ class Worker extends PipeWriter
     /** @var Task */
     protected $task;
 
+    /**
+     * @var DispatchStrategyInterface
+     */
+    private $strat;
+
 
     /**
      * @param string                    $cmd
@@ -45,7 +48,7 @@ class Worker extends PipeWriter
      * @param array                     $pipes
      * @param DispatchStrategyInterface $strat
      */
-    function __construct($cmd, $pp, $pipes, $strat)
+    public function __construct($cmd, $pp, $pipes, $strat)
     {
         parent::__construct($strat, null, $pipes[0]);
         $this->cmd    = $cmd;
@@ -60,7 +63,7 @@ class Worker extends PipeWriter
     /**
      * Ensure we clean up after ourselves
      */
-    function __destruct()
+    public function __destruct()
     {
         // if the process has already terminated, these closures won't do anything (so suppress warnings)
         foreach ($this->pipes as &$p) {
@@ -120,7 +123,7 @@ class Worker extends PipeWriter
 
     /**
      * @param int $status
-     * @return self
+     * @return int
      */
     public function setStatus($status)
     {
@@ -246,4 +249,4 @@ class Worker extends PipeWriter
         return $this;
     }
 
-} 
+}
