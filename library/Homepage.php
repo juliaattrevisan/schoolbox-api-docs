@@ -198,8 +198,6 @@ class Homepage
             WHERE id = $templateID
         ";
 
-        $x[] = [$sql];
-
         // retrieve template data
         $tpl = $this->db->getRow($sql);
 
