@@ -11,10 +11,13 @@ namespace Schoolbox;
 use JsonSerializable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
+class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Sequential
 {
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
     use ModelTrait\CreateCollection;
+    use ModelTrait\HasSequence;
 
     /** @var int */
     private $id;
@@ -35,6 +38,11 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
      * @var string
      */
     protected $digestSchedule;
+
+    /**
+     * @var int
+     */
+    private $updatedBy;
 
     /**
      * Role Types
@@ -217,6 +225,24 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
         return $this->digestSchedule;
     }
 
+
+    /**
+     * @param int $updatedBy
+     * @return self
+     */
+    public function setUpdatedBy(int $updatedBy): Role
+    {
+        $this->updatedBy = $updatedBy;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedBy(): int
+    {
+        return $this->updatedBy;
+    }
 
     /**
      * @return array
