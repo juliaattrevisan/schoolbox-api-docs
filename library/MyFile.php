@@ -9,10 +9,12 @@ use Schoolbox\Notif\Notifactory;
  */
 class MyFile extends DeprecatedModel
 {
+
     /**
      * @var int
      */
     private $owner;
+
 
     /**
      * MyFile constructor.
@@ -34,6 +36,7 @@ class MyFile extends DeprecatedModel
         parent::__construct();
     }
 
+
     /**
      * @deprecated
      *
@@ -41,7 +44,7 @@ class MyFile extends DeprecatedModel
      * @param bool $config
      * @return array|bool
      */
-    function getAllInFolder($folderID, $config = false)
+    public function getAllInFolder($folderID, $config = false)
     {
         $query = "
             SELECT f.*, f.submitted, af.iconFile FROM " . $this->_table . " f
@@ -82,13 +85,14 @@ class MyFile extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
+
     /**
      * @deprecated
      *
      * @param $fileID
      * @param $action
      */
-    function logAction($fileID, $action)
+    public function logAction($fileID, $action)
     {
         $logEntry = [
             'object'   => 'myfile',
@@ -101,13 +105,14 @@ class MyFile extends DeprecatedModel
         $notif->info("CRUD", $logEntry);
     }
 
+
     /**
      * @deprecated
      *
      * @param $fileID
      * @return bool
      */
-    function delete($fileID)
+    public function delete($fileID)
     {
         $this->logAction($fileID, "delete");
         return parent::update([
@@ -116,12 +121,13 @@ class MyFile extends DeprecatedModel
         ]);
     }
 
+
     /**
      * @deprecated
      *
      * @param $parentID
      */
-    function deleteByParent($parentID)
+    public function deleteByParent($parentID)
     {
         $fileList = $this->getAllInFolder($parentID);
         if (is_array($fileList)) {
