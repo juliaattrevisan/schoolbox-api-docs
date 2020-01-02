@@ -6,13 +6,44 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link		https://schoolbox.com.au/
  */
-abstract class Report_Abstract {
-    protected $page = null;
-    protected $yearLevel = null;
-    protected $groupHandler = null;
-    protected $externalUserHandler = null;
-    protected $userHandler = null;
+abstract class Report_Abstract
+{
+
+    /**
+     * @var null
+     */
+    protected $page;
+
+
+    /**
+     * @var null
+     */
+    protected $yearLevel;
+
+
+    /**
+     * @var null
+     */
+    protected $groupHandler;
+
+
+    /**
+     * @var null
+     */
+    protected $externalUserHandler;
+
+
+    /**
+     * @var null
+     */
+    protected $userHandler;
+
+
+    /**
+     * @var array
+     */
     protected $allRecords = [];
+
 
     /**
      * Set up blocks and stuff
@@ -20,6 +51,7 @@ abstract class Report_Abstract {
      * @abstract
      */
     abstract protected function setup();
+
 
     /**
      * Check permissions. By default only parents and superusers can view this page
@@ -30,12 +62,14 @@ abstract class Report_Abstract {
         return $this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
     }
 
+
     /**
      * Render dat
      *
      * @abstract
      */
     abstract public function render(): void;
+
 
     /* Getters/Setters
      */

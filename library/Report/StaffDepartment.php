@@ -3,7 +3,7 @@
 use Schoolbox\UserMapper;
 
 /**
- * Report_Staff_Department
+ * Report_StaffDepartment
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -83,7 +83,7 @@ class Report_StaffDepartment extends Report_Abstract
 
         if (!array_key_exists($staffId, $mergedRecords)) {
             $mergedRecords[$staffId] = $record;
-            $mergedRecords[$staffId]['JobPositionDescription'] = array();
+            $mergedRecords[$staffId]['JobPositionDescription'] = [];
         }
 
         $mergedRecords[$staffId]['JobPositionDescription'][] = $record['JobPositionDescription'];
@@ -120,7 +120,7 @@ class Report_StaffDepartment extends Report_Abstract
                 }
             }
 
-            $sort = array();
+            $sort = [];
 
             foreach ($allStaff as $k=>$v) {
                 $sort['StaffDepartment'][$k] = $v['StaffDepartment'];
@@ -199,6 +199,3 @@ class Report_StaffDepartment extends Report_Abstract
         // can be implemented if export required.
     }
 }
-
-
-
