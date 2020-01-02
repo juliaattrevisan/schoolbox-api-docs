@@ -8,7 +8,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     private $group;
 
-    function __construct()
+
+    /**
+     * Chat constructor.
+     */
+    public function __construct()
     {
         $this->_table = 'chat';
         $this->_index = 'id';
@@ -18,7 +22,15 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         parent::__construct();
     }
 
-    /* Get logs */
+
+    /**
+     * Get logs
+     *
+     * @param      $category_id
+     * @param null $last_poll
+     * @param int  $not_user_id
+     * @return array|bool
+     */
     public function get_logs($category_id, $last_poll = null, $not_user_id = 0)
     {
         $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, c.*
@@ -61,6 +73,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $logs;
     }
 
+
     /**
      * Create a log entry which remembers what people typed.
      *
@@ -69,6 +82,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param        $body
      * @param string $type
      * @return int
+     * @throws InvalidArgumentException
      */
     public function create_log($category_id, $user_id, $body, $type = 'user')
     {
@@ -83,6 +97,12 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         ]);
     }
 
+
+    /**
+     * @param $category_id
+     * @param $user_id
+     * @return bool|PDOStatement
+     */
     public function update_poll($category_id, $user_id)
     {
         if (!is_numeric($user_id)) {
@@ -99,6 +119,11 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $this->db->query($query);
     }
 
+
+    /**
+     * @param $category_id
+     * @return array|bool
+     */
     public function get_users($category_id)
     {
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
@@ -122,6 +147,12 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $users;
     }
 
+
+    /**
+     * @param $category_id
+     * @return PDOStatement
+     * @throws Exception
+     */
     public function prune_users($category_id)
     {
         $time = new DateTime('-9 seconds');
@@ -132,6 +163,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         return $this->db->query($query);
     }
+
 
     /**
      * Removes content
@@ -152,6 +184,12 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $this->db->query($query);
     }
 
+
+    /**
+     * @param $categoryID
+     * @return array|null
+     * @throws InvalidArgumentException
+     */
     public function getOccupiedDateList($categoryID)
     {
         $memberships = $this->group->getAllUserAccess($_SESSION['id']);
@@ -197,6 +235,15 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $occupiedDates;
     }
 
+
+    /**
+     * @param     $categoryID
+     * @param int $year
+     * @param int $month
+     * @param int $index
+     * @param int $limit
+     * @return array|bool
+     */
     public function getChatListing($categoryID, $year = 0, $month = 0, $index = 0, $limit = 0)
     {
         $yearFilter  = $year != 0 ? " AND YEAR(time) = $year " : '';
