@@ -4,20 +4,31 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Fixtures\Component\Dashboard;
 
 use Alaress\Database\Connector\Base;
 use Alaress\Session\Session;
+use Aura\Di\Exception\ServiceNotFound;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
+use RuntimeException;
 use Schoolbox\Collection;
 use Schoolbox\Fixtures\Component\ComponentDelegate;
 use Schoolbox\User;
 use SitePage;
+use Twig_Error_Loader;
+use Twig_Error_Runtime;
+use Twig_Error_Syntax;
+use UnexpectedValueException;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Fixtures\Component\Dashboard
+ */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
+
     /**
      * @var ComponentDelegate
      */
@@ -28,8 +39,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * Injectable constructor
      *
      * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param User               $user
+     * @param SitePage           $sitepage
+     * @throws ServiceNotFound
+     * @throws RuntimeException
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
@@ -37,20 +50,30 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         /** @var Base $databaseInternal */
         $databaseInternal = $sitepage->getDi()->get('databaseInternal');
-        $this->setDelegate(new ComponentDelegate($databaseInternal));
+        $this->delegate =new ComponentDelegate($databaseInternal);
     }
+
 
     /**
      * @return bool Whether to continue on and attempt Component render
+     * @throws ServiceNotFound
+     * @throws RuntimeException
      */
     public function execute()
     {
         return $this->getSitePage()->getDi()->get('config')->get('fixtures_enabled') == '1';
     }
 
+
     /**
      * @param String $templateHandle
      * @return bool
+     * @throws ServiceNotFound
+     * @throws RuntimeException
+     * @throws Twig_Error_Loader
+     * @throws Twig_Error_Runtime
+     * @throws Twig_Error_Syntax
+     * @throws UnexpectedValueException
      */
     public function renderTemplate($templateHandle)
     {
@@ -67,9 +90,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
             foreach ($children as $child) {
                 $userIds[] = $child['id'];
             }
-            $matches = $matches->mergeUnique($this->getDelegate()->getMatchesForUsers($userIds, $getHistorical),'id');
+            $matches = $matches->mergeUnique($this->delegate->getMatchesForUsers($userIds, $getHistorical),'id');
         } else {
-            $matches = $this->getDelegate()->getMatchesForUsers([$this->getUser()->getId()], $getHistorical);
+            $matches = $this->delegate->getMatchesForUsers([$this->getUser()->getId()], $getHistorical);
         }
 
         if (0 == count($matches)) {
@@ -87,27 +110,4 @@ class Controller extends Component_Dashboard_ControllerAbstract
             ]
         );
     }
-
-    /*
-     * Getters / Setters
-     */
-
-    /**
-     * @return ComponentDelegate
-     */
-    protected function getDelegate()
-    {
-        return $this->delegate;
-    }
-
-    /**
-     * @param ComponentDelegate $delegate
-     * @return static
-     */
-    protected function setDelegate(ComponentDelegate $delegate)
-    {
-        $this->delegate = $delegate;
-        return $this;
-    }
-
 }
