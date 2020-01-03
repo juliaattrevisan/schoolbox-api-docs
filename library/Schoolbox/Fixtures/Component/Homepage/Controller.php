@@ -122,7 +122,11 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         // Grab data for the team we are viewing
 
-        $this->matches = $this->delegate->getTeamMatches($this->getConfig('team'), $this->getConfig('showHistorical'));
+        $this->matches = $this->delegate->getTeamMatches(
+            $this->getConfig('team'),
+            $this->getConfig('showHistorical'),
+            $this->getConfig('days')
+        );
 
         return true;
     }

@@ -24,6 +24,7 @@ use \Schoolbox\Fixtures\Result\Model as Result;
 use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
 use Alaress\Database\Predicate\Builder;
+use UnexpectedValueException;
 
 class ComponentDelegate
 {
@@ -96,17 +97,17 @@ class ComponentDelegate
             FROM                sportsfixtures_match
             LEFT JOIN           sportsfixtures_team_participantcoach ON
                                 sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id AND
-                                sportsfixtures_team_participantcoach.user_id IN {$placeholders} AND 
+                                sportsfixtures_team_participantcoach.user_id IN {$placeholders} AND
                                 sportsfixtures_team_participantcoach.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team_participantuser ON
                                 sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id AND
-                                sportsfixtures_team_participantuser.user_id IN {$placeholders} AND 
+                                sportsfixtures_team_participantuser.user_id IN {$placeholders} AND
                                 sportsfixtures_team_participantuser.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team awayTeam ON
-                                sportsfixtures_match.away_team_id = awayTeam.id AND 
+                                sportsfixtures_match.away_team_id = awayTeam.id AND
                                 awayTeam.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team homeTeam ON
-                                sportsfixtures_match.home_team_id = homeTeam.id AND 
+                                sportsfixtures_match.home_team_id = homeTeam.id AND
                                 homeTeam.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team_coach ON
                                 (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id)
@@ -138,9 +139,11 @@ class ComponentDelegate
     /**
      * @param int  $teamId
      * @param bool $includeHistorical Whether to also return matches that have been played
+     * @param int  $days
      * @return Collection|Match[]
+     * @throws UnexpectedValueException
      */
-    public function getTeamMatches($teamId, $includeHistorical)
+    public function getTeamMatches(int $teamId, bool $includeHistorical, int $days)
     {
         /** @var Collection|Match[] $matches */
         $matches = new Collection();
