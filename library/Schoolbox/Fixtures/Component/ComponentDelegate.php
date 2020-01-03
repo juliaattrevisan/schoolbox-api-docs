@@ -158,14 +158,14 @@ class ComponentDelegate
 
             // Load all home and away matches for the team
 
-            $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
-            $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
+            $homeMatches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
+            $awayMatches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
-            /** @var Collection|Match[] $all_matches */
-            $all_matches = $home_matches->mergeUnique($away_matches, 'id');
+            /** @var Collection|Match[] $allMatches */
+            $allMatches = $homeMatches->mergeUnique($awayMatches, 'id');
 
             // Filter matches
-            foreach ($all_matches as $match) {
+            foreach ($allMatches as $match) {
                 $matchDay = clone $match->getStartAt();
                 $matchDay->endOfDay();
 
