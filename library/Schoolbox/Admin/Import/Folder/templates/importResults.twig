@@ -16,11 +16,11 @@
     <div class="large-12 columns">
         {% if not perform %}
             <div data-alert="" class="alert-box warning">
-                Dry run results. Repeat with 'Live Run' checkbox checked to persist changes.
+                This is a preview only. Repeat with 'Apply Changes' enabled to persist changes.
             </div>
         {% else %}
             <div data-alert="" class="alert-box success">
-                Live run results. Changes have been persisted to database..
+                The import was successfully completed.
             </div>
         {% endif %}
     </div>
@@ -58,6 +58,6 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ routeLookupIfAuthorized('adminImportFolder.getIndex') }}" class="button icon-previous">Back to folders</a>
+        <a href="{{ routeLookupIfAuthorized('adminImportFolder.getIndex') }}" class="button icon-previous">Return to Folder Import</a>
     </div>
 </div>
