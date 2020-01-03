@@ -680,10 +680,7 @@ class HtmlTemplate
      */
     function isError($val)
     {
-        if ($val === false) {
-            return true;
-        }
-        return false;
+        return $val === false;
     }
 
     // Deprecated Functions
