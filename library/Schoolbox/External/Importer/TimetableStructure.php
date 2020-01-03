@@ -295,7 +295,6 @@ class TimetableStructure extends AbstractImporter
                             'Period "%s" for day %d has sequence %d',
                             $period->getTitle(),
                             $period->getDay(),
-                            $day,
                             $i
                         )
                     );
