@@ -188,18 +188,16 @@ class Controller extends Base
             $calendarDate = new DateTime('now');
         }
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceItem/read.twig',
-                'data'     => array(
-                    'item'        => $item,
-                    'currentTerm' => $this->getTermMapper()->findForToday(),
-                    'calendar'    => array(
-                                        'date' => $calendarDate->format('Y-m-d'),
-                                        'view' => $this->request->query['view'] ?: 'week',
-                                    ),
-                    'token'      => $_SESSION['key']
-                ),
-            )
+                'data'     => [
+                    'item'         => $item,
+                    'currentTerm'  => $this->getTermMapper()->findForToday(),
+                    'selectedDate' => $calendarDate->format('Y-m-d'),
+                    'calendarView' => $this->request->query['view'] === 'day' ? 'timeGridDay' : '',
+                    'token'        => $_SESSION['key'],
+                ],
+            ]
         );
     }
 
