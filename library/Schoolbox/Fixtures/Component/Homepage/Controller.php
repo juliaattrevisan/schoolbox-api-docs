@@ -85,7 +85,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         /** @var Base $databaseInternal */
         $databaseInternal = $sitepage->getDi()->get('databaseInternal');
-        $this->setDelegate(new ComponentDelegate($databaseInternal));
+        $this->delegate = new ComponentDelegate($databaseInternal);
     }
 
 
@@ -152,28 +152,5 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'team'                => $this->getConfig('team')
             ]
         );
-    }
-
-
-    /*
-     * Getters / Setters
-     */
-
-    /**
-     * @return ComponentDelegate
-     */
-    protected function getDelegate()
-    {
-        return $this->delegate;
-    }
-
-    /**
-     * @param ComponentDelegate $delegate
-     * @return static
-     */
-    protected function setDelegate(ComponentDelegate $delegate)
-    {
-        $this->delegate = $delegate;
-        return $this;
     }
 }
