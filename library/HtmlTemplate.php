@@ -680,17 +680,7 @@ class HtmlTemplate
      */
     function isError($val)
     {
-        if ($val === false) {
-            return true;
-        } else {
-            if ($this->haltOnError == 'return' && is_object($val)) {
-                /** @noinspection PhpIncludeInspection */
-                require_once 'PEAR.php';
-                /** @noinspection PhpUndefinedClassInspection */
-                return PEAR::isError($val);
-            }
-        }
-        return false;
+        return $val === false;
     }
 
     // Deprecated Functions
