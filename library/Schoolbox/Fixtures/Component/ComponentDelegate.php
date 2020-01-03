@@ -14,6 +14,7 @@
 namespace Schoolbox\Fixtures\Component;
 
 use Alaress\Database\Connector\Base;
+use Alaress\Database\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
@@ -82,12 +83,13 @@ class ComponentDelegate
      * @param array $userIds
      * @param bool  $includeHistorical Whether to return matches in the past
      * @return Collection|Match[]
+     * @throws Exception
      */
     public function getMatchesForUsers(array $userIds, $includeHistorical)
     {
         $historical = '';
         if (!$includeHistorical) {
-            $historical = "AND DATE(sportsfixtures_match.start_at) >= DATE(NOW())";
+            $historical = 'AND DATE(sportsfixtures_match.start_at) >= DATE(NOW())';
         }
 
         $placeholders = Builder::getArrayPlaceholders($userIds, 'userId');
@@ -129,6 +131,7 @@ class ComponentDelegate
 
         if ($statement->execute(Builder::getArrayParameters($userIds, 'userId'))) {
             $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
             return $this->sortMatches($this->getMatchMapper()->findByColumn('id', $result));
         }
 
