@@ -48,8 +48,8 @@ HELP;
             exit;
         }
 
-        $this->addToHomepageComponents('Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller');
-        $this->addToDashboardComponents('Schoolbox\\\Fixtures\\\Component\\\Dashboard\\\Controller');
+        $this->addToHomepageComponents('Schoolbox\\Fixtures\\Component\\Homepage\\Controller');
+        $this->addToDashboardComponents('Schoolbox\\Fixtures\\Component\\Dashboard\\Controller');
     }
 
 
