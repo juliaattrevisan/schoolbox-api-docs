@@ -24,6 +24,12 @@ $app = new class extends CliTool\App {
     private const LABEL = 'Days';
     private const DESCRIPTION = null;
 
+    /* Component Controllers
+     */
+    private const HOMEPAGE_CLASS = 'Schoolbox\\Fixtures\\Component\\Homepage\\Controller';
+    private const DASHBOARD_CLASS = 'Schoolbox\\Fixtures\\Component\\Dashboard\\Controller';
+
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -48,8 +54,8 @@ HELP;
             exit;
         }
 
-        $this->addToHomepageComponents('Schoolbox\\Fixtures\\Component\\Homepage\\Controller');
-        $this->addToDashboardComponents('Schoolbox\\Fixtures\\Component\\Dashboard\\Controller');
+        $this->addToHomepageComponents(self::HOMEPAGE_CLASS);
+        $this->addToDashboardComponents(self::DASHBOARD_CLASS);
     }
 
 
