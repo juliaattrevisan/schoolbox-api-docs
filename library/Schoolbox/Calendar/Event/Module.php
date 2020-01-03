@@ -22,7 +22,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Relation\Campus;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\Role;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -141,7 +141,7 @@ class Module extends BaseModule
     {
         try {
             return ['event' => $this->getEventMapper()->findById($params['eventId'])];
-        } catch (Exception $e) {
+        } catch (Mapper\Exception $e) {
             throw new NotFound('Event not found');
         }
     }
