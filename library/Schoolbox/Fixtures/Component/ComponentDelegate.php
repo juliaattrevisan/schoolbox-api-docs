@@ -90,12 +90,14 @@ class ComponentDelegate
     {
         /* Decide the upper threshold determined by $days, if greater than zero
          */
-        $threshold = null;
+        $date = null;
+        $thresholdDate = null;
+        $threshold = '';
 
         if ($days) {
-            $date = \Alaress_Date_Format::now()->addDays($days)->endOfDay()->getDatabase();
+            $thresholdDate = \Alaress_Date_Format::now()->addDays($days)->endOfDay()->getDatabase();
 
-            $threshold = " AND (sportsfixtures_match.start_at) < '{$date}'";
+            $threshold = ' AND (sportsfixtures_match.start_at) < :thresholdDate';
         }
 
         $historical = '';
@@ -142,7 +144,13 @@ class ComponentDelegate
 
         $statement = $this->database->prepareQuery($query);
 
-        if ($statement->execute(Builder::getArrayParameters($userIds, 'userId'))) {
+        $params = Builder::getArrayParameters($userIds, 'userId');
+
+        if (null !== $thresholdDate) {
+            $params = array_merge($params, ['thresholdDate' => $thresholdDate]);
+        }
+
+        if ($statement->execute($params)) {
             $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
             return $this->sortMatches($this->getMatchMapper()->findByColumn('id', $result));
