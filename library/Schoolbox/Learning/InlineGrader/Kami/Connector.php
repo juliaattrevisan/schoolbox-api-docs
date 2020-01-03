@@ -462,14 +462,23 @@ class Connector implements IConnector
      */
     private function decodeResponseContent(StreamInterface $response): stdClass
     {
+        /* Runtime exception can be thrown when there's a problem in getContents()
+         */
         try {
-            return json_decode($response->getContents());
-        } catch (\RuntimeException|\TypeError $e) {
-            throw new Exception\ResponseDecodeException(
-                $e->getMessage(),
-                $e->getCode()
-            );
+            $payload = $response->getContents();
+        } catch (\RuntimeException $e) {
+            throw new Exception\ResponseDecodeException($e->getMessage(), $e->getCode());
         }
+
+        /* $payload can be null if it can't be json_decode()'d
+         */
+        $decodedPayload = json_decode($payload, false);
+
+        if (!is_object($decodedPayload)) {
+            throw new Exception\ResponseDecodeException('Cannot decode kami payload; not json');
+        }
+
+        return $decodedPayload;
     }
 
 
