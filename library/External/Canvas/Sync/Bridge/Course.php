@@ -121,7 +121,7 @@ class Course
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function findUnitSpecFolder(int $courseCanvasId): Folder\Model
+    public function findUnitSpecFolder(int $courseCanvasId): ?Folder\Model
     {
         $canvasCourseFolderPb    = $this->equalsCanvasCourse($courseCanvasId, 'f');
         $canvasCourseFolderWhere = $canvasCourseFolderPb->getWhere()[0];
