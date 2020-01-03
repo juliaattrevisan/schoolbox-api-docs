@@ -154,9 +154,18 @@ class ComponentDelegate
         // Get the team we are looking at
 
         try {
-            $team = $this->getTeamMapper()->findById($teamId);
 
-            // Load all home and away matches for the team
+            /* Decide the upper threshold determined by $days, if greater than zero
+             */
+            $threshold = null;
+
+            if ($days) {
+                $threshold = \Alaress_Date_Format::now()->addDays($days)->endOfDay();
+            }
+
+            /* Load all home and away matches for the team we've configured in the component
+             */
+            $team = $this->getTeamMapper()->findById($teamId);
 
             $homeMatches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
             $awayMatches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
@@ -169,8 +178,23 @@ class ComponentDelegate
                 $matchDay = clone $match->getStartAt();
                 $matchDay->endOfDay();
 
-                if ($includeHistorical || $matchDay->isFuture()) {
+                if ($includeHistorical && $matchDay->isPast()) {
+
+                    /* Include matches previously played
+                     */
                     $matches[$match->getId()] = $match;
+                } elseif ($matchDay->isFuture()) {
+
+                    /* If no threshold was specified, add it to the list
+                     * This shows all future matches
+                     *
+                     * Otherwise,
+                     * Check that the future match day falls within the threshold defined earlier
+                     * If it does, add it to the list
+                     */
+                    if (null === $threshold || $matchDay->lte($threshold)) {
+                        $matches[$match->getId()] = $match;
+                    }
                 }
             }
 
