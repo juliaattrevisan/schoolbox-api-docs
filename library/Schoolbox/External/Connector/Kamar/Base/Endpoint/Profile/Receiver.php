@@ -21,6 +21,14 @@ class Receiver
 {
 
     /**
+     * An identifying string, since the files end up in the cache folder
+     * we should have a way of discriminating these source xmls from
+     * whatever else appears in that folder
+     */
+    private const KAMAR_NAMESPACE = 'kamar';
+
+
+    /**
      * @var string
      */
     private $dir;
@@ -40,7 +48,7 @@ class Receiver
     public function __construct($dir)
     {
         $this->dir = $dir;
-        $this->suffix = date('Ymd').'_'.date('His') . '.xml';
+        $this->suffix = date('Ymd') . '_' . date('His') . '.xml';
     }
 
 
@@ -81,6 +89,7 @@ XML;
     private function process(string $data): void
     {
         $nodes = new SimpleXMLElement($data);
+        $namespace = self::KAMAR_NAMESPACE;
 
         /* Figure out the prefix for this payload's filename
          *
@@ -102,7 +111,7 @@ XML;
          * each push attempt that the school makes while we're figuring out this integration.
          */
         $prefix = (string)$nodes->xpath('/SMSDirectoryData/@sync')[0];
-        $path = "{$this->dir}/{$prefix}_{$this->suffix}";
+        $path = "{$this->dir}/{$namespace}_{$prefix}_{$this->suffix}";
 
         /* TODO: switch ($prefix) case 'full': case 'studenttimetable' et al
          */
