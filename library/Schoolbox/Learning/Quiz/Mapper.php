@@ -33,6 +33,7 @@ use UnexpectedValueException;
 /**
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
@@ -90,6 +91,8 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteAssessment']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteAssessment']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
@@ -292,6 +295,28 @@ class Mapper extends BaseMapper
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->deleteAssessment($object);
+    }
+
+
+    /**
+     * Post-delete callback.
+     *
+     * Delete's this quiz's assessment
+     *
+     * @param Model $object
+     * @return true
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    protected function deleteAssessment(Model $object): bool
+    {
+        $assessment = $object->getAssessmentModel();
+        if (!$assessment->isDeleted()) {
+            /** @var AssessmentMapper $assessmentMapper */
+            $assessmentMapper = $this->getJoinMapper('am');
+            $assessmentMapper->delete($assessment);
+        }
+        return true;
     }
 
 
