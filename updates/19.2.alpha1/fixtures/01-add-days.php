@@ -66,7 +66,7 @@ HELP;
         $componentDefinitionId = (int)$statement->fetchColumn();
 
         if ($componentDefinitionId) {
-            $this->addToComponent($componentDefinitionId);
+            $this->addToComponent($componentDefinitionId, 'days', '0', 'Days', null);
         } else {
             $this->getLogger()->warning("Component definition id didn't exist for homepage component; skipping");
         }
@@ -92,7 +92,7 @@ HELP;
         $componentDefinitionId = (int)$statement->fetchColumn();
 
         if ($componentDefinitionId) {
-            $this->addToComponent($componentDefinitionId);
+            $this->addToComponent($componentDefinitionId, 'days', '0', 'Days', null);
         } else {
             $this->getLogger()->warning("Component definition id didn't exist for dashboard component; skipping");
         }
@@ -102,26 +102,34 @@ HELP;
     /**
      * Assign Days config to every existence of a component using $componentDefinitionId
      *
-     * @param int $componentDefinitionId
+     * @param int         $componentDefinitionId
+     * @param string      $key
+     * @param string      $defaultValue
+     * @param string      $label
+     * @param string|null $description
      */
-    private function addToComponent(int $componentDefinitionId): void
+    private function addToComponent(int $componentDefinitionId, string $key, string $defaultValue, string $label, string $description = null): void
     {
         /* Add a default config into the component config definition list
          */
-        $query = "
+        $query = '
             INSERT INTO component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
             VALUES (
                 :componentDefinitionId,
-                'days',
-                0,
-                'Days',
-                null
+                :key,
+                :defaultValue,
+                :label,
+                :description
             )
-        ";
+        ';
 
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
         $statement->execute([
-            'componentDefinitionId' => $componentDefinitionId
+            'componentDefinitionId' => $componentDefinitionId,
+            'key' => $key,
+            'defaultValue' => $defaultValue,
+            'label' => $label,
+            'description' => $description
         ]);
 
         /* Find every Fixtures component instance
