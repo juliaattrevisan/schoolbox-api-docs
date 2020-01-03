@@ -48,6 +48,58 @@ HELP;
 
 
     /**
+     * Add Days component config to all Homepage Fixtures instances
+     */
+    private function addToHomepageComponents(): void
+    {
+        /* Find the component definition id
+         */
+        $query = "
+            SELECT id
+            FROM component_definition
+            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller'
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepareQuery($query);
+        $statement->execute();
+
+        $componentDefinitionId = (int)$statement->fetchColumn();
+
+        if ($componentDefinitionId) {
+            $this->addToComponent($componentDefinitionId);
+        } else {
+            $this->getLogger()->warning("Component definition id didn't exist for homepage component; skipping");
+        }
+    }
+
+
+    /**
+     * Add Days component config to all Dashboard Fixtures instances
+     */
+    private function addToDashboardComponents(): void
+    {
+        /* Find the component definition id
+         */
+        $query = "
+            SELECT id
+            FROM component_definition
+            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Dashboard\\\Controller'
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepareQuery($query);
+        $statement->execute();
+
+        $componentDefinitionId = (int)$statement->fetchColumn();
+
+        if ($componentDefinitionId) {
+            $this->addToComponent($componentDefinitionId);
+        } else {
+            $this->getLogger()->warning("Component definition id didn't exist for dashboard component; skipping");
+        }
+    }
+
+
+    /**
      * Assign Days config to every existence of a component using $componentDefinitionId
      *
      * @param int $componentDefinitionId
@@ -100,58 +152,16 @@ HELP;
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $componentInstanceId = $row['id'];
 
+            $this->getLogger()->info(sprintf(
+                'Assigning component definition id %s to component instance %s',
+                $componentDefinitionId,
+                $componentInstanceId
+            ));
+
             $insertStatement->execute([
                 'componentDefinitionId' => $componentDefinitionId,
                 'componentInstanceId' => $componentInstanceId
             ]);
-        }
-    }
-
-
-    /**
-     * Add Days component config to all Homepage Fixtures instances
-     */
-    private function addToHomepageComponents(): void
-    {
-        /* Find the component definition id
-         */
-        $query = "
-            SELECT id
-            FROM component_definition
-            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller'
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute();
-
-        $componentDefinitionId = (int)$statement->fetchColumn();
-
-        if ($componentDefinitionId) {
-            $this->addToComponent($componentDefinitionId);
-        }
-    }
-
-
-    /**
-     * Add Days component config to all Dashboard Fixtures instances
-     */
-    private function addToDashboardComponents(): void
-    {
-        /* Find the component definition id
-         */
-        $query = "
-            SELECT id
-            FROM component_definition
-            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Dashboard\\\Controller'
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute();
-
-        $componentDefinitionId = (int)$statement->fetchColumn();
-
-        if ($componentDefinitionId) {
-            $this->addToComponent($componentDefinitionId);
         }
     }
 };
