@@ -113,7 +113,11 @@ XML;
         $prefix = (string)$nodes->xpath('/SMSDirectoryData/@sync')[0];
         $path = "{$this->dir}/{$namespace}_{$prefix}_{$this->suffix}";
 
-        /* TODO: switch ($prefix) case 'full': case 'studenttimetable' et al
+        /* TODO: Remove temporal suffix from $path
+         * We need to keep the timestamped files here while we experiment with kamar
+         *
+         * Once we figure it out, we just need the profile.xml and studenttimetables.xml files
+         * without the datetime in them
          */
 
         /* Write xml file
