@@ -48,26 +48,30 @@ HELP;
             exit;
         }
 
-        $this->addToHomepageComponents();
-        $this->addToDashboardComponents();
+        $this->addToHomepageComponents('Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller');
+        $this->addToDashboardComponents('Schoolbox\\\Fixtures\\\Component\\\Dashboard\\\Controller');
     }
 
 
     /**
      * Add Days component config to all Homepage Fixtures instances
+     *
+     * @param string $class
      */
-    private function addToHomepageComponents(): void
+    private function addToHomepageComponents(string $class): void
     {
         /* Find the component definition id
          */
-        $query = "
+        $query = '
             SELECT id
             FROM component_definition
-            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller'
-        ";
+            WHERE `class` = :class
+        ';
 
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute();
+        $statement->execute([
+            'class' => $class
+        ]);
 
         $componentDefinitionId = (int)$statement->fetchColumn();
 
@@ -81,19 +85,23 @@ HELP;
 
     /**
      * Add Days component config to all Dashboard Fixtures instances
+     *
+     * @param string $class
      */
-    private function addToDashboardComponents(): void
+    private function addToDashboardComponents(string $class): void
     {
         /* Find the component definition id
          */
-        $query = "
+        $query = '
             SELECT id
             FROM component_definition
-            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Dashboard\\\Controller'
-        ";
+            WHERE `class` = :class
+        ';
 
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute();
+        $statement->execute([
+            'class' => $class
+        ]);
 
         $componentDefinitionId = (int)$statement->fetchColumn();
 
