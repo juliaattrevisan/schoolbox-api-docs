@@ -11,7 +11,7 @@ namespace Alaress\Async\Test;
 use Aura\Di;
 use InvalidArgumentException;
 use OutOfBoundsException;
-use PHPUnit_Framework_AssertionFailedError;
+use PHPUnit\Framework\AssertionFailedError;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use ReflectionClass;
@@ -374,7 +374,7 @@ class Framework
     {
         // the sequence here is important - we want to de-register the
         // daemon BEFORE we actually kill it in case it dodges the blow
-        list ($pp, $pipes) = $this->daemonInstances[$name];
+        [$pp, $pipes] = $this->daemonInstances[$name];
         unset ($this->daemonInstances[$name]);
 
         $status = proc_get_status($pp);
@@ -491,7 +491,7 @@ class Framework
                         // attempt to fire this subscription; if the preconditions are not met it won't fire
                         $unhook = $subscription->fire($this->hooks[$testClass][$callbackName]);
 
-                    } catch (PHPUnit_Framework_AssertionFailedError $e) {
+                    } catch (AssertionFailedError $e) {
                         // it failed assertions, but it *did* fire, so we can unhook
                         $unhook = true;
 
