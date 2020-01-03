@@ -1,3 +1,12 @@
+{#
+    item         ResourceBooking\Item\Model
+    search       string                      TODO, investigate this as it appears to never be provided by any current usage
+    token        string
+    selectedDate string|DateTime|DateInterval Passed to twig 'date' filter, see https://twig.symfony.com/doc/3.x/filters/date.html
+    calendarView string
+    currentTerm  Term\Model
+#}
+
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
     <li><a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.category.id|e('url') }}" >{{ item.category.name }}</a></li>
