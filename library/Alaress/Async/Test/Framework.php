@@ -12,7 +12,6 @@ use Aura\Di;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit_Framework_AssertionFailedError;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use ReflectionClass;
