@@ -48,23 +48,12 @@ HELP;
 
 
     /**
-     * Add Days component config to all Homepage Fixtures instances
+     * Assign Days config to every existence of a component using $componentDefinitionId
+     *
+     * @param int $componentDefinitionId
      */
-    private function addToHomepageComponents(): void
+    private function addToComponent(int $componentDefinitionId): void
     {
-        /* Find the component definition id
-         */
-        $query = "
-            SELECT id
-            FROM component_definition
-            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller'
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute();
-
-        $componentDefinitionId = $statement->fetchColumn();
-
         /* Add a default config into the component config definition list
          */
         $query = "
@@ -118,6 +107,31 @@ HELP;
         }
     }
 
+
+    /**
+     * Add Days component config to all Homepage Fixtures instances
+     */
+    private function addToHomepageComponents(): void
+    {
+        /* Find the component definition id
+         */
+        $query = "
+            SELECT id
+            FROM component_definition
+            WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller'
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepareQuery($query);
+        $statement->execute();
+
+        $componentDefinitionId = (int)$statement->fetchColumn();
+
+        if ($componentDefinitionId) {
+            $this->addToComponent($componentDefinitionId);
+        }
+    }
+
+
     /**
      * Add Days component config to all Dashboard Fixtures instances
      */
@@ -134,58 +148,10 @@ HELP;
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
         $statement->execute();
 
-        $componentDefinitionId = $statement->fetchColumn();
+        $componentDefinitionId = (int)$statement->fetchColumn();
 
-        /* Add a default config into the component config definition list
-         */
-        $query = "
-            INSERT INTO component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
-            VALUES (
-                :componentDefinitionId,
-                'days',
-                0,
-                'Days',
-                null
-            )
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute([
-            'componentDefinitionId' => $componentDefinitionId
-        ]);
-
-        /* Find every Fixtures component instance
-         */
-        $query = '
-            SELECT ci.id
-            FROM component_instance ci
-            INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
-            WHERE cd.id = :componentDefinitionId
-        ';
-
-        $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute([
-            'componentDefinitionId' => $componentDefinitionId
-        ]);
-
-        /* Assign it to every component instance of Fixtures that exists in homepages
-         */
-        $insertStatement = $this->getDatabaseInternal()->prepareQuery('
-            INSERT INTO component_config_instance (`component_config_definition_id`, `component_instance_id`, `value`)
-            VALUES (
-                :componentDefinitionId,
-                :componentInstanceId,
-                0
-            )
-        ');
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $componentInstanceId = $row['id'];
-
-            $insertStatement->execute([
-                'componentDefinitionId' => $componentDefinitionId,
-                'componentInstanceId' => $componentInstanceId
-            ]);
+        if ($componentDefinitionId) {
+            $this->addToComponent($componentDefinitionId);
         }
     }
 };
