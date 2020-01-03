@@ -82,12 +82,24 @@ class ComponentDelegate
      *
      * @param array $userIds
      * @param bool  $includeHistorical Whether to return matches in the past
+     * @param int   $days
      * @return Collection|Match[]
      * @throws Exception
      */
-    public function getMatchesForUsers(array $userIds, $includeHistorical)
+    public function getMatchesForUsers(array $userIds, bool $includeHistorical, int $days)
     {
+        /* Decide the upper threshold determined by $days, if greater than zero
+         */
+        $threshold = null;
+
+        if ($days) {
+            $date = \Alaress_Date_Format::now()->addDays($days)->endOfDay()->getDatabase();
+
+            $threshold = " AND (sportsfixtures_match.start_at) < '{$date}'";
+        }
+
         $historical = '';
+
         if (!$includeHistorical) {
             $historical = 'AND DATE(sportsfixtures_match.start_at) >= DATE(NOW())';
         }
@@ -125,6 +137,7 @@ class ComponentDelegate
                                 sportsfixtures_coach.user_id IN {$placeholders} OR
                                 sportsfixtures_team_user.user_id IN {$placeholders})
                                 {$historical}
+                                {$threshold}
         ";
 
         $statement = $this->database->prepareQuery($query);

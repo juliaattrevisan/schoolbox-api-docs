@@ -94,7 +94,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             }
         }
 
-        $this->matches = $this->delegate->getMatchesForUsers($userIds, $getHistorical);
+        $this->matches = $this->delegate->getMatchesForUsers($userIds, $getHistorical, $this->getConfig('days'));
 
         return count($this->matches) > 0;
     }
