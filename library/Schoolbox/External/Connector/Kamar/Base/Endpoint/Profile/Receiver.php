@@ -25,7 +25,7 @@ class Receiver
      * we should have a way of discriminating these source xmls from
      * whatever else appears in that folder
      */
-    private const KAMAR_NAMESPACE = 'kamar';
+    public const KAMAR_NAMESPACE = 'kamar';
 
 
     /**

@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Receiver;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -21,8 +22,8 @@ class Status implements IStatus
      * Expected xml files
      * These correspond to the @sync attribute in the root xml node SMSDirectoryData
      */
-    private const EXPECTED_PROFILE_XML = 'profile.xml';
-    private const EXPECTED_TIMETABLE_XML = 'studenttimetables.xml';
+    private const EXPECTED_PROFILE_XML = Receiver::KAMAR_NAMESPACE . '_profile.xml';
+    private const EXPECTED_TIMETABLE_XML = Receiver::KAMAR_NAMESPACE . '_studenttimetables.xml';
 
     private const EXPECTED_XML = [
         self::EXPECTED_PROFILE_XML,
