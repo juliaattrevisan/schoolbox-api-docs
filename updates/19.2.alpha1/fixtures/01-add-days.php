@@ -60,20 +60,7 @@ HELP;
      */
     private function addToHomepageComponents(string $class): void
     {
-        /* Find the component definition id
-         */
-        $query = '
-            SELECT id
-            FROM component_definition
-            WHERE `class` = :class
-        ';
-
-        $statement = $this->getDatabaseInternal()->prepareQuery($query);
-        $statement->execute([
-            'class' => $class
-        ]);
-
-        $componentDefinitionId = (int)$statement->fetchColumn();
+        $componentDefinitionId = $this->findComponentDefinitionId($class);
 
         if ($componentDefinitionId) {
             $this->addToComponent($componentDefinitionId, self::KEY, self::DEFAULT_VALUE, self::LABEL, self::DESCRIPTION);
@@ -90,8 +77,24 @@ HELP;
      */
     private function addToDashboardComponents(string $class): void
     {
-        /* Find the component definition id
-         */
+        $componentDefinitionId = $this->findComponentDefinitionId($class);
+
+        if ($componentDefinitionId) {
+            $this->addToComponent($componentDefinitionId, self::KEY, self::DEFAULT_VALUE, self::LABEL, self::DESCRIPTION);
+        } else {
+            $this->getLogger()->warning("Component definition id didn't exist for dashboard component; skipping");
+        }
+    }
+
+
+    /**
+     * Find the component definition id belonging to $class
+     *
+     * @param string $class
+     * @return int
+     */
+    private function findComponentDefinitionId(string $class): int
+    {
         $query = '
             SELECT id
             FROM component_definition
@@ -103,13 +106,7 @@ HELP;
             'class' => $class
         ]);
 
-        $componentDefinitionId = (int)$statement->fetchColumn();
-
-        if ($componentDefinitionId) {
-            $this->addToComponent($componentDefinitionId, self::KEY, self::DEFAULT_VALUE, self::LABEL, self::DESCRIPTION);
-        } else {
-            $this->getLogger()->warning("Component definition id didn't exist for dashboard component; skipping");
-        }
+        return (int)$statement->fetchColumn();
     }
 
 
