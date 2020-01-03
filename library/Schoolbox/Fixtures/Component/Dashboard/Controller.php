@@ -36,6 +36,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
 
     /**
+     * @var Collection
+     */
+    private $matches;
+
+
+    /**
      * Injectable constructor
      *
      * @param Component_Instance $instance
@@ -55,50 +61,67 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
 
     /**
-     * @return bool Whether to continue on and attempt Component render
-     * @throws ServiceNotFound
+     * @return bool  Whether to continue on and attempt Component render
      * @throws RuntimeException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function execute()
     {
-        return $this->getSitePage()->getDi()->get('config')->get('fixtures_enabled') == '1';
-    }
 
+        /* If the module is disabled, do nothing
+         */
+        if (!(int)$this->getSitePage()->getDi()->get('config')->get('fixtures_enabled')) {
+            return false;
+        }
 
-    /**
-     * @param String $templateHandle
-     * @return bool
-     * @throws ServiceNotFound
-     * @throws RuntimeException
-     * @throws Twig_Error_Loader
-     * @throws Twig_Error_Runtime
-     * @throws Twig_Error_Syntax
-     * @throws UnexpectedValueException
-     */
-    public function renderTemplate($templateHandle)
-    {
+        /* Otherwise fetch all the relevant matches
+         */
         $matches = new Collection();
         $getHistorical = false;
 
         // Grab the relevant data depending on role type
 
         if ($this->getUser()->getRole()->isParent()) {
+
             /** @var Session $session */
             $session  = $this->getSitePage()->getDi()->get('session');
+
             $children = $session->get('children') ?: [];
+
             $userIds = [$this->getUser()->getId()];
+
             foreach ($children as $child) {
                 $userIds[] = $child['id'];
             }
+
             $matches = $matches->mergeUnique($this->delegate->getMatchesForUsers($userIds, $getHistorical),'id');
         } else {
             $matches = $this->delegate->getMatchesForUsers([$this->getUser()->getId()], $getHistorical);
         }
 
-        if (0 == count($matches)) {
+        if (0 === count($matches)) {
             return false;
         }
 
+        /* Store the output for rendering
+         */
+        $this->matches = $matches;
+
+        return true;
+    }
+
+
+    /**
+     * @param String $templateHandle
+     * @return bool
+     * @throws RuntimeException
+     * @throws Twig_Error_Loader
+     * @throws Twig_Error_Runtime
+     * @throws Twig_Error_Syntax
+     */
+    public function renderTemplate($templateHandle)
+    {
         return $this->renderTwigTemplate(
             $templateHandle,
             '@sportsfixturesDashboard/component.twig',
@@ -106,7 +129,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'componentClass'      => $this->getComponentName(),
                 'user'                => $this->getUser(),
-                'matches'             => $matches,
+                'matches'             => $this->matches,
             ]
         );
     }
