@@ -56,7 +56,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         /** @var Base $databaseInternal */
         $databaseInternal = $sitepage->getDi()->get('databaseInternal');
-        $this->delegate =new ComponentDelegate($databaseInternal);
+        $this->delegate = new ComponentDelegate($databaseInternal);
     }
 
 
@@ -77,10 +77,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         /* Otherwise fetch all the relevant matches
          */
-        $matches = new Collection();
         $getHistorical = false;
 
         // Grab the relevant data depending on role type
+        $userIds = [$this->getUser()->getId()];
 
         if ($this->getUser()->getRole()->isParent()) {
 
@@ -89,26 +89,14 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             $children = $session->get('children') ?: [];
 
-            $userIds = [$this->getUser()->getId()];
-
             foreach ($children as $child) {
                 $userIds[] = $child['id'];
             }
-
-            $matches = $matches->mergeUnique($this->delegate->getMatchesForUsers($userIds, $getHistorical),'id');
-        } else {
-            $matches = $this->delegate->getMatchesForUsers([$this->getUser()->getId()], $getHistorical);
         }
 
-        if (0 === count($matches)) {
-            return false;
-        }
+        $this->matches = $this->delegate->getMatchesForUsers($userIds, $getHistorical);
 
-        /* Store the output for rendering
-         */
-        $this->matches = $matches;
-
-        return true;
+        return count($this->matches) > 0;
     }
 
 
