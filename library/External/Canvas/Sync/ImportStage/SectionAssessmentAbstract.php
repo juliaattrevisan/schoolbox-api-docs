@@ -917,7 +917,7 @@ abstract class SectionAssessmentAbstract
     /**
      * Logs the results of this stage
      */
-    private function printCounts(): void
+    protected function printCounts(): void
     {
         $canvasEntity    = ucfirst($this->getCanvasEntity());
         $schoolboxEntity = ucfirst($this->getSchoolboxEntity());
@@ -925,18 +925,18 @@ abstract class SectionAssessmentAbstract
         $this->log->notice($this->countCanvasSectionAssessmentsSynchronised . " Canvas CourseSections-{$canvasEntity} synchronised");
         $this->log->notice($this->countCanvasAssessmentOverridesSynchronised . " Canvas {$canvasEntity} Overrides synchronised");
 
-        $this->log->notice($this->countAssessablesCreated . " Schoolbox {$schoolboxEntity}Impl created");
-        $this->log->notice($this->countAssessablesMoved . " Schoolbox {$schoolboxEntity}Impl moved");
-        $this->log->notice($this->countAssessablesUpdated . " Schoolbox {$schoolboxEntity}Impl updated");
-        $this->log->notice($this->countAssessablesDeleted . " Schoolbox {$schoolboxEntity}Impl deleted");
+        $this->log->notice($this->countAssessablesCreated . " Schoolbox {$schoolboxEntity} Impl created");
+        $this->log->notice($this->countAssessablesMoved . " Schoolbox {$schoolboxEntity} Impl moved");
+        $this->log->notice($this->countAssessablesUpdated . " Schoolbox {$schoolboxEntity} Impl updated");
+        $this->log->notice($this->countAssessablesDeleted . " Schoolbox {$schoolboxEntity} Impl deleted");
 
-        $this->log->notice($this->countPlansCreated . " Schoolbox {$schoolboxEntity} Plans created");
-        $this->log->notice($this->countPlansUpdated . " Schoolbox {$schoolboxEntity} Plans updated");
-        $this->log->notice($this->countPlansDeleted . " Schoolbox {$schoolboxEntity} Plans deleted");
+        $this->log->notice($this->countPlansCreated . " Schoolbox {$schoolboxEntity} Impl Plans created");
+        $this->log->notice($this->countPlansUpdated . " Schoolbox {$schoolboxEntity} Impl Plans updated");
+        $this->log->notice($this->countPlansDeleted . " Schoolbox {$schoolboxEntity} Impl Plans deleted");
 
-        $this->log->notice($this->countParticipantsCreated . " Schoolbox {$schoolboxEntity} Participants created");
-        $this->log->notice($this->countParticipantsUpdated . " Schoolbox {$schoolboxEntity} Participants updated");
-        $this->log->notice($this->countParticipantsDeleted . " Schoolbox {$schoolboxEntity} Participants deleted");
+        $this->log->notice($this->countParticipantsCreated . " Schoolbox {$schoolboxEntity} Impl Participants created");
+        $this->log->notice($this->countParticipantsUpdated . " Schoolbox {$schoolboxEntity} Impl Participants updated");
+        $this->log->notice($this->countParticipantsDeleted . " Schoolbox {$schoolboxEntity} Impl Participants deleted");
     }
 
 

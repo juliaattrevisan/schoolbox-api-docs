@@ -14,6 +14,7 @@ use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use External_ClassInterface;
 use PDO;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -22,6 +23,10 @@ use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\Learning\Quiz\Section as QuizSection;
+use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
+use Schoolbox\Learning\Quiz\Section\Question\QuestionType;
+use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -51,6 +56,18 @@ class SectionQuiz extends SectionAssessmentAbstract
     /** @var Quiz\Mapper */
     private $quizMapper;
 
+    /** @var QuizSection\Mapper */
+    private $quizSectionMapper;
+
+    /** @var QuizQuestion\Mapper */
+    private $quizQuestionMapper;
+
+    /** @var QuestionType\Mapper */
+    private $questionTypeMapper;
+
+    /** @var QuizSolution\Mapper */
+    private $quizSolutionMapper;
+
     /** @var Assessment\Mapper */
     private $assessmentMapper;
 
@@ -64,6 +81,13 @@ class SectionQuiz extends SectionAssessmentAbstract
     /** @var Quiz\Model[] $quizSpecCache Indexed by Canvas `assess`.`canvas_id` */
     private $quizSpecCache = [];
 
+    /** @var int */
+    private $countQuizSectionsCreated;
+
+    /** @var int */
+    private $countQuizSectionsDeleted;
+
+
     /**
      * @param IConnector                $canvasDb
      * @param IConnector                $schoolboxDb
@@ -72,6 +96,9 @@ class SectionQuiz extends SectionAssessmentAbstract
      * @param UnitImpl\Mapper           $unitImplMapper
      * @param UnitSpec\Mapper           $unitSpecMapper
      * @param Quiz\Mapper               $quizMapper
+     * @param QuizSection\Mapper        $quizSectionMapper
+     * @param QuizQuestion\Mapper       $quizQuestionMapper
+     * @param QuizSolution\Mapper       $quizSolutionMapper
      * @param Assessment\Mapper         $assessmentMapper
      * @param Participant\Plan\Mapper   $planMapper
      * @param Participant\Mapper        $participantMapper
@@ -90,6 +117,9 @@ class SectionQuiz extends SectionAssessmentAbstract
         UnitImpl\Mapper $unitImplMapper,
         UnitSpec\Mapper $unitSpecMapper,
         Quiz\Mapper $quizMapper,
+        QuizSection\Mapper $quizSectionMapper,
+        QuizQuestion\Mapper $quizQuestionMapper,
+        QuizSolution\Mapper $quizSolutionMapper,
         Assessment\Mapper $assessmentMapper,
         Participant\Plan\Mapper $planMapper,
         Participant\Mapper $participantMapper,
@@ -120,7 +150,9 @@ class SectionQuiz extends SectionAssessmentAbstract
         $this->canvasDb              = $canvasDb;
         $this->schoolboxDb           = $schoolboxDb;
         $this->quizMapper            = $quizMapper;
-        $this->assessmentMapper      = $assessmentMapper;
+        $this->quizSectionMapper     = $quizSectionMapper;
+        $this->quizQuestionMapper    = $quizQuestionMapper;
+        $this->quizSolutionMapper    = $quizSolutionMapper;
         $this->participantPlanMapper = $planMapper;
         $this->log                   = $log;
     }
@@ -205,7 +237,11 @@ class SectionQuiz extends SectionAssessmentAbstract
     }
 
 
-    /** @inheritDoc */
+    /**
+     * Returns a quiz spec with sections, questions + solutions hydrated
+     * @inheritDoc
+     * @throws UnexpectedValueException
+     */
     protected function findAssessableSpec(int $assessmentCanvasId): IAssessableDataModel
     {
         // Because Canvas Assignments (SB SubBox) belong to a Course, rather than CourseSection (SB Class),
@@ -216,6 +252,20 @@ class SectionQuiz extends SectionAssessmentAbstract
         if (!array_key_exists($assessmentCanvasId, $this->quizSpecCache)) {
             $quiz = $this->quizMapper->findOneByColumn('external_id', $assessmentCanvasId);
             $quiz->getAssessmentModel()->setQuiz($quiz);
+            $indexSectionsById = static function (QuizSection\Model $section): int {
+                return $section->getId();
+            };
+            $sections          = $this->quizSectionMapper
+                ->findByColumn('assess_id', $quiz->getId())
+                ->indexByCallback($indexSectionsById);
+            $quiz->setSections($sections);
+            $questions = $this->quizQuestionMapper->findByColumn('section_id', $quiz->getSections()->keys());
+            foreach ($questions as $question) {
+                /** @var QuizSection\Model $section */
+                $section = $quiz->getSections()->getOffset($question->getSection()->getId());
+                $section->getQuestions()->setOffset($question->getId(), $question);
+                $question->setSection($section);
+            }
             $this->quizSpecCache[$assessmentCanvasId] = $quiz;
         }
 
@@ -245,41 +295,226 @@ class SectionQuiz extends SectionAssessmentAbstract
         User $owner,
         UnitImpl\Model $unitImpl
     ): bool {
+        $quizUpdated    = $this->syncWithQuiz($assessmentCanvasId, $assessableImpl, $assessableSpec, $owner, $unitImpl);
+        $sectionUpdated = $this->syncSections($assessableImpl, $assessableSpec);
+
+        return $quizUpdated || $sectionUpdated;
+    }
+
+    /**
+     * Checks whether the Quiz Spec & Quiz Impl sections (including sub-models) are the same.
+     *
+     * If not, deletes any impl sections and re-copies from spec
+     *
+     * @param Quiz\Model $quizImpl
+     * @param Quiz\Model $quizSpec
+     * @return bool
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function syncSections(Quiz\Model $quizImpl, Quiz\Model $quizSpec): bool
+    {
+        $indexBySequence = static function (QuizSection\Model $section): int {
+            return $section->getSequence();
+        };
+
+        $implSectionsBySequence = $quizImpl->getSections()->shallowClone()->indexByCallback($indexBySequence);
+        $specSectionsBySequence = $quizSpec->getSections()->shallowClone()->indexByCallback($indexBySequence);
+
+        $different = false;
+        if ($implSectionsBySequence->keys() !== $specSectionsBySequence->keys()) {
+            $different = true;
+        }
+        if (!$different) {
+            foreach ($implSectionsBySequence->keys() as $sequence) {
+                if (!$this->areQuizSectionsEqual(
+                    $implSectionsBySequence->getOffset($sequence),
+                    $specSectionsBySequence->getOffset($sequence)
+                )) {
+                    $different = true;
+                    break;
+                }
+            }
+        }
+
+        if ($different) {
+            if ($quizImpl->getSections()->count()) {
+                $this->log->debug("Quiz sections different between spec and impl, re-creating from spec");
+                $this->quizSectionMapper->delete($quizImpl->getSections());
+                $this->countQuizSectionsDeleted += $quizImpl->getSections()->count();
+                $quizImpl->setSections($quizImpl->getSections()->emptyClone());
+            }
+            foreach ($quizSpec->getSections() as $sectionSpec) {
+                $this->copySection($sectionSpec, $quizImpl);
+            }
+        }
+        return $different;
+    }
+
+
+    /**
+     * Copies a quiz section (and sub models) to another quiz
+     *
+     * @param QuizSection\Model $section
+     * @param Quiz\Model        $quiz
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function copySection(QuizSection\Model $section, Quiz\Model $quiz): void
+    {
+        $this->log->debug("Copying quiz spec section '{$section->getTitle()}' to quiz impl '{$quiz->getTitle()}'");
+        $this->countQuizSectionsCreated++;
+
+        $newSection = clone $section;
+
+        $newSection->setQuiz($quiz);
+        $this->quizSectionMapper->save($newSection);
+        $quiz->getSections()->setOffset($newSection->getId(), $newSection);
+
+        $newQuestions = $newSection->getQuestions();
+        foreach ($newQuestions as $newQuestion) {
+            $this->quizQuestionMapper->save($newQuestion);
+            $this->quizSolutionMapper->save($newQuestion->getSolution());
+        }
+    }
+
+
+    /**
+     * Returns whether two quiz sections are logically equal.
+     *
+     * Must have same attributes and contain same questions in the same sequence
+     *
+     * @param QuizSection\Model $left
+     * @param QuizSection\Model $right
+     * @return bool
+     */
+    private function areQuizSectionsEqual(QuizSection\Model $left, QuizSection\Model $right): bool
+    {
+        if (
+            $left->getDescription() !== $right->getDescription() ||
+            $left->getTitle() !== $right->getTitle() ||
+            $left->getPool() !== $right->getPool() ||
+            $left->getRandom() !== $right->getRandom() ||
+            $left->getSequence() !== $right->getSequence() ||
+            $left->getQuestions()->count() !== $right->getQuestions()->count()
+        ) {
+            return false;
+        }
+
+        $indexBySequence          = static function (QuizQuestion\Model $question): int {
+            return $question->getSequence();
+        };
+        $leftQuestionsBySequence  = $left->getQuestions()->shallowClone()->indexByCallback($indexBySequence);
+        $rightQuestionsBySequence = $right->getQuestions()->shallowClone()->indexByCallback($indexBySequence);
+
+        if ($leftQuestionsBySequence->keys() !== $rightQuestionsBySequence->keys()) {
+            return false;
+        }
+
+        foreach ($leftQuestionsBySequence->keys() as $sequence) {
+            $leftQuestion  = $leftQuestionsBySequence->getOffset($sequence);
+            $rightQuestion = $rightQuestionsBySequence->getOffset($sequence);
+            if (!$this->areQuizQuestionsEqual($leftQuestion, $rightQuestion)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Returns whether two quiz questions are logically equal.
+     *
+     * Must have same attributes and contain same solutions in the same sequence
+     *
+     * @param QuizQuestion\Model $left
+     * @param QuizQuestion\Model $right
+     * @return bool
+     */
+    private function areQuizQuestionsEqual(QuizQuestion\Model $left, QuizQuestion\Model $right): bool
+    {
+        if (
+            $left->getConfig() !== $right->getConfig() ||
+            $left->getMarks() !== $right->getMarks() ||
+            $left->getQuestion() !== $right->getQuestion() ||
+            $left->getType()->getId() !== $right->getType()->getId()
+        ) {
+            return false;
+        }
+        return $this->areQuizSolutionsEqual($left->getSolution(), $right->getSolution());
+    }
+
+
+    /**
+     * Returns whether two quiz solutions are equal.
+     *
+     * @param QuizSolution\Model $left
+     * @param QuizSolution\Model $right
+     * @return bool
+     */
+    private function areQuizSolutionsEqual(QuizSolution\Model $left, QuizSolution\Model $right): bool
+    {
+        return $left->getSolution() === $right->getSolution();
+    }
+
+
+    /**
+     * Checks whether the quiz impl needs to be reset to quiz spec properties. Returns whether any changes made.
+     *
+     * @param int            $assessmentCanvasId
+     * @param Quiz\Model     $quizImpl
+     * @param Quiz\Model     $quizSpec
+     * @param User           $owner
+     * @param UnitImpl\Model $unitImpl
+     * @return bool
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     */
+    private function syncWithQuiz(
+        int $assessmentCanvasId,
+        Quiz\Model $quizImpl,
+        Quiz\Model $quizSpec,
+        User $owner,
+        UnitImpl\Model $unitImpl
+    ): bool {
         if (
             // Does any attribute no longer align?
-            $assessableImpl->getAvailability() === Quiz\Model::AVAILABILITY_ASSESS &&
-            (($assessableImpl->getWorkType() === null) === ($assessableSpec->getWorkType() === null)) &&
-            $assessableImpl->getTitle() === $assessableSpec->getTitle() &&
-            $assessableImpl->getDescription() === $assessableSpec->getDescription() &&
-            $assessableImpl->getDuration() === $assessableSpec->getDuration() &&
-            $assessableImpl->getMaxAttempts() === $assessableSpec->getMaxAttempts() &&
-            $assessableImpl->getWeight() === $assessableSpec->getWeight() &&
-            $assessableImpl->getAnonymousResult() === $assessableSpec->getAnonymousResult() &&
-            $assessableImpl->getMarkVisibility() === $assessableSpec->getMarkVisibility() &&
-            $assessableImpl->getUser()->getId() === $owner->getId() &&
-            $assessableImpl->getCreated()->getDatabase() === $assessableSpec->getCreated()->getDatabase() &&
-            $assessableImpl->getCategory()->getId() === $unitImpl->getFolder()->getId() &&
-            ($assessableImpl->getWorkType() && $assessableSpec->getWorkType() && $assessableImpl->getWorkType()->getId() === $assessableSpec->getWorkType()->getId())
+            $quizImpl->getAvailability() === Quiz\Model::AVAILABILITY_ASSESS &&
+            (($quizImpl->getWorkType() === null) === ($quizSpec->getWorkType() === null)) &&
+            $quizImpl->getTitle() === $quizSpec->getTitle() &&
+            $quizImpl->getDescription() === $quizSpec->getDescription() &&
+            $quizImpl->getDuration() === $quizSpec->getDuration() &&
+            $quizImpl->getMaxAttempts() === $quizSpec->getMaxAttempts() &&
+            $quizImpl->getWeight() === $quizSpec->getWeight() &&
+            $quizImpl->getAnonymousResult() === $quizSpec->getAnonymousResult() &&
+            $quizImpl->getMarkVisibility() === $quizSpec->getMarkVisibility() &&
+            $quizImpl->getUser()->getId() === $owner->getId() &&
+            $quizImpl->getCreated()->getDatabase() === $quizSpec->getCreated()->getDatabase() &&
+            $quizImpl->getCategory()->getId() === $unitImpl->getFolder()->getId() &&
+            ($quizImpl->getWorkType() && $quizSpec->getWorkType() && $quizImpl->getWorkType()->getId() === $quizSpec->getWorkType()->getId())
         ) {
             return false;
         }
         // Update all attributes and persist
         $this->log->debug("Updating QuizImpl for Canvas Quiz (canvasId: $assessmentCanvasId)");
-        $assessableImpl
+        $quizImpl
             ->setCategory($unitImpl->getFolder())
             ->setUser($owner)
-            ->setWorkType($assessableSpec->getWorkType())
-            ->setTitle($assessableSpec->getTitle())
-            ->setDescription($assessableSpec->getDescription())
-            ->setDuration($assessableSpec->getDuration())
-            ->setMaxAttempts($assessableSpec->getMaxAttempts())
-            ->setWeight($assessableSpec->getWeight())
+            ->setWorkType($quizSpec->getWorkType())
+            ->setTitle($quizSpec->getTitle())
+            ->setDescription($quizSpec->getDescription())
+            ->setDuration($quizSpec->getDuration())
+            ->setMaxAttempts($quizSpec->getMaxAttempts())
+            ->setWeight($quizSpec->getWeight())
             ->setAvailability(Quiz\Model::AVAILABILITY_ASSESS)
-            ->setAnonymousResult($assessableSpec->getAnonymousResult())
-            ->setMarkVisibility($assessableSpec->getMarkVisibility())
-            ->setCreated($assessableSpec->getCreated());
+            ->setAnonymousResult($quizSpec->getAnonymousResult())
+            ->setMarkVisibility($quizSpec->getMarkVisibility())
+            ->setCreated($quizSpec->getCreated());
 
-        $this->quizMapper->save($assessableImpl);
+        $this->quizMapper->save($quizImpl);
 
         return true;
     }
@@ -287,11 +522,21 @@ class SectionQuiz extends SectionAssessmentAbstract
 
     /**
      * Returns a Quiz Impl for the specified AssessmentSpecId + UnitImplId, or NULL if none found
+     * Hydrates:
+     *  Quiz
+     *  Assessment
+     *  Participation Plan (so we don't recreate plan due to mapper pre-save callback) TODO fix this properly in develop
+     *  QuizSections
+     *  QuizQuestions
+     *  QuizSolutions
      *
      * Hydrates:
      *  assess
      *  assess.assessment
      *  assess.assessment.participant_plan (so we don't recreate plan due to mapper pre-save callback) TODO fix this properly in develop
+     *  assess.assess_section
+     *  assess.assess_section.assess_question
+     *  assess.assess_section.assess_question.assess_solution
      *
      * @param Assessment\Model $assessmentSpec
      * @param UnitImpl\Model   $unitImpl
@@ -302,62 +547,65 @@ class SectionQuiz extends SectionAssessmentAbstract
      */
     protected function findAssessableImpl(Assessment\Model $assessmentSpec, UnitImpl\Model $unitImpl): ?IAssessableDataModel
     {
-        $sql  = "
-                SELECT
-                    {$this->quizMapper->getColumnString('q')},
-                    {$this->assessmentMapper->getColumnString('a')},
-                    {$this->participantPlanMapper->getColumnString('pp')}
-                FROM assess q
-                JOIN assessment a ON a.id = q.assessment_id
-                LEFT JOIN participant_plan pp ON pp.assessment_id = a.id
-                JOIN assessment_specification_implementation asi ON a.id = asi.implementation_assessment_id
-                JOIN assessment_course_unit_implementation acui ON a.id = acui.assessment_id
-                WHERE
-                      asi.specification_assessment_id = :aSpecId AND
-                      acui.course_unit_implementation_id = :unitImplId AND
-                      a.deleted_at IS NULL
-            ";
-        $rows = $this->schoolboxDb->executeQuery($sql, [
+        // Find the quiz impl's id
+        $sql     = "
+            SELECT q.assess_id
+            FROM assess q
+            JOIN assessment a ON a.id = q.assessment_id
+            JOIN assessment_specification_implementation asi ON a.id = asi.implementation_assessment_id
+            JOIN assessment_course_unit_implementation acui ON a.id = acui.assessment_id
+            WHERE
+                  asi.specification_assessment_id = :aSpecId AND
+                  acui.course_unit_implementation_id = :unitImplId AND
+                  a.deleted_at IS NULL
+        ";
+        $quizIds = $this->schoolboxDb->executeQuery($sql, [
             'aSpecId'    => $assessmentSpec->getId(),
             'unitImplId' => $unitImpl->getId(),
-        ])->fetchAll();
-        if (!count($rows)) {
+        ])->fetchAll(PDO::FETCH_COLUMN);
+        if (!count($quizIds)) {
             return null;
         }
-
-        /** @var Assessment\Model[] $assessments */
-        $assessments = [];
-        /** @var Quiz\Model[] $quizzes */
-        $quizzes = [];
-        foreach ($rows as $row) {
-            $assessmentId = $row['a.id'];
-            $quizId       = $row['q.assess_id'];
-            if (!isset($assessments[$assessmentId])) {
-                $assessments[$assessmentId] = $this->assessmentMapper->hydrate($row, 'a')->setPlans($this->participantPlanMapper->createCollection());
-            }
-            $quizzes[$quizId] = $quizzes[$quizId] ?? $this->quizMapper->hydrate($row, 'q');
-
-            if ($row['pp.id']) {
-                $plan = $this->participantPlanMapper->hydrate($row, 'pp');
-                $assessments[$assessmentId]->getPlans()->setOffset($plan->getId(), $plan);
-            }
+        if (count($quizIds) > 1) {
+            throw new UnexpectedValueException("Multiple Quiz Impls found for assessmentSpecId {$assessmentSpec->getId()} in UnitImpl {$unitImpl->getId()}");
         }
 
-        if (count($assessments) > 1) {
-            throw new UnexpectedValueException("Multiple Quiz Specs found for assessmentSpecId {$assessmentSpec->getId()} in UnitImpl {$unitImpl->getId()}");
-        }
-        $assessmentImpl = reset($assessments);
-        $quizImpl       = reset($quizzes);
+        $quizImpl = $this->quizMapper->findById(reset($quizIds));
+        $sections = $this->quizSectionMapper
+            ->findByColumn(QuizSection\Mapper::COL_ASSESS_ID, $quizImpl->getId())
+            ->indexByCallback(static function (QuizSection\Model $section): int {
+                return $section->getId();
+            });
 
-        $quizImpl->setAssessmentModel($assessmentImpl);
+        $questions = $this->quizQuestionMapper->findByColumn(QuizQuestion\Mapper::COL_SECTION_ID, $sections->keys());
+        foreach ($questions as $question) {
+            /** @var QuizSection\Model $section */
+            $section = $sections->getOffset($question->getSection()->getId());
+            $section->getQuestions()->setOffset($question->getId(), $question);
+            $question->setSection($section);
+        }
+
+        $quizImpl->setSections($sections);
+
+        $assessmentImpl = $quizImpl->getAssessmentModel();
         $assessmentImpl->setQuiz($quizImpl);
         $assessmentImpl->setSpecificationAssessment($assessmentSpec);
         $assessmentImpl->setContextUnitImplementation($unitImpl);
+
+        $plans = $this->participantPlanMapper->findByColumn(Participant\Plan\Mapper::COL_ASSESSMENT_ID, $assessmentImpl->getId());
+        foreach ($plans as $plan) {
+            $plan->setAssessment($assessmentImpl);
+        }
+        $assessmentImpl->setPlans($plans);
+
         return $quizImpl;
     }
 
 
-    /** @inheritDoc */
+    /**
+     * @param IAssessableDataModel|Quiz\Model $assessableSpec With Sections, Questions + Solutions hydrated
+     * @inheritDoc
+     */
     protected function createAssessableImpl(
         IAssessableDataModel $assessableSpec,
         UnitImpl\Model $unitImpl,
@@ -386,6 +634,11 @@ class SectionQuiz extends SectionAssessmentAbstract
 
         // Insert Quiz Impl
         $this->quizMapper->save($quizImpl);
+
+        foreach ($assessableSpec->getSections() as $sectionSpec) {
+            $this->copySection($sectionSpec, $quizImpl);
+        }
+
         return $quizImpl;
     }
 
@@ -418,6 +671,25 @@ class SectionQuiz extends SectionAssessmentAbstract
             JOIN assess q ON q.assessment_id = a.id
         ";
         return array_map('intval', $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+
+    /** @inheritDoc */
+    protected function resetCounts(): void
+    {
+        parent::resetCounts();
+        $this->countQuizSectionsCreated = 0;
+        $this->countQuizSectionsDeleted = 0;
+    }
+
+
+    /** @inheritDoc */
+    protected function printCounts(): void
+    {
+        parent::printCounts();
+
+        $this->log->notice($this->countQuizSectionsCreated . " Schoolbox Quiz Impl Sections created");
+        $this->log->notice($this->countQuizSectionsDeleted . " Schoolbox Quiz Impl Sections deleted");
     }
 
 
