@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
 
+use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -17,9 +18,8 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
+use SimpleXMLElement;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Profile
@@ -137,6 +137,7 @@ class Profile implements IStrategy
      * @throws PDOException
      * @throws RuntimeException
      * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function import(): void
     {
@@ -192,6 +193,7 @@ class Profile implements IStrategy
      * @throws PDOException
      * @throws RuntimeException
      * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     private function importStudents(): void
     {
@@ -385,7 +387,7 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param \SimpleXMLElement $student
+     * @param SimpleXMLElement $student
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
      * @throws Mapper\DefinitionException
@@ -393,10 +395,10 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(\SimpleXMLElement $student, UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(SimpleXMLElement $student, UserProfile\Model $studentBaseProfile): void
     {
 
-        /** @var \SimpleXMLElement $parent */
+        /** @var SimpleXMLElement $parent */
         foreach ($student->caregivers->caregiver as $parent) {
 
             /* Parents don't have an external unique identifier; therefore we manufacture them
