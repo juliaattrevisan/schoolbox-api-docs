@@ -145,23 +145,26 @@ class ComponentDelegate
      */
     public function getTeamMatches(int $teamId, bool $includeHistorical, int $days)
     {
+        /* Decide the upper threshold determined by $days, if greater than zero
+         */
+        $threshold = null;
+
+        if ($days) {
+            $threshold = \Alaress_Date_Format::now()->addDays($days)->endOfDay();
+        }
+
+        /* Remember the relevant matches and whether they were in the past
+         */
         /** @var Collection|Match[] $matches */
         $matches = new Collection();
+
         if (!$teamId) {
             return $matches;
         }
 
-        // Get the team we are looking at
+        $playedMatchIds = [];
 
         try {
-
-            /* Decide the upper threshold determined by $days, if greater than zero
-             */
-            $threshold = null;
-
-            if ($days) {
-                $threshold = \Alaress_Date_Format::now()->addDays($days)->endOfDay();
-            }
 
             /* Load all home and away matches for the team we've configured in the component
              */
@@ -183,6 +186,7 @@ class ComponentDelegate
                     /* Include matches previously played
                      */
                     $matches[$match->getId()] = $match;
+                    $playedMatchIds[] = $match->getId();
                 } elseif ($matchDay->isFuture()) {
 
                     /* If no threshold was specified, add it to the list
@@ -200,13 +204,7 @@ class ComponentDelegate
 
             // Are we getting matches that have been played ?
             if ($includeHistorical) {
-                $playedMatchIds = [];
-                foreach ($matches as $match) {
-                    // Has the match been played ?
-                    if ($match->getStartAt()->isPast()) {
-                        $playedMatchIds[] = $match->getId();
-                    }
-                }
+
                 /** @var Collection|Result[] $results */
                 $results = $this->getResultMapper()->findByColumnList(['match_id' => $playedMatchIds]);
 
