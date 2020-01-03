@@ -17,6 +17,12 @@ $app = new class extends CliTool\App {
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+    /* Component Config specification
+     */
+    private const KEY = 'days';
+    private const DEFAULT_VALUE = '0';
+    private const LABEL = 'Days';
+    private const DESCRIPTION = null;
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -66,7 +72,7 @@ HELP;
         $componentDefinitionId = (int)$statement->fetchColumn();
 
         if ($componentDefinitionId) {
-            $this->addToComponent($componentDefinitionId, 'days', '0', 'Days', null);
+            $this->addToComponent($componentDefinitionId, self::KEY, self::DEFAULT_VALUE, self::LABEL, self::DESCRIPTION);
         } else {
             $this->getLogger()->warning("Component definition id didn't exist for homepage component; skipping");
         }
@@ -92,7 +98,7 @@ HELP;
         $componentDefinitionId = (int)$statement->fetchColumn();
 
         if ($componentDefinitionId) {
-            $this->addToComponent($componentDefinitionId, 'days', '0', 'Days', null);
+            $this->addToComponent($componentDefinitionId, self::KEY, self::DEFAULT_VALUE, self::LABEL, self::DESCRIPTION);
         } else {
             $this->getLogger()->warning("Component definition id didn't exist for dashboard component; skipping");
         }
