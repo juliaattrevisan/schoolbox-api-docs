@@ -22,6 +22,8 @@ trait ModelSaveTrait
      * Saves (either INSERT or UPDATE) a model's attributes.
      * - Does not save joins.
      * - Populates the model's identifier if it has one, and this is an INSERT
+     * - Optionally populates timestamps
+     * - Optionally invokes pre/post-save callback triggers
      *
      * We need this, rather than the Mapper::save() method, because we don't want to use a transaction, and
      * we want to by-pass pre/post save hooks, eg auto-creation of Assessment's dynamic plan.
@@ -29,10 +31,11 @@ trait ModelSaveTrait
      * @param IMapper $mapper
      * @param         $model
      * @param bool    $populateTimestamps
+     * @param bool    $triggerCallbacks
      * @return mixed
      * @throws Database\Exception
      */
-    private function saveModel(IMapper $mapper, $model, bool $populateTimestamps = true)
+    private function saveModel(IMapper $mapper, $model, bool $populateTimestamps = true, bool $triggerCallbacks = true)
     {
         $hasId     = (bool)$mapper->getIdentifier();
         $currentId = $hasId ? $mapper->getModelProperty($model, $mapper->getIdentifierProperty()) : null;
@@ -54,11 +57,13 @@ trait ModelSaveTrait
             VALUES ({$mapper->getPlaceholderString()})
             ON DUPLICATE KEY UPDATE {$mapper->getUpdateString()};
         ");
+        $triggerCallbacks && $mapper->triggerCallbacks($mapper::CALLBACK_PRESAVE, $model);
         try {
             $statement->execute($mapper->dehydrate($model));
         } catch (PDOException $e) {
             throw new Database\Exception("Could not save model", 0, $e);
         }
+        $triggerCallbacks && $mapper->triggerCallbacks($mapper::CALLBACK_POSTSAVE, $model);
 
         if ($hasId && !$currentId) {
             $mapper->setModelProperty($model, $mapper->getIdentifierProperty(), $mapper->getDatabase()->lastInsertId());
