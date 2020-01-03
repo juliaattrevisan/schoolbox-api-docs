@@ -19,7 +19,7 @@ use Schoolbox\User;
  * TODO - for now there is no compression. Need to add this in SA-3201
  * TODO - This is placeholder. All server-side URL compression/decompression + encoding/decoding will happen inside here
  */
-class Codec implements ICodec
+class Codec
 {
 
     /**
@@ -106,8 +106,9 @@ class Codec implements ICodec
 
             /** @var Selection\Model[] $filterSelections */
             foreach ($filterSelections as $selection) {
-                $selected       = $selection->getSelected() ? '1' : '0';
-                $queryStrings[] = "{$filterId}[{$selection->getKey()}]={$selected}";
+                if ($selection->getSelected()) {
+                    $queryStrings[] = "{$filterId}[{$selection->getKey()}]=1";
+                }
             }
         }
 

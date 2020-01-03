@@ -99,7 +99,11 @@ class Transformer
         foreach ($this->keyConverters as $keyConverter) {
             $filter          = $keyConverter->getFilter();
             $class           = $filter->getClass();
-            $filters[$class] = $this->getSelectedItems($class, $user, $page);
+
+            // Ignore filters that do not have any selections
+            if ($this->selectionsPerFilter->keyExists($filter->getId())) {
+                $filters[$class] = $this->getSelectedItems($class, $user, $page);
+            }
         }
 
         return $filters;

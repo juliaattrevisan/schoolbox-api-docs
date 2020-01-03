@@ -10,6 +10,7 @@ use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Filter\Codec;
 use function func_get_args;
 use External_ClassInterface;
 use Schoolbox\Application\Exception\NotFound;
@@ -254,7 +255,7 @@ class Controller extends Base
         $page                = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
 
         // Convert Request to Selection models
-        $codec               = $filterFactoryFactory->buildCodec();
+        $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
