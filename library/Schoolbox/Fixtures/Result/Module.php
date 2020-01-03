@@ -50,10 +50,7 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer) {
 
-        /* Superusers can see this
-         * Sports Admin can see this
-         * All Staff and Students can see this
-         * Parents of a Player in the Team can see this
+        /* Any authenticated user can access the result page
          */
         $resultAccess = new Rule\All(
             new Rule\IsLoggedIn()
