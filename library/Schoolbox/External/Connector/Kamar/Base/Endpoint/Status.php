@@ -22,8 +22,8 @@ class Status implements IStatus
      * Expected xml files
      * These correspond to the @sync attribute in the root xml node SMSDirectoryData
      */
-    private const EXPECTED_PROFILE_XML = Receiver::KAMAR_NAMESPACE . '_profile.xml';
-    private const EXPECTED_TIMETABLE_XML = Receiver::KAMAR_NAMESPACE . '_studenttimetables.xml';
+    public const EXPECTED_PROFILE_XML = Receiver::KAMAR_NAMESPACE . '_profile.xml';
+    public const EXPECTED_TIMETABLE_XML = Receiver::KAMAR_NAMESPACE . '_studenttimetables.xml';
 
     private const EXPECTED_XML = [
         self::EXPECTED_PROFILE_XML,

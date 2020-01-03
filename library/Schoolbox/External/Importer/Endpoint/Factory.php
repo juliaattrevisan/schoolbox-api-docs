@@ -20,6 +20,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Status;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable as KamarTimetable;
 
 use Schoolbox\External\Profile as UserProfile;
@@ -188,8 +189,8 @@ class Factory
          * Pass it multiple $batchxml instances that have their $this->host vars
          * set to hardcoded filenames; $this->host becomes a dir, not a file
          */
-        $profileBatchXml = new KamarBatchxml(new KamarApi($this->host . '/profile.xml'));
-        $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/timetable.xml'));
+        $profileBatchXml = new KamarBatchxml(new KamarApi($this->host . '/' . Status::EXPECTED_PROFILE_XML));
+        $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/' . Status::EXPECTED_TIMETABLE_XML));
 
         return (new GenericCollection(IStrategy::class))
 //            ->add(new KamarProfile\Composite(
