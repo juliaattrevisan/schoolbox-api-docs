@@ -42,8 +42,15 @@ HELP;
             exit;
         }
 
-        $db = $this->getDatabaseInternal();
+        $this->addToHomepageComponents();
+    }
 
+
+    /**
+     * Add Days component config to all Homepage Fixtures instances
+     */
+    private function addToHomepageComponents(): void
+    {
         /* Find the component definition id
          */
         $query = "
@@ -52,7 +59,7 @@ HELP;
             WHERE `class` = 'Schoolbox\\\Fixtures\\\Component\\\Homepage\\\Controller'
         ";
 
-        $statement = $db->prepareQuery($query);
+        $statement = $this->getDatabaseInternal()->prepareQuery($query);
         $statement->execute();
 
         $componentDefinitionId = $statement->fetchColumn();
@@ -70,7 +77,7 @@ HELP;
             )
         ";
 
-        $statement = $db->prepareQuery($query);
+        $statement = $this->getDatabaseInternal()->prepareQuery($query);
         $statement->execute([
             'componentDefinitionId' => $componentDefinitionId
         ]);
@@ -84,14 +91,14 @@ HELP;
             WHERE cd.id = :componentDefinitionId
         ';
 
-        $statement = $db->prepareQuery($query);
+        $statement = $this->getDatabaseInternal()->prepareQuery($query);
         $statement->execute([
             'componentDefinitionId' => $componentDefinitionId
         ]);
 
         /* Assign it to every component instance of Fixtures that exists in homepages
          */
-        $insertStatement = $db->prepareQuery('
+        $insertStatement = $this->getDatabaseInternal()->prepareQuery('
             INSERT INTO component_config_instance (`component_config_definition_id`, `component_instance_id`, `value`)
             VALUES (
                 :componentDefinitionId,
