@@ -193,16 +193,16 @@ class Factory
         $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/' . Status::EXPECTED_TIMETABLE_XML));
 
         return (new GenericCollection(IStrategy::class))
-//            ->add(new KamarProfile\Composite(
-//                $this->logger,
-//                $this->perform,
-//                $profileBatchXml,
-//                UserProfile\Mapper::getInstance(),
-//                UserProfile\Student\Mapper::getInstance(),
-//                UserProfile\Parent\Mapper::getInstance(),
-//                UserProfile\Staff\Mapper::getInstance(),
-//                UserProfile\Relationship\Mapper::getInstance()
-//            ))
+            ->add(new KamarProfile\Composite(
+                $this->logger,
+                $this->perform,
+                $profileBatchXml,
+                UserProfile\Mapper::getInstance(),
+                UserProfile\Student\Mapper::getInstance(),
+                UserProfile\Parent\Mapper::getInstance(),
+                UserProfile\Staff\Mapper::getInstance(),
+                UserProfile\Relationship\Mapper::getInstance()
+            ))
             ->add(new KamarTimetable\Composite(
                 $this->logger,
                 $this->perform,
