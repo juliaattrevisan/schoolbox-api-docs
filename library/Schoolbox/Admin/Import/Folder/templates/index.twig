@@ -19,27 +19,30 @@
         });
     });
 </script>
+<script type="text/javascript" src="/javascript/shared/attacher.checkbox-group.js"></script>
+
 
 {# Config page contents #}
 
 <div class="row">
     <div class="small-12 island">
+        <section>
+            <fieldset class="content">
+                <div class="small-12 columns">
+                    <p>From this screen you can bulk create homepages and folders for class pages or general use. This import uses a specific CSV format which you can download from the link below, then enter your required class pages or folders and upload your CSV.</p>
+                </div>
+            </fieldset>
+            <div class="component-action">
+                <section>
+                    <a href="/adminv2/csv/folderBulkAdd.csv" class="button" title="Download template">Download Template</a>
+                </section>
+            </div>
+        </section>
         <form action="{{ routeLookupIfAuthorized('adminImportFolder.postImportResults') }}" method="post" enctype="multipart/form-data" name="form" id="form">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <p>First, download the template from the link below, then enter your required class pages or folders and upload your CSV.</p>
-                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
-                    </div>
-                </fieldset>
-                <div class="component-action">
-                    <section>
-                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button" title="Download template">Download Template</a>
-                    </section>
-                </div>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>Default Access Permissions</label>
+                        <label>Folder Access Permissions</label>
                     </div>
                     <div class="small-12 columns">
                         <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" />
@@ -79,7 +82,7 @@
                     <div class="small-12 columns">
                         <label for='template'>
                             Homepage Template
-                            <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each uploaded folder.">?</span>
+                            <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each created folder.">?</span>
                         </label>
                     </div>
                     <div class="small-12 columns">
@@ -89,6 +92,23 @@
                                 <option value="{{ template.getId }}">{{ template.getName }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Apply Changes<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Leaving this off will show you what would happen, but not actually make the change. ">?</span></label>
+                    </div>
+                    <div class="small-12 columns">
+                        <div class="switch round">
+                            <input id="perform" name="perform" type="checkbox" data-ordinary-checkbox="">
+                            <label for="perform">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-12 columns">
+                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
                     </div>
                 </fieldset>
             </section>

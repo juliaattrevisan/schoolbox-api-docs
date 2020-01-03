@@ -1,3 +1,8 @@
+{#
+    array allBreadcrumbs
+    array results
+    bool  perform
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -9,9 +14,21 @@
 
 <div class="row">
     <div class="large-12 columns">
+        {% if not perform %}
+            <div data-alert="" class="alert-box warning">
+                This is a preview only. Repeat with 'Apply Changes' enabled to persist changes.
+            </div>
+        {% else %}
+            <div data-alert="" class="alert-box success">
+                The import was successfully completed.
+            </div>
+        {% endif %}
+    </div>
+    <div class="large-12 columns">
         <table>
             <thead>
                 <tr>
+                    <th>Line</th>
                     <th>Folder<em></em>
                         <span data-tooltip class="hint has-tip tip-right" title="The name of the folder, indicated from reading the rows in the CSV file.">?</span>
                     </th>
@@ -25,21 +42,22 @@
                 </tr>
             </thead>
             <tbody>
-                {% for folder in folders %}
+                {% for result in results %}
                     <tr>
+                        <td>{{ result.row }}</td>
                         <td>
-                        {% if folder.id %}
-                            <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
+                        {% if result.id %}
+                            <a href="/homepage/{{ result.id }}">{{ result.name }}</a>
                         {% else %}
-                            {{ folder.name }}
+                            {{ result.name }}
                         {% endif %}
                         </td>
-                        <td>{{ folder.status }}</td>
-                        <td>{{ folder.error }}</td>
+                        <td>{{ result.status }}</td>
+                        <td>{{ result.error }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ routeLookupIfAuthorized('adminImportFolder.getIndex') }}" class="button icon-previous">Back to folders</a>
+        <a href="{{ routeLookupIfAuthorized('adminImportFolder.getIndex') }}" class="button icon-previous">Return to Folder Import</a>
     </div>
 </div>
