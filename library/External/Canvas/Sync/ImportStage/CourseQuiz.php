@@ -16,8 +16,8 @@ use Evaluation_Section;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
-use InvalidArgumentException;
 use PDO;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -116,28 +116,28 @@ class CourseQuiz
         Bridge\Assignment $assignmentBridge,
         Bridge\Course $courseBridge
     ) {
-        $this->canvasDb            = $canvasDb;
-        $this->schoolboxDb         = $schoolboxDb;
-        $this->log                 = $log;
-        $this->assignmentBridge    = $assignmentBridge;
-        $this->quizMapper          = $quizMapper;
-        $this->quizSectionMapper   = $quizSectionMapper;
-        $this->quizQuestionMapper  = $quizQuestionMapper;
-        $this->questionTypeMapper  = $quizQuestionTypeMapper;
-        $this->quizSolutionMapper  = $quizSolutionMapper;
-        $this->assessmentMapper    = $assessmentMapper;
-        $this->folderMapper        = $folderMapper;
-        $this->courseBridge        = $courseBridge;
+        $this->canvasDb           = $canvasDb;
+        $this->schoolboxDb        = $schoolboxDb;
+        $this->log                = $log;
+        $this->assignmentBridge   = $assignmentBridge;
+        $this->quizMapper         = $quizMapper;
+        $this->quizSectionMapper  = $quizSectionMapper;
+        $this->quizQuestionMapper = $quizQuestionMapper;
+        $this->questionTypeMapper = $quizQuestionTypeMapper;
+        $this->quizSolutionMapper = $quizSolutionMapper;
+        $this->assessmentMapper   = $assessmentMapper;
+        $this->folderMapper       = $folderMapper;
+        $this->courseBridge       = $courseBridge;
     }
 
 
     /**
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
-     * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws UnderflowException
      * @throws UnexpectedValueException
+     * @throws PDOException
      */
     public function synchronise(): void
     {
@@ -195,7 +195,8 @@ class CourseQuiz
                     'points_possible'       => $row['quiz.points_possible'] === null ? null : (float)$row['quiz.points_possible'],
                     'created_at'            => $row['quiz.created_at'],
                     'updated_at'            => $row['quiz.updated_at'],
-                    'muted'                 => false, // TODO this has been deprecated by Canvas, will always be FALSE here
+                    'muted'                 => false,
+                    // TODO this has been deprecated by Canvas, will always be FALSE here
                     'quiz_type'             => $row['quiz.quiz_type'],
                     'anonymous_submissions' => $row['quiz.anonymous_submissions'] === 'allow_anonymous_submissions',
                     'time_limit'            => $row['quiz_fact.time_limit'] === null ? null : (int)$row['quiz_fact.time_limit'],
@@ -238,6 +239,7 @@ class CourseQuiz
                     $quizData['position']
                 );
                 $synchronizedQuizIds[] = $quiz->getId();
+                $this->countQuizSynchronised++;
             }
         }
 
@@ -311,9 +313,10 @@ class CourseQuiz
      * @param int          $position
      * @return Quiz\Model
      * @throws Database\Exception
-     * @throws InvalidColumnException
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
+     * @throws PDOException
+     * @throws InvalidColumnException
      */
     private function syncWithCompositeQuiz(
         Folder\Model $unitSpecFolder,
@@ -374,6 +377,7 @@ class CourseQuiz
      * @throws Database\Exception
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
+     * @throws PDOException
      */
     private function syncWithQuiz(
         Folder\Model $unitSpecFolder,
@@ -420,7 +424,7 @@ class CourseQuiz
             );
         }
 
-        $this->log->debug("Synchronising Canvas Assignment(canvasId: $quizCanvasId) with QuizSpec (id: {$quiz->getId()})");
+        $this->log->debug("Synchronising Canvas Quiz (canvasId: $quizCanvasId) with QuizSpec (id: {$quiz->getId()})");
 
         if ($this->checkAssessmentBelongsToUnitSpec($quiz->getAssessmentModel(), $unitSpecFolder->getUnitSpecification())) {
             $this->countQuizMoved++;
@@ -436,49 +440,103 @@ class CourseQuiz
             $updatedAt
         );
 
-        $isQuizUpdated = false;
-        if (
-            // Does any attribute no longer align?
-            ($quiz->getWorkType() === null xor $workType === null) ||
-            $quiz->getTitle() !== $title ||
-            $quiz->getDescription() !== $description ||
-            $quiz->getDuration() !== $duration ||
-            $quiz->getMaxAttempts() !== $maxAttempts ||
-            $quiz->getWeight() !== $weight ||
-            $quiz->getAvailability() !== Quiz\Model::AVAILABILITY_ASSESS ||
-            $quiz->getAnonymousResult() !== $anonymousSubmissions ||
-            $quiz->getMarkVisibility() !== $markVisibility ||
-            $quiz->getCreated()->getDatabase() !== $createdAt ||
-            $quiz->getUser()->getId() !== $quizOwnerId ||
-            $quiz->getCategory()->getId() !== $unitSpecFolder->getId() ||
-            ($quiz->getWorkType() && $workType && $quiz->getWorkType()->getId() !== $workType->getId())
-        ) {
-            // Update all attributes and update
-            $quiz
-                ->setCategory($unitSpecFolder)
-                ->setUser((new User())->setId($quizOwnerId))
-                ->setWorkType($workType)
-                ->setTitle($title)
-                ->setDescription($description)
-                ->setDuration($duration)
-                ->setMaxAttempts($maxAttempts)
-                ->setWeight($weight)
-                ->setAvailability(Quiz\Model::AVAILABILITY_ASSESS)
-                ->setAnonymousResult($anonymousSubmissions)
-                ->setMarkVisibility($markVisibility)
-                ->setExternalId((string)$quizCanvasId)
-                ->setCreated(Alaress_Date_Format::newDatabaseDate($createdAt));
-
-            $this->quizMapper->save($quiz);
-            $isQuizUpdated = true;
-        }
+        $isQuizUpdated = $this->checkQuizForChanges(
+            $quizCanvasId,
+            $quiz,
+            $workType,
+            $title,
+            $description,
+            $duration,
+            $maxAttempts,
+            $weight,
+            $anonymousSubmissions,
+            $markVisibility,
+            $createdAt,
+            $quizOwnerId,
+            $unitSpecFolder
+        );
         if ($isAssessmentUpdated || $isQuizUpdated) {
             $this->countQuizUpdated++;
             $this->log->debug("Quiz '$title' (canvasId: $quizCanvasId) updated");
         }
         return $quiz;
-
     }
+
+
+    /**
+     * Checks whether the quiz spec needs to be updated. Returns whether any changes persisted.
+     *
+     * @param int                 $quizCanvasId
+     * @param Quiz\Model          $quiz
+     * @param WorkType\Model|null $workType
+     * @param string              $title
+     * @param string|null         $description
+     * @param int                 $duration
+     * @param int                 $maxAttempts
+     * @param int                 $weight
+     * @param bool                $anonymousSubmissions
+     * @param int                 $markVisibility
+     * @param string              $createdAt
+     * @param int                 $quizOwnerId
+     * @param Folder\Model        $unitSpecFolder
+     * @return bool
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     */
+    private function checkQuizForChanges(
+        int $quizCanvasId,
+        Quiz\Model $quiz,
+        ?WorkType\Model $workType,
+        string $title,
+        ?string $description,
+        int $duration,
+        int $maxAttempts,
+        int $weight,
+        bool $anonymousSubmissions,
+        int $markVisibility,
+        string $createdAt,
+        int $quizOwnerId,
+        Folder\Model $unitSpecFolder
+    ): bool {
+        if (
+            // Does any attribute no longer align?
+            (($quiz->getWorkType() === null) === ($workType === null)) &&
+            $quiz->getTitle() === $title &&
+            $quiz->getDescription() === $description &&
+            $quiz->getDuration() === $duration &&
+            $quiz->getMaxAttempts() === $maxAttempts &&
+            $quiz->getWeight() === $weight &&
+            $quiz->getAvailability() === Quiz\Model::AVAILABILITY_ASSESS &&
+            $quiz->getAnonymousResult() === $anonymousSubmissions &&
+            $quiz->getMarkVisibility() === $markVisibility &&
+            $quiz->getCreated()->getDatabase() === $createdAt &&
+            $quiz->getUser()->getId() === $quizOwnerId &&
+            $quiz->getCategory()->getId() === $unitSpecFolder->getId() &&
+            ($quiz->getWorkType() && $workType && $quiz->getWorkType()->getId() === $workType->getId())
+        ) {
+            return false;
+        }
+        // Update all attributes and update
+        $quiz
+            ->setCategory($unitSpecFolder)
+            ->setUser((new User())->setId($quizOwnerId))
+            ->setWorkType($workType)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setDuration($duration)
+            ->setMaxAttempts($maxAttempts)
+            ->setWeight($weight)
+            ->setAvailability(Quiz\Model::AVAILABILITY_ASSESS)
+            ->setAnonymousResult($anonymousSubmissions)
+            ->setMarkVisibility($markVisibility)
+            ->setExternalId((string)$quizCanvasId)
+            ->setCreated(Alaress_Date_Format::newDatabaseDate($createdAt));
+
+        $this->quizMapper->save($quiz);
+        return true;
+    }
+
 
     /**
      * Sync Canvas data with SB Quiz section
@@ -486,6 +544,8 @@ class CourseQuiz
      * @param Quiz\Model $quiz
      * @return QuizSection\Model
      * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function syncWithSection(Quiz\Model $quiz): QuizSection\Model
     {
@@ -542,7 +602,10 @@ class CourseQuiz
      * @param QuizSection\Model $section
      * @param float|null        $pointsPossible
      * @return QuizQuestion\Model
+     * @throws InvalidColumnException
      * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function syncWithQuestion(QuizSection\Model $section, ?float $pointsPossible): QuizQuestion\Model
     {
@@ -600,6 +663,8 @@ class CourseQuiz
      * @param QuizQuestion\Model $question
      * @return QuizSolution\Model
      * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function syncWithSolution(QuizQuestion\Model $question): QuizSolution\Model
     {
@@ -699,7 +764,7 @@ class CourseQuiz
      * @param int                 $position
      * @param int                 $markVisibility
      * @return Quiz\Model
-     * @throws Mapper\Exception
+     * @throws Database\Exception
      */
     private function createQuizSpec(
         Folder\Model $unitSpecFolder,
@@ -743,7 +808,8 @@ class CourseQuiz
             ->setExternalId((string)$quizCanvasId)
             ->setCreated($assessment->getCreatedAt());
 
-        $this->quizMapper->save($quiz);
+        // Need to respect Canvas's created_at value
+        $this->saveModel($this->quizMapper, $quiz, false);
 
         return $quiz;
     }
@@ -784,7 +850,7 @@ class CourseQuiz
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
          * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
          */
-        $this->saveModel($this->assessmentMapper, $assessment, false);
+        $this->saveModel($this->assessmentMapper, $assessment, false, false);
 
         $sql = "INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id) VALUES (:assessmentId, :unitSpecId)";
         $this->schoolboxDb->executeQuery($sql, [
@@ -856,7 +922,6 @@ class CourseQuiz
         ) {
             return false;
         }
-
         $assessment->setTitle($title)
                    ->setDescription($description)
                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
@@ -864,7 +929,7 @@ class CourseQuiz
                    ->setSequence($position)
                    ->setWorkType($workType);
 
-        $this->saveModel($this->assessmentMapper, $assessment, false);
+        $this->saveModel($this->assessmentMapper, $assessment, false, false);
 
         return true;
     }
@@ -904,7 +969,7 @@ class CourseQuiz
         }
 
         foreach ($this->quizMapper->findByPredicates($pb) as $quiz) {
-            $this->log->debug("Deleting un-synchronised assignment '{$quiz->getAssessmentModel()->getTitle()}' (quizId: {$quiz->getId()})");
+            $this->log->debug("Deleting un-synchronised quiz '{$quiz->getAssessmentModel()->getTitle()}' (quizId: {$quiz->getId()})");
             $this->quizMapper->delete($quiz);
             $this->countQuizDeleted++;
         }

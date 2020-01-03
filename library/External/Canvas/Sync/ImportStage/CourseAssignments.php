@@ -121,10 +121,10 @@ class CourseAssignments
         $this->log->notice("Synchronising Canvas Assignments => Schoolbox SubmissionBoxSpec...");
         $this->resetCounts();
 
-        $canvasCourseIds = $this->getCanvasCourseIdsToImport();
-        $courseFilterPb = (new Builder($this->canvasDb, ''))->in('course.canvas_id', $canvasCourseIds);
+        $canvasCourseIds   = $this->getCanvasCourseIdsToImport();
+        $courseFilterPb    = (new Builder($this->canvasDb, ''))->in('course.canvas_id', $canvasCourseIds);
         $courseFilterWhere = $courseFilterPb->getWhere()[0];
-        $sql       = "
+        $sql               = "
         SELECT
                course.canvas_id            'course.canvas_id',
                course.name                 'course.name',
@@ -144,10 +144,10 @@ class CourseAssignments
         WHERE {$courseFilterWhere} AND quiz.id IS NULL
         ORDER BY course.code, course.canvas_id, assignment_group.position, assignment.position
         ";
-        $statement = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
+        $statement         = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
 
         // Parse results into hierarchical structure
-        $coursesData = [];
+        $coursesData        = [];
         $assessmentSequence = null;
         while ($row = $statement->fetch()) {
             $courseCanvasId     = (int)$row['course.canvas_id'];
@@ -159,21 +159,22 @@ class CourseAssignments
                     'name'        => $row['course.name'],
                     'assignments' => [],
                 ];
-                $assessmentSequence = 1; // TODO remove hard-coding in develop branch
+                $assessmentSequence           = 1; // TODO remove hard-coding in develop branch
             }
 
             // First time we've seen this assignment?
             if (!array_key_exists($assignmentCanvasId, $coursesData[$courseCanvasId]['assignments'])) {
                 $coursesData[$courseCanvasId]['assignments'][$assignmentCanvasId] = [
-                    'title'                 => $row['assignment.title'],
-                    'description'           => $row['assignment.description'],
-                    'points_possible'       => $row['assignment.points_possible'] === null ? null : (float)$row['assignment.points_possible'],
-                    'grading_type'          => $row['assignment.grading_type'],
-                    'submission_types'      => $row['assignment.submission_types'],
-                    'created_at'            => $row['assignment.created_at'],
-                    'updated_at'            => $row['assignment.updated_at'],
-                    'muted'                 => $row['assignment.muted'] === 'true',  // TODO this has been deprecated by Canvas, will always be NULL
-                    'position'              => $assessmentSequence++,
+                    'title'            => $row['assignment.title'],
+                    'description'      => $row['assignment.description'],
+                    'points_possible'  => $row['assignment.points_possible'] === null ? null : (float)$row['assignment.points_possible'],
+                    'grading_type'     => $row['assignment.grading_type'],
+                    'submission_types' => $row['assignment.submission_types'],
+                    'created_at'       => $row['assignment.created_at'],
+                    'updated_at'       => $row['assignment.updated_at'],
+                    'muted'            => $row['assignment.muted'] === 'true',
+                    // TODO this has been deprecated by Canvas, will always be NULL
+                    'position'         => $assessmentSequence++,
                 ];
             }
         }
@@ -181,25 +182,25 @@ class CourseAssignments
         // Attempt to find a teacher for each course who we can set as the course's assessment owner
         // User must exist in Schoolbox, have roleType of 'staff', and have 'teacher-enrollment' to assignment's course
         $courseTeachers = new CourseTeachers($this->schoolboxDb, $this->canvasDb);
-        foreach($courseTeachers->getCourseTeacherMap(array_keys($coursesData)) as $courseCanvasId => $teacherUserId){
+        foreach ($courseTeachers->getCourseTeacherMap(array_keys($coursesData)) as $courseCanvasId => $teacherUserId) {
             $coursesData[$courseCanvasId]['teacherSchoolboxId'] = $teacherUserId;
         }
 
         // Keep track of all entities synchronized.
         // We will later delete all entities in Schoolbox that appear to have been imported from Canvas
         // but appear to no longer exist.
-        $synchronizedSubmissionBoxIds     = [];
+        $synchronizedSubmissionBoxIds = [];
 
         // Fall back to setting SubmissionBoxSpec.owner to Schoolbox Admin if no course teacher found
         $schoolboxAdminUserId = $this->getSchoolboxAdminUserId();
 
         foreach ($coursesData as $courseCanvasId => $courseData) {
-            $pb = $this->courseBridge->equalsCanvasCourse($courseCanvasId);
+            $pb             = $this->courseBridge->equalsCanvasCourse($courseCanvasId);
             $unitSpecFolder = $this->folderMapper->findOneByPredicates($pb);
 
             foreach ($courseData['assignments'] as $assignmentCanvasId => $assignmentData) {
                 $this->countAssignmentsSynchronised++;
-                $submissionBox  = $this->syncWithSubmissionBox(
+                $submissionBox                  = $this->syncWithSubmissionBox(
                     $unitSpecFolder,
                     $assignmentCanvasId,
                     $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
@@ -246,7 +247,7 @@ class CourseAssignments
             JOIN course_section_dim cs ON cs.course_id = c.id
             WHERE {$whereClause}
         ";
-        $canvasIds = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+        $canvasIds   = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
         return array_map(static function (string $canvasId) {
             return (int)$canvasId;
         }, $canvasIds);
@@ -311,7 +312,7 @@ class CourseAssignments
         $selfReviewability = $this->assignmentBridge->getSelfReviewability();
         $workType          = $this->assignmentBridge->getSubmissionBoxWorkType();
         $weight            = $this->assignmentBridge->getSubmissionBoxWeight();
-        $submissionBox = $this->findSubmissionBoxSpec($canvasId);
+        $submissionBox     = $this->findSubmissionBoxSpec($canvasId);
 
         // Not found in SB?
         if (!$submissionBox) {
@@ -341,7 +342,7 @@ class CourseAssignments
         $this->log->debug("Synchronising Canvas Assignment(canvasId: $canvasId) with SubmissionBoxSpec (id: {$submissionBox->getId()})");
 
         // Already exists in SB. Do we need to update it?
-        if($this->checkAssessmentBelongsToUnitSpec($submissionBox->getAssessmentModel(), $unitSpecFolder->getUnitSpecification() )){
+        if ($this->checkAssessmentBelongsToUnitSpec($submissionBox->getAssessmentModel(), $unitSpecFolder->getUnitSpecification())) {
             $this->countSubmissionBoxMoved++;
         }
 
@@ -538,7 +539,7 @@ class CourseAssignments
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
          * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
          */
-        $this->saveModel($this->assessmentMapper, $assessment, false);
+        $this->saveModel($this->assessmentMapper, $assessment, false, false);
 
         $sql = "INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id) VALUES (:assessmentId, :unitSpecId)";
         $this->schoolboxDb->executeQuery($sql, [
@@ -617,7 +618,7 @@ class CourseAssignments
                    ->setSequence($position)
                    ->setWorkType($workType);
 
-        $this->saveModel($this->assessmentMapper, $assessment, false);
+        $this->saveModel($this->assessmentMapper, $assessment, false, false);
 
         return true;
     }

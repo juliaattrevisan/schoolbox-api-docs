@@ -216,22 +216,39 @@ class DataSync
         }
 
         $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
-        $accountBridge     = new Bridge\Account($this->schoolboxDb);
-        $assignmentBridge  = new Bridge\Assignment(
+        $accountBridge            = new Bridge\Account($this->schoolboxDb);
+        $assignmentBridge         = new Bridge\Assignment(
             $this->configMapper->get('site_location'),
             $this->markTypeMapper->findAll(),
             $this->workTypeMapper->findAll()
         );
-        $courseBridge      = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
-        $courseGroupBridge = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
+        $courseBridge             = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
+        $courseGroupBridge        = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
+        $assignmentDatesBridge    = new Bridge\AssignmentDates();
+        $assignmentOverrideBridge = new Bridge\AssignmentOverride($this->schoolboxDb);
 
         $this->syncAccounts($accountBridge);
         $this->syncCourses($accountBridge, $courseBridge, $courseGroupBridge);
         $this->syncCourseAssignments($assignmentBridge, $courseBridge);
         $this->syncCourseQuiz($assignmentBridge, $courseBridge);
-        $this->syncCourseSections();
-        $this->syncClassAssignments();
-        $this->syncClassQuiz();
+
+        // Defer building this one till as late as possible (it can take a while)
+        $sectionBridge = new Bridge\CourseSection(
+            $this->canvasDb,
+            $this->schoolboxDb,
+            $this->folderMapper,
+            $courseBridge,
+            $this->log
+        );
+        $sectionBridge->execute();
+
+        $this->syncCourseSections($courseBridge, $courseGroupBridge, $sectionBridge);
+        $this->syncClassAssignments($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
+        $this->syncClassQuiz($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
+
+        if (!$this->persist) {
+            $this->schoolboxDb->rollBack();
+        }
     }
 
     /**
@@ -269,7 +286,7 @@ class DataSync
         Bridge\Account $accountBridge,
         Bridge\Course $courseBridge,
         Bridge\CourseGroup $courseGroupBridge
-    ): void  {
+    ): void {
         (new ImportStage\Courses(
             $this->canvasDb,
             $this->folderMapper,
@@ -293,7 +310,8 @@ class DataSync
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    private function syncCourseAssignments(Bridge\Assignment $assignmentBridge, Bridge\Course $courseBridge): void {
+    private function syncCourseAssignments(Bridge\Assignment $assignmentBridge, Bridge\Course $courseBridge): void
+    {
         (new ImportStage\CourseAssignments(
             $this->canvasDb,
             $this->schoolboxDb,
@@ -310,9 +328,15 @@ class DataSync
      * @param Bridge\Assignment $assignmentBridge
      * @param Bridge\Course     $courseBridge
      * @return void
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
      * @throws Mapper\Exception
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     * @throws PDOException
      */
-    private function syncCourseQuiz(Bridge\Assignment $assignmentBridge, Bridge\Course $courseBridge): void {
+    private function syncCourseQuiz(Bridge\Assignment $assignmentBridge, Bridge\Course $courseBridge): void
+    {
         (new ImportStage\CourseQuiz(
             $this->canvasDb,
             $this->schoolboxDb,
@@ -328,54 +352,118 @@ class DataSync
             $courseBridge
         ))->synchronise();
     }
-    private function syncCourseSections(): void { }
-    private function syncClassAssignments(): void { }
-    private function syncClassQuiz(): void { }
 
 
-
-
-    private function syncAccountss(): void{
-
-
-die('todo');
-        // Delay building this one, it takes a while.
-        $sectionBridge = new Bridge\CourseSection(
-            $this->canvasDb,
-            $this->schoolboxDb,
-            $this->folderMapper,
-            $courseBridge,
-            $this->log
-        );
-        $sectionBridge->execute();
-
+    /**
+     * @param Bridge\Course        $courseBridge
+     * @param Bridge\CourseGroup   $courseGroupBridge
+     * @param Bridge\CourseSection $sectionBridge
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    private function syncCourseSections(Bridge\Course $courseBridge, Bridge\CourseGroup $courseGroupBridge, Bridge\CourseSection $sectionBridge): void
+    {
         // Import Canvas CourseSections + Assignments => Schoolbox CourseImpl/UnitImpl/AssessmentImpl
         (new ImportStage\CourseSections(
             $this->canvasDb,
             $this->schoolboxDb,
-            $this->externalClass,
-            $this->externalUser->getCurrentYear(),
             $this->courseImplMapper,
             $this->courseSpecMapper,
+            $this->unitImplMapper,
+            $this->unitSpecMapper,
+            $this->folderMapper,
+            $this->log,
+            $courseBridge,
+            $courseGroupBridge,
+            $sectionBridge,
+            new Bridge\CourseSectionDates()
+        ))->synchronise();
+
+        if (!$this->persist) {
+            $this->schoolboxDb->rollBack();
+        }
+    }
+
+    /**
+     * @param Bridge\AssignmentDates    $assignmentDatesBridge
+     * @param Bridge\Course             $courseBridge
+     * @param Bridge\CourseSection      $courseSectionBridge
+     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     */
+    private function syncClassAssignments(
+        Bridge\AssignmentDates $assignmentDatesBridge,
+        Bridge\Course $courseBridge,
+        Bridge\CourseSection $courseSectionBridge,
+        Bridge\AssignmentOverride $assignmentOverrideBridge
+    ): void {
+        (new ImportStage\SectionAssignment(
+            $this->canvasDb,
+            $this->schoolboxDb,
+            $this->externalClass,
+            $this->externalUser->getCurrentYear(),
             $this->unitImplMapper,
             $this->unitSpecMapper,
             $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->planMapper,
             $this->participantMapper,
-            $this->folderMapper,
             $this->userMapper,
             $this->log,
-            new Bridge\AssignmentDates(),
+            $assignmentDatesBridge,
             $courseBridge,
-            $courseGroupBridge,
-            $sectionBridge,
-            new Bridge\CourseSectionDates(),
-            new Bridge\AssignmentOverride($this->schoolboxDb)
+            $courseSectionBridge,
+            $assignmentOverrideBridge
         ))->synchronise();
+    }
 
-        if (!$this->persist) {
-            $this->schoolboxDb->rollBack();
-        }
+
+    /**
+     * @param Bridge\AssignmentDates    $assignmentDatesBridge
+     * @param Bridge\Course             $courseBridge
+     * @param Bridge\CourseSection      $courseSectionBridge
+     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    private function syncClassQuiz(
+        Bridge\AssignmentDates $assignmentDatesBridge,
+        Bridge\Course $courseBridge,
+        Bridge\CourseSection $courseSectionBridge,
+        Bridge\AssignmentOverride $assignmentOverrideBridge
+    ): void {
+        (new ImportStage\SectionQuiz(
+            $this->canvasDb,
+            $this->schoolboxDb,
+            $this->externalClass,
+            $this->externalUser->getCurrentYear(),
+            $this->unitImplMapper,
+            $this->unitSpecMapper,
+            $this->quizMapper,
+            $this->assessmentMapper,
+            $this->planMapper,
+            $this->participantMapper,
+            $this->userMapper,
+            $this->log,
+            $assignmentDatesBridge,
+            $courseBridge,
+            $courseSectionBridge,
+            $assignmentOverrideBridge
+        ))->synchronise();
     }
 }

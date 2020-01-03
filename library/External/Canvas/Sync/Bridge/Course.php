@@ -132,9 +132,9 @@ class Course
                    f.parent 'f.parent',
                    us.id 'us.id'
             FROM folder f
-            JOIN course_unit_specification us on f.id = us.folder_id
+            JOIN course_unit_specification us ON f.id = us.folder_id
             WHERE
-                  $canvasCourseFolderWhere AND
+                  {$canvasCourseFolderWhere} AND
                   f.deleted_at IS NULL AND
                   us.deleted_at IS NULL
         ";
