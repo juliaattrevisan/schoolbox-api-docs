@@ -27,7 +27,7 @@ class Controller extends Base
             'background_color' => $this->getConfigLoader()->get('skin_colour_navigation_background'),
             'display'          => 'minimal-ui',
             'Scope'            => '/',
-            'start_url'        => '/',
+            'start_url'        => '/login/',
             'icons'            => [
                 [
                     'src'   => '/images/logo.php?logo=skin_logo_square&size=apple72',
