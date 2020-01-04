@@ -292,7 +292,7 @@ foreach ($alreadyInFolderList as $current) {
  * force the homepage into the checkbox list
  */
 if (isset($_GET['homepageId']) && !in_array($_GET['homepageId'], $tempFolderIds)) {
-    if (FolderAccess::getInstance()->getFolderAccess($_SESSION['user'], $_GET['homepageId']) >= UserAccess::ACCESS_WRITE) {
+    if (FolderAccess::getInstance()->getFolderAccess($_SESSION['user'], (int)$_GET['homepageId']) >= UserAccess::ACCESS_WRITE) {
         $tempFolderIds[] = $_GET['homepageId'];
     }
 }
