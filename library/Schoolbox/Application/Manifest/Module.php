@@ -26,6 +26,17 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $this->register('GET', '', 'getManifest', null, null);
+        $this->register('GET', '/offline', 'getOffline', null, null);
+
+    }
+
+    /**
+     * @param IChainLoader $templateLoader
+     * @throws Twig_Error_Loader
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

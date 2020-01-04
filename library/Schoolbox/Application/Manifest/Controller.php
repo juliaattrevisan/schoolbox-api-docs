@@ -74,4 +74,8 @@ class Controller extends Base
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($manifest));
     }
+
+    public function getOffline(): void {
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/offline.twig', []));
+    }
 }

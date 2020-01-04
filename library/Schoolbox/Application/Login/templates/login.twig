@@ -158,15 +158,6 @@
 </div>
 <script type="text/javascript">
 
-    function isTouchDevice() {
-        return (('ontouchstart' in window) ||
-        (navigator.maxTouchPoints > 0) ||
-        (navigator.msMaxTouchPoints > 0));
-    }
-    if (!isTouchDevice()) {
-        document.getElementById('username').focus();
-    }
-
     var l, fy;
 
     $(function () {
@@ -197,6 +188,15 @@
                 $('#error-msg').remove();
             }
         });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                        .then((reg) => {
+                            console.log('Service worker registered.', reg);
+                        });
+            });
+        }
     });
 </script>
 {{ config.site_analytics | replace({'{USER_ROLE}':''}) | raw }}
