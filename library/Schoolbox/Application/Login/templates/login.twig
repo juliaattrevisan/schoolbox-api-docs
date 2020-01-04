@@ -8,12 +8,21 @@
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="Schoolbox Pty Ltd"/>
 <meta name="application-name" content="{{ config.school_name }}" />
+<link rel="manifest" href="/manifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="application-name" content="{{ config.title }}">
+<meta name="theme-color" content="{{ config.skin_colour_navigation_background }}">
+<meta name="msapplication-navbutton-color" content="{{ config.skin_colour_navigation_background }}">
+<meta name="msapplication-starturl" content="/">
 <meta name="msapplication-TileColor" content="#0066b0" />
 <meta name="msapplication-square70x70logo" content="/images/logo.php?logo=skin_logo_square&size=tile70" />
 <meta name="msapplication-square150x150logo" content="/images/logo.php?logo=skin_logo_square&size=tile150" />
 <meta name="msapplication-wide310x150logo" content="/images/logo.php?logo=skin_logo_login&size=tile310" />
 <meta name="msapplication-square310x310logo" content="/images/logo.php?logo=skin_logo_large&size=tile310" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="initial-scale=1, maximum-scale=1", shrink-to-fit=no">
+    <meta name="apple-mobile-web-app-title" content="{{ config.title }}">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" sizes="57x57" href="/images/logo.php?logo=skin_logo_square&size=apple57">
 <link rel="apple-touch-icon" sizes="60x60" href="/images/logo.php?logo=skin_logo_square&size=apple60">
 <link rel="apple-touch-icon" sizes="72x72" href="/images/logo.php?logo=skin_logo_square&size=apple72">
@@ -24,38 +33,46 @@
 <link rel="apple-touch-icon" sizes="152x152" href="/images/logo.php?logo=skin_logo_square&size=apple152">
 <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_logo_square&size=apple180">
 <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
-{% include 'include/skin.twig' with { config: config } only %}
-
-{% autoescape 'css' %}
-    <style type="text/css">
-        body.login {
-            background-image: url("{{ random(login_backgrounds) }}");
-        }
-    </style>
-{% endautoescape %}
-
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
+<link rel="stylesheet" type="text/css" href="/css/{{ config.site_location }}/chrome-foundation.css?v={{ config.site_version }}" />
+<style type="text/css">
+    body.login {
+        background-image: url({{ login_bg }});
+    }
+</style>
+<script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
+<script src="/javascript/shared/browser-redirect.js"></script>
+<script type="text/javascript">
+$(function() {
+    if (!Modernizr.touch) {
+        $('#username').focus();
+    }
+});
+</script>
 {% if config.site_usage_tracking %}
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-97642429-1"></script>
+
     {% autoescape 'js' %}
-        <!-- Google Tag Manager -->
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            dataLayer.push({
-                'event': 'page_view',
-                'site_school_code': '{{ config. site_school_code }}',
-                'site_type': '{{ config.site_type }}',
-                'site_version': '{{ config.site_version }}',
-            });
-        </script>
-        <script>
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-N8R6VLV');
-        </script>
-        <!-- End Google Tag Manager -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments)}
+        gtag('js', new Date());
+
+        // Set tracking ID and map custom dimensions
+        gtag('config', 'UA-97642429-1', {
+            'custom_map': {
+                'dimension1': 'site_school_code',
+                'dimension2': 'site_type',
+                'dimension6': 'site_version'
+            }
+        });
+
+        // Send custom dimension events
+        gtag('event', 'site_school_code_dimension', {'site_school_code': '{{ config. site_school_code }}'});
+        gtag('event', 'site_type_dimension', {'site_type': '{{ config.site_type }}'});
+        gtag('event', 'site_version_dimension', {'site_version': '{{ config.site_version }}'});
+
+    </script>
     {% endautoescape %}
 
 {% endif %}
