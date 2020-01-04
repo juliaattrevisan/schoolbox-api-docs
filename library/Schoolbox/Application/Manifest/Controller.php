@@ -24,7 +24,7 @@ class Controller extends Base
             'name'             => $this->getConfigLoader()->get('title'),
             'short_name'       => $this->getConfigLoader()->get('title'),
             'theme_color'      => $this->getConfigLoader()->get('skin_colour_navigation_background'),
-            'background_color' => $this->getConfigLoader()->get('skin_colour_offcanvas_background'),
+            'background_color' => $this->getConfigLoader()->get('skin_colour_navigation_background'),
             'display'          => 'minimal-ui',
             'Scope'            => '/',
             'start_url'        => '/',

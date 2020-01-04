@@ -45,8 +45,10 @@
         </script>
         {% endautoescape %}
         {% endif %}
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="/service-worker.js?v={{ config.site_version }}"></script>
+
 
         <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jscurry-0.3.0.js?v={{ config.site_version }}"></script>
