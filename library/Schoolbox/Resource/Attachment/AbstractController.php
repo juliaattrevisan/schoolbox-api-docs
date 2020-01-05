@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -11,9 +11,8 @@ namespace Schoolbox\Resource\Attachment;
 
 use SitePage;
 
-abstract class AbstractController implements ControllerInterface {
-
-
+abstract class AbstractController implements ControllerInterface
+{
     /** @var bool */
     protected $multi;
 
@@ -22,7 +21,6 @@ abstract class AbstractController implements ControllerInterface {
 
     /** @var string */
     protected $slug;
-
 
     /**
      * @param bool   $multi
@@ -37,7 +35,7 @@ abstract class AbstractController implements ControllerInterface {
 
         $this->multi      = $multi;
         $this->mimeFilter = $mimeFilter;
-        $this->slug       = strtolower(str_replace('\\','/',$matches[1]));
+        $this->slug       = strtolower(str_replace('\\', '/', $matches[1]));
         $this->template   = $this->slug;
     }
 

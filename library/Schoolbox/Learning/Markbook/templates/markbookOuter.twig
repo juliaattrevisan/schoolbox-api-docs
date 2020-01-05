@@ -20,6 +20,42 @@
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function() {
+        var $toast = $('[data-relation="submit-label"]');
+        $(document).on('change', '[data-weight]', function (e) {
+            let data = {
+                assessmentId: $(this).attr('data-assessment'),
+                weight: $(this).val()
+            }
+            updateAssessment($(this).attr('name'), data);
+        });
+
+        $(document).on('change', '[data-visibility]', function (e) {
+            let data = {
+                assessmentId: $(this).attr('data-assessment'),
+                visibility: $(this).val()
+            }
+            updateAssessment($(this).attr('name'), data);
+        });
+
+        function updateAssessment(property, data) {
+            let path = '/learning/assessments/' + property + '/' + data['assessmentId'];
+            $toast.toastActivate({text: 'Updating assessment...'});
+
+            $.ajax({
+                type: "POST",
+                url: path,
+                data: data,
+                dataType: 'json',
+            }).success(function (response) {
+                $toast.toastTimeout({text: response.message, css: 'success'});
+            }).error(function (response) {
+                $toast.toastTimeout({
+                    text: response.responseJSON.error,
+                    css: 'alert'
+                });
+            });
+        }
+
         $('#{{ reportContentId }}').on('filterContentLoaded', function() {
             // Use datatables to do fixed headers and left column
             // Only do this on small up

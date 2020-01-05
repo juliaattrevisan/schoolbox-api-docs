@@ -18,8 +18,7 @@ use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
-
-ini_set('max_execution_time', 300);
+use function ini_set;
 
 class Controller extends Base
 {
@@ -58,6 +57,7 @@ class Controller extends Base
         Folder\Mapper $folderMapper,
         UserAccessMapper $userAccessMapper
     ) {
+        ini_set('max_execution_time', 300);
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
         $this->folderMapper = $folderMapper;

@@ -22,6 +22,9 @@ class Model
     /** @var boolean */
     protected $visible;
 
+    /** @var string */
+    private   $title;
+
     /**
      * @param int $id
      * @return self

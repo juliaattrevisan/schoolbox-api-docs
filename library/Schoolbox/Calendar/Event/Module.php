@@ -22,6 +22,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Relation\Campus;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\Role;
+use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -135,14 +136,12 @@ class Module extends BaseModule
      * @param array $params
      * @return array|null
      * @throws NotFound
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     private function preloadEvent(array $params): ?array
     {
         try {
             return ['event' => $this->getEventMapper()->findById($params['eventId'])];
-        } catch (MapperException $e) {
+        } catch (Mapper\Exception $e) {
             throw new NotFound('Event not found');
         }
     }

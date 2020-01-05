@@ -5,28 +5,106 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Resource\Folder;
+use \Schoolbox\Resource\File;
 
 /**
  * Puts all resources from a folder into a zip
  */
 class ZipFolder
 {
-    function __construct($folder)
-    {
-        $this->db = DeprecatedDatabase::getInstance();
-        $this->folder = $folder;
-        $this->tmpName = tempnam(Config::get('zip_dir'), 'zip');
-        $this->tmpFolder = $this->tmpName . 'dir';
-        $this->tmpZip = $this->tmpName . '.zip';
-        $this->allowedChars = "[^0-9a-zA-Z()_-]";
-        $this->size = 0;
-        $this->maxDepth = 5;
-        $this->maxSize = 1073741824; //1GB
 
-        $this->groupHandler = new Group;
-        $this->folderMapper = new \Schoolbox\Resource\Folder\Mapper();
-        $this->fileMapper = new \Schoolbox\Resource\File\Mapper();
+    /**
+     * @var false|string
+     */
+    private $tmpName;
+
+
+    /**
+     * @var string
+     */
+    private $tmpFolder;
+
+
+    /**
+     * @var string
+     */
+    private $tmpZip;
+
+
+    /**
+     * @var string
+     */
+    private $allowedChars = "[^0-9a-zA-Z()_-]";
+
+
+    /**
+     * @var int
+     */
+    private $size = 0;
+
+
+    /**
+     * Max folder depth of zip
+     * @var int
+     */
+    private $maxDepth = 5;
+
+
+    /**
+     * Max size of zip file 1GB
+     *
+     * @var int
+     */
+    private $maxSize = 1073741824;
+
+
+    /**
+     * @var Group
+     */
+    private $groupHandler;
+
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * @var File\Mapper
+     */
+    private $fileMapper;
+
+
+    /**
+     * @var Folder\Model|null
+     */
+    private $folderDetails;
+
+
+    /**
+     * ZipFolder constructor.
+     * @param $folder
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    public function __construct($folder)
+    {
+        $this->tmpName   = tempnam(Config::get('zip_dir'), 'zip');
+        $this->tmpFolder = $this->tmpName . 'dir';
+        $this->tmpZip    = $this->tmpName . '.zip';
+
+        $this->groupHandler  = new Group;
+        $this->folderMapper  = new Folder\Mapper();
+        $this->fileMapper    = new File\Mapper();
         $this->folderDetails = $this->getFolderDetails($folder);
+
+        /* If you can't get details about $folder (it might not exist/be deleted)
+         * then folderDetails will be null; prevent NPE in following statements
+         */
+        if (null === $this->folderDetails) {
+            error(13);
+        }
 
         if (is_numeric($this->folderDetails->getId())) {
             if ($this->getPermission($this->folderDetails->getId()) < UserAccess::ACCESS_READ) {
@@ -37,6 +115,10 @@ class ZipFolder
         }
     }
 
+
+    /**
+     *
+     */
     public function __destruct()
     {
         // Might be a bit redundant, but can't hurt anything
@@ -44,37 +126,62 @@ class ZipFolder
         $this->cleanUp();
     }
 
-    function getResources($folder, $permission)
+
+    /**
+     * @param $folder
+     * @param $permission
+     * @return \Schoolbox\Collection|File\Model[]
+     */
+    private function getResources($folder, $permission)
     {
         return $this->fileMapper->findForFolders(
-            array($folder),
-            array('getHidden' => ($permission >= UserAccess::ACCESS_WRITE))
+            [$folder],
+            ['getHidden' => ($permission >= UserAccess::ACCESS_WRITE)]
         );
     }
 
+
+    /**
+     * @param $folderId
+     * @return \Schoolbox\GenericCollection|Folder\Model[]
+     */
     private function getFolders($folderId)
     {
         return $this->folderMapper->findByParent($folderId);
     }
 
-    function cleanName($name)
+
+    /**
+     * @param $name
+     * @return string|string[]|null
+     */
+    private function cleanName($name)
     {
-        $filename = preg_replace("/{$this->allowedChars}/", "_", $name);
-        return $filename;
+        return preg_replace("/{$this->allowedChars}/", '_', $name);
     }
 
-    function uniqueFileName($fileName, $depth = 1)
+
+    /**
+     * @param     $fileName
+     * @param int $depth
+     * @return mixed
+     */
+    private function uniqueFileName($fileName, $depth = 1)
     {
         if (is_file($fileName)) {
             $pathParts = pathinfo($fileName);
-            $newName = $pathParts['dirname'] . '/' . $pathParts['filename'] . '_' . $depth . '.' . $pathParts['extension'];
+            $newName   = $pathParts['dirname'] . '/' . $pathParts['filename'] . '_' . $depth . '.' . $pathParts['extension'];
             return $this->uniqueFileName($newName, ++$depth);
         } else {
             return $fileName;
         }
     }
 
-    function sendZip()
+
+    /**
+     * @throws UnexpectedValueException
+     */
+    public function sendZip()
     {
         if ($this->createZip()) {
             $filename = $this->cleanName($this->folderDetails->getName());
@@ -93,7 +200,15 @@ class ZipFolder
         }
     }
 
-    function createDirectory($currentDir, $parentFolder, $permission, $depth = 0)
+
+    /**
+     * @param     $currentDir
+     * @param     $parentFolder
+     * @param     $permission
+     * @param int $depth
+     * @throws Exception
+     */
+    private function createDirectory($currentDir, $parentFolder, $permission, $depth = 0)
     {
         //populate dir with files
         $fileList = $this->getResources($parentFolder->getId(), $permission);
@@ -103,12 +218,12 @@ class ZipFolder
                 $nextSize = $this->size + $file->getSize();
                 if ($this->maxSize > $nextSize) {
                     $this->size = $this->size + $file->getSize();
-                    $fileName = $this->getTargetPath($currentDir, $file->getBasename());
-                    $fp = fopen($fileName, 'wb');
+                    $fileName   = $this->getTargetPath($currentDir, $file->getBasename());
+                    $fp         = fopen($fileName, 'wb');
                     stream_copy_to_stream($file->getStorage()->readStream(), $fp);
                     fclose($fp);
                 } else {
-                   error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is '.\Alaress_Byte_Format::bytesToString($this->maxSize).'.');
+                    error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is ' . \Alaress_Byte_Format::bytesToString($this->maxSize) . '.');
                 }
             }
         }
@@ -121,32 +236,40 @@ class ZipFolder
             foreach ($folderList as $folder) {
                 $permission = $this->getPermission($folder->getId());
                 if ($permission > UserAccess::ACCESS_DENY) {
-                    $folderName = $this->cleanName($folder->getName());
+                    $folderName     = $this->cleanName($folder->getName());
                     $folderLocation = $currentDir . '/' . $folderName;
                     mkdir($folderLocation);
-                    $this->createDirectory($folderLocation, $folder, $permission, $depth+1);
+                    $this->createDirectory($folderLocation, $folder, $permission, $depth + 1);
                 }
             }
         }
     }
 
-    function createZip()
+
+    /**
+     * @return bool
+     * @throws UnexpectedValueException
+     */
+    public function createZip()
     {
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
+
         $this->createDirectory(
             $this->tmpFolder,
             $this->folderDetails,
             $this->getPermission($this->folderDetails->getId())
         );
+
         $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
 
         $i      = 0;
         $ulimit = 250;
+
         foreach (new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // Close/open archive after 250 additions, to avoid ulimit issues
-            if ($i++ % $ulimit === ($ulimit-1)) {
+            if ($i++ % $ulimit === ($ulimit - 1)) {
                 $archive->close();
                 $archive->open($this->tmpZip);
             }
@@ -154,18 +277,23 @@ class ZipFolder
             /** @var SplFileInfo $file */
             // Chop parts of path that match $this->tmpFolder
             $filePath = $file->getPath() . '/' . $file->getFilename();
-            $zipPath  = substr($filePath, strlen($this->tmpFolder)+1);
+            $zipPath  = substr($filePath, strlen($this->tmpFolder) + 1);
             if ($file->isDir()) {
                 $archive->addEmptyDir($zipPath);
             } elseif ($file->isFile()) {
                 $archive->addFile($filePath, $zipPath);
             }
         }
-        $archive->close();
-        return true;
 
+        $archive->close();
+
+        return true;
     }
 
+
+    /**
+     *
+     */
     public function cleanUp()
     {
         if (file_exists($this->tmpName)) {
@@ -181,7 +309,11 @@ class ZipFolder
         }
     }
 
-    function removeDir($path)
+
+    /**
+     * @param $path
+     */
+    private function removeDir($path)
     {
         // Add trailing slash to $path if one is not there
         if (substr($path, -1, 1) != "/") {
@@ -205,23 +337,25 @@ class ZipFolder
     /**
      * Gets a db row representing the given category id
      *
-     * @param $folder_id
-     * @return array|bool
+     * @param int $folder_id
+     * @return Folder\Model
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getFolderDetails($folder_id)
+    protected function getFolderDetails($folder_id): ?\Schoolbox\Resource\Folder\Model
     {
         try {
-            $category = $this->folderMapper->findById($folder_id);
-            return $category;
-        } catch (\Exception $e) {
+            return $this->folderMapper->findById($folder_id);
+        } catch (\Schoolbox\Mapper\Exception $e) {
         }
+
+        return null;
     }
 
     /**
      * Gets a Group permission level for the given folder
      *
      * @param $folder_id
-     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
+     * @return int UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
      */
     protected function getPermission($folder_id)
     {
@@ -233,7 +367,7 @@ class ZipFolder
      * Gets a target path the file should be copied to
      *
      * @param string $currentDir Parent directory the file should be copied to
-     * @param string $file Real full filename
+     * @param string $file       Real full filename
      * @return string
      */
     protected function getTargetPath($currentDir, $file)

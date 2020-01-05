@@ -5,16 +5,11 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
-use Schoolbox\Filter;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\GenericCollection;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -66,7 +61,6 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
-     * @throws ServiceNotFound
      * @throws RuntimeException
      */
     public function execute()
@@ -102,7 +96,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         // Short circuit if no assessments match filters
         if (!count($taughtAssessmentIds)) {
-            $this->assessments = $this->assessmentMapperProxy->createCollection();
+            $this->results = [];
             return false;
         }
 

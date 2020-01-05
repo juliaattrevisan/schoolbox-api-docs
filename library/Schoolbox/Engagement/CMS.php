@@ -13,6 +13,10 @@ use Database;
 
 class CMS
 {
+    /**
+     * @var Database
+     */
+    private $database;
 
     /**
      * Constructor - sets up database

@@ -50,21 +50,10 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer) {
 
-        /* Superusers can see this
-         * Sports Admin can see this
-         * All Staff and Students can see this
-         * Parents of a Player in the Team can see this
+        /* Any authenticated user can access the result page
          */
         $resultAccess = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STUDENT),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\HasRole(Role::PARENT),
-                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE),
-                new IsCoachOfTeam()
-            )
+            new Rule\IsLoggedIn()
         );
 
         /* Apply route permissions here as you add them to initRoutes()

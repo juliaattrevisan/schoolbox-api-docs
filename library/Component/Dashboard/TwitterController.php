@@ -1,20 +1,25 @@
 <?php
 /**
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Zend\Uri\UriFactory;
 use \Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * Class Component_Dashboard_TwitterController
+ */
 class Component_Dashboard_TwitterController extends Component_Dashboard_ControllerAbstract {
 
     /**
      * Renders the data into the SitePage. Presentation logic.
+     *
      * @param String $templateHandle
      * @return boolean
+     * @throws InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
     public function renderTemplate($templateHandle)
     {
@@ -69,7 +74,6 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
          * Show empty state or show content - that is the if statement
          */
         if ($emptyState) {
-
             $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
             $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
@@ -88,23 +92,18 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
             ]);
 
             if ($noApiKey) {
-
                 if ($this->getUser()->isSuperuser()) {
                     $this->parse('empty_api_admin_block', 'empty_api_admin');
                 } else {
                     $this->parse('empty_api_block', 'empty_api');
                 }
-
             } elseif ($noConfig) {
-
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->parse('empty_config_block', 'empty_config');
                 } else {
                     $this->parse('empty_config_write_block', 'empty_config_write');
                 }
-
             } else {
-
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->parse('empty_results_block', 'empty_results');
                 } else {
@@ -113,12 +112,9 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setVar('empty_state_block', '');
 
-            $i = 0;
             foreach ($allResults as $currentTweet) {
                 $date  = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
 
@@ -164,22 +160,13 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
                 $this->setVar('tweet_media_thumbnails_block', '');
             }
 
+            /* Build Twitter Search URL per component
+             */
+            $this->setVar('SEARCH_URL', $allTweets->getSearchUrl());
+
             $this->parse('twitter_feed_block', 'twitter_feed');
         }
 
-        /**
-         * Build Twitter Search URL
-         */
-        $q = 'https://twitter.com/search?q=';
-        $q .= urlencode($this->getConfig('username'));
-        if ($this->getConfig('username') && $this->getConfig('keywords')) {
-            $q .= '%20';
-        }
-        $q .= urlencode($this->getConfig('keywords'));
-
-        $this->setVar('SEARCH_URL', $q);
-
         return true;
     }
-
 }

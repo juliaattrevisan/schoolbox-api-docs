@@ -19,8 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\UserMapper;
-
-ini_set('max_execution_time', 300);
+use function ini_set;
 
 class Controller extends Base
 {
@@ -66,6 +65,7 @@ class Controller extends Base
         ProfessionalDevelopment\Mapper $pdMapper,
         UserMapper $userMapper
     ) {
+        ini_set('max_execution_time', 300);
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
         $this->rubricMapper = $rubricMapper;

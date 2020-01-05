@@ -1,22 +1,43 @@
 <?php
 
-class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
-    function __construct () {
-            $this->_table = "chat";
-            $this->_index = "id";
+class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
+{
 
-            $this->group = new Group();
+    /**
+     * @var Group
+     */
+    private $group;
 
-            parent::__construct();
+
+    /**
+     * Chat constructor.
+     */
+    public function __construct()
+    {
+        $this->_table = 'chat';
+        $this->_index = 'id';
+
+        $this->group = new Group();
+
+        parent::__construct();
     }
 
-    /* Get logs */
-    function get_logs ($category_id, $last_poll = null, $not_user_id = 0) {
+
+    /**
+     * Get logs
+     *
+     * @param      $category_id
+     * @param null $last_poll
+     * @param int  $not_user_id
+     * @return array|bool
+     */
+    public function get_logs($category_id, $last_poll = null, $not_user_id = 0)
+    {
         $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, c.*
                   FROM {$this->_table} c LEFT JOIN user ON c.user_id = user.id
                   WHERE `category_id` = $category_id";
 
-        if ( !empty($not_user_id) ) {
+        if (!empty($not_user_id)) {
             $query .= " AND `user_id` != $not_user_id";
         }
 
@@ -29,18 +50,22 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         $logs = $this->db->getAll($query);
 
         if (!empty($logs)) {
-			$userHandler = new User();
+            $userHandler = new User();
 
             foreach ($logs as &$log) {
-                $log_time = new DateTime($log['time']);
+                try {
+                    $log_time = new DateTime($log['time']);
+                } catch (Exception $e) {
+                    continue;
+                }
 
-                $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
-                $log['stamp'] = $log_time->format('Y-m-d H:i:s');
-                $log['time'] = $log_time->format('h:i:s a');
-                $log['name'] = $userHandler->formatName($log);
+                $log['time_js']   = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
+                $log['stamp']     = $log_time->format('Y-m-d H:i:s');
+                $log['time']      = $log_time->format('h:i:s a');
+                $log['name']      = $userHandler->formatName($log);
                 $log['user_perm'] = $this->group->getPermission($category_id, $log['user_id']);
-                $log['type'] = Scrub::text($log['type']);
-                $log['body'] = Scrub::text($log['body']);
+                $log['type']      = Scrub::text($log['type']);
+                $log['body']      = Scrub::text($log['body']);
             }
 
         }
@@ -48,41 +73,44 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $logs;
     }
 
-	/**
-	 * Create a log entry which remembers what people typed.
-	 *
-	 * @param $category_id
-	 * @param $user_id
-	 * @param $body
-	 * @param string $type
-	 * @return int
-	 */
-	public function create_log($category_id, $user_id, $body, $type = 'user') {
-		$now = new Alaress_Date_Format(time(), 'U');
 
-		return $this->create(array(
-			'category_id' => $category_id,
-			'user_id' => $user_id,
-			'type' => $type,
-			'time' => $now->getDatabase(),
-			'body' => $body,
-		));
-	}
+    /**
+     * Create a log entry which remembers what people typed.
+     *
+     * @param        $category_id
+     * @param        $user_id
+     * @param        $body
+     * @param string $type
+     * @return int
+     * @throws InvalidArgumentException
+     */
+    public function create_log($category_id, $user_id, $body, $type = 'user')
+    {
+        $now = new Alaress_Date_Format(time(), 'U');
 
-/*  *** DEPRECATED ***
-    function clear_log ($category_id) {
-        $query = "DELETE FROM {$this->_table} WHERE category_id = $category_id";
-
-        return $this->db->query($query);
+        return $this->create([
+            'category_id' => $category_id,
+            'user_id'     => $user_id,
+            'type'        => $type,
+            'time'        => $now->getDatabase(),
+            'body'        => $body,
+        ]);
     }
-*/
-    function update_poll ($category_id, $user_id) {
-        if(!is_numeric($user_id)) {
+
+
+    /**
+     * @param $category_id
+     * @param $user_id
+     * @return bool|PDOStatement
+     */
+    public function update_poll($category_id, $user_id)
+    {
+        if (!is_numeric($user_id)) {
             return false;
         }
 
         $category_id = $this->db->smartQuote($category_id);
-        $user_id = $this->db->smartQuote($user_id);
+        $user_id     = $this->db->smartQuote($user_id);
 
         $query = "INSERT INTO chat_poll (user_id, category_id, time)
                   VALUES ($user_id, $category_id, NOW())
@@ -91,7 +119,13 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->db->query($query);
     }
 
-    function get_users ($category_id) {
+
+    /**
+     * @param $category_id
+     * @return array|bool
+     */
+    public function get_users($category_id)
+    {
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
         $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, group_type, chat_poll.*
                   FROM chat_poll
@@ -102,7 +136,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         $users = $this->db->getAll($query);
 
         if (!empty($users)) {
-			$userHandler = new User();
+            $userHandler = new User();
 
             foreach ($users as &$user) {
                 $user['name'] = $userHandler->formatName($user);
@@ -113,67 +147,81 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $users;
     }
 
-    function prune_users ($category_id) {
+
+    /**
+     * @param $category_id
+     * @return PDOStatement
+     * @throws Exception
+     */
+    public function prune_users($category_id)
+    {
         $time = new DateTime('-9 seconds');
 
         $query = "DELETE FROM chat_poll
-                  WHERE time < '".$time->format('Y-m-d H:i:s')."'
+                  WHERE time < '" . $time->format('Y-m-d H:i:s') . "'
                     AND category_id = $category_id";
 
         return $this->db->query($query);
     }
 
-	/**
-	 * Removes content
-	 *
-	 * TODO: Refactor
-	 *
-	 * @param  $cid
-	 * @return void
-	 */
-	public function homepageClean($cid) {
-		$query = "DELETE FROM {$this->_table}  WHERE category_id = '{$cid}'";
 
-		$this->db->query($query);
+    /**
+     * Removes content
+     *
+     * TODO: Refactor
+     *
+     * @param  $cid
+     * @return void
+     */
+    public function homepageClean($cid)
+    {
+        $query = "DELETE FROM {$this->_table}  WHERE category_id = '{$cid}'";
 
-		$query = "DELETE FROM chat_poll  WHERE category_id = '{$cid}'";
+        $this->db->query($query);
 
-		$this->db->query($query);
-	}
+        $query = "DELETE FROM chat_poll  WHERE category_id = '{$cid}'";
 
-    public function getOccupiedDateList($categoryID) {
-        // check membership
-        $groupHandler = new Group();
+        $this->db->query($query);
+    }
 
-        $memberships = $groupHandler->getAllUserAccess($_SESSION['id']);
 
-        if(!$groupHandler->isSuperuser()) {
+    /**
+     * @param $categoryID
+     * @return array|null
+     * @throws InvalidArgumentException
+     */
+    public function getOccupiedDateList($categoryID)
+    {
+        $memberships = $this->group->getAllUserAccess($_SESSION['id']);
+
+        if (!$this->group->isSuperuser()) {
             if (!$memberships) {
                 return null;
             }
             $permit = false;
             foreach ($memberships as $group) {
-                if($categoryID == $group['sid']) {
+                if ($categoryID == $group['sid']) {
                     $permit = true;
                     break;
                 }
             }
-            if(!$permit)
+            if (!$permit) {
                 return null;
+            }
         }
 
         $chats = $this->get_logs($categoryID);
 
         // go through and extract the years and months
-        $occupiedDates = array();
-        if($chats) {
-            foreach($chats as $chat) {
-                $df = new Alaress_Date_Format($chat['stamp'], 'Y-m-d H:i:s');
-                $occupation = array(
+        $occupiedDates = [];
+        if ($chats) {
+            foreach ($chats as $chat) {
+                $df         = new Alaress_Date_Format($chat['stamp'], 'Y-m-d H:i:s');
+                $occupation = [
                     'year'  => $df->getYear(),
                     'month' => $df->getMonth(),
-                );
-                if(!in_array($occupation, $occupiedDates)) {
+                ];
+                if (!in_array($occupation, $occupiedDates)) {
                     $occupiedDates[] = $occupation;
                 }
             }
@@ -187,8 +235,18 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $occupiedDates;
     }
 
-    public function getChatListing($categoryID, $year = 0, $month = 0, $index = 0, $limit = 0) {
-        $yearFilter = $year != 0 ? " AND YEAR(time) = $year " : '';
+
+    /**
+     * @param     $categoryID
+     * @param int $year
+     * @param int $month
+     * @param int $index
+     * @param int $limit
+     * @return array|bool
+     */
+    public function getChatListing($categoryID, $year = 0, $month = 0, $index = 0, $limit = 0)
+    {
+        $yearFilter  = $year != 0 ? " AND YEAR(time) = $year " : '';
         $monthFilter = $month != 0 ? " AND MONTH(time) = $month " : '';
 
         $query = "SELECT c.*, DATE(`time`) AS `date`, u.synergy_id
@@ -196,7 +254,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                   LEFT JOIN `user` u on c.user_id = u.id
                   WHERE category_id = $categoryID $yearFilter $monthFilter";
 
-        if($limit) {
+        if ($limit) {
             $query .= " LIMIT $index, $limit";
         }
 

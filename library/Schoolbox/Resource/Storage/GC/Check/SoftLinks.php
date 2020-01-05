@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -66,6 +66,11 @@ class SoftLinks implements Check
         'ups_log',
         'eportfolio_component_blog_image',
     ];
+
+    /**
+     * @var int
+     */
+    private $limit;
 
 
     /**
@@ -182,7 +187,7 @@ class SoftLinks implements Check
         $i       = 0;
 
         // cache the list of fields to scan
-        while (list($table, $field) = $this->getScannableFieldsStatement()->fetch(PDO::FETCH_NUM)) {
+        while ([$table, $field] = $this->getScannableFieldsStatement()->fetch(PDO::FETCH_NUM)) {
             // index by table
             $sources[$table]['fields'][] = $field;
             $sources[$table]['delete'] = ''; // ensure this is set, even if blank
@@ -194,7 +199,7 @@ class SoftLinks implements Check
         $this->log->info("Scanning $i fields from $j tables");
 
         // cache the list of soft-delete fields to compensate for
-        while (list($table, $field, $type) = $this->getSoftDeleteFieldsStatement()->fetch(PDO::FETCH_NUM)) {
+        while ([$table, $field, $type] = $this->getSoftDeleteFieldsStatement()->fetch(PDO::FETCH_NUM)) {
 
             // we're only interested in tables we've already seen
             if (!array_key_exists($table, $sources)) {
@@ -354,4 +359,4 @@ class SoftLinks implements Check
         return array_values($test);
     }
 
-} 
+}

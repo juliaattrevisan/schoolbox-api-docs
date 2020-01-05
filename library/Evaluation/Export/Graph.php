@@ -14,7 +14,13 @@ class Evaluation_Export_Graph {
 	protected $legendHTML = false;
 	protected $columnHeadings = array("Synergy ID", "Respondent", "Response", "Teacher's Comment");
 
-	/**
+    private $assess_id;
+    private $questionHandler;
+    private $factory;
+    private $sectionHandler;
+    private $attemptHandler;
+
+    /**
 	 * Constructor
 	 *
 	 * @param  $assess

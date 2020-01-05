@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,6 +13,10 @@ use Schoolbox\Resource\Storage;
 
 class FileExists implements Check
 {
+    /**
+     * @var Storage\Mapper
+     */
+    private $mapper;
 
     /**
      * @param Storage\Mapper $mapper
@@ -41,4 +45,4 @@ class FileExists implements Check
         return $previous;
     }
 
-} 
+}

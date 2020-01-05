@@ -10,8 +10,9 @@ class Survey_Graph_Render {
 	protected $currentQuestion = array();
 	protected $templateFile = null;
 	protected $page = null;
+    private   $componentHandle;
 
-	/**
+    /**
 	 * Constructor
 	 *
 	 * @param  $page

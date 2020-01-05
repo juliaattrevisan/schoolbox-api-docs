@@ -240,7 +240,11 @@ class Report_Login extends Report_Abstract implements Report_IReport
         return $this->dataCount;
     }
 
-    public function render()
+
+    /**
+     * @throws Exception
+     */
+    public function render(): void
     {
         // the group and the dataset must both not be null
         if ($this->getIndexID() == null || empty($this->dataSet)) {

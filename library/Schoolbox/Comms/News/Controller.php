@@ -1243,7 +1243,7 @@ class Controller extends Base
             return
                 $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
                 $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
+                Access::getInstance()->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ;
         }
 
         // Recursive Case:

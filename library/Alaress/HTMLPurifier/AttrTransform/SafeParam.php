@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Extends HTMLPurifier_AttrTransform_SafeParam to:
  * * allow 'url' attribute, as long as URI is valid
  * * allow 'autoplay', 'autostart', 'classid' attributes
  */
-class Alaress_HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform_SafeParam {
+class Alaress_HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform_SafeParam
+{
     /**
      * Screw you HTMLPurifier for using private variables - it's not for you to
      * decide whether I'm going to extend your code or not.
@@ -15,12 +17,19 @@ class Alaress_HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTran
      */
     protected $uri;
 
-    public function __construct() {
-        $this->uri = new HTMLPurifier_AttrDef_URI(true); // embedded
-        $this->wmode = new HTMLPurifier_AttrDef_Enum(array('window', 'opaque', 'transparent'));
+    /**
+     * @var HTMLPurifier_AttrDef_Enum
+     */
+    protected $wmode;
+
+    public function __construct()
+    {
+        $this->uri   = new HTMLPurifier_AttrDef_URI(true); // embedded
+        $this->wmode = new HTMLPurifier_AttrDef_Enum(['window', 'opaque', 'transparent']);
     }
 
-    public function transform($attr, $config, $context) {
+    public function transform($attr, $config, $context)
+    {
         // If we add support for other objects, we'll need to alter the
         // transforms.
         switch ($attr['name']) {

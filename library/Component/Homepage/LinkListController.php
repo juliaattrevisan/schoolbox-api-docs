@@ -5,9 +5,14 @@
  * @link        https://schoolbox.com.au/
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\LinkMapper;
 
+/**
+ * Class Component_Homepage_LinkListController
+ */
 class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * Link Mapper
      *
@@ -15,30 +20,33 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      */
     private $linkMapper;
 
+
     /**
      * Available sort fields for this component.
      *
      * @var array
      */
-    protected $sortFields = array('Name', 'Date');
+    protected $sortFields = ['Name', 'Date'];
+
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute()
+    public function execute(): bool
     {
-        $this->linkMapper = \Schoolbox\Resource\LinkMapper::getInstance();
+        $this->linkMapper = LinkMapper::getInstance();
 
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
-        
+
         return true;
     }
+
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -46,6 +54,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      * @param String $templateHandle
      *
      * @return boolean
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function renderTemplate($templateHandle)
     {
@@ -68,15 +79,29 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             'LINK_CATEGORY_ID'          => Scrub::text($this->getSource()->getId()),
         ]);
 
+        $includeHiddenLinks = $this->getContentPermission() > UserAccess::ACCESS_READ;
+
         /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->linkMapper->findAllInCategory(
-            $this->getSource(),
-            array(
-                'size' => $this->getConfig('size'),
-                'sort' => $this->getConfig('sort'),
+            $this->getSource(), [
+                'size'    => $this->getConfig('size'),
+                'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
-            )
+            ],
+            $includeHiddenLinks
         );
+
+        // Get total number of links available for the user
+        $countParams = [
+            'category' => $this->getSource()->getId(),
+        ];
+
+        if (!$includeHiddenLinks) {
+            // If readonly user, do not count hidden links
+            $countParams['hidden'] = 0;
+        }
+
+        $linkCount = $this->linkMapper->countByColumnList($countParams);
 
         /* Need title injected here
          */
@@ -88,7 +113,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         //setup block for submission button
         $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
 
-        if (count($allLinks) == 0) {
+        if (\count($allLinks) === 0) {
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
@@ -115,6 +140,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->setBlock('has_link', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'link', 'link_block');
             $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
+            $this->setBlock('source_folder_exists', "view_all_links", "view_all_links_block");
             $this->setBlock('link', 'modify_link', 'modify_link_block');
             $this->setBlock('link', 'owner_exists', 'owner_exists_block');
             $this->setBlock('link', 'owner_deleted', 'owner_deleted_block');
@@ -124,18 +150,12 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-
                 $this->setVar([
                     'source_folder_deleted_block' => '',
                     'link_block'                  => '',
                 ]);
 
                 foreach ($allLinks as $currentLink) {
-
-                    if ($currentLink->getHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                        continue;
-                    }
-
                     $this->setVar([
                         'LINK_ID'           => Scrub::text($currentLink->getId()),
                         'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
@@ -167,10 +187,18 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 }
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar("submit_link_block", "");
+                    $this->setVar('submit_link_block', '');
                 } else {
-                    $this->parse("submit_link_block", "submit_link");
+                    $this->parse('submit_link_block', 'submit_link');
                 }
+
+                // Show view all links button, only when total available is more than links displayed.
+                if (\count($allLinks) < $linkCount) {
+                    $this->parse('view_all_links_block', 'view_all_links');
+                } else {
+                    $this->setVar('view_all_links_block', '');
+                }
+
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
 

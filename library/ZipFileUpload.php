@@ -51,8 +51,7 @@ class ZipFileUpload extends DeprecatedModel
      *
      * @var array
      */
-    private $errorFiles = array();
-
+    private $errorFiles = [];
 
     /**
      * Constructor
@@ -71,7 +70,6 @@ class ZipFileUpload extends DeprecatedModel
         }
 
         $this->path = $this->extractTo . '/' . $this->prefix . uniqid();
-        $this->allowedFileHandler = new AllowedFile();
 
         /* Prepare folder: if folder already exists, unlink all the stuff in it
 		 * and start it again
@@ -88,15 +86,6 @@ class ZipFileUpload extends DeprecatedModel
     {
         return $this->path;
     }
-
-    /**
-    * Use verbose mode
-    */
-    public function setVerbose()
-    {
-        $this->verbose = true;
-    }
-
 
     /**
      * Extract files to the path specified. Returns a dirhandle if successfully
@@ -179,7 +168,7 @@ class ZipFileUpload extends DeprecatedModel
                 }
 
                 if ($this->verbose) {
-                    echo "Creating $currentPath with {$category->getId()}, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
+                    echo "Creating $currentPath with {$category->getId()}, corresponding to $obj<br>";
                 }
 
                 /* If it's a directory, create a Category for it and remember
@@ -204,11 +193,11 @@ class ZipFileUpload extends DeprecatedModel
                     /* For the File table
                      */
                     $file = $fileMapper->createModel()
-                        ->setFolder($parent)
-                        ->setOwner($_SESSION['user']) // we dun need full hydr8
-                        ->setTitle($obj)
-                        ->setFilename(pathinfo($obj, PATHINFO_FILENAME))
-                        ->setStorage($storage);
+                                       ->setFolder($parent)
+                                       ->setOwner($_SESSION['user']) // we dun need full hydr8
+                                       ->setTitle($obj)
+                                       ->setFilename(pathinfo($obj, PATHINFO_FILENAME))
+                                       ->setStorage($storage);
 
                     if ($this->verbose) {
                         echo "Creating <strong>$obj</strong> in $parentID<br>";
@@ -217,24 +206,23 @@ class ZipFileUpload extends DeprecatedModel
                     $fileMapper->save($file);
 
                 } catch (\Schoolbox\File\Exception $e) {
-                    $this->errorFiles[] = array(
+                    $this->errorFiles[] = [
                         'file'    => $obj,
                         'code'    => $e->getCode(),
-                        'message' => $e->getMessage()
-                    );
+                        'message' => $e->getMessage(),
+                    ];
 
                     if ($this->verbose) {
                         echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
                     }
 
-                }
-                catch (\RuntimeException $e) {
+                } catch (\RuntimeException $e) {
                     // because common interfaces would make this too easy...
-                    $this->errorFiles[] = array(
+                    $this->errorFiles[] = [
                         'file'    => $obj,
                         'code'    => $e->getCode(),
-                        'message' => $e->getMessage()
-                    );
+                        'message' => $e->getMessage(),
+                    ];
 
                     if ($this->verbose) {
                         echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
@@ -271,13 +259,13 @@ class ZipFileUpload extends DeprecatedModel
     }
 
     /**
-    * Recursively delete a directory
-    *
-    * @param string $dir           Directory name
-    * @param bool   $deleteRootToo Delete specified top-level directory as well
-    *
-    * Taken from php.net
-    */
+     * Recursively delete a directory
+     *
+     * @param string $dir           Directory name
+     * @param bool   $deleteRootToo Delete specified top-level directory as well
+     *
+     * Taken from php.net
+     */
     public function unlinkRecursive($dir, $deleteRootToo)
     {
         if (!$dh = @opendir($dir)) {
@@ -304,20 +292,20 @@ class ZipFileUpload extends DeprecatedModel
     }
 
     /**
-    * Get error data for files which couldn't be uploaded
-    */
+     * Get error data for files which couldn't be uploaded
+     */
     public function getErrors()
     {
-        $errorMessages = array();
-        $query = 'SELECT message FROM error WHERE id = 9';
-        $error = $this->db->getRow($query);
+        $errorMessages = [];
+        $query         = 'SELECT message FROM error WHERE id = 9';
+        $error         = $this->db->getRow($query);
 
         if (count($this->errorFiles)) {
             foreach ($this->errorFiles as $currentFile) {
-                $errorMessages[] = array(
-                    'file' => $currentFile['file'],
+                $errorMessages[] = [
+                    'file'    => $currentFile['file'],
                     'message' => str_replace('%MESSAGE%', $currentFile['message'], $error['message']),
-                );
+                ];
             }
         }
 

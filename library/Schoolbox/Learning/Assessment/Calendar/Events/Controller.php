@@ -19,6 +19,8 @@ use Calendar_Api_EventType_Interface;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Filter\Filters\Event as EventFilters;
 use Schoolbox\Filter\IFactoryFactory;
@@ -152,7 +154,7 @@ class Controller extends Base
     {
         $qsFilters      = $this->request->query->get('filters', []);
         $page           = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
-        $codec          = $this->filterFactoryFactory->buildCodec();
+        $codec          = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $user           = $this->getUser();
         $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
         $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);

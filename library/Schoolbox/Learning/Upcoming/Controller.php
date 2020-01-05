@@ -16,6 +16,7 @@ use External_ClassInterface;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
@@ -306,7 +307,7 @@ class Controller extends Base
     {
         $request             = $this->request->post->get('filter_selection', []);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
-        $codec               = $this->filterFactoryFactory->buildCodec();
+        $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
         $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
@@ -379,7 +380,7 @@ class Controller extends Base
     {
         $request             = $this->request->query->get('filters', []);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
-        $codec               = $this->filterFactoryFactory->buildCodec();
+        $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
         $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
         $visibility          = new Visibility($this->access);

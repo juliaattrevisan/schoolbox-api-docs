@@ -12,6 +12,10 @@ use Database;
 
 class DueWork
 {
+    /**
+     * @var Database
+     */
+    private $database;
 
     /**
      * Constructor - sets up database

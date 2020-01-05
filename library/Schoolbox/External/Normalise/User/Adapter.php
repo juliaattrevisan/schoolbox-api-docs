@@ -1060,7 +1060,7 @@ class Adapter {
      */
     public function getStudentForms(): array
     {
-        return $this->getHandler()->getStudentForms();
+        return $this->handler->getStudentForms();
     }
 
     /**

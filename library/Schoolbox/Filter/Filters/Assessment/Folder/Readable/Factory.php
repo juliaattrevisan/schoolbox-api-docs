@@ -132,12 +132,6 @@ class Factory extends FolderFilter\Factory
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->filter(function ($folderId) use ($user) {
-                // Too heavy to filter by folder access
-                // Filter instead by whether the folder fits in the selections
-                return true;
-//                return $this->getAccess()->getFolderAccess($user, $folderId) >= UserAccess::ACCESS_WRITE;
-            })
             ->indexByCallback(static function ($folderId) {
                 return $folderId;
             });

@@ -431,7 +431,7 @@ class Group extends DeprecatedModel
         }
 
         if ($this->_service == UserAccess::SERVICE_HOMEPAGE) {
-            return Access::getInstance()->getFolderAccess($user, $relationID, $cache);
+            return Access::getInstance()->getFolderAccess($user, (int)$relationID, $cache);
         } else {
             return $this->legacyGetPermission($relationID, $user);
         }
@@ -730,7 +730,7 @@ class Group extends DeprecatedModel
 
         $query = "
 			SELECT
-			folder.name, folder.id, type, 
+			folder.name, folder.id, type,
 			GROUP_CONCAT(cc.code) as code
 			FROM userAccess, folder LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
 			$homepageJoin

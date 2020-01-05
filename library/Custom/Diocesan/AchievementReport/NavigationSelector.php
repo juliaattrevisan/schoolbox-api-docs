@@ -163,7 +163,6 @@ class NavigationSelector
             $availableNavigation[self::NCEA_KEY] = [
                 'url' => $this->router->generate('achievementreport.getNcea', [
                     'externalUserId' => $this->externalUser['StudentID'],
-                    'year' => $this->year
                 ]),
                 'label' => 'NCEA'
             ];
@@ -175,7 +174,6 @@ class NavigationSelector
             $availableNavigation[self::IB_KEY] = [
                 'url' => $this->router->generate('achievementreport.getIb', [
                     'externalUserId' => $this->externalUser['StudentID'],
-                    'year' => $this->year
                 ]),
                 'label' => 'IB'
             ];
@@ -187,7 +185,6 @@ class NavigationSelector
             $availableNavigation[self::SCHOOLGRADES_KEY] = [
                 'url' => $this->router->generate('achievementreport.getSchoolGrades', [
                     'externalUserId' => $this->externalUser['StudentID'],
-                    'year' => $this->year
                 ]),
                 'label' => 'School Grades'
             ];
@@ -195,15 +192,12 @@ class NavigationSelector
 
         /* Conditionally add Standardised Test option
          */
-        if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
-            $availableNavigation[self::STANDARDISEDTEST_KEY] = [
-                'url' => $this->router->generate('achievementreport.getStandardisedTests', [
-                    'externalUserId' => $this->externalUser['StudentID'],
-                    'year' => $this->year
-                ]),
-                'label' => 'Standardised Tests'
-            ];
-        }
+        $availableNavigation[self::STANDARDISEDTEST_KEY] = [
+            'url' => $this->router->generate('achievementreport.getStandardisedTests', [
+                'externalUserId' => $this->externalUser['StudentID'],
+            ]),
+            'label' => 'Standardised Tests'
+        ];
 
         /* Conditionally add Comment option
          */
@@ -211,7 +205,6 @@ class NavigationSelector
             $availableNavigation[self::COMMENTS_KEY] = [
                 'url' => $this->router->generate('achievementreport.getComments', [
                     'externalUserId' => $this->externalUser['StudentID'],
-                    'year' => $this->year
                 ]),
                 'label' => 'Comments'
             ];
@@ -231,7 +224,6 @@ class NavigationSelector
             $availableNavigation[self::COCURRICULAR_KEY] = [
                 'url' => $this->router->generate('achievementreport.getCoCurricular', [
                     'externalUserId' => $this->externalUser['StudentID'],
-                    'year' => $this->year
                 ]),
                 'label' => 'Co-Curricular'
             ];
