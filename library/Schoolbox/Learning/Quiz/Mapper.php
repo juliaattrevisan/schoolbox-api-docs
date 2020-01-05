@@ -83,15 +83,17 @@ class Mapper extends BaseMapper
             'other_key' => 'assess_id',
         ));
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
+        // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'updateExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSections'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
 
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
     /**
