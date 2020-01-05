@@ -49,27 +49,6 @@ class Controller extends Base
         $this->mapperFactory = $mapperFactory;
     }
 
-
-    /**
-     * Converts "strings_like_this" to "StringsLikeThis"
-     *
-     * @param $string
-     * @param bool $capitalizeFirstCharacter
-     * @return mixed
-     */
-    private function underscoreToCamelCase($string, $capitalizeFirstCharacter = true)
-    {
-        $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
-
-        if (!$capitalizeFirstCharacter) {
-            $str[0] = strtolower($str[0]);
-        } else {
-            $str[0] = strtoupper($str[0]);
-        }
-
-        return $str;
-    }
-
     /**
      * Deletes a list item using the specified mapper
      */
@@ -168,6 +147,7 @@ class Controller extends Base
 
         foreach ($ids as $currentIndex => $id)
         {
+            $isRoleChanged = false;
             // Negative ID numbers indicate new records
 
             if ($id > 0) {
@@ -179,7 +159,7 @@ class Controller extends Base
                 $model = $mapper->createModel();
 
                 foreach ($fixed as $field => $value) {
-                    $setter = "set" . $this->underscoreToCamelCase($field);
+                    $setter = $mapper->getSetMethodName($field);
 
                     if (empty(trim($value))) {
                         $value = null;
@@ -195,16 +175,20 @@ class Controller extends Base
                     // do not save this field, if required and empty
                     continue 2;
                 }
+                $getter = $mapper->getGetMethodName($field);
+                if ($model->$getter() != $value[$currentIndex]) {
 
-                // Update values
-                $setter = "set" . $this->underscoreToCamelCase($field);
+                    // Update values
+                    $setter = $mapper->getSetMethodName($field);
 
-                $model->$setter($value[$currentIndex]);
+                    $model->$setter($value[$currentIndex]);
+                    $isRoleChanged = true;
+                }
             }
 
             // Override nullable fields where appropriate
             foreach ($nulls as $field => $value) {
-                $setter = "set" . $this->underscoreToCamelCase($field);
+                $setter = $mapper->getSetMethodName($field);
 
                 foreach ($value as $index => $_) {
                     if ($currentIndex == $index) {
@@ -215,7 +199,7 @@ class Controller extends Base
 
             // Process any radio buttons for this list
             foreach ($radios as $field => $index) {
-                $setter = "set" . $this->underscoreToCamelCase($field);
+                $setter = $mapper->getSetMethodName($field);
 
                 // Radio buttons can only be on for one row, so set that row to true and all others to false
 
@@ -229,24 +213,30 @@ class Controller extends Base
             //Process all the lovely checkboxes
             //First unset all models
             foreach ($empty_checkboxes as $field => $value) {
-                $setter = "set" . $this->underscoreToCamelCase($field);
+                $setter = $mapper->getSetMethodName($field);
                 $boolean = !isset($value[$currentIndex]);
                 $model->$setter($boolean);
             }
 
             //Then set models whose that are checked
             foreach ($checkboxes as $field => $value) {
-                $setter = "set" . $this->underscoreToCamelCase($field);
+                $setter = $mapper->getSetMethodName($field);
                 $boolean = isset($value[$currentIndex]);
                 $model->$setter($boolean);
             }
 
-            if ($model instanceof Sequential) {
-                $model->setSequence($sequence++);
+            if ($model->getSequence() !== $sequence) {
+                $model->setSequence($sequence);
+                $isRoleChanged = true;
             }
+            $sequence++;
 
-            // Save the changes
-            $mapper->save($model);
+            // Update the role if there is changes
+            if ($isRoleChanged) {
+                // Save the changes
+                $model->setUpdatedBy($_SESSION['user']->getId());
+                $mapper->save($model);
+            }
         }
 
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
@@ -757,7 +747,7 @@ class Controller extends Base
         } elseif (isset($tables[$table]['sort'])) {
             $rows = $mapper->findAll(['order' => [$tables[$table]['sort'] => 'ASC']]);
         } elseif ($prototype instanceof Sequential) {
-            $rows = $mapper->findAll();
+            $rows = $mapper->findAll(['order' => ['sequence' => 'ASC']]);
             $tables[$table]['sortable'] = true;
         } else {
             $orderArr = array($mapper->getIdentifierColumn() => 'ASC');
@@ -783,7 +773,7 @@ class Controller extends Base
                         if (isset($tables[$table]['fields'][$prop->getName()]['getter'])) {
                             $getter = $tables[$table]['fields'][$prop->getName()]['getter'];
                         } else {
-                            $getter = "get" . $this->underscoreToCamelCase($prop->getName());
+                            $getter = $mapper->getGetMethodName($prop->getName());
                         }
 
                         if ($reflect->hasMethod($getter)) {
