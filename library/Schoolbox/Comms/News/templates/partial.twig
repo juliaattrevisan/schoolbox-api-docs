@@ -43,7 +43,7 @@
 
                         <p class="meta">
                             {% if article.sticky %}Pinned by{% else %}By{% endif %}
-                            {% if article.author.deletedAt.isNull %}
+                            {% if not article.author.deletedAt %}
                                 <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
                             {% else %}
                                 {{ article.author.fullname }}

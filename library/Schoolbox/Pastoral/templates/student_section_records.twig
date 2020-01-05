@@ -44,7 +44,7 @@
                                         {{ record.type.name }} {% if record.subtype.name is defined %}({{ record.subtype.name }}){% endif %} |
                                         {# Display name of poster #}
                                         Created by
-                                        {% if record.owner.deletedAt.isNull %}
+                                        {% if not record.owner.deletedAt %}
                                             <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
                                         {% else %}
                                             {{ record.owner.fullName }}
@@ -53,7 +53,7 @@
                                     {# Display last updated by if applicable #}
                                     {% if record.createdAt.long != record.updatedAtDisplay.long %}
                                         last updated by
-                                        {% if record.modifiedBy.deletedAt.isNull %}
+                                        {% if not record.modifiedBy.deletedAt %}
                                             <a href="{{ profile.link(record.modifiedBy) }}">{{ record.modifiedBy.fullName }}</a>
                                         {% else %}
                                             {{ record.modifiedBy.fullName }}
