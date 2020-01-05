@@ -9,6 +9,7 @@ namespace Schoolbox\Application\Manifest;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Twig_Error_Loader;
 
@@ -28,6 +29,14 @@ class Module extends BaseModule
         $this->register('GET', '', 'getManifest', null, null);
         $this->register('GET', '/offline', 'getOffline', null, null);
 
+    }
+
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class)
+        ];
     }
 
     /**

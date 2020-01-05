@@ -8,9 +8,34 @@
 namespace Schoolbox\Application\Manifest;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\MobileApp\ServiceMapper;
 
 class Controller extends Base
 {
+
+    /**
+     * @var ServiceMapper
+     */
+    private $serviceMapper;
+
+    /**
+     * Maps notification providers to application stores they are available in
+     * https://github.com/w3c/manifest/wiki/Platforms
+     * @var array
+     */
+    private $relatedAppsMap = ['APNS' => 'itunes', 'GCM' => 'play'];
+
+    /**
+     * Controller constructor.
+     *
+     * @param ServiceMapper $serviceMapper
+     */
+    public function __construct(ServiceMapper $serviceMapper)
+    {
+        $this->serviceMapper = $serviceMapper;
+    }
+
+
     /**
      * Schoolbox policy page, can be accessed with and without a session
      * @api   GET /policy
@@ -21,70 +46,92 @@ class Controller extends Base
     public function getManifest(): void
     {
         $manifest = [
-            'name'             => $this->getConfigLoader()->get('title'),
-            'short_name'       => $this->getConfigLoader()->get('title'),
-            'theme_color'      => $this->getConfigLoader()->get('skin_colour_navigation_background'),
-            'background_color' => $this->getConfigLoader()->get('skin_colour_navigation_background'),
-            'display'          => 'minimal-ui',
-            'Scope'            => '/',
-            'start_url'        => '/login/',
-            'icons'            => [
+            'name'                        => $this->getConfigLoader()->get('title'),
+            'short_name'                  => $this->getConfigLoader()->get('title'),
+            'theme_color'                 => $this->getConfigLoader()->get('skin_colour_navigation_background'),
+            'background_color'            => $this->getConfigLoader()->get('skin_colour_navigation_background'),
+            'display'                     => 'minimal-ui',
+            'Scope'                       => '/',
+            'start_url'                   => '/login/',
+            'icons'                       => [
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=apple72',
-                    'sizes' => '72x72',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=apple72',
+                    'sizes'   => '72x72',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=google96',
-                    'sizes' => '96x96',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google96',
+                    'sizes'   => '96x96',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
 
                 ],
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=google128',
-                    'sizes' => '128x128',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google128',
+                    'sizes'   => '128x128',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=apple144',
-                    'sizes' => '144x144',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=apple144',
+                    'sizes'   => '144x144',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=apple152',
-                    'sizes' => '152x152',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=apple152',
+                    'sizes'   => '152x152',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=google192',
-                    'sizes' => '192x192',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google192',
+                    'sizes'   => '192x192',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=google384',
-                    'sizes' => '384x384',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google384',
+                    'sizes'   => '384x384',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'   => '/images/logo.php?logo=skin_logo_square&size=google512',
-                    'sizes' => '512x512',
-                    'type'  => 'image/png',
+                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google512',
+                    'sizes'   => '512x512',
+                    'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
             ],
-            'splash_pages'     => null,
+            'splash_pages'                => null,
         ];
+
+        $serviceList = $this->serviceMapper->findAll();
+
+        if(count($serviceList)) {
+            $manifest['prefer_related_applications'] = true;
+            foreach($serviceList as $application) {
+
+                $url = '';
+
+                if($application->getProviderName() === 'GCM') {
+                    $url = 'https://play.google.com/store/apps/details?id='.$application->getAppIdentifier();
+                }
+
+                $manifest['related_applications'][] = [
+                    'platform' => $this->relatedAppsMap[$application->getProviderName()],
+                    'url'       => $url,
+                    'id'        => $application->getAppIdentifier(),
+                ];
+            }
+        }
+
         $this->getResponse()->content->set($this->buildJsonOutput($manifest));
     }
 
-    public function getOffline(): void {
+    public function getOffline(): void
+    {
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/offline.twig', []));
     }
 }
