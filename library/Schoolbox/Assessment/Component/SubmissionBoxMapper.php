@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -326,18 +327,23 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      */
     public function syncToExternalMarkbook(SubmissionBox $object): bool
     {
-        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if (!$this->isAssessmentSpecification($object)) {
-            // This saves the assessment to the remote system
-            $externalMarkbook = new External_Markbook();
-            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
+        /** @var AssessmentDataSource $assessmentDataSource */
+        $assessmentDataSource = self::getDi()->get('assessmentDataSource');
+        $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
+        $assessmentDataSource->syncToMarkbook($assessment);
 
-            if (!$externalMarkbook->hasAssessment($activity)) {
-                $externalMarkbook->createAssessment($activity);
-            } else {
-                $externalMarkbook->updateAssessment($activity);
-            }
-        }
+//        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
+//        if (!$this->isAssessmentSpecification($object)) {
+//            // This saves the assessment to the remote system
+//            $externalMarkbook = new External_Markbook();
+//            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
+//
+//            if (!$externalMarkbook->hasAssessment($activity)) {
+//                $externalMarkbook->createAssessment($activity);
+//            } else {
+//                $externalMarkbook->updateAssessment($activity);
+//            }
+//        }
 
         return true;
     }

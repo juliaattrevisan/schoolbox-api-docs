@@ -11,6 +11,7 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
@@ -204,15 +205,20 @@ class Mapper extends BaseMapper
      */
     public function updateExternalMarkbook(Model $quiz): bool
     {
-        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if (!$this->isAssessmentSpecification($quiz)) {
-            $externalMarkbook = new \External_Markbook();
-            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($quiz, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
-            if (!$externalMarkbook->hasAssessment($activity)) {
-                $externalMarkbook->createAssessment($activity);
-            }
-            $externalMarkbook->updateAssessment($activity);
-        }
+        /** @var AssessmentDataSource $assessmentDataSource */
+        $assessmentDataSource = self::getDi()->get('assessmentDataSource');
+        $assessment           = $assessmentDataSource->findById($quiz->getAssessmentModel()->getId());
+        $assessmentDataSource->syncToMarkbook($assessment);
+
+//        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
+//        if (!$this->isAssessmentSpecification($quiz)) {
+//            $externalMarkbook = new \External_Markbook();
+//            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($quiz, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
+//            if (!$externalMarkbook->hasAssessment($activity)) {
+//                $externalMarkbook->createAssessment($activity);
+//            }
+//            $externalMarkbook->updateAssessment($activity);
+//        }
 
         return true;
     }

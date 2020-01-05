@@ -907,6 +907,24 @@ class MapperProxy
     }
 
     /**
+     * Helper method for syncing an assessment to the markbook.
+     *
+     * TODO make private and call in `save()` once all persistence of assessments goes thru here
+     *
+     * @param IAssessable $assessment
+     */
+    public function syncToMarkbook(IAssessable $assessment): void
+    {
+        $externalMarkbook = new \External_Markbook();
+        if ($externalMarkbook->isSyncable($assessment)) {
+            if (!$externalMarkbook->hasAssessment($assessment)) {
+                $externalMarkbook->createAssessment($assessment);
+            }
+            $externalMarkbook->updateAssessment($assessment);
+        }
+    }
+
+    /**
      * Optimized save method for assessable order.
      *
      * @param Collection $assessables A list of assessables to resequence
