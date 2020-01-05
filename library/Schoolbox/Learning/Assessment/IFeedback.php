@@ -163,8 +163,7 @@ interface IFeedback
      * Get the date when this IFeedback was made accessible to respondents
      * (typically students)
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IFeedback was never published
+     * A value of null indicates that this IFeedback was never published
      *
      * @return \Alaress_Date_Format
      */

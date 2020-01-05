@@ -557,8 +557,7 @@ interface IAssessable extends ISoftDeletable
      * This is the date at which the IAssessable becomes both visible
      * and available for user participation
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IFeedback was never published
+     * A value of null indicates that this IFeedback was never published
      *
      * @return \Alaress_Date_Format
      */
@@ -577,8 +576,7 @@ interface IAssessable extends ISoftDeletable
      *
      * This is the date at which participants can create Responses to this IAssessable
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IAssessable will never open
+     * A value of null indicates that this IAssessable will never open
      *
      * @return \Alaress_Date_Format
      */
@@ -597,9 +595,8 @@ interface IAssessable extends ISoftDeletable
      *
      * This is the date by which participants should create their Responses to this IAssessable
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IAssessable has no particular date to check against (it will be
-     * subclass-specific logic which uses it)
+     * A value of null indicates that this IAssessable has no particular date to check against
+     * (it will be subclass-specific logic which uses it)
      *
      * @return \Alaress_Date_Format
      */
@@ -618,9 +615,8 @@ interface IAssessable extends ISoftDeletable
      *
      * When this date is reached, any IResponses spawned are indicated as being "late"
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IAssessable has no particular date to check against (it will be
-     * subclass-specific logic which uses it)
+     * A value of null indicates that this IAssessable has no particular date to check against
+     * (it will be subclass-specific logic which uses it)
      *
      * @return \Alaress_Date_Format
      */

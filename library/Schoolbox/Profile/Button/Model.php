@@ -6,9 +6,12 @@ namespace Schoolbox\Profile\Button;
 
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Model implements ISoftDeletable
 {
+    use DeletedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -32,9 +35,6 @@ class Model implements ISoftDeletable
 
     /** @var string|null */
     protected $target;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
 
     /**
      * @param int $id
@@ -180,33 +180,5 @@ class Model implements ISoftDeletable
     public function getSortOrder(): int
     {
         return $this->sortOrder;
-    }
-
-    /**
-     * @param Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt(Alaress_Date_Format $deletedAt): self
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return null|Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt(): ?Alaress_Date_Format
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
     }
 }

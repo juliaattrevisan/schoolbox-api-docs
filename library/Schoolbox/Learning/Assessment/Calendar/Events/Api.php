@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Color\Color;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\Submission\Event;
@@ -160,7 +159,7 @@ class Api implements Calendar_Api_EventType_Interface
 
 
         // Can't show an event if I don't know when to show it
-        if (!$dueDate || $dueDate instanceof Alaress_Date_NullDate) {
+        if (!$dueDate) {
             return null;
         }
 

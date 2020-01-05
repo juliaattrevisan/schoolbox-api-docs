@@ -87,9 +87,9 @@ class Model implements ISoftDeletable
     private $errorMessage;
 
     /**
-     * An Alaress_Date_NullDate if not yet successfully uploaded into Kami
+     * Null if not yet successfully uploaded into Kami
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     private $kamiCreatedAt;
 
