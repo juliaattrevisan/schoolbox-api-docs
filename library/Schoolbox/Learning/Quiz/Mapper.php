@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Quiz;
 
 use PDO;
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
@@ -34,6 +35,7 @@ use UnexpectedValueException;
 /**
  * @method Model createModel($id = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {
@@ -96,6 +98,57 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
 
     }
+
+
+    /**
+     * @inheritdoc
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('am', 'am')},
+                   {$this->getJoinColumnString('user', 'u')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM       {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('am', '', 'am', true)}
+            INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $quiz = $this->hydrate($row)
+                         ->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'))
+                         ->setUser($this->hydrateJoin($row, 'user', 'u'))
+            ;
+            $collection[$quiz->getId()] = $quiz;
+        }
+
+        return $collection;
+    }
+
 
     /**
      * Soft deletes all Attempts for the specified Quiz

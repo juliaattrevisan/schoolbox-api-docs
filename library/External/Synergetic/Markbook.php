@@ -1027,15 +1027,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function retrieveOwnerFromAssessment(IAssessable $assessment): ?User
     {
-        $mapper = null;
         if ($assessment instanceof DueWork) {
-            $mapper = SubmissionBoxMapper::getInstance();
+            return SubmissionBoxMapper::getInstance()
+                                      ->findOneByColumn('assessment_id', $assessment->getId())
+                                      ->getOwner();
         }
         if ($assessment instanceof Quiz) {
-            $mapper = QuizMapper::getInstance();
-        }
-        if ($mapper) {
-            return $mapper->findOneByColumn('assessment_id', $assessment->getId())->getOwner();
+            return QuizMapper::getInstance()
+                             ->findOneByColumn('assessment_id', $assessment->getId())
+                             ->getUser();
         }
         return null;
     }

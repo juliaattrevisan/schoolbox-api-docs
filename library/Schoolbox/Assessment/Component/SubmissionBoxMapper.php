@@ -126,13 +126,25 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      * @inheritdoc
      * @throws Schoolbox\Mapper\DefinitionException
      */
-    public function getSelectString(): string
+    protected function getSelectString(): string
     {
         return "
-            SELECT     {$this->getColumnString()},
-                       {$this->getJoinColumnString('assessmentModel', 'am')}
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('assessmentModel', 'am')},
+                   {$this->getJoinColumnString('owner', 'o')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
         ";
     }
 
@@ -145,13 +157,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      */
     public function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var AssessmentMapper $assessmentMapper */
-        $assessmentMapper = $this->getJoinMapper('assessmentModel');
-        $collection       = $this->createCollection();
+        $collection = $this->createCollection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $box                       = $this->hydrate($row)->setAssessmentModel($assessmentMapper->hydrate($row, 'am'));
+            $box = $this->hydrate($row)
+                        ->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'am'))
+                        ->setOwner($this->hydrateJoin($row, 'owner', 'o'))
+            ;
             $collection[$box->getId()] = $box;
         }
 
