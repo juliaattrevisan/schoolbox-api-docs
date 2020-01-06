@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment;
 
 use External_MarkbookInterface;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 
 /**
@@ -45,10 +47,15 @@ class MarkbookSyncHelper
     /**
      * Syncs an assessment to the markbook.
      *
-     * @param IAssessable $assessment
+     * @param IAssessableDataModel $assessmentDataModel
      */
-    public function syncAssessment(IAssessable $assessment): void
+    public function syncAssessment(IAssessableDataModel $assessmentDataModel): void
     {
+        try {
+            $assessment = $this->dataSource->findById($assessmentDataModel->getAssessmentModel()->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            return;
+        }
         if ($this->externalMarkbook->isSyncable($assessment)) {
             $this->externalMarkbook->syncAssessment($assessment);
         }
@@ -58,11 +65,16 @@ class MarkbookSyncHelper
     /**
      * Deletes a previously-synced assessment from the markbook.
      *
-     * @param IAssessable $assessment
+     * @param IAssessableDataModel $assessmentDataModel
      */
-    public function deleteAssessment(IAssessable $assessment): void
+    public function deleteAssessment(IAssessableDataModel $assessmentDataModel): void
     {
-        if ($this->externalMarkbook->isSyncable($assessment)) {
+        try {
+            $assessment = $this->dataSource->findById($assessmentDataModel->getAssessmentModel()->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $assessment = $e->getDeletedObject();
+        }
+        if ($assessment instanceof IAssessable && $this->externalMarkbook->isSyncable($assessment)) {
             $this->externalMarkbook->deleteAssessment($assessment);
         }
     }
