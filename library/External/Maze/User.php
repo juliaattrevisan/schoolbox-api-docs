@@ -58,27 +58,27 @@ class External_Maze_User implements External_UserInterface
     public function getParent(string $externalUserId): array
     {
         $query = "
-			SELECT
-				DFKEY AS ContactID,
-				MTITLE AS ContactTitle,
-				MNAME AS Preferred,
-				MSURNAME AS Surname,
-				M_EMAIL AS Email,
-				'' AS HomePhone,
-				MMOBILE AS MobilePhone,
-				'' AS SilentPhoneFlag,
-				'' AS DirectoryIncludeFlag,
-				DFKEY AS ContactSpouseID,
-				FTITLE AS SpouseTitle,
-				FNAME AS SpousePreferred,
-				FSURNAME AS SpouseSurname,
-				F_EMAIL AS SpouseEmail,
-				'' AS SpouseHomePhone,
-				FMOBILE AS SpouseMobilePhone,
-				'' AS SpouseDirectoryIncludeFlag
-			FROM DF
-			WHERE DFKEY = '{$externalUserId}'
-		";
+            SELECT
+                DFKEY AS ContactID,
+                MTITLE AS ContactTitle,
+                MNAME AS Preferred,
+                MSURNAME AS Surname,
+                M_EMAIL AS Email,
+                '' AS HomePhone,
+                MMOBILE AS MobilePhone,
+                '' AS SilentPhoneFlag,
+                1 AS DirectoryIncludeFlag,
+                DFKEY AS ContactSpouseID,
+                FTITLE AS SpouseTitle,
+                FNAME AS SpousePreferred,
+                FSURNAME AS SpouseSurname,
+                F_EMAIL AS SpouseEmail,
+                '' AS SpouseHomePhone,
+                FMOBILE AS SpouseMobilePhone,
+                1 AS SpouseDirectoryIncludeFlag
+            FROM DF
+            WHERE DFKEY = '{$externalUserId}'
+        ";
 
         return $this->getDb()->getRow($query) ?: [];
     }
@@ -402,7 +402,7 @@ class External_Maze_User implements External_UserInterface
 			FROM DF
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
 			LEFT JOIN ST ON (DF.DFKEY = ST.FAMILY OR (ST.FAMB = DF.DFKEY AND ST.LIVING_B != 'N'))
-			WHERE ST.STKEY IN ($ids) 
+			WHERE ST.STKEY IN ($ids)
 			ORDER BY primaryFamily DESC
 		";
 
