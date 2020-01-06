@@ -208,7 +208,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createAssessment(IAssessable $assessment): bool
+    private function createAssessment(IAssessable $assessment): bool
     {
         if (!$this->isSyncable($assessment)) {
             return false;
@@ -247,7 +247,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Alaress\Database\Exception
      */
-    public function updateAssessment(IAssessable $assessment): bool
+    private function updateAssessment(IAssessable $assessment): bool
     {
         if (!$this->isSyncable($assessment)) {
             return false;

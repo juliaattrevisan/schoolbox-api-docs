@@ -64,24 +64,6 @@ class External_Markbook implements External_MarkbookInterface
 
 
     /**
-     * @inheritdoc
-     */
-    public function createAssessment(IAssessable $assessment): bool
-    {
-        return $this->database->createAssessment($assessment);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function updateAssessment(IAssessable $assessment): bool
-    {
-        return $this->database->updateAssessment($assessment);
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function deleteAssessment(IAssessable $assessment): bool

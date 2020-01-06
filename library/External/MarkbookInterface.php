@@ -45,22 +45,6 @@ interface External_MarkbookInterface extends External\IConnector
     public function hasAssessment(IAssessable $assessment): bool;
 
     /**
-     * Creates a new assessment item in the markbook
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    public function createAssessment(IAssessable $assessment): bool;
-
-    /**
-     * Updates an existing markbook assessment
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    public function updateAssessment(IAssessable $assessment): bool;
-
-    /**
      * Deletes an existing markbook assessment
      *
      * @param IAssessable $assessment
