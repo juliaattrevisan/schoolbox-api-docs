@@ -913,7 +913,7 @@ class MapperProxy
      *
      * @param IAssessable $assessment
      */
-    public function syncToMarkbook(IAssessable $assessment): void
+    public function syncToExternalMarkbook(IAssessable $assessment): void
     {
         $externalMarkbook = new \External_Markbook();
         if ($externalMarkbook->isSyncable($assessment)) {
@@ -921,6 +921,21 @@ class MapperProxy
                 $externalMarkbook->createAssessment($assessment);
             }
             $externalMarkbook->updateAssessment($assessment);
+        }
+    }
+
+    /**
+     * Helper method for deleting an assessment from the markbook.
+     *
+     * TODO make private and call in `delete()` once all persistence of assessments goes thru here
+     *
+     * @param IAssessable $assessment
+     */
+    public function deleteFromMarkbook(IAssessable $assessment): void
+    {
+        $externalMarkbook = new \External_Markbook();
+        if ($externalMarkbook->isSyncable($assessment)) {
+            $externalMarkbook->deleteAssessment($assessment);
         }
     }
 

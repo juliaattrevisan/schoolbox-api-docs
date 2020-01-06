@@ -253,15 +253,15 @@ class Mapper extends BaseMapper
      *
      * Saves a record in external markbook system. Always returns TRUE as we never want to short-circuit subsequent callbacks
      *
-     * @param  Model $quiz
-     * @return bool
+     * @param  Model $object
+     * @return true
      */
-    public function syncToExternalMarkbook(Model $quiz): bool
+    public function syncToExternalMarkbook(Model $object): bool
     {
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
-        $assessment           = $assessmentDataSource->findById($quiz->getAssessmentModel()->getId());
-        $assessmentDataSource->syncToMarkbook($assessment);
+        $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
+        $assessmentDataSource->syncToExternalMarkbook($assessment);
         return true;
     }
 
@@ -273,15 +273,13 @@ class Mapper extends BaseMapper
      *
      * @param Model $object
      * @return true
-     * @throws UnexpectedValueException If unable to build Acitivity from Quiz
      */
     public function deleteFromMarkbook(Model $object)
     {
-        $externalMarkbook = new \External_Markbook();
-        $activityFactory = new ActivityFactory();
-        $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
-        );
+        /** @var AssessmentDataSource $assessmentDataSource */
+        $assessmentDataSource = self::getDi()->get('assessmentDataSource');
+        $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
+        $assessmentDataSource->deleteFromMarkbook($assessment);
         return true;
     }
 

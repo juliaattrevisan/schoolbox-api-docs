@@ -335,15 +335,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      * Always returns TRUE - we don't want to prevent other callbacks executing if this fails.
      *
      * @param SubmissionBox $object
-     * @return bool
-     * @throws UnexpectedValueException If unable to build an Activity from the Submission Box
+     * @return true
      */
     public function syncToExternalMarkbook(SubmissionBox $object): bool
     {
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
         $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
-        $assessmentDataSource->syncToMarkbook($assessment);
+        $assessmentDataSource->syncToExternalMarkbook($assessment);
         return true;
     }
 
@@ -354,15 +353,15 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      * This is used as a post-delete hook.
      *
      * @param SubmissionBox $object
-     * @throws \UnexpectedValueException If unable to build an Activity from the SubmissionBox
+     * @return true
      */
     public function deleteFromMarkbook(SubmissionBox $object)
     {
-        $externalMarkbook = new \External_Markbook();
-        $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
-        $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
-        );
+        /** @var AssessmentDataSource $assessmentDataSource */
+        $assessmentDataSource = self::getDi()->get('assessmentDataSource');
+        $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
+        $assessmentDataSource->deleteFromMarkbook($assessment);
+        return true;
     }
 
     /**
