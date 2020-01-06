@@ -87,10 +87,10 @@ class Mapper extends BaseMapper
         ));
 
         // Markbook sync
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'updateExternalMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
 
@@ -256,49 +256,13 @@ class Mapper extends BaseMapper
      * @param  Model $quiz
      * @return bool
      */
-    public function updateExternalMarkbook(Model $quiz): bool
+    public function syncToExternalMarkbook(Model $quiz): bool
     {
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
         $assessment           = $assessmentDataSource->findById($quiz->getAssessmentModel()->getId());
         $assessmentDataSource->syncToMarkbook($assessment);
-
-//        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-//        if (!$this->isAssessmentSpecification($quiz)) {
-//            $externalMarkbook = new \External_Markbook();
-//            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($quiz, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
-//            if (!$externalMarkbook->hasAssessment($activity)) {
-//                $externalMarkbook->createAssessment($activity);
-//            }
-//            $externalMarkbook->updateAssessment($activity);
-//        }
-
         return true;
-    }
-
-
-    /**
-     * Post-restore callback to re-insert in SIS markbook
-     *
-     * @param Model $quiz
-     * @return bool
-     */
-    public function restoreToExternalMarkbook(Model $quiz): bool
-    {
-        $this->updateExternalMarkbook($quiz);
-        return true;
-    }
-
-
-    /**
-     * @param Model $quiz
-     * @return bool
-     */
-    private function isAssessmentSpecification(Model $quiz)
-    {
-        /** @var Schoolbox\Learning\Assessment\DataModel\Model $assessment */
-        $assessment = $this->getJoinMapper('am')->findById($quiz->getAssessmentModel()->getId());
-        return $assessment->getAssessmentContext()->isSpecificationContext();
     }
 
 

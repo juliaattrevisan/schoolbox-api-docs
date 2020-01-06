@@ -113,7 +113,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteFromMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteFromMarkbook']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteSubmissions']);
@@ -344,46 +344,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
         $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
         $assessmentDataSource->syncToMarkbook($assessment);
-
-//        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-//        if (!$this->isAssessmentSpecification($object)) {
-//            // This saves the assessment to the remote system
-//            $externalMarkbook = new External_Markbook();
-//            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
-//
-//            if (!$externalMarkbook->hasAssessment($activity)) {
-//                $externalMarkbook->createAssessment($activity);
-//            } else {
-//                $externalMarkbook->updateAssessment($activity);
-//            }
-//        }
-
         return true;
-    }
-
-
-    /**
-     * Re-inserts assessment in markbook
-     *
-     * @param SubmissionBox $box
-     * @return bool
-     */
-    public function restoreToExternalMarkbook(SubmissionBox $box): bool
-    {
-        $this->syncToExternalMarkbook($box);
-        return true;
-    }
-
-
-    /**
-     * @param SubmissionBox $box
-     * @return bool
-     */
-    private function isAssessmentSpecification(SubmissionBox $box)
-    {
-        /** @var Schoolbox\Learning\Assessment\DataModel\Model $assessment */
-        $assessment = $this->getJoinMapper('assessmentModel')->findById($box->getAssessmentId());
-        return $assessment->getAssessmentContext()->isSpecificationContext();
     }
 
 
