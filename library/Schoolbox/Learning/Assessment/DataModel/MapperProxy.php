@@ -913,7 +913,7 @@ class MapperProxy
      *
      * @param IAssessable $assessment
      */
-    public function syncToExternalMarkbook(IAssessable $assessment): void
+    public function syncAssessmentToExternalMarkbook(IAssessable $assessment): void
     {
         $externalMarkbook = new \External_Markbook();
         if ($externalMarkbook->isSyncable($assessment)) {

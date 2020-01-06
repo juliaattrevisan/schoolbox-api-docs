@@ -261,7 +261,7 @@ class Mapper extends BaseMapper
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
         $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
-        $assessmentDataSource->syncToExternalMarkbook($assessment);
+        $assessmentDataSource->syncAssessmentToExternalMarkbook($assessment);
         return true;
     }
 
