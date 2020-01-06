@@ -355,7 +355,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      * @param SubmissionBox $object
      * @return true
      */
-    public function deleteFromMarkbook(SubmissionBox $object)
+    public function deleteFromMarkbook(SubmissionBox $object): bool
     {
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');

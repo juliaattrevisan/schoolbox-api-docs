@@ -274,7 +274,7 @@ class Mapper extends BaseMapper
      * @param Model $object
      * @return true
      */
-    public function deleteFromMarkbook(Model $object)
+    public function deleteFromMarkbook(Model $object): bool
     {
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
