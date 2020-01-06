@@ -29,6 +29,14 @@ interface External_MarkbookInterface extends External\IConnector
     public function getAssessment(IAssessable $assessment): array;
 
     /**
+     * Syncs this assessment to the markbook.
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    public function syncAssessment(IAssessable $assessment): bool;
+
+    /**
      * Indicates if assessment exists in external system's markbook
      *
      * @param IAssessable $assessment

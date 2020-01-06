@@ -261,11 +261,7 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 $log->info("    {$action}Create/Update");
 
                 if (!$dryRun) {
-                    if (!$markbookExternal->hasAssessment($assessment)) {
-                        $markbookExternal->createAssessment($assessment);
-                    } else {
-                        $markbookExternal->updateAssessment($assessment);
-                    }
+                    $markbookExternal->syncAssessment($assessment);
                 }
 
             } else {
@@ -275,10 +271,8 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 $action = str_pad("Action:", 30, " ");
                 $log->info("    {$action}Update Only");
 
-                if (!$dryRun) {
-                    if ($markbookExternal->hasAssessment($assessment)) {
-                        $markbookExternal->updateAssessment($assessment);
-                    }
+                if (!$dryRun && $markbookExternal->hasAssessment($assessment)) {
+                    $markbookExternal->syncAssessment($assessment);
                 }
             }
 

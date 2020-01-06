@@ -30,6 +30,14 @@ class External_Offline_Markbook implements External_MarkbookInterface, IOfflineC
     /**
      * @inheritdoc
      */
+    public function syncAssessment(IAssessable $assessment): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAssessment(IAssessable $assessment): array
     {
         return [];

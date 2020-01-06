@@ -917,10 +917,7 @@ class MapperProxy
     {
         $externalMarkbook = new \External_Markbook();
         if ($externalMarkbook->isSyncable($assessment)) {
-            if (!$externalMarkbook->hasAssessment($assessment)) {
-                $externalMarkbook->createAssessment($assessment);
-            }
-            $externalMarkbook->updateAssessment($assessment);
+            $externalMarkbook->syncAssessment($assessment);
         }
     }
 

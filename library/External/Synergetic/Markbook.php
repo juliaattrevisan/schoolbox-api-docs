@@ -102,6 +102,23 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         return $assessment instanceof Quiz || $assessment instanceof DueWork;
     }
 
+
+    /**
+     * @inheritdoc
+     *
+     * @throws \Alaress\Database\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function syncAssessment(IAssessable $assessment): bool
+    {
+        if (!$this->hasAssessment($assessment)) {
+            return $this->createAssessment($assessment);
+        }
+        return $this->updateAssessment($assessment);
+    }
+
+
     /**
      * Returns the assessment information if found in remote system
      *
