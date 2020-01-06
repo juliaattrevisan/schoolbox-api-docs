@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Component;
 
 use Alaress\Database\Predicate\Builder;
 use Eportfolio\ShowcaseMapper;
-use External_Markbook;
 use PDO;
 use PDOStatement;
 use Schoolbox;
@@ -23,9 +22,9 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Class SubmissionBoxMapper
@@ -39,7 +38,7 @@ use UnexpectedValueException;
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, array $options = [])
  * @method SubmissionBox findOneByColumnList($columnList, array $options = [])
  */
-class SubmissionBoxMapper extends Schoolbox\Mapper
+class SubmissionBoxMapper extends BaseMapper
 {
     public const COL_EXTERNAL_ID = 'external_id';
 
@@ -359,10 +358,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     {
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
-        $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
-        $assessmentDataSource->deleteFromMarkbook($assessment);
+        try {
+            $assessmentDataSource->findById($object->getAssessmentModel()->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $assessmentDataSource->deleteFromMarkbook($e->getDeletedObject());
+        }
         return true;
     }
+
 
     /**
     * Conversion of SubmissionBoxHandler->getAllYearsByUser().

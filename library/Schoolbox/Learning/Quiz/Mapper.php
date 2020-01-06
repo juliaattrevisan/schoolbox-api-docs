@@ -278,8 +278,11 @@ class Mapper extends BaseMapper
     {
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = self::getDi()->get('assessmentDataSource');
-        $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
-        $assessmentDataSource->deleteFromMarkbook($assessment);
+        try {
+            $assessmentDataSource->findById($object->getAssessmentModel()->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $assessmentDataSource->deleteFromMarkbook($e->getDeletedObject());
+        }
         return true;
     }
 
