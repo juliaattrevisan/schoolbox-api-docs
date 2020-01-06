@@ -299,7 +299,7 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 $log->info("        {$name}{$feedback->getHumanReadableMark()}");
 
                 if (!$dryRun) {
-                    $markbookExternal->setMark($participant->findMostRecentInstructorGivenFeedback());
+                    $markbookExternal->syncFeedback($participant->findMostRecentInstructorGivenFeedback());
                 }
             }
         }

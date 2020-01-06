@@ -379,7 +379,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @throws \Alaress\Database\Exception
      * @throws Exception
      */
-    public function setMark(IFeedback $feedback): bool
+    public function syncFeedback(IFeedback $feedback): bool
     {
         if (!$this->isSyncable($feedback->getAssessable())) {
             return false;

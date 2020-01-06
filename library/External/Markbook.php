@@ -96,8 +96,8 @@ class External_Markbook implements External_MarkbookInterface
      *
      * @inheritdoc
      */
-    public function setMark(IFeedback $returnedWork): bool
+    public function syncFeedback(IFeedback $returnedWork): bool
     {
-        return $this->database->setMark($returnedWork);
+        return $this->database->syncFeedback($returnedWork);
     }
 }

@@ -74,6 +74,6 @@ interface External_MarkbookInterface extends External\IConnector
      * @param IFeedback $returnedWork
      * @return bool
      */
-    public function setMark(IFeedback $returnedWork): bool;
+    public function syncFeedback(IFeedback $returnedWork): bool;
 }
 

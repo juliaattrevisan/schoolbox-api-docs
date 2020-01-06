@@ -78,7 +78,7 @@ class External_Offline_Markbook implements External_MarkbookInterface, IOfflineC
     /**
      * @inheritdoc
      */
-    public function setMark(IFeedback $returnedWork): bool
+    public function syncFeedback(IFeedback $returnedWork): bool
     {
         return false;
     }

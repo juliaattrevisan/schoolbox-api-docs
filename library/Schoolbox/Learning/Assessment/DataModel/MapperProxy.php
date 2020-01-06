@@ -938,7 +938,7 @@ class MapperProxy
             if ($participant) {
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
                 if ($feedback) {
-                    $externalMarkbook->setMark($feedback);
+                    $externalMarkbook->syncFeedback($feedback);
                 }
             }
         }
