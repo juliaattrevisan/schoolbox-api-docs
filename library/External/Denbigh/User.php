@@ -114,31 +114,29 @@ class External_Denbigh_User implements External_UserInterface
             'MobilePhone'                => '',
             'HomePhone'                  => '',
             'SilentPhoneFlag'            => '',
-            'DirectoryIncludeFlag'       => '',
+            'DirectoryIncludeFlag'       => '1',
             'SpouseID'                   => '',
             'SpouseTitle'                => '',
             'SpousePreferred'            => '',
             'SpouseSurname'              => '',
             'SpouseEmail'                => '',
             'SpouseMobilePhone'          => '',
-            'SpouseDirectoryIncludeFlag' => '',
+            'SpouseDirectoryIncludeFlag' => '1',
         ];
 
         if (!empty($parentList[0])) {
-            $adaption['Title']                = $parentList[0]['title'];
-            $adaption['Preferred']            = $parentList[0]['preferred_name'];
-            $adaption['Surname']              = $parentList[0]['surname'];
-            $adaption['HomePhone']            = $parentList[0]['telephoneHome'];
-            $adaption['SilentPhoneFlag']      = false;
-            $adaption['DirectoryIncludeFlag'] = '';
+            $adaption['Title']           = $parentList[0]['title'];
+            $adaption['Preferred']       = $parentList[0]['preferred_name'];
+            $adaption['Surname']         = $parentList[0]['surname'];
+            $adaption['HomePhone']       = $parentList[0]['telephoneHome'];
+            $adaption['SilentPhoneFlag'] = false;
         }
 
         if (!empty($parentList[1]) && $parentList[1]['denbighID'] != $externalUserId) {
-            $adaption['SpouseID']                   = $parentList[1]['denbighID'];
-            $adaption['SpouseTitle']                = $parentList[1]['title'];
-            $adaption['SpousePreferred']            = $parentList[1]['preferred_name'];
-            $adaption['SpouseSurname']              = $parentList[1]['surname'];
-            $adaption['SpouseDirectoryIncludeFlag'] = '';
+            $adaption['SpouseID']        = $parentList[1]['denbighID'];
+            $adaption['SpouseTitle']     = $parentList[1]['title'];
+            $adaption['SpousePreferred'] = $parentList[1]['preferred_name'];
+            $adaption['SpouseSurname']   = $parentList[1]['surname'];
         }
 
         return $adaption;
