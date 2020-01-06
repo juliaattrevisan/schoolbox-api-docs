@@ -924,6 +924,30 @@ class MapperProxy
         }
     }
 
+
+    /**
+     * Helper method for syncing an assessment's participation to the markbook.
+     *
+     * TODO move to a helper class
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     */
+    public function syncParticipationToExternalMarkbook(IAssessable $assessment, User $student): void
+    {
+        $externalMarkbook = new \External_Markbook();
+        if ($externalMarkbook->isSyncable($assessment)) {
+            $participant = $assessment->getParticipantIfExtant($student);
+            if ($participant) {
+                $feedback = $participant->findMostRecentInstructorGivenFeedback();
+                if ($feedback) {
+                    $externalMarkbook->setMark($feedback);
+                }
+            }
+        }
+    }
+
+
     /**
      * Helper method for deleting an assessment from the markbook.
      *

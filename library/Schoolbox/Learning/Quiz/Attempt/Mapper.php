@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use PDOStatement;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -194,18 +195,20 @@ class Mapper extends BaseMapper
      * Writes mark data back into remote markbook
      *
      * @param Model $object
-     * @param Model|null $previous
-     * @return true
      */
-    protected function syncToExternalMarkbook(Model $object, $previous = null)
+    protected function syncToExternalMarkbook(Model $object): void
     {
-        // Only update markbook if attempt is reviewed
         if ($object->isReviewed()) {
-            $externalMarkbook = new \External_Markbook();
-            $externalMarkbook->setMark($object);
+            // Need the entire assessment, and to fetch its participation,
+            // then fetch a most recent feedback out of that
+            /** @var AssessmentDataSource $assessmentDataSource */
+            $assessmentDataSource = self::getDi()->get('assessmentDataSource');
+            $assessment           = $assessmentDataSource->findByQuizId(
+                $object->getQuiz()->getId(),
+                $object->getUser()
+            );
+            $assessmentDataSource->syncParticipationToExternalMarkbook($assessment, $object->getUser());
         }
-
-        return true;
     }
 
 
