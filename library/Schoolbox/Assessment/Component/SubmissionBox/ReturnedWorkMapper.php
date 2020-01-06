@@ -9,16 +9,16 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
+use PDOStatement;
 use RangeException;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use PDOStatement;
+use Schoolbox\Assessment\Participant;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
-use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Participant;
 
 /**
  * Class ReturnedWorkMapper
@@ -78,13 +78,15 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         );
 
         // SoftDelete/Restore weak entities
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturnedWorkFiles'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'persistFiles'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteReturnedWorkFiles']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistFiles']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateNormMark']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
+
+        // Markbook sync
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
     }
 
     /**
@@ -282,19 +284,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             $externalMarkbook = new \External_Markbook();
             $externalMarkbook->setMark($object);
         }
-    }
-
-
-    /**
-     * Re-inserts mark in markbook
-     *
-     * @param ReturnedWork $returnedWork
-     * @return bool
-     */
-    public function restoreToExternalMarkbook(ReturnedWork $returnedWork): bool
-    {
-        $this->syncToExternalMarkbook($returnedWork);
-        return true;
     }
 
 

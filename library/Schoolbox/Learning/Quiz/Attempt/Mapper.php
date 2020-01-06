@@ -11,16 +11,16 @@ namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper as BaseMapper;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
-use Schoolbox\Assessment\Participant;
 
 /**
  * @method Model createModel($idValue = null)
@@ -68,13 +68,14 @@ class Mapper extends BaseMapper
             'other_key' => 'attempt_id',
         ));
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
 
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
+        // Markbook sync
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
     }
 
 
@@ -196,7 +197,7 @@ class Mapper extends BaseMapper
      * @param Model|null $previous
      * @return true
      */
-    protected function updateExternalMarkbook(Model $object, $previous = null)
+    protected function syncToExternalMarkbook(Model $object, $previous = null)
     {
         // Only update markbook if attempt is reviewed
         if ($object->isReviewed()) {
@@ -204,19 +205,6 @@ class Mapper extends BaseMapper
             $externalMarkbook->setMark($object);
         }
 
-        return true;
-    }
-
-
-    /**
-     * Post-restore callback to re-insert in SIS markbook
-     *
-     * @param Model $attempt
-     * @return bool
-     */
-    public function restoreToExternalMarkbook(Model $attempt): bool
-    {
-        $this->updateExternalMarkbook($attempt);
         return true;
     }
 
