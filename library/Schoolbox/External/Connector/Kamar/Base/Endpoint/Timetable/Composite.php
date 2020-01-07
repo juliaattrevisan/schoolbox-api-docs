@@ -59,27 +59,9 @@ class Composite implements IStrategy
 
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
      * @var UserMapper
      */
     private $userMapper;
-
-
-    /**
-     * @var TimetableCampusMapper
-     */
-    private $timetableCampusMapper;
-
-
-    /**
-     * @var TimetableCycleMapper
-     */
-    private $timetableCycleMapper;
 
 
     /**
@@ -119,10 +101,7 @@ class Composite implements IStrategy
      * @param bool                   $perform
      * @param Container              $container
      * @param Endpoint\Batchxml      $timetableBatchXml
-     * @param CampusMapper           $campusMapper
      * @param UserMapper             $userMapper
-     * @param TimetableCampusMapper  $timetableCampusMapper
-     * @param TimetableCycleMapper   $timetableCycleMapper
      * @param TimetablePeriodMapper  $timetablePeriodMapper
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
@@ -133,10 +112,7 @@ class Composite implements IStrategy
         bool $perform,
         Container $container,
         Endpoint\Batchxml $timetableBatchXml,
-        CampusMapper $campusMapper,
         UserMapper $userMapper,
-        TimetableCampusMapper $timetableCampusMapper,
-        TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
@@ -147,10 +123,7 @@ class Composite implements IStrategy
         $this->registry = new Collection();
         $this->container = $container;
         $this->timetableBatchXml = $timetableBatchXml;
-        $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
-        $this->timetableCampusMapper = $timetableCampusMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -164,7 +137,6 @@ class Composite implements IStrategy
     public function import(): void
     {
         $this->registry
-            ->add(new Endpoint\Timetable\Definition($this->log, $this->perform, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
             ->add(new Endpoint\Timetable\Classes($this->log, $this->perform, $this->container, $this->timetableBatchXml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
 
         foreach ($this->registry as $strategy) {

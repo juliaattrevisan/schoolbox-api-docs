@@ -241,6 +241,17 @@ class Factory
             ));
         }
 
+        /* Set up the Timetable definition separately from the masses of timetable-related xml files
+         */
+        $bus->add(new KamarTimetable\Definition(
+            $this->logger,
+            $this->perform,
+            CampusMapper::getInstance(),
+            TimetableCampusMapper::getInstance(),
+            TimetableCycleMapper::getInstance(),
+            TimetablePeriodMapper::getInstance()
+        ));
+
         /* Load all the Student Timetable xmls
          */
         foreach ($xml['studenttimetables'] as $xmlFile) {
@@ -249,10 +260,7 @@ class Factory
                 $this->perform,
                 $container,
                 new KamarBatchxml(new KamarApi($this->host . '/' . $xmlFile)),
-                CampusMapper::getInstance(),
                 UserMapper::getInstance(),
-                TimetableCampusMapper::getInstance(),
-                TimetableCycleMapper::getInstance(),
                 TimetablePeriodMapper::getInstance(),
                 ClassEntryMapper::getInstance(),
                 ClassInvolvementMapper::getInstance(),
