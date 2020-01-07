@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Course\Task as TaskDataModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectDataModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Model as QuizDataModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
