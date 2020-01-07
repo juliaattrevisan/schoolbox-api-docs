@@ -41,6 +41,13 @@ class Batchxml
 
 
     /**
+     * Kamar returned some sort of error message, not xml
+     * Display the first 200 chars of the broken data
+     */
+    private const DEBUG_CHARS = 200;
+
+
+    /**
      * Batchxml constructor.
      *
      * @param IApi $api
@@ -80,8 +87,9 @@ class Batchxml
             } catch (\Exception $e) {
 
                 /* Kamar returned some sort of error message, not xml
+                 * Display the first 200 chars of the broken data
                  */
-                throw new RuntimeException("{$e->getMessage()}\n\n{$xml}");
+                throw new RuntimeException("{$e->getMessage()}\n\n" . substr($xml,0, self::DEBUG_CHARS));
             }
         }
 
