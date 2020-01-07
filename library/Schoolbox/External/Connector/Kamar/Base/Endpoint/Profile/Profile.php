@@ -521,7 +521,7 @@ class Profile implements IStrategy
         $staffs = $this->batchxml->fetchXml('/SMSDirectoryData/staff/user');
 
         foreach ($staffs as $staff) {
-            $externalId = trim((string)$staff->uniqueid);
+            $externalId = trim((string)$staff->xpath('@id')[0]);
             $username = trim((string)$staff->username);
             $title = trim((string)$staff->title);
             $firstname = trim((string)$staff->firstname);
