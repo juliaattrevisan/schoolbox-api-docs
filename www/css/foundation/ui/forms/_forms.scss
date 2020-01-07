@@ -974,6 +974,11 @@ fieldset {
 	}
 }
 
+input.invalid-data, input.invalid-data:focus {
+  background-color: $hot-color;
+  border-color: $alert-color;
+}
+
 @import 'dropzone';
 @import 'datetime';
 @import 'tinymce';
