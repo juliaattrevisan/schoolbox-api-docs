@@ -7,15 +7,21 @@ declare(strict_types=1);
 
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Receiver;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 header('Content-type: application/xml');
 
-/* Consume data from stream
+/* Consume data from stream...
  */
 $data = file_get_contents('php://input');
+
+/* ...and place the results in this special folder
+ * which will be created if it doesn't already exist
+ */
+$cacheDir = (new Setup(null, Loader::getInstance()->get('stream-dir')))->getCacheDir();
 
 /* Testing independently of a Kamar push
  *
@@ -24,15 +30,7 @@ $data = file_get_contents('php://input');
  *
  * Or you can do it via the cli:
  * clear;curl --data-binary "@/vagrant/tools/synchronise/temp.xml" -k https://vagrant.dev.schoolbox.cloud/api/kamar.php
- *
- * TODO: Consider a kamar-specific folder
- * That'll become available to all schools but only NZ schools can use it.
- * Add a config var
- * Register its usage in:
- *     clean-cache-dir.sh
- *     create-data-dirs.sh
- *     generate-dir-sql.sh
  */
-(new Receiver(Loader::getInstance()->get('stream_dir')))->receive((string)$data);
+(new Receiver($cacheDir))->receive((string)$data);
 
 exit();

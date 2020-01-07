@@ -9,6 +9,7 @@ namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -20,6 +21,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Status;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable as KamarTimetable;
 
@@ -193,6 +195,10 @@ class Factory
         $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/' . Status::EXPECTED_TIMETABLE_XML));
 
         return (new GenericCollection(IStrategy::class))
+            ->add(new Setup(
+                $this->logger,
+                Loader::getInstance()->get('stream_dir')
+            ))
             ->add(new KamarProfile\Composite(
                 $this->logger,
                 $this->perform,
