@@ -187,33 +187,67 @@ class Factory
     {
         $this->logger->info('Accessing local xml endpoints');
 
-        /* Timetable Composite requires access across multiple xml files
-         * Pass it multiple $batchxml instances that have their $this->host vars
-         * set to hardcoded filenames; $this->host becomes a dir, not a file
+        /* Set up composite bus - everybody's xml gets on board and shuttled off
+         * into schoolbox town
          */
-        $profileBatchXml = new KamarBatchxml(new KamarApi($this->host . '/' . Status::EXPECTED_PROFILE_XML));
-        $timetableBatchXml = new KamarBatchxml(new KamarApi($this->host . '/' . Status::EXPECTED_TIMETABLE_XML));
-
-        return (new GenericCollection(IStrategy::class))
+        $bus = (new GenericCollection(IStrategy::class))
             ->add(new Setup(
                 $this->logger,
                 Loader::getInstance()->get('stream_dir')
-            ))
-            ->add(new KamarProfile\Composite(
+            ));
+
+        /* Profile and student timetable xmls come with a datetime suffix
+         *
+         * Timetable Composite requires access across multiple xml files cross-referencing nodes
+         * in profile xml so you can identify who is in a class
+         *
+         * Pass it multiple $batchxml instances that have their $this->host vars
+         * set to hardcoded filenames; $this->host becomes a dir, not a file
+         */
+        $dirhandle = opendir($this->host);
+
+        $xml = [
+            'full' => [],
+            'studenttimetables' => []
+        ];
+
+        /* TODO: replace magic strings with consts
+         */
+        while ($xmlFile = readdir($dirhandle)) {
+            if ($xmlFile !== '.' && $xmlFile !== '..') {
+                if (strpos($xmlFile, 'full_') !== false) {
+                    $xml['full'][] = $xmlFile;
+                } elseif (strpos($xmlFile, 'studenttimetables_') !== false) {
+                    $xml['studenttimetables'][] = $xmlFile;
+                }
+            }
+        }
+
+        /* Load all the Profile xmls
+         */
+        foreach ($xml['studenttimetables'] as $xmlFile) {
+            $bus->add(new KamarProfile\Composite(
                 $this->logger,
                 $this->perform,
-                $profileBatchXml,
+                new KamarBatchxml(new KamarApi($this->host . '/' . $xmlFile)),
+                // TODO: Insert cache container to remember staff details for logging
                 UserProfile\Mapper::getInstance(),
                 UserProfile\Student\Mapper::getInstance(),
                 UserProfile\Parent\Mapper::getInstance(),
                 UserProfile\Staff\Mapper::getInstance(),
                 UserProfile\Relationship\Mapper::getInstance()
-            ))
-            ->add(new KamarTimetable\Composite(
+            ));
+        }
+
+        /* Load all the Student Timetable xmls
+         */
+        foreach ($xml['studenttimetables'] as $xmlFile) {
+            $bus->add(new KamarTimetable\Composite(
                 $this->logger,
                 $this->perform,
-                $profileBatchXml,
-                $timetableBatchXml,
+
+                $profileBatchXml, // TODO: Replace with cached id=>externalId tuples container
+                new KamarBatchxml(new KamarApi($this->host . '/' . $xmlFile)),
                 CampusMapper::getInstance(),
                 UserMapper::getInstance(),
                 TimetableCampusMapper::getInstance(),
@@ -223,5 +257,6 @@ class Factory
                 ClassInvolvementMapper::getInstance(),
                 ClassPeriodMapper::getInstance()
             ));
+        }
     }
 }
