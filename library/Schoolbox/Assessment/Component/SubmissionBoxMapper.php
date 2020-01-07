@@ -14,9 +14,6 @@ use Eportfolio\ShowcaseMapper;
 use PDO;
 use PDOStatement;
 use Schoolbox;
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -382,73 +379,6 @@ class SubmissionBoxMapper extends BaseMapper
     }
 
 
-    /**
-     * Gets all submission boxes that are due within the given date span.
-     *
-     * @param array $category_list  A list of category IDs to filter on.
-     * @param int   $from_timestamp A Unix timestamp to search from
-     * @param int   $to_timestamp   A Unix timestamp to search until
-     *
-     * @return ActivityCollection
-     * @throws \UnexpectedValueException If unable to build an Activity from a SB Assessment
-     */
-    public function getDueActivities($category_list, $from_timestamp, $to_timestamp)
-    {
-        $factory    = new ActivityFactory();
-        $collection = new ActivityCollection();
-        if (empty($category_list)) {
-            return $collection;
-        }
-
-        $cat_mapper  = $this->getJoinMapper('category');
-        $user_mapper = $this->getJoinMapper('owner');
-        $assessment_mapper = $this->getJoinMapper('assessmentModel');
-
-        $query = "
-            SELECT
-                {$this->getColumnString('sb')},
-                {$assessment_mapper->getColumnString('a')},
-                {$cat_mapper->getColumnString('c')},
-                {$user_mapper->getColumnString('u')}
-            FROM {$this->getTable()} sb
-            INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
-            LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-            LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u', true)}
-            WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
-            AND sb.date BETWEEN :from_date AND :to_date
-            AND a.deleted_at IS NULL
-            ORDER BY sb.date ASC
-        ";
-
-        //
-        // Build parameters
-        $from_date = new \Alaress_Date_Format($from_timestamp, 'U');
-        $to_date   = new \Alaress_Date_Format($to_timestamp, 'U');
-        $params    = $this->getArrayParameters($category_list, 'category');
-        $params['from_date'] = $from_date->getDatabase();
-        $params['to_date']   = $to_date->getDatabase();
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        //
-        // Hydrate as activity list, then add category codes
-        foreach ($statement as $row) {
-            $box = $this->hydrate($row, 'sb');
-            $box->setAssessmentModel($assessment_mapper->hydrate($row, 'a'));
-            $box->setOwner($user_mapper->hydrate($row, 'u'));
-            $box->setCategory($cat_mapper->hydrate($row, 'c'));
-            $collection->add($factory->buildFromSubmissionBox($box, Schoolbox\Assessment\Activity::EVENT_OVERDUE));
-        }
-        /** @var Folder\Code\Mapper $code_mapper */
-        $code_mapper = $cat_mapper->getJoinMapper('codes');
-        $code_mapper->applyCodesToCategories(
-            $collection,
-            static function (Activity $item): Folder\Model {
-                return $item->getCategory();
-            }
-        );
-        return $collection;
-    }
 
     /**
     * Calculates and returns the statistics of the given submission box
