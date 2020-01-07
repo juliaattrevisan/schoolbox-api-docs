@@ -34,12 +34,21 @@ class Container
     /**
      * Remember a staff member's details, using their externalId as a key
      *
-     * @param string           $externalId
-     * @param SimpleXMLElement $staff
+     * @param string $externalId
+     * @param string $title
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $username
      */
-    public function remember(string $externalId, SimpleXMLElement $staff): void
+    public function remember(string $externalId, string $title, string $firstname, string $lastname, string $username): void
     {
-        $this->registry[$externalId] = $staff;
+        $this->registry[$externalId] = [
+            'externalId' => $externalId,
+            'title' => $title,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'username' => $username
+        ];
     }
 
 

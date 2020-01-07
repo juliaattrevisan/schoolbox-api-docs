@@ -211,9 +211,9 @@ class SubjectIterator implements Iterator
         $teacherIds = explode(',', trim((string)$subject->teachers));
 
         foreach ($teacherIds as $teacherId) {
-            $teacherNode = $this->container->recall($teacherId);
+            $teacher = $this->container->recall($teacherId);
 
-            if (!$teacherNode) {
+            if (!$teacher) {
                 $this->log->warning(sprintf(
                     'Teacher %s profile not found',
                     $teacherId
@@ -222,14 +222,12 @@ class SubjectIterator implements Iterator
                 continue;
             }
 
-            $teacher = $teacherNode[0];
-
             $teachers[] = [
-                'externalId' => trim((string)$teacher->uniqueid),
-                'title' => trim((string)$teacher->title),
-                'firstname' => trim((string)$teacher->firstname),
-                'surname' => trim((string)$teacher->lastname),
-                'username' => trim((string)$teacher->username),
+                'externalId' => $teacher['externalId'],
+                'title' => $teacher['title'],
+                'firstname' => $teacher['firstname'],
+                'surname' => $teacher['lastname'],
+                'username' => $teacher['username'],
             ];
         }
 
@@ -247,9 +245,9 @@ class SubjectIterator implements Iterator
      */
     private function findStudents(string $studentId): ?array
     {
-        $studentNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/students/user[@id='{$studentId}']");
+        $student = $this->container->recall($studentId);
 
-        if (!$studentNode) {
+        if (!$student) {
             $this->log->warning(sprintf(
                 'Student %s profile not found',
                 $studentId
@@ -258,14 +256,12 @@ class SubjectIterator implements Iterator
             return null;
         }
 
-        $student = $studentNode[0];
-
         return [
-            'externalId' => trim((string)$student->uniqueid),
-            'title' => '',
-            'firstname' => trim((string)$student->firstname),
-            'surname' => trim((string)$student->lastname),
-            'username' => trim((string)$student->username),
+            'externalId' => $student['externalId'],
+            'title' => $student['title'],
+            'firstname' => $student['firstname'],
+            'surname' => $student['lastname'],
+            'username' => $student['username'],
         ];
     }
 

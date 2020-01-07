@@ -389,6 +389,10 @@ class Profile implements IStrategy
             /* Add their parents + relationships too
              */
             $this->importParentsOfStudent($student, $studentBaseProfile);
+
+            /* Remember this person's details for timetable import
+             */
+            $this->container->remember($externalId, $title, $firstname, $lastname, $username);
         }
     }
 
@@ -607,7 +611,7 @@ class Profile implements IStrategy
 
             /* Remember this person's details for timetable import
              */
-            $this->container->remember($externalId, $staff);
+            $this->container->remember($externalId, $title, $firstname, $lastname, $username);
         }
     }
 }
