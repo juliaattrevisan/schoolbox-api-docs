@@ -227,7 +227,7 @@ class Factory
          */
         $container = new KamarProfile\Container();
 
-        foreach ($xml['studenttimetables'] as $xmlFile) {
+        foreach ($xml['full'] as $xmlFile) {
             $bus->add(new KamarProfile\Composite(
                 $this->logger,
                 $this->perform,
