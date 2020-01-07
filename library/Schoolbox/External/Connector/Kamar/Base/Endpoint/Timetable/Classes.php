@@ -218,11 +218,7 @@ class Classes implements IStrategy
      */
     private function findCurrentCycle(SimpleXMLElement $timetable): SimpleXMLElement
     {
-        $weekNum = date('W');
-
-        /* TODO: Unluck when there's real data
-         */
-        $weekNum = 40;
+        $weekNum = (int)date('W');
 
         return $timetable->xpath("week[@index='{$weekNum}']")[0];
     }
