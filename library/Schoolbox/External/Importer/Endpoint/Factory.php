@@ -191,7 +191,7 @@ class Factory
         /* Set up composite bus - everybody's xml gets on board and shuttled off
          * into schoolbox town
          */
-        $bus = new GenericCollection(IStrategy::class)
+        $bus = new GenericCollection(IStrategy::class);
 
         /* Set up the kamar directory which is where all their xml files go
          */
