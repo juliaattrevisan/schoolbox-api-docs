@@ -20,7 +20,9 @@ use Schoolbox\User;
 use TypeError;
 
 /**
- * Class MarkbookSyncHelper
+ * An adapter class for syncing `IAssessableDataModel` instances to the external
+ * markbook
+ * (instead of the `IAssessable` objects `External_MarkbookInterface` expects).
  */
 class MarkbookSyncHelper
 {
@@ -52,6 +54,8 @@ class MarkbookSyncHelper
     /**
      * Syncs an assessment to the markbook.
      *
+     * @see External_MarkbookInterface::syncAssessment()
+     *
      * @param IAssessableDataModel $assessmentModel
      */
     public function syncAssessment(IAssessableDataModel $assessmentModel): void
@@ -70,6 +74,8 @@ class MarkbookSyncHelper
     /**
      * Deletes a previously-synced assessment from the markbook.
      *
+     * @see External_MarkbookInterface::deleteAssessment()
+     *
      * @param IAssessableDataModel $assessmentModel
      */
     public function deleteAssessment(IAssessableDataModel $assessmentModel): void
@@ -87,6 +93,8 @@ class MarkbookSyncHelper
 
     /**
      * Syncs participation in an assessment to the markbook.
+     *
+     * @see External_MarkbookInterface::syncFeedback()
      *
      * @param IAssessableDataModel $assessmentModel
      * @param User                 $student
