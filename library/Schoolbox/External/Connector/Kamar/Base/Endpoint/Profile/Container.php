@@ -32,15 +32,16 @@ class Container
     /**
      * Remember a staff member's details, using their externalId as a key
      *
+     * @param string $key
      * @param string $externalId
      * @param string $title
      * @param string $firstname
      * @param string $lastname
      * @param string $username
      */
-    public function remember(string $externalId, string $title, string $firstname, string $lastname, string $username): void
+    public function remember(string $key, string $externalId, string $title, string $firstname, string $lastname, string $username): void
     {
-        $this->registry[$externalId] = [
+        $this->registry[$key] = [
             'externalId' => $externalId,
             'title' => $title,
             'firstname' => $firstname,

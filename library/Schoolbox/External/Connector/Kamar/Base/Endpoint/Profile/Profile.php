@@ -209,6 +209,7 @@ class Profile implements IStrategy
         $students = $this->batchxml->fetchXml('/SMSDirectoryData/students/user');
 
         foreach ($students as $student) {
+            $internalId = trim((string)$student->xpath('@id')[0]);
             $externalId = trim((string)$student->uniqueid);
             $username = trim((string)$student->username);
             $title = '';
@@ -392,7 +393,7 @@ class Profile implements IStrategy
 
             /* Remember this person's details for timetable import
              */
-            $this->container->remember($externalId, $title, $firstname, $lastname, $username);
+            $this->container->remember($internalId, $externalId, $title, $firstname, $lastname, $username);
         }
     }
 
@@ -611,7 +612,7 @@ class Profile implements IStrategy
 
             /* Remember this person's details for timetable import
              */
-            $this->container->remember($externalId, $title, $firstname, $lastname, $username);
+            $this->container->remember($externalId, $externalId, $title, $firstname, $lastname, $username);
         }
     }
 }
