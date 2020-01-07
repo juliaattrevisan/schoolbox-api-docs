@@ -62,8 +62,8 @@ class Status implements IStatus
     private function findSpecimens(): array
     {
         $expectedXmls = [
-            Receiver::XML_FULL => false,
-            Receiver::XML_STUDENTTIMETABLES => false
+            Receiver::XML_FULL => '',
+            Receiver::XML_STUDENTTIMETABLES => ''
         ];
 
         $dirhandle = opendir($this->path);
@@ -98,17 +98,17 @@ class Status implements IStatus
         $expectedXmls = $this->findSpecimens();
 
         $specifications = [
-            new Profile\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
-            new Timetable\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
+            Receiver::XML_FULL => new Profile\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
+            Receiver::XML_STUDENTTIMETABLES => new Timetable\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
         ];
 
         $result = [];
 
-        foreach ($specifications as $specification) {
+        foreach ($specifications as $key => $specification) {
             try {
                 $result[] = implode("\n", $specification->check());
             } catch (\RuntimeException $e) {
-                $result[] = "Cannot access api endpoint: {$e->getMessage()}";
+                $result[] = "Cannot access api endpoint: cannot open/read at least one {$key} xml";
             }
         }
 
