@@ -254,9 +254,9 @@ class Factory
 
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
+         * Recycle this instance in every iteration
          */
         $lookup = new KamarTimetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
-        $lookup->init();
 
         /* Load all the Student Timetable xmls
          */

@@ -37,13 +37,13 @@ class Lookup
     /**
      * @var array
      */
-    private $users = [];
+    private $users;
 
 
     /**
      * @var array
      */
-    private $periods = [];
+    private $periods;
 
 
     /**
@@ -62,13 +62,21 @@ class Lookup
     /**
      * Facade method
      *
+     * If users and periods weren't previously fetched, get them
+     * Otherwise return whatever was previously found
+     *
      * @return void
      * @throws Exception
      */
     public function init(): void
     {
-        $this->users = $this->initUserLookup();
-        $this->periods = $this->initPeriodLookup();
+        if (null === $this->users) {
+            $this->users = $this->initUserLookup();
+        }
+
+        if (null === $this->periods) {
+            $this->periods = $this->initPeriodLookup();
+        }
     }
 
 

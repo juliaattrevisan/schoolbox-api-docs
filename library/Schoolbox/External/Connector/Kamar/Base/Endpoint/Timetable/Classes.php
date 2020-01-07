@@ -169,11 +169,12 @@ class Classes implements IStrategy
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
+         *
+         * Cache a flat key-value array of (day, period)
          */
-        $users = $this->lookup->getUsers();
+        $this->lookup->init();
 
-        /* Cache a flat key-value array of (day, period)
-         */
+        $users = $this->lookup->getUsers();
         $periods = $this->lookup->getPeriods();
 
         /* Get a list of all the timetables to process
