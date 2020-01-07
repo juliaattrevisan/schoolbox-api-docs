@@ -21,11 +21,13 @@
 <script type="text/javascript">
     $(function() {
         var $toast = $('[data-relation="submit-label"]');
+        var $weightInput;
         $(document).on('change', '[data-weight]', function (e) {
             let data = {
                 assessmentId: $(this).attr('data-assessment'),
                 weight: $(this).val()
             }
+            $weightInput = $(this);
             updateAssessment($(this).attr('name'), data);
         });
 
@@ -47,10 +49,16 @@
                 data: data,
                 dataType: 'json',
             }).success(function (response) {
+                if (typeof $weightInput !== 'undefined') {
+                    $weightInput.removeClass('invalid-data');
+                }
                 $toast.toastTimeout({text: response.message, css: 'success'});
             }).error(function (response) {
+                if (typeof $weightInput !== 'undefined') {
+                    $weightInput.focus().addClass('invalid-data');
+                }
                 $toast.toastTimeout({
-                    text: response.responseJSON.error,
+                    text: 'Failed to save weight',
                     css: 'alert'
                 });
             });

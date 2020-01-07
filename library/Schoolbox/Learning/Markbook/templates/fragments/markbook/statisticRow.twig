@@ -5,7 +5,7 @@
     <td data-assessment="{{ assessment.id }}">
         {% if markbook.assessmentStatistics[assessment.id][key] is defined %}
             {% if input and assessment is not task %}
-                <input type="number" name="weight" data-weight value="{{ assessment.weight }}" min=0 max=100 data-assessment="{{ assessment.id }}">
+                <input type="number" name="weight" data-weight value="{{ assessment.weight }}" min=0 data-assessment="{{ assessment.id }}">
             {% elseif round %}
                 {{ markbook.assessmentStatistics[assessment.id][key] | round(round) }}
             {% else %}
