@@ -190,11 +190,14 @@ class Factory
         /* Set up composite bus - everybody's xml gets on board and shuttled off
          * into schoolbox town
          */
-        $bus = (new GenericCollection(IStrategy::class))
-            ->add(new Setup(
-                $this->logger,
-                Loader::getInstance()->get('stream_dir')
-            ));
+        $bus = new GenericCollection(IStrategy::class)
+
+        /* Set up the kamar directory which is where all their xml files go
+         */
+        $bus->add(new Setup(
+            $this->logger,
+            Loader::getInstance()->get('stream_dir')
+        ));
 
         /* Profile and student timetable xmls come with a datetime suffix
          *
