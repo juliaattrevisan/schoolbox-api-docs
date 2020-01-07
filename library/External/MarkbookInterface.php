@@ -21,14 +21,6 @@ interface External_MarkbookInterface extends External\IConnector
     public function isSyncable(IAssessable $assessment): bool;
 
     /**
-     * Returns the assessment information if found in remote system
-     *
-     * @param IAssessable $assessment
-     * @return array
-     */
-    public function getAssessment(IAssessable $assessment): array;
-
-    /**
      * Syncs this assessment to the markbook.
      *
      * @param IAssessable $assessment

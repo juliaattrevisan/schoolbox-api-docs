@@ -120,24 +120,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
-     * Returns the assessment information if found in remote system
-     *
-     * Note this matches Synergetic's globally-configured year and semester,
-     * rather than in the context of a specific user.
-     *
-     * @param IAssessable $assessment
-     * @return array
-     */
-    public function getAssessment(IAssessable $assessment): array
-    {
-        if (!$this->isSyncable($assessment)) {
-            return [];
-        }
-
-        return $this->getSynergeticMarkbookList($assessment, $this->getSystemFileYear(), $this->getSystemFileSemester());
-    }
-
-    /**
      * Returns TRUE if there are any markbooks in synergetic for this assessment.
      *
      * Only checks Synergetic's current globally-configured year and semester, rather than in the context of a specific user.

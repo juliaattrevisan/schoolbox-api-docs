@@ -48,15 +48,6 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function getAssessment(IAssessable $assessment): array
-    {
-        return $this->database->getAssessment($assessment);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function hasAssessment(IAssessable $assessment): bool
     {
         return $this->database->hasAssessment($assessment);
