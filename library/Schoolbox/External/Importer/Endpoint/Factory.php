@@ -258,6 +258,16 @@ class Factory
          */
         $lookup = new KamarTimetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
 
+        /* Purge previously-imported classes
+         */
+        $bus->add(new KamarTimetable\Purge(
+            $this->logger,
+            $this->perform,
+            ClassEntryMapper::getInstance(),
+            ClassInvolvementMapper::getInstance(),
+            ClassPeriodMapper::getInstance()
+        ));
+
         /* Load all the Student Timetable xmls
          */
         foreach ($xml['studenttimetables'] as $xmlFile) {
