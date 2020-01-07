@@ -21,11 +21,11 @@ class Receiver
 {
 
     /**
-     * An identifying string, since the files end up in the cache folder
-     * we should have a way of discriminating these source xmls from
-     * whatever else appears in that folder
+     * The prefixes we can expect to receive
+     * These are the SMSDirectoryData node's @sync attribute
      */
-    public const KAMAR_NAMESPACE = 'kamar';
+    public const XML_FULL = 'full';
+    public const XML_STUDENTTIMETABLES = 'studenttimetables';
 
 
     /**
@@ -89,7 +89,6 @@ XML;
     private function process(string $data): void
     {
         $nodes = new SimpleXMLElement($data);
-        $namespace = self::KAMAR_NAMESPACE;
 
         /* Figure out the prefix for this payload's filename
          *
@@ -111,14 +110,7 @@ XML;
          * each push attempt that the school makes while we're figuring out this integration.
          */
         $prefix = (string)$nodes->xpath('/SMSDirectoryData/@sync')[0];
-        $path = "{$this->dir}/{$namespace}_{$prefix}_{$this->suffix}";
-
-        /* TODO: Remove temporal suffix from $path
-         * We need to keep the timestamped files here while we experiment with kamar
-         *
-         * Once we figure it out, we just need the profile.xml and studenttimetables.xml files
-         * without the datetime in them
-         */
+        $path = "{$this->dir}/{$prefix}{$this->suffix}";
 
         /* Write xml file
          */

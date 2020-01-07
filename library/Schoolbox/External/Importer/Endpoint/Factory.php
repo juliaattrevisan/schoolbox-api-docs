@@ -21,6 +21,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Status;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable as KamarTimetable;
@@ -210,18 +211,19 @@ class Factory
         $dirhandle = opendir($this->host);
 
         $xml = [
-            'full' => [],
-            'studenttimetables' => []
+            Receiver::XML_FULL => [],
+            Receiver::XML_STUDENTTIMETABLES => []
         ];
 
-        /* TODO: replace magic strings with consts
+        /* Make a stack of profile xmls (full_ ... .xml)
+         * Make a stack fo student timetable xmls (studenttimetables_ ... .xml)
          */
         while ($xmlFile = readdir($dirhandle)) {
             if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, 'full') !== false) {
-                    $xml['full'][] = $xmlFile;
-                } elseif (strpos($xmlFile, 'studenttimetables') !== false) {
-                    $xml['studenttimetables'][] = $xmlFile;
+                if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
+                    $xml[Receiver::XML_FULL][] = $xmlFile;
+                } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
+                    $xml[Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
                 }
             }
         }
