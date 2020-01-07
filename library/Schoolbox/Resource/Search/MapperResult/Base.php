@@ -162,7 +162,7 @@ abstract class Base
         return new CallbackFilterIterator(
             new IteratorIterator($rawResult),
             function ($row) use ($user, $folderColumn) {
-                return $this->getAccessor()->getFolderAccess($user, $row[$folderColumn]) > UserAccess::ACCESS_DENY;
+                return $this->getAccessor()->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_DENY;
             }
         );
     }

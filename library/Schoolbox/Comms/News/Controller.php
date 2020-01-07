@@ -235,7 +235,7 @@ class Controller extends Base
 
             // Ensure the user is permitted to target this entity type and has the permissions to audience into the folder
             if ($folderStrategy->canAudienceToEntityType($this->getUser()) &&
-                (Access::getInstance()->getFolderAccess($this->getUser(),$folderId) >= UserAccess::ACCESS_WRITE ||
+                (Access::getInstance()->getFolderAccess($this->getUser(),(int)$folderId) >= UserAccess::ACCESS_WRITE ||
                     $folderStrategy->canAudienceToAnyClassOrGroup($this->getUser()))
             ) {
                 $codec = new Audience\Segment\Codec();

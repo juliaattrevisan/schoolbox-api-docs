@@ -80,7 +80,7 @@ class HasHomepageAccess extends All
 
             // Look for this homepage's permission
             try {
-                $permission = $this->access->getFolderAccess($user, $identifier);
+                $permission = $this->access->getFolderAccess($user, (int)$identifier);
             } catch (Exception $e) {
                 $permission = UserAccess::ACCESS_DENY;
             }
