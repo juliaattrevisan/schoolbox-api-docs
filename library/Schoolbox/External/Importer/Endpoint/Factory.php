@@ -218,9 +218,9 @@ class Factory
          */
         while ($xmlFile = readdir($dirhandle)) {
             if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, 'full_') !== false) {
+                if (strpos($xmlFile, 'full') !== false) {
                     $xml['full'][] = $xmlFile;
-                } elseif (strpos($xmlFile, 'studenttimetables_') !== false) {
+                } elseif (strpos($xmlFile, 'studenttimetables') !== false) {
                     $xml['studenttimetables'][] = $xmlFile;
                 }
             }
