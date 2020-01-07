@@ -150,19 +150,29 @@ class SubjectIterator implements Iterator
     {
         $code = null;
 
+        /* Figure out a subject code
+         */
+        if (isset($subjectNode->code)) {
+            $code = trim((string)$subjectNode->code);
+        }
+
+        /* Figure out the subject's name
+         * There are some special constructs for optional classes
+         * Take a punt as to what they're called...
+         */
         if (isset($subjectNode->core)) {
             $name = trim((string)$subjectNode->core);
         } elseif (isset($subjectNode->option)) {
-            $name = trim((string)$subjectNode->option);
+            $name = implode('-', array_filter([
+                trim((string)$subjectNode->option),
+                $code,
+                trim((string)$subjectNode->teachers)
+            ]));
         } else {
 
             /* No subjects in this slot
              */
             return null;
-        }
-
-        if (isset($subjectNode->code)) {
-            $code = trim((string)$subjectNode->code);
         }
 
         return [
