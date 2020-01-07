@@ -19,6 +19,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Container;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -52,9 +53,9 @@ class Classes implements IStrategy
 
 
     /**
-     * @var Batchxml
+     * @var Container
      */
-    private $profileBatchXml;
+    private $container;
 
 
     /**
@@ -98,7 +99,7 @@ class Classes implements IStrategy
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Batchxml               $profileBatchXml
+     * @param Container              $container
      * @param Batchxml               $timetableBatchXml
      * @param TimetablePeriodMapper  $timetablePeriodMapper
      * @param ClassEntryMapper       $classEntryMapper
@@ -109,7 +110,7 @@ class Classes implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $profileBatchXml,
+        Container $container,
         Batchxml $timetableBatchXml,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -119,7 +120,7 @@ class Classes implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->profileBatchXml = $profileBatchXml;
+        $this->container = $container;
         $this->timetableBatchXml = $timetableBatchXml;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -280,7 +281,7 @@ class Classes implements IStrategy
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
 
-                $subjects = new SubjectIterator($this->log, $this->profileBatchXml, $studentId, $day);
+                $subjects = new SubjectIterator($this->log, $this->container, $studentId, $day);
 
                 foreach ($subjects as $subject) {
 

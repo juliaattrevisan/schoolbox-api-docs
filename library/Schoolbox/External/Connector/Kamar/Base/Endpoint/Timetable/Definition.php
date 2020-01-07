@@ -12,7 +12,6 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
@@ -20,8 +19,6 @@ use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\Mapper\Exception;
-use SimpleXMLElement;
 
 /**
  * Class Definition
@@ -68,12 +65,6 @@ class Definition implements IStrategy
 
 
     /**
-     * @var Batchxml
-     */
-    private $batchxml;
-
-
-    /**
      * @var CampusMapper
      */
     private $campusMapper;
@@ -102,7 +93,6 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
-     * @param Batchxml              $batchxml
      * @param CampusMapper          $campusMapper
      * @param TimetableCampusMapper $timetableCampusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
@@ -111,7 +101,6 @@ class Definition implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml,
         CampusMapper $campusMapper,
         TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
@@ -119,7 +108,6 @@ class Definition implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->batchxml = $batchxml;
         $this->campusMapper = $campusMapper;
         $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;

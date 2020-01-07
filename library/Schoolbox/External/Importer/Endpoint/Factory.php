@@ -225,12 +225,14 @@ class Factory
 
         /* Load all the Profile xmls
          */
+        $container = new KamarProfile\Container();
+
         foreach ($xml['studenttimetables'] as $xmlFile) {
             $bus->add(new KamarProfile\Composite(
                 $this->logger,
                 $this->perform,
                 new KamarBatchxml(new KamarApi($this->host . '/' . $xmlFile)),
-                // TODO: Insert cache container to remember staff details for logging
+                $container,
                 UserProfile\Mapper::getInstance(),
                 UserProfile\Student\Mapper::getInstance(),
                 UserProfile\Parent\Mapper::getInstance(),
@@ -245,8 +247,7 @@ class Factory
             $bus->add(new KamarTimetable\Composite(
                 $this->logger,
                 $this->perform,
-
-                $profileBatchXml, // TODO: Replace with cached id=>externalId tuples container
+                $container,
                 new KamarBatchxml(new KamarApi($this->host . '/' . $xmlFile)),
                 CampusMapper::getInstance(),
                 UserMapper::getInstance(),

@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Container;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
@@ -46,9 +47,9 @@ class Composite implements IStrategy
 
 
     /**
-     * @var Endpoint\Batchxml
+     * @var Container
      */
-    private $profileBatchXml;
+    private $container;
 
 
     /**
@@ -116,7 +117,7 @@ class Composite implements IStrategy
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Endpoint\Batchxml      $profileBatchXml
+     * @param Container              $container
      * @param Endpoint\Batchxml      $timetableBatchXml
      * @param CampusMapper           $campusMapper
      * @param UserMapper             $userMapper
@@ -130,7 +131,7 @@ class Composite implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Endpoint\Batchxml $profileBatchXml,
+        Container $container,
         Endpoint\Batchxml $timetableBatchXml,
         CampusMapper $campusMapper,
         UserMapper $userMapper,
@@ -144,7 +145,7 @@ class Composite implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->registry = new Collection();
-        $this->profileBatchXml = $profileBatchXml;
+        $this->container = $container;
         $this->timetableBatchXml = $timetableBatchXml;
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
@@ -163,8 +164,8 @@ class Composite implements IStrategy
     public function import(): void
     {
         $this->registry
-            ->add(new Endpoint\Timetable\Definition($this->log, $this->perform, $this->profileBatchXml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
-            ->add(new Endpoint\Timetable\Classes($this->log, $this->perform, $this->profileBatchXml, $this->timetableBatchXml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
+            ->add(new Endpoint\Timetable\Definition($this->log, $this->perform, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
+            ->add(new Endpoint\Timetable\Classes($this->log, $this->perform, $this->container, $this->timetableBatchXml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();

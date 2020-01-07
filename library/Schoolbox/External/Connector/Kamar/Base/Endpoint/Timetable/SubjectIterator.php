@@ -13,6 +13,7 @@ use Iterator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Container;
 use SimpleXMLElement;
 
 /**
@@ -33,9 +34,9 @@ class SubjectIterator implements Iterator
 
 
     /**
-     * @var Batchxml
+     * @var Container
      */
-    private $profileBatchXml;
+    private $container;
 
 
     /**
@@ -66,14 +67,14 @@ class SubjectIterator implements Iterator
      * SubjectIterator constructor.
      *
      * @param LoggerInterface  $log
-     * @param Batchxml         $profileBatchXml
+     * @param Container        $container
      * @param string           $studentId
      * @param SimpleXMLElement $day
      */
-    public function __construct(LoggerInterface $log, Batchxml $profileBatchXml, string $studentId, SimpleXMLElement $day)
+    public function __construct(LoggerInterface $log, Container $container, string $studentId, SimpleXMLElement $day)
     {
         $this->log = $log;
-        $this->profileBatchXml = $profileBatchXml;
+        $this->container = $container;
         $this->studentId = $studentId;
         $this->subjects = $day->xpath('slots/subjects');
         $this->day = trim((string)$day->xpath('@index')[0]);
@@ -210,7 +211,7 @@ class SubjectIterator implements Iterator
         $teacherIds = explode(',', trim((string)$subject->teachers));
 
         foreach ($teacherIds as $teacherId) {
-            $teacherNode = $this->profileBatchXml->fetchXml("/SMSDirectoryData/staff/user[@id='{$teacherId}']");
+            $teacherNode = $this->container->recall($teacherId);
 
             if (!$teacherNode) {
                 $this->log->warning(sprintf(

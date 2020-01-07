@@ -45,6 +45,12 @@ class Composite implements IStrategy
 
 
     /**
+     * @var Container
+     */
+    private $container;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -86,6 +92,7 @@ class Composite implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Endpoint\Batchxml               $profileBatchXml
+     * @param Container                       $container
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -96,6 +103,7 @@ class Composite implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Endpoint\Batchxml $profileBatchXml,
+        Container $container,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -106,6 +114,7 @@ class Composite implements IStrategy
         $this->perform = $perform;
         $this->registry = new Collection();
         $this->profileBatchXml = $profileBatchXml;
+        $this->container = $container;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -125,6 +134,7 @@ class Composite implements IStrategy
                 $this->log,
                 $this->perform,
                 $this->profileBatchXml,
+                $this->container,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
