@@ -2,6 +2,7 @@
  */
 $f-dropdown-triangle-color: transparent;
 $f-dropdown-max-width: 300px;
+$f-dropdown-max-height: 400px;
 $f-dropdown-margin-top: 0px;
 $f-dropdown-bg: $content-ui-background;
 $f-dropdown-border-width: 0px;
@@ -19,6 +20,8 @@ $f-dropdown-icon-align: 0.25rem;
 // Dropdown
 .f-dropdown{
 	@include box-shadow(-2px, 2px, 4px, rgba(0,0,0,0.15));
+    overflow-y: auto;
+    overflow-x: hidden;
 	li{
 		display: block;
 		width: 100%;
