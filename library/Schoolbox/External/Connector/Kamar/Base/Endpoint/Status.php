@@ -46,6 +46,21 @@ class Status implements IStatus
         /* We cached the file locally so if it exists, then it's reachable
          * Whether or not it contains valid data is a different question altogether
          */
+        $expectedXmls = $this->findSpecimens();
+
+        $numFound = \count(array_filter(array_values($expectedXmls)));
+
+        return $numFound === \count($expectedXmls);
+    }
+
+
+    /**
+     * Find a specimen xml for each fo the $expectedXmls
+     *
+     * @return array
+     */
+    private function findSpecimens(): array
+    {
         $expectedXmls = [
             Receiver::XML_FULL => false,
             Receiver::XML_STUDENTTIMETABLES => false
@@ -63,18 +78,15 @@ class Status implements IStatus
                 if ((new Api($path))->isXmlFileExtant()) {
                     foreach ($expectedXmls as $key => $value) {
                         if (strpos($xmlFile, $key) !== false) {
-                            $expectedXmls[$key] = true;
+                            $expectedXmls[$key] = $path;
                         }
                     }
                 }
             }
         }
 
-        $numFound = \count(array_filter(array_values($expectedXmls)));
-
-        return $numFound === \count($expectedXmls);
+        return $expectedXmls;
     }
-
 
     /**
      * @inheritDoc
@@ -83,20 +95,22 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
-//        $specifications = [
-//            new Profile\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_PROFILE_XML))),
-//            new Timetable\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_TIMETABLE_XML))),
-//        ];
-//
+        $expectedXmls = $this->findSpecimens();
+
+        $specifications = [
+            new Profile\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
+            new Timetable\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
+        ];
+
         $result = [];
-//
-//        foreach ($specifications as $specification) {
-//            try {
-//                $result[] = implode("\n", $specification->check());
-//            } catch (\RuntimeException $e) {
-//                $result[] = "Cannot access api endpoint: {$e->getMessage()}";
-//            }
-//        }
+
+        foreach ($specifications as $specification) {
+            try {
+                $result[] = implode("\n", $specification->check());
+            } catch (\RuntimeException $e) {
+                $result[] = "Cannot access api endpoint: {$e->getMessage()}";
+            }
+        }
 
         return implode("\n", $result);
     }
