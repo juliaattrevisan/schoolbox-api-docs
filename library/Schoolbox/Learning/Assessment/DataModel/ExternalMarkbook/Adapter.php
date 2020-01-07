@@ -6,12 +6,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook;
 
 use External_MarkbookInterface;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataModel;
 use Schoolbox\Assessment\Course\Task as TaskDataModel;
-use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectDataModel;
 use Schoolbox\Learning\Quiz\Model as QuizDataModel;
@@ -24,7 +23,7 @@ use TypeError;
  * markbook
  * (instead of the `IAssessable` objects `External_MarkbookInterface` expects).
  */
-class MarkbookSyncHelper
+class Adapter
 {
     /**
      * @var AssessmentDataSource
