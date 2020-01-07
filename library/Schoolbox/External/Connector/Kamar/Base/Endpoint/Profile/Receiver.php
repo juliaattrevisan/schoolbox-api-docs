@@ -48,7 +48,7 @@ class Receiver
     public function __construct($dir)
     {
         $this->dir = $dir;
-        $this->suffix = date('Ymd') . '_' . date('His') . '.xml';
+        $this->suffix = uniqid('_', true) . '.xml';
     }
 
 
