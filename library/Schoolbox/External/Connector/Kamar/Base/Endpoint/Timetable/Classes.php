@@ -65,12 +65,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var TimetablePeriodMapper
-     */
-    private $timetablePeriodMapper;
-
-
-    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -89,9 +83,9 @@ class Classes implements IStrategy
 
 
     /**
-     * @var UserMapper
+     * @var Lookup
      */
-    private $userMapper;
+    private $lookup;
 
 
     /**
@@ -101,94 +95,29 @@ class Classes implements IStrategy
      * @param bool                   $perform
      * @param Container              $container
      * @param Batchxml               $timetableBatchXml
-     * @param TimetablePeriodMapper  $timetablePeriodMapper
+     * @param Lookup                 $lookup
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
-     * @param UserMapper             $userMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         Container $container,
         Batchxml $timetableBatchXml,
-        TimetablePeriodMapper $timetablePeriodMapper,
+        Lookup $lookup,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        UserMapper $userMapper
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->container = $container;
         $this->timetableBatchXml = $timetableBatchXml;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
+        $this->lookup = $lookup;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->userMapper = $userMapper;
-    }
-
-
-    /**
-     * Get a list of (user_id, synergy_id) tuples
-     *
-     * @return array
-     */
-    private function initUserLookup(): array
-    {
-        $userStatement = $this->userMapper->getDatabase()->query("
-            SELECT u.`id`, username
-            FROM {$this->userMapper->getTable()} u
-            INNER JOIN `groups` g ON u.`group_id` = g.id
-            WHERE synergy_id IS NOT NULL
-        ");
-
-        $users = [];
-
-        foreach ($userStatement as $row) {
-            $users[$row['username']] = $row['id'];
-        }
-
-        return $users;
-    }
-
-
-    /**
-     * Get a list of (day, period) tuples
-     *
-     * @return array
-     * @throws Exception
-     */
-    private function initPeriodLookup(): array
-    {
-        $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
-            SELECT
-                luCampus.ext_timetable_code,
-                period.day, period.id, period.title
-            FROM luCampus
-            LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
-            LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
-            LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
-
-        ');
-
-        $periods = [];
-
-        foreach ($periodStatement as $row) {
-            $ext = $row['ext_timetable_code'];
-            $day = $row['day'];
-            $periodName = $row['title'];
-
-            /* Minimum period
-             */
-            $period = $this->timetablePeriodMapper->createModel()
-                ->setId($row['id']);
-
-            $periods['ext'][$ext]['day'][$day]['period'][$periodName] = $period;
-        }
-
-        return $periods;
     }
 
 
@@ -241,11 +170,11 @@ class Classes implements IStrategy
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          */
-        $users = $this->initUserLookup();
+        $users = $this->lookup->getUsers();
 
         /* Cache a flat key-value array of (day, period)
          */
-        $periods = $this->initPeriodLookup();
+        $periods = $this->lookup->getPeriods();
 
         /* Get a list of all the timetables to process
          */
