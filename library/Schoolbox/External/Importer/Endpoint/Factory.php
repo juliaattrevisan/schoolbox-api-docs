@@ -259,5 +259,7 @@ class Factory
                 ClassPeriodMapper::getInstance()
             ));
         }
+
+        return $bus;
     }
 }
