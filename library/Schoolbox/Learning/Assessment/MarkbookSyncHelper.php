@@ -10,12 +10,10 @@ namespace Schoolbox\Learning\Assessment;
 
 use External_MarkbookInterface;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataModel;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DueWorkFeedbackModel;
 use Schoolbox\Assessment\Course\Task as TaskDataModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectDataModel;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizFeedbackModel;
 use Schoolbox\Learning\Quiz\Model as QuizDataModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
@@ -63,7 +61,7 @@ class MarkbookSyncHelper
         } catch (BaseMapper\Exception\Deleted $e) {
             return;
         }
-        if ($this->externalMarkbook->isSyncable($assessment)) {
+        if ($assessment instanceof IAssessable && $this->externalMarkbook->isSyncable($assessment)) {
             $this->externalMarkbook->syncAssessment($assessment);
         }
     }
@@ -87,39 +85,6 @@ class MarkbookSyncHelper
     }
 
 
-//    /**
-//     * Syncs a due work participation to the markbook.
-//     *
-//     * This and `syncQuizParticipation` are separate methods, as there's no
-//     * unified interface for feedback data models.
-//     *
-//     * @param DueWorkFeedbackModel $feedbackModel The due work feedback
-//     * @param User                 $student       Sync this student's particpation
-//     */
-//    public function syncDueWorkParticipation(DueWorkFeedbackModel $feedbackModel, User $student): void
-//    {
-//        $this->syncParticipation(
-//            $this->dataSource->findByDueWorkId($feedbackModel->getSubmissionBox()->getId(), $feedbackModel->getOwner()),
-//            $student
-//        );
-//    }
-//
-//
-//    /**
-//     * Syncs a quiz participation to the markbook.
-//     *
-//     * @param QuizFeedbackModel $feedbackModel The quiz feedback
-//     * @param User              $student       Sync this student's particpation
-//     */
-//    public function syncQuizParticipation(QuizFeedbackModel $feedbackModel, User $student): void
-//    {
-//        $this->syncParticipation(
-//            $this->dataSource->findByQuizId($feedbackModel->getQuiz()->getId(), $feedbackModel->getUser()),
-//            $student
-//        );
-//    }
-
-
     /**
      * Syncs participation in an assessment to the markbook.
      *
@@ -128,18 +93,13 @@ class MarkbookSyncHelper
      */
     public function syncParticipation(IAssessableDataModel $assessmentModel, User $student): void
     {
-        $assessmentId = $assessmentModel->getAssessmentModel()->getId();
-        $assessment   = $this->findAssessmentFromDataModel($assessmentModel, $student);
-
-        if ($assessmentId) {
-            $assessment = $this->dataSource->findByIdForReview($assessmentId, $student);
-        } elseif ($assessmentModel instanceof DueWorkFeedbackModel) {
-            $assessment = $this->dataSource->findByDueWorkId($assessmentModel->getSubmissionBox()->getId(), $student);
-        } elseif ($feedbackModel instanceof QuizFeedbackModel) {
-            $assessment = $this->dataSource->findByQuizId($feedbackModel->getQuiz()->getId(), $student);
+        try {
+            $assessment = $this->findAssessmentFromDataModel($assessmentModel);
+        } catch (BaseMapper\Exception\Deleted $e) {
+            return;
         }
 
-        if ($assessment && $this->externalMarkbook->isSyncable($assessment)) {
+        if ($assessment instanceof IAssessable && $this->externalMarkbook->isSyncable($assessment)) {
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
@@ -152,8 +112,7 @@ class MarkbookSyncHelper
 
 
     /**
-     * Helper function for retrieving an assessment domain model, given a data
-     * model.
+     * Helper function for retrieving an assessment domain model, given a data model.
      *
      * @param IAssessableDataModel $assessmentModel
      * @param User|null            $student Find this student's particpation (if provided)
@@ -165,6 +124,7 @@ class MarkbookSyncHelper
         IAssessableDataModel $assessmentModel,
         ?User $student = null
     ): ?IAssessable {
+        // Simplest case: assessment ID is hydrated
         $assessmentId = $assessmentModel->getAssessmentModel()->getId();
         if ($assessmentId) {
             // Don't fetch participation if no student provided
@@ -175,23 +135,16 @@ class MarkbookSyncHelper
 
         // The assessment ID wasn't hydrated:
         // try with the different types of assessment.
-        // Again, don't fetch if no student provided
+        // Again, don't fetch participation if no student provided
         $field = null;
         if ($assessmentModel instanceof DueWorkDataModel) {
             $field = 'd.id';
-//            return $this->dataSource->findByDueWorkId($assessmentModel->getId(), $student);
-        }
-        if ($assessmentModel instanceof QuizDataModel) {
+        } elseif ($assessmentModel instanceof QuizDataModel) {
             $field = 'q.assess_id';
-//            return $this->dataSource->findByQuizId($assessmentModel->getId(), $student);
-        }
-        if ($assessmentModel instanceof TaskDataModel) {
+        } elseif ($assessmentModel instanceof TaskDataModel) {
             $field = 't.id';
-//            return $this->dataSource->findByTaskId($assessmentModel->getId(), $student);
-        }
-        if ($assessmentModel instanceof ProjectDataModel) {
+        } elseif ($assessmentModel instanceof ProjectDataModel) {
             $field = 'p.id';
-//            return $this->dataSource->findByTaskId($assessmentModel->getId(), $student);
         }
 
         if (isset($field)) {
