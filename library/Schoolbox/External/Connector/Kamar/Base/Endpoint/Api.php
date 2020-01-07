@@ -62,4 +62,15 @@ class Api implements IApi
 
         throw new RuntimeException("Cannot open or read kamar xml in {$this->path}");
     }
+
+
+    /**
+     * The file currently being consumed by this IApi instance
+     *
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
 }
