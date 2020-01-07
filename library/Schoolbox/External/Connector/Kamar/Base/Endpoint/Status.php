@@ -19,19 +19,6 @@ class Status implements IStatus
 {
 
     /**
-     * Expected xml files
-     * These correspond to the @sync attribute in the root xml node SMSDirectoryData
-     */
-    public const EXPECTED_PROFILE_XML = Receiver::KAMAR_NAMESPACE . '_profile.xml';
-    public const EXPECTED_TIMETABLE_XML = Receiver::KAMAR_NAMESPACE . '_studenttimetables.xml';
-
-    private const EXPECTED_XML = [
-        self::EXPECTED_PROFILE_XML,
-        self::EXPECTED_TIMETABLE_XML
-    ];
-
-
-    /**
      * @var string
      */
     private $path;
@@ -59,15 +46,33 @@ class Status implements IStatus
         /* We cached the file locally so if it exists, then it's reachable
          * Whether or not it contains valid data is a different question altogether
          */
-        foreach (self::EXPECTED_XML as $xml) {
-            $api = new Api("{$this->path}/{$xml}");
+        $expectedXmls = [
+            Receiver::XML_FULL => false,
+            Receiver::XML_STUDENTTIMETABLES => false
+        ];
 
-            if (!$api->isXmlFileExtant()) {
-                return false;
+        $dirhandle = opendir($this->path);
+
+        while ($xmlFile = readdir($dirhandle)) {
+            if ($xmlFile !== '.' && $xmlFile !== '..') {
+                $path = "{$this->path}/{$xmlFile}";
+
+                /* There's at least one profile xml and one student timetables xml
+                 * and they are both readable
+                 */
+                if ((new Api($path))->isXmlFileExtant()) {
+                    foreach ($expectedXmls as $key => $value) {
+                        if (strpos($xmlFile, $key) !== false) {
+                            $expectedXmls[$key] = true;
+                        }
+                    }
+                }
             }
         }
 
-        return true;
+        $numFound = \count(array_filter(array_values($expectedXmls)));
+
+        return $numFound === \count($expectedXmls);
     }
 
 
@@ -78,20 +83,20 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
-        $specifications = [
-            new Profile\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_PROFILE_XML))),
-            new Timetable\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_TIMETABLE_XML))),
-        ];
-
+//        $specifications = [
+//            new Profile\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_PROFILE_XML))),
+//            new Timetable\Specification(null, new Batchxml(new Api("{$this->path}/" . self::EXPECTED_TIMETABLE_XML))),
+//        ];
+//
         $result = [];
-
-        foreach ($specifications as $specification) {
-            try {
-                $result[] = implode("\n", $specification->check());
-            } catch (\RuntimeException $e) {
-                $result[] = "Cannot access api endpoint: {$e->getMessage()}";
-            }
-        }
+//
+//        foreach ($specifications as $specification) {
+//            try {
+//                $result[] = implode("\n", $specification->check());
+//            } catch (\RuntimeException $e) {
+//                $result[] = "Cannot access api endpoint: {$e->getMessage()}";
+//            }
+//        }
 
         return implode("\n", $result);
     }
