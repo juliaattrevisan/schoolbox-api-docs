@@ -1095,8 +1095,10 @@ class MapperProxy
     }
 
     /**
-     * @param string $column
-     * @param        $value
+     * @param string    $column
+     * @param mixed     $value
+     * @param bool      $loadParticipants Should we load participations?
+     * @param null|User $student          If specified, only load this user's interactions
      * @return IAssessable
      * @throws DefinitionException
      * @throws DomainException
@@ -1105,9 +1107,9 @@ class MapperProxy
      * @throws MapperException\Deleted
      * @throws UnexpectedValueException
      */
-    public function findOneByColumn(string $column, $value): IAssessable
+    public function findOneByColumn(string $column, $value, bool $loadParticipants = false, User $student = null): IAssessable
     {
-        return $this->findSingle($column, $value, false);
+        return $this->findSingle($column, $value, $loadParticipants, $student);
     }
 
 
@@ -1115,7 +1117,7 @@ class MapperProxy
      * Helper function for finding a single assessment by a column and value.
      *
      * @param string    $column
-     * @param int       $value
+     * @param mixed     $value
      * @param bool      $loadParticipants Should we load participations?
      * @param null|User $student          If specified, only load this user's interactions
      * @return IAssessable
@@ -1126,7 +1128,7 @@ class MapperProxy
      * @throws MapperException\Deleted if the assessment was deleted
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    protected function findSingle($column, $value, bool $loadParticipants, User $student = null)
+    protected function findSingle(string $column, $value, bool $loadParticipants = false, User $student = null): IAssessable
     {
         try {
             // Load model and its participants

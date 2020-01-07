@@ -11,8 +11,10 @@ namespace Schoolbox\Learning\Assessment;
 use External_MarkbookInterface;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataModel;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DueWorkFeedbackModel;
+use Schoolbox\Assessment\Course\Task as TaskDataModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectDataModel;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizFeedbackModel;
 use Schoolbox\Learning\Quiz\Model as QuizDataModel;
 use Schoolbox\Mapper as BaseMapper;
@@ -57,7 +59,7 @@ class MarkbookSyncHelper
     public function syncAssessment(IAssessableDataModel $assessmentModel): void
     {
         try {
-            $assessment = $this->dataSource->findById($assessmentModel->getAssessmentModel()->getId());
+            $assessment = $this->findAssessmentFromDataModel($assessmentModel);
         } catch (BaseMapper\Exception\Deleted $e) {
             return;
         }
@@ -75,7 +77,7 @@ class MarkbookSyncHelper
     public function deleteAssessment(IAssessableDataModel $assessmentModel): void
     {
         try {
-            $assessment = $this->dataSource->findById($assessmentModel->getAssessmentModel()->getId());
+            $assessment = $this->findAssessmentFromDataModel($assessmentModel);
         } catch (BaseMapper\Exception\Deleted $e) {
             $assessment = $e->getDeletedObject();
         }
@@ -119,16 +121,20 @@ class MarkbookSyncHelper
 
 
     /**
-     * Syncs a participation to the markbook.
+     * Syncs participation in an assessment to the markbook.
      *
-     * @param object $feedbackModel
-     * @param User   $student
+     * @param IAssessableDataModel $assessmentModel
+     * @param User                 $student
      */
-    public function syncParticipation($feedbackModel, User $student): void
+    public function syncParticipation(IAssessableDataModel $assessmentModel, User $student): void
     {
-        $assessment = null;
-        if ($feedbackModel instanceof DueWorkFeedbackModel) {
-            $assessment = $this->dataSource->findByDueWorkId($feedbackModel->getSubmissionBox()->getId(), $student);
+        $assessmentId = $assessmentModel->getAssessmentModel()->getId();
+        $assessment   = $this->findAssessmentFromDataModel($assessmentModel, $student);
+
+        if ($assessmentId) {
+            $assessment = $this->dataSource->findByIdForReview($assessmentId, $student);
+        } elseif ($assessmentModel instanceof DueWorkFeedbackModel) {
+            $assessment = $this->dataSource->findByDueWorkId($assessmentModel->getSubmissionBox()->getId(), $student);
         } elseif ($feedbackModel instanceof QuizFeedbackModel) {
             $assessment = $this->dataSource->findByQuizId($feedbackModel->getQuiz()->getId(), $student);
         }
@@ -150,22 +156,53 @@ class MarkbookSyncHelper
      * model.
      *
      * @param IAssessableDataModel $assessmentModel
-     * @param User|null            $student         Find this student's particpation (if provided)
+     * @param User|null            $student Find this student's particpation (if provided)
      * @return IAssessable
      * @throws BaseMapper\Exception\Deleted if the assessment has been deleted
      * @throws TypeError                    if `$assessmentModel` isn't recognized
      */
-    private function findAssessmentFromDataModel(IAssessableDataModel $assessmentModel, ?User $student = null): IAssessable
-    {
+    private function findAssessmentFromDataModel(
+        IAssessableDataModel $assessmentModel,
+        ?User $student = null
+    ): ?IAssessable {
         $assessmentId = $assessmentModel->getAssessmentModel()->getId();
         if ($assessmentId) {
-            return $this->dataSource->findByIdForReview($assessmentId, $student);
+            // Don't fetch participation if no student provided
+            return $student
+                ? $this->dataSource->findByIdForReview($assessmentId, $student)
+                : $this->dataSource->findById($assessmentId);
         }
+
+        // The assessment ID wasn't hydrated:
+        // try with the different types of assessment.
+        // Again, don't fetch if no student provided
+        $field = null;
         if ($assessmentModel instanceof DueWorkDataModel) {
-            return $this->dataSource->findByDueWorkId($assessmentModel->getId(), $student);
+            $field = 'd.id';
+//            return $this->dataSource->findByDueWorkId($assessmentModel->getId(), $student);
         }
         if ($assessmentModel instanceof QuizDataModel) {
-            return $this->dataSource->findByQuizId($assessmentModel->getId(), $student);
+            $field = 'q.assess_id';
+//            return $this->dataSource->findByQuizId($assessmentModel->getId(), $student);
         }
+        if ($assessmentModel instanceof TaskDataModel) {
+            $field = 't.id';
+//            return $this->dataSource->findByTaskId($assessmentModel->getId(), $student);
+        }
+        if ($assessmentModel instanceof ProjectDataModel) {
+            $field = 'p.id';
+//            return $this->dataSource->findByTaskId($assessmentModel->getId(), $student);
+        }
+
+        if (isset($field)) {
+            return $this->dataSource->findOneByColumn(
+                $field,
+                $assessmentModel->getId(),
+                isset($student),
+                $student
+            );
+        }
+
+        return null;
     }
 }
