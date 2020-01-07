@@ -10,7 +10,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
 /**
  * Class Container
  *
- * For staff members, we remember their (external id, details) tuples
+ * For staff members, we remember their (internal kamar id, [details]) tuples
  * because other xml files use teacher codes (e.g. BKE) to represent a teacher
  * but you don't have an easy way to find out what their details are such as
  * their full name etc. because it's contained in some other xml file
@@ -30,7 +30,7 @@ class Container
 
 
     /**
-     * Remember a staff member's details, using their externalId as a key
+     * Remember a staff member's details, using their internal kamar id as a key
      *
      * @param string $key
      * @param string $externalId
