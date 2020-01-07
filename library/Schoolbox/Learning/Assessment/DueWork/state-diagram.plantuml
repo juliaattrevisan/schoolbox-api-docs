@@ -63,9 +63,12 @@ RS : \
 
 [*] --> RR : assessment opens
 RR --> FR  : participant submits\nresponse
+RR --> FR  : instructor marks as submitted\nwithout waiting for response
+RR --> RC  : instructor submits feedback\n without waiting for response
+RR --> RS  : instructor marks as requiring\nresubmit without waiting for response
 FR --> RC  : instructor accepts\nresponse
-FR -right-> RS : instructor rejects\nresponse
-RS -left-> FR  : participant resubmits\nresponse
+FR -left-> RS : instructor rejects\nresponse
+RS -right-> FR  : participant resubmits\nresponse
 RC --> [*]
 
 @enduml
@@ -137,9 +140,9 @@ RS : \
 
 [*] --> RR : assessment opens
 RR --> FR  : participant submits\nresponse
-FR --> RC  : instructor accepts\nresponse
-FR -right-> RS : instructor rejects\nresponse
-RS -left-> FR  : participant resubmits\nresponse
+FR --> RC  : instructor marks feedback\nas not requiring re-response
+FR -left-> RS : instructor marks feedback\nas requiring re-response
+RS -right-> FR  : participant resubmits\nresponse
 RC --> [*]
 
 @enduml
