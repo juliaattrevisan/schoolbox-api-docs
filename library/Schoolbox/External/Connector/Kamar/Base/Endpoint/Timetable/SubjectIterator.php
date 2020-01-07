@@ -12,7 +12,6 @@ use InvalidArgumentException;
 use Iterator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Container;
 use SimpleXMLElement;
 
@@ -202,8 +201,6 @@ class SubjectIterator implements Iterator
      *
      * @param SimpleXMLElement $subject
      * @return array
-     * @throws RuntimeException
-     * @throws InvalidArgumentException
      */
     private function findTeacher(SimpleXMLElement $subject): array
     {
@@ -251,7 +248,6 @@ class SubjectIterator implements Iterator
      *
      * @param string $studentId
      * @return array|null
-     * @throws RuntimeException
      */
     private function findStudents(string $studentId): ?array
     {
