@@ -1,0 +1,190 @@
+@startuml
+
+note as n1
+    <b>Resubmit on response</b>
+
+    if not participant.open:
+        return "not open"
+
+    lastResponse = particpant.response.lastPublished
+    lastFeedback = particpant.feedback.lastPublished
+
+    if lastResponse is null:
+        return "response required"
+
+    if lastFeedback is null:
+        return "feedback required"
+
+    if lastResponse.requiresResubmit:
+        return "requires resubmit"
+
+    return lastResponse.date > lastFeedback.date
+        ? "feedback required"
+        : "review complete"
+
+    ----
+
+    <b>Resubmit allowed?</b>
+    if participant.assessment.submitOnline = "multiple"
+        return true
+    if participant.assessment.submitOnline = "none"
+        return false
+
+    lastResponse = particpant.response.lastPublished
+    return lastResponse is null or lastResponse.requiresResubmit
+
+end note
+
+state "Response Required" as RR
+RR : \
+* no response exists
+
+state "Feedback Required" as FR
+FR : \
+* at least one response exists\n\
+* no feedback newer than the most recent response
+
+state "Review Complete" as RC
+RC : \
+either:\n\
+* at least one response exists\n\
+* most recent response is accepted\n\
+or:\n\
+* at least one feedback exists
+
+state "Resubmit Required" as RS
+RS : \
+* at least one response exists\n\
+* most recent response requires resubmit
+
+[*] --> RR : assessment opens
+RR --> FR  : participant submits\nresponse
+FR --> RC  : instructor accepts\nresponse
+FR -right-> RS : instructor rejects\nresponse
+RS -left-> FR  : participant resubmits\nresponse
+RC --> [*]
+
+@enduml
+
+@startuml
+
+note as n1
+    <b>Resubmit on feedback</b>
+
+    if not participant.open:
+        return "not open"
+
+    lastResponse = particpant.response.lastPublished
+    lastFeedback = particpant.feedback.lastPublished
+
+    if lastResponse is null:
+        return "response required"
+
+    if lastFeedback is null:
+        return "feedback required"
+
+    if lastResponse.date > lastFeedback.date:
+        return "feedback required"
+
+    return lastFeedback.requiresResubmit
+        ? "requires resubmit"
+        : "review complete"
+
+    ----
+
+    <b>Resubmit allowed?</b>
+    if participant.assessment.submitOnline = "multiple"
+        return true
+    if participant.assessment.submitOnline = "none"
+        return false
+
+    if particpant.response.lastPublished is null
+        return true
+
+    lastFeedback = particpant.feedback.lastPublished
+    return lastFeedback and lastFeedback.requiresResubmit
+end note
+
+state "Response Required" as RR
+RR : \
+* no response exists
+
+state "Feedback Required" as FR
+FR : \
+* at least one response exists\n\
+and either:\n\
+* no feedback exists
+
+state "Review Complete" as RC
+RC : \
+* most recent feedback doesn't require resubmit
+
+state "Resubmit Required" as RS
+RS : \
+* at least one response exists\n\
+* most recent feedback requires resubmit\n\
+* there's no response after that feedback
+
+[*] --> RR : assessment opens
+RR --> FR  : participant submits\nresponse
+FR --> RC  : instructor accepts\nresponse
+FR -right-> RS : instructor rejects\nresponse
+RS -left-> FR  : participant resubmits\nresponse
+RC --> [*]
+
+@enduml
+
+
+# resubmit field on response
+getState(Participant):
+    if not participant.open:
+        return "not open"
+
+    lastResponse = particpant.response.lastPublished
+    lastFeedback = particpant.feedback.lastPublished
+
+    if lastResponse is null:
+        return "response required"
+
+    if lastFeedback is null:
+        return "feedback required"
+
+    if lastResponse.date > lastFeedback.date:
+        return "feedback required"
+
+    return lastResponse.requiresResubmit
+        ? "requires resubmit"
+        : "review complete"
+
+
+
+# resubmit field on feedback
+getState(Participant):
+    if not participant.open:
+        return "not open"
+
+    lastResponse = particpant.response.lastPublished
+    lastFeedback = particpant.feedback.lastPublished
+
+    if lastResponse is null:
+        return "response required"
+
+    if lastFeedback is null:
+        return "feedback required"
+
+    if lastResponse.date > lastFeedback.date:
+        return "feedback required"
+
+    return lastFeedback.requiresResubmit
+        ? "requires resubmit"
+        : "review complete"
+
+
+
+resubmit field on response:
++ can easily show response as invalid on submission history
+- could have issues for due works which don't allow online response
+
+resubmit field on feedback:
++ more intuitive to understand
+- resubmit allowed logic could be more difficult?
