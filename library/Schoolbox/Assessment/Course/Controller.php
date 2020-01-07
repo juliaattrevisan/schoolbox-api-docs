@@ -319,7 +319,7 @@ class Controller extends Base\Base
      * @throws \DomainException
      * @throws \LogicException
      */
-    public function modifyCourse(CourseSpecification $courseSpec)
+    public function modifyCourse(CourseSpecification $courseSpec): void
     {
         // Is course deleted ?
         // TODO move this to module's route auth rule
@@ -393,12 +393,10 @@ class Controller extends Base\Base
      */
     public function newCourse(string $name = null)
     {
-        $course = $this->courseSpecificationMapper->createModel();
-        $folder = $this->folderMapper->createModel();
-        $folder->setCourseSpecification($course);
-        $course->setFolder($folder);
-        $folder->setName($name);
-        $this->modifyCourse($course);
+        $this->courseTpl('course', [
+            'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+            'isValidFacultyRoot'=> $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+        ]);
     }
 
 
