@@ -9,12 +9,15 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment;
 
 use External_MarkbookInterface;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataModel;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DueWorkFeedbackModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizFeedbackModel;
+use Schoolbox\Learning\Quiz\Model as QuizDataModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
+use TypeError;
 
 /**
  * Class MarkbookSyncHelper
@@ -138,6 +141,31 @@ class MarkbookSyncHelper
                     $this->externalMarkbook->syncFeedback($feedback);
                 }
             }
+        }
+    }
+
+
+    /**
+     * Helper function for retrieving an assessment domain model, given a data
+     * model.
+     *
+     * @param IAssessableDataModel $assessmentModel
+     * @param User|null            $student         Find this student's particpation (if provided)
+     * @return IAssessable
+     * @throws BaseMapper\Exception\Deleted if the assessment has been deleted
+     * @throws TypeError                    if `$assessmentModel` isn't recognized
+     */
+    private function findAssessmentFromDataModel(IAssessableDataModel $assessmentModel, ?User $student = null): IAssessable
+    {
+        $assessmentId = $assessmentModel->getAssessmentModel()->getId();
+        if ($assessmentId) {
+            return $this->dataSource->findByIdForReview($assessmentId, $student);
+        }
+        if ($assessmentModel instanceof DueWorkDataModel) {
+            return $this->dataSource->findByDueWorkId($assessmentModel->getId(), $student);
+        }
+        if ($assessmentModel instanceof QuizDataModel) {
+            return $this->dataSource->findByQuizId($assessmentModel->getId(), $student);
         }
     }
 }
