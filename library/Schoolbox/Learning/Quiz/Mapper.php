@@ -252,14 +252,12 @@ class Mapper extends BaseMapper
      * Saves a record in external markbook system.
      *
      * @param  Model $object
-     * @return true
      */
     public function syncToExternalMarkbook(Model $object): void
     {
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->syncAssessment($object);
-        return true;
     }
 
 
