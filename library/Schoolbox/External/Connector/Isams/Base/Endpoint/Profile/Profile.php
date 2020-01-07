@@ -163,10 +163,6 @@ class Profile implements IStrategy
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
         }
-
-        if (!$this->perform) {
-            $this->log->info('Planning finished.');
-        }
     }
 
 

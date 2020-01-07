@@ -364,10 +364,6 @@ class Classes implements IStrategy
                 }
             }
         }
-
-        if (!$this->perform) {
-            $this->log->info('Planning finished.');
-        }
     }
 
 
