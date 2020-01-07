@@ -9,8 +9,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment;
 
 use External_MarkbookInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DueWorkFeedbackModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizFeedbackModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 
@@ -47,12 +49,12 @@ class MarkbookSyncHelper
     /**
      * Syncs an assessment to the markbook.
      *
-     * @param IAssessableDataModel $assessmentDataModel
+     * @param IAssessableDataModel $assessmentModel
      */
-    public function syncAssessment(IAssessableDataModel $assessmentDataModel): void
+    public function syncAssessment(IAssessableDataModel $assessmentModel): void
     {
         try {
-            $assessment = $this->dataSource->findById($assessmentDataModel->getAssessmentModel()->getId());
+            $assessment = $this->dataSource->findById($assessmentModel->getAssessmentModel()->getId());
         } catch (BaseMapper\Exception\Deleted $e) {
             return;
         }
@@ -65,12 +67,12 @@ class MarkbookSyncHelper
     /**
      * Deletes a previously-synced assessment from the markbook.
      *
-     * @param IAssessableDataModel $assessmentDataModel
+     * @param IAssessableDataModel $assessmentModel
      */
-    public function deleteAssessment(IAssessableDataModel $assessmentDataModel): void
+    public function deleteAssessment(IAssessableDataModel $assessmentModel): void
     {
         try {
-            $assessment = $this->dataSource->findById($assessmentDataModel->getAssessmentModel()->getId());
+            $assessment = $this->dataSource->findById($assessmentModel->getAssessmentModel()->getId());
         } catch (BaseMapper\Exception\Deleted $e) {
             $assessment = $e->getDeletedObject();
         }
@@ -80,15 +82,55 @@ class MarkbookSyncHelper
     }
 
 
+//    /**
+//     * Syncs a due work participation to the markbook.
+//     *
+//     * This and `syncQuizParticipation` are separate methods, as there's no
+//     * unified interface for feedback data models.
+//     *
+//     * @param DueWorkFeedbackModel $feedbackModel The due work feedback
+//     * @param User                 $student       Sync this student's particpation
+//     */
+//    public function syncDueWorkParticipation(DueWorkFeedbackModel $feedbackModel, User $student): void
+//    {
+//        $this->syncParticipation(
+//            $this->dataSource->findByDueWorkId($feedbackModel->getSubmissionBox()->getId(), $feedbackModel->getOwner()),
+//            $student
+//        );
+//    }
+//
+//
+//    /**
+//     * Syncs a quiz participation to the markbook.
+//     *
+//     * @param QuizFeedbackModel $feedbackModel The quiz feedback
+//     * @param User              $student       Sync this student's particpation
+//     */
+//    public function syncQuizParticipation(QuizFeedbackModel $feedbackModel, User $student): void
+//    {
+//        $this->syncParticipation(
+//            $this->dataSource->findByQuizId($feedbackModel->getQuiz()->getId(), $feedbackModel->getUser()),
+//            $student
+//        );
+//    }
+
+
     /**
-     * Syncs an assessment's participation to the markbook.
+     * Syncs a participation to the markbook.
      *
-     * @param IAssessable $assessment
-     * @param User        $student    Sync this student's particpation
+     * @param object $feedbackModel
+     * @param User   $student
      */
-    public function syncParticipation(IAssessable $assessment, User $student): void
+    public function syncParticipation($feedbackModel, User $student): void
     {
-        if ($this->externalMarkbook->isSyncable($assessment)) {
+        $assessment = null;
+        if ($feedbackModel instanceof DueWorkFeedbackModel) {
+            $assessment = $this->dataSource->findByDueWorkId($feedbackModel->getSubmissionBox()->getId(), $student);
+        } elseif ($feedbackModel instanceof QuizFeedbackModel) {
+            $assessment = $this->dataSource->findByQuizId($feedbackModel->getQuiz()->getId(), $student);
+        }
+
+        if ($assessment && $this->externalMarkbook->isSyncable($assessment)) {
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
