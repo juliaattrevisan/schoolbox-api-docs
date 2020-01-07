@@ -20,8 +20,8 @@ use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
@@ -331,18 +331,13 @@ class SubmissionBoxMapper extends BaseMapper
     /**
      * Post-save method for submission boxes - syncs details to SIS markbook
      *
-     * Always returns TRUE - we don't want to prevent other callbacks executing if this fails.
-     *
      * @param SubmissionBox $object
-     * @return true
      */
-    public function syncToExternalMarkbook(SubmissionBox $object): bool
+    public function syncToExternalMarkbook(SubmissionBox $object): void
     {
-        /** @var AssessmentDataSource $assessmentDataSource */
-        $assessmentDataSource = self::getDi()->get('assessmentDataSource');
-        $assessment           = $assessmentDataSource->findById($object->getAssessmentModel()->getId());
-        $assessmentDataSource->syncAssessmentToExternalMarkbook($assessment);
-        return true;
+        /** @var MarkbookAdapter $markbookAdapter */
+        $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
+        $markbookAdapter->syncAssessment($object);
     }
 
 
@@ -352,18 +347,12 @@ class SubmissionBoxMapper extends BaseMapper
      * This is used as a post-delete hook.
      *
      * @param SubmissionBox $object
-     * @return true
      */
-    public function deleteFromMarkbook(SubmissionBox $object): bool
+    public function deleteFromMarkbook(SubmissionBox $object): void
     {
-        /** @var AssessmentDataSource $assessmentDataSource */
-        $assessmentDataSource = self::getDi()->get('assessmentDataSource');
-        try {
-            $assessmentDataSource->findById($object->getAssessmentModel()->getId());
-        } catch (BaseMapper\Exception\Deleted $e) {
-            $assessmentDataSource->deleteFromMarkbook($e->getDeletedObject());
-        }
-        return true;
+        /** @var MarkbookAdapter $markbookAdapter */
+        $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
+        $markbookAdapter->deleteAssessment($object);
     }
 
 

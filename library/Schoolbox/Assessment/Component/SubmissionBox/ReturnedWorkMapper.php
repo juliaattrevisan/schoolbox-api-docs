@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\UserMapper;
 
@@ -282,15 +282,9 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
     public function syncToExternalMarkbook(ReturnedWork $object): void
     {
         if ($object->isPublished() && !$object->isSelfAssess()) {
-            // Need the entire assessment, and to fetch its participation,
-            // then fetch a most recent feedback out of that
-            /** @var AssessmentDataSource $assessmentDataSource */
-            $assessmentDataSource = self::getDi()->get('assessmentDataSource');
-            $assessment           = $assessmentDataSource->findByDueWorkId(
-                $object->getSubmissionBox()->getId(),
-                $object->getOwner()
-            );
-            $assessmentDataSource->syncParticipationToExternalMarkbook($assessment, $object->getOwner());
+            /** @var MarkbookAdapter $markbookAdapter */
+            $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
+            $markbookAdapter->syncParticipation($object->getSubmissionBox(), $object->getOwner());
         }
     }
 

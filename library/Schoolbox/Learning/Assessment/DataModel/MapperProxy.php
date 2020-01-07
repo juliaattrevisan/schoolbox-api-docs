@@ -907,60 +907,6 @@ class MapperProxy
     }
 
     /**
-     * Helper method for syncing an assessment to the markbook.
-     *
-     * TODO make private and call in `save()` once all persistence of assessments goes thru here
-     *
-     * @param IAssessable $assessment
-     */
-    public function syncAssessmentToExternalMarkbook(IAssessable $assessment): void
-    {
-        $externalMarkbook = new \External_Markbook();
-        if ($externalMarkbook->isSyncable($assessment)) {
-            $externalMarkbook->syncAssessment($assessment);
-        }
-    }
-
-
-    /**
-     * Helper method for syncing an assessment's participation to the markbook.
-     *
-     * TODO move to a helper class
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     */
-    public function syncParticipationToExternalMarkbook(IAssessable $assessment, User $student): void
-    {
-        $externalMarkbook = new \External_Markbook();
-        if ($externalMarkbook->isSyncable($assessment)) {
-            $participant = $assessment->getParticipantIfExtant($student);
-            if ($participant) {
-                $feedback = $participant->findMostRecentInstructorGivenFeedback();
-                if ($feedback) {
-                    $externalMarkbook->syncFeedback($feedback);
-                }
-            }
-        }
-    }
-
-
-    /**
-     * Helper method for deleting an assessment from the markbook.
-     *
-     * TODO make private and call in `delete()` once all persistence of assessments goes thru here
-     *
-     * @param IAssessable $assessment
-     */
-    public function deleteFromMarkbook(IAssessable $assessment): void
-    {
-        $externalMarkbook = new \External_Markbook();
-        if ($externalMarkbook->isSyncable($assessment)) {
-            $externalMarkbook->deleteAssessment($assessment);
-        }
-    }
-
-    /**
      * Optimized save method for assessable order.
      *
      * @param Collection $assessables A list of assessables to resequence
