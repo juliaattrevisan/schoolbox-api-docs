@@ -28,6 +28,7 @@ use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -255,7 +256,7 @@ class Controller extends Base
                 }
 
                 if (
-                    $assessment instanceof DueWork\Model &&
+                    ($assessment instanceof DueWork\Model || $assessment instanceof Quiz\Model) &&
                     $assessment->getWorkType() &&
                     \in_array($assessment->getWorkType()->getName(), $workTypeNames, true) &&
                     $visibility->isVisibleToUser($assessment, $viewee, true, null, !$this->access->isInstructor($this->getUser(), $folder))
