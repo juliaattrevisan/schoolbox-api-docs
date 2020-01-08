@@ -200,6 +200,17 @@ class Factory
             Loader::getInstance()->get('stream_dir')
         ));
 
+        /* Purge previously-imported profile relationships and classes
+         */
+        $bus->add(new KamarTimetable\Purge(
+            $this->logger,
+            $this->perform,
+            UserProfile\Relationship\Mapper::getInstance(),
+            ClassEntryMapper::getInstance(),
+            ClassInvolvementMapper::getInstance(),
+            ClassPeriodMapper::getInstance()
+        ));
+
         /* Profile and student timetable xmls come with a datetime suffix
          *
          * Timetable Composite requires access across multiple xml files cross-referencing nodes
@@ -262,16 +273,6 @@ class Factory
          * Recycle this instance in every iteration
          */
         $lookup = new KamarTimetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
-
-        /* Purge previously-imported classes
-         */
-        $bus->add(new KamarTimetable\Purge(
-            $this->logger,
-            $this->perform,
-            ClassEntryMapper::getInstance(),
-            ClassInvolvementMapper::getInstance(),
-            ClassPeriodMapper::getInstance()
-        ));
 
         /* Load all the Student Timetable xmls
          */

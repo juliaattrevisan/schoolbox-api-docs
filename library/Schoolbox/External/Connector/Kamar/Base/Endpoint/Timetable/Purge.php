@@ -12,6 +12,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\Profile\Relationship;
 
 /**
  * Class Purge
@@ -33,6 +34,12 @@ class Purge implements IStrategy
      * @var bool
      */
     private $perform;
+
+
+    /**
+     * @var Relationship\Mapper
+     */
+    private $relationshipMapper;
 
 
     /**
@@ -58,6 +65,7 @@ class Purge implements IStrategy
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
+     * @param Relationship\Mapper    $relationshipMapper
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -65,12 +73,14 @@ class Purge implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        Relationship\Mapper $relationshipMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->relationshipMapper = $relationshipMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -83,11 +93,12 @@ class Purge implements IStrategy
     public function import(): void
     {
         if ($this->perform) {
+            $this->relationshipMapper->truncate();
             $this->classEntryMapper->getDatabase()->query("DELETE FROM {$this->classEntryMapper->getTable()}");
             $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
             $this->classPeriodMapper->getDatabase()->query("DELETE FROM {$this->classPeriodMapper->getTable()}");
 
-            $this->log->info('Purged existing classEntry, classInvolvement, classPeriod data');
+            $this->log->info('Purged existing profile relations, classEntry, classInvolvement, classPeriod data');
         }
     }
 }
