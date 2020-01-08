@@ -21,7 +21,10 @@ $data = file_get_contents('php://input');
 /* ...and place the results in this special folder
  * which will be created if it doesn't already exist
  */
-$cacheDir = (new Setup(null, Loader::getInstance()->get('stream_dir')))->getCacheDir();
+$setup = new Setup(null, Loader::getInstance()->get('stream_dir'));
+$setup->import();
+
+$cacheDir = $setup->getCacheDir();
 
 /* Testing independently of a Kamar push
  *
