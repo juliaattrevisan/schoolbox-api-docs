@@ -3,6 +3,13 @@
 note as n1
     <b>Resubmit on response</b>
 
+    + can easily show response as requiring resubmit on submission history
+    - could have issues for due works which don't allow online response
+
+
+    ----
+    <b>Get state of participant</b>
+
     if not participant.open:
         return "not open"
 
@@ -25,6 +32,7 @@ note as n1
 
     ----
     <b>Resubmit allowed?</b>
+
     if participant.assessment.submitOnline = "multiple"
         return true
     if participant.assessment.submitOnline = "none"
@@ -36,6 +44,7 @@ note as n1
 
     ----
     <b>Does response require resubmit?</b>
+
     return response.requiresResubmit
 end note
 
@@ -78,6 +87,14 @@ RC --> [*]
 note as n1
     <b>Resubmit on feedback</b>
 
+    + more intuitive workflow for instructor
+    - more difficult logic on whether a response requires resubmit
+      (still need to know for showing on submission history)
+
+
+    ----
+    <b>Get state of participant</b>
+
     if not participant.open:
         return "not open"
 
@@ -100,6 +117,7 @@ note as n1
 
     ----
     <b>Resubmit allowed?</b>
+
     if participant.assessment.submitOnline = "multiple"
         return true
     if participant.assessment.submitOnline = "none"
@@ -114,6 +132,7 @@ note as n1
 
     ----
     <b>Does response require resubmit?</b>
+
     feedback = response.mostRecentFeedback
     return feedback is not null and feedback.requiresResubmit
 end note
@@ -149,13 +168,3 @@ RS -right-> FR  : participant resubmits\nresponse
 RC --> [*]
 
 @enduml
-
-
-resubmit field on response:
-+ can easily show response as requiring resubmit on submission history
-- could have issues for due works which don't allow online response
-
-resubmit field on feedback:
-+ more intuitive workflow
-- more difficult logic on whether a response requires resubmit
-  (still need to know for showing on submission history)
