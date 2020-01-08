@@ -36,7 +36,7 @@ class CategoryMapper extends Schoolbox\Mapper
         );
         $this->hasMap(
             array(
-                'column' => 'category_id',
+                'column' => 'folder_id',
                 'property' => 'categoryId',
                 'type' => self::TYPE_INTEGER,
             )
@@ -45,7 +45,7 @@ class CategoryMapper extends Schoolbox\Mapper
             'category',
             array(
                 'mapper' => '\\Schoolbox\\Resource\\Folder\\Mapper',
-                'this_key' => 'category_id',
+                'this_key' => 'folder_id',
                 'other_key' => 'id',
             )
         );
