@@ -255,6 +255,12 @@ class External_Tass_User implements External_UserInterface
             JOIN parent
                 ON student.par_code = parent.par_code
                 AND student.cmpy_code = parent.cmpy_code
+            INNER JOIN family
+                ON parent.par_code = family.entity_code
+                AND family.entity_gender = 'M'
+            INNER JOIN persondefs
+                ON family.person_num = persondefs.person_num
+                AND persondefs.deceased_flg = 'N'
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
@@ -280,6 +286,12 @@ class External_Tass_User implements External_UserInterface
             JOIN parent
                 ON student.par_code = parent.par_code
                 AND student.cmpy_code = parent.cmpy_code
+            INNER JOIN family
+                ON parent.par_code = family.entity_code
+                AND family.entity_gender = 'F'
+            INNER JOIN persondefs
+                ON family.person_num = persondefs.person_num
+                AND persondefs.deceased_flg = 'N'
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
@@ -306,6 +318,12 @@ class External_Tass_User implements External_UserInterface
             JOIN parent
                 ON parent.par_code = sf.par_code
                 AND parent.cmpy_code = sf.cmpy_code
+            INNER JOIN family
+                ON parent.par_code = family.entity_code
+                AND family.entity_gender = 'M'
+            INNER JOIN persondefs
+                ON family.person_num = persondefs.person_num
+                AND persondefs.deceased_flg = 'N'
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
@@ -333,6 +351,12 @@ class External_Tass_User implements External_UserInterface
             JOIN parent
                 ON parent.par_code = sf.par_code
                 AND parent.cmpy_code = sf.cmpy_code
+            INNER JOIN family
+                ON parent.par_code = family.entity_code
+                AND family.entity_gender = 'F'
+            INNER JOIN persondefs
+                ON family.person_num = persondefs.person_num
+                AND persondefs.deceased_flg = 'N'
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
@@ -340,6 +364,7 @@ class External_Tass_User implements External_UserInterface
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
             WHERE $charIndexQueryString
         ";
+
         $parents = $this->database->trimAll($this->database->getAll($query));
 
         foreach ($parents as $key => $parent) {
