@@ -4,6 +4,7 @@ note as n1
     <b>Resubmit on feedback</b>
 
     + more intuitive workflow for instructor
+      (requiring resubmit and marking are one action)
     - more difficult logic on whether a response requires resubmit
       (still need to know for showing on submission history)
 

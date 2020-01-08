@@ -5,6 +5,7 @@ note as n1
 
     + can easily show response as requiring resubmit on submission history
     - could have issues for due works which don't allow online response
+      (the requiresResubmit field must be set on a phantom response)
 
     ----
     <b>Get state of participant</b>
