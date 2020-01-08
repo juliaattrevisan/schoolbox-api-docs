@@ -100,13 +100,16 @@ class Mapper extends BaseMapper
         return $model;
     }
 
+
     /**
      * Find first term for a year.
      *
      * @param int $year
      * @return Collection
+     * @throws BaseMapper\Exception
+     * @throws \PDOException
      */
-    public function findForYear($year)
+    public function findForYear(int $year): Collection
     {
         $query = "
             SELECT   {$this->getColumnString()}
@@ -126,6 +129,8 @@ class Mapper extends BaseMapper
 
         return $collection;
     }
+
+
     /**
      * Retrieves whichever term is the next term opening after this one.
      *
