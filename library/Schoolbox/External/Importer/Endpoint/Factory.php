@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
@@ -23,9 +24,7 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Status;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable as KamarTimetable;
-
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
@@ -285,7 +284,8 @@ class Factory
                 $lookup,
                 ClassEntryMapper::getInstance(),
                 ClassInvolvementMapper::getInstance(),
-                ClassPeriodMapper::getInstance()
+                ClassPeriodMapper::getInstance(),
+                Term\Mapper::getInstance()
             ));
         }
 

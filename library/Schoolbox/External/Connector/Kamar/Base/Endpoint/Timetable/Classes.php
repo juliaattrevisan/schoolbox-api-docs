@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
-use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\Assessment\Term;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -22,9 +22,7 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Container;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use SimpleXMLElement;
 use UnexpectedValueException;
 
@@ -83,6 +81,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var Term\Mapper
+     */
+    private $termMapper;
+
+
+    /**
      * @var Lookup
      */
     private $lookup;
@@ -99,6 +103,7 @@ class Classes implements IStrategy
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
+     * @param Term\Mapper            $termMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -108,7 +113,8 @@ class Classes implements IStrategy
         Lookup $lookup,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        ClassPeriodMapper $classPeriodMapper,
+        Term\Mapper $termMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -118,6 +124,7 @@ class Classes implements IStrategy
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
+        $this->termMapper = $termMapper;
     }
 
 
@@ -150,7 +157,7 @@ class Classes implements IStrategy
      */
     private function findWeekOffset(int $year): ?int
     {
-        $terms = \Schoolbox\Assessment\Term\Mapper::getInstance()->findForYear($year);
+        $terms = $this->termMapper->findForYear($year);
 
         if ($terms->count()) {
             $term = $terms->first();

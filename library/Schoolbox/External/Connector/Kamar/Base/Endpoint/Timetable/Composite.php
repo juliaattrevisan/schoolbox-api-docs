@@ -9,18 +9,14 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Assessment\Term;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Container;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCampusMapper;
-use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\UserMapper;
 
 /**
  * Class Composite
@@ -83,6 +79,12 @@ class Composite implements IStrategy
 
 
     /**
+     * @var Term\Mapper
+     */
+    private $termMapper;
+
+
+    /**
      * @var Collection
      */
     private $registry;
@@ -99,6 +101,7 @@ class Composite implements IStrategy
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
+     * @param Term\Mapper            $termMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -108,7 +111,8 @@ class Composite implements IStrategy
         Lookup $lookup,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        ClassPeriodMapper $classPeriodMapper,
+        Term\Mapper $termMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -119,6 +123,7 @@ class Composite implements IStrategy
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
+        $this->termMapper = $termMapper;
     }
 
 
@@ -128,7 +133,7 @@ class Composite implements IStrategy
     public function import(): void
     {
         $this->registry
-            ->add(new Endpoint\Timetable\Classes($this->log, $this->perform, $this->container, $this->timetableBatchXml, $this->lookup, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper));
+            ->add(new Endpoint\Timetable\Classes($this->log, $this->perform, $this->container, $this->timetableBatchXml, $this->lookup, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->termMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();
