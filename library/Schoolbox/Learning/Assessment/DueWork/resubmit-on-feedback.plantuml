@@ -71,7 +71,8 @@ state "Feedback Required" as FR
 FR : \
 * at least one response exists\n\
 and either:\n\
-* no feedback exists
+* no feedback exists\n\
+* the most recent feedback is before the most recent response
 
 state "Review Complete" as RC
 RC : \
