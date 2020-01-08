@@ -140,16 +140,53 @@ class Classes implements IStrategy
 
 
     /**
+     * Determine which week we're in, if possible
+     * Returns null when it can't be determined
+     *
+     * @param int $year
+     * @return int|null
+     * @throws Exception
+     * @throws PDOException
+     */
+    private function findWeekOffset(int $year): ?int
+    {
+        $terms = \Schoolbox\Assessment\Term\Mapper::getInstance()->findForYear($year);
+
+        if ($terms->count()) {
+            $term = $terms->first();
+            $now = \Alaress_Date_Format::now();
+
+            $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
+            $currentWeek = (int)date('W', $now->getUnixTimestamp());
+
+            /* Include the current week in calculations using a +1 offset
+             * e.g. if term begins on 8/1/20,
+             *     8/1/20, 9/1/20 and 10/1/20 are in week 1
+             *     11/1/20 is in week 2
+             *     17/1/20 is in week 2
+             *     21/2/20 is in week 3
+             */
+            $offset = $currentWeek - $startWeek + 1;
+
+            if ($offset > 0) {
+                return $offset;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * Find the current week node for a given $studentId
      *
      * @param SimpleXMLElement $timetable
+     * @param int              $weekOffset
      * @return SimpleXMLElement
      */
-    private function findCurrentCycle(SimpleXMLElement $timetable): SimpleXMLElement
+    private function findCurrentCycle(SimpleXMLElement $timetable, int $weekOffset): SimpleXMLElement
     {
-        $weekNum = (int)date('W');
-
-        return $timetable->xpath("week[@index='{$weekNum}']")[0];
+        return $timetable->xpath("week[@index='{$weekOffset}']")[0];
     }
 
 
@@ -161,6 +198,24 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
+        /* TODO: Potentially configurable
+         * You could potentially make this configurable, giving the school an opportunity
+         * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
+         */
+        $currentWeekOffset = $this->findWeekOffset((int)date('Y'));
+
+        /* Can't determine which week we're in; can't import anything
+         */
+        if (null === $currentWeekOffset) {
+            $this->log->warning('Cannot determine week index for timetable import.');
+
+            return;
+        }
+
+        $this->log->info(sprintf(
+            'Importing timetables using week offset %s',
+            $currentWeekOffset
+        ));
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -197,7 +252,7 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            $cycle = $this->findCurrentCycle($timetable);
+            $cycle = $this->findCurrentCycle($timetable, $currentWeekOffset);
 
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
@@ -224,8 +279,9 @@ class Classes implements IStrategy
                     }
 
                     $this->log->info(sprintf(
-                        'Looking for ext_timetable_code %s, day %s, period %s',
+                        'Looking for ext_timetable_code %s, week %s, day %s, period %s',
                         $ext,
+                        $currentWeekOffset,
                         $dayNum,
                         $subject['period']
                     ));
