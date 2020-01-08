@@ -65,24 +65,21 @@ end note
 
 state "Response Required" as RR
 RR : \
-* no response exists
+* no interaction exists
 
 state "Feedback Required" as FR
 FR : \
-* at least one response exists\n\
-and either:\n\
-* no feedback exists\n\
-* the most recent feedback is before the most recent response
+* most recent interaction is a response
 
 state "Review Complete" as RC
 RC : \
+* most recent interaction is a feedback\n\
 * most recent feedback doesn't require resubmit
 
 state "Resubmit Required" as RS
 RS : \
-* at least one response exists\n\
-* most recent feedback requires resubmit\n\
-* there's no response after that feedback
+* most recent interaction is a feedback\n\
+* most recent feedback requires resubmit
 
 [*] --> RR : assessment opens
 RR --> FR  : participant submits\nresponse
