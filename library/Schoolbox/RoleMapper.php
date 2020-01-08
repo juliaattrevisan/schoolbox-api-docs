@@ -37,6 +37,10 @@ class RoleMapper extends Mapper
         $this->uses('group_type', self::TYPE_STRING, self::COLUMN_ENUM, 'type', [Role::STAFF, Role::STUDENT, Role::PARENT, Role::GUEST,]);
         $this->uses('can_change_password', self::TYPE_BOOLEAN);
         $this->uses('digest_schedule', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteUsersExists']);
@@ -96,5 +100,11 @@ class RoleMapper extends Mapper
     {
         $escaped = $this->getDatabase()->escapeForLike($name);
         return $this->findByPredicates($this->getPredicateBuilder()->like('name', "%{$escaped}%"), $options);
+    }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }
