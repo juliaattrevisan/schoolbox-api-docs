@@ -1,96 +1,11 @@
 @startuml
 
 note as n1
-    <b>Resubmit on response</b>
-
-    + can easily show response as requiring resubmit on submission history
-    - could have issues for due works which don't allow online response
-
-
-    ----
-    <b>Get state of participant</b>
-
-    if not participant.open:
-        return "not open"
-
-    lastResponse = particpant.response.lastPublished
-    lastFeedback = particpant.feedback.lastPublished
-
-    if lastResponse is null:
-        return "response required"
-
-    if lastFeedback is null:
-        return "feedback required"
-
-    if lastResponse.requiresResubmit:
-        return "requires resubmit"
-
-    return lastResponse.date > lastFeedback.date
-        ? "feedback required"
-        : "review complete"
-
-
-    ----
-    <b>Resubmit allowed?</b>
-
-    if participant.assessment.submitOnline = "multiple"
-        return true
-    if participant.assessment.submitOnline = "none"
-        return false
-
-    lastResponse = particpant.response.lastPublished
-    return lastResponse is null or lastResponse.requiresResubmit
-
-
-    ----
-    <b>Does response require resubmit?</b>
-
-    return response.requiresResubmit
-end note
-
-state "Response Required" as RR
-RR : \
-* no response exists
-
-state "Feedback Required" as FR
-FR : \
-* at least one response exists\n\
-* no feedback newer than the most recent response
-
-state "Review Complete" as RC
-RC : \
-either:\n\
-* at least one response exists\n\
-* most recent response is accepted\n\
-or:\n\
-* at least one feedback exists
-
-state "Resubmit Required" as RS
-RS : \
-* at least one response exists\n\
-* most recent response requires resubmit
-
-[*] --> RR : assessment opens
-RR --> FR  : participant submits\nresponse
-RR --> FR  : instructor marks as submitted\nwithout waiting for response
-RR --> RC  : instructor submits feedback\n without waiting for response
-RR --> RS  : instructor marks as requiring\nresubmit without waiting for response
-FR --> RC  : instructor accepts\nresponse
-FR -left-> RS : instructor rejects\nresponse
-RS -right-> FR  : participant resubmits\nresponse
-RC --> [*]
-
-@enduml
-
-@startuml
-
-note as n1
     <b>Resubmit on feedback</b>
 
     + more intuitive workflow for instructor
     - more difficult logic on whether a response requires resubmit
       (still need to know for showing on submission history)
-
 
     ----
     <b>Get state of participant</b>
@@ -114,7 +29,6 @@ note as n1
         ? "requires resubmit"
         : "review complete"
 
-
     ----
     <b>Resubmit allowed?</b>
 
@@ -128,7 +42,6 @@ note as n1
 
     lastFeedback = particpant.feedback.lastPublished
     return lastFeedback and lastFeedback.requiresResubmit
-
 
     ----
     <b>Does response require resubmit?</b>
