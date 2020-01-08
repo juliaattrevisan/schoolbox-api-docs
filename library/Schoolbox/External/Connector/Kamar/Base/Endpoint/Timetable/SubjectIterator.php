@@ -134,6 +134,16 @@ class SubjectIterator implements Iterator
             'student' => $students
         ];
 
+        $this->log->info(sprintf(
+            'Processing %s/%s/%s/%s with %s teachers and %s students',
+            $this->day,
+            $period,
+            $subject,
+            $room,
+            \count($teachers),
+            \count($students)
+        ));
+
         return $class;
     }
 
