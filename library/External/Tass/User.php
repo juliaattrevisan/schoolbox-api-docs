@@ -260,7 +260,7 @@ class External_Tass_User implements External_UserInterface
                 AND family.entity_gender = 'M'
             INNER JOIN persondefs
                 ON family.person_num = persondefs.person_num
-                AND persondefs.deceased_flg = 'N'
+                AND persondefs.deceased_flg = 'N' OR persondefs.deceased_flg IS NULL
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
@@ -291,7 +291,7 @@ class External_Tass_User implements External_UserInterface
                 AND family.entity_gender = 'F'
             INNER JOIN persondefs
                 ON family.person_num = persondefs.person_num
-                AND persondefs.deceased_flg = 'N'
+                AND persondefs.deceased_flg = 'N' OR persondefs.deceased_flg IS NULL
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
@@ -323,7 +323,7 @@ class External_Tass_User implements External_UserInterface
                 AND family.entity_gender = 'M'
             INNER JOIN persondefs
                 ON family.person_num = persondefs.person_num
-                AND persondefs.deceased_flg = 'N'
+                AND persondefs.deceased_flg = 'N' OR persondefs.deceased_flg IS NULL
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
@@ -356,7 +356,7 @@ class External_Tass_User implements External_UserInterface
                 AND family.entity_gender = 'F'
             INNER JOIN persondefs
                 ON family.person_num = persondefs.person_num
-                AND persondefs.deceased_flg = 'N'
+                AND persondefs.deceased_flg = 'N' OR persondefs.deceased_flg IS NULL
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
