@@ -704,10 +704,13 @@ abstract class Mapper implements IMapper, Serializable
                     );
 
                 } catch (Di\Exception\ServiceNotFound $e) {
-
                     // in PHPUnit land, we do not have external services.
                     // this catch is merely to accommodate that case, it should not be
                     // relied upon in development
+                    self::$prop = new MockPropagator();
+                } catch (\ErrorException $e) {
+                    // Could not connect to the propagator's AMQP instance (i.e. RabbitMQ).
+                    // I guess continue as if it didn't exist?
                     self::$prop = new MockPropagator();
                 }
             }
