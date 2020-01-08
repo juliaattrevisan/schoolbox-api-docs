@@ -135,13 +135,12 @@ class SubjectIterator implements Iterator
         ];
 
         $this->log->info(sprintf(
-            'Processing %s/%s/%s/%s with %s teachers and %s students',
+            'Processing %s/%s/%s/%s with %s teachers',
             $this->day,
             $period,
             $subject,
             $room,
-            \count($teachers),
-            \count($students)
+            \count($teachers)
         ));
 
         return $class;
