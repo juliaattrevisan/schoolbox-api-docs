@@ -149,15 +149,15 @@ class Sync extends Base implements ISync
                     ON p.par_code = sf.par_code
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
-                LEFT JOIN family f
+                INNER JOIN family f
                     ON f.entity_code = p.par_code AND f.entity_gender = 'M'
-                LEFT JOIN persondefs pd
+                INNER JOIN persondefs pd
                     ON pd.person_num = f.person_num
+                    AND pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL
                 WHERE p.cmpy_code = :companyCode
                 AND   p.f_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-                AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
 
@@ -196,15 +196,15 @@ class Sync extends Base implements ISync
                     ON p.par_code = sf.par_code
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
-                LEFT JOIN family f
+                INNER JOIN family f
                     ON f.entity_code = p.par_code AND f.entity_gender = 'F'
-                LEFT JOIN persondefs pd
+                INNER JOIN persondefs pd
                     ON pd.person_num = f.person_num
+                    AND pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL
                 WHERE p.cmpy_code = :companyCode2
                 AND   p.m_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-                AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
 
