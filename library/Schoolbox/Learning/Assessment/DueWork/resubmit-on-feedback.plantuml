@@ -14,8 +14,8 @@ note as n1
     if not participant.open:
         return "not open"
 
-    lastResponse = particpant.response.lastPublished
-    lastFeedback = particpant.feedback.lastPublished
+    lastResponse = particpant.responses.lastPublished
+    lastFeedback = particpant.feedbacks.lastPublished
 
     if lastResponse is null:
         return "response required"
@@ -38,11 +38,23 @@ note as n1
     if participant.assessment.submitOnline = "none"
         return false
 
-    if particpant.response.lastPublished is null
+    // submit type is single: check the last response
+    // If there is none, allow resubmit
+    lastResponse = particpant.responses.lastPublished
+    if lastResponse is null
         return true
 
-    lastFeedback = particpant.feedback.lastPublished
-    return lastFeedback and lastFeedback.requiresResubmit
+    // If there is a last response, check the last feedback:
+    // If it doesn't exist, don't allow resubmit
+    // If that feedback requires resubmit:
+    // allow resubmit if the last response is after the last feedback
+    lastFeedback = particpant.feedbacks.lastPublished
+    if lastFeedback is null
+        return false
+    if not lastFeedback.requiresResubmit
+        return false
+    else
+        return lastFeedback.date < lastResponse.date
 
     ----
     <b>Does response require resubmit?</b>

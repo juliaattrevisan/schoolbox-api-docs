@@ -13,8 +13,8 @@ note as n1
     if not participant.open:
         return "not open"
 
-    lastResponse = particpant.response.lastPublished
-    lastFeedback = particpant.feedback.lastPublished
+    lastResponse = particpant.responses.lastPublished
+    lastFeedback = particpant.feedbacks.lastPublished
 
     if lastResponse is null:
         return "response required"
@@ -37,7 +37,9 @@ note as n1
     if participant.assessment.submitOnline = "none"
         return false
 
-    lastResponse = particpant.response.lastPublished
+    // submit type is single: check the last response
+    // If there is none, or it requires resubmit, allow resubmit
+    lastResponse = particpant.responses.lastPublished
     return lastResponse is null or lastResponse.requiresResubmit
 
     ----
