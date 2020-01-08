@@ -24,63 +24,59 @@
 <!-- END no_attendees -->
 
 <!-- BEGIN pending_attendee_list -->
-<form action="/calendar/attendance/processModifyAttendanceList" method="post" class="top">
+<div class="row actions-small-1">
+    <div class="small-12 columns">
+        <h2 class="subheader">Pending Attendees</h2>
+    </div>
+    <nav>
+        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions" aria-expanded="false"></a>
+    </nav>
+    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+        <li><a class="icon-export" href="/calendar/attendance/exportPending/{EVENT_ID}">Export to CSV</a></li>
+    </ul>
+</div>
+<form action="/calendar/attendance/processModifyAttendanceList" method="post" class="row top">
     <input type="hidden" name="event[id]" value="{EVENT_ID}">
-    <div class="row actions-small-1">
-        <div class="small-12 columns">
-            <h2 class="subheader">Pending Attendees</h2>
-        </div>
-        <nav>
-            <a href="#" class="icon-more" data-dropdown="header-options" title="Actions" aria-expanded="false"></a>
-        </nav>
-        <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
-            <li><a class="icon-export" href="/calendar/attendance/exportPending/{EVENT_ID}">Export to CSV</a></li>
-        </ul>
+    <div class="small-12 columns">
+        <table id="pendingAttendeeList">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN pending_attendee -->
+                <tr>
+                    <td>
+                        <input id='attendanceList[{ATTENDING_USER_ID}][id]' name="attendanceList[{ATTENDING_USER_ID}][id]" type="checkbox" value="{ATTENDANCE_ID}" />
+                        <label for="attendanceList[{ATTENDING_USER_ID}][id]" class="checkbox-label"></label>
+                    </td>
+                    <td>
+                        <a href="/search/user/{ATTENDING_USER_ID}" title="View Profile">{USER_NAME}</a>
+                    </td>
+                    <td>
+                        {USER_ROLE}
+                    </td>
+                    <td class="actions-small-1">
+                        <nav>
+                            <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
+                        <nav>
+                    </td>
+                </tr>
+                <!-- END pending_attendee -->
+            </tbody>
+        </table>
     </div>
 
-    <div class="row">
-        <div class="small-12 columns">
-            <table id="pendingAttendeeList">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- BEGIN pending_attendee -->
-                    <tr>
-                        <td>
-                            <input id='attendanceList[{ATTENDING_USER_ID}][id]' name="attendanceList[{ATTENDING_USER_ID}][id]" type="checkbox" value="{ATTENDANCE_ID}" />
-                            <label for="attendanceList[{ATTENDING_USER_ID}][id]" class="checkbox-label"></label>
-                        </td>
-                        <td>
-                            <a href="/search/user/{ATTENDING_USER_ID}" title="View Profile">{USER_NAME}</a>
-                        </td>
-                        <td>
-                            {USER_ROLE}
-                        </td>
-                        <td class="actions-small-1">
-                            <nav>
-                                <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
-                            <nav>
-                        </td>
-                    </tr>
-                    <!-- END pending_attendee -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12 columns right">
-            <ul class="flex-list">
-                <li><input type="hidden" name="reject" value="true">
-                    <a class="button expand" onclick="$(this).closest('form').submit();">Reject Selected</a></li>
-                <li><input type="submit" name="approve" value="Approve Selected"></li>
-            </ul>
-        </div>
+    <div class="small-12 columns right">
+        <ul class="flex-list">
+            <li><input type="hidden" name="reject" value="true">
+                <a class="button expand" onclick="$(this).closest('form').submit();">Reject Selected</a></li>
+            <li><input type="submit" name="approve" value="Approve Selected"></li>
+        </ul>
     </div>
 </form>
 <!-- END pending_attendee_list -->
