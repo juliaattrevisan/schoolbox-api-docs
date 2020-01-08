@@ -6,7 +6,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Config\Loader;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Receiver;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
 
 require_once __DIR__ . '/../../conf/core/require.php';

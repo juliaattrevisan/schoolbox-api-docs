@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Receiver;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**

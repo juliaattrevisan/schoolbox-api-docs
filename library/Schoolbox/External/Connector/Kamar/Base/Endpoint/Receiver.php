@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use \RuntimeException;
 use SimpleXMLElement;
@@ -15,7 +15,7 @@ use SimpleXMLElement;
  *
  * Receive an xml payload and save it locally
  *
- * @package Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile
+ * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
 class Receiver
 {

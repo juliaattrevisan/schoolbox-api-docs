@@ -21,7 +21,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Receiver;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Status;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable as KamarTimetable;
