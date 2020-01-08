@@ -140,6 +140,9 @@ RS : \
 
 [*] --> RR : assessment opens
 RR --> FR  : participant submits\nresponse
+RR --> FR  : instructor marks as submitted\nwithout waiting for response
+RR --> RC  : instructor marks feedback\nas not requiring re-response\nwithout waiting for response
+RR --> RS  : instructor marks feedback\nas requiring re-response\nwithout waiting for response
 FR --> RC  : instructor marks feedback\nas not requiring re-response
 FR -left-> RS : instructor marks feedback\nas requiring re-response
 RS -right-> FR  : participant resubmits\nresponse
