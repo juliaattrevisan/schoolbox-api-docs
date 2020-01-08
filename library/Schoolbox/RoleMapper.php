@@ -101,4 +101,10 @@ class RoleMapper extends Mapper
         $escaped = $this->getDatabase()->escapeForLike($name);
         return $this->findByPredicates($this->getPredicateBuilder()->like('name', "%{$escaped}%"), $options);
     }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }

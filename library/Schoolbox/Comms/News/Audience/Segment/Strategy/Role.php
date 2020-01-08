@@ -62,6 +62,7 @@ class Role extends SimpleStrategy
             WHERE deleted_at IS NULL
             AND name IS NOT NULL
             {$keywordFilter}
+            ORDER BY `sequence` ASC
         ";
     }
 

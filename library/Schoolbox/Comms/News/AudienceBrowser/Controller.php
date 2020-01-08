@@ -145,10 +145,6 @@ class Controller extends Base
             $valueLabels = $this->buildValueLabels($strategy, $codec);
         }
 
-        \uasort($valueLabels, function (string $left, string $right) {
-            return \strnatcasecmp($left, $right);
-        });
-
         $data = [
             'availableModifiers' => $strategy->getValidRelationshipModifiers(),
             'canTargetNull'      => $strategy->canAudienceToEntityValue($this->getUser(), null),

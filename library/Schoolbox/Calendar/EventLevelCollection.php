@@ -26,7 +26,7 @@ class EventLevelCollection extends \Schoolbox\Collection {
 		}
 
 		if ($campusList->count()) {
-			$this->add(new EventLevel(\Schoolbox\Calendar\Event::ACCESS_CAMPUS, 'Campus'));
+			$this->add(new EventLevel(\Schoolbox\Calendar\Event::ACCESS_CAMPUS, 'School'));
 		}
 	}
-} 
+}
