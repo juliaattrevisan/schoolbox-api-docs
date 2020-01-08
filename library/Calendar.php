@@ -365,7 +365,7 @@ class Calendar extends DeprecatedModel
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
-                $groupQuery = "OR (access = '2' AND event_folder.category_id IN (" . implode(',', $groupList) . "))";
+                $groupQuery = "OR (access = '2' AND event_folder.folder_id IN (" . implode(',', $groupList) . "))";
             }
         }
 
@@ -402,7 +402,7 @@ class Calendar extends DeprecatedModel
                         LEFT JOIN event_campus ON event.id = event_campus.event_id
                         LEFT JOIN event_group ON event.id = event_group.event_id
                         LEFT JOIN event_folder ON event.id = event_folder.event_id
-                        WHERE 
+                        WHERE
                              (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
                                   $groupQuery
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
@@ -514,7 +514,7 @@ class Calendar extends DeprecatedModel
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
-                $groupQuery = "OR (access = " . EventModel::ACCESS_GROUP . " AND event_folder.category_id IN (" . implode(
+                $groupQuery = "OR (access = " . EventModel::ACCESS_GROUP . " AND event_folder.folder_id IN (" . implode(
                         ',',
                         $groupList
                     ) . "))";
@@ -548,7 +548,7 @@ class Calendar extends DeprecatedModel
 
         if ($filter['group']) {
             $filter_query[] = 'access = ' . EventModel::ACCESS_GROUP;
-            $filter_query[] = 'event_folder.category_id = ' . intval($filter['group']);
+            $filter_query[] = 'event_folder.folder_id = ' . intval($filter['group']);
         }
 
         if ($filter['type']) {
@@ -570,7 +570,7 @@ class Calendar extends DeprecatedModel
             $filter_query = " AND ($filter_query)";
         }
 
-        $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}' 
+        $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}'
             AND event_attendance.status = '". EventModel::ATTENDANCE_STATUS_APPROVED ."' )";
 
         $access_query = "AND (
@@ -623,7 +623,7 @@ class Calendar extends DeprecatedModel
 			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
 			LEFT JOIN event_user ON event.id = event_user.event_id AND access = ".EventModel::ACCESS_PERSONAL."
 			LEFT JOIN event_folder ON event.id = event_folder.event_id AND access = ".EventModel::ACCESS_GROUP."
-			LEFT JOIN folder ON event_folder.category_id = folder.id AND event_folder.category_id IS NOT NULL
+			LEFT JOIN folder ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL
 			LEFT JOIN event_group ON event.id = event_group.event_id AND access = ".EventModel::ACCESS_CAMPUS."
 			LEFT JOIN event_campus ON event.id = event_campus.event_id AND access = ".EventModel::ACCESS_CAMPUS."
 			LEFT JOIN event_attendance ON event.id = event_attendance.event_id
@@ -770,10 +770,10 @@ class Calendar extends DeprecatedModel
     public function getEventCategory($eventID)
     {
         $output = array();
-        $query  = "SELECT category_id FROM event_folder WHERE event_id = ".intval($eventID);
+        $query  = "SELECT folder_id FROM event_folder WHERE event_id = ".intval($eventID);
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
-            $output[] = $event['category_id'];
+            $output[] = $event['folder_id'];
         }
         return $output;
     }

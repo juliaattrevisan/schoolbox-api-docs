@@ -151,7 +151,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     protected function getFromString()
     {
         return "
-            FROM `{$this->table}` 
+            FROM `{$this->table}`
 			LEFT JOIN {$this->getJoinSql('owner', '', 'o', true)}
 			LEFT JOIN {$this->getJoinSql('owner.role','o', 'ro')}
 			LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
@@ -603,16 +603,16 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * @throws Exception
      * @throws Exception\Deleted
      */
-    public function homepageClean($cid)
+    public function homepageClean($fid)
     {
         // Get ids of all events which do not belong to
         // any other folder other than the current one
-        $folderSpecificEventIds = $this->getFolderSpecificEventIds($cid);
+        $folderSpecificEventIds = $this->getFolderSpecificEventIds($fid);
 
         // deleteByColumn doesn't work as expected when querying a join column,
         // because the delete string doesn't contain the joins the select does.
         // Fortunately delete(findByColumn()) works.
-        $this->getJoinMapper('category')->deleteByColumn('category_id', $cid);
+        $this->getJoinMapper('category')->deleteByColumn('folder_id', $fid);
 
         if (!empty($folderSpecificEventIds)) {
             // soft delete events do not belong to any folder; if there is any
@@ -635,7 +635,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         /** @var CategoryMapper $folderEventMapper */
         $folderEventMapper = $this->getJoinMapper('category');
 
-        $folderEventsForFolder = $folderEventMapper->findByColumn('category_id', $folderId);
+        $folderEventsForFolder = $folderEventMapper->findByColumn('folder_id', $folderId);
         foreach ($folderEventsForFolder as $folderEvent) {
             /** @var Category $folderEvent */
             $eventIds[] = $folderEvent->getEventId();
