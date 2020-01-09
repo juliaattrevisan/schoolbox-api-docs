@@ -241,7 +241,7 @@ class Factory
          */
         $container = new KamarEndpoint\Profile\Container();
 
-        foreach ($xml['full'] as $xmlFile) {
+        foreach ($xml[KamarEndpoint\Receiver::XML_FULL] as $xmlFile) {
             $bus->add(new KamarEndpoint\Profile\Composite(
                 $this->logger,
                 $this->perform,
@@ -274,7 +274,7 @@ class Factory
 
         /* Load all the Student Timetable xmls
          */
-        foreach ($xml['studenttimetables'] as $xmlFile) {
+        foreach ($xml[KamarEndpoint\Receiver::XML_STUDENTTIMETABLES] as $xmlFile) {
             $bus->add(new KamarEndpoint\Timetable\Composite(
                 $this->logger,
                 $this->perform,
