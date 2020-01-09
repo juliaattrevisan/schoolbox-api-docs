@@ -73,8 +73,8 @@ class External_Schooledge_User implements External_UserInterface
                 INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
                 INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
                 INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.PersonID
-                
-                WHERE s.Code = $quotedId         
+
+                WHERE s.Code = $quotedId
                 AND   t.Enabled = 1
                 AND   t.Name IN ($campusCodeString)
 
@@ -325,7 +325,7 @@ class External_Schooledge_User implements External_UserInterface
                 c.PhoneFamily AS HomePhone,
                 '' AS SilentPhoneFlag,
                 c.PhoneMobile AS MobilePhone,
-                '' AS DirectoryIncludeFlag,
+                1 AS DirectoryIncludeFlag,
                 '' AS SpouseID,
                 '' AS SpouseTitle,
                 '' AS SpousePreferred,
@@ -334,7 +334,7 @@ class External_Schooledge_User implements External_UserInterface
                 '' AS SpouseOccupEmail,
                 '' AS SpouseDefaultEmailCode,
                 '' AS SpouseMobilePhone,
-                '' AS SpouseDirectoryIncludeFlag
+                1 AS SpouseDirectoryIncludeFlag
             FROM Contact c
             WHERE c.Code = {$this->database->smartQuote($externalUserId)}
         ";
@@ -386,13 +386,13 @@ class External_Schooledge_User implements External_UserInterface
     public function getStaffContactListExtended(): array
     {
         $query = "
-            SELECT      
+            SELECT
                 t.Code AS StaffID,
                 t.Code AS SchoolStaffCode,
                 t.Title AS StaffTitle,
-                    CASE WHEN (LEN(t.PreferredName)>0) 
-                    THEN t.PreferredName 
-                    ELSE t.FirstName END 
+                    CASE WHEN (LEN(t.PreferredName)>0)
+                    THEN t.PreferredName
+                    ELSE t.FirstName END
                     AS StaffPreferredName,
                 t.LastName AS StaffSurname,
                 '' AS StaffOccupPhone,
@@ -416,7 +416,7 @@ class External_Schooledge_User implements External_UserInterface
             FROM Staff t
             LEFT JOIN Person.PersonPhone ppp ON ppp.PersonID = t.PersonID AND ppp.Archived = 0
             LEFT JOIN Campus c ON t.CampusID = c.ID
-            WHERE t.Deceased = 'N' 
+            WHERE t.Deceased = 'N'
             AND t.Active = 'Y'
         ";
 
