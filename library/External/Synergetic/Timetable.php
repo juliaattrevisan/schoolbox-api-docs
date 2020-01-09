@@ -173,6 +173,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $date = time();
         }
 
+        if (!$this->isDateWithinCurrentFileSemester($date)) {
+            return 0;
+        }
+
         $statement = $this->getDatabase()->prepareProcedure('spgTimetableDay');
 
         $statement->bindInputs([
@@ -194,6 +198,37 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         return $currentDay ?? 0;
     }
+
+
+    /**
+     * Is this date timestamp within the current file semester?
+     *
+     * If not, day numbers and timetables won't be shown.
+     *
+     * @param int $date
+     * @return bool
+     */
+    private function isDateWithinCurrentFileSemester(int $date): bool
+    {
+        $query = '
+            SELECT COUNT(*)
+            FROM   FileSemesters
+            WHERE  FileYear                 =  :year
+            AND    FileSemester             =  :semester
+            AND    CONVERT(DATE, StartDate) <= :startDate
+            AND    CONVERT(DATE, EndDate)   >= :endDate
+        ';
+        $dateObject = Alaress_Date_Format::newFromTimestamp($date);
+        $params     = [
+            'year'      => $this->externalUser->getCurrentYear(),
+            'semester'  => $this->externalUser->getCurrentSemester(),
+            'startDate' => $dateObject->getDatabaseDate(),
+            'endDate'   => $dateObject->getDatabaseDate(),
+        ];
+
+        return $this->database->query($query, $params)->fetchColumn() > 0;
+    }
+
 
     /**
      * Returns the day name
