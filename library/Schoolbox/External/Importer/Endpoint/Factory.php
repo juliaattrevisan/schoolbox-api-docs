@@ -183,6 +183,43 @@ class Factory
          */
         $bus = new GenericCollection(IStrategy::class);
 
+        /* Profile and student timetable xmls come with a datetime suffix
+         *
+         * Timetable Composite requires access across multiple xml files cross-referencing nodes
+         * in profile xml so you can identify who is in a class ($container)
+         */
+        $dirhandle = opendir($this->host);
+
+        $xml = [
+            KamarEndpoint\Receiver::XML_FULL => [],
+            KamarEndpoint\Receiver::XML_STUDENTTIMETABLES => []
+        ];
+
+        /* Make a stack of profile xmls (full_ ... .xml)
+         * Make a stack oo student timetable xmls (studenttimetables_ ... .xml)
+         */
+        $numFiles = 0;
+
+        while ($xmlFile = readdir($dirhandle)) {
+            if ($xmlFile !== '.' && $xmlFile !== '..') {
+                if (strpos($xmlFile, KamarEndpoint\Receiver::XML_FULL) !== false) {
+                    $xml[KamarEndpoint\Receiver::XML_FULL][] = $xmlFile;
+                    $numFiles++;
+                } elseif (strpos($xmlFile, KamarEndpoint\Receiver::XML_STUDENTTIMETABLES) !== false) {
+                    $xml[KamarEndpoint\Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
+                    $numFiles++;
+                }
+            }
+        }
+
+        /* If there aren't any files to process, do nothing
+         */
+        if (!$numFiles) {
+            $this->logger->info('No xml files here; noop');
+
+            return $bus;
+        }
+
         /* Set up the kamar directory which is where all their xml files go
          */
         $bus->add(new KamarEndpoint\Setup(
@@ -200,34 +237,6 @@ class Factory
             ClassInvolvementMapper::getInstance(),
             ClassPeriodMapper::getInstance()
         ));
-
-        /* Profile and student timetable xmls come with a datetime suffix
-         *
-         * Timetable Composite requires access across multiple xml files cross-referencing nodes
-         * in profile xml so you can identify who is in a class
-         *
-         * Pass it multiple $batchxml instances that have their $this->host vars
-         * set to hardcoded filenames; $this->host becomes a dir, not a file
-         */
-        $dirhandle = opendir($this->host);
-
-        $xml = [
-            KamarEndpoint\Receiver::XML_FULL => [],
-            KamarEndpoint\Receiver::XML_STUDENTTIMETABLES => []
-        ];
-
-        /* Make a stack of profile xmls (full_ ... .xml)
-         * Make a stack fo student timetable xmls (studenttimetables_ ... .xml)
-         */
-        while ($xmlFile = readdir($dirhandle)) {
-            if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, KamarEndpoint\Receiver::XML_FULL) !== false) {
-                    $xml[KamarEndpoint\Receiver::XML_FULL][] = $xmlFile;
-                } elseif (strpos($xmlFile, KamarEndpoint\Receiver::XML_STUDENTTIMETABLES) !== false) {
-                    $xml[KamarEndpoint\Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
-                }
-            }
-        }
 
         /* Load all the Profile xmls
          */
