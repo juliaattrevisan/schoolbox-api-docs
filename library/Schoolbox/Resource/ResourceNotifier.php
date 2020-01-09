@@ -358,7 +358,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         }
 
         // if changed in some other way...
-        if (count($diff) || is_null($diff)) {
+        if (!isset($diff) || count($diff) > 0) {
             $instances = $this->notify(
                 $resourceKind, $resourceId, self::TRIGGER_UPDATED,
                 new Param($resourceName, $resourceHref), $effector, $category, $roleType, $accessLevel
