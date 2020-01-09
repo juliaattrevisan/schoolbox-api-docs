@@ -103,7 +103,7 @@ class Factory
                 return $this->produceIsams($file);
 
             case self::KAMAR:
-                return $this->produceKamar($file);
+                return $this->produceKamar();
 
             case self::SENTRAL:
             default:
@@ -170,11 +170,10 @@ class Factory
     /**
      * We never reach out to kamar so we technically don't need the $file option
      *
-     * @param string|null $file
      * @return GenericCollection
      * @throws UnexpectedValueException
      */
-    private function produceKamar(?string $file): GenericCollection
+    private function produceKamar(): GenericCollection
     {
         $this->logger->info('Accessing local xml endpoints');
 
