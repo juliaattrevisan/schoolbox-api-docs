@@ -10,7 +10,7 @@ echo "IDP metadata:\n\n";
 if (Config::get('saml_idp_metadata_url')) {
     if ($idpMetadata_raw) {
         try {
-            $check = OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata_raw);
+            $check = OneLogin\Saml2\IdPMetadataParser::parseXML($idpMetadata_raw);
             print_r($check['idp']);
         } catch (Exception $e) {
             echo "Error: unable to read SAML Identity Provider (IDP) metadata from:\n" . Config::get('saml_idp_metadata_url') . "\n";
