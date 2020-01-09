@@ -280,6 +280,14 @@ class Factory
             ));
         }
 
+        /* Archive the xmls into a folder when we're done processing
+         * We could delete them at any time, but if we just deleted it at the end of every
+         * processing we'd have no idea how the schoolbox instance was populated - we'd
+         * have destroyed the source. Instead, chuck them into a folder which we can remove
+         * whenever we need
+         */
+        $bus->add(new KamarEndpoint\Cleanup($this->logger, $this->perform, Loader::getInstance()->get('stream_dir')));
+
         return $bus;
     }
 }

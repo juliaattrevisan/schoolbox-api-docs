@@ -24,7 +24,7 @@ class Setup implements IStrategy
     /**
      * @var string
      */
-    private const KAMAR_CACHE_DIR = 'kamar';
+    public const KAMAR_CACHE_DIR = 'kamar';
 
 
     /**
