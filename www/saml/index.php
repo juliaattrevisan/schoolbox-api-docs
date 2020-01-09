@@ -9,7 +9,7 @@
 
 require 'saml-setup.php';
 
-$auth = new OneLogin_Saml2_Auth($settingsInfo);
+$auth = new OneLogin\Saml2\Auth($settingsInfo);
 $returnUrl = null;
 
 // Include page as local URL (if it's set)

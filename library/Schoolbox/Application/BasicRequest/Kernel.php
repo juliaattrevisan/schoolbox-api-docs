@@ -25,12 +25,12 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
 use SitePage;
-use Twig_Environment;
+use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
-use Twig_Extension_Debug;
+use Twig\Extension\DebugExtension;
 use Twig_Extensions_Extension_Text;
-use Twig_Loader_Filesystem;
-use Twig_SimpleFilter;
+use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Alaress_Date_Locale_Config;
 use Alaress_Date_Format;
@@ -259,18 +259,18 @@ class Kernel extends WebKernelAbstract
                         $options['cache'] = $config->get('stream_dir') . '/templates/';
                     }
 
-                    /** @var Twig_Loader_Filesystem $loader */
+                    /** @var FilesystemLoader $loader */
                     $loader = $di->get('templateEngine:loader');
-                    $twig = new Twig_Environment($loader, $options);
+                    $twig = new Environment($loader, $options);
 
-                    $twig->addExtension(new Twig_Extension_Debug());
+                    $twig->addExtension(new DebugExtension());
                     $twig->addExtension(new Twig_Extensions_Extension_Text());
                     $twig->addExtension(new AdminNavigationRenderer());
 
                     // HTML Purifier filter - known to output safe HTML
 
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'purify',
                             array('Scrub', 'html'),
                             array('is_safe' => array('html'))
@@ -279,7 +279,7 @@ class Kernel extends WebKernelAbstract
 
                     // HTML2Text filter
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'html2text',
                             array('Scrub', 'html2text')
                         )
@@ -287,7 +287,7 @@ class Kernel extends WebKernelAbstract
 
                     // Cut sentence filter
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'cutSentence',
                             array('TextFormatter', 'cutSentence')
                         )
@@ -295,14 +295,14 @@ class Kernel extends WebKernelAbstract
 
                     // Bytes to string filter
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'bytes',
                             array('Alaress_Byte_Format', 'bytesToString')
                         )
                     );
 
                     $twig->addFilter(
-                        new Twig_SimpleFilter(
+                        new TwigFilter(
                             'column',
                             [ Collection::class, 'array_column' ]
                         )
@@ -340,7 +340,7 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di) {
                     $config      = $di->get('config');
-                    $baseLoader  = new Twig_Loader_Filesystem(array());
+                    $baseLoader  = new FilesystemLoader(array());
                     // Paths: prefer templates/{site_location} over templates/core
                     $basePath     = SITE_root.'/templates/';
                     $overridePath = $basePath.$config->get('site_location');

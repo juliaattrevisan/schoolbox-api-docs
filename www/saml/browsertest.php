@@ -1,27 +1,17 @@
 <?php
-use BrowscapPHP\Browscap;
-use Psr\Log\NullLogger;
-use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
+use Wolfcast\BrowserDetection;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Alaress\Saml\CacheReader;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 require "saml-setup.php";
 
-echo "<pre>";
-$bc = new Browscap(
-    new SimpleCacheAdapter(
-        new CacheReader(__DIR__ . '/../../tools/browscap')
-    ),
-    new NullLogger()
-);
+$browser = new BrowserDetection();
 
-$current_browser = $bc->getBrowser();
-echo "\nBrowser: " . $current_browser->browser . "\n";
-echo "Platform: " . $current_browser->platform . "\n";
-echo "Device Type: " . $current_browser->device_type . "\n";
+echo "\nBrowser: " . $browser->getName() ;
+echo "\nPlatform: " . $browser->getPlatform() ;
+echo "\nMobile: " . ($browser->isMobile() ? 'Yes' : 'No');
 
 echo "\nAttempt to use Kerberos/WIA with SAML for this browser? " . '' ."\n";
 var_dump(useSAMLKerberos());

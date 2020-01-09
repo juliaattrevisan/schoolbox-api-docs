@@ -1775,21 +1775,27 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Retrieves identifier property name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getIdentifierProperty()
+    public function getIdentifierProperty(): ?string
     {
-        return $this->getIdentifier()['property'];
+        if (!$this->getIdentifier()) {
+            return null;
+        }
+        return $this->getIdentifier()['property'] ?? null;
     }
 
     /**
      * Retrieves identifier column name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getIdentifierColumn()
+    public function getIdentifierColumn(): ?string
     {
-        return $this->getIdentifier()['column'];
+        if (!$this->getIdentifier()) {
+            return null;
+        }
+        return $this->getIdentifier()['column'] ?? null;
     }
 
     /**

@@ -33,7 +33,6 @@ node_modules/
 test/behavior/screenshots/*.png
 test/behavior/screenshots/*.html
 vagrantcache/
-tools/browscap/
 tools/xdebug.ini
 vagrant.yaml
 www/css/foundation/utils/_skin*.scss
@@ -41,7 +40,6 @@ www/css/foundation/utils/_custom*.scss
 .sass-cache/
 post-provision.sh
 .idea/
-browscap.ini
 *.lock
 !composer.lock
 !Gemfile.lock

@@ -11,7 +11,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 require 'saml-setup.php';
 
 $page = new SitePage(false);
-$auth = new OneLogin_Saml2_Auth($settingsInfo);
+$auth = new OneLogin\Saml2\Auth($settingsInfo);
 
 
 /* Handle Single Logout commands */
@@ -22,7 +22,7 @@ if (isset($_GET['sls'])) {
     try {
         SAMLDebugLog("Attempting SLS");
         $auth->processSLO(false, null, true);
-    } catch (OneLogin_Saml2_Error $e) {
+    } catch (OneLogin\Saml2\Error $e) {
         SAMLDebugLog("SLS Error: ".$e->getMessage());
         error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
     }
@@ -61,7 +61,7 @@ else if(isset($_POST['SAMLResponse'])) {
 
     try {
         $auth->processResponse($requestID);
-    } catch (OneLogin_Saml2_Error $e) {
+    } catch (OneLogin\Saml2\Error $e) {
         error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
     }
 

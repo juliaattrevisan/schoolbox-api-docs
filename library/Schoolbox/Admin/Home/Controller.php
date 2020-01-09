@@ -212,7 +212,7 @@ class Controller extends Base
                     break;
 
                 default:  //If unknown, skip output
-                    continue;
+                    continue 2;
             }
 
             if ($action != '') {

@@ -128,7 +128,7 @@ class NotificationBundle
             $atime = $a->getTimestamp();
             $btime = $b->getTimestamp();
 
-            return $dir * ($atime == $btime ? 0 : $atime > $btime ? 1 : -1);
+            return $dir * ($atime == $btime ? 0 : ($atime > $btime ? 1 : -1));
         });
 
         return $this;
@@ -143,4 +143,4 @@ class NotificationBundle
         $this->notifications = array_slice($this->notifications, $offset, $limit, false);
     }
 
-} 
+}

@@ -53,9 +53,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
-if [ "$phpversion" != "7.1" ];
+if [ "$phpversion" != "7.4" ];
 then
-    /usr/bin/update-alternatives --set php /usr/bin/php7.1;
+    /usr/bin/update-alternatives --set php /usr/bin/php7.4;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
@@ -176,10 +176,6 @@ cd /vagrant;
 tar -xzf $cachedir/$data_filename_short;
 rm -rf /vagrant/data/cache;
 /vagrant/tools/create-data-dirs.sh /vagrant/data;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Setting up browscap cache";
-mkdir -p /vagrant/tools/browscap;
-/vagrant/vendor/browscap/browscap-php/bin/browscap-php browscap:update --cache=/vagrant/tools/browscap/ --remote-file=Lite_PHP_BrowscapINI
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
 mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";

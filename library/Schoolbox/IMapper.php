@@ -57,9 +57,9 @@ interface IMapper
     /**
      * Retrieves identifier column name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getIdentifierColumn();
+    public function getIdentifierColumn(): ?string;
 
     /**
      * Create a PredicateBuilder for this Mapper's table.
@@ -112,9 +112,9 @@ interface IMapper
     /**
      * Retrieves identifier property name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getIdentifierProperty();
+    public function getIdentifierProperty(): ?string;
 
 
     /**

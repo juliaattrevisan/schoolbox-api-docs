@@ -63,9 +63,11 @@ class Session extends BaseSession {
      */
     protected function configureCookie()
     {
-        $this->setCookieParams([
-            'lifetime' => $this->getConfig()->get('session_length'),
-        ]);
+        if (!$this->isStarted()) {
+            $this->setCookieParams([
+                'lifetime' => $this->getConfig()->get('session_length'),
+            ]);
+        }
     }
 
     /**

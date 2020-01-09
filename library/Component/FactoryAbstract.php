@@ -165,7 +165,8 @@ abstract class Component_FactoryAbstract
 
                     try {
                         ///Parses the export of the parameter for the class
-                        $dependencyClass = preg_replace('/.*?(\w+)\s+\$' . $parameter->name . '.*/', '\\1', Reflection::export($parameter, true));
+                        //$parameterString = (string) new ReflectionClass($parameter);
+                        $dependencyClass = preg_replace('/.*?(\w+)\s+\$' . $parameter->name . '.*/', '\\1', (string) $parameter);
 
                         if (!empty($dependencyClass)) {
                             $dependencyList[] = new $dependencyClass;
