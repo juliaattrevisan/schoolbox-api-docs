@@ -716,7 +716,7 @@ class External_Tass_User implements External_UserInterface
             FROM dbo.tel_vw_telemf
             LEFT OUTER JOIN dbo.teacher ON dbo.tel_vw_telemf.emp_code = dbo.teacher.emp_code
             WHERE
-              (dbo.tel_vw_telemf.cust_code = '01') AND
+              (dbo.tel_vw_telemf.cust_code = '{$this->companyCode}') AND
               (dbo.tel_vw_telemf.term_date IS NULL)
               {$wherePositionText}
               {$wherePositionTitle}
