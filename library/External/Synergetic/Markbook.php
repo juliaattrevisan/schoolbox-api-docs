@@ -6,16 +6,16 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\UserMapper;
 use Alaress\Database\Predicate;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\User;
 
 /**
  * Synergetic Markbook Connector
@@ -89,18 +89,35 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * Returns the assessment information if found in remote system
+     * The Synergetic markbook syncs due works and quizzes, so long as they are
+     * not spec assessments.
      *
-     * Note this matches Synergetic's globally-configured year and semester,
-     * rather than in the context of a specific user.
-     *
-     * @param Activity $activity
-     * @return array
+     * @inheritDoc
      */
-    public function getAssessment(Activity $activity): array
+    public function isSyncable(IAssessable $assessment): bool
     {
-        return $this->getSynergeticMarkbookList($activity, $this->getSystemFileYear(), $this->getSystemFileSemester());
+        if ($assessment->isSpecification()) {
+            return false;
+        }
+        return $assessment instanceof Quiz || $assessment instanceof DueWork;
     }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @throws \Alaress\Database\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function syncAssessment(IAssessable $assessment): bool
+    {
+        if (!$this->hasAssessment($assessment)) {
+            return $this->createAssessment($assessment);
+        }
+        return $this->updateAssessment($assessment);
+    }
+
 
     /**
      * Returns TRUE if there are any markbooks in synergetic for this assessment.
@@ -117,27 +134,35 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @inheritdoc
      */
-    public function hasAssessment(Activity $activity): bool
+    public function hasAssessment(IAssessable $assessment): bool
     {
-        $folderCodes = $activity->getCategory()->getCodes()->getPropertyValues('code');
-        if (!\count($folderCodes)) {
+        if (!$this->isSyncable($assessment)) {
             return false;
         }
 
-        $folderCodeBindings    = Predicate\Builder::getBindings($folderCodes, 'code');
-        $assessmentFieldValues = $this->getAssessmentFieldValues($activity);
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
+        if (!count($folderCodes)) {
+            return false;
+        }
+
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
+            return false;
+        }
+
+        $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
 
         $sql = "
-            SELECT    COUNT(*) AS result 
-            FROM      StaffAssessmentMarkBook 
-            WHERE     HdgAbbrev2 = :markbookIdentifier AND    
-                      FileYear = :fileYear AND    
+            SELECT    COUNT(*) AS result
+            FROM      StaffAssessmentMarkBook
+            WHERE     HdgAbbrev2 = :markbookIdentifier AND
+                      FileYear = :fileYear AND
                       FileSemester = :fileSemester AND
                       ClassCode IN ({$folderCodeBindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
-            'markbookIdentifier' => $assessmentFieldValues["HdgAbbrev2"],
+        $params = array_merge([
+            'markbookIdentifier' => $markbookId,
             'fileYear'           => $this->getSystemFileYear(),
             'fileSemester'       => $this->getSystemFileSemester(),
         ], $folderCodeBindings->getParams());
@@ -159,18 +184,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * Returns true if ANY markbooks are created in Synergetic.
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      * @return bool
      * @throws \Alaress\Database\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createAssessment(Activity $assessment): bool
+    private function createAssessment(IAssessable $assessment): bool
     {
-        $folder = $assessment->getCategory();
-        $owner  = $assessment->getOwner();
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
 
-        if (!$this->isExternalIdValid($owner->getExternalId())) {
+        $owner = $this->retrieveOwnerFromAssessment($assessment);
+        if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
             return false;
         }
 
@@ -180,8 +207,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $semester   = $this->getSystemFileSemester();
 
         $result = false;
-        foreach ($folder->getCodes() as $code) {
-            if ($this->insertStaffMarkbook($assessment, $owner, $code->getCode(), $resultType, $year, $semester)) {
+        foreach ($this->retrieveFolderCodesFromAssessment($assessment) as $code) {
+            if ($this->insertStaffMarkbook($assessment, $owner, $code, $resultType, $year, $semester)) {
                 $result = true;
             }
         }
@@ -202,16 +229,25 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Alaress\Database\Exception
      */
-    public function updateAssessment(Activity $assessment): bool
+    private function updateAssessment(IAssessable $assessment): bool
     {
-        $folderCodes = $assessment->getCategory()->getCodes()->getPropertyValues('code');
-        if (!\count($folderCodes)) {
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
+
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
+        if (!count($folderCodes)) {
+            return false;
+        }
+
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
             return false;
         }
 
         $this->insertMarkbooksIfNotExists(
             $assessment,
-            $assessment->getCategory()->getCodes()->getPropertyValues('code'),
+            $folderCodes,
             $this->getSystemFileYear(),
             $this->getSystemFileSemester()
         );
@@ -221,27 +257,27 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $bindings              = Predicate\Builder::getBindings($folderCodes, 'code');
 
         $sql = "
-            UPDATE  StaffAssessmentMarkBook 
+            UPDATE  StaffAssessmentMarkBook
             SET     Heading = :heading,
                     HdgAbbrev1 = :headingAbbreviation1,
                     WeightingFactor = :weightingFactor,
                     ResultType = :resultType,
                     TestDate = :dueDate
-            WHERE   HdgAbbrev2 = :headingAbbreviation2 AND 
-                    FileYear = :fileYear AND  
+            WHERE   HdgAbbrev2 = :headingAbbreviation2 AND
+                    FileYear = :fileYear AND
                     FileSemester = :fileSemester AND
                     ClassCode IN ({$bindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
+        $params = array_merge([
             'heading'              => $assessmentFieldValues["Heading"],
             'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
-            'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
+            'headingAbbreviation2' => $markbookId,
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
             'resultType'           => $resultType,
             'fileYear'             => $this->getSystemFileYear(),
             'fileSemester'         => $this->getSystemFileSemester(),
-            'dueDate'              => $assessment->getDate()->getDatabase()
+            'dueDate'              => $assessment->getDueAt()->getDatabase(),
         ], $bindings->getParams());
 
         return $this->getConnector()->prepareQuery($sql, $params)->execute();
@@ -252,10 +288,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @inheritdoc
      * @throws \Alaress\Database\Exception
      */
-    public function deleteAssessment(Activity $assessment): bool
+    public function deleteAssessment(IAssessable $assessment): bool
     {
-        $folderCodes = $assessment->getCategory()->getCodes()->getPropertyValues('code');
-        if (!\count($folderCodes)) {
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
+
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
+        if (!count($folderCodes)) {
+            return false;
+        }
+
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
             return false;
         }
 
@@ -281,8 +326,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         staffBook.ClassCode IN ({$bindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
-            $headingAbbreviation2 => $this->getMarkbookIdentifier($assessment),
+        $params = array_merge([
+            $headingAbbreviation2 => $markbookId,
             $fileYear             => $this->getSystemFileYear(),
             $fileSemester         => $this->getSystemFileSemester(),
         ], $bindings->getParams());
@@ -311,70 +356,42 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * However, we still want to sync a comment from SB -> Synergetic when it is published.
      * In this case, we enter a -1 to represent 'No mark' in Synergetic
      *
-     * @param ReturnedWork|QuizAttempt $feedback
+     * @param IFeedback $feedback
      * @return bool
      * @throws \Alaress\Database\Exception
      * @throws Exception
      */
-    public function setMark($feedback): bool
+    public function syncFeedback(IFeedback $feedback): bool
     {
-        $mark = null;
-        $markText = null;
-
-        if ($feedback instanceof ReturnedWork) {
-            // Handle submission box result
-            $box      = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
-            $activity = $this->buildActivityFromSubmissionBox($box);
-            try {
-                $marker = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                $marker = $e->getDeletedObject();
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                return false;
-            }
-            try {
-                $student = UserMapper::getInstance()->findById($feedback->getOwner()->getId());
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                return false;
-            }
-
-            // If the mark type is set to none then we shouldn't be saving a normalised mark
-            if ($box->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
-                $mark = $feedback->getNormalizedMark();
-                $markText = $feedback->getHumanReadableMark();
-            }
-            $comment = $feedback->getComment();
-
-        } elseif ($feedback instanceof QuizAttempt) {
-            // Handle quiz attempt
-            $quiz     = QuizMapper::getInstance()->findById($feedback->getQuiz()->getId());
-            $activity = $this->buildActivityFromQuiz($quiz);
-            $student  = UserMapper::getInstance()->findById($feedback->getUser()->getId());
-            $marker   = $activity->getAssessment()->getUser();
-
-            // TODO: Some old handler action needs to be deprecated
-            $evAttempt = new Assess_Attempt();
-            $total     = (float)$evAttempt->getTotalMarks($feedback->getQuiz()->getId(), $feedback->getId());
-            $actual    = (float)$evAttempt->getMarksForAttempt($feedback->getId());
-            if ($total > 0) {
-                $mark = ($actual / $total) * 100;
-            } else {
-                $mark = 0;
-            }
-            $comment = '';
-
-        } else {
-            throw new Exception('Unknown object passed');
-        }
-
-        if (!(
-            $this->isExternalIdValid($student->getExternalId())
-            && $this->isExternalIdValid($marker->getExternalId())
-        )) {
+        if (!$this->isSyncable($feedback->getAssessable())) {
             return false;
         }
 
-        return $this->setActivityMark($activity, $marker, $student, $mark, $markText, $comment);
+        $student = $feedback->getReviewee();
+        $marker  = $feedback->getReviewer();
+
+        // Don't sync marks if:
+        // * Student is deleted
+        // * Student's ID is invalid
+        // * Marker's ID is invalid
+        if ($student->isDeleted()) {
+            return false;
+        }
+        if (!$this->isExternalIdValid($student->getExternalId())) {
+            return false;
+        }
+        if (!$this->isExternalIdValid($marker->getExternalId())) {
+            return false;
+        }
+
+        return $this->setActivityMark(
+            $feedback->getAssessable(),
+            $feedback->getReviewer(),
+            $feedback->getReviewee(),
+            $feedback->getNormalisedMark(),
+            $feedback->getHumanReadableMark(),
+            $feedback->getComment()
+        );
     }
 
 
@@ -383,23 +400,28 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * Supports creating the markbook in a file year/semester other than the globally-configured values.
      *
-     * @param Activity        $assessment
-     * @param \Schoolbox\User $owner
-     * @param string          $classCode
-     * @param string          $resultType
-     * @param int             $fileYear
-     * @param int             $fileSemester
+     * @param IAssessable $assessment
+     * @param User        $owner
+     * @param string      $classCode
+     * @param string      $resultType
+     * @param int         $fileYear
+     * @param int         $fileSemester
      * @return bool
      * @throws \Alaress\Database\Exception
      */
     private function insertStaffMarkbook(
-        Activity $assessment,
-        \Schoolbox\User $owner,
+        IAssessable $assessment,
+        User $owner,
         string $classCode,
         string $resultType,
         int $fileYear,
         int $fileSemester
     ): bool {
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
+            return false;
+        }
+
         $externalClass = new External_Synergetic_Class();
         $class         = $externalClass->getClass($classCode, $owner, $fileYear, $fileSemester);
 
@@ -454,10 +476,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'classCode'            => $class['ClassCode'],
             'heading'              => $assessmentFieldValues["Heading"],
             'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
-            'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
+            'headingAbbreviation2' => $markbookId,
             'resultType'           => $resultType,
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
-            'dueDate'              => $assessment->getDate()->getDatabase()
+            'dueDate'              => $assessment->getDueAt()->getDatabase(),
         ]);
 
         return $statement->execute();
@@ -468,31 +490,23 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Gets database field values out of an assessment. Gets the following fields:
      * * Heading
      * * HdgAbbrev1
-     * * HdgAbbrev2 (used as the identifier for this row)
      * * WeightingFactor
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      *
      * @return array
      */
-    protected function getAssessmentFieldValues(Activity $assessment): array
+    private function getAssessmentFieldValues(IAssessable $assessment): array
     {
-        $weight = 0;
-
-        if ($assessment->getSubmissionBox() instanceof Schoolbox\Assessment\Component\SubmissionBox) {
-            $weight = $assessment->getSubmissionBox()->getWeight();
-        } elseif ($assessment->getAssessment() instanceof Quiz) {
-            $weight = $assessment->getAssessment()->getWeight();
-        }
+        $weight = $assessment->getWeight();
 
         // DB-level limits:
         // Heading: 255 chars
-        // HdgAbbrev1, HdgAbbrev2: 10 chars
+        // HdgAbbrev1: 10 chars
         // WeightingFactor: 0-9999
         return [
-            'Heading'         => $this->truncateForDatabase($assessment->getName(), 255),
-            'HdgAbbrev1'      => $this->truncateForDatabase($assessment->getName(), 10),
-            'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
+            'Heading'         => $this->truncateForDatabase($assessment->getTitle(), 255),
+            'HdgAbbrev1'      => $this->truncateForDatabase($assessment->getTitle(), 10),
             'WeightingFactor' => max(0, min($weight, 9999)),
         ];
     }
@@ -541,52 +555,22 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
-     * @param SubmissionBox $submissionBox
-     * @return Activity
-     */
-    private function buildActivityFromSubmissionBox(SubmissionBox $submissionBox): Activity
-    {
-        $activity = new Activity();
-        $activity->setSubmissionBox($submissionBox)
-            ->setOwner($submissionBox->getOwner())
-            ->setCategory($submissionBox->getCategory())
-            ->setDate($submissionBox->getDueDate());
-        return $activity;
-    }
-
-
-    /**
-     * @param Quiz $quiz
-     * @return Activity
-     */
-    private function buildActivityFromQuiz(Quiz $quiz): Activity
-    {
-        $activity = new Activity();
-        $activity->setAssessment($quiz)
-            ->setOwner($quiz->getUser())
-            ->setCategory($quiz->getCategory())
-            ->setDate($quiz->getFinish());
-        return $activity;
-    }
-
-
-    /**
      * Inserts/Updates/Deletes a student's mark and comment in Synergetic
      *
      * Returns whether any changes were made to the remote system.
      *
-     * @param Activity        $activity
-     * @param \Schoolbox\User $marker
-     * @param \Schoolbox\User $student
-     * @param null|float      $mark
-     * @param null|string     $markText
-     * @param string          $comment
+     * @param IAssessable $activity
+     * @param User        $marker
+     * @param User        $student
+     * @param null|float  $mark
+     * @param null|string $markText
+     * @param string      $comment
      * @return bool
      * @throws \Alaress\Database\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    private function setActivityMark(Activity $activity, Schoolbox\User $marker, Schoolbox\User $student, $mark, $markText, $comment): bool
+    private function setActivityMark(IAssessable $activity, Schoolbox\User $marker, Schoolbox\User $student, $mark, $markText, $comment): bool
     {
         $studentExternalId   = $student->getExternalId();
         $studentFileYear     = $this->getUserFileYear($studentExternalId);
@@ -597,11 +581,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          * In this case, the student's marks should only be written to the markbooks for folder codes that the student is enrolled in.
          */
         /** @var string[] $folderCodes */
-        $folderCodes = $activity->getCategory()->getCodes()->getPropertyValues('code');
-        $classCodes  = \array_column($this->externalUser->getSubjectList($student), 'code');
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
+        $classCodes  = array_column($this->externalUser->getSubjectList($student), 'code');
 
         // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
-        $markbookFolderCodes = \array_intersect($folderCodes, $classCodes);
+        $markbookFolderCodes = array_intersect($folderCodes, $classCodes);
 
         // In this context, we need to ensure the fileYear etc match the student, not the marker
         $this->insertMarkbooksIfNotExists($activity, $markbookFolderCodes, $studentFileYear, $studentFileSemester);
@@ -613,14 +597,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          */
         $markValue = null === $mark
             ? self::NO_MARK_GIVEN
-            : round($mark,2);
+            : round($mark, 2);
 
-        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText)) ;
+        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText));
 
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
             // Ignore markbooks if the student is not involved in them
-            if (!\in_array($assessmentRemote['ClassCode'], $markbookFolderCodes, true)) {
+            if (!in_array($assessmentRemote['ClassCode'], $markbookFolderCodes, true)) {
                 continue;
             }
 
@@ -658,7 +642,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Update a student's existing mark/comment in synergetic
      *
      * @param array           $assessmentRemote
-     * @param \Schoolbox\User $student
+     * @param User            $student
      * @param                 $markValue
      * @param                 $comment
      * @return bool
@@ -701,8 +685,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Delete a student's mark/comment from synergetic
      *
-     * @param array           $assessmentRemote
-     * @param \Schoolbox\User $student
+     * @param array $assessmentRemote
+     * @param User  $student
      * @return bool
      * @throws \Alaress\Database\Exception
      */
@@ -735,17 +719,17 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Insert a student's mark/comment into Synergetic
      *
-     * @param Activity        $activity
-     * @param array           $assessmentRemote
-     * @param \Schoolbox\User $marker
-     * @param \Schoolbox\User $student
-     * @param int             $markValue
-     * @param string          $comment
+     * @param IAssessable $activity
+     * @param array       $assessmentRemote
+     * @param User        $marker
+     * @param User        $student
+     * @param int         $markValue
+     * @param string      $comment
      * @return bool
      * @throws \Alaress\Database\Exception
      */
     private function insertActivityMark(
-        Activity $activity,
+        IAssessable $activity,
         array $assessmentRemote,
         Schoolbox\User $marker,
         Schoolbox\User $student,
@@ -793,7 +777,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'markbookSeq'      => $assessmentRemote['MarkBookSeq'],
             'mark'             => $markValue,
             'topicComment'     => $comment,
-            'resultDate'       => $activity->getDate()->getDatabase(),
+            'resultDate'       => $activity->getDueAt()->getDatabase(),
             'markerExternalId' => $marker->getExternalId(),
         ];
         $statement = $this->getConnector()->prepareQuery($sql);
@@ -804,19 +788,18 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Determine what result type this assessment should have.
      *
-     * @param Activity $assessment
+     * @param IAssessable $assessment
      * @return string
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    private function getResultType(Activity $assessment): string
+    private function getResultType(IAssessable $assessment): string
     {
         $defaultType = 'OGRaw';
 
         // Does this assessment have a work type with an external result type?
-        if (null !== $assessment->getType()) {
-            $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
-            $resultType = $workType->getExternalResultType();
+        if (null !== $assessment->getWorkType()) {
+            $resultType = $assessment->getWorkType()->getExternalResultType();
         }
 
         // We know OGRaw is in the DB, and if it's not there's bigger problems
@@ -858,14 +841,29 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Returns the string used to identify this assessment in the markbook.
      *
-     * @param Activity $assessment
-     * @return string
+     * @param IAssessable $assessment
+     * @return string|null
      */
-    private function getMarkbookIdentifier(Activity $assessment): string
+    private function getMarkbookIdentifier(IAssessable $assessment): ?string
     {
         // This column is limited to 10 characters
-        $id = ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
-        return $this->truncateForDatabase($id, 10);
+        // Need the original ID as well here?
+        $prefix  = '';
+        $syncIds = [];
+        if ($assessment instanceof DueWork) {
+            $prefix  = self::SUBMISSION_PREFIX;
+            $syncIds = SubmissionBoxMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
+        } elseif ($assessment instanceof Quiz) {
+            $prefix  = self::ASSESSMENT_PREFIX;
+            $syncIds = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
+        }
+
+        // Must be exactly one item
+        if (count($syncIds) !== 1) {
+            return null;
+        }
+
+        return $this->truncateForDatabase($prefix . $syncIds[0], 10);
     }
 
 
@@ -874,29 +872,42 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * Returns true if any markbooks were created.
      *
-     * @param Activity $activity
-     * @param string[] $folderCodes
-     * @param int      $fileYear
-     * @param int      $fileSemester
+     * @param IAssessable $activity
+     * @param string[]    $folderCodes
+     * @param int         $fileYear
+     * @param int         $fileSemester
      * @return bool
      * @throws \Alaress\Database\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    private function insertMarkbooksIfNotExists(Activity $activity, array $folderCodes, int $fileYear, int $fileSemester): bool
+    private function insertMarkbooksIfNotExists(IAssessable $activity, array $folderCodes, int $fileYear, int $fileSemester): bool
     {
-        if (!\count($folderCodes)) {
+        if (!count($folderCodes)) {
+            return false;
+        }
+
+        $owner = $this->retrieveOwnerFromAssessment($activity);
+        if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
             return false;
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
-        $remoteFolderCodes    = \array_column($remoteAssessmentList, 'ClassCode');
-        $codesNotInRemote     = \array_diff($folderCodes, $remoteFolderCodes);
+        $remoteFolderCodes    = array_column($remoteAssessmentList, 'ClassCode');
+        $codesNotInRemote     = array_diff($folderCodes, $remoteFolderCodes);
         $resultType           = $this->getResultType($activity);
 
         $isCreated = false;
         foreach ($codesNotInRemote as $folderCode) {
-            if ($this->insertStaffMarkbook($activity, $activity->getOwner(), $folderCode, $resultType, $fileYear, $fileSemester)) {
+
+            if ($this->insertStaffMarkbook(
+                $activity,
+                $owner,
+                $folderCode,
+                $resultType,
+                $fileYear,
+                $fileSemester
+            )) {
                 $isCreated = true;
             }
         }
@@ -954,15 +965,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Returns the set of markbooks in synergetic that match this assessment, and the specified file year/semester
      *
-     * @param Activity $activity
-     * @param int      $fileYear
-     * @param int      $fileSemester
+     * @param IAssessable $activity
+     * @param int         $fileYear
+     * @param int         $fileSemester
      * @return array
      */
-    private function getSynergeticMarkbookList(Activity $activity, int $fileYear, int $fileSemester): array
+    private function getSynergeticMarkbookList(IAssessable $activity, int $fileYear, int $fileSemester): array
     {
-        $folderCodes = $activity->getCategory()->getCodes()->getPropertyValues('code');
-        if (!\count($folderCodes)) {
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
+        if (!count($folderCodes)) {
+            return [];
+        }
+
+        $markbookId = $this->getMarkbookIdentifier($activity);
+        if (!isset($markbookId)) {
             return [];
         }
 
@@ -989,12 +1005,69 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       ClassCode IN ({$folderCodeBindings->getPlaceholder()})
         ";
 
-        $params = \array_merge([
-            'markbookIdentifier' => $this->getMarkbookIdentifier($activity),
+        $params = array_merge([
+            'markbookIdentifier' => $markbookId,
             'fileYear'           => $fileYear,
             'fileSemester'       => $fileSemester,
         ], $folderCodeBindings->getParams());
 
         return $this->getConnector()->executeQuery($sql, $params)->fetchAll();
+    }
+
+
+    /**
+     * Retrieve the owner from the assessment.
+     *
+     * IAssessable objects do not have the concept of an owner: only the
+     * underlying due work or quiz store this.
+     *
+     * @param IAssessable $assessment
+     * @return User|null
+     */
+    private function retrieveOwnerFromAssessment(IAssessable $assessment): ?User
+    {
+        if ($assessment instanceof DueWork) {
+            return SubmissionBoxMapper::getInstance()
+                                      ->findOneByColumn('assessment_id', $assessment->getId())
+                                      ->getOwner();
+        }
+        if ($assessment instanceof Quiz) {
+            return QuizMapper::getInstance()
+                             ->findOneByColumn('assessment_id', $assessment->getId())
+                             ->getUser();
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieve the folder from the assessment
+     *
+     * @param IAssessable $assessment
+     * @return FolderModel
+     */
+    private function retrieveFolderFromAssessment(IAssessable $assessment): FolderModel
+    {
+        return $assessment->getBaseContext()->getFolder();
+    }
+
+
+    /**
+     * Retrieve folder codes out of the assessment
+     *
+     * @param IAssessable $assessment
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function retrieveFolderCodesFromAssessment(IAssessable $assessment): array
+    {
+        $folder      = $this->retrieveFolderFromAssessment($assessment);
+        $folderCodes = $folder->getCodes();
+        if (!isset($folderCodes)) {
+            // Need to actually load folder codes
+            $folderCodes = FolderMapper::getInstance()->findById($folder->getId());
+        }
+        return $folderCodes->getPropertyValues('code');
     }
 }

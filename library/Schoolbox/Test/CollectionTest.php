@@ -93,7 +93,6 @@ class CollectionTest extends TestCase
             [\Schoolbox\CampusMapper::getInstance()->createCollection()],
             [new \Schoolbox\MappingCollection()],
             [new \Schoolbox\External\SubjectCollection()],
-            [new \Schoolbox\Assessment\ActivityCollection()],
             [new \Schoolbox\GenericCollection(User::class)],
         ];
     }

@@ -121,7 +121,7 @@ class MapperProxy
      */
     public function findById($id)
     {
-        return $this->findSingle('id', $id, false);
+        return $this->findOneByColumn('id', $id, false);
     }
 
     /**
@@ -162,7 +162,7 @@ class MapperProxy
      */
     public function findByIdForReview($id, User $student = null)
     {
-        return $this->findSingle('id', $id, true, $student);
+        return $this->findOneByColumn('id', $id, true, $student);
     }
 
 
@@ -208,7 +208,7 @@ class MapperProxy
      */
     public function findByQuizId($quizId, User $student = null)
     {
-        return $this->findSingle('q.assess_id', $quizId, true, $student);
+        return $this->findOneByColumn('q.assess_id', $quizId, true, $student);
     }
 
     /**
@@ -234,7 +234,7 @@ class MapperProxy
      */
     public function findByDueWorkId($dueWorkId, User $student = null)
     {
-        return $this->findSingle('d.id', $dueWorkId, true, $student);
+        return $this->findOneByColumn('d.id', $dueWorkId, true, $student);
     }
 
 
@@ -260,7 +260,7 @@ class MapperProxy
      */
     public function findByTaskId($taskId, User $student = null)
     {
-        return $this->findSingle('t.id', $taskId, true, $student);
+        return $this->findOneByColumn('t.id', $taskId, true, $student);
     }
 
 
@@ -1037,27 +1037,10 @@ class MapperProxy
     }
 
     /**
-     * @param string $column
-     * @param        $value
-     * @return IAssessable
-     * @throws DefinitionException
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws MapperException\Deleted
-     * @throws UnexpectedValueException
-     */
-    public function findOneByColumn(string $column, $value): IAssessable
-    {
-        return $this->findSingle($column, $value, false);
-    }
-
-
-    /**
-     * Helper function for finding a single assessment by a column and value.
+     * Find a single assessment by a column and value.
      *
      * @param string    $column
-     * @param int       $value
+     * @param mixed     $value
      * @param bool      $loadParticipants Should we load participations?
      * @param null|User $student          If specified, only load this user's interactions
      * @return IAssessable
@@ -1068,7 +1051,7 @@ class MapperProxy
      * @throws MapperException\Deleted if the assessment was deleted
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    protected function findSingle($column, $value, bool $loadParticipants, User $student = null)
+    public function findOneByColumn(string $column, $value, bool $loadParticipants = false, User $student = null): IAssessable
     {
         try {
             // Load model and its participants

@@ -16,17 +16,11 @@
 use Aura\Di\Container as Injector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Application\Daemon;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\User;
-use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -34,19 +28,27 @@ $kernel = new Daemon\Kernel(
     'Schoolbox Markbook Sync Script',
     [
         Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'vp::h::',
-        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['help', 'start::', 'end::', 'year::', 'semester::', 'update-only', 'dry-run'],
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => [
+            'help',
+            'start::',
+            'end::',
+            'year::',
+            'semester::',
+            'update-only',
+            'dry-run',
+        ],
     ]
 );
 
 /**
  * Recursive function that retrieves the children of a folder that have class codes attached.
  *
- * @param $folderId
+ * @param                                  $folderId
  * @param Schoolbox\Resource\Folder\Mapper $folderMapper
- * @param array $catsWithCodes
+ * @param array                            $catsWithCodes
  * @return Folder[]
  */
-function traverse($folderId, $folderMapper, $catsWithCodes = array())
+function traverse($folderId, $folderMapper, $catsWithCodes = [])
 {
     $allFolders = $folderMapper->findByParent($folderId);
 
@@ -75,7 +77,7 @@ function help($config)
     if ($config->get('external_type') === 'synergetic') {
         $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook and student marks, format --year=2016 (must be used with semester parameter)\n";
         $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook and student marks, --semester=1 (must be used with year parameter)\n";
-        $addParamsShort = "[--year=yyyy] [--semester=s] ";
+        $addParamsShort       = "[--year=yyyy] [--semester=s] ";
     }
 
     // Get pretty uppercased SIS name
@@ -83,9 +85,9 @@ function help($config)
     $remoteSystemName = ucwords($config->get('external_type'));
 
     echo <<<HELP
-    
-Schoolbox Markbook Sync Script    
-    
+
+Schoolbox Markbook Sync Script
+
 Description:   Syncs existing markbook data from Schoolbox into {$remoteSystemName}
 Usage:         php sync.php -p=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
 
@@ -94,13 +96,13 @@ Usage:         php sync.php -p=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] 
     --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
     --dry-run:           if set, does not actually update anything, but shows what would be updated
     --update-only:       if set, will not create any new items in the remote system, only updates existing markbooks
-{$additionalParameters}                         
+{$additionalParameters}
 
 HELP;
 
 }
 
-$kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     $help       = isset($opts['h']) || isset($opts['help']);
     $parentId   = $opts['p'] ?? 0;
@@ -124,15 +126,12 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
         exit(0);
     }
 
+    /** @var AssessmentDataSource $assessmentDataSource */
+    $assessmentDataSource = $di->get('assessmentDataSource');
+
     // Get instance of mappers
 
     $folderMapper = FolderMapper::getInstance();
-    $submissionMapper = SubmissionBoxMapper::getInstance();
-    $onlineAssessmentMapper = QuizMapper::getInstance();
-    $attemptMapper = QuizAttemptMapper::getInstance();
-
-    /** @noinspection PhpDeprecationInspection */
-    $markbookHandler = new SubmissionReturn();
 
     // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
     if ($config->get('external_type') === 'synergetic') {
@@ -150,7 +149,7 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
     // Determine the time period we want to sync
 
     $startTime = new Alaress_Date_Format;
-    $endTime = new Alaress_Date_Format;
+    $endTime   = new Alaress_Date_Format;
 
     if ($start && $end) {
 
@@ -203,11 +202,12 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
         $folderList[$parentId] = $folderMapper->findById($parentId);
     }
 
-    $folderList = $folderList + traverse($parentId, $folderMapper);
+    /** @noinspection AdditionOperationOnArraysInspection */
+    $folderList += traverse($parentId, $folderMapper);
 
     // Make sure we got a result
 
-    if (count($folderList) == 0) {
+    if (count($folderList) === 0) {
         $log->info('No matching folders were found, nothing to sync.');
         exit(0);
     }
@@ -231,182 +231,75 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
 
         $log->info("{$action}{$folder->getName()} ({$code})");
 
-        // Process submission boxes
+        // Process assessments
 
-        $submissionBoxList = $submissionMapper->getDueActivities(
-            [$folder->getId()],
-            $startTime->getUnixTimeStamp(),
-            $endTime->getUnixTimeStamp()
+        $assessmentList = $assessmentDataSource->findAllByFolderIdForReview(
+            $folder->getId(),
+            null,
+            [
+                'due_after'  => $startTime,
+                'due_before' => $endTime,
+            ]
         );
 
-        // Check if we found anything
+        foreach ($assessmentList as $assessment) {
+            if (!$markbookExternal->isSyncable($assessment)) {
+                continue;
+            }
 
-        if ($submissionBoxList->count() == 0) {
+            $action = str_pad("Assessment:", 30, " ");
 
-            // Might want to log something
+            $log->info("    {$action}{$assessment->getTitle()} ({$assessment->getId()})");
 
-        } else {
+            // Check if we are allowed to create new markbook entries
 
-            // Iterate all submissions
+            if (!$updateOnly) {
 
-            /** @var Activity $submissionBox */
-            foreach ($submissionBoxList as $submissionBox) {
+                // Creation allowed
 
-                $action = str_pad("Submission Box:", 30, " ");
+                $action = str_pad("Action:", 30, " ");
+                $log->info("    {$action}Create/Update");
 
-                $log->info("    {$action}{$submissionBox->getName()} ({$submissionBox->getId()})");
-
-                // Check if we are allowed to create new markbook entries
-
-                if (!$updateOnly) {
-
-                    // Creation allowed
-
-                    $action = str_pad("Action:", 30, " ");
-                    $log->info("    {$action}Create/Update");
-
-                    if (!$dryRun) {
-                        if (!$markbookExternal->hasAssessment($submissionBox)) {
-                            $markbookExternal->createAssessment($submissionBox);
-                        } else {
-                            $markbookExternal->updateAssessment($submissionBox);
-                        }
-                    }
-
-                } else {
-
-                    // No creation of new assessments in markbook is allowed
-
-                    $action = str_pad("Action:", 30, " ");
-                    $log->info("    {$action}Update Only");
-
-                    if (!$dryRun) {
-                        if ($markbookExternal->hasAssessment($submissionBox)) {
-                            $markbookExternal->updateAssessment($submissionBox);
-                        }
-                    }
+                if (!$dryRun) {
+                    $markbookExternal->syncAssessment($assessment);
                 }
 
-                // Retrieve the class list for the submission box
+            } else {
 
-                $action = str_pad("Submission Returns Found:", 30, " ");
+                // No creation of new assessments in markbook is allowed
 
-                $classList = $markbookHandler->getStudentListByBoxId($submissionBox->getId());
-                $log->info("    {$action}" . count($classList));
+                $action = str_pad("Action:", 30, " ");
+                $log->info("    {$action}Update Only");
 
-                /** @var User $student */
-                foreach ($classList as $student) {
-                    $result = $markbookHandler->getByUser($student['uid'], $submissionBox->getId());
-
-                    if (empty($result)) {
-                        continue;
-                    }
-
-                    // Create some fake user objects
-
-                    $owner = new User();
-                    $owner->setId($result[0]['owner']);
-
-                    $marker = new User();
-                    $marker->setId($result[0]['marker']);
-
-                    // Pretending to be a mapper even though we don't have one yet
-
-                    $return = new ReturnedWork();
-                    $return->setSubmissionBox($submissionBox->getSubmissionBox());
-                    $return->setNormalizedMark($result[0]['norm_mark']);
-                    $return->setHumanReadableMark($result[0]['visible_mark'] ?: $result[0]['mark']);
-                    $return->setMarker($marker);
-                    $return->setOwner($owner);
-                    $return->setComment($result[0]['comment']);
-
-                    $mark = $result[0]['norm_mark'];
-
-                    if (empty($mark)) {
-                        $mark = 'Unmarked';
-                    } else {
-                        $mark = round($mark, 2);
-                    }
-
-                    $name = str_pad("{$student['firstname']} {$student['lastname']} ({$student['synergy_id']}):", 26, " ");
-                    $log->info("        {$name}{$mark}");
-
-                    if (!$dryRun) {
-                        $markbookExternal->setMark($return);
-
-                    }
+                if (!$dryRun && $markbookExternal->hasAssessment($assessment)) {
+                    $markbookExternal->syncAssessment($assessment);
                 }
             }
-        }
 
-        // Process quizzes
+            // Retrieve the class list for the submission box
 
-        $quizList = $onlineAssessmentMapper->getDueActivities(
-            [$folder->getId()],
-            $startTime->getUnixTimeStamp(),
-            $endTime->getUnixTimeStamp()
-        );
+            $action        = str_pad("Assessment Feedback Found:", 30, " ");
+            $feedbackCount = 0;
+            foreach ($assessment->getAllParticipants() as $participant) {
+                if ($participant->hasPublishedFeedback()) {
+                    $feedbackCount++;
+                }
+            }
 
-        if ($quizList->count() == 0) {
+            $log->info("    {$action}" . $feedbackCount);
 
-            // Might want to log something
-
-        } else {
-
-            /** @var Activity $activity */
-            foreach ($quizList as $activity) {
-                $quiz = $activity->getAssessment();
-
-                $action = str_pad("Quiz: ", 30, " ");
-
-                $log->info("    {$action}{$quiz->getTitle()} ({$quiz->getId()})");
-
-                if ($markbookExternal->hasAssessment($activity)) {
-
-                    $action = str_pad("Updating assessment:", 30, " ");
-
-                    $log->info("    {$action}{$activity->getName()}");
-
-                    if (!$dryRun) {
-                        $markbookExternal->updateAssessment($activity);
-                    }
-
-                } elseif (!$updateOnly) {
-
-                    $action = str_pad("Creating assessment:", 30, " ");
-
-                    $log->info("    {$action}{$activity->getName()}");
-
-                    if (!$dryRun) {
-                        $markbookExternal->createAssessment($activity);
-                    }
-
-                } else {
-
-                    // Markbook didn't exist in external and we are in update only mode, nothing else we can do
-
-                    $action = str_pad("Skipping:", 30, " ");
-
-                    $log->warning("{$action}{$activity->getName()}");
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $feedback = $participant->findMostRecentInstructorGivenFeedback();
+                if (!$feedback) {
                     continue;
                 }
 
-                $action = str_pad("Students Found:", 30, " ");
+                $student = $participant->getUser();
+                $name    = str_pad("{$student->getFirstname()} {$student->getLastname()} ({$student->getExternalId()}):", 26, " ");
+                $log->info("        {$name}{$feedback->getHumanReadableMark()}");
 
-                $classList = $attemptMapper->getAllAttempts($quiz->getId(), array('most_recent' => true));
-                $log->info("    {$action}" . count($classList));
-
-                foreach ($classList as $studentID => $result) {
-                    // Pretending to be a mapper, even though I dont have one yet.
-                    $return = new QuizAttempt();
-                    $return->setQuiz($quiz);
-                    $return->setId($result[0]['attempt_id']);
-                    $return->setUser(new User);
-                    $return->getUser()->setId($studentID);
-
-                    if (!$dryRun) {
-                        $markbookExternal->setMark($return);
-                    }
+                if (!$dryRun) {
+                    $markbookExternal->syncFeedback($participant->findMostRecentInstructorGivenFeedback());
                 }
             }
         }

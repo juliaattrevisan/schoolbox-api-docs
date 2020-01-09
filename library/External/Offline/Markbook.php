@@ -12,24 +12,17 @@
  */
 
 use External\IOfflineConnector;
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 
 class External_Offline_Markbook implements External_MarkbookInterface, IOfflineConnector
 {
     /**
-     * @inheritdoc
+     * The offline markbook doesn't sync anything.
+     *
+     * @inheritDoc
      */
-    public function getAssessment(Activity $assessment): array
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasAssessment(Activity $assessment): bool
+    public function isSyncable(IAssessable $assessment): bool
     {
         return false;
     }
@@ -37,7 +30,7 @@ class External_Offline_Markbook implements External_MarkbookInterface, IOfflineC
     /**
      * @inheritdoc
      */
-    public function createAssessment(Activity $assessment): bool
+    public function syncAssessment(IAssessable $assessment): bool
     {
         return false;
     }
@@ -45,7 +38,7 @@ class External_Offline_Markbook implements External_MarkbookInterface, IOfflineC
     /**
      * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment): bool
+    public function hasAssessment(IAssessable $assessment): bool
     {
         return false;
     }
@@ -53,18 +46,15 @@ class External_Offline_Markbook implements External_MarkbookInterface, IOfflineC
     /**
      * @inheritDoc
      */
-    public function deleteAssessment(Activity $assessment): bool
+    public function deleteAssessment(IAssessable $assessment): bool
     {
         return false;
     }
 
     /**
      * @inheritdoc
-     *
-     * @param ReturnedWork|QuizAttempt $returnedWork
-     * @return bool
      */
-    public function setMark($returnedWork): bool
+    public function syncFeedback(IFeedback $returnedWork): bool
     {
         return false;
     }

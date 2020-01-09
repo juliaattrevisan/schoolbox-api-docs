@@ -5,9 +5,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 
 class External_Markbook implements External_MarkbookInterface
 {
@@ -31,56 +30,47 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function getAssessment(Activity $assessment): array
+    public function isSyncable(IAssessable $assessment): bool
     {
-        return $this->database->getAssessment($assessment);
+        return $this->database->isSyncable($assessment);
     }
 
 
     /**
      * @inheritdoc
      */
-    public function hasAssessment(Activity $assessment): bool
+    public function syncAssessment(IAssessable $assessment): bool
+    {
+        return $this->database->syncAssessment($assessment);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function hasAssessment(IAssessable $assessment): bool
     {
         return $this->database->hasAssessment($assessment);
     }
 
 
     /**
-     * @inheritdoc
-     */
-    public function createAssessment(Activity $assessment): bool
-    {
-        return $this->database->createAssessment($assessment);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function updateAssessment(Activity $assessment): bool
-    {
-        return $this->database->updateAssessment($assessment);
-    }
-
-
-    /**
      * @inheritDoc
      */
-    public function deleteAssessment(Activity $assessment): bool
+    public function deleteAssessment(IAssessable $assessment): bool
     {
         return $this->database->deleteAssessment($assessment);
     }
 
 
     /**
-     * @param ReturnedWork|QuizAttempt $returnedWork
+     * @param IFeedback $returnedWork
      * @return bool
      *
      * @inheritdoc
      */
-    public function setMark($returnedWork): bool
+    public function syncFeedback(IFeedback $returnedWork): bool
     {
-        return $this->database->setMark($returnedWork);
+        return $this->database->syncFeedback($returnedWork);
     }
 }

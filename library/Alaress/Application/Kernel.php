@@ -10,9 +10,10 @@ namespace Alaress\Application;
 
 use Aura\Di;
 use Config\Modules\ModuleConfigInterface;
+use External_Markbook;
 use Predis;
-use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Throwable;
@@ -1034,6 +1035,18 @@ abstract class Kernel
 
             return $communityPortal;
         }));
+
+        // Register external markbook service
+        $di->set('externalMarkbook', $di->lazyNew(External_Markbook::class));
+        $di->set('externalMarkbookAdapter',
+            $di->lazyNew(
+                MarkbookAdapter::class,
+                [
+                    'dataSource'       => $di->lazyGet('assessmentDataSource'),
+                    'externalMarkbook' => $di->lazyGet('externalMarkbook'),
+                ]
+            )
+        );
 
         // Document Manager
         $di->set('externalDocumentManager', $di->lazy(function () use ($di) {

@@ -11,20 +11,17 @@ namespace Schoolbox\Assessment\Component;
 
 use Alaress\Database\Predicate\Builder;
 use Eportfolio\ShowcaseMapper;
-use External_Markbook;
 use PDO;
 use PDOStatement;
 use Schoolbox;
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Class SubmissionBoxMapper
@@ -38,7 +35,7 @@ use UnexpectedValueException;
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, array $options = [])
  * @method SubmissionBox findOneByColumnList($columnList, array $options = [])
  */
-class SubmissionBoxMapper extends Schoolbox\Mapper
+class SubmissionBoxMapper extends BaseMapper
 {
     public const COL_EXTERNAL_ID = 'external_id';
 
@@ -108,17 +105,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
             'other_key' => 'box_id',
         ));
 
-
+        // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteFromMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteFromMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteSubmissions']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteReturns']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteShowcase']);
-
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
 
@@ -126,13 +122,25 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      * @inheritdoc
      * @throws Schoolbox\Mapper\DefinitionException
      */
-    public function getSelectString(): string
+    protected function getSelectString(): string
     {
         return "
-            SELECT     {$this->getColumnString()},
-                       {$this->getJoinColumnString('assessmentModel', 'am')}
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('assessmentModel', 'am')},
+                   {$this->getJoinColumnString('owner', 'o')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
         ";
     }
 
@@ -145,13 +153,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      */
     public function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var AssessmentMapper $assessmentMapper */
-        $assessmentMapper = $this->getJoinMapper('assessmentModel');
-        $collection       = $this->createCollection();
+        $collection = $this->createCollection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $box                       = $this->hydrate($row)->setAssessmentModel($assessmentMapper->hydrate($row, 'am'));
+            $box = $this->hydrate($row)
+                        ->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'am'))
+                        ->setOwner($this->hydrateJoin($row, 'owner', 'o'))
+            ;
             $collection[$box->getId()] = $box;
         }
 
@@ -319,53 +328,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     /**
      * Post-save method for submission boxes - syncs details to SIS markbook
      *
-     * Always returns TRUE - we don't want to prevent other callbacks executing if this fails.
-     *
      * @param SubmissionBox $object
-     * @return bool
-     * @throws UnexpectedValueException If unable to build an Activity from the Submission Box
      */
-    public function syncToExternalMarkbook(SubmissionBox $object): bool
+    public function syncToExternalMarkbook(SubmissionBox $object): void
     {
-        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if (!$this->isAssessmentSpecification($object)) {
-            // This saves the assessment to the remote system
-            $externalMarkbook = new External_Markbook();
-            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
-
-            if (!$externalMarkbook->hasAssessment($activity)) {
-                $externalMarkbook->createAssessment($activity);
-            } else {
-                $externalMarkbook->updateAssessment($activity);
-            }
-        }
-
-        return true;
-    }
-
-
-    /**
-     * Re-inserts assessment in markbook
-     *
-     * @param SubmissionBox $box
-     * @return bool
-     */
-    public function restoreToExternalMarkbook(SubmissionBox $box): bool
-    {
-        $this->syncToExternalMarkbook($box);
-        return true;
-    }
-
-
-    /**
-     * @param SubmissionBox $box
-     * @return bool
-     */
-    private function isAssessmentSpecification(SubmissionBox $box)
-    {
-        /** @var Schoolbox\Learning\Assessment\DataModel\Model $assessment */
-        $assessment = $this->getJoinMapper('assessmentModel')->findById($box->getAssessmentId());
-        return $assessment->getAssessmentContext()->isSpecificationContext();
+        /** @var MarkbookAdapter $markbookAdapter */
+        $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
+        $markbookAdapter->syncAssessment($object);
     }
 
 
@@ -375,16 +344,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      * This is used as a post-delete hook.
      *
      * @param SubmissionBox $object
-     * @throws \UnexpectedValueException If unable to build an Activity from the SubmissionBox
      */
-    public function deleteFromMarkbook(SubmissionBox $object)
+    public function deleteFromMarkbook(SubmissionBox $object): void
     {
-        $externalMarkbook = new \External_Markbook();
-        $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
-        $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
-        );
+        /** @var MarkbookAdapter $markbookAdapter */
+        $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
+        $markbookAdapter->deleteAssessment($object);
     }
+
 
     /**
     * Conversion of SubmissionBoxHandler->getAllYearsByUser().
@@ -412,73 +379,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     }
 
 
-    /**
-     * Gets all submission boxes that are due within the given date span.
-     *
-     * @param array $category_list  A list of category IDs to filter on.
-     * @param int   $from_timestamp A Unix timestamp to search from
-     * @param int   $to_timestamp   A Unix timestamp to search until
-     *
-     * @return ActivityCollection
-     * @throws \UnexpectedValueException If unable to build an Activity from a SB Assessment
-     */
-    public function getDueActivities($category_list, $from_timestamp, $to_timestamp)
-    {
-        $factory    = new ActivityFactory();
-        $collection = new ActivityCollection();
-        if (empty($category_list)) {
-            return $collection;
-        }
-
-        $cat_mapper  = $this->getJoinMapper('category');
-        $user_mapper = $this->getJoinMapper('owner');
-        $assessment_mapper = $this->getJoinMapper('assessmentModel');
-
-        $query = "
-            SELECT
-                {$this->getColumnString('sb')},
-                {$assessment_mapper->getColumnString('a')},
-                {$cat_mapper->getColumnString('c')},
-                {$user_mapper->getColumnString('u')}
-            FROM {$this->getTable()} sb
-            INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
-            LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-            LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u', true)}
-            WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
-            AND sb.date BETWEEN :from_date AND :to_date
-            AND a.deleted_at IS NULL
-            ORDER BY sb.date ASC
-        ";
-
-        //
-        // Build parameters
-        $from_date = new \Alaress_Date_Format($from_timestamp, 'U');
-        $to_date   = new \Alaress_Date_Format($to_timestamp, 'U');
-        $params    = $this->getArrayParameters($category_list, 'category');
-        $params['from_date'] = $from_date->getDatabase();
-        $params['to_date']   = $to_date->getDatabase();
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        //
-        // Hydrate as activity list, then add category codes
-        foreach ($statement as $row) {
-            $box = $this->hydrate($row, 'sb');
-            $box->setAssessmentModel($assessment_mapper->hydrate($row, 'a'));
-            $box->setOwner($user_mapper->hydrate($row, 'u'));
-            $box->setCategory($cat_mapper->hydrate($row, 'c'));
-            $collection->add($factory->buildFromSubmissionBox($box, Schoolbox\Assessment\Activity::EVENT_OVERDUE));
-        }
-        /** @var Folder\Code\Mapper $code_mapper */
-        $code_mapper = $cat_mapper->getJoinMapper('codes');
-        $code_mapper->applyCodesToCategories(
-            $collection,
-            static function (Activity $item): Folder\Model {
-                return $item->getCategory();
-            }
-        );
-        return $collection;
-    }
 
     /**
     * Calculates and returns the statistics of the given submission box

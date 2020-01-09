@@ -8,9 +8,9 @@
 namespace Schoolbox\Learning\Quiz;
 
 use PDO;
+use PDOStatement;
 use Schoolbox;
-use Schoolbox\Assessment\ActivityFactory;
-use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
@@ -33,6 +33,7 @@ use UnexpectedValueException;
 /**
  * @method Model createModel($id = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {
@@ -83,16 +84,69 @@ class Mapper extends BaseMapper
             'other_key' => 'assess_id',
         ));
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'updateExternalMarkbook'));
+        // Markbook sync
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSections'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
 
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
+
+
+    /**
+     * @inheritdoc
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('am', 'am')},
+                   {$this->getJoinColumnString('user', 'u')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM       {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('am', '', 'am', true)}
+            INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $quiz = $this->hydrate($row)
+                         ->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'))
+                         ->setUser($this->hydrateJoin($row, 'user', 'u'))
+            ;
+            $collection[$quiz->getId()] = $quiz;
+        }
+
+        return $collection;
+    }
+
 
     /**
      * Soft deletes all Attempts for the specified Quiz
@@ -195,49 +249,15 @@ class Mapper extends BaseMapper
     /**
      * Post-save callback.
      *
-     * Saves a record in external markbook system. Always returns TRUE as we never want to short-circuit subsequent callbacks
+     * Saves a record in external markbook system.
      *
-     * @param  Model $quiz
-     * @return bool
+     * @param  Model $object
      */
-    public function updateExternalMarkbook(Model $quiz): bool
+    public function syncToExternalMarkbook(Model $object): void
     {
-        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if (!$this->isAssessmentSpecification($quiz)) {
-            $externalMarkbook = new \External_Markbook();
-            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($quiz, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
-            if (!$externalMarkbook->hasAssessment($activity)) {
-                $externalMarkbook->createAssessment($activity);
-            }
-            $externalMarkbook->updateAssessment($activity);
-        }
-
-        return true;
-    }
-
-
-    /**
-     * Post-restore callback to re-insert in SIS markbook
-     *
-     * @param Model $quiz
-     * @return bool
-     */
-    public function restoreToExternalMarkbook(Model $quiz): bool
-    {
-        $this->updateExternalMarkbook($quiz);
-        return true;
-    }
-
-
-    /**
-     * @param Model $quiz
-     * @return bool
-     */
-    private function isAssessmentSpecification(Model $quiz)
-    {
-        /** @var Schoolbox\Learning\Assessment\DataModel\Model $assessment */
-        $assessment = $this->getJoinMapper('am')->findById($quiz->getAssessmentModel()->getId());
-        return $assessment->getAssessmentContext()->isSpecificationContext();
+        /** @var MarkbookAdapter $markbookAdapter */
+        $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
+        $markbookAdapter->syncAssessment($object);
     }
 
 
@@ -247,80 +267,12 @@ class Mapper extends BaseMapper
      * Removes this assessment from the external markbook.
      *
      * @param Model $object
-     * @return true
-     * @throws UnexpectedValueException If unable to build Acitivity from Quiz
      */
-    public function deleteFromMarkbook(Model $object)
+    public function deleteFromMarkbook(Model $object): void
     {
-        $externalMarkbook = new \External_Markbook();
-        $activityFactory = new ActivityFactory();
-        $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
-        );
-        return true;
-    }
-
-
-    /**
-     * Gets all assessments that are due within the given date span.
-     *
-     * @param array $category_list  A list of category IDs to filter on.
-     * @param int   $from_timestamp A Unix timestamp to search from
-     * @param int   $to_timestamp   A Unix timestamp to search until
-     *
-     * @return ActivityCollection
-     * @throws UnexpectedValueException If unable to build Activity from assessment
-     */
-    public function getDueActivities($category_list, $from_timestamp, $to_timestamp)
-    {
-        $factory = new ActivityFactory();
-        $collection = new ActivityCollection();
-        if (empty($category_list)) {
-            return $collection;
-        }
-
-        $cat_mapper = $this->getJoinMapper('category');
-        $user_mapper = $this->getJoinMapper('user');
-        $query = "
-			SELECT
-				{$this->getColumnString('a')},
-				{$cat_mapper->getColumnString('c')},
-				{$user_mapper->getColumnString('u')}
-			FROM {$this->getTable()} a
-			LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
-			LEFT JOIN {$this->getJoinSql('user',     'a', 'u', true)}
-			WHERE a.category_id IN {$this->getArrayPlaceholders($category_list, 'category')}
-			AND a.finish BETWEEN :from_date AND :to_date
-			AND a.deleted_at IS NULL
-			AND a.availability = 'assess'
-			ORDER BY a.finish ASC
-		";
-
-        //
-        // Build parameters
-        $from_date = new \Alaress_Date_Format($from_timestamp, 'U');
-        $to_date = new \Alaress_Date_Format($to_timestamp, 'U');
-        $params = $this->getArrayParameters($category_list, 'category');
-        $params['from_date'] = $from_date->getDatabaseDate();
-        $params['to_date'] = $to_date->getDatabaseDate();
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        //
-        // Hydrate as activity list, then add category codes
-        foreach ($statement as $row) {
-            $box = $this->hydrate($row, 'a');
-            $box->setUser($user_mapper->hydrate($row, 'u'))
-                ->setCategory($cat_mapper->hydrate($row, 'c'));
-            $collection->add($factory->buildFromOnlineAssessment($box, Schoolbox\Assessment\Activity::EVENT_CLOSED));
-        }
-        $cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
-            $collection,
-            function ($item) {
-                return $item->getCategory();
-            }
-        );
-        return $collection;
+        /** @var MarkbookAdapter $markbookAdapter */
+        $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
+        $markbookAdapter->deleteAssessment($object);
     }
 
 
