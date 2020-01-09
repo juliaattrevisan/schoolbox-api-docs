@@ -112,22 +112,23 @@ class Mapper extends BaseMapper
         $sports    = new Collection();
         $seasons   = new Collection();
 
+        $idColumn = $this->getIdentifierColumn();
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC))
         {
             // Hydrate Division
-            $divisions->setOffset($row[$this->getIdentifier()['column']], $this->hydrate($row));
+            $divisions->setOffset($row[$idColumn], $this->hydrate($row));
 
             // Hydrate + Attach Sport
             if (!$sports->getOffset($row['sp.id']) instanceof Sport) {
                 $sports->setOffset($row['sp.id'], $this->hydrateJoin($row, 'sport', 'sp'));
             }
-            $divisions->getOffset($row[$this->getIdentifier()['column']])->setSport($sports->getOffset($row['sp.id']));
+            $divisions->getOffset($row[$idColumn])->setSport($sports->getOffset($row['sp.id']));
 
             // Hydrate + Attach Season
             if (!$seasons->getOffset($row['se.id']) instanceof Season) {
                 $seasons->setOffset($row['se.id'], $this->hydrateJoin($row, 'season', 'se'));
             }
-            $divisions->getOffset($row[$this->getIdentifier()['column']])->setSeason($seasons->getOffset($row['se.id']));
+            $divisions->getOffset($row[$idColumn])->setSeason($seasons->getOffset($row['se.id']));
         }
 
         return $divisions;
