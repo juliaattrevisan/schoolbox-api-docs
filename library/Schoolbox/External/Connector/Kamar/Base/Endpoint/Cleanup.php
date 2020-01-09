@@ -107,7 +107,7 @@ class Cleanup implements IStrategy
 
             /* Remove every existing file from the archive
              */
-            $dirhandle = opendir($this->cacheDir);
+            $dirhandle = opendir($this->archiveDir);
 
             while ($xmlFile = readdir($dirhandle)) {
                 if ($xmlFile !== '.' && $xmlFile !== '..') {
@@ -116,8 +116,9 @@ class Cleanup implements IStrategy
                         $xmlFile
                     ));
 
-                    /* TODO: Perform remove
-                     */
+                    $source = "{$this->archiveDir}/{$xmlFile}";
+
+                    unlink($source);
                 }
             }
 
@@ -133,8 +134,10 @@ class Cleanup implements IStrategy
                         $this->archiveDir
                     ));
 
-                    /* TODO: Perform move
-                     */
+                    $source = "{$this->cacheDir}/{$xmlFile}";
+                    $destination = "{$this->archiveDir}/" . pathInfo($source, PATHINFO_BASENAME);
+
+                    rename($source, $destination);
                 }
             }
         }
