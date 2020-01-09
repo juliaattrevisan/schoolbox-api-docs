@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\Loader;
@@ -95,6 +96,7 @@ class Factory
      *
      * @return null|GenericCollection
      * @throws UnexpectedValueException
+     * @throws RuntimeException
      */
     public function produce(?string $file, string $type): ?GenericCollection
     {
@@ -172,10 +174,18 @@ class Factory
      *
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws RuntimeException
      */
     private function produceKamar(): GenericCollection
     {
         $this->logger->info('Accessing local xml endpoints');
+
+        /* Set up the kamar directory which is where all their xml files go
+         */
+        (new KamarEndpoint\Setup(
+            $this->logger,
+            Loader::getInstance()->get('stream_dir')
+        ))->import();
 
         /* Set up composite bus - everybody's xml gets on board and shuttled off
          * into schoolbox town
@@ -222,13 +232,6 @@ class Factory
 
             return $bus;
         }
-
-        /* Set up the kamar directory which is where all their xml files go
-         */
-        $bus->add(new KamarEndpoint\Setup(
-            $this->logger,
-            Loader::getInstance()->get('stream_dir')
-        ));
 
         /* Purge previously-imported profile relationships and classes
          */
