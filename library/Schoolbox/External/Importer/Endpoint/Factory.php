@@ -14,11 +14,7 @@ use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Api as IsamsApi;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml as IsamsBatchxml;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi as IsamsMockApi;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile as IsamsProfile;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable;
+use Schoolbox\External\Connector\Isams\Base\Endpoint as IsamsEndpoint;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint as KamarEndpoint;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
@@ -129,15 +125,15 @@ class Factory
     {
         if ($file) {
             $this->logger->info("Loading from locally-cached xml file: {$file}");
-            $api = new IsamsMockApi($file);
+            $api = new IsamsEndpoint\MockApi($file);
         } else {
             $this->logger->info('Accessing api endpoint');
-            $api = new IsamsApi($this->host, $this->key);
+            $api = new IsamsEndpoint\Api($this->host, $this->key);
         }
 
         /* Connect and shank data
          */
-        $batchxml = new IsamsBatchxml($api);
+        $batchxml = new IsamsEndpoint\Batchxml($api);
 
         /* Import each piece of the puzzle: Profiles and Timetable
          *
@@ -145,7 +141,7 @@ class Factory
          * do them in sequence, which gives me more dexterity later
          */
         return (new GenericCollection(IStrategy::class))
-            ->add(new IsamsProfile\Composite(
+            ->add(new IsamsEndpoint\Profile\Composite(
                 $this->logger,
                 $this->perform,
                 $batchxml,
@@ -155,7 +151,7 @@ class Factory
                 UserProfile\Staff\Mapper::getInstance(),
                 UserProfile\Relationship\Mapper::getInstance()
             ))
-            ->add(new IsamsTimetable\Composite(
+            ->add(new IsamsEndpoint\Timetable\Composite(
                 $this->logger,
                 $this->perform,
                 $batchxml,
