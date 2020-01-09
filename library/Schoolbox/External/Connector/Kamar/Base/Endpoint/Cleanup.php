@@ -126,7 +126,7 @@ class Cleanup implements IStrategy
             $dirhandle = opendir($this->cacheDir);
 
             while ($xmlFile = readdir($dirhandle)) {
-                if ($xmlFile !== '.' && $xmlFile !== '..') {
+                if ($xmlFile !== '.' && $xmlFile !== '..' && $xmlFile !== self::KAMAR_ARCHIVE_DIR) {
                     $this->log->info(sprintf(
                         'Archiving kamar xml %s into %s',
                         $xmlFile,
