@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
@@ -15,13 +15,13 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile\Relationship;
 
 /**
- * Class Purge
+ * Class Prepare
  *
  * Clears data from a db in preparation for a kamar import
  *
- * @package Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
-class Purge implements IStrategy
+class Prepare implements IStrategy
 {
 
     /**
@@ -61,7 +61,7 @@ class Purge implements IStrategy
 
 
     /**
-     * Purge constructor.
+     * Prepare constructor.
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform

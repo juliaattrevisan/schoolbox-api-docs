@@ -21,6 +21,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile as IsamsProfile;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Prepare as KamarPrepare;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
@@ -201,7 +202,7 @@ class Factory
 
         /* Purge previously-imported profile relationships and classes
          */
-        $bus->add(new KamarTimetable\Purge(
+        $bus->add(new KamarPrepare(
             $this->logger,
             $this->perform,
             UserProfile\Relationship\Mapper::getInstance(),
