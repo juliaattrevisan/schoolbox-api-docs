@@ -190,11 +190,11 @@ if (is_array($threadList)) {
         }
 
         $this->setVar('deleted_thread_author_block', '');
-        $this->parse('thread_author_block', 'thread_author', true);
+        $this->parse('thread_author_block', 'thread_author');
 
         if ($thread['authorDeletedAt']) {
             $this->setVar('thread_author_block', '');
-            $this->parse('deleted_thread_author_block', 'deleted_thread_author', true);
+            $this->parse('deleted_thread_author_block', 'deleted_thread_author');
         }
 
         $this->parse('thread_block', 'thread', true);
