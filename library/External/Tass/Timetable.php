@@ -112,9 +112,9 @@ class External_Tass_Timetable implements External_TimetableInterface
         ];
 
         $query = "
-            SELECT  day_code 
-            FROM    ttcalendar 
-            WHERE   cmpy_code = :cmpyCode AND 
+            SELECT  day_code
+            FROM    ttcalendar
+            WHERE   cmpy_code = :cmpyCode AND
                     ttdate = :ttDate AND
                     tt_id = :ttId
         ";
@@ -183,12 +183,14 @@ class External_Tass_Timetable implements External_TimetableInterface
             $query = "SELECT room_code, tch_code, ttmast.sub_code,ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc
                         FROM studsub
                         JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
-                        JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester 
+                        JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
                                 AND studsub.stud_code = '$externalUserId'
                                 AND day_code = '$dayNumber'
+                                AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
+                                AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                         ORDER BY prd_code";
         } else {
             $query = "SELECT room_code, tch_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
