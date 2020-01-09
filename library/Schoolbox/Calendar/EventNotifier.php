@@ -178,6 +178,12 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
     {
+
+        // If the event is not yet published, the update never happened
+        if($event->getPublishDateTime() > Alaress_Date_Format::now()) {
+            return;
+        }
+
         /** @var Event $event */
         $event     = $this->mapper->findById($event->getId());
         $bob       = $this->newBuilder(self::TRIGGER_UPDATED, $roleType, $event);
