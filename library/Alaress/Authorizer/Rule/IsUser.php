@@ -48,12 +48,16 @@ class IsUser implements IAuthorizationRule
         if (!array_key_exists($this->paramsKey, $params)) {
             throw new Base(sprintf('Key "%s" not in route params', $this->paramsKey));
         }
-        if ($user instanceof User && $user->getId() == $params[$this->paramsKey]) {
-            return true;
-        } elseif ($params[$this->paramsKey] instanceof Participant) {
-            /** @var Participant $participant */
-            $participant = $params[$this->paramsKey];
-            if ($participant->getUser() && ($user->getId() === $participant->getUser()->getId())) {
+        if ($user instanceof User) {
+            $param = $params[$this->paramsKey];
+
+            if ($param instanceof User && $param->getId() === $user->getId()) {
+                return true;
+            }
+            if ($param === $user->getId()) {
+                return true;
+            }
+            if ($param instanceof Participant && $param->getUser() && ($user->getId() === $param->getUser()->getId())) {
                 return true;
             }
         }

@@ -32,7 +32,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'componentInstanceId' => $this->getInstance()->getId(),
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $limit,
-            'folderId' => $this->getSource()->getId(),
+            'folder' => $this->getSource(),
             'key' => $this->getUser()->getKey(),
             'referrer' => News\Statistics\Mapper::REFERRER_HOMEPAGE,
             'readonly' => $this->getContextPermission() < UserAccess::ACCESS_WRITE

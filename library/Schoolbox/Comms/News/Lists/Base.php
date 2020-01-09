@@ -89,7 +89,7 @@ abstract class Base
 
 
     /**
-     * @var IArticleResolver
+     * @var Audience\ArticleResolver
      */
     protected $articleResolver;
 

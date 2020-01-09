@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,17 +11,24 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use InvalidArgumentException;
+use PDO;
+use PDOException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
+use UnderflowException;
+use function implode;
+use function is_array;
+use function strtolower;
 
 /**
  * Class Mapper
@@ -52,7 +57,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function mapping()
     {
@@ -157,7 +162,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /** @var \Schoolbox\File\MimetypeMapper $mimeTypeMapper */
         $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             if ($collection->offsetExists($row[$idColumn])) {
                 $article = $collection->offsetGet($row[$idColumn]);
             } else {
@@ -244,6 +249,27 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
+     * Returns a predicate for getting articles that are awaiting publication.
+     *
+     * Must be:
+     * * approved at
+     * * publish_at > now
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return Builder
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
+     */
+    public function getPredicateAwaitingPublication(Alaress_Date_Format $now = null): IBuilder
+    {
+        $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
+        return $this->getPredicateBuilder()
+                    ->notNull('accepted_at')
+                    ->greaterThan('publish_at', $nowDatabase);
+    }
+
+
+    /**
      * Returns a predicate for getting articles that are approved
      *
      * @return Builder
@@ -298,23 +324,78 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Get a list of years that have article(s) that were audienced to a user
+     * Returns a predicate that will match articles in the specified state.
      *
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \PDOException
-     * @return array
+     * @param int $state A bit-mask of atomic states
+     * @return Builder
+     * @throws InvalidColumnException
+     * @throws UnderflowException       If state indicates no articles can ever match
+     * @throws InvalidArgumentException If state is invalid
      */
-    public function findYearsAndMonthsWithArticles(): array
+    public function getPredicateForState(int $state): Builder
     {
-        /* Dates - must be accepted, published and not deleted
-         */
-        $now = \Alaress_Date_Format::now()->getDatabase();
+        if($state === Model::STATE_NONE){
+            // We could generate a predicate that matches no articles (eg id=0) but that  would
+            // cause a wasted round trip to DB, better to force caller to test and short-circuit in code.
+            throw new UnderflowException("No articles can ever match an article with no state");
+        }
 
-        $pb = $this->getPredicateBuilder()
-            ->lessThan('publish_at', $now)
-            ->notNull('accepted_at')
-            ->isNull('deleted_at');
+        if ($state < Model::STATE_NONE || $state > Model::STATE_ALL) {
+            throw new InvalidArgumentException(sprintf(
+                "State must be between %d and %d, found %d",
+                Model::STATE_NONE,
+                Model::STATE_ALL,
+                $state
+            ));
+        }
+
+        $pb = $this->getPredicateBuilder();
+
+        if($state & Model::STATE_DRAFT){
+            $pb->all($this->getPredicateDraft());
+        }
+        if($state & Model::STATE_AWAITING_MODERATION){
+            $pb->all($this->getPredicateAwaitingModeration());
+        }
+        if($state & Model::STATE_AWAITING_PUBLICATION){
+            $pb->all($this->getPredicateAwaitingPublication());
+        }
+        if($state & Model::STATE_REJECTED){
+            $pb->all($this->getPredicateRejected());
+        }
+        if($state & Model::STATE_PUBLISHED){
+            $pb->all($this->getPredicatePublished());
+        }
+        if($state & Model::STATE_EXPIRED){
+            $pb->all($this->getPredicateExpired());
+        }
+        return $this->getPredicateBuilder()->any($pb);
+    }
+
+
+    /**
+     * Get a list of years and months that have non-deleted articles matching the specified args
+     *
+     * @param int[]|null $articleIdFilter
+     * @param int|null   $state
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws PDOException
+     * @throws UnderflowException
+     */
+    public function findYearsAndMonthsWithArticles(?array $articleIdFilter, ?int $state): array
+    {
+        if ($articleIdFilter !== null && !count($articleIdFilter)) {
+            return [];
+        }
+        $pb = $this->getPredicateBuilder()->isNull('deleted_at');
+        if ($articleIdFilter !== null) {
+            $pb->in('id', $articleIdFilter);
+        }
+        if ($state !== null && $state !== Model::STATE_ALL) {
+            $pb->all($this->getPredicateForState($state));
+        }
 
         $where = implode("\nAND ", $pb->getWhere());
 
@@ -337,7 +418,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /* Convert 06 into just 6, because I'm taking chunks out of a timestamp 2018-06-01 11:22:33.
          * The url is an int. To avoid issues with the leading zero I just force int on it.
          */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $years[$row['year']][(int)$row['month']] = true;
         }
 
@@ -349,188 +430,121 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
      *
      * @param User $user
-     * @param bool $active        non-expired articles (expiry date not yet reached)
      * @return array
      * @throws InvalidColumnException
-     * @throws \PDOException
      */
-    public function findAuthoredOrAcceptedArticleIds(User $user, bool $active = true): array
+    public function findAuthoredOrAcceptedArticleIds(User $user): array
     {
         $pb = $this->getPredicateBuilder()
-            ->equals('author_id', $user->getId());
+                   ->equals('author_id', $user->getId())
+                   ->equals('accepted_by', $user->getId());
 
-        if ((new ValidNewsModerator(Access::getInstance()))->isSatisfiedBy($user)) {
-            $pb->equals('accepted_by', $user->getId());
-        }
-
-        $where  = implode("\nOR ", $pb->getWhere());
-        $params = $pb->getParams();
-
-        /* Only include published articles
-         */
-        $query = "SELECT id FROM {$this->table} WHERE ({$where}) ";
-
-        /* If it's published and active
-         * publish_at < now and expires_at > now
-         *
-         * If it's published and inactive
-         * publish_at < now and expires_at < now
-         */
-        if ($active) {
-            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
-        } else {
-            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicateExpired());
-        }
-
-        $publishedWhere = implode(' AND ', $publishedPb->getWhere());
-
-        $query .= " AND {$publishedWhere}";
-        $params = array_merge($params, $publishedPb->getParams());
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        $hydrator = $this->getColumnScalarHydrator('id');
-        return array_map([$hydrator, 'hydrate'], $statement->fetchAll(\PDO::FETCH_COLUMN));
+        return $this->findIdsByPredicates($this->getPredicateBuilder()->any($pb));
     }
 
 
     /**
-     * Find just the ids for the articles in a topic
-     * We generally use this for pagination counts where we need a count instead of hydrated things
+     * Returns a set of article ids that match the supplied parameters.
      *
-     * Pass null as $limit to disable it; beware the n-n join on articles-topics
+     * Each param is combined using intersection. Passing NULL for any param will cause it to be ignored.
      *
-     * Filters to the $availableArticleIds that can be seen
+     * $limit applies to the number of articles, rather than number of rows due to *:N joins.
      *
-     * @param array    $availableArticleIds
-     * @param int      $topicId
-     * @param int|null $limit
-     * @param int|null $pageNum
-     * @param int|null $year
-     * @param int|null $month
-     * @param int|null $folderId
-     * @return array
+     * @param array|null  $availableArticleIds If provided, do not return results outside this set
+     * @param string|null $topicSlug           If provided, filter to articles that include this topic. 'all' => no filter
+     * @param int|null    $offset              If provided, offset results by this many
+     * @param int|null    $limit               If provided, limit to this many article ids
+     * @param int|null    $publishYear         If provided, filter to articles published in this year
+     * @param int|null    $publishMonth        If provided, filter to articles published in this month
+     * @param int|null    $temporalState       The article's state. A bit-mask of discrete/atomic states
+     * @return int[]
+     * @throws InvalidArgumentException
      * @throws InvalidColumnException
-     * @throws \DomainException
-     * @throws \UnderflowException
-     * @throws \PDOException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws DefinitionException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
-    {
-        /* Invalid combination of year/month params
-         */
-        if ($month && !$year) {
-            throw new \DomainException('Invalid year/month combination');
-        }
+    public function findArticleIdsByFilters(
+        ?array $availableArticleIds,
+        ?string $topicSlug,
+        ?int $offset,
+        ?int $limit,
+        ?int $publishYear,
+        ?int $publishMonth,
+        ?int $temporalState
+    ): array {
 
-        /* This user can't see any articles
-         */
-        if (null === $folderId && \count($availableArticleIds) < 1) {
+        // Short-circuit if searching for an empty set
+        if (is_array($availableArticleIds) && !count($availableArticleIds)) {
             return [];
         }
 
-        /* If either year or month is specified, we're looking in the news archive
-         * Look for expired items matching a certain year/month combination
-         */
-        $now = Alaress_Date_Format::now()->getDatabase();
+        // Short-circuit if searching for articles without a state (all articles have a state)
+        // It's quite valid to generate this value programmatically using boolean logic, it's not
+        // an error at this point.
+        if ($temporalState === Model::STATE_NONE) {
+            return [];
+        }
 
-        /* Dates - must be accepted, published and not deleted
-         */
+        // Start building predicate - never return deleted articles.
         $pb = $this->getPredicateBuilder()
-            ->lessThan('publish_at', $now)
-            ->notNull('accepted_at')
-            ->isNull('deleted_at');
+                   ->isNull('deleted_at');
 
-        if(\count($availableArticleIds)) {
+        if($temporalState !== null && $temporalState !== Model::STATE_ALL){
+            $pb->all($this->getPredicateForState($temporalState));
+        }
+
+        if ($availableArticleIds !== null) {
             $pb->in('id', $availableArticleIds);
         }
 
-        if ($year || $month) {
-            $paddedMonth = $month ? str_pad((string)$month, 2, '0', STR_PAD_LEFT) : '';
-
-            $yearMonth = "{$year}-{$paddedMonth}%";
-
-            $pb->like('publish_at', $yearMonth);
-
-        } else {
-            $pb->greaterThan('expires_at', $now);
+        // Build publish date predicate (ensure leading 0s for month)
+        $publishMonthString = $publishMonth === null ? null : sprintf('%02d', $publishMonth);
+        if ($publishYear !== null && $publishMonthString !== null) {
+            $pb->like('publish_at', "{$publishYear}-{$publishMonthString}-%");
+        } elseif ($publishYear !== null) {
+            $pb->like('publish_at', "{$publishYear}-%");
+        } elseif ($publishYear !== null) {
+            $pb->like('publish_at', "%-{$publishMonthString}-%");
         }
 
-        /* If $topicId is provided, only get articles for that topic
-         * Otherwise get $limit articles from any topic
-         */
-        $join = $groupBy = '';
+        /** @var string[] $joins */
+        $joins = [];
+        /** @var bool $distinct Required if performing any *:N joins */
+        $distinct = false;
 
-        if ($topicId !== self::TOPIC_ALL_ID) {
-            $join    = "INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id ";
-            $groupBy = 'GROUP BY id';
-            $pb->equals('cnat.topic_id', $topicId);
+        if (($topicSlug ?? '') !== '' && strtolower($topicSlug) !== self::TOPIC_ALL_SLUG) {
+            $joins[] = "INNER JOIN {$this->getJoinSql('comms_news_article_topic')}";
+            $pb->equals('newsTopic.name', $topicSlug);
+            $distinct = true;
         }
 
-        if (null !== $folderId) {
-            $join .= "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id
-            AND cnau.entity_type = :entityType AND cnau.entity_value = :folderId";
-        }
-
-        $where = implode("\nAND ", $pb->getWhere());
+        $distinctClause = $distinct ? 'DISTINCT' : '';
+        $join           = implode("\n", $joins);
+        $where          = implode("\nAND ", $pb->getWhere());
 
         /* TODO: Sorting algorithm SA-7097
          */
         $query = "
-            SELECT {$this->table}.id
+            SELECT {$distinctClause} {$this->table}.id
             FROM {$this->table}
             {$join}
             WHERE {$where}
-            {$groupBy}
             ORDER BY publish_at DESC, created_at DESC
         ";
 
-        /* Limits and offsets
-         * Apply either the $limit provided, or use the system default
-         *
-         *     $limit === int:  use the value of the int for the number of items per page
-         *     $limit === null: use system default for number of items per page
-         *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
-         */
-        if ($pageNum && ($limit || $limit === null)) {
-            $query .= ' LIMIT :limit';
-            $query .= ' OFFSET :offset';
+        if ($offset !== null) {
+            $query .= "\nOFFSET :offset";
+            $pb->putParam('offset', $offset);
+        }
+        if ($limit !== null) {
+            $query .= "\nLIMIT :limit";
+            $pb->putParam('limit', $limit);
         }
 
         $statement = $this->database->prepare($query);
-
-        /* Bind the pb params
-        */
-        foreach ($pb->getParams() as $key => $value) {
-            $statement->bindValue($key, $value);
-        }
-
-        if ($folderId) {
-            $statement->bindValue('folderId', $folderId);
-            $statement->bindValue('entityType', Folder::getEntityType());
-        }
-
-        /* Because pdo does some mickey mouse shenanigans
-         */
-        if ($pageNum && ($limit || $limit === null)) {
-
-            /* Apply either the $limit provided, or use the system default
-             */
-            $derivedLimit = $limit ?: (int)$this->getConfigLoader()->get('search_type_limit');
-
-            $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
-
-            /* Paginate
-             */
-            $statement->bindValue('offset', $derivedLimit * ($pageNum - 1), \PDO::PARAM_INT);
-        }
-
-        /* finally
-         */
-        $statement->execute();
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+        $statement->execute($pb->getParams());
+        return $statement->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
@@ -570,7 +584,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @return bool
      * @throws InvalidColumnException
-     * @throws \PDOException
+     * @throws PDOException
      */
     public function checkArchiveForHomepage(int $folderId): bool
     {
@@ -596,6 +610,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $statement->execute($pb->getParams());
 
-        return (boolean)$statement->fetch(\PDO::FETCH_COLUMN);
+        return (boolean)$statement->fetch(PDO::FETCH_COLUMN);
     }
 }

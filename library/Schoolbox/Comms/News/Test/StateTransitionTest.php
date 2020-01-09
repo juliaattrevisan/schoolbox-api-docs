@@ -13,12 +13,19 @@ use Schoolbox\User;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Exceptions\InvalidTransitionException;
+use PHPUnit\Framework;
 use PHPUnit\Framework\AssertionFailedError;
 
+/**
+ * @covers \Schoolbox\Comms\News\Model
+ * @codeCoverageIgnore
+ */
 class StateTransitionTest extends TestCase
 {
 
     /**
+     * Test we can transition an article through valid transitions
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -30,6 +37,7 @@ class StateTransitionTest extends TestCase
         // New models are drafts
         $this->assertTrue($article->isDraft());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // Pretend that we saved it
         $article
@@ -40,22 +48,26 @@ class StateTransitionTest extends TestCase
         // Still a draft
         $this->assertTrue($article->isDraft());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // Submit for moderation
         $article->submit();
         $this->assertTrue($article->isAwaitingModeration());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // Reject it
         $rejectionReason = 'cause i can';
         $article->reject($moderator, $rejectionReason);
         $this->assertTrue($article->isRejected());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // Resubmit it
         $article->submit();
         $this->assertTrue($article->isAwaitingModeration());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // The reason is still there so the reviewer can see why it was rejected
         $this->assertEquals($rejectionReason, $article->getRejectedReason());
@@ -64,29 +76,36 @@ class StateTransitionTest extends TestCase
         $article->approve($moderator);
         $this->assertTrue($article->isApproved());
         $this->assertNull($article->getRejectedReason());
+        $this->assertFalse($article->isPublic());
 
         // Send it back to draft
         $article->unSubmit();
         $this->assertTrue($article->isDraft());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // Approve it
         $article->approve($moderator);
         $this->assertTrue($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // Reject it
         $article->reject($moderator);
         $this->assertTrue($article->isRejected());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
 
         // Send it back to draft
         $article->unSubmit();
         $this->assertTrue($article->isDraft());
         $this->assertFalse($article->isApproved());
+        $this->assertFalse($article->isPublic());
     }
 
 
     /**
+     * Tests the approved composite state
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -100,15 +119,19 @@ class StateTransitionTest extends TestCase
 
         // Currently awaiting publication
         $this->assertTrue($article->isAwaitingPublication());
+        $this->assertFalse($article->isPublic());
 
         // Still awaiting in 5 days
         $this->assertTrue($article->isAwaitingPublication(Alaress_Date_Format::newNaturalDate('5 days')));
+        $this->assertFalse($article->isPublic());
 
         // published in 10
         $this->assertTrue($article->isPublished(Alaress_Date_Format::newNaturalDate('10 days')));
+        $this->assertTrue($article->isPublic(Alaress_Date_Format::newNaturalDate('10 days')));
 
         // expired in 20
         $this->assertTrue($article->isExpired(Alaress_Date_Format::newNaturalDate('20 days')));
+        $this->assertTrue($article->isPublic(Alaress_Date_Format::newNaturalDate('20 days')));
 
         // But these are all sub-states of the approved state
         $this->assertTrue($article->isApproved(Alaress_Date_Format::newNaturalDate('5 days')));
@@ -118,6 +141,8 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests approval transitions
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -149,10 +174,12 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot reject a draft article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionRejectDraft(Model $article, User $moderator): void
@@ -163,10 +190,12 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot reject an already-rejected article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionRejectReject(Model $article, User $moderator): void
@@ -180,9 +209,63 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot submit an article already awaiting moderation
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
+     * @throws InvalidTransitionException
+     */
+    public function testInvalidTransitionSubmitAwaitingModeration(Model $article): void
+    {
+        $article->submit();
+        $this->expectException(InvalidTransitionException::class);
+        $article->submit();
+    }
+
+
+    /**
+     * Tests we cannot submit an article already awaiting moderation
+     *
+     * @dataProvider providerStubArticleAndModerator
+     * @param Model $article
+     * @throws Framework\Exception
+     * @throws InvalidTransitionException
+     */
+    public function testInvalidTransitionSubmitExpired(Model $article): void
+    {
+        $article->submit();
+        $article->approve($this->getModerator());
+        $article->archive();
+        $this->expectException(InvalidTransitionException::class);
+        $article->submit();
+    }
+
+
+    /**
+     * Tests we cannot publish a draft
+     *
+     * @throws InvalidTransitionException
+     * @throws Framework\Exception
+     * @throws InvalidArgumentException
+     */
+    public function testInvalidTransitionPublishDraft(): void
+    {
+        $article = (new Model())
+            ->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'))
+            ->setExpiresAt(Alaress_Date_Format::newNaturalDate('14 days'));
+
+        $this->expectException(InvalidTransitionException::class);
+        $article->publish();
+    }
+
+
+    /**
+     * Tests we cannot un-submit a draft
+     *
+     * @dataProvider providerStubArticleAndModerator
+     * @param Model $article
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionUnSubmitDraft(Model $article): void
@@ -193,9 +276,11 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive a draft
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionUnArchiveDraft(Model $article): void
@@ -206,9 +291,11 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive an article awaiting moderation
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     public function testInvalidTransitionUnArchiveAwaitingMod(Model $article): void
@@ -220,11 +307,13 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive a rejected article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws InvalidTransitionException
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      */
     public function testInvalidTransitionUnArchiveRejected(Model $article, User $moderator): void
     {
@@ -236,11 +325,13 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests we cannot archive an already-archived article
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws InvalidTransitionException
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Framework\Exception
      */
     public function testInvalidTransitionUnArchiveArchived(Model $article, User $moderator): void
     {
@@ -253,6 +344,9 @@ class StateTransitionTest extends TestCase
 
 
     /**
+     * Tests that if we extend a publish date into the future, it automatically pushes out the expiry date
+     * so that no invalid data occurs (cannot have expiry < publish)
+     *
      * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
@@ -262,11 +356,83 @@ class StateTransitionTest extends TestCase
      */
     public function testPublishAfterExpiry(Model $article, User $moderator): void
     {
+        $article->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'));
+        $article->setExpiresAt(Alaress_Date_Format::newNaturalDate('14 days'));
         $article->submit();
         $article->approve($moderator);
         $article->publish(Alaress_Date_Format::newNaturalDate('20 days'));
 
         $this->assertFalse($article->getExpiresAt()->lt($article->getPublishAt()));
+    }
+
+    /**
+     * Tests whether the available transitions per atomic state
+     *
+     * @throws AssertionFailedError
+     * @throws InvalidArgumentException
+     * @throws InvalidTransitionException
+     */
+    public function testAvailableTransitions(): void
+    {
+        // Created now, publish in 7 days, expire in 14 days
+        $article = (new Model())
+            ->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'))
+            ->setExpiresAt(Alaress_Date_Format::newNaturalDate('14 days'));
+
+        // Draft
+        $this->assertTrue($article->canBeSubmitted());
+        $this->assertFalse($article->canBeUnSubmitted());
+        $this->assertTrue($article->canBeApproved());
+        $this->assertFalse($article->canBeRejected());
+        $this->assertFalse($article->canBeArchived());
+
+        // Awaiting moderation
+        $article->submit();
+        $this->assertFalse($article->canBeSubmitted());
+        $this->assertTrue($article->canBeUnSubmitted());
+        $this->assertTrue($article->canBeApproved());
+        $this->assertTrue($article->canBeRejected());
+        $this->assertFalse($article->canBeArchived());
+
+        // Rejected
+        $article->reject($this->getModerator());
+        $this->assertTrue($article->canBeSubmitted());
+        $this->assertTrue($article->canBeUnSubmitted());
+        $this->assertTrue($article->canBeApproved());
+        $this->assertFalse($article->canBeRejected());
+        $this->assertFalse($article->canBeArchived());
+
+        // Awaiting moderation
+        $article->submit();
+        $this->assertFalse($article->canBeSubmitted());
+        $this->assertTrue($article->canBeUnSubmitted());
+        $this->assertTrue($article->canBeApproved());
+        $this->assertTrue($article->canBeRejected());
+        $this->assertFalse($article->canBeArchived());
+
+        // Awaiting publication
+        $article->approve($this->getModerator());
+        $this->assertFalse($article->canBeSubmitted());
+        $this->assertTrue($article->canBeUnSubmitted());
+        $this->assertFalse($article->canBeApproved());
+        $this->assertTrue($article->canBeRejected());
+        $this->assertTrue($article->canBeArchived());
+
+        // Published
+        $article->publish();
+        $this->assertFalse($article->canBeSubmitted());
+        $this->assertTrue($article->canBeUnSubmitted());
+        $this->assertFalse($article->canBeApproved());
+        $this->assertTrue($article->canBeRejected());
+        $this->assertTrue($article->canBeArchived());
+
+        // Expired
+        $article->archive();
+        $this->assertFalse($article->canBeSubmitted());
+        $this->assertTrue($article->canBeUnSubmitted());
+        $this->assertFalse($article->canBeApproved());
+        $this->assertTrue($article->canBeRejected());
+        $this->assertFalse($article->canBeArchived());
     }
 
     // Data providers
@@ -285,10 +451,22 @@ class StateTransitionTest extends TestCase
             ->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'))
             ->setExpiresAt(Alaress_Date_Format::newNaturalDate('14 days'));
 
-        $moderator = (new User())->setId(151);
+        $moderator = $this->getModerator();
 
         return [
             [$article, $moderator],
         ];
+    }
+
+    // Helpers
+
+    /**
+     * Returns a user we can set as moderator
+     *
+     * @return User
+     */
+    private function getModerator(): User
+    {
+        return (new User())->setId(151);
     }
 }

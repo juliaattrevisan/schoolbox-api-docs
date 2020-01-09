@@ -80,8 +80,8 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
-                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_READ),
+                    new Authorizer\Rule\CanModerateAudience($strategyFactory),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
                         new Authorizer\Rule\IsPublishedOrExpired(),
@@ -201,7 +201,7 @@ class Module extends BaseModule
         // (async) Get a list of articles a user has authored
         $this->register('GET', '/me/articles', 'getAuthoredArticles', $loggedIn);
 
-        // (async) Get a list of articles published to the user
+        // (async) Get a list of articles published-to/authored-by/moderated-by the user
         $this->register('GET', '/lists/feed', 'getListForIndex', $loggedIn);
 
     }

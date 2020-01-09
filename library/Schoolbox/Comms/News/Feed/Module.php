@@ -4,22 +4,25 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Feed;
 
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Comment;
+use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -31,17 +34,44 @@ class Module extends BaseModule
 
     /**
      * Hook method for setting up routes via self::register()
-     *
-     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
-        $preloadUserAndFolder = function ($params) {
-            return $this->preloadUserAndFolder($params);
+        $preloadUser          = function ($params) {
+            return $this->preloadUser($params);
+        };
+        $preloadFolderAndUser = function ($params) {
+            return array_merge(
+                $this->preloadUser($params),
+                $this->preloadFolder($params)
+            );
         };
 
-        $this->register('GET', '/{key}{/folderId}', 'getFeed', null, $preloadUserAndFolder);
+        // Must be SU, or have News service READ+ perm, or READ+ access to folder
+        $canReadFolderNews = new Rule\LazyCallback(static function () {
+            return new Rule\Callback(static function (array $params): bool {
+                /** @var User $user */
+                $user = $params['user'];
+                if ($user->isSuperuser()) {
+                    return true;
+                }
+                if (Access::getInstance()->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_READ) {
+                    return true;
+                }
+                if (Access::getInstance()->getFolderAccess($user, (int)$params['folderId']) >= UserAccess::ACCESS_READ) {
+                    return true;
+                }
+                throw new Unauthorized("User with key '{$user->getKey()}' does not have access to news RSS for folder {$params['folderId']}");
+            });
+        });
+
+        // Note there is no route auth here, it does not require a session, simply knowing a user.key suffices.
+        $this->register('GET', '/{key}', 'getFeedForUser', null, $preloadUser);
+
+        // User identified by 'key' (not session user), must be SU, or have News service READ+ perm, or READ+ access to folder
+        $this->register('GET', '/{key}/{folderId:\d+}', 'getFeedForFolder', $canReadFolderNews, $preloadFolderAndUser);
     }
+
 
     /**
      * Preload a User instance
@@ -49,27 +79,39 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws NotFound
+     * @throws Unauthorized
      */
-    private function preloadUserAndFolder(array $params): array
+    private function preloadUser(array $params): array
     {
+        if ($params['user'] instanceof User) {
+            return ['user' => $params['user']];
+        }
         try {
-            $user = $this->getUserMapper()->findOneByColumn('key', $params['key']);
-
-            $folder = null;
-
-            if ($params['folderId']) {
-                $folder = $this->getFolderMapper()->findOneByColumn('id', $params['folderId']);
-            }
+            return ['user' => $this->getUserMapper()->findOneByColumn('key', $params['key'])];
+        } catch (MapperException $e) {
+            throw new Unauthorized("No user found for key: '{$params['key']}'", $e->getCode(), $e);
         }
-        catch (MapperException $e) {
-            throw new Unauthorized();
-        }
+    }
 
-        return [
-            'user' => $user,
-            'folder' => $folder,
-        ];
+
+    /**
+     * Preload a Folder instance
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws Unauthorized
+     */
+    private function preloadFolder(array $params): array
+    {
+        if ($params['folder'] instanceof Folder\Model) {
+            return ['folder' => $params['folder']];
+        }
+        try {
+            return ['folder' => $this->getFolderMapper()->findOneByColumn('id', $params['folderId'])];
+        } catch (MapperException $e) {
+            throw new Unauthorized("No folder found for id: '{$params['folderId']}'", $e->getCode(), $e);
+        }
     }
 
     /**
@@ -104,14 +146,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'newsMapper'                 => $this->getMapperFactory()->getLazy(News\Mapper::class),
             'topicMapper'                => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
-            'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(News\SaveForLater\Mapper::class),
-            'statisticsMapper'           => $this->getMapperFactory()->getLazy(News\Statistics\Mapper::class),
-            'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(News\Statistics\Cumulative\Mapper::class),
-            'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
-            'access'                     => $this->getMapperFactory()->getLazy(Access::class),
-            'commentMapper'              => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
-            'audienceMapper'             => $this->getMapperFactory()->getLazy(News\Audience\Mapper::class),
         ];
     }
 

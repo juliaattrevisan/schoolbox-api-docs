@@ -8,19 +8,23 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
 
-use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
+use LogicException;
+use PDOException;
+use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Collection;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
+use Schoolbox\Comms\News\Lists\UserFeed;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\Interactions;
 use Schoolbox\Comms\News\Validation\Factory;
@@ -40,9 +44,12 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
+use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use function array_keys;
+use function array_merge;
 
 class Controller extends Base
 {
@@ -184,7 +191,7 @@ class Controller extends Base
      *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws UnknownEntityTypeException
      * @throws RouteNotFound
@@ -242,11 +249,11 @@ class Controller extends Base
                 $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
 
                 $audienceSegment = new Audience\SegmentSelectizeOption(
-                    $codec->encodeSimpleAttributes($entityType, $folderId, Audience\Model::RELATIONSHIP_SELF),
+                    $codec->encodeSimpleAttributes($entityType, (string)$folderId, Audience\Model::RELATIONSHIP_SELF),
                     $label
                 );
 
-                $audienceSegment->addLabel($entityType, $codec->encodeValue($folderId), $label);
+                $audienceSegment->addLabel($entityType, $codec->encodeValue((string)$folderId), $label);
                 $audienceSegments[] = $audienceSegment;
             }
         }
@@ -299,9 +306,9 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws RouteNotFound
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Resource\Exception
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws \DomainException
      */
     public function postCreate(): void
@@ -326,7 +333,7 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws MapperException\InsufficientHydrationException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws RouteNotFound
      */
     public function getUpdate(Model $article): void
@@ -370,9 +377,9 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws RouteNotFound
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Resource\Exception
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws UnknownEntityTypeException
      * @throws InvalidArgumentException
@@ -478,9 +485,9 @@ class Controller extends Base
      * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postDelete(Model $article): void
@@ -518,7 +525,7 @@ class Controller extends Base
                 $this->getResponse()->redirect->to($nextStep);
             }
 
-        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
+        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|PDOException|DefinitionException|UnexpectedValueException|Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -554,8 +561,8 @@ class Controller extends Base
      *
      * @param Model $article
      * @throws MapperException
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
+     * @throws UnexpectedValueException
+     * @throws PDOException
      * @throws RouteNotFound
      * @throws UnknownEntityTypeException
      * @throws MapperException\InsufficientHydrationException
@@ -655,9 +662,9 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws InvalidArgumentException
-     * @throws \UnderflowException
+     * @throws UnderflowException
      */
     public function getListForHomepage() :void
     {
@@ -692,9 +699,9 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws InvalidArgumentException
-     * @throws \UnderflowException
+     * @throws UnderflowException
      */
     private function generatePartialForHomepage(Querystring $params): array
     {
@@ -722,7 +729,7 @@ class Controller extends Base
         );
 
         if (\count($topicData['articles']) < 1) {
-            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
+            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage($params->getFolderId());
         }
 
         return array_merge($topicData, [
@@ -784,38 +791,38 @@ class Controller extends Base
 
 
     /**
-     * Get a list of articles that are audienced to me from anywhere and are published and not expired
-     * This is only returns data as JSON
+     * Get a list of published (not expired) articles that are:
+     * * Audienced to session user
+     * * Authored by session user, OR
+     * * Moderated by session user
      *
-     * @api GET /news/lists/feed
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
+     * Returns data as JSON
+     *
+     * @api          GET /news/lists/feed?topic={topicSlug}
+     *
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      * @throws InvalidArgumentException
-     * @throws \DomainException
+     * @throws NotFound
+     * @noinspection PhpUnused
      */
-    public function getListForIndex() :void
+    public function getListForIndex(): void
     {
+        $topicSlug = $this->getRequest()->query->get(Querystring::TOPIC_SLUG);
+        $this->assertValidTopic($topicSlug);
+
+        $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);
+        $articleIds = $userFeed->find($this->getUser());
+
         $commentCounts = [];
 
-        $articleIds = (new Lists\Index(
-            0,
-            $this->topicMapper,
-            $this->newsMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-            $this->saveForLaterMapper,
-            $this->statisticsMapper,
-            $this->statisticsCumulativeMapper,
-            $this->databaseInternal,
-            $this->articleResolver,
-            $this->commentMapper,
-            $this->audienceMapper,
-            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
-        ))->find(new Querystring([]), $this->getUser());
-
-        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
+        if (count($articleIds)) {
+            $pb       = $this->newsMapper->getPredicatePublished()->in('id', $articleIds);
+            $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['publish_at' => 'DESC']]);
+        } else {
+            $articles = $this->newsMapper->createCollection();
+        }
 
         $map = [
             'id',
@@ -872,18 +879,22 @@ class Controller extends Base
      *
      * @param int|null $year
      * @param int|null $month
+     * @throws AccessDenied
+     * @throws DefinitionException
      * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws LogicException
      * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws MapperException\NotFound
+     * @throws NotFound
+     * @throws PDOException
      * @throws RouteNotFound
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
-     * @throws Exception
-     * @throws Unauthorized
      * @api   GET /news/archive{/year,month}
      * @since 18.1
      */
@@ -895,11 +906,7 @@ class Controller extends Base
          */
         $params = new Querystring($this->getRequest()->query);
 
-        if ($params->getFolderId()) {
-            if (Access::getInstance()->getFolderAccess($this->getUser(), $params->getFolderId()) < UserAccess::ACCESS_READ) {
-                throw new Unauthorized();
-            }
-        }
+        $this->assertValidFolder($params->getFolderId());
 
         $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
 
@@ -911,15 +918,15 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
-        // Find the years and months that have any articles (some may not contain any visible articles; thats ok)
-        $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles();
+        $this->assertValidTopic($params->getSlug());
 
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, false, $year, $month, true);
+
+        $availableYearsAndMonths = $partialData['yearsAndMonths'];
         // Default to filtering by the most recent year if none is provided
         if (null === $year) {
             $year = array_keys($availableYearsAndMonths)[0];
         }
-
-        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $topics, false, $year, $month);
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
@@ -934,17 +941,14 @@ class Controller extends Base
             'referrer' => $params->getReferrer(),
             'page' => $this->getRequest()->query['page'],
             'pageWithoutParams' => $this->getRouter()->generate('commsNews.getArchive'),
-
-            /* Archive-specific vars that don't appear anywhere else
-             */
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
             'newsItems' => $partialData,
         ];
 
-        if ($params->getFolderId()) {
-            $details = $this->folderMapper->findCheaplyById((int)$params->getFolderId())->findValueLabelPair();
+        if ($params->getFolderId() !== null) {
+            $details = $this->folderMapper->findCheaplyById($params->getFolderId())->findValueLabelPair();
 
             $metaDetails = [
                 'folderId'    => $details['value'],
@@ -975,21 +979,21 @@ class Controller extends Base
      *
      * @param string             $urlPrefix
      * @param Querystring        $params
-     * @param Collection|Topic[] $topics
      * @param bool               $hidePaginator
      * @param int|null           $year
      * @param int|null           $month
+     * @param bool               $getYearsAndMonths Whether to include data regarding which years/months have data
      * @throws InvalidArgumentException
      * @throws MapperException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
+     * @throws PDOException
+     * @throws UnderflowException
      * @return array
      */
-    private function generatePartialForArchive(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
+    private function generatePartialForArchive(string $urlPrefix, Querystring $params, bool $hidePaginator, ?int $year, ?int $month, bool $getYearsAndMonths): array
     {
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
@@ -1012,9 +1016,9 @@ class Controller extends Base
             $urlPrefix,
             $params,
             $this->getUser(),
-            $topics,
             $year,
-            $month
+            $month,
+            $getYearsAndMonths
         );
 
         /* Always provide paginator from this context
@@ -1036,10 +1040,10 @@ class Controller extends Base
      * This is now used only in News Archive with a topic
      * This is the central piece of the puzzle
      *
-     * @api GET /news/list
-     * @since 18.1
+     * @api          GET /news/list
+     * @since        18.1
      *
-     * @deprecated Article lists should now be done on the front-end, with an XHR calls
+     * @deprecated   Article lists should now be done on the front-end, with an XHR calls
      *
      * @param int|null $year
      * @param int|null $month
@@ -1050,14 +1054,16 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     * @throws NotFound
+     * @throws AccessDenied
+     * @noinspection PhpUnused
      */
     public function getListByTopic(?int $year, ?int $month): void
     {
         $params = new Querystring($this->getRequest()->query);
-        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
         /* The requested data set to load, given the params provided
          */
@@ -1067,7 +1073,9 @@ class Controller extends Base
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 
-        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
+        $this->assertValidTopic($params->getSlug());
+        $this->assertValidFolder($params->getFolderId());
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $params->getHidePaginator(), $year, $month, false);
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
@@ -1265,8 +1273,8 @@ class Controller extends Base
      *
      * @param Model $article
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function getRecipients(Model $article): void
     {
@@ -1570,6 +1578,42 @@ class Controller extends Base
                     ? $audiencesPerArticle->getOffset($articlesId)
                     : new GenericCollection(Audience\Model::class)
             );
+        }
+    }
+
+
+    /**
+     * Asserts that a topic is valid, throws 404 if not found
+     *
+     * @param string|null $topic
+     * @throws NotFound
+     */
+    private function assertValidTopic(?string $topic): void
+    {
+        if(!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)){
+            throw new NotFound("No topic found with name '$topic'");
+        }
+    }
+
+
+    /**
+     * Asserts that a folder param is valid, throws 401 if not authorised
+     *
+     * @param int|null $folderId
+     * @throws AccessDenied
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     * @throws LogicException
+     */
+    private function assertValidFolder(?int $folderId): void
+    {
+        if ($folderId === null) {
+            return;
+        }
+
+        if (Access::getInstance()->getFolderAccess($this->getUser(), $folderId) === UserAccess::ACCESS_DENY) {
+            throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
     }
 }

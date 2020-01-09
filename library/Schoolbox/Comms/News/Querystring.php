@@ -6,6 +6,8 @@
  */
 namespace Schoolbox\Comms\News;
 
+use ArrayAccess;
+
 /**
  * Class Querystring
  *
@@ -80,29 +82,31 @@ class Querystring
     /**
      * An array of key/value pairs corresponding to GET params
      *
-     * @var array
+     * Will be string if supplied, null otherwise
+     *
+     * @var string[]|null[]
      */
     private $querystring;
 
     /**
      * Querystring constructor.
      *
-     * @param $data
+     * @param ArrayAccess|string[]|null[] $data
      */
-    public function __construct($data)
+    public function __construct(ArrayAccess $data)
     {
         $this->querystring = [
-            self::COMPACT_MODE => $data[self::COMPACT_MODE],
-            self::TOPIC_SLUG => $data[self::TOPIC_SLUG],
-            self::PAGE_NUMBER => $data[self::PAGE_NUMBER],
-            self::LIMIT => $data[self::LIMIT],
-            self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR],
-            self::FOLDER => $data[self::FOLDER],
-            self::REFERRER => $data[self::REFERRER],
-            self::STATUS => $data[self::STATUS],
-            self::ENTITY_TYPE => $data[self::ENTITY_TYPE],
-            self::RETURN_URL => $data[self::RETURN_URL],
-            self::COMPONENT_ID => $data[self::COMPONENT_ID],
+            self::COMPACT_MODE   => $data[self::COMPACT_MODE] ?? null,
+            self::TOPIC_SLUG     => $data[self::TOPIC_SLUG] ?? null,
+            self::PAGE_NUMBER    => $data[self::PAGE_NUMBER] ?? null,
+            self::LIMIT          => $data[self::LIMIT] ?? null,
+            self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR] ?? null,
+            self::FOLDER         => $data[self::FOLDER] ?? null,
+            self::REFERRER       => $data[self::REFERRER] ?? null,
+            self::STATUS         => $data[self::STATUS] ?? null,
+            self::ENTITY_TYPE    => $data[self::ENTITY_TYPE] ?? null,
+            self::RETURN_URL     => $data[self::RETURN_URL] ?? null,
+            self::COMPONENT_ID   => $data[self::COMPONENT_ID] ?? null,
         ];
     }
 
@@ -112,7 +116,7 @@ class Querystring
      *
      * @return mixed
      */
-    public function getCompactMode()
+    public function getCompactMode(): ?string
     {
         return $this->querystring[self::COMPACT_MODE];
     }
@@ -123,7 +127,7 @@ class Querystring
      *
      * @return mixed
      */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->querystring[self::TOPIC_SLUG];
     }
@@ -132,9 +136,9 @@ class Querystring
     /**
      * Current page index
      *
-     * @return mixed
+     * @return int
      */
-    public function getPageNum()
+    public function getPageNum(): int
     {
         return $this->determinePageNum($this->querystring[self::PAGE_NUMBER]);
     }
@@ -145,7 +149,7 @@ class Querystring
      *
      * @return mixed
      */
-    public function getLimit()
+    public function getLimit(): ?string
     {
         return $this->querystring[self::LIMIT];
     }
@@ -165,11 +169,11 @@ class Querystring
     /**
      * Get the folder id if one was specified
      *
-     * @return mixed
+     * @return null|int
      */
-    public function getFolderId()
+    public function getFolderId(): ?int
     {
-        return $this->querystring[self::FOLDER];
+        return $this->querystring[self::FOLDER] === null ? null : (int)$this->querystring[self::FOLDER];
     }
 
 
@@ -178,7 +182,7 @@ class Querystring
      *
      * @return mixed
      */
-    public function getStatus()
+    public function getStatus(): ?string
     {
         return $this->querystring[self::STATUS];
     }
@@ -189,7 +193,7 @@ class Querystring
      *
      * @return mixed
      */
-    public function getReferrer()
+    public function getReferrer(): ?string
     {
         return $this->querystring[self::REFERRER];
     }
@@ -230,7 +234,7 @@ class Querystring
      * @param null|string $referrer
      * @return $this
      */
-    public function setReferrer(?string $referrer)
+    public function setReferrer(?string $referrer): self
     {
         $this->querystring[self::REFERRER] = $referrer;
         return $this;
@@ -240,11 +244,13 @@ class Querystring
     /**
      * Set entity type
      *
-     * @param string $entityType
+     * @param null|string $entityType
+     * @return $this
      */
-    public function setEntityType(?string $entityType)
+    public function setEntityType(?string $entityType): self
     {
         $this->querystring[self::ENTITY_TYPE] = $entityType;
+        return $this;
     }
 
 
@@ -252,37 +258,43 @@ class Querystring
      * Set the folder id if one was specified
      *
      * @param int $folderId
-     *
+     * @return $this
      */
-    public function setFolderId(int $folderId)
+    public function setFolderId(int $folderId): self
     {
         $this->querystring[self::FOLDER] = (string)$folderId;
+        return $this;
     }
 
 
     /**
      * Set the return url
+     *
      * @param null|string $returnUrl
+     * @return $this
      */
-    public function setReturnUrl(?string $returnUrl)
+    public function setReturnUrl(?string $returnUrl): self
     {
         $this->querystring[self::RETURN_URL] = $returnUrl;
+        return $this;
     }
 
 
     /**
      * @param string|null $componentId
+     * @return $this
      */
-    public function setComponentId(?string $componentId)
+    public function setComponentId(?string $componentId): self
     {
         $this->querystring[self::COMPONENT_ID] = $componentId;
+        return $this;
     }
 
 
     /**
      * Array representation of the params
      *
-     * @return array
+     * @return string[]|null[]
      */
     public function toArray(): array
     {
@@ -296,10 +308,10 @@ class Querystring
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return http_build_query(array_filter($this->querystring, function ($value) {
-            return \strlen($value);
+        return http_build_query(array_filter($this->querystring, static function (?string $value): bool {
+            return trim($value ?? '') !== '';
         }));
     }
 

@@ -28,33 +28,39 @@ use TypeError;
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
     // The discrete, atomic states this article may be in.
-    private const STATE_DRAFT                = 1;
-    private const STATE_AWAITING_MODERATION  = 2;
-    private const STATE_AWAITING_PUBLICATION = 3;
-    private const STATE_REJECTED             = 4;
-    private const STATE_PUBLISHED            = 5;
-    private const STATE_EXPIRED              = 6;
+    // @see https://www.draw.io/#G1hgNAeuen61KzCzlIa0gEzYK5l0qsYtkw
+    public const STATE_DRAFT                = 1;
+    public const STATE_AWAITING_MODERATION  = 2;
+    public const STATE_AWAITING_PUBLICATION = 4;
+    public const STATE_REJECTED             = 8;
+    public const STATE_PUBLISHED            = 16;
+    public const STATE_EXPIRED              = 32;
+
+    public const STATE_NONE = 0;
+    public const STATE_ALL  =
+        self::STATE_DRAFT | self::STATE_AWAITING_MODERATION | self::STATE_AWAITING_PUBLICATION |
+        self::STATE_REJECTED | self::STATE_PUBLISHED | self::STATE_EXPIRED;
 
     // Composite states
-    private const STATE_PUBLIC    = [self::STATE_PUBLISHED, self::STATE_EXPIRED];
-    private const STATE_APPROVED  = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
-    private const STATE_SUBMITTED = [self::STATE_AWAITING_MODERATION, self::STATE_REJECTED, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    public const STATE_PUBLIC    = self::STATE_PUBLISHED | self::STATE_EXPIRED;
+    public const STATE_APPROVED  = self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED | self::STATE_EXPIRED;
+    public const STATE_SUBMITTED = self::STATE_AWAITING_MODERATION | self::STATE_REJECTED | self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED | self::STATE_EXPIRED;
 
     // Authoritative declaration of *possible* transitions.
     // *Permitted* (ie for some user) transitions are always a subset of these.
     // The latter concept is the domain of route auth rules.
     // Action=Submit
-    private const VALID_STATES_TO_SUBMIT    = [self::STATE_DRAFT, self::STATE_REJECTED];
+    private const VALID_STATES_TO_SUBMIT    = self::STATE_DRAFT | self::STATE_REJECTED;
     // Action=UnSubmit
     private const VALID_STATES_TO_UN_SUBMIT = self::STATE_SUBMITTED;
     // Action=Approve
-    private const VALID_STATES_TO_APPROVE   = [self::STATE_DRAFT, self::STATE_AWAITING_MODERATION, self::STATE_REJECTED];
+    private const VALID_STATES_TO_APPROVE   = self::STATE_DRAFT | self::STATE_AWAITING_MODERATION | self::STATE_REJECTED;
     // Action=Reject
-    private const VALID_STATES_TO_REJECT    = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    private const VALID_STATES_TO_REJECT    = self::STATE_AWAITING_MODERATION | self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED | self::STATE_EXPIRED;
     // Action=Publish
-    private const VALID_STATES_TO_PUBLISH   = [self::STATE_AWAITING_PUBLICATION];
+    private const VALID_STATES_TO_PUBLISH   = self::STATE_AWAITING_PUBLICATION;
     // Action=Archive
-    private const VALID_STATES_TO_ARCHIVE   = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED];
+    private const VALID_STATES_TO_ARCHIVE   = self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED;
 
     use Id;
     use CreatedAtDate;
@@ -164,7 +170,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * A set of News\Topic instances - there used to be only one, but now there are zero or many
      *
-     * @var Collection|Topic/Model[]
+     * @var Collection|Topic\Model[]
      */
     private $topics;
 
@@ -262,7 +268,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function isApproved(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::STATE_APPROVED, true);
+        return $this->getDiscreteState($now) & self::STATE_APPROVED;
     }
 
 
@@ -274,7 +280,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function isSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::STATE_SUBMITTED, true);
+        return $this->getDiscreteState($now) & self::STATE_SUBMITTED;
     }
 
 
@@ -290,7 +296,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function isPublic(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::STATE_PUBLIC, true);
+        return $this->getDiscreteState($now) & self::STATE_PUBLIC;
     }
 
 
@@ -378,7 +384,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_SUBMIT, true);
+        return $this->getDiscreteState($now) & self::VALID_STATES_TO_SUBMIT;
     }
 
 
@@ -390,7 +396,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeUnSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_UN_SUBMIT, true);
+        return $this->getDiscreteState($now) & self::VALID_STATES_TO_UN_SUBMIT;
     }
 
 
@@ -402,7 +408,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeApproved(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_APPROVE, true);
+        return $this->getDiscreteState($now) & self::VALID_STATES_TO_APPROVE;
     }
 
 
@@ -414,7 +420,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeRejected(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_REJECT, true);
+        return $this->getDiscreteState($now) & self::VALID_STATES_TO_REJECT;
     }
 
 
@@ -426,7 +432,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeArchived(Alaress_Date_Format $now = null): bool
     {
-        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_ARCHIVE, true);
+        return $this->getDiscreteState($now) & self::VALID_STATES_TO_ARCHIVE;
     }
 
 
@@ -447,8 +453,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
 
         // Invalid operation
-        if (!\in_array($currentState, self::VALID_STATES_TO_SUBMIT, true)) {
-            throw new InvalidTransitionException($currentState, 'Only draft and rejected articles may be submitted');
+        if (!($currentState & self::VALID_STATES_TO_SUBMIT)) {
+            throw new InvalidTransitionException($currentState, "Only draft and rejected articles may be submitted. Found '{$this->getStatus($now)}'");
         }
 
         $this->submittedAt = $now;
@@ -470,8 +476,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
             throw new InvalidTransitionException($currentState, "Article is already a draft");
         }
 
-        if (!\in_array($currentState, self::VALID_STATES_TO_UN_SUBMIT, true)) {
-            throw new InvalidTransitionException($currentState, "Cannot un-submit article");
+        if (!($currentState & self::VALID_STATES_TO_UN_SUBMIT)) {
+            throw new InvalidTransitionException($currentState, "Cannot un-submit article. Found '{$this->getStatus()}'");
         }
 
         // Put back to draft state
@@ -504,8 +510,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
 
         // Ensure it is able to be approved
-        if (!\in_array($currentState, self::VALID_STATES_TO_APPROVE, true)) {
-            throw new InvalidTransitionException($currentState, "Article was already approved by user {$this->acceptedBy->getId()} at {$this->acceptedAt->getDatabase()}");
+        if (!($currentState & self::VALID_STATES_TO_APPROVE)) {
+            throw new InvalidTransitionException($currentState, "Article state does not permit approval. Found '{$this->getStatus($now)}'");
         }
 
         // Ensure it is submitted
@@ -543,8 +549,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
 
         // Invalid operation
-        if (!\in_array($currentState, self::VALID_STATES_TO_REJECT, true)) {
-            throw new InvalidTransitionException($currentState, "An article in draft state cannot be rejected");
+        if (!($currentState & self::VALID_STATES_TO_REJECT)) {
+            throw new InvalidTransitionException($currentState, "Article state does not permit rejection. Found '{$this->getStatus($now)}'");
         }
 
         // Treat article as never being approved.
@@ -578,8 +584,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
 
         // Ensure transition is valid
-        if (!\in_array($currentState, self::VALID_STATES_TO_PUBLISH, true)) {
-            throw new InvalidTransitionException($currentState, "Only articles awaiting publication may be published");
+        if (!($currentState & self::VALID_STATES_TO_PUBLISH)) {
+            throw new InvalidTransitionException($currentState, "Article state does not permit publish. Found '{$this->getStatus($now)}'");
         }
 
         // Default to publish immediately
@@ -612,8 +618,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
 
         // Ensure transition is valid
-        if (!\in_array($currentState, self::VALID_STATES_TO_ARCHIVE, true)) {
-            throw new InvalidTransitionException($currentState, "Only articles awaiting publication, or published, may be archived");
+        if (!($currentState & self::VALID_STATES_TO_ARCHIVE)) {
+            throw new InvalidTransitionException($currentState, "Article state does not permit archive. Found '{$this->getStatus($now)}'");
         }
 
         // Default to expiring now
@@ -887,7 +893,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @param Collection|Topic[] $topics
+     * @param Collection|Topic\Model[] $topics
      * @return $this
      */
     public function setTopics(Collection $topics): self
