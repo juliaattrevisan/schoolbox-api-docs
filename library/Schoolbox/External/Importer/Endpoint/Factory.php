@@ -195,7 +195,7 @@ class Factory
         ];
 
         /* Make a stack of profile xmls (full_ ... .xml)
-         * Make a stack oo student timetable xmls (studenttimetables_ ... .xml)
+         * Make a stack of student timetable xmls (studenttimetables_ ... .xml)
          */
         $numFiles = 0;
 
@@ -208,6 +208,10 @@ class Factory
                     $xml[KamarEndpoint\Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
                     $numFiles++;
                 }
+
+                /* TODO: Potentially manage stafftimetables_xxxx.xml files
+                 * TODO: Potentially manage part_xxxx.xml files
+                 */
             }
         }
 
