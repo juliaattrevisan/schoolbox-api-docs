@@ -898,8 +898,6 @@ class MapperProxy
         // TODO If at all possible, trigger the assessment notifier here so that it contains all assessment information
         // Will need to move participant persistence here before that can happen though.
 
-        // TODO add markbook sync here
-
         // Load the dynamic participation record if this is new.
         if ($isCreate) {
             $this->participantDataSource->loadParticipationIntoAssessment($assessable);
@@ -974,8 +972,6 @@ class MapperProxy
         $assessable->setDeletedAt($dataModel->getDeletedAt());
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
-
-        // TODO add markbook sync here
     }
 
     /**
