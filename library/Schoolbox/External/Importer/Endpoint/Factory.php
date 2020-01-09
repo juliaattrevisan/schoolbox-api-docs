@@ -19,13 +19,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml as IsamsBatchxml;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi as IsamsMockApi;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile as IsamsProfile;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable as IsamsTimetable;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api as KamarApi;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml as KamarBatchxml;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Prepare as KamarPrepare;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile as KamarProfile;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Setup;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable as KamarTimetable;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint as KamarEndpoint;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
@@ -195,14 +189,14 @@ class Factory
 
         /* Set up the kamar directory which is where all their xml files go
          */
-        $bus->add(new Setup(
+        $bus->add(new KamarEndpoint\Setup(
             $this->logger,
             Loader::getInstance()->get('stream_dir')
         ));
 
         /* Purge previously-imported profile relationships and classes
          */
-        $bus->add(new KamarPrepare(
+        $bus->add(new KamarEndpoint\Prepare(
             $this->logger,
             $this->perform,
             UserProfile\Relationship\Mapper::getInstance(),
@@ -222,8 +216,8 @@ class Factory
         $dirhandle = opendir($this->host);
 
         $xml = [
-            Receiver::XML_FULL => [],
-            Receiver::XML_STUDENTTIMETABLES => []
+            KamarEndpoint\Receiver::XML_FULL => [],
+            KamarEndpoint\Receiver::XML_STUDENTTIMETABLES => []
         ];
 
         /* Make a stack of profile xmls (full_ ... .xml)
@@ -231,23 +225,23 @@ class Factory
          */
         while ($xmlFile = readdir($dirhandle)) {
             if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
-                    $xml[Receiver::XML_FULL][] = $xmlFile;
-                } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
-                    $xml[Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
+                if (strpos($xmlFile, KamarEndpoint\Receiver::XML_FULL) !== false) {
+                    $xml[KamarEndpoint\Receiver::XML_FULL][] = $xmlFile;
+                } elseif (strpos($xmlFile, KamarEndpoint\Receiver::XML_STUDENTTIMETABLES) !== false) {
+                    $xml[KamarEndpoint\Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
                 }
             }
         }
 
         /* Load all the Profile xmls
          */
-        $container = new KamarProfile\Container();
+        $container = new KamarEndpoint\Profile\Container();
 
         foreach ($xml['full'] as $xmlFile) {
-            $bus->add(new KamarProfile\Composite(
+            $bus->add(new KamarEndpoint\Profile\Composite(
                 $this->logger,
                 $this->perform,
-                new KamarBatchxml(new KamarApi($this->host . '/' . $xmlFile)),
+                new KamarEndpoint\Batchxml(new KamarEndpoint\Api($this->host . '/' . $xmlFile)),
                 $container,
                 UserProfile\Mapper::getInstance(),
                 UserProfile\Student\Mapper::getInstance(),
@@ -259,7 +253,7 @@ class Factory
 
         /* Set up the Timetable definition separately from the masses of timetable-related xml files
          */
-        $bus->add(new KamarTimetable\Definition(
+        $bus->add(new KamarEndpoint\Timetable\Definition(
             $this->logger,
             $this->perform,
             CampusMapper::getInstance(),
@@ -272,16 +266,16 @@ class Factory
          * Every student timetable processing uses info stored there
          * Recycle this instance in every iteration
          */
-        $lookup = new KamarTimetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
+        $lookup = new KamarEndpoint\Timetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
 
         /* Load all the Student Timetable xmls
          */
         foreach ($xml['studenttimetables'] as $xmlFile) {
-            $bus->add(new KamarTimetable\Composite(
+            $bus->add(new KamarEndpoint\Timetable\Composite(
                 $this->logger,
                 $this->perform,
                 $container,
-                new KamarBatchxml(new KamarApi($this->host . '/' . $xmlFile)),
+                new KamarEndpoint\Batchxml(new KamarEndpoint\Api($this->host . '/' . $xmlFile)),
                 $lookup,
                 ClassEntryMapper::getInstance(),
                 ClassInvolvementMapper::getInstance(),
