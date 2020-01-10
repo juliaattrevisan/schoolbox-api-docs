@@ -46,7 +46,7 @@
                     legend: {
                         enabled: false
                     }
-                }
+                };
 
             options = Highcharts.merge(defaultOptions, options);
 
@@ -58,130 +58,133 @@
 </script>
 
 <div class="row">
-    <div class="small-12 column">
-        <h2 class="subheader">{{ locale.translate('rubricGroup', true, true) }}</h2>
-        <section>
-            <div class="row" id="rubric-table">
+    <div class="small-12 island">
+        <dl class="tabs" data-tab="">
+            <dd class="active"><a href="#panel1-1" aria-selected="true" tabindex="0">Progression</a></dd>
+            <dd class=""><a href="#panel1-2" aria-selected="false" tabindex="0">Descriptors</a></dd>
+        </dl>
+        <div class="tabs-content">
+            <div class="content active" id="panel1-1">
                 {% for capability in longitudinalRubric %}
-                    <div class="small-12 island">
-                        <section data-interaction="collapse" data-collapse-container>
-                            <ul class="information-list">
-                                <li class="list-item">
-                                    <div class="card small small-12">
-                                        <h3>
-                                        <span data-collapser="true" class="expander" title="{{ capability.name }}">
-                                            <a href="#">{{ capability.name | nl2br }}</a>
-                                        </span>
-                                        </h3>
-                                    </div>
-                                </li>
-                                {% for indicator in capability.indicators %}
-                                    <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
-                                        <div class="content">
-                                            <h4>{{ indicator.name | nl2br }}</h4>
-                                            <ul class="information-list">
+                    <h2 class="subheader">{{ capability.name }}</h2>
+                    <table>
+                        {% for indicatorId,indicator in capability.indicators %}
+                            <tr>
+                                <th width="15%">{{ indicator.name }}</th>
+                                <td>
+                                    <div id="rubricGraph{{ indicatorId }}"></div>
+                                    <script type="application/javascript">
+                                        $(function() {
+
+                                            var assessments = [
                                                 {% for activity_id, activity in indicator.activities %}
-                                                    <li>
-                                                        {% set activityAssessment = assessments.by('id', activity_id) %}
-                                                        {% if activityAssessment %}
-                                                            {%- set activityHref = routeLookupIfAuthorized(
-                                                                'learningAssessment.getSummary',
-                                                                {
-                                                                    assessmentId: activity_id,
-                                                                    studentId: student.id,
-                                                                    student: student,
-                                                                    assessment: activityAssessment,
-                                                                }
-                                                                ) -%}
-                                                        {% else %}
-                                                            {%- set activityHref = '' -%}
-                                                        {% endif %}
-                                                        {%- if activityHref -%}
-                                                            <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
-                                                        {%- else -%}
-                                                            {{ activity.name }}
-                                                        {%- endif -%}
-                                                        : <em>{{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}</em>
-                                                    </li>
+                                                "{{ activity.name }}",
                                                 {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </section>
-                    </div>
+                                            ];
+
+                                            var grades = [
+                                                {% for activity_id, activity in indicator.activities %}
+                                                {{ ((activity.value / activity.max_value) * 100) }},
+                                                {% endfor %}
+                                            ]
+
+                                            var ranges = [
+                                                {% for activity_id, activity in indicator.activities %}
+                                                ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],
+                                                {% endfor %}
+                                            ];
+
+                                            $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
+                                                xAxis: [{
+                                                    categories: assessments,
+                                                    visible: false,
+                                                    title: {
+                                                        text: null
+                                                    }
+                                                }],
+                                                series: [{
+                                                    name: 'Marks',
+                                                    data: grades,
+                                                    zIndex: 1,
+                                                    color: 'rgb(255, 87, 87)',
+                                                }, {
+                                                    name: 'Range',
+                                                    data: ranges,
+                                                    type: 'boxplot',
+                                                    linkedTo: ':previous',
+                                                    color: Highcharts.getOptions().colors[0],
+                                                    fillOpacity: 0.3,
+                                                    zIndex: 0,
+                                                    marker: {
+                                                        enabled: false
+                                                    }
+                                                }]
+                                            })
+                                        });
+                                    </script>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
                 {% endfor %}
             </div>
-        </section>
+            <div class="content" id="panel1-2">
+                <section>
+                    <div class="row" id="rubric-table">
+                        {% for capability in longitudinalRubric %}
+                            <div class="small-12 island">
+                                <section data-interaction="collapse" data-collapse-container>
+                                    <ul class="information-list">
+                                        <li class="list-item">
+                                            <div class="card small small-12">
+                                                <h3>
+                                                <span data-collapser="true" class="expander" title="{{ capability.name }}">
+                                                    <a href="#">{{ capability.name | nl2br }}</a>
+                                                </span>
+                                                </h3>
+                                            </div>
+                                        </li>
+                                        {% for indicator in capability.indicators %}
+                                            <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
+                                                <div class="content">
+                                                    <h4>{{ indicator.name | nl2br }}</h4>
+                                                    <ul class="information-list">
+                                                        {% for activity_id, activity in indicator.activities %}
+                                                            <li>
+                                                                {% set activityAssessment = assessments.by('id', activity_id) %}
+                                                                {% if activityAssessment %}
+                                                                    {%- set activityHref = routeLookupIfAuthorized(
+                                                                        'learningAssessment.getSummary',
+                                                                        {
+                                                                            assessmentId: activity_id,
+                                                                            studentId: student.id,
+                                                                            student: student,
+                                                                            assessment: activityAssessment,
+                                                                        }
+                                                                        ) -%}
+                                                                {% else %}
+                                                                    {%- set activityHref = '' -%}
+                                                                {% endif %}
+                                                                {%- if activityHref -%}
+                                                                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
+                                                                {%- else -%}
+                                                                    {{ activity.name }}
+                                                                {%- endif -%}
+                                                                : <em>{{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}</em>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </section>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 
-
-<div class="row">
-    <div class="small-12 column">
-        {% for capability in longitudinalRubric %}
-        <h2 class="subheader">{{ capability.name }}</h2>
-            <table>
-                {% for indicatorId,indicator in capability.indicators %}
-                <tr>
-                    <th width="15%">{{ indicator.name }}</th>
-                    <td>
-                        <div id="rubricGraph{{ indicatorId }}"></div>
-                        <script type="application/javascript">
-                            $(function() {
-
-                                var assessments = [
-                                {% for activity_id, activity in indicator.activities %}
-                                    "{{ activity.name }}",
-                                {% endfor %}
-                                ];
-
-                                var grades = [
-                                    {% for activity_id, activity in indicator.activities %}
-                                    {{ ((activity.value / activity.max_value) * 100) }},
-                                    {% endfor %}
-                                ]
-
-                                var ranges = [
-                                    {% for activity_id, activity in indicator.activities %}
-                                    ["{{ activity.name  }}",14.3, 27.7, 29.1, 40.2, 60.2],
-                                    {% endfor %}
-                                ];
-
-                                $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
-                                    xAxis: [{
-                                        categories: assessments,
-                                        visible: false,
-                                        title: {
-                                            text: null
-                                        }
-                                    }],
-                                    series: [{
-                                        name: 'Marks',
-                                        data: grades,
-                                        zIndex: 1,
-                                        color: 'rgb(255, 87, 87)',
-                                    }, {
-                                        name: 'Range',
-                                        data: ranges,
-                                        type: 'boxplot',
-                                        linkedTo: ':previous',
-                                        color: Highcharts.getOptions().colors[0],
-                                        fillOpacity: 0.3,
-                                        zIndex: 0,
-                                        marker: {
-                                            enabled: false
-                                        }
-                                    }]
-                                })
-                            });
-                        </script>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        {% endfor %}
-        </section>
-    </div>
-</div>

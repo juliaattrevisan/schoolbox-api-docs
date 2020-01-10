@@ -46,6 +46,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -1209,6 +1210,76 @@ class DataSource
                     'max_value'  => $row['max_value'],
                     'value'      => $row['value']
                 ];
+            }
+
+            unset($pb);
+
+            // Find the most recent feedback for all students got the given assessments
+            $pb = new Builder($this->database, '');
+            $pb->in('a.id', $dueWorks->getPropertyValues('id'))
+               ->isNull('a.deleted_at')
+               ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+               ->notNull('sr.published_at')
+               ->isNull('sr.deleted_at');
+
+            $where             = implode(' AND ', $pb->getWhere());
+            $allFeedbackStatement = $this->database->prepare("
+            SELECT
+                sr.id AS feedbackId,
+                a.id  AS assessmentId
+            FROM submission_return sr
+            INNER JOIN submission_box sb ON sr.box_id = sb.id
+            INNER JOIN assessment      a ON sb.assessment_id = a.id
+            WHERE {$where}
+            ORDER BY sr.published_at ASC
+        ");
+            $allFeedbackStatement->execute($pb->getParams());
+
+            $feedbackIds = [];
+            foreach ($allFeedbackStatement as $row) {
+                $allFeedbackIds[] = $row['feedbackId'];
+            }
+            unset($pb);
+
+            if(count($allFeedbackIds) > 0) {
+                // Find the descriptors selected for each of these feedback IDs
+                $pb = new Builder($this->database, '');
+                $pb->in('sr.id', $allFeedbackIds);
+
+                $where            = implode(' AND ', $pb->getWhere());
+                $averageStatement = $this->database->prepare(
+                    "
+                    SELECT
+                        rg.id AS capability_id,
+                        rc.id AS indicator_id,
+                        a.id AS assessment_id,
+                        rdm.value
+                    FROM       rubric_indicator_mark  rdm
+                    INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
+                    INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
+                    INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
+                    INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
+                    INNER JOIN submission_return       sr ON rgm.return_id = sr.id
+                    INNER JOIN submission_box          sb ON sr.box_id = sb.id
+                    INNER JOIN assessment               a ON sb.assessment_id = a.id
+                    WHERE {$where}
+                    ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
+                "
+                );
+                $averageStatement->execute($pb->getParams());
+
+                while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
+                    $allResults[$row['assessment_id']][$row['capability_id']][$row['indicator_id']][] = (float)$row['value'];
+                }
+            }
+
+            foreach($allResults as $assessmentId => $assessment) {
+                foreach($assessment as $capabilityId => $capability) {
+                    foreach($capability as $indicatorId => $indicator) {
+                        $boxPlot = new Summary($indicator);
+                        $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['statistics'] = $boxPlot->getSummary();
+                    }
+                }
             }
 
             return $longitude;

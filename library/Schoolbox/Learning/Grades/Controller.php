@@ -670,7 +670,10 @@ class Controller extends Base
             return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
         });
 
-        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student);
+        $longitudinal = $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student);
+
+
+        return $longitudinal;
     }
 
 
