@@ -23,7 +23,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
 
         if($this->config->get('external_learning_plans')) {
             $learningPlanQuery = "(
-                            SELECT    COUNT(*) 
+                            SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
                             WHERE     IEP.ID = uvStudents.ID AND
                             StartDate <= CURRENT_TIMESTAMP AND
@@ -71,28 +71,28 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         uvStudents.StudentBoarder,
                         uvStudents.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
-                        '' AS StudentLeavingDate,  
-                        '' AS StudentIBFlag,                      
+                        '' AS StudentLeavingDate,
+                        '' AS StudentIBFlag,
                         '' AS EnglishSecondFlag,
                         $learningPlanQuery
             FROM        dbo.uvStudents uvStudents
-            LEFT JOIN   CommunityAlerts ON 
-                            CommunityAlerts.ID = StudentID AND 
+            LEFT JOIN   CommunityAlerts ON
+                            CommunityAlerts.ID = StudentID AND
                             (
-                                CommunityAlerts.AlertDateFrom IS NULL OR 
+                                CommunityAlerts.AlertDateFrom IS NULL OR
                                 CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE)
-                            ) AND 
+                            ) AND
                             (
-                                CommunityAlerts.AlertDateTo IS NULL OR 
+                                CommunityAlerts.AlertDateTo IS NULL OR
                                 CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE)
                             )
             LEFT JOIN   luForm ON uvStudents.StudentForm = luForm.Code
             LEFT JOIN   luTutor ON uvStudents.StudentTutor = luTutor.Code
-            LEFT JOIN   luYearLevel ON 
-                            uvStudents.StudentCampus = luYearLevel.Campus AND 
+            LEFT JOIN   luYearLevel ON
+                            uvStudents.StudentCampus = luYearLevel.Campus AND
                             uvStudents.StudentYearLevel = luYearLevel.Code
-            LEFT JOIN   luHouse House ON 
-                            StudentCampus = House.Campus AND 
+            LEFT JOIN   luHouse House ON
+                            StudentCampus = House.Campus AND
                             StudentHouse = House.Code
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = uvStudents.FileSemester AND
@@ -164,8 +164,8 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
         // Do a query to get the photos modification date in the SIS. We don't pull the actual photo at this time
 
         $queryPhoto = $this->getConnector()->executeQuery(
-            'SELECT uvPhotos.ModifiedDate 
-            FROM dbo.uvPhotos uvPhotos 
+            'SELECT uvPhotos.ModifiedDate
+            FROM dbo.uvPhotos uvPhotos
             WHERE uvPhotos.ID = :externalId',
             ['externalId' => $user->getExternalId()]
         );
@@ -184,8 +184,8 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                 unset($queryPhoto);
 
                 $queryPhoto = $this->getConnector()->executeQuery(
-                    'SELECT uvPhotos.Photo 
-                    FROM dbo.uvPhotos vPhotos 
+                    'SELECT uvPhotos.Photo
+                    FROM dbo.uvPhotos uvPhotos
                     WHERE uvPhotos.ID = :externalId',
                     ['externalId' => $user->getExternalId()]
                 );
