@@ -1171,11 +1171,16 @@ class DataSource
             $descriptorStatement = $this->database->prepare(
                 "
                     SELECT
-                        rg.name AS grouping,
-                        rc.name,
-                        a.id,
-                        a.title,
-                        rd.description
+                        rg.id AS capability_id,
+                        rg.name AS capability_name,
+                        rgm.value AS capability_value,
+                        rc.id AS indicator_id,
+                        rc.name AS indicator_name,
+                        a.id AS assessment_id,
+                        a.title AS asessessment_title,
+                        rd.description,
+                        (SELECT MAX(rd2.max_value) FROM rubric_descriptor rd2 WHERE rd2.rubric_indicator_id = rd.rubric_indicator_id ) as max_value,
+                        rdm.value
                     FROM       rubric_indicator_mark  rdm
                     INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
                     INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
@@ -1193,16 +1198,16 @@ class DataSource
 
             // Collate the selected descriptor values into longitudinal array
             $longitude = [];
-            while ($r = $descriptorStatement->fetch(\PDO::FETCH_NUM)) {
+            while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
 
-                [$capability, $indicator, $assessmentId, $assessmentTitle, $descriptor] = $r;
-
-                $longitude[$capability]['name'] = $capability;
-                $longitude[$capability]['indicators'][$indicator]['name'] = $indicator;
-                $longitude[$capability]['indicators'][$indicator]['activities'][$assessmentId] = [
-                    'id'         => $assessmentId,
-                    'name'       => $assessmentTitle,
-                    'descriptor' => $descriptor,
+                $longitude[$row['capability_id']]['name'] = $row['capability_name'];
+                $longitude[$row['capability_id']]['value'] = $row['capability_value'];
+                $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
+                $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
+                    'name'       => $row['asessessment_title'],
+                    'descriptor' => $row['description'],
+                    'max_value'  => $row['max_value'],
+                    'value'      => $row['value']
                 ];
             }
 

@@ -80,14 +80,14 @@
                                         <div class="content">
                                             <h4>{{ indicator.name | nl2br }}</h4>
                                             <ul class="information-list">
-                                                {% for activity in indicator.activities %}
+                                                {% for activity_id, activity in indicator.activities %}
                                                     <li>
-                                                        {% set activityAssessment = assessments.by('id', activity.id) %}
+                                                        {% set activityAssessment = assessments.by('id', activity_id) %}
                                                         {% if activityAssessment %}
                                                             {%- set activityHref = routeLookupIfAuthorized(
                                                                 'learningAssessment.getSummary',
                                                                 {
-                                                                    assessmentId: activity.id,
+                                                                    assessmentId: activity_id,
                                                                     studentId: student.id,
                                                                     student: student,
                                                                     assessment: activityAssessment,
@@ -101,7 +101,7 @@
                                                         {%- else -%}
                                                             {{ activity.name }}
                                                         {%- endif -%}
-                                                        : <em>{{ activity.descriptor }}</em>
+                                                        : <em>{{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}</em>
                                                     </li>
                                                 {% endfor %}
                                             </ul>
@@ -131,32 +131,23 @@
                         <script type="application/javascript">
                             $(function() {
 
-                                var assessments = ["Assessment 1", "Assessment 2", "Assessment 3", "Assessment 4", "Assessment 5"];
-                                var ranges = [
-                                        ["Assessment 1", 14.3, 27.7, 29.1, 40.2, 60.2],
-                                        [ "Assessment 2", 14.5, 27.8, 29.1, 40.2, 60.2],
-                                        ["Assessment 3", 15.5, 49.6, 53, 68, 79.3],
-                                        ["Assessment 4", 16.7, 53.7, 60.2, 82, 95],
-                                        ["Assessment 5", 16.5, 60, 68, 80, 100]
+                                var assessments = [
+                                {% for activity_id, activity in indicator.activities %}
+                                    "{{ activity.name }}",
+                                {% endfor %}
+                                ];
 
-                                    ],
-                                    ranges2 = [
-                                        [1246406400000, 14.3, 27.7, 29.1, 40.2, 60.2],
-                                        [1246492800000, null, null,null,null,null],
-                                        [1246579200000, 15.5, 29.6, 49.3, 58.2, 64.5],
-                                        [1246665600000, 16.7, 30.7, 43, 48.3, 56.3],
-                                        [1246752000000, null, null,null,null,null]
-                                    ],
-                                    averages = [
-                                         30, 42.1, 53, 63.8, 87.4
-                                    ],
-                                    averages2 = [
-                                        [1246406400000, 21.5],
-                                        [1246492800000, null],
-                                        [1246579200000, 23],
-                                        [1246665600000, 23.8],
-                                        [1246752000000, null]
-                                    ];
+                                var grades = [
+                                    {% for activity_id, activity in indicator.activities %}
+                                    {{ ((activity.value / activity.max_value) * 100) }},
+                                    {% endfor %}
+                                ]
+
+                                var ranges = [
+                                    {% for activity_id, activity in indicator.activities %}
+                                    ["{{ activity.name  }}",14.3, 27.7, 29.1, 40.2, 60.2],
+                                    {% endfor %}
+                                ];
 
                                 $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
                                     xAxis: [{
@@ -168,7 +159,7 @@
                                     }],
                                     series: [{
                                         name: 'Marks',
-                                        data: averages,
+                                        data: grades,
                                         zIndex: 1,
                                         color: 'rgb(255, 87, 87)',
                                     }, {
