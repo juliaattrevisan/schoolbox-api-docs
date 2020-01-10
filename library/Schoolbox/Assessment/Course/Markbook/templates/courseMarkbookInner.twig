@@ -1,5 +1,5 @@
 {#
-    courseSpecId             int                 Course Spec Id
+    courseSpec               CourseSpec\Model
     collapsedAssessments     IAssessable[]       Column headers. Will be specs if imported from spec, impl if created in class's unit-import
     unitSpecs                UnitSpec/Model[]    The unit-specs to display as column header groups
     courseImpls              CourseImpl/Model[]  The vertical sections of the table.
@@ -24,6 +24,22 @@
 
 <div class="row">
     <div class="actions-small-1 row">
+        {% if not courseSpec.courseImplementations|length %}
+        {% set importUrl = routeLookup('courseImport.getImport', {courseSpecId: courseSpec.id, folderId: 0, componentId: 0}) %}
+        <div class="empty-state">
+            <i class="icon-curriculum"></i>
+            <p>
+                This course has not yet been imported to any classes or groups. <a href="{{ importUrl }}">Import this course</a>.
+            </p>
+        </div>
+        {% elseif not collapsedAssessments | length %}
+        <div class="empty-state">
+            <i class="icon-curriculum"></i>
+            <p>
+                There are no activities that match the selected filters.  Try altering the filters to broaden your search.
+            </p>
+        </div>
+        {% else %}
         <nav>
             <div class="legend">
                 <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
@@ -40,7 +56,7 @@
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content="">
             <li class="separator">Report</li>
-            <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpecId} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a></li>
+            <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpec.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a></li>
         </ul>
     </div>
     <div class="small-12 island" style="overflow-x: scroll;">
@@ -246,4 +262,5 @@
             </tbody>
         </table>
     </div>
+    {% endif %}
 </div>

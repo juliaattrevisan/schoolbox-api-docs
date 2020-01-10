@@ -219,7 +219,7 @@ class Controller extends WebController\Base
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@courseMarkbook/courseMarkbookInner.twig', [
-                    'courseSpecId'            => $courseSpec->getId(),
+                    'courseSpec'              => $courseSpec,
                     'collapsedAssessments'    => $courseMarkbook->getCollapsedAssessments(),
                     'unitSpecs'               => $courseMarkbook->getUnitSpecs(),
                     'courseImpls'             => $courseMarkbook->getCourseImpls(),
@@ -289,9 +289,12 @@ class Controller extends WebController\Base
         // * not Assessment Specs
         // * Are inside unitImpls that belong to courseImpls that were imported from the courseSpec
         $courseImpls = $this->courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId());
-        $pb          = $this->unitImplMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
-        $unitImplIds = $this->unitImplMapper->findIdsByPredicates($pb);
-
+        if ($courseImpls->count()) {
+            $pb          = $this->unitImplMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
+            $unitImplIds = $this->unitImplMapper->findIdsByPredicates($pb);
+        } else {
+            $unitImplIds = [];
+        }
         $filters = array_merge($filters, [
             Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
             Filter\Filters\Assessment\NullableContext\UnitImpl\Definition::class => array_combine($unitImplIds, $unitImplIds),
