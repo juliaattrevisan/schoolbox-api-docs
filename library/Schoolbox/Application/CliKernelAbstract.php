@@ -124,7 +124,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         }
 
         // don't report anything
-        if (!isset($cases[$error['type']])) {
+        if (!isset($error['type'], $cases[$error['type']])) {
             exit(self::EXIT_STATUS_OK);
         }
 

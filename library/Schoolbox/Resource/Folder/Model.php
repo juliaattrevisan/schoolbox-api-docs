@@ -189,9 +189,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function getCodeString()
     {
-        $codeSet = array();
+        $codeSet = [];
 
-        if (\count($this->codes)) {
+        if (is_iterable($this->codes)) {
             foreach ($this->codes as $code) {
                 if (!$code->isDeleted()) {
                     $codeSet[] = $code->getCode();
