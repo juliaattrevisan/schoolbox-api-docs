@@ -2799,9 +2799,11 @@ abstract class Mapper implements IMapper, Serializable
                 )->getAll()
             );
 
-            foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
-                // index by ID
-                $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+            if (count($collectionIds)) {
+                foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
+                    // index by ID
+                    $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+                }
             }
         }
 
