@@ -1240,6 +1240,7 @@ class DataSource
                 $allFeedbackIds[] = $row['feedbackId'];
             }
             unset($pb);
+            $allResults = [];
 
             if(count($allFeedbackIds) > 0) {
                 // Find the descriptors selected for each of these feedback IDs
