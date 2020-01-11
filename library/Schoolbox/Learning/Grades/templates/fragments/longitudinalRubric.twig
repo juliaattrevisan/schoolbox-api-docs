@@ -59,12 +59,12 @@
 
 <div class="row">
     <div class="small-12 island">
-        <dl class="tabs" data-tab="">
-            <dd class="active"><a href="#panel1-1" aria-selected="true" tabindex="0">Progression</a></dd>
-            <dd class=""><a href="#panel1-2" aria-selected="false" tabindex="0">Descriptors</a></dd>
+        <dl class="tabs" data-tab>
+            <dd class="active"><a href="#progression" aria-selected="true" tabindex="0">Progression</a></dd>
+            <dd class=""><a href="#descriptors" aria-selected="false" tabindex="0">Descriptors</a></dd>
         </dl>
         <div class="tabs-content">
-            <div class="content active" id="panel1-1">
+            <div class="content active" id="progression">
                 {% for capability in longitudinalRubric %}
                     <h2 class="subheader">{{ capability.name }}</h2>
                     <table>
@@ -75,22 +75,27 @@
                                     <div id="rubricGraph{{ indicatorId }}"></div>
                                     <script type="application/javascript">
                                         $(function() {
-
                                             var assessments = [
                                                 {% for activity_id, activity in indicator.activities %}
+                                                {% if activity.max_value > 0  %}
                                                 "{{ activity.name }}",
+                                                {% endif %}
                                                 {% endfor %}
                                             ];
 
                                             var grades = [
                                                 {% for activity_id, activity in indicator.activities %}
+                                                {% if activity.max_value > 0  %}
                                                 {{ ((activity.value / activity.max_value) * 100) }},
+                                                {% endif %}
                                                 {% endfor %}
-                                            ]
+                                            ];
 
                                             var ranges = [
                                                 {% for activity_id, activity in indicator.activities %}
+                                                {% if activity.max_value > 0  %}
                                                 ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],
+                                                {% endif %}
                                                 {% endfor %}
                                             ];
 
@@ -128,7 +133,7 @@
                     </table>
                 {% endfor %}
             </div>
-            <div class="content" id="panel1-2">
+            <div class="content" id="descriptors">
                 <section>
                     <div class="row" id="rubric-table">
                         {% for capability in longitudinalRubric %}

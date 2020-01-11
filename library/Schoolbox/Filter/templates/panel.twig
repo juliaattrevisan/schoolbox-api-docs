@@ -236,6 +236,7 @@ Usage:
             $serverErrorFeedback.hide();
             $reportContent.attr('data-loaded', '1');
             $reportContent.trigger('filterContentLoaded', [decodedSelections]);
+            $(document).foundation();
             $toast.toastTimeout({text: 'Success!', css: 'success'});
         }
 
