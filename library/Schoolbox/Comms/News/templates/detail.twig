@@ -31,24 +31,6 @@ Data:
 
 {{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], [article.title |default("(untitled)")]) }}
 
-{% if flashMessage|length %}
-    <script>
-        $(function() {
-            $('#flash').on('click', '.close', function(event) {
-                event.preventDefault();
-
-                $('#flash').remove();
-            });
-        });
-    </script>
-    <div class="small-12 columns">
-        <div id="flash" class="alert-box success">
-            {{ flashMessage }}
-            <a class="close">×</a>
-        </div>
-    </div>
-{% endif %}
-
 <div class="actions-small-2 row">
     {% if deleteRoute %}
         <script>
@@ -154,6 +136,24 @@ Data:
     </ul>
     {% endif %}
 </div>
+
+{% if flashMessage|length %}
+    <script>
+        $(function() {
+            $('#flash').on('click', '.close', function(event) {
+                event.preventDefault();
+
+                $('#flash').remove();
+            });
+        });
+    </script>
+    <div class="small-12 columns">
+        <div id="flash" class="alert-box success">
+            {{ flashMessage }}
+            <a class="close">×</a>
+        </div>
+    </div>
+{% endif %}
 
 {# Always display the whole layout of the news article, as the title isn't shown otherwise #}
 <div class="news-post row">
