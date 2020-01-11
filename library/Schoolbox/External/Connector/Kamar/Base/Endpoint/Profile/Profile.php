@@ -52,6 +52,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Container
+     */
+    private $container;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -99,6 +105,7 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Batchxml                        $batchxml
+     * @param Container                       $container
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -109,6 +116,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
+        Container $container,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -118,6 +126,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
+        $this->container = $container;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -141,12 +150,6 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-
-        /* Purge old relations before re-inserting them
-         */
-        if ($this->perform) {
-            $this->relationshipMapper->truncate();
-        }
 
         /* Remember the one and only campus identifier
          */
@@ -178,10 +181,6 @@ class Profile implements IStrategy
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
         }
-
-        if (!$this->perform) {
-            $this->log->info('Planning finished.');
-        }
     }
 
 
@@ -200,7 +199,7 @@ class Profile implements IStrategy
         $students = $this->batchxml->fetchXml('/SMSDirectoryData/students/user');
 
         foreach ($students as $student) {
-            $externalId = trim((string)$student->uniqueid);
+            $externalId = trim((string)$student->xpath('@id')[0]);
             $username = trim((string)$student->username);
             $title = '';
             $firstname = trim((string)$student->firstname);
@@ -380,6 +379,10 @@ class Profile implements IStrategy
             /* Add their parents + relationships too
              */
             $this->importParentsOfStudent($student, $studentBaseProfile);
+
+            /* Remember this person's details for timetable import
+             */
+            $this->container->remember($externalId, $externalId, $title, $firstname, $lastname, $username);
         }
     }
 
@@ -508,7 +511,7 @@ class Profile implements IStrategy
         $staffs = $this->batchxml->fetchXml('/SMSDirectoryData/staff/user');
 
         foreach ($staffs as $staff) {
-            $externalId = trim((string)$staff->uniqueid);
+            $externalId = trim((string)$staff->xpath('@id')[0]);
             $username = trim((string)$staff->username);
             $title = trim((string)$staff->title);
             $firstname = trim((string)$staff->firstname);
@@ -595,6 +598,10 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->staffProfileMapper->save($staffProfile);
             }
+
+            /* Remember this person's details for timetable import
+             */
+            $this->container->remember($externalId, $externalId, $title, $firstname, $lastname, $username);
         }
     }
 }

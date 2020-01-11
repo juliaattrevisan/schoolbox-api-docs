@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -18,9 +19,9 @@ class Status implements IStatus
 {
 
     /**
-     * @var Api
+     * @var string
      */
-    private $api;
+    private $path;
 
 
     /**
@@ -30,7 +31,7 @@ class Status implements IStatus
      */
     public function __construct(string $path)
     {
-        $this->api = new Api($path);
+        $this->path = $path;
     }
 
 
@@ -41,12 +42,51 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
+
         /* We cached the file locally so if it exists, then it's reachable
          * Whether or not it contains valid data is a different question altogether
          */
-        return $this->api->isXmlFileExtant();
+        $expectedXmls = $this->findSpecimens();
+
+        $numFound = \count(array_filter(array_values($expectedXmls)));
+
+        return $numFound === \count($expectedXmls);
     }
 
+
+    /**
+     * Find a specimen xml for each fo the $expectedXmls
+     *
+     * @return array
+     */
+    private function findSpecimens(): array
+    {
+        $expectedXmls = [
+            Receiver::XML_FULL => '',
+            Receiver::XML_STUDENTTIMETABLES => ''
+        ];
+
+        $dirhandle = opendir($this->path);
+
+        while ($xmlFile = readdir($dirhandle)) {
+            if ($xmlFile !== '.' && $xmlFile !== '..') {
+                $path = "{$this->path}/{$xmlFile}";
+
+                /* There's at least one profile xml and one student timetables xml
+                 * and they are both readable
+                 */
+                if ((new Api($path))->isXmlFileExtant()) {
+                    foreach ($expectedXmls as $key => $value) {
+                        if (strpos($xmlFile, $key) !== false) {
+                            $expectedXmls[$key] = $path;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $expectedXmls;
+    }
 
     /**
      * @inheritDoc
@@ -55,12 +95,23 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
-        $specification = new Specification(null, new Batchxml($this->api));
+        $expectedXmls = $this->findSpecimens();
 
-        try {
-            return implode("\n", $specification->check());
-        } catch (\RuntimeException $e) {
-            return "Cannot access api endpoint: {$e->getMessage()}";
+        $specifications = [
+            Receiver::XML_FULL => new Profile\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
+            Receiver::XML_STUDENTTIMETABLES => new Timetable\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
+        ];
+
+        $result = [];
+
+        foreach ($specifications as $key => $specification) {
+            try {
+                $result[] = implode("\n", $specification->check());
+            } catch (\RuntimeException $e) {
+                $result[] = "Cannot access api endpoint: cannot open/read at least one {$key} xml";
+            }
         }
+
+        return implode("\n", $result);
     }
 }
