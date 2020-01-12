@@ -63,11 +63,13 @@ trait ModelSaveTrait
         } catch (PDOException $e) {
             throw new Database\Exception("Could not save model", 0, $e);
         }
-        $triggerCallbacks && $mapper->triggerCallbacks($mapper::CALLBACK_POSTSAVE, $model);
 
-        if ($hasId && !$currentId) {
+        if ($hasId && $currentId === null) {
             $mapper->setModelProperty($model, $mapper->getIdentifierProperty(), $mapper->getDatabase()->lastInsertId());
         }
+
+        $triggerCallbacks && $mapper->triggerCallbacks($mapper::CALLBACK_POSTSAVE, $model);
+
         return $model;
     }
 }
