@@ -56,6 +56,9 @@
         }
     });
 </script>
+<script type="text/css">
+    .highcharts-container, .highcharts-container svg { width: 100% !important; }
+</script>
 
 <div class="row">
     <div class="small-12 island">
@@ -65,12 +68,14 @@
         </dl>
         <div class="tabs-content">
             <div class="content active" id="progression">
+                <table>
                 {% for capability in longitudinalRubric %}
-                    <h2 class="subheader">{{ capability.name }}</h2>
-                    <table>
+                       <tr><td width="15%"><b>{{ capability.name | nl2br }}</b></td>
                         {% for indicatorId,indicator in capability.indicators %}
-                            <tr>
-                                <th width="15%">{{ indicator.name }}</th>
+                            {% if not loop.first %}
+                                <tr><td width="15%">&nbsp;</td>
+                            {% endif %}
+                                <th width="15%">{{ indicator.name | nl2br}}</th>
                                 <td>
                                     <div id="rubricGraph{{ indicatorId }}"></div>
                                     <script type="application/javascript">
@@ -80,7 +85,6 @@
                                                 "{{ activity_name }}",
                                                 {% endfor %}
                                             ];
-
                                             var grades = [
                                                 {% for activity_id, activity_name in rubricAssessmentList %}
                                                 {% set activity = indicator.activities[activity_id] %}
@@ -91,7 +95,6 @@
                                                 {% endif %}
                                                 {% endfor %}
                                             ];
-
                                             var ranges = [
                                                 {% for activity_id, activity in rubricAssessmentList %}
                                                 {% set activity = indicator.activities[activity_id] %}
@@ -102,7 +105,6 @@
                                                 {% endif %}
                                                 {% endfor %}
                                             ];
-
                                             $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
                                                 xAxis: [{
                                                     categories: assessments,
@@ -135,58 +137,56 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                    </table>
                 {% endfor %}
+                    </table>
             </div>
             <div class="content" id="descriptors">
-                <section>
-                        <table>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td>
-                            {% for activity_id, activity_name in rubricAssessmentList  %}
-                            <td>
-                                {% set activityAssessment = assessments.by('id', activity_id) %}
-                                {% if activityAssessment %}
-                                    {%- set activityHref = routeLookupIfAuthorized(
-                                        'learningAssessment.getSummary',
-                                        {
-                                            assessmentId: activity_id,
-                                            studentId: student.id,
-                                            student: student,
-                                            assessment: activityAssessment,
-                                        }
-                                        ) -%}
-                                {% else %}
-                                    {%- set activityHref = '' -%}
-                                {% endif %}
-                                {%- if activityHref -%}
-                                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity_name }}</a>
-                                {%- else -%}
-                                    {{ activity_name }}
-                                {%- endif -%}
-                            </td>
-                            {% endfor %}
-                            </tr>
-                        {% for capability in longitudinalRubric %}
-                            <tr >
-                                <td rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></td>
-                            {% for indicator in capability.indicators %}
-                                {% if not loop.first %}
-                                <tr>
-                                {% endif %}
-                                <td><b>{{ indicator.name | nl2br }}</b></td>
-                                {% for activity_id, activity_name in rubricAssessmentList %}
-                                    {% set activity = indicator.activities[activity_id] %}
-                                        <td>
-                                        {{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
-                                        </td>
+                <table>
+                    <tr><td>&nbsp;</td><td>&nbsp;</td>
+                    {% for activity_id, activity_name in rubricAssessmentList  %}
+                    <td>
+                        {% set activityAssessment = assessments.by('id', activity_id) %}
+                        {% if activityAssessment %}
+                            {%- set activityHref = routeLookupIfAuthorized(
+                                'learningAssessment.getSummary',
+                                {
+                                    assessmentId: activity_id,
+                                    studentId: student.id,
+                                    student: student,
+                                    assessment: activityAssessment,
+                                }
+                                ) -%}
+                        {% else %}
+                            {%- set activityHref = '' -%}
+                        {% endif %}
+                        {%- if activityHref -%}
+                            <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity_name }}</a>
+                        {%- else -%}
+                            {{ activity_name }}
+                        {%- endif -%}
+                    </td>
+                    {% endfor %}
+                    </tr>
+                {% for capability in longitudinalRubric %}
+                    <tr >
+                        <td rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></td>
+                    {% for indicator in capability.indicators %}
+                        {% if not loop.first %}
+                        <tr>
+                        {% endif %}
+                        <td><b>{{ indicator.name | nl2br }}</b></td>
+                        {% for activity_id, activity_name in rubricAssessmentList %}
+                            {% set activity = indicator.activities[activity_id] %}
+                                <td>
+                                {{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                                </td>
 
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                            </tr>
                         {% endfor %}
-                        </table>
-                </section>
+                    </tr>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+                </table>
             </div>
         </div>
     </div>
