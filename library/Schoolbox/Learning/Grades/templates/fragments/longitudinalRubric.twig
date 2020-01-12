@@ -140,58 +140,52 @@
             </div>
             <div class="content" id="descriptors">
                 <section>
-                    <div class="row" id="rubric-table">
+                        <table>
+                            <tr><td>&nbsp;</td><td>&nbsp;</td>
+                            {% for activity_id, activity_name in rubricAssessmentList  %}
+                            <td>
+                                {% set activityAssessment = assessments.by('id', activity_id) %}
+                                {% if activityAssessment %}
+                                    {%- set activityHref = routeLookupIfAuthorized(
+                                        'learningAssessment.getSummary',
+                                        {
+                                            assessmentId: activity_id,
+                                            studentId: student.id,
+                                            student: student,
+                                            assessment: activityAssessment,
+                                        }
+                                        ) -%}
+                                {% else %}
+                                    {%- set activityHref = '' -%}
+                                {% endif %}
+                                {%- if activityHref -%}
+                                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity_name }}</a>
+                                {%- else -%}
+                                    {{ activity_name }}
+                                {%- endif -%}
+                            </td>
+                            {% endfor %}
+                            </tr>
                         {% for capability in longitudinalRubric %}
-                            <div class="small-12 island">
-                                <section data-interaction="collapse" data-collapse-container>
-                                    <ul class="information-list">
-                                        <li class="list-item">
-                                            <div class="card small small-12">
-                                                <h3>
-                                                <span data-collapser="true" class="expander" title="{{ capability.name }}">
-                                                    <a href="#">{{ capability.name | nl2br }}</a>
-                                                </span>
-                                                </h3>
-                                            </div>
-                                        </li>
-                                        {% for indicator in capability.indicators %}
-                                            <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
-                                                <div class="content">
-                                                    <h4>{{ indicator.name | nl2br }}</h4>
-                                                    <ul class="information-list">
-                                                        {% for activity_id, activity in indicator.activities %}
-                                                            <li>
-                                                                {% set activityAssessment = assessments.by('id', activity_id) %}
-                                                                {% if activityAssessment %}
-                                                                    {%- set activityHref = routeLookupIfAuthorized(
-                                                                        'learningAssessment.getSummary',
-                                                                        {
-                                                                            assessmentId: activity_id,
-                                                                            studentId: student.id,
-                                                                            student: student,
-                                                                            assessment: activityAssessment,
-                                                                        }
-                                                                        ) -%}
-                                                                {% else %}
-                                                                    {%- set activityHref = '' -%}
-                                                                {% endif %}
-                                                                {%- if activityHref -%}
-                                                                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
-                                                                {%- else -%}
-                                                                    {{ activity.name }}
-                                                                {%- endif -%}
-                                                                : <em>{{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}</em>
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </section>
-                            </div>
+                            <tr >
+                                <td rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></td>
+                            {% for indicator in capability.indicators %}
+                                {% if not loop.first %}
+                                <tr>
+                                {% endif %}
+                                <td><b>{{ indicator.name | nl2br }}</b></td>
+                                {% for activity_id, activity_name in rubricAssessmentList %}
+                                    {% set activity = indicator.activities[activity_id] %}
+                                        <td>
+                                        {{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                                        </td>
+
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                            </tr>
                         {% endfor %}
-                    </div>
+                        </table>
                 </section>
             </div>
         </div>

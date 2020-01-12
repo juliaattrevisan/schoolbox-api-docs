@@ -1191,7 +1191,7 @@ class DataSource
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
-                    ORDER BY a.due_date DESC;
+                    ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
                 "
             );
             $descriptorStatement->execute($pb->getParams());
