@@ -571,7 +571,9 @@ abstract class SectionAssessmentAbstract
             $assessableImpl,
             $assessableSpec,
             $owner,
-            $unitImpl
+            $unitImpl,
+            $openDate,
+            $dueDate
         );
         if ($assessmentUpdated || $assessableUpdated) {
             $this->countAssessablesUpdated++;
@@ -598,6 +600,8 @@ abstract class SectionAssessmentAbstract
      * @param IAssessableDataModel $assessableSpec
      * @param User                 $owner
      * @param UnitImpl\Model       $unitImpl
+     * @param string               $openDate
+     * @param string               $dueDate
      * @return bool
      * @throws Mapper\Exception
      * @throws PDOException
@@ -608,7 +612,9 @@ abstract class SectionAssessmentAbstract
         IAssessableDataModel $assessableImpl,
         IAssessableDataModel $assessableSpec,
         User $owner,
-        UnitImpl\Model $unitImpl
+        UnitImpl\Model $unitImpl,
+        string $openDate,
+        string $dueDate
     ): bool;
 
 

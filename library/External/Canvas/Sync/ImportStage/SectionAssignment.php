@@ -239,7 +239,9 @@ class SectionAssignment extends SectionAssessmentAbstract
         IAssessableDataModel $assessableImpl,
         IAssessableDataModel $assessableSpec,
         User $owner,
-        UnitImpl\Model $unitImpl
+        UnitImpl\Model $unitImpl,
+        string $openDate,
+        string $dueDate
     ): bool {
         if (
             $assessableImpl->getMaxMark() === $assessableSpec->getMaxMark() &&

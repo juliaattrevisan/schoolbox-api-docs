@@ -10,6 +10,7 @@ namespace External\Canvas\Sync\ImportStage;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use External_ClassInterface;
@@ -293,9 +294,11 @@ class SectionQuiz extends SectionAssessmentAbstract
         IAssessableDataModel $assessableImpl,
         IAssessableDataModel $assessableSpec,
         User $owner,
-        UnitImpl\Model $unitImpl
+        UnitImpl\Model $unitImpl,
+        string $openDate,
+        string $dueDate
     ): bool {
-        $quizUpdated    = $this->syncWithQuiz($assessmentCanvasId, $assessableImpl, $assessableSpec, $owner, $unitImpl);
+        $quizUpdated    = $this->syncWithQuiz($assessmentCanvasId, $assessableImpl, $assessableSpec, $owner, $unitImpl, $openDate, $dueDate);
         $sectionUpdated = $this->syncSections($assessableImpl, $assessableSpec);
 
         return $quizUpdated || $sectionUpdated;
@@ -468,17 +471,19 @@ class SectionQuiz extends SectionAssessmentAbstract
      * @param Quiz\Model     $quizSpec
      * @param User           $owner
      * @param UnitImpl\Model $unitImpl
+     * @param string         $openDate
+     * @param string         $dueDate
      * @return bool
      * @throws Mapper\Exception
-     * @throws UnexpectedValueException
-     * @throws PDOException
      */
     private function syncWithQuiz(
         int $assessmentCanvasId,
         Quiz\Model $quizImpl,
         Quiz\Model $quizSpec,
         User $owner,
-        UnitImpl\Model $unitImpl
+        UnitImpl\Model $unitImpl,
+        string $openDate,
+        string $dueDate
     ): bool {
         if (
             // Does any attribute no longer align?
@@ -491,6 +496,8 @@ class SectionQuiz extends SectionAssessmentAbstract
             $quizImpl->getWeight() === $quizSpec->getWeight() &&
             $quizImpl->getAnonymousResult() === $quizSpec->getAnonymousResult() &&
             $quizImpl->getMarkVisibility() === $quizSpec->getMarkVisibility() &&
+            $quizImpl->getStart()->getDatabase() === $openDate &&
+            $quizImpl->getFinish()->getDatabase() === $dueDate &&
             $quizImpl->getUser()->getId() === $owner->getId() &&
             $quizImpl->getCreated()->getDatabase() === $quizSpec->getCreated()->getDatabase() &&
             $quizImpl->getCategory()->getId() === $unitImpl->getFolder()->getId() &&
@@ -506,6 +513,8 @@ class SectionQuiz extends SectionAssessmentAbstract
             ->setWorkType($quizSpec->getWorkType())
             ->setTitle($quizSpec->getTitle())
             ->setDescription($quizSpec->getDescription())
+            ->setStart(Alaress_Date_Format::newDatabaseDate($openDate))
+            ->setFinish(Alaress_Date_Format::newDatabaseDate($dueDate))
             ->setDuration($quizSpec->getDuration())
             ->setMaxAttempts($quizSpec->getMaxAttempts())
             ->setWeight($quizSpec->getWeight())
@@ -630,6 +639,8 @@ class SectionQuiz extends SectionAssessmentAbstract
             ->setAssessmentModel($assessmentImpl)            // TODO This line compensates for a core bug. Fix this properly in develop.
             ->setCategory($unitImpl->getFolder())
             ->setUser($owner)
+            ->setStart(Alaress_Date_Format::newDatabaseDate($openDate))
+            ->setFinish(Alaress_Date_Format::newDatabaseDate($dueDate))
             ->setExternalId(null);
 
         // Insert Quiz Impl
