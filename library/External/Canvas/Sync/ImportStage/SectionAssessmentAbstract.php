@@ -223,6 +223,9 @@ abstract class SectionAssessmentAbstract
         foreach ($coursesSectionData as $courseCanvasId => $courseSectionsData) {
             $this->log->info("Processing Canvas Course '{$courseSectionsData['name']}' (CanvasId: $courseCanvasId)");
             $unitSpec = $this->unitSpecMapper->findOneByPredicates($this->courseBridge->equalsCanvasCourse($courseCanvasId, 'f'));
+            if (!array_key_exists($courseCanvasId, $coursesAssessmentData)) {
+                continue;
+            }
             foreach ($coursesAssessmentData[$courseCanvasId] as $assessmentCanvasId => $assessment) {
                 /* We need to examine the Canvas assignment/quiz and assignment-overrides to determine:
                  * - What class folders does this assignment/quiz need to be copied to?

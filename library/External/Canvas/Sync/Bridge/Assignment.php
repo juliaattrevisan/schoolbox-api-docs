@@ -22,7 +22,7 @@ use function explode;
 use function strtolower;
 
 /**
- * Responsible for providing the link between a  Canvas Assignment to Schoolbox SubmissionBox Spec
+ * Responsible for providing the link between a Canvas Assignment/Quiz to Schoolbox SubmissionBox/Quiz Spec
  */
 class Assignment
 {
@@ -53,6 +53,23 @@ class Assignment
         $this->siteLocation = $siteLocation;
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
         $this->workTypes    = $workTypes->shallowClone()->indexBy('id');
+    }
+
+    public function syncCanvasAssignments(): bool
+    {
+        // For now, all instances sync assignments
+        return true;
+    }
+
+    public function syncCanvasQuizzes(): bool
+    {
+        switch (strtolower($this->siteLocation)) {
+            case 'staloy':
+                return false;
+            case 'demo':
+            default:
+                return true;
+        }
     }
 
 

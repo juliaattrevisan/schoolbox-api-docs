@@ -199,6 +199,9 @@ class CourseAssignments
             $unitSpecFolder = $this->folderMapper->findOneByPredicates($pb);
 
             foreach ($courseData['assignments'] as $assignmentCanvasId => $assignmentData) {
+                if (!$this->assignmentBridge->syncCanvasAssignments()) {
+                    continue;
+                }
                 $this->countAssignmentsSynchronised++;
                 $submissionBox                  = $this->syncWithSubmissionBox(
                     $unitSpecFolder,
