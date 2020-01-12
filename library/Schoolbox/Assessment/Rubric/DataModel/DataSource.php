@@ -1175,6 +1175,7 @@ class DataSource
                         rg.id AS capability_id,
                         rg.name AS capability_name,
                         rgm.value AS capability_value,
+                        rcu.max_value AS capability_max_value,
                         rc.id AS indicator_id,
                         rc.name AS indicator_name,
                         a.id AS assessment_id,
@@ -1189,6 +1190,7 @@ class DataSource
                     INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
                     INNER JOIN submission_return       sr ON rgm.return_id = sr.id
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
+                    INNER JOIN rubric_capability_usage rcu ON rg.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
                     ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
@@ -1202,7 +1204,8 @@ class DataSource
             while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
 
                 $longitude[$row['capability_id']]['name'] = $row['capability_name'];
-                $longitude[$row['capability_id']]['value'] = $row['capability_value'];
+                $longitude[$row['capability_id']]['value'][$row['assessment_id']] = $row['capability_value'];
+                $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] = $row['capability_value'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
                     'name'       => $row['asessessment_title'],

@@ -65,6 +65,8 @@
         <dl class="tabs" data-tab>
             <dd class="active"><a href="#progression" aria-selected="true" tabindex="0">Progression</a></dd>
             <dd class=""><a href="#descriptors" aria-selected="false" tabindex="0">Descriptors</a></dd>
+            <dd class=""><a href="#capabilities" aria-selected="false" tabindex="0">Capabilities</a></dd>
+
         </dl>
         <div class="tabs-content">
             <div class="content active" id="progression">
@@ -186,6 +188,50 @@
                     {% endfor %}
                     </tr>
                 {% endfor %}
+                </table>
+            </div>
+            <div class="content" id="capabilities">
+                <table>
+                    <tr><td>&nbsp;</td>
+                        {% for activity_id, activity_name in rubricAssessmentList  %}
+                            <td>
+                                {% set activityAssessment = assessments.by('id', activity_id) %}
+                                {% if activityAssessment %}
+                                    {%- set activityHref = routeLookupIfAuthorized(
+                                        'learningAssessment.getSummary',
+                                        {
+                                            assessmentId: activity_id,
+                                            studentId: student.id,
+                                            student: student,
+                                            assessment: activityAssessment,
+                                        }
+                                        ) -%}
+                                {% else %}
+                                    {%- set activityHref = '' -%}
+                                {% endif %}
+                                {%- if activityHref -%}
+                                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity_name }}</a>
+                                {%- else -%}
+                                    {{ activity_name }}
+                                {%- endif -%}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    {% for capability in longitudinalRubric %}
+                        <tr>
+                        <td><b>{{ capability.name | nl2br }}</b></td>
+                            {% for activity_id, activity_name in rubricAssessmentList %}
+                                {% set activity = indicator.activities[activity_id] %}
+                                <td>
+                                    {% if capability.value[activity_id] %}
+                                        {{ capability.value[activity_id] | round }} / {{ capability.max_value[activity_id] | round  }}
+                                        {% else %}
+                                        &nbsp;
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
                 </table>
             </div>
         </div>
