@@ -1191,7 +1191,7 @@ class DataSource
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
-                    ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
+                    ORDER BY a.due_date DESC;
                 "
             );
             $descriptorStatement->execute($pb->getParams());
@@ -1279,9 +1279,12 @@ class DataSource
                     foreach($capability as $indicatorId => $indicator) {
                         $boxPlot = new Summary($indicator);
                         $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['statistics'] = $boxPlot->getSummary();
+                        $assessmentList[$assessmentId] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['name'];
                     }
                 }
             }
+
+            $longitude['assessments'] = $assessmentList;
 
             return $longitude;
         }

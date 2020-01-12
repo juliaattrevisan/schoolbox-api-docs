@@ -76,25 +76,29 @@
                                     <script type="application/javascript">
                                         $(function() {
                                             var assessments = [
-                                                {% for activity_id, activity in indicator.activities %}
-                                                {% if activity.max_value > 0  %}
-                                                "{{ activity.name }}",
-                                                {% endif %}
+                                                {% for activity_id, activity_name in rubricAssessmentList %}
+                                                "{{ activity_name }}",
                                                 {% endfor %}
                                             ];
 
                                             var grades = [
-                                                {% for activity_id, activity in indicator.activities %}
+                                                {% for activity_id, activity_name in rubricAssessmentList %}
+                                                {% set activity = indicator.activities[activity_id] %}
                                                 {% if activity.max_value > 0  %}
                                                 {{ ((activity.value / activity.max_value) * 100) }},
+                                                {% else %}
+                                                '',
                                                 {% endif %}
                                                 {% endfor %}
                                             ];
 
                                             var ranges = [
-                                                {% for activity_id, activity in indicator.activities %}
+                                                {% for activity_id, activity in rubricAssessmentList %}
+                                                {% set activity = indicator.activities[activity_id] %}
                                                 {% if activity.max_value > 0  %}
                                                 ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],
+                                                {% else %}
+                                                '',
                                                 {% endif %}
                                                 {% endfor %}
                                             ];
@@ -111,6 +115,7 @@
                                                     name: 'Marks',
                                                     data: grades,
                                                     zIndex: 1,
+                                                    connectNulls: true,
                                                     color: 'rgb(255, 87, 87)',
                                                 }, {
                                                     name: 'Range',

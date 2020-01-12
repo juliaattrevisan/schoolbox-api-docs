@@ -496,6 +496,8 @@ class Controller extends Base
         $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
 
         $longitudinalRubric = $this->getLongitudinalRubricData($assessments, $viewee);
+        $rubricAssessmentList = $longitudinalRubric['assessments'];
+        unset($longitudinalRubric['assessments']);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
@@ -506,6 +508,7 @@ class Controller extends Base
                 'canSeeShowcaseButton' => $canSeeShowcaseButton,
                 'graph'              => $graph,
                 'longitudinalRubric' => $longitudinalRubric,
+                'rubricAssessmentList' => $rubricAssessmentList,
                 'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getAsString(),
         ]));

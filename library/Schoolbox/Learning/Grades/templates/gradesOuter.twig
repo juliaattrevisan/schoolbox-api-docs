@@ -30,6 +30,10 @@
                 folderId: '{{ subject.id }}'
             }
         });
+        $('[data-print]').click(function () {
+            window.print();
+            $('#container').highcharts().reflow();
+        });
     });
 </script>
 
@@ -37,10 +41,15 @@
 
 {{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ locale.grades.properPlural }} for {{ subject.name }}</h1>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{{ locale.grades.properPlural }} for {{ subject.name }}</h1>
+        </div>
     </div>
+    <nav>
+        <a href="#" data-print class="icon-print" title="Print Report"></a>
+    </nav>
 </div>
 
 <div class="row">

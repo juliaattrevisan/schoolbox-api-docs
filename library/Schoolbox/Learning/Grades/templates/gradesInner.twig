@@ -32,6 +32,7 @@
     {% if longitudinalRubric %}
         {% include '@learningGrades/fragments/longitudinalRubric.twig' with {
         longitudinalRubric: longitudinalRubric,
+        rubricAssessmentList: rubricAssessmentList,
         student:            student,
         assessments:        markbook.assessments,
         returnUrlSuffix:    returnUrlSuffix
