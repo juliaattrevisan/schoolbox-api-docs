@@ -4,6 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
@@ -12,11 +13,10 @@ use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Model as PastoralRecord;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
@@ -29,6 +29,7 @@ use HouseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
+use Aura\Router\Exception\RouteNotFound;
 
 class Controller extends Base
 {
@@ -137,7 +138,7 @@ class Controller extends Base
     /**
      * Display report builder saved reports
      */
-    public function getIndex()
+    public function getIndex(): void
     {
         $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser());
 
@@ -172,8 +173,9 @@ class Controller extends Base
 
     /**
      * Create new pastoral report
+     * @throws MapperException
      */
-    public function getReportInsert()
+    public function getReportInsert(): void
     {
         $report = $this->pastoralReportMapper->createModel();
         $report->setOwner($this->getUser());
@@ -186,7 +188,7 @@ class Controller extends Base
      *
      * @param PastoralReport $report
      */
-    public function getReportUpdate($report)
+    public function getReportUpdate($report): void
     {
         // These are required to populate the selectize
 
@@ -299,7 +301,7 @@ class Controller extends Base
      *
      * @param PastoralTag $tag
      */
-    public function getReportTags($tag)
+    public function getReportTags($tag): void
     {
         $records = $this->pastoralDataSource->findByTag($this->getUser(), $tag);
 
@@ -321,8 +323,9 @@ class Controller extends Base
      * Generate a pastoral report with the relevant filtering applied, this version has the accordion and pagination
      *
      * @param PastoralReport $report
+     * @throws MapperException
      */
-    public function getReportResults($report)
+    public function getReportResults(PastoralReport $report): void
     {
         $records = $this->getReportData($report);
 
@@ -359,27 +362,70 @@ class Controller extends Base
     }
 
     /**
+     * Exports report data
+     * @param PastoralReport $report
+     */
+    public function getReportResultsExport(PastoralReport $report): void
+    {
+        $records  = $this->getReportData($report);
+        $exporter = new \Report_Exporter($report->getName());
+        $exporter->setHeadings([
+            'Pastoral ID'  => 'Pastoral ID',
+            'Student Name' => 'Student Name',
+            'Student ID'   => 'Student ID',
+            'Title'        => 'Title',
+            'Type'         => 'Type',
+            'Sub-Type'     => 'Sub-Type',
+            'Tags'         => 'Tags',
+            'Body'         => 'Body',
+        ]);
+
+        // we need to modify the dataset to substitute resourceIDs with their actual names / descriptions
+        $exporter->setData($records, [$this, 'dataManipulator']);
+        $exporter->exportCSV();
+    }
+
+    /**
+     * Manipulator for exporting report
+     * @param PastoralRecord $record
+     * @return array
+     */
+    public function dataManipulator(PastoralRecord $record): array
+    {
+        return [
+            'Pastoral ID'  => $record->getId(),
+            'Student Name' => $record->getStudent()->getFullName(),
+            'Student ID'   => $record->getStudent()->getId(),
+            'Title'        => $record->getHeading(),
+            'Type'         => $record->getType() ? $record->getType()->getName() : '',
+            'Sub-Type'     => $record->getSubType() ? $record->getSubType()->getName() : '',
+            'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
+            'Body'         => $record->getBodyPublic(),
+        ];
+    }
+
+    /**
      * Get pastoral report records
      *
      * @param PastoralReport $report
      *
      * @return Collection
      */
-    private function getReportData($report)
+    private function getReportData($report): Collection
     {
         // Get matching records
 
         $beforeDate = Alaress_Date_Format::now();
         // Special case for the current term relative date, which is not a strtotime-able thingy
-        if ($report->getRelativeDateString() === self::THIS_TERM) {
-            $afterDate = $this->termMapper->findForToday()->getStart();
+        if ($report->getUsesRelativeDate()) {
+            if ($report->getRelativeDateString() === self::THIS_TERM) {
+                $afterDate = $this->termMapper->findForToday()->getStart();
+            } else {
+                $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
+            }
         } else {
-            $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
-        }
-
-        if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
-            $afterDate = $report->getAfterDate();
+            $afterDate  = $report->getAfterDate();
         }
 
         return $this->pastoralDataSource->getReportData(
@@ -403,16 +449,19 @@ class Controller extends Base
      * Delete pastoral report
      *
      * @param PastoralReport $report
+     * @throws MapperException
      */
-    public function postReportDelete($report)
+    public function postReportDelete($report): void
     {
         $this->pastoralReportMapper->delete($report);
     }
 
     /**
      * Insert/update pastoral report
+     * @throws MapperException
+     * @throws RouteNotFound
      */
-    public function postReportModify()
+    public function postReportModify(): void
     {
         $post = $this->getRequest()->post;
 
@@ -535,8 +584,9 @@ class Controller extends Base
 
     /**
      * Update the display status of a report on the current users dashboard
+     * @throws MapperException
      */
-    public function postReportDashboardModify()
+    public function postReportDashboardModify(): void
     {
         $post = $this->getRequest()->post;
 
@@ -562,8 +612,9 @@ class Controller extends Base
      * @param bool           $display
      *
      * @return string
+     * @throws MapperException
      */
-    private function updatePastoralDashboard($report, $display)
+    private function updatePastoralDashboard($report, $display): string
     {
         try {
             // Check if the report is already on the dashboard

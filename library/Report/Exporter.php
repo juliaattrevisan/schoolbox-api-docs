@@ -67,7 +67,7 @@ class Report_Exporter {
         $this->filename = str_replace(' ', '_', strtolower($this->filename));
 
         // set the output headers
-        header('Content-type: text/csv');
+        header('Content-type: text/csv; charset=UTF-8');
         header('Content-disposition: attachment; filename="report-' . $this->filename . '.csv"');
 
         $outstream = fopen("php://output", 'r');
@@ -90,8 +90,8 @@ class Report_Exporter {
 
     /**
      * Check for and perform any data manipulation that needs doing, then write the row to file
+     * @param $outstream
      * @param $row
-     * @return array
      */
     protected function parseRow($outstream, $row) {
         if(is_callable($this->dataManipulatorCallback)) {
@@ -104,5 +104,4 @@ class Report_Exporter {
 
         fputcsv($outstream, $datum);
     }
-
 }
