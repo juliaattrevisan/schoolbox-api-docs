@@ -1133,6 +1133,7 @@ class DataSource
             return [];
         }
 
+        $dueWorks->indexBy('id');
 
         // Find the most recent feedback for each of these due works
         $pb = new Builder($this->database, '');
@@ -1180,6 +1181,8 @@ class DataSource
                         rc.name AS indicator_name,
                         a.id AS assessment_id,
                         a.title AS asessessment_title,
+                        sb.mark_type,
+                        rl.name as level,
                         rd.description,
                         (SELECT MAX(rd2.max_value) FROM rubric_descriptor rd2 WHERE rd2.rubric_indicator_id = rd.rubric_indicator_id ) as max_value,
                         rdm.value
@@ -1187,6 +1190,7 @@ class DataSource
                     INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
                     INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
                     INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
+                    INNER JOIN rubric_level            rl ON rd.level_id = rl.id
                     INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
                     INNER JOIN submission_return       sr ON rgm.return_id = sr.id
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
@@ -1201,15 +1205,27 @@ class DataSource
 
             // Collate the selected descriptor values into longitudinal array
             $longitude = [];
+            $markSchemeFactory = new MarkSchemeFactory();
+
             while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
 
-                $longitude[$row['capability_id']]['name'] = $row['capability_name'];
-                $longitude[$row['capability_id']]['value'][$row['assessment_id']] = $row['capability_value'];
-                $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] = $row['capability_value'];
+                $longitude[$row['capability_id']]['name']                             = $row['capability_name'];
+                $longitude[$row['capability_id']]['value'][$row['assessment_id']]     = $row['capability_value'];
+                $longitude[$row['capability_id']]['mark_type'][$row['assessment_id']] = $row['mark_type'];
+                $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] = $row['capability_max_value'];
+
+                // Create the cap mark
+                if (!isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']]) && $row['capability_max_value'] > 0 && isset($dueWorks[$row['assessment_id']]) ) {
+                    $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $markSchemeFactory->spawnForCapability(
+                        $dueWorks[$row['assessment_id']], $row['capability_max_value']
+                    )->getHumanReadableMark(($row['capability_value'] / $row['capability_max_value']) * 100);
+                }
+
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
                     'name'       => $row['asessessment_title'],
                     'descriptor' => $row['description'],
+                    'level'      => $row['level'],
                     'max_value'  => $row['max_value'],
                     'value'      => $row['value']
                 ];
@@ -1238,7 +1254,7 @@ class DataSource
         ");
             $allFeedbackStatement->execute($pb->getParams());
 
-            $feedbackIds = [];
+            $allFeedbackIds = [];
             foreach ($allFeedbackStatement as $row) {
                 $allFeedbackIds[] = $row['feedbackId'];
             }

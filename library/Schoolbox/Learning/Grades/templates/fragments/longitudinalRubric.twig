@@ -179,8 +179,10 @@
                         <td><b>{{ indicator.name | nl2br }}</b></td>
                         {% for activity_id, activity_name in rubricAssessmentList %}
                             {% set activity = indicator.activities[activity_id] %}
-                                <td>
-                                {{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                                <td><p>
+                                    {% if  activity.level %}<b>{{ activity.level }}</b><br />{% endif %}
+                                    {{ activity.descriptor }} {% if activity.value %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                                </p>
                                 </td>
 
                         {% endfor %}
@@ -224,7 +226,7 @@
                                 {% set activity = indicator.activities[activity_id] %}
                                 <td>
                                     {% if capability.value[activity_id] %}
-                                        {{ capability.value[activity_id] | round }} / {{ capability.max_value[activity_id] | round  }}
+                                        {{ capability.mark[activity_id] }}
                                         {% else %}
                                         &nbsp;
                                     {% endif %}
