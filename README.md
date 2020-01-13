@@ -93,3 +93,4 @@ This is to follow the standard packaging process linux distributions use for web
   * [Smoke Tests](./test/codeception/smoketests/README.md)
   * [Behaviour Tests](./test/behavior/README.md)
   * [Unit Tests](./docs/unit-test.md)
+  * [PHP Stan](./docs/php-stan.md)
