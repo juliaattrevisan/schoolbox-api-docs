@@ -406,7 +406,7 @@ class Controller extends BaseController
             /* If Inherit Permissions is on, don't create group
              */
             if ($model->getInherit()) {
-                $newLocation = $this->router->generate('resourceBrowser.browse', ['folderId' => $model->getId()]);
+                $newLocation = $this->getSession()->getHistory(2);
             } else {
                 $newLocation = $this->createGroup($this->getRequest()->post, $model, $this->getUser());
             }
