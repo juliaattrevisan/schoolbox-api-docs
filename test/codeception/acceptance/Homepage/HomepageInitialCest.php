@@ -32,6 +32,7 @@ class HomepageInitialCest
         $i->click(['css'=>'label[class=radio-label][for=groupRead3]']);
         $i->click(['css'=>'label[class=radio-label][for=groupRead4]']);
         $i->click(['css'=>'label[class=radio-label][for=groupRead5]']);
+        $i->click(['css'=>'label[class=radio-label][for=groupRead6]']);
         echo "Forget to submit \n";
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->cantSee("Test Homepage");
@@ -48,6 +49,7 @@ class HomepageInitialCest
         $i->click(['css'=>'label[class=radio-label][for=groupRead3]']);
         $i->click(['css'=>'label[class=radio-label][for=groupRead4]']);
         $i->click(['css'=>'label[class=radio-label][for=groupRead5]']);
+        $i->click(['css'=>'label[class=radio-label][for=groupRead6]']);
         $i->click(['css'=>'input[type=submit]']);
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Homepage");
@@ -62,7 +64,8 @@ class HomepageInitialCest
         $testHomepage=Locator::contains('a.jstree-anchor', 'Test Homepage');
         $i->click($testHomepage);
         $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
+        sleep(1);
+        $i->click("a.icon-home");
         $i->click(['css'=>'label[for=component-lock-toggle]']);
         $i->canSeeElement(['css'=>'span[class=icon-unlocked]']);
         $i->click(['css'=>'a#add-component']);
@@ -95,10 +98,11 @@ class HomepageInitialCest
         $i->login("alaress", "alaress");
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Homepage");
-        $i->click("Test Homepage");
+        $testHomepage=Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
         $i->waitForText("Homepage", 5);
-        sleep(2);
-        $i->click("Homepage");
+        sleep(1);
+        $i->click("a.icon-home");
         $home_page_url=$i->getCurrentUrl();
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
         sleep(2);
@@ -129,17 +133,19 @@ class HomepageInitialCest
     }
 
     #@depends createHomepage
-    #@depends editElement
+    #@depends useElement
     public function viewElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Homepage");
-        $i->click("Test Homepage");
+        $testHomepage=Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
         $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
+        sleep(1);
+        $i->click("a.icon-home");
         $home_page_url=$i->getCurrentUrl();
-        $i->impersonate("Mrs Jana Reed");
+        $i->impersonate("Ms Jana Reed");
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
         sleep(2);
@@ -159,23 +165,27 @@ class HomepageInitialCest
         $i->login("alaress", "alaress");
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Homepage");
-        $i->click("Test Homepage");
+        $testHomepage=Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
         $i->waitForText("Homepage", 5);
-        $i->click("Homepage");
+        sleep(1);
+        $i->click("a.icon-home");
         $home_page_url=$i->getCurrentUrl();
         $i->click(['css'=>'label[for=component-lock-toggle]']);
         $i->canSeeElement(['css'=>'span[class=icon-unlocked]']);
         sleep(2);
         $i->click(['css'=>'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a.icon-close[data-state=closed][title=Close]']);
-        sleep(2);
+        sleep(3);
         $i->canSeeElement(['css'=>'a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a[class=button\ submit]']);
+        sleep(1);
         $i->click(['css'=>'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a.icon-close[data-state=closed][title=Close]']);
-        sleep(2);
+        sleep(3);
         $i->canSeeElement(['css'=>'a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a[class=button\ submit]']);
+        sleep(1);
         $i->click(['css'=>'div.component-container.Component_Homepage_TextBoxController a.icon-close[data-state=closed][title=Close]']);
-        sleep(2);
+        sleep(3);
         $i->canSeeElement(['css'=>'a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Component_Homepage_TextBoxController a[class=button\ submit]']);
         echo "Not done yet";
