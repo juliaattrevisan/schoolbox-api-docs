@@ -363,6 +363,7 @@ class Controller extends BaseController
         $this->postUpdateFolder($newFolder);
     }
 
+
     /**
      * Update a folder's details
      *
@@ -374,6 +375,7 @@ class Controller extends BaseController
      * @throws SchoolboxException
      * @throws PDOException
      * @throws DefinitionException
+     * @throws Router\Exception\RouteNotFound
      */
     public function postUpdateFolder(Model $folder): void
     {
@@ -400,10 +402,16 @@ class Controller extends BaseController
                 (bool)($post['recursive-year-levels'] ?? false),
                 $this->getUser()
             );
-            $newLocation = $this->createGroup($this->getRequest()->post, $model, $this->getUser());
+
+            /* If Inherit Permissions is on, don't create group
+             */
+            if ($model->getInherit()) {
+                $newLocation = $this->getSession()->getHistory(2);
+            } else {
+                $newLocation = $this->createGroup($this->getRequest()->post, $model, $this->getUser());
+            }
 
             $this->getResponse()->redirect->afterPost($newLocation);
-
         } catch (RangeException $e) {
             // not enough info submitted to the form
             throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING, $e);
