@@ -44,21 +44,19 @@ class External_Schoolpro_User implements External_UserInterface
         $currentParent = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
         if ($currentParent) {
-
-            $parent = array(
-                'ContactID'        => $currentParent['ID'],
-                'ContactPreferred' => $currentParent['FirstName'],
-                'ContactSurname'   => $currentParent['Surname'],
-                'ContactEmail'     => $currentParent['Email'],
-                'ContactMobile'    => $currentParent['Mobile'],
-                'SpouseID'         => $currentParent['SpouseID'],
-                'SpousePreferred'  => $currentParent['SpouseFirstName'],
-                'SpouseSurname'    => $currentParent['SpouseSurname'],
-                'SpouseEmail'      => $currentParent['SpouseEmail'],
-                'SpouseMobile'     => $currentParent['SpouseMobile'],
-            );
-
-            return $parent;
+            return [
+                'ContactID'            => $currentParent['ID'],
+                'ContactPreferred'     => $currentParent['FirstName'],
+                'ContactSurname'       => $currentParent['Surname'],
+                'ContactEmail'         => $currentParent['Email'],
+                'ContactMobile'        => $currentParent['Mobile'],
+                'SpouseID'             => $currentParent['SpouseID'],
+                'SpousePreferred'      => $currentParent['SpouseFirstName'],
+                'SpouseSurname'        => $currentParent['SpouseSurname'],
+                'SpouseEmail'          => $currentParent['SpouseEmail'],
+                'SpouseMobile'         => $currentParent['SpouseMobile'],
+                'DirectoryIncludeFlag' => 1
+            ];
         }
 
         return [];
