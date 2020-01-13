@@ -26,13 +26,16 @@
                         enabled: false
                     },
                     yAxis: {
+                        min: -5,
+                        max: 105,
                         visible: false,
                         title: {
                             text: null
                         },
                         endOnTick: false,
                         startOnTick: false,
-                        tickPositions: [0]
+                        tickPositions: [0, 25, 50, 75, 100],
+
                     },
                     tooltip: {
                         crosshairs: false,
@@ -125,6 +128,7 @@
                                                     name: 'Range',
                                                     data: ranges,
                                                     type: 'boxplot',
+                                                    pointWidth: 40,
                                                     linkedTo: ':previous',
                                                     color: Highcharts.getOptions().colors[0],
                                                     fillOpacity: 0.3,
