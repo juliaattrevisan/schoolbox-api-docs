@@ -14,7 +14,7 @@ $magellan-padding: rem-calc(0);
 // Main Navigation Tab Bar Variables
 $include-html-off-canvas-classes: $include-html-classes !default;
 
-$tabbar-bg: $navigation-background;
+$tabbar-bg: var(--navigation-background);
 $tabbar-height: rem-calc(72);
 $tabbar-icon-width: rem-calc(72);
 $tabbar-line-height: $tabbar-height;
@@ -30,8 +30,8 @@ $tabbar-header-weight: $header-font-weight;
 $tabbar-header-line-height: $header-line-height;
 $tabbar-header-margin: $header-bottom-margin;
 
-$tabbar-menu-icon-color: $navigation-foreground;
-$tabbar-menu-icon-hover: $navigation-hover;
+$tabbar-menu-icon-color: var(--navigation-foreground);
+$tabbar-menu-icon-hover: var(--navigation-hover);
 $tabbar-menu-icon-text-indent: rem-calc(35);
 $tabbar-menu-icon-width: rem-calc(80);
 $tabbar-menu-icon-height: $tabbar-height;
@@ -219,20 +219,20 @@ $allow-sidebar-stash: $large-up;
         }
 
         &:hover {
-          background-color: $navigation-hover;
+          background-color: var(--navigation-hover);
         }
 
         &:before {
           @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
           text-align: center;
           float: none;
-          color: $navigation-foreground;
+          color: var(--navigation-foreground);
         }
       }
 
       span {
         @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-        color: $navigation-foreground;
+        color: var(--navigation-foreground);
         font-weight: $font-weight-normal;
         line-height: rem-calc($base-font-size * 1.5);
         display: block;
@@ -312,9 +312,9 @@ $allow-sidebar-stash: $large-up;
 
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
-  color: $navigation-foreground;
+  color: var(--navigation-foreground);
   &:hover {
-    color: $navigation-foreground;
+    color: var(--navigation-foreground);
   }
 }
 

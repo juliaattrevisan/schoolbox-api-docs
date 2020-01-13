@@ -1,6 +1,6 @@
 $notification-unread-background: $alert-color !default;
 $notification-unread-color: calc-text-color($notification-unread-background);
-$notification-header-background: $navigation-background !default;
+$notification-header-background: var(--navigation-background) !default;
 $allow-notification-stash: $xlarge-up;
 
 // where data-unread != 0
@@ -15,7 +15,7 @@ $allow-notification-stash: $xlarge-up;
      */
     &[data-unread] {
         padding-left: 1.65rem;
-        color: $navigation-foreground;
+        color: var(--navigation-foreground);
 
         /* The colour of the bell in its idle state
          */
@@ -106,7 +106,7 @@ $allow-notification-stash: $xlarge-up;
         }
         &[data-unread="0"] {
             .right-menu-dock {
-                color: $navigation-foreground;
+                color: var(--navigation-foreground);
             }
         }
     }
