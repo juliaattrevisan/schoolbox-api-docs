@@ -14,6 +14,7 @@
 namespace Schoolbox\Fixtures\Component;
 
 use Alaress\Database\Connector\Base;
+use Alaress\Database\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
@@ -24,6 +25,7 @@ use \Schoolbox\Fixtures\Result\Model as Result;
 use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
 use Alaress\Database\Predicate\Builder;
+use UnexpectedValueException;
 
 class ComponentDelegate
 {
@@ -80,13 +82,28 @@ class ComponentDelegate
      *
      * @param array $userIds
      * @param bool  $includeHistorical Whether to return matches in the past
+     * @param int   $days
      * @return Collection|Match[]
+     * @throws Exception
      */
-    public function getMatchesForUsers(array $userIds, $includeHistorical)
+    public function getMatchesForUsers(array $userIds, bool $includeHistorical, int $days)
     {
+        /* Decide the upper threshold determined by $days, if greater than zero
+         */
+        $date = null;
+        $thresholdDate = null;
+        $threshold = '';
+
+        if ($days) {
+            $thresholdDate = \Alaress_Date_Format::now()->addDays($days)->endOfDay()->getDatabase();
+
+            $threshold = ' AND (sportsfixtures_match.start_at) < :thresholdDate';
+        }
+
         $historical = '';
+
         if (!$includeHistorical) {
-            $historical = "AND DATE(sportsfixtures_match.start_at) >= DATE(NOW())";
+            $historical = 'AND DATE(sportsfixtures_match.start_at) >= DATE(NOW())';
         }
 
         $placeholders = Builder::getArrayPlaceholders($userIds, 'userId');
@@ -96,17 +113,17 @@ class ComponentDelegate
             FROM                sportsfixtures_match
             LEFT JOIN           sportsfixtures_team_participantcoach ON
                                 sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id AND
-                                sportsfixtures_team_participantcoach.user_id IN {$placeholders} AND 
+                                sportsfixtures_team_participantcoach.user_id IN {$placeholders} AND
                                 sportsfixtures_team_participantcoach.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team_participantuser ON
                                 sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id AND
-                                sportsfixtures_team_participantuser.user_id IN {$placeholders} AND 
+                                sportsfixtures_team_participantuser.user_id IN {$placeholders} AND
                                 sportsfixtures_team_participantuser.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team awayTeam ON
-                                sportsfixtures_match.away_team_id = awayTeam.id AND 
+                                sportsfixtures_match.away_team_id = awayTeam.id AND
                                 awayTeam.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team homeTeam ON
-                                sportsfixtures_match.home_team_id = homeTeam.id AND 
+                                sportsfixtures_match.home_team_id = homeTeam.id AND
                                 homeTeam.deleted_at IS NULL
             LEFT JOIN           sportsfixtures_team_coach ON
                                 (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id)
@@ -122,12 +139,20 @@ class ComponentDelegate
                                 sportsfixtures_coach.user_id IN {$placeholders} OR
                                 sportsfixtures_team_user.user_id IN {$placeholders})
                                 {$historical}
+                                {$threshold}
         ";
 
         $statement = $this->database->prepareQuery($query);
 
-        if ($statement->execute(Builder::getArrayParameters($userIds, 'userId'))) {
+        $params = Builder::getArrayParameters($userIds, 'userId');
+
+        if (null !== $thresholdDate) {
+            $params = array_merge($params, ['thresholdDate' => $thresholdDate]);
+        }
+
+        if ($statement->execute($params)) {
             $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
             return $this->sortMatches($this->getMatchMapper()->findByColumn('id', $result));
         }
 
@@ -138,48 +163,72 @@ class ComponentDelegate
     /**
      * @param int  $teamId
      * @param bool $includeHistorical Whether to also return matches that have been played
+     * @param int  $days
      * @return Collection|Match[]
+     * @throws UnexpectedValueException
      */
-    public function getTeamMatches($teamId, $includeHistorical)
+    public function getTeamMatches(int $teamId, bool $includeHistorical, int $days)
     {
+        /* Decide the upper threshold determined by $days, if greater than zero
+         */
+        $threshold = null;
+
+        if ($days) {
+            $threshold = \Alaress_Date_Format::now()->addDays($days)->endOfDay();
+        }
+
+        /* Remember the relevant matches and whether they were in the past
+         */
         /** @var Collection|Match[] $matches */
         $matches = new Collection();
+
         if (!$teamId) {
             return $matches;
         }
 
-        // Get the team we are looking at
+        $playedMatchIds = [];
 
         try {
+
+            /* Load all home and away matches for the team we've configured in the component
+             */
             $team = $this->getTeamMapper()->findById($teamId);
 
-            // Load all home and away matches for the team
+            $homeMatches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
+            $awayMatches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
-            $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
-            $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
-
-            /** @var Collection|Match[] $all_matches */
-            $all_matches = $home_matches->mergeUnique($away_matches, 'id');
+            /** @var Collection|Match[] $allMatches */
+            $allMatches = $homeMatches->mergeUnique($awayMatches, 'id');
 
             // Filter matches
-            foreach ($all_matches as $match) {
+            foreach ($allMatches as $match) {
                 $matchDay = clone $match->getStartAt();
                 $matchDay->endOfDay();
 
-                if ($includeHistorical || $matchDay->isFuture()) {
+                if ($includeHistorical && $matchDay->isPast()) {
+
+                    /* Include matches previously played
+                     */
                     $matches[$match->getId()] = $match;
+                    $playedMatchIds[] = $match->getId();
+                } elseif ($matchDay->isFuture()) {
+
+                    /* If no threshold was specified, add it to the list
+                     * This shows all future matches
+                     *
+                     * Otherwise,
+                     * Check that the future match day falls within the threshold defined earlier
+                     * If it does, add it to the list
+                     */
+                    if (null === $threshold || $matchDay->lte($threshold)) {
+                        $matches[$match->getId()] = $match;
+                    }
                 }
             }
 
             // Are we getting matches that have been played ?
             if ($includeHistorical) {
-                $playedMatchIds = [];
-                foreach ($matches as $match) {
-                    // Has the match been played ?
-                    if ($match->getStartAt()->isPast()) {
-                        $playedMatchIds[] = $match->getId();
-                    }
-                }
+
                 /** @var Collection|Result[] $results */
                 $results = $this->getResultMapper()->findByColumnList(['match_id' => $playedMatchIds]);
 
