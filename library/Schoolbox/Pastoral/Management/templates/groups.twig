@@ -47,8 +47,12 @@
                                         </h3>
                                     </a>
                                     <p class="meta">
-                                        Created by <a
-                                                href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
+                                        Created by
+                                        {% if group.user.deletedAt.isNull %}
+                                            <a href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
+                                        {% else %}
+                                            {{ group.user.fullName }}
+                                        {% endif %}
                                     </p>
                                 </div>
                             </div>

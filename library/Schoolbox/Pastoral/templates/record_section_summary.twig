@@ -8,7 +8,13 @@
         <div class="small-12 medium-10 large-11 columns">
             <dl class="profile">
                 <dt class="small-12 medium-3">Created By:</dt>
-                <dd class="small-12 medium-9"><a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a></dd>
+                <dd class="small-12 medium-9">
+                    {% if record.owner.deletedAt.isNull %}
+                        <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
+                    {% else %}
+                        {{ record.owner.fullName }}
+                    {% endif %}
+                </dd>
 
                 <dt class="small-12 medium-3">Created:</dt>
                 <dd class="small-12 medium-9">{{ record.createdAt.long }}</dd>
