@@ -35,7 +35,17 @@ trait External_Schoolbox_TimetableDefinitionTrait
             return 0;
         }
 
-        if (empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
+        // Don't show day numbers for dates outside of the current timetable def
+        // This means that no timetable days or classes will show outside that def
+        $databaseDate = $dateObject->getDatabaseDate();
+        if ($databaseDate < $definition['start']) {
+            return 0;
+        }
+        if ($databaseDate > $definition['finish']) {
+            return 0;
+        }
+
+        if (empty($definition['reset']) || $definition['reset'] === '0000-00-00') {
             $startObject = new Alaress_Date_Format($definition['start'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
         } else {
             $startObject = new Alaress_Date_Format($definition['reset'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -45,7 +55,7 @@ trait External_Schoolbox_TimetableDefinitionTrait
         $weekdays    = $startObject->diffInWeekdays($dateObject);
         $currentDay  = (($definition['start_day'] + $weekdays) % $definition['cycle_length']);
 
-        if ($currentDay == 0) {
+        if ($currentDay === 0) {
             $currentDay = $definition['cycle_length'];
         }
 

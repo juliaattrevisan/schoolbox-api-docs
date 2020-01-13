@@ -169,10 +169,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function fetchDayNumber(Campus $campus, $date = 0)
     {
-        $days = $this->getTotalDays($campus);
-
         if (!$date) {
             $date = time();
+        }
+
+        if (!$this->isDateWithinCurrentFileSemester($date)) {
+            return 0;
         }
 
         $statement = $this->getDatabase()->prepareProcedure('spgTimetableDay');
@@ -194,101 +196,39 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $statement->execute();
         $statement->close();
 
-        if (isset($currentDay)) {
-            return $currentDay;
-        }
-
-        if (date('w', $date) == 0 || date('w', $date) == 6) {
-            return false;
-        }
-
-        if ($days == 5) {
-            // if operating on a 5-day timetable
-            $day = date("w", $date);
-            if ($day < 1 || $day > 5) {
-                $day = 1;
-            }
-
-            // calc offset
-            $startDate = $this->getLastSynergeticDay($date, $campus);
-            if ($startDate) {
-                $offset = ($this->synergeticDay[$startDate] - 1) + (date('N', $startDate) + 4);
-
-                // timetable does not start on a Monday: calculate the offset for display
-                $today = ($day + $days) - $offset;
-
-                // if offset pushes "today" back further than the diaplayed week, wraparound
-                while ($today <= 0) {
-                    $today += $days;
-                }
-
-                // if offset is negative, mod to bring back into this week
-                if ($today > $days) {
-                    $today %= $days;
-                }
-
-                return $today;
-            } else {
-                return $day;
-            }
-
-        } elseif ($days == 7) {
-            // if operating on a 7-day timetable
-            $startDate = $this->getLastSynergeticDay($date, $campus);
-
-            //find number of days between both dates
-            $difference = (int)(($date - $startDate) / 86400);
-
-            //find number of weekends between 2 dates
-            $weekends = (int)(($difference + date("w", $startDate)) / 7);
-
-            $currentDay = ($this->synergeticDay[$startDate] + $difference - 2 * $weekends - 1) % 7 + 1;
-
-            //make correction for sunday (otherwise we travel back in time)
-            if (date("w", $date) == 0) {
-                $currentDay = $currentDay % 7 + 1;
-            }
-            return $currentDay;
-        } elseif ($days == 10) {
-            // if operating on a 10-day timetable
-            $startDate = $this->getLastSynergeticDay($date, $campus);
-
-            if ($this->synergeticDay[$startDate] > 5) {
-                $this->synergeticDay[$startDate] = $this->synergeticDay[$startDate] + 1;
-            } //extra days for weekend
-
-            $startDate = $startDate - ($this->synergeticDay[$startDate] * 86400);
-
-            if (!$startDate) {
-                // Just assume the start of the year if we cannot find anything
-                $startDate = mktime(0, 0, 0, 1, 1, date('Y'));
-            }
-
-            //find number of days between both dates
-            $difference = floor(($date - $startDate) / 86400);
-            //find number of weeks between 2 dates
-            $weeks = (int)($difference / 7);
-
-            if (($weeks % 2) == 0) {
-                $day = date('w', $date);
-                if ($day < 1) {
-                    // on sundays move it forward
-                    $day = 1;
-                }
-            } else {
-                $day = date('w', $date) + 5;
-                if ($day < 6) {
-                    // on sundays move it forward
-                    $day = 6;
-                }
-
-            }
-            return $day;
-        } else {
-            // ¯\_(ツ)_/¯ unknown day number
-            return 0;
-        }
+        return $currentDay ?? 0;
     }
+
+
+    /**
+     * Is this date timestamp within the current file semester?
+     *
+     * If not, day numbers and timetables won't be shown.
+     *
+     * @param int $date
+     * @return bool
+     */
+    private function isDateWithinCurrentFileSemester(int $date): bool
+    {
+        $query = '
+            SELECT COUNT(*)
+            FROM   FileSemesters
+            WHERE  FileYear                 =  :year
+            AND    FileSemester             =  :semester
+            AND    CONVERT(DATE, StartDate) <= :startDate
+            AND    CONVERT(DATE, EndDate)   >= :endDate
+        ';
+        $dateObject = Alaress_Date_Format::newFromTimestamp($date);
+        $params     = [
+            'year'      => $this->externalUser->getCurrentYear(),
+            'semester'  => $this->externalUser->getCurrentSemester(),
+            'startDate' => $dateObject->getDatabaseDate(),
+            'endDate'   => $dateObject->getDatabaseDate(),
+        ];
+
+        return $this->database->query($query, $params)->fetchColumn() > 0;
+    }
+
 
     /**
      * Returns the day name
@@ -811,7 +751,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						SubjectClasses.FileYear='" . $fileYear . "' AND
 						Timetable.TimetableGroup = '$campusString' AND
 						Timetable.StaffID='$externalUserId' AND
-						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " 
+						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
         }
 
