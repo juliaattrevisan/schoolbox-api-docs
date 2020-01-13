@@ -80,32 +80,15 @@ class Definition extends Filter\AbstractDefinition
 
 
     /**
-     * Alphabetically sort event type options.
+     * Event type options are sorted based on the
+     * sequence column by default
      *
      * @param GenericCollection|Filter\Page\Option\Model[] $options
      * @return GenericCollection
      */
     protected function sortFilterOptions(GenericCollection $options): GenericCollection
     {
-        // Keys represent event type IDs
-        return $options->sortByCallback(
-            function (Filter\Page\Option\Model $left, Filter\Page\Option\Model $right) {
-                $leftKey  = $left->getKey();
-                $rightKey = $right->getKey();
-                if ($leftKey === $right) {
-                    return 0;
-                }
-
-                // Find the keys in the list of labels
-                $leftEventType  = $this->eventTypes->getBy('id', $leftKey);
-                $rightEventType = $this->eventTypes->getBy('id', $rightKey);
-                if (!($leftEventType instanceof EventType && $rightEventType instanceof EventType)) {
-                    return 0;
-                }
-                return strnatcasecmp($leftEventType->getType(), $rightEventType->getType());
-            },
-            true
-        );
+        return $options;
     }
 
 
