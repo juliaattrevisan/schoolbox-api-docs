@@ -94,7 +94,7 @@ class Javascript extends Base
                     ],
                 ],
                 'styles'          => [
-                    'visible' => $this->getEvent()->getPeriodCancelled() ? 'strike' : '',
+                    'visible' => '',
                 ],
                 'classAttendance' => [
                     'url' => $attendanceUrl,
