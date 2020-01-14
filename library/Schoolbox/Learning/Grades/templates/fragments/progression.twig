@@ -41,9 +41,28 @@
                             crosshairs: false,
                             useHTML: true,
                             shared: true,
+                            outside: true,
                             valueSuffix: '',
                             formatter: function() {
-                                return 'The value for '+this.points[0].x;
+                                /* Basic template for each outlier */
+                                var template =
+                                        '<div style="width:250px!important;overflow:auto;white-space:normal !important;">' +
+                                        '<h2>{NAME}</h2>' +
+                                        '<p><b>{LEVEL}</b></br>' +
+                                        '{DESCRIPTOR}</p>' +
+                                        '</div>';
+                                /* Concatenate everything
+                                 */
+                                if (typeof this.points[0].x !== 'undefined') {
+                                    var tooltipContent = template;
+
+                                    tooltipContent = tooltipContent.replace(/{NAME}/, this.points[0].x);
+                                    tooltipContent = tooltipContent.replace(/{DESCRIPTOR}/, this.points[0].point.desc);
+                                    tooltipContent = tooltipContent.replace(/{LEVEL}/, this.points[0].point.level);
+
+
+                                    return tooltipContent;
+                                }
                             }
                         },
                         legend: {
@@ -84,7 +103,12 @@
                             {% for activity_id, activity_name in rubricAssessmentList %}
                             {% set activity = indicator.activities[activity_id] %}
                             {% if activity.max_value > 0  %}
-                            {{ ((activity.value / activity.max_value) * 100) }},
+                            {
+                                y: {{ ((activity.value / activity.max_value) * 100) }},
+                                desc: "{{ activity.descriptor |nl2br | escape('js') }}",
+                                title: "{{ activity_name }}",
+                                level: "{{ activity.level }}"
+                            },
                             {% else %}
                             '',
                             {% endif %}
