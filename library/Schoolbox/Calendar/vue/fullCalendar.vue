@@ -745,9 +745,6 @@
     .fc-button-group > .fc-button {
         padding: 0 0.6rem !important;
     }
-    .strike {
-        text-decoration: line-through !important;
-    }
 </style>
 
 <style lang="scss">
