@@ -94,9 +94,9 @@ class Prepare implements IStrategy
     {
         if ($this->perform) {
             $this->relationshipMapper->truncate();
-            $this->classEntryMapper->getDatabase()->query("DELETE FROM {$this->classEntryMapper->getTable()}");
-            $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
-            $this->classPeriodMapper->getDatabase()->query("DELETE FROM {$this->classPeriodMapper->getTable()}");
+            $this->classEntryMapper->truncate();
+            $this->classInvolvementMapper->truncate();
+            $this->classPeriodMapper->truncate();
 
             $this->log->info('Purged existing profile relations, classEntry, classInvolvement, classPeriod data');
         }
