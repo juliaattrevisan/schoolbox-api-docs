@@ -54,16 +54,16 @@ class External_Isams_Class implements External_ClassInterface
         $classQuery = $this->getClassCodeQuery($classCode);
 
         $query = "
-            SELECT    V_Student.StudentSurname      AS lastname, 
-                      V_Student.StudentFirstname    AS firstname, 
-                      V_Student.Grade               AS yearlevel, 
-                      ''                            AS house, 
-                      V_Student.MedicalFlag         AS StudentMedicalAlert, 
+            SELECT    V_Student.StudentSurname      AS lastname,
+                      V_Student.StudentFirstname    AS firstname,
+                      V_Student.Grade               AS yearlevel,
+                      ''                            AS house,
+                      V_Student.MedicalFlag         AS StudentMedicalAlert,
                       V_Student.txtadditionalHealth AS StudentSpecialNeedsFlag,
                       ''                            AS EnglishSecondFlag,
                       ''                            AS StudentTutorDescription,
                       V_Student.StudentID           AS synergy_id
-            FROM      V_Student 
+            FROM      V_Student
             JOIN      V_Class ON V_Class.StudentID = V_Student.StudentID
             WHERE     $classQuery
         ";
@@ -97,7 +97,7 @@ class External_Isams_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         if (empty($classCode)) {
             return [];
@@ -108,12 +108,12 @@ class External_Isams_Class implements External_ClassInterface
         $query =
             "
             SELECT DISTINCT   Tutor1ID AS tutorID
-            FROM              V_Class 
+            FROM              V_Class
             WHERE             $classQuery
-            UNION 
+            UNION
             SELECT DISTINCT   Tutor2ID AS tutorID
             FROM              V_Class
-            WHERE             NULLIF(LTRIM(RTRIM(Tutor2name)), '') IS NOT NULL AND 
+            WHERE             NULLIF(LTRIM(RTRIM(Tutor2name)), '') IS NOT NULL AND
                               $classQuery
         ";
 

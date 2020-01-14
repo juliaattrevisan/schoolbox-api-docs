@@ -83,11 +83,7 @@ class TeacherFetcher
 
         // Bypass encapsulation to extract the underlying external class connection
         if ($this->externalClass instanceof CachingConnectorAbstract) {
-            $extractExternalClassInner = function () {
-                /** @var CachingConnectorAbstract $this */
-                return $this->getDatabase();
-            };
-            $externalClassInner        = $extractExternalClassInner->call($this->externalClass);
+            $externalClassInner = $this->externalClass->getDatabase();
             if ($externalClassInner instanceof External_Synergetic_Class) {
                 return $this->getStaffUsers($externalClassInner->getTeachers(
                     $folder->getCodeString(),

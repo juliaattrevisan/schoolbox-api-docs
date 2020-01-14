@@ -94,9 +94,9 @@ class External_Schoolbox_Class implements External_ClassInterface
 
         return $this->internalDatabase->prepareQuery(
             "
-                SELECT        u.id, 
+                SELECT        u.id,
                               u.synergy_id,
-                              u.title, 
+                              u.title,
                               u.firstname,
                               u.lastname,
                               sups.year_level,
@@ -129,7 +129,7 @@ class External_Schoolbox_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
