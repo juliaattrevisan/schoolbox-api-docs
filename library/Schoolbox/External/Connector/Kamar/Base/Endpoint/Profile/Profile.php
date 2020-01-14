@@ -407,7 +407,7 @@ class Profile implements IStrategy
             /* Parents don't have an external unique identifier; therefore we manufacture them
              * Parents also don't have separate first/last names, just a fullname
              */
-            $externalId = trim((string)$student->uniqueid) . '-' . $parent->xpath('@index')[0];
+            $externalId = trim((string)$student->xpath('@id')[0]) . '-' . $parent->xpath('@index')[0];
             $username = $email = trim((string)$parent->email);
             $firstname = trim((string)$parent->name);
             $lastname = '';
