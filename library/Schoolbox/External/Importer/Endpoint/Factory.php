@@ -178,140 +178,30 @@ class Factory
      */
     private function produceKamar(): GenericCollection
     {
-        $this->logger->info('Accessing local xml endpoints');
-
-        /* Set up the kamar directory which is where all their xml files go
-         */
-        (new KamarEndpoint\Setup(
-            $this->logger,
-            Loader::getInstance()->get('stream_dir')
-        ))->import();
-
-        /* Set up composite bus - everybody's xml gets on board and shuttled off
-         * into schoolbox town
-         */
-        $bus = new GenericCollection(IStrategy::class);
-
-        /* Profile and student timetable xmls come with a datetime suffix
-         *
-         * Timetable Composite requires access across multiple xml files cross-referencing nodes
-         * in profile xml so you can identify who is in a class ($container)
-         */
-        $dirhandle = opendir($this->host);
-
-        $xml = [
-            KamarEndpoint\Receiver::XML_FULL => [],
-            KamarEndpoint\Receiver::XML_STUDENTTIMETABLES => []
-        ];
-
-        /* Make a stack of profile xmls (full_ ... .xml)
-         * Make a stack of student timetable xmls (studenttimetables_ ... .xml)
-         */
-        $numFiles = 0;
-
-        while ($xmlFile = readdir($dirhandle)) {
-            if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, KamarEndpoint\Receiver::XML_FULL) !== false) {
-                    $xml[KamarEndpoint\Receiver::XML_FULL][] = $xmlFile;
-                    $numFiles++;
-                } elseif (strpos($xmlFile, KamarEndpoint\Receiver::XML_STUDENTTIMETABLES) !== false) {
-                    $xml[KamarEndpoint\Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
-                    $numFiles++;
-                }
-
-                /* TODO: Potentially manage stafftimetables_xxxx.xml files
-                 * TODO: Potentially manage part_xxxx.xml files
-                 */
-            }
-        }
-
-        /* If there aren't any files to process, do nothing
-         */
-        if (!$numFiles) {
-            $this->logger->info('No xml files here; noop');
-
-            return $bus;
-        }
-
-        /* Purge previously-imported profile relationships and classes
-         */
-        $bus->add(new KamarEndpoint\Prepare(
+        return (new KamarEndpoint\Factory(
             $this->logger,
             $this->perform,
-            UserProfile\Relationship\Mapper::getInstance(),
-            ClassEntryMapper::getInstance(),
-            ClassInvolvementMapper::getInstance(),
-            ClassPeriodMapper::getInstance()
-        ));
-
-        /* Load all the Profile xmls
-         */
-        $container = new KamarEndpoint\Profile\Container();
-
-        foreach ($xml[KamarEndpoint\Receiver::XML_FULL] as $xmlFile) {
-            $bus->add(new KamarEndpoint\Profile\Composite(
-                $this->logger,
-                $this->perform,
-                new KamarEndpoint\Batchxml(new KamarEndpoint\Api($this->host . '/' . $xmlFile)),
-                $container,
-                UserProfile\Mapper::getInstance(),
-                UserProfile\Student\Mapper::getInstance(),
-                UserProfile\Parent\Mapper::getInstance(),
-                UserProfile\Staff\Mapper::getInstance(),
-                UserProfile\Relationship\Mapper::getInstance()
-            ));
-        }
-
-        /* Set up the Timetable definition separately from the masses of timetable-related xml files
-         */
-        $bus->add(new KamarEndpoint\Timetable\Definition(
-            $this->logger,
-            $this->perform,
-            CampusMapper::getInstance(),
-            TimetableCampusMapper::getInstance(),
-            TimetableCycleMapper::getInstance(),
-            TimetablePeriodMapper::getInstance()
-        ));
-
-        /* Cache a list of known users and periods
-         * Every student timetable processing uses info stored there
-         * Recycle this instance in every iteration
-         */
-        $lookup = new KamarEndpoint\Timetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
-
-        /* Load all the Student Timetable xmls
-         */
-        foreach ($xml[KamarEndpoint\Receiver::XML_STUDENTTIMETABLES] as $xmlFile) {
-            $bus->add(new KamarEndpoint\Timetable\Composite(
-                $this->logger,
-                $this->perform,
-                $container,
-                new KamarEndpoint\Batchxml(new KamarEndpoint\Api($this->host . '/' . $xmlFile)),
-                $lookup,
-                ClassEntryMapper::getInstance(),
-                ClassInvolvementMapper::getInstance(),
-                ClassPeriodMapper::getInstance(),
-                Term\Mapper::getInstance()
-            ));
-        }
-
-        /* Archive the xmls into a folder when we're done processing
-         * We could delete them at any time, but if we just deleted it at the end of every
-         * processing we'd have no idea how the schoolbox instance was populated - we'd
-         * have destroyed the source. Instead, chuck them into a folder which we can remove
-         * whenever we need
-         */
-        $bus->add(new KamarEndpoint\Cleanup(
-            $this->logger,
-            $this->perform,
+            $this->host,
             Loader::getInstance()->get('stream_dir'),
+
+            /* Profile pieces
+             */
             UserProfile\Mapper::getInstance(),
             UserProfile\Student\Mapper::getInstance(),
             UserProfile\Parent\Mapper::getInstance(),
             UserProfile\Staff\Mapper::getInstance(),
-            UserProfile\Relationship\Mapper::getInstance()
-        ));
+            UserProfile\Relationship\Mapper::getInstance(),
 
-        return $bus;
+            /* Timetable pieces
+             */
+            CampusMapper::getInstance(),
+            TimetableCampusMapper::getInstance(),
+            TimetableCycleMapper::getInstance(),
+            TimetablePeriodMapper::getInstance(),
+            ClassEntryMapper::getInstance(),
+            ClassInvolvementMapper::getInstance(),
+            ClassPeriodMapper::getInstance(),
+            Term\Mapper::getInstance()
+        ))->produce();
     }
 }
