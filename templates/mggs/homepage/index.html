@@ -4,42 +4,42 @@
 <style type="text/css">
     /** Make these styles more specific than topbar styles  **/
     #component-layout .column-top .component-titlebar {
-    background-color: {top_head_bg};
+        background-color: {top_head_bg};
     }
 
     #component-layout .column-top .component-titlebar h2, #component-layout .column-top .component-titlebar a {
-    color: {top_head_font};
+        color: {top_head_font};
     }
 
     #component-layout .column-top .island section {
-    color: {top_font};
-    background-color: {top_bg_primary};
+        color: {top_font};
+        background-color: {top_bg_primary};
     }
 
     #component-layout .column-left .component-titlebar {
-    background-color: {left_head_bg};
+        background-color: {left_head_bg};
     }
 
     #component-layout .column-left .component-titlebar h2, #component-layout .column-left .component-titlebar a {
-    color: {left_head_font};
+        color: {left_head_font};
     }
 
     #component-layout .column-left .island section {
-    color: {left_font};
-    background-color: {left_bg_primary};
+        color: {left_font};
+        background-color: {left_bg_primary};
     }
 
     #component-layout .column-right .component-titlebar {
-    background-color: {right_head_bg};
+        background-color: {right_head_bg};
     }
 
     #component-layout .column-right .component-titlebar h2, #component-layout .column-right .component-titlebar a {
-    color: {right_head_font};
+        color: {right_head_font};
     }
 
     #component-layout .column-right .island section {
-    color: {right_font};
-    background-color: {right_bg_primary};
+        color: {right_font};
+        background-color: {right_bg_primary};
     }
 
     <!-- Special Effects for Action Buttons -->
@@ -114,7 +114,10 @@
 
         });
 
-        $('#component-lock-switch').trigger('editTourStart');
+        // Send out a custom trigger for the homepage feature tour
+        // This won't trigger if #component-lock-switch doesn't exist on the page (which is what we want)
+         $('#component-lock-switch').trigger('editTourStart');
+
     });
 </script>
 
@@ -136,8 +139,8 @@
                 url: url,
                 calcSequenceData: function (columns) {
                     var masonry = this,
-                            data  = { type: 'components' },
-                            order = ['left','right','top','bottom'];
+                        data  = { type: 'components' },
+                        order = ['left','right','top','bottom'];
 
                     $.each(columns, function (position, column) {
                         var key = 'column' + (order.indexOf(position) + 1);
@@ -241,7 +244,7 @@
         <!-- BEGIN edit_page -->
         <span data-tab>
             <span class="switch inline round" id="component-lock-switch">
-                <input id="component-lock-toggle" type="checkbox" />
+                <input id="component-lock-toggle" type="checkbox" autocomplete="off" />
                 <label for="component-lock-toggle">
                     <span class="icon-unlocked">&nbsp;</span>
                     <span class="icon-locked">&nbsp;</span>
@@ -254,11 +257,11 @@
                 <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator id="edit-column"></a>
             </span>
         </span>
+
         <!-- END edit_page -->
         <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions" id="all-actions"></a>
     </nav>
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
-
         <!-- BEGIN readonly_switch_on -->
         <li class="separator">You are in Teacher View</li>
         <li><a href="?readonly=1" class="icon-staff-students">Switch to Student View</a></li>
@@ -298,7 +301,7 @@
             <a href="/resources/{ID}" class="icon-folder">Browse {TPL_LOCAL_RESOURCE_PLURAL_PC}</a>
         </li>
         <li>
-            <a href="/homepage/rss/{ID}/{USER_TOKEN}" class="icon-homepagefeed">RSS</a>
+            <a href="{RSS}" class="icon-homepagefeed">RSS</a>
         </li>
 
         <!-- BEGIN subscribedModerated -->
@@ -357,6 +360,12 @@
             <a href="{COURSE_MARKBOOK_LINK}" class="icon-curriculum">Course Markbook</a>
         </li>
         <!-- END course_markbook_link -->
+
+        <!-- BEGIN assessment_calendar_link -->
+        <li>
+            <a href="/learning/assessment/calendar" class="icon-calendar">{TPL_LOCAL_ASSESSMENT_PC} Calendar</a>
+        </li>
+        <!-- END assessment_calendar_link -->
 
         <!-- BEGIN course_link -->
         <li>
