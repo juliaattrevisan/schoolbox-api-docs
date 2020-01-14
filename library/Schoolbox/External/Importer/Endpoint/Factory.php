@@ -301,7 +301,16 @@ class Factory
          * have destroyed the source. Instead, chuck them into a folder which we can remove
          * whenever we need
          */
-        $bus->add(new KamarEndpoint\Cleanup($this->logger, $this->perform, Loader::getInstance()->get('stream_dir')));
+        $bus->add(new KamarEndpoint\Cleanup(
+            $this->logger,
+            $this->perform,
+            Loader::getInstance()->get('stream_dir'),
+            UserProfile\Mapper::getInstance(),
+            UserProfile\Student\Mapper::getInstance(),
+            UserProfile\Parent\Mapper::getInstance(),
+            UserProfile\Staff\Mapper::getInstance(),
+            UserProfile\Relationship\Mapper::getInstance()
+        ));
 
         return $bus;
     }
