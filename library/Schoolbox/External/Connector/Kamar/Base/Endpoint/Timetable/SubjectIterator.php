@@ -12,7 +12,7 @@ use InvalidArgumentException;
 use Iterator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Container;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use SimpleXMLElement;
 
 /**
@@ -33,9 +33,9 @@ class SubjectIterator implements Iterator
 
 
     /**
-     * @var Container
+     * @var Registry
      */
-    private $container;
+    private $registry;
 
 
     /**
@@ -66,14 +66,14 @@ class SubjectIterator implements Iterator
      * SubjectIterator constructor.
      *
      * @param LoggerInterface  $log
-     * @param Container        $container
+     * @param Registry         $registry
      * @param string           $studentId
      * @param SimpleXMLElement $day
      */
-    public function __construct(LoggerInterface $log, Container $container, string $studentId, SimpleXMLElement $day)
+    public function __construct(LoggerInterface $log, Registry $registry, string $studentId, SimpleXMLElement $day)
     {
         $this->log = $log;
-        $this->container = $container;
+        $this->registry = $registry;
         $this->studentId = $studentId;
         $this->subjects = $day->xpath('slots/subjects');
         $this->day = trim((string)$day->xpath('@index')[0]);
@@ -88,8 +88,6 @@ class SubjectIterator implements Iterator
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @since 5.0.0
-     * @throws RuntimeException
-     * @throws InvalidArgumentException
      */
     public function current()
     {
@@ -255,7 +253,7 @@ class SubjectIterator implements Iterator
         $teacherIds = explode(',', trim((string)$subject->teachers));
 
         foreach ($teacherIds as $teacherId) {
-            $teacher = $this->container->recall($teacherId);
+            $teacher = $this->registry->recall($teacherId);
 
             if (!$teacher) {
                 $this->log->warning(sprintf(
@@ -288,7 +286,7 @@ class SubjectIterator implements Iterator
      */
     private function findStudents(string $studentId): ?array
     {
-        $student = $this->container->recall($studentId);
+        $student = $this->registry->recall($studentId);
 
         if (!$student) {
             $this->log->warning(sprintf(

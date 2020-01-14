@@ -291,14 +291,14 @@ class Factory
 
         /* Load all the Profile xmls
          */
-        $container = new Profile\Container();
+        $registry = new Profile\Registry();
 
         foreach ($xml[Receiver::XML_FULL] as $xmlFile) {
             $bus->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
                 new Batchxml(new Api($this->host . '/' . $xmlFile)),
-                $container,
+                $registry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
@@ -330,7 +330,7 @@ class Factory
             $bus->add(new Timetable\Classes(
                 $this->log,
                 $this->perform,
-                $container,
+                $registry,
                 new Batchxml(new Api($this->host . '/' . $xmlFile)),
                 $lookup,
                 $this->classEntryMapper,
