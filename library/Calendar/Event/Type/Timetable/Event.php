@@ -43,6 +43,11 @@ class Event extends Day\Event
     protected $periodName;
 
     /**
+     * @var bool $periodCancelled Whether the period is cancelled
+     */
+    protected $periodCancelled;
+
+    /**
      * @var bool $hasAttendance If this class has attendance that can be marked
      */
     protected $hasAttendance = false;
@@ -129,6 +134,22 @@ class Event extends Day\Event
     public function setPeriodName($periodName)
     {
         $this->periodName = $periodName;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPeriodCancelled()
+    {
+        return $this->periodCancelled;
+    }
+
+    /**
+     * @param bool $periodCancelled
+     */
+    public function setPeriodCancelled(bool $periodCancelled)
+    {
+        $this->periodCancelled = $periodCancelled;
     }
 
     /**
