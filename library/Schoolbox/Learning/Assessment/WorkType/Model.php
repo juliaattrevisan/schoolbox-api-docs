@@ -177,6 +177,7 @@ class Model implements ISoftDeletable, Sequential
     {
         return $this->updatedBy;
     }
+
     /**
      * @param int|null $updatedBy
      * @return $this

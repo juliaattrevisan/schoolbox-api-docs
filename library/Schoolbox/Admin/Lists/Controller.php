@@ -207,7 +207,7 @@ class Controller extends Base
 
             //Set checkboxes whose that are checked
             foreach ($checkboxes as $field => $value) {
-                $setter = $mapper->getSetMethodName($field);
+                $setter  = $mapper->getSetMethodName($field);
                 $boolean = (bool)$value[$currentIndex];
                 $model->$setter($boolean);
             }
@@ -221,7 +221,7 @@ class Controller extends Base
             $diff = (new Differ())->diff($mapper->dehydrate($model), $mapper->dehydrate($oldModel));
             if (count($diff) > 0) {
                 // Save the changes
-                if (method_exists($model, $mapper->getGetMethodName('updatedBy'))){
+                if (method_exists($model, $mapper->getGetMethodName('updatedBy'))) {
                     $model->setUpdatedBy($_SESSION['user']->getId());
                 }
                 $mapper->save($model);

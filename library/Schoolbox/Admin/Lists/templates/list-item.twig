@@ -32,7 +32,7 @@
                                 </div>
                             {% elseif field.checkbox is not empty %}
                                 <div class="checklist">
-                                    <input name="checkbox-{{ field_key }}[{{ recordIndex }}]" type="hidden" value="0" />
+                                    <input name="checkbox-{{ field_key }}[{{ recordIndex }}]" type="hidden" value="0"/>
                                     <input name="checkbox-{{ field_key }}[{{ recordIndex }}]"
                                            value="1"
                                            id="{{ field_key }}-{{ recordIndex }}"
