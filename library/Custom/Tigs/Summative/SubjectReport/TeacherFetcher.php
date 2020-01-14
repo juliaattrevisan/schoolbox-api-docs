@@ -85,8 +85,9 @@ class TeacherFetcher
         if ($this->externalClass instanceof CachingConnectorAbstract) {
             $externalClassInner = $this->externalClass->getDatabase();
             if ($externalClassInner instanceof External_Synergetic_Class) {
+                $codes = array_merge($folder->getCodes()->getPropertyValues('code'), $folder->getRolledOverCodes());
                 return $this->getStaffUsers($externalClassInner->getTeachers(
-                    $folder->getCodeString(),
+                    implode(',', $codes),
                     $attributes->getReportDate()
                 ));
             }
