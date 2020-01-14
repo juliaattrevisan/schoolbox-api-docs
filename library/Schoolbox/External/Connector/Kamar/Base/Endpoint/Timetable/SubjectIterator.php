@@ -167,16 +167,43 @@ class SubjectIterator implements Iterator
 
         /* Figure out the subject's name
          * There are some special constructs for optional classes
-         * Take a punt as to what they're called...
+         * Take a punt as to what they're called:
+         *
+         *   - Make the subject code the same as its name
+         *   - We don't get a subject's name in the timetable xml
+         *   - The code itself isn't unique enough for class lists etc.
          */
         if (isset($subjectNode->core)) {
-            $name = trim((string)$subjectNode->core);
+
+            /* For subjects classified as 'core'
+             *
+             * This creates subject names like 11C-11MATH
+             * This creates subject codes like 11C-11MATH-MTO
+             */
+            $name = implode('-', array_filter([
+                trim((string)$subjectNode->core),
+                $code
+            ]));
+
+            $code = implode('-', array_filter([
+                $name,
+                trim((string)$subjectNode->teachers)
+            ]));
+
         } elseif (isset($subjectNode->option)) {
+
+            /* For subjects classified as 'optional' :
+             *
+             * This creates subject names like 5-11GEOG-JAB
+             * This creates subject codes like 5-11GEOG-JAB
+             */
             $name = implode('-', array_filter([
                 trim((string)$subjectNode->option),
                 $code,
                 trim((string)$subjectNode->teachers)
             ]));
+
+            $code = $name;
         } else {
 
             /* No subjects in this slot
