@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use UnexpectedValueException;
 
 /**
@@ -85,6 +86,7 @@ class Scheduler
      *
      * @param int $now
      * @throws UnexpectedValueException
+     * @throws RuntimeException
      */
     public function run(int $now): void
     {
@@ -102,7 +104,7 @@ class Scheduler
                 foreach ($composites as $composite) {
                     $composite->import();
                 }
-            } catch (\RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
             }
         }
