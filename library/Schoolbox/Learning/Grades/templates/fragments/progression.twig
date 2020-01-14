@@ -63,76 +63,75 @@
     .highcharts-container, .highcharts-container svg { width: 100% !important; }
 </script>
 
-    <table>
-        {% for capability in longitudinalRubric %}
-            <tr><td width="15%"><b>{{ capability.name | nl2br }}</b></td>
-            {% for indicatorId,indicator in capability.indicators %}
-                {% if not loop.first %}
-                    <tr><td width="15%">&nbsp;</td>
-                {% endif %}
-                <th width="15%">{{ indicator.name | nl2br}}</th>
-                <td>
-                    <div id="rubricGraph{{ indicatorId }}"></div>
-                    <script type="application/javascript">
-                        $(function() {
-                            var assessments = [
-                                {% for activity_id, activity_name in rubricAssessmentList %}
-                                "{{ activity_name }}",
-                                {% endfor %}
-                            ];
-                            var grades = [
-                                {% for activity_id, activity_name in rubricAssessmentList %}
-                                {% set activity = indicator.activities[activity_id] %}
-                                {% if activity.max_value > 0  %}
-                                {{ ((activity.value / activity.max_value) * 100) }},
-                                {% else %}
-                                '',
-                                {% endif %}
-                                {% endfor %}
-                            ];
-                            var ranges = [
-                                {% for activity_id, activity in rubricAssessmentList %}
-                                {% set activity = indicator.activities[activity_id] %}
-                                {% if activity.max_value > 0  %}
-                                ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],
-                                {% else %}
-                                '',
-                                {% endif %}
-                                {% endfor %}
-                            ];
-                            $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
-                                xAxis: [{
-                                    categories: assessments,
-                                    visible: false,
-                                    title: {
-                                        text: null
-                                    }
-                                }],
-                                series: [{
-                                    name: 'Marks',
-                                    data: grades,
-                                    zIndex: 1,
-                                    connectNulls: true,
-                                    color: 'rgb(255, 87, 87)',
-                                }, {
-                                    name: 'Range',
-                                    data: ranges,
-                                    type: 'boxplot',
-                                    pointWidth: 40,
-                                    linkedTo: ':previous',
-                                    color: Highcharts.getOptions().colors[0],
-                                    fillOpacity: 0.3,
-                                    zIndex: 0,
-                                    marker: {
-                                        enabled: false
-                                    }
-                                }]
-                            })
-                        });
-                    </script>
-                </td>
-                </tr>
-            {% endfor %}
+<table>
+    {% for capability in longitudinalRubric %}
+        <tr><td width="15%"><b>{{ capability.name | nl2br }}</b></td>
+        {% for indicatorId,indicator in capability.indicators %}
+            {% if not loop.first %}
+                <tr><td width="15%">&nbsp;</td>
+            {% endif %}
+            <th width="15%">{{ indicator.name | nl2br}}</th>
+            <td>
+                <div id="rubricGraph{{ indicatorId }}"></div>
+                <script type="application/javascript">
+                    $(function() {
+                        var assessments = [
+                            {% for activity_id, activity_name in rubricAssessmentList %}
+                            "{{ activity_name }}",
+                            {% endfor %}
+                        ];
+                        var grades = [
+                            {% for activity_id, activity_name in rubricAssessmentList %}
+                            {% set activity = indicator.activities[activity_id] %}
+                            {% if activity.max_value > 0  %}
+                            {{ ((activity.value / activity.max_value) * 100) }},
+                            {% else %}
+                            '',
+                            {% endif %}
+                            {% endfor %}
+                        ];
+                        var ranges = [
+                            {% for activity_id, activity in rubricAssessmentList %}
+                            {% set activity = indicator.activities[activity_id] %}
+                            {% if activity.max_value > 0  %}
+                            ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],
+                            {% else %}
+                            '',
+                            {% endif %}
+                            {% endfor %}
+                        ];
+                        $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
+                            xAxis: [{
+                                categories: assessments,
+                                visible: false,
+                                title: {
+                                    text: null
+                                }
+                            }],
+                            series: [{
+                                name: 'Marks',
+                                data: grades,
+                                zIndex: 1,
+                                connectNulls: true,
+                                color: 'rgb(255, 87, 87)',
+                            }, {
+                                name: 'Range',
+                                data: ranges,
+                                type: 'boxplot',
+                                pointWidth: 40,
+                                linkedTo: ':previous',
+                                color: Highcharts.getOptions().colors[0],
+                                fillOpacity: 0.3,
+                                zIndex: 0,
+                                marker: {
+                                    enabled: false
+                                }
+                            }]
+                        })
+                    });
+                </script>
+            </td>
+            </tr>
         {% endfor %}
-    </table>
-</div>
+    {% endfor %}
+</table>
