@@ -1293,6 +1293,7 @@ class DataSource
                 }
             }
 
+            //Insert the statistical summary data collated from all students results across all indicators in all activities
             foreach($allResults as $assessmentId => $assessment) {
                 foreach($assessment as $capabilityId => $capability) {
                     foreach($capability as $indicatorId => $indicator) {
@@ -1303,6 +1304,7 @@ class DataSource
                 }
             }
 
+            //A list of all assessments that we found to contain marked rubrics to make iterating the set easier
             $longitude['assessments'] = $assessmentList;
 
             return $longitude;
