@@ -1,0 +1,60 @@
+{#
+    Renders all the selected descriptors in rubrics across all the rubrics students have been marked for
+
+    Usage:
+        longitudinalRubric    array
+        student               User
+        assessments           IAssessable[]
+        returnUrlSuffix       string
+#}
+
+<table>
+    <tr><td>&nbsp;</td><td>&nbsp;</td>
+        {% for activity_id, activity_name in rubricAssessmentList  %}
+            <td>
+                {% set activityAssessment = assessments.by('id', activity_id) %}
+                {% if activityAssessment %}
+                    {%- set activityHref = routeLookupIfAuthorized(
+                        'learningAssessment.getSummary',
+                        {
+                            assessmentId: activity_id,
+                            studentId: student.id,
+                            student: student,
+                            assessment: activityAssessment,
+                        }
+                        ) -%}
+                {% else %}
+                    {%- set activityHref = '' -%}
+                {% endif %}
+                {%- if activityHref -%}
+                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity_name }}</a>
+                {%- else -%}
+                    {{ activity_name }}
+                {%- endif -%}
+            </td>
+        {% endfor %}
+    </tr>
+    {% for capability in longitudinalRubric %}
+        <tr >
+        <td rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></td>
+        {% for indicator in capability.indicators %}
+            {% if not loop.first %}
+                <tr>
+            {% endif %}
+            <td><b>{{ indicator.name | nl2br }}</b></td>
+            {% for activity_id, activity_name in rubricAssessmentList %}
+                {% set activity = indicator.activities[activity_id] %}
+                <td><p>
+                        {% if  activity.level %}<b>{{ activity.level }}</b><br />{% endif %}
+                        {{ activity.descriptor }} {% if activity.value and config.rubric_show_points %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                    </p>
+                </td>
+
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+

@@ -502,11 +502,14 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
-                'student'            => $viewee,
-                'markbook'           => $filteredMarkbook,
-                'canSeeGraph'        => $canSeeGraph,
-                'canSeeShowcaseButton' => $canSeeShowcaseButton,
-                'graph'              => $graph,
+                'student'               => $viewee,
+                'markbook'              => $filteredMarkbook,
+                'showActivityGraph'     => $canSeeGraph,
+                'showLearningLevels'    => $this->getConfigLoader()->get('enable_grades_criteria'),
+                'showCapabilityGrades'  => $this->getConfigLoader()->get('grade_capability_display'),
+                'showProgression'       => $this->getConfigLoader()->get('grade_progression_display'),
+                'canSeeShowcaseButton'  => $canSeeShowcaseButton,
+                'graph'                 => $graph,
                 'longitudinalRubric' => $longitudinalRubric,
                 'rubricAssessmentList' => $rubricAssessmentList,
                 'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
@@ -662,7 +665,7 @@ class Controller extends Base
      */
     protected function getLongitudinalRubricData(GenericCollection $assessments, User $student): array
     {
-        if(!$this->getConfigLoader()->get('enable_grades_criteria')) {
+        if(!($this->getConfigLoader()->get('enable_grades_criteria') || $this->getConfigLoader()->get('grade_capability_display') || $this->getConfigLoader()->get('grade_progression_display'))) {
             // only populate this if we're actually allowed to see it
             return [];
         }

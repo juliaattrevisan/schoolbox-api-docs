@@ -92,7 +92,7 @@
 
 {% if markbook.assessments | length %}
     <div class="row">
-        <div class="small-12 large-6 island">
+        <div class="small-12 medium-6 island">
             <h2 class="subheader">Teachers</h2>
             <section>
                 <ul class="action-list">
@@ -112,7 +112,7 @@
             </section>
         </div>
         {% if canSeeGradeAverage %}
-            <div class="small-12 large-6 island">
+            <div class="small-12 medium-6 island">
                 <h2 class="subheader">Current {{ locale.grades.proper }} Average</h2>
                 <section class="content">
                     <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}">
