@@ -376,7 +376,7 @@ if(\count($allFolderList)) {
 /* Only provide Campus options if campuses have been defined
  */
 $campusMapper = \Schoolbox\CampusMapper::getInstance();
-$campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
+$campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
 /* Event Access Levels
  * Requires both $possibleFolderList and $campusList for optional values

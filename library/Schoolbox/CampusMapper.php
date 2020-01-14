@@ -42,7 +42,7 @@ class CampusMapper extends Mapper {
 	 * @param int $accessType
 	 * @return GenericCollection|Campus[]
 	 */
-	public function getAvailableCampusesForUser(User $user, $accessType = 1)
+	public function getAvailableCampusesForUser(User $user, $accessType = UserAccess::ACCESS_READ)
     {
 		$calendarService = UserAccess::SERVICE_CALENDAR;
 
@@ -58,7 +58,7 @@ class CampusMapper extends Mapper {
 				INNER JOIN userAccess ON luCampus.id = userAccess.sid
 				WHERE userAccess.service = :calendarService
 				AND userAccess.uid = :userId
-				AND type > :accessType
+				AND type >= :accessType
 			";
 
 			$statement = $this->database->prepare($query);
