@@ -8,10 +8,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\WorkType;
 
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Sequential;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
-class Model
+class Model implements ISoftDeletable, Sequential
 {
+
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\CreateCollection;
+    use ModelTrait\HasSequence;
+
     /**
      * @var int
      */
@@ -34,6 +44,11 @@ class Model
 
     /** @var bool */
     private $staffOrInstructorVisibleOnly;
+
+    /**
+     * @var int
+     */
+    private $updatedBy;
 
     /**
      * @return bool
@@ -152,6 +167,23 @@ class Model
     public function setStaffOrInstructorVisibleOnly(bool $staffOrInstructorVisibleOnly): self
     {
         $this->staffOrInstructorVisibleOnly = $staffOrInstructorVisibleOnly;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getUpdatedBy(): ?int
+    {
+        return $this->updatedBy;
+    }
+    /**
+     * @param int|null $updatedBy
+     * @return $this
+     */
+    public function setUpdatedBy(?int $updatedBy): self
+    {
+        $this->updatedBy = $updatedBy;
         return $this;
     }
 }
