@@ -143,7 +143,7 @@ class CachingConnectorAbstract
     /**
      * @return IConnector
      */
-    protected function getDatabase(): IConnector
+    public function getDatabase(): IConnector
     {
         return $this->database;
     }
