@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
 
 /**
- * Class Container
+ * Class Registry
  *
  * For staff members, we remember their (internal kamar id, [details]) tuples
  * because other xml files use teacher codes (e.g. BKE) to represent a teacher
@@ -16,11 +16,11 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
  * their full name etc. because it's contained in some other xml file
  *
  * Therefore as we process each profile xml, we remember the staff members
- * for easier reference later
+ * for easier reference later. Can also be used to index students etc.
  *
  * @package Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile
  */
-class Container
+class Registry
 {
 
     /**
@@ -30,7 +30,7 @@ class Container
 
 
     /**
-     * Remember a staff member's details, using their internal kamar id as a key
+     * Remember a person's details, using their internal kamar id as a key
      *
      * @param string $key
      * @param string $externalId

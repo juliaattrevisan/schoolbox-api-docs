@@ -9,7 +9,9 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\Profile as UserProfile;
 
 /**
  * Class Cleanup
@@ -55,18 +57,67 @@ class Cleanup implements IStrategy
 
 
     /**
+     * @var UserProfile\Mapper
+     */
+    private $baseProfileMapper;
+
+
+    /**
+     * @var UserProfile\Student\Mapper
+     */
+    private $studentProfileMapper;
+
+
+    /**
+     * @var UserProfile\Parent\Mapper
+     */
+    private $parentProfileMapper;
+
+
+    /**
+     * @var UserProfile\Staff\Mapper
+     */
+    private $staffProfileMapper;
+
+
+    /**
+     * @var UserProfile\Relationship\Mapper
+     */
+    private $relationshipMapper;
+
+
+    /**
      * Cleanup constructor.
      *
-     * @param LoggerInterface|null $log
-     * @param bool                 $perform
-     * @param string               $streamDir
+     * @param LoggerInterface|null            $log
+     * @param bool                            $perform
+     * @param string                          $streamDir
+     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param UserProfile\Student\Mapper      $studentProfileMapper
+     * @param UserProfile\Parent\Mapper       $parentProfileMapper
+     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
-    public function __construct(?LoggerInterface $log, bool $perform, string $streamDir)
-    {
+    public function __construct(
+        ?LoggerInterface $log,
+        bool $perform,
+        string $streamDir,
+        UserProfile\Mapper $baseProfileMapper,
+        UserProfile\Student\Mapper $studentProfileMapper,
+        UserProfile\Parent\Mapper $parentProfileMapper,
+        UserProfile\Staff\Mapper $staffProfileMapper,
+        UserProfile\Relationship\Mapper $relationshipMapper
+    ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->cacheDir = $streamDir . '/' . Setup::KAMAR_CACHE_DIR;
         $this->archiveDir = $this->cacheDir . '/' . self::KAMAR_ARCHIVE_DIR;
+
+        $this->baseProfileMapper = $baseProfileMapper;
+        $this->studentProfileMapper = $studentProfileMapper;
+        $this->parentProfileMapper = $parentProfileMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
+        $this->relationshipMapper = $relationshipMapper;
     }
 
 
@@ -140,6 +191,25 @@ class Cleanup implements IStrategy
                     rename($source, $destination);
                 }
             }
+
+            /* Remove everything that wasn't touched
+             */
+            $this->studentProfileMapper->getDatabase()->query("DELETE FROM {$this->studentProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+            $this->parentProfileMapper->getDatabase()->query("DELETE FROM {$this->parentProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+            $this->staffProfileMapper->getDatabase()->query("DELETE FROM {$this->staffProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+            $this->baseProfileMapper->getDatabase()->query("DELETE FROM {$this->baseProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+
+            /* Remove any orphaned profiles (base profiles that have no extension)
+             */
+            $orphans = (new OrphanRemover(
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))->remove();
+
+            $this->log->info("Removed {$orphans} orphaned profiles.");
         }
     }
 }
