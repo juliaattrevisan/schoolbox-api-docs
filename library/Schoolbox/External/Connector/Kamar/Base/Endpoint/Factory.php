@@ -283,6 +283,11 @@ class Factory
         $bus->add(new Prepare(
             $this->log,
             $this->perform,
+            $this->baseProfileMapper,
+            $this->studentProfileMapper,
+            $this->parentProfileMapper,
+            $this->staffProfileMapper,
+
             $this->relationshipMapper,
             $this->classEntryMapper,
             $this->classInvolvementMapper,

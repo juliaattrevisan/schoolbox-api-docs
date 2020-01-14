@@ -192,6 +192,13 @@ class Cleanup implements IStrategy
                 }
             }
 
+            /* Remove everything that wasn't touched
+             */
+            $this->studentProfileMapper->getDatabase()->query("DELETE FROM {$this->studentProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+            $this->parentProfileMapper->getDatabase()->query("DELETE FROM {$this->parentProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+            $this->staffProfileMapper->getDatabase()->query("DELETE FROM {$this->staffProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+            $this->baseProfileMapper->getDatabase()->query("DELETE FROM {$this->baseProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+
             /* Remove any orphaned profiles (base profiles that have no extension)
              */
             $orphans = (new OrphanRemover(
