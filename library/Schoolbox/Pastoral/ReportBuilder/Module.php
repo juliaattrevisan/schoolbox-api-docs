@@ -40,12 +40,13 @@ class Module extends BaseModule
 
         $this->registerRoutesArray([
             'GET'  => [
-                ''                              => ['getIndex' => $permissionStaff],
-                '/insert'                       => ['getReportInsert' => $permissionStaff],
-                '/update/{reportId:\d+}'        => ['getReportUpdate' => $permissionReportOwner],
-                '/results/{reportId:\d+}'       => ['getReportResults' => $permissionStaff],
-                '/results/tag/{tagId:\d+}'      => ['getReportTags' => $permissionStaff],
-                '/results/{reportId:\d+}/print' => ['getReportResultsPrint' => $permissionStaff],
+                ''                               => ['getIndex' => $permissionStaff],
+                '/insert'                        => ['getReportInsert' => $permissionStaff],
+                '/update/{reportId:\d+}'         => ['getReportUpdate' => $permissionReportOwner],
+                '/results/{reportId:\d+}'        => ['getReportResults' => $permissionStaff],
+                '/results/tag/{tagId:\d+}'       => ['getReportTags' => $permissionStaff],
+                '/results/{reportId:\d+}/print'  => ['getReportResultsPrint' => $permissionStaff],
+                '/results/{reportId:\d+}/export' => ['getReportResultsExport' => $permissionStaff],
             ],
             'POST' => [
                 '/modify'                => ['postReportModify' => $permissionReportOwner],
