@@ -138,11 +138,6 @@ class Definition implements IStrategy
      */
     public function import(): void
     {
-        if ($this->perform) {
-            $this->timetableCycleMapper->getDatabase()->query("DELETE FROM {$this->timetableCycleMapper->getTable()}");
-            $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
-        }
-
         $campus = $this->findFirstCampus();
 
         /** @var TimetableCycle $timetableCycle */

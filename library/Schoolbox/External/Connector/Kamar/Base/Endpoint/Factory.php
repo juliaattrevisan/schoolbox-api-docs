@@ -288,8 +288,10 @@ class Factory
             $this->studentProfileMapper,
             $this->parentProfileMapper,
             $this->staffProfileMapper,
-
             $this->relationshipMapper,
+            $this->timetableCampusMapper,
+            $this->timetableCycleMapper,
+            $this->timetablePeriodMapper,
             $this->classEntryMapper,
             $this->classInvolvementMapper,
             $this->classPeriodMapper
