@@ -39,10 +39,10 @@ class Factory
     /**
      * The family of importers that we can spawn
      */
-    public const CSV = 'csv';
     public const ISAMS = 'isams';
     public const KAMAR = 'kamar';
     public const SENTRAL = 'sentral';
+    public const CSV = 'csv';
 
 
     /**
@@ -101,92 +101,71 @@ class Factory
     public function produce(?string $file, string $type): ?GenericCollection
     {
         switch ($type) {
-            case self::ISAMS:
-                return $this->produceIsams($file);
 
+            /* Produce the composites with optional Mock api connection
+             * (use a locally-stored file path)
+             */
+            case self::ISAMS:
+                return (new IsamsEndpoint\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+                    $file,
+
+                    /* Profile pieces
+                     */
+                    UserProfile\Mapper::getInstance(),
+                    UserProfile\Student\Mapper::getInstance(),
+                    UserProfile\Parent\Mapper::getInstance(),
+                    UserProfile\Staff\Mapper::getInstance(),
+                    UserProfile\Relationship\Mapper::getInstance(),
+
+                    /* Timetable pieces
+                     */
+                    CampusMapper::getInstance(),
+                    UserMapper::getInstance(),
+                    TimetableCampusMapper::getInstance(),
+                    TimetableCycleMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance()
+                ))->produce();
+
+            /* We never reach out to kamar so we technically don't need the $file option
+             */
             case self::KAMAR:
-                return $this->produceKamar();
+                return (new KamarEndpoint\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    Loader::getInstance()->get('stream_dir'),
+
+                    /* Profile pieces
+                     */
+                    UserProfile\Mapper::getInstance(),
+                    UserProfile\Student\Mapper::getInstance(),
+                    UserProfile\Parent\Mapper::getInstance(),
+                    UserProfile\Staff\Mapper::getInstance(),
+                    UserProfile\Relationship\Mapper::getInstance(),
+
+                    /* Timetable pieces
+                     */
+                    CampusMapper::getInstance(),
+                    TimetableCampusMapper::getInstance(),
+                    TimetableCycleMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance(),
+                    Term\Mapper::getInstance()
+                ))->produce();
 
             case self::SENTRAL:
             default:
                 // Use manual csv imports
                 return null;
         }
-    }
-
-
-    /**
-     * Produce the composites with optional Mock api connection
-     * (use a locally-stored file path)
-     *
-     * @param string|null $file
-     * @return GenericCollection
-     * @throws UnexpectedValueException
-     */
-    private function produceIsams(?string $file): GenericCollection
-    {
-        return (new IsamsEndpoint\Factory(
-            $this->logger,
-            $this->perform,
-            $this->host,
-            $this->key,
-            $file,
-
-            /* Profile pieces
-             */
-            UserProfile\Mapper::getInstance(),
-            UserProfile\Student\Mapper::getInstance(),
-            UserProfile\Parent\Mapper::getInstance(),
-            UserProfile\Staff\Mapper::getInstance(),
-            UserProfile\Relationship\Mapper::getInstance(),
-
-            /* Timetable pieces
-             */
-            CampusMapper::getInstance(),
-            UserMapper::getInstance(),
-            TimetableCampusMapper::getInstance(),
-            TimetableCycleMapper::getInstance(),
-            TimetablePeriodMapper::getInstance(),
-            ClassEntryMapper::getInstance(),
-            ClassInvolvementMapper::getInstance(),
-            ClassPeriodMapper::getInstance()
-        ))->produce();
-    }
-
-
-    /**
-     * We never reach out to kamar so we technically don't need the $file option
-     *
-     * @return GenericCollection
-     * @throws UnexpectedValueException
-     * @throws RuntimeException
-     */
-    private function produceKamar(): GenericCollection
-    {
-        return (new KamarEndpoint\Factory(
-            $this->logger,
-            $this->perform,
-            $this->host,
-            Loader::getInstance()->get('stream_dir'),
-
-            /* Profile pieces
-             */
-            UserProfile\Mapper::getInstance(),
-            UserProfile\Student\Mapper::getInstance(),
-            UserProfile\Parent\Mapper::getInstance(),
-            UserProfile\Staff\Mapper::getInstance(),
-            UserProfile\Relationship\Mapper::getInstance(),
-
-            /* Timetable pieces
-             */
-            CampusMapper::getInstance(),
-            TimetableCampusMapper::getInstance(),
-            TimetableCycleMapper::getInstance(),
-            TimetablePeriodMapper::getInstance(),
-            ClassEntryMapper::getInstance(),
-            ClassInvolvementMapper::getInstance(),
-            ClassPeriodMapper::getInstance(),
-            Term\Mapper::getInstance()
-        ))->produce();
     }
 }
