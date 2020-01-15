@@ -146,7 +146,8 @@ class Factory
 
 
     /**
-     * Bus constructor.
+     * Factory constructor.
+     *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param string                          $host
@@ -287,8 +288,10 @@ class Factory
             $this->studentProfileMapper,
             $this->parentProfileMapper,
             $this->staffProfileMapper,
-
             $this->relationshipMapper,
+            $this->timetableCampusMapper,
+            $this->timetableCycleMapper,
+            $this->timetablePeriodMapper,
             $this->classEntryMapper,
             $this->classInvolvementMapper,
             $this->classPeriodMapper
