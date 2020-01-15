@@ -125,47 +125,32 @@ class Factory
      */
     private function produceIsams(?string $file): GenericCollection
     {
-        if ($file) {
-            $this->logger->info("Loading from locally-cached xml file: {$file}");
-            $api = new IsamsEndpoint\MockApi($file);
-        } else {
-            $this->logger->info('Accessing api endpoint');
-            $api = new IsamsEndpoint\Api($this->host, $this->key);
-        }
+        return (new IsamsEndpoint\Factory(
+            $this->logger,
+            $this->perform,
+            $this->host,
+            $this->key,
+            $file,
 
-        /* Connect and shank data
-         */
-        $batchxml = new IsamsEndpoint\Batchxml($api);
+            /* Profile pieces
+             */
+            UserProfile\Mapper::getInstance(),
+            UserProfile\Student\Mapper::getInstance(),
+            UserProfile\Parent\Mapper::getInstance(),
+            UserProfile\Staff\Mapper::getInstance(),
+            UserProfile\Relationship\Mapper::getInstance(),
 
-        /* Import each piece of the puzzle: Profiles and Timetable
-         *
-         * They're distinct pieces so instead of making a super-composite, I just
-         * do them in sequence, which gives me more dexterity later
-         */
-        return (new GenericCollection(IStrategy::class))
-            ->add(new IsamsEndpoint\Profile\Composite(
-                $this->logger,
-                $this->perform,
-                $batchxml,
-                UserProfile\Mapper::getInstance(),
-                UserProfile\Student\Mapper::getInstance(),
-                UserProfile\Parent\Mapper::getInstance(),
-                UserProfile\Staff\Mapper::getInstance(),
-                UserProfile\Relationship\Mapper::getInstance()
-            ))
-            ->add(new IsamsEndpoint\Timetable\Composite(
-                $this->logger,
-                $this->perform,
-                $batchxml,
-                CampusMapper::getInstance(),
-                UserMapper::getInstance(),
-                TimetableCampusMapper::getInstance(),
-                TimetableCycleMapper::getInstance(),
-                TimetablePeriodMapper::getInstance(),
-                ClassEntryMapper::getInstance(),
-                ClassInvolvementMapper::getInstance(),
-                ClassPeriodMapper::getInstance()
-            ));
+            /* Timetable pieces
+             */
+            CampusMapper::getInstance(),
+            UserMapper::getInstance(),
+            TimetableCampusMapper::getInstance(),
+            TimetableCycleMapper::getInstance(),
+            TimetablePeriodMapper::getInstance(),
+            ClassEntryMapper::getInstance(),
+            ClassInvolvementMapper::getInstance(),
+            ClassPeriodMapper::getInstance()
+        ))->produce();
     }
 
 
