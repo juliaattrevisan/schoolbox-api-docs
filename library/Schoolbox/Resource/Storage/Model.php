@@ -311,4 +311,28 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
         ];
     }
 
+
+    /**
+     * Serialize everything except the filesystem.
+     *
+     * This will mean unserialized files cannot have any filesystem-related
+     * operations performed on them, until `setFilesystem` is called on them.
+     *
+     * @see Mapper::getManager(), Manager::getFilesystem()
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [
+            'path',
+            'hash',
+            'mimetype',
+            'size',
+            'lastAccessed',
+            'public',
+            'extension',
+            'createdAt',
+        ];
+    }
 }
