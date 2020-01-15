@@ -146,7 +146,8 @@ class Factory
 
 
     /**
-     * Bus constructor.
+     * Factory constructor.
+     *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param string                          $host
