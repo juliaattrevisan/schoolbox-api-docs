@@ -324,15 +324,8 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function __sleep()
     {
-        return [
-            'path',
-            'hash',
-            'mimetype',
-            'size',
-            'lastAccessed',
-            'public',
-            'extension',
-            'createdAt',
-        ];
+        $vars = get_class_vars(get_class($this));
+        unset($vars['filesystem']);
+        return array_keys($vars);
     }
 }
