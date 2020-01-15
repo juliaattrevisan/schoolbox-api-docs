@@ -22,7 +22,7 @@ $userMapper      = new UserMapper();
 $eventMapper     = new EventMapper();
 $eventAccess     = new Access(FolderAccess::getInstance());
 
-switch ($_REQUEST['action']) {
+switch ($_POST['action']) {
     case 'Add':
     case 'Update':
         $publishDate = null;
@@ -218,7 +218,7 @@ switch ($_REQUEST['action']) {
          * Check event exists
          */
         try {
-            $event = $eventMapper->findById($_REQUEST['id']);
+            $event = $eventMapper->findById($_POST['id']);
         } catch (\Exception $e) {
             error(160);
         }
@@ -245,11 +245,13 @@ switch ($_REQUEST['action']) {
             $eventMapper->delete($event);
         }
 
-        SitePage::localRedir($event->setupRedirect(
+        $redirect = $event->setupRedirect(
             urldecode($_GET['returnTo']),
-            ($_GET['returnDate']?$_GET['returnDate']:$event->getStartDateTime()->getURLDate()),
+            ($_GET['returnDate'] ? $_GET['returnDate'] : $event->getStartDateTime()->getURLDate()),
             $_GET['homepageId'],
-            $_GET['userId']));
+            $_GET['userId']);
+        header('Content-type: application/json');
+        echo json_encode(['callbackUrl' => $redirect]);
         break;
 
     default:

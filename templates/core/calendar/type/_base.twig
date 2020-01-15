@@ -92,10 +92,10 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
     {% block deleteUrls %}
-        <input type="hidden" id="delete-single-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr }}">
+        <input type="hidden" id="delete-single-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}">
         {% if event.seriesId() %}
-            <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr }}&efficacy=self">
-            <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr }}&efficacy=series">
+            <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}&efficacy=self">
+            <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}&efficacy=series">
         {% endif %}
     {% endblock deleteUrls %}
 </li>
