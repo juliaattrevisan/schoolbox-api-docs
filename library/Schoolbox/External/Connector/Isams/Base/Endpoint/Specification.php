@@ -263,6 +263,37 @@ class Specification
             $messages[] = $message;
         }
 
+        /* Find the timetable identifier, for reference, in the status screen
+         */
+
+        /* Get a list of all the timetables to process
+         */
+        $timetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
+
+        /* If there aren't any timetables, log it and exit
+         */
+        if (!\count($timetables)) {
+            $messages[] = 'No PublishedTimetables detected.';
+
+            if ($this->log) {
+                $this->log->warning('No PublishedTimetables detected.');
+            }
+        }
+
+        foreach ($timetables as $timetable) {
+            $timetableMessage = sprintf(
+                'Found timetable %s: assign %s to ext_timetable_code',
+                trim((string)$timetable->Name),
+                trim((string)$timetable->xpath('@Id')[0]->Id)
+            );
+
+            $messages[] = $timetableMessage;
+
+            if ($this->log) {
+                $this->log->info($timetableMessage);
+            }
+        }
+
         return $messages;
     }
 }
