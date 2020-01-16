@@ -18,6 +18,7 @@ class EventType implements ISoftDeletable, JsonSerializable, Sequential
 {
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
+    use ModelTrait\UpdatedBy;
     use ModelTrait\DeletedAtDate;
     use ModelTrait\CreateCollection;
     use ModelTrait\HasSequence;
@@ -42,11 +43,6 @@ class EventType implements ISoftDeletable, JsonSerializable, Sequential
      * @var string
      */
     private $color = '';
-
-    /**
-     * @var int
-     */
-    private $updatedBy;
 
     /**
      * Constructor
@@ -135,24 +131,6 @@ class EventType implements ISoftDeletable, JsonSerializable, Sequential
     public function isTaskType()
     {
         return $this->getType() == 'Task';
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getUpdatedBy(): ?int
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * @param int|null $updatedBy
-     * @return $this
-     */
-    public function setUpdatedBy(?int $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-        return $this;
     }
 
     /**
