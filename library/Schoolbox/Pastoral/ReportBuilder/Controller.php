@@ -278,7 +278,7 @@ class Controller extends Base
                             UserAccess::SERVICE_PASTORAL
                         )->count() > 0,
                     'years'            => $this->userMapper->getYearLevels(),
-                    'houses'           => $this->houseMapper->findAll()->sortBy('house', 'asc'),
+                    'houses'           => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
                     'types'            => $this->pastoralTypeMapper->findAll()->sortBy('name', 'asc'),
                     'subTypes'         => $this->pastoralSubTypeMapper->findAll()->sortBy('name', 'asc'),
                     'severities'       => $severities,
