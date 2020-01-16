@@ -1197,7 +1197,7 @@ class DataSource
                     INNER JOIN rubric_capability_usage rcu ON rc.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
-                    ORDER BY rc.name ASC, rc.name ASC, a.due_date DESC;
+                    ORDER BY a.due_date ASC;
                 "
             );
             $descriptorStatement->execute($pb->getParams());
@@ -1273,6 +1273,7 @@ class DataSource
                         rc.id AS capability_id,
                         ri.id AS indicator_id,
                         a.id AS assessment_id,
+                        a.due_date,
                         rim.value
                     FROM       rubric_indicator_mark  rim
                     INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
@@ -1283,7 +1284,7 @@ class DataSource
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
-                    ORDER BY rc.name ASC, ri.name ASC, a.due_date DESC;
+                    ORDER BY a.due_date ASC;
                 "
                 );
                 $averageStatement->execute($pb->getParams());
