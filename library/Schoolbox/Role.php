@@ -16,6 +16,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
+    use ModelTrait\UpdatedBy;
     use ModelTrait\CreateCollection;
     use ModelTrait\HasSequence;
 
@@ -38,11 +39,6 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
      * @var string
      */
     protected $digestSchedule;
-
-    /**
-     * @var int
-     */
-    private $updatedBy;
 
     /**
      * Role Types
@@ -226,25 +222,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     }
 
 
-    /**
-     * @param int $updatedBy
-     * @return self
-     */
-    public function setUpdatedBy(int $updatedBy): Role
-    {
-        $this->updatedBy = $updatedBy;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getUpdatedBy(): int
-    {
-        return $this->updatedBy;
-    }
-
-    /**
+     /**
      * @return array
      */
     public function jsonSerialize(): array
