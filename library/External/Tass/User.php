@@ -46,7 +46,7 @@ class External_Tass_User implements External_UserInterface
     public function __construct()
     {
         $this->database = MSSQL::getInstance();
-        $this->companyCode  = Config::get('external_tass_company_code');
+        $this->companyCode  = $this->database->smartQuote(Config::get('external_tass_company_code'));
         $this->helper = new External_Tass_Helper();
     }
 
@@ -73,7 +73,6 @@ class External_Tass_User implements External_UserInterface
         }
 
         $addnum = $this->helper->getAddNum();
-        $companyCode = $this->database->smartQuote($this->companyCode);
 
         $query = "
             SELECT pa.par_code, pa.e_mail, pa.add_num
@@ -83,7 +82,7 @@ class External_Tass_User implements External_UserInterface
             WHERE
                   pa.e_mail IS NOT NULL AND
                   s.stud_code IN ($idList) AND
-                  pa.cmpy_code = {$companyCode} AND
+                  pa.cmpy_code = {$this->companyCode} AND
                   pa.add_num IN ($addnum)
         ";
 
@@ -98,7 +97,7 @@ class External_Tass_User implements External_UserInterface
                 FROM paraddress pa
                 INNER JOIN studcommrules scr ON pa.par_code=scr.par_code
                     AND pa.cmpy_code = scr.cmpy_code
-                    AND scr.cmpy_code = {$companyCode}
+                    AND scr.cmpy_code = {$this->companyCode}
                     AND pa.add_num = scr.add_num
             ";
 
@@ -113,7 +112,7 @@ class External_Tass_User implements External_UserInterface
                 WHERE
                     pa.e_mail IS NOT NULL AND
                     s.stud_code IN ($idList) AND
-                    pa.cmpy_code = {$companyCode} AND
+                    pa.cmpy_code = {$this->companyCode} AND
                     pa.add_num IN ($addnum)
             ";
         }
@@ -461,7 +460,6 @@ class External_Tass_User implements External_UserInterface
         // remove the P|S prefix
         $id = substr($externalUserId, 1);
 
-        $companyCode = $this->database->smartQuote($this->companyCode);
         $commrules = Config::get('external_tass_commrules');
         $addnum = $this->helper->getAddNum();
         $typecode = $this->helper->getTypeCode();
@@ -499,7 +497,7 @@ class External_Tass_User implements External_UserInterface
                     SELECT DISTINCT
                         scr.stud_code AS RelatedID
                     FROM studcommrules as scr
-                    WHERE cmpy_code = {$companyCode}
+                    WHERE cmpy_code = {$this->companyCode}
                     AND par_code = {$this->database->smartQuote($parentCode)}
                     AND add_num IN({$addnum})
                 ";
@@ -540,7 +538,7 @@ class External_Tass_User implements External_UserInterface
                     SELECT DISTINCT
                         scr.stud_code AS RelatedID
                     FROM studcommrules as scr
-                    WHERE cmpy_code = {$companyCode}
+                    WHERE cmpy_code = {$this->companyCode}
                     AND par_code = {$this->database->smartQuote($id)}
                     AND add_num IN ({$addnum})
                 ";
