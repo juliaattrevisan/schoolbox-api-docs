@@ -56,6 +56,7 @@ class Module extends BaseModule
         // - Instructors of the class
         $canViewPage = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn('rubric_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 // Allow staff regardless of access level to the folder
