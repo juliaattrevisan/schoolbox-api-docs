@@ -109,7 +109,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setVar('WORK_TERM', $currentTerm->getCode());
 
         // Show markbook link to staff on class or group pages
-        if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage)) {
+        if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage) && $this->getConfigLoader()->get('class_markbook_enable')) {
             $this->setVar('MARKBOOK_LINK', $this->buildMarkbookLink($wasClassPage, $currentTerm));
             $this->parse('markbook_link_block', 'markbook_link');
             $hasClassActions = true;
@@ -123,7 +123,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $params     = ['folderId' => $this->getContext()->getId()];
 
         // Show rubric markbook link on class or group pages to those who are authorized
-        if (($isGroupPage || $isClassPage || $wasClassPage) && $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())) {
+        if (($isGroupPage || $isClassPage || $wasClassPage)  && $this->getConfigLoader()->get('rubric_markbook_enable') && $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())) {
             $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate($route, $params));
             $this->parse('rubric_markbook_link_block', 'rubric_markbook_link');
             $hasClassActions = true;

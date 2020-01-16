@@ -66,6 +66,7 @@ class Module extends BaseModule
 
         $classMarkbookPerm = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn('class_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
