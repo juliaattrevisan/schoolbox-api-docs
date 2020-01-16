@@ -1,0 +1,253 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Homepage;
+
+use AcceptanceTester;
+use Codeception\Util\Locator;
+
+/**
+ * Test for attaching a textbox to a page.
+ */
+class HomepageInitialCest
+{
+
+    var $createFolderUrl = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
+
+    /**
+     * @param AcceptanceTester $i
+     */
+    public function createHomepageFail(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl($this->createFolderUrl);
+        $i->selectOption("template", "Blank");
+        $i->fillField(['name' => 'name'], 'Test Homepage');
+        $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupWrite2]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead3]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead4]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead5]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead6]']);
+        echo "Forget to submit \n";
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->cantSee("Test Homepage");
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     */
+    public function createHomepage(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl($this->createFolderUrl);
+        $i->selectOption("template", "Blank");
+        $i->fillField(['name' => 'name'], 'Test Homepage');
+        $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupWrite2]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead3]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead4]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead5]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead6]']);
+        $i->click(['css' => 'input[type=submit]']);
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+    }
+
+    /**
+     * @depends createHomepage
+     * @param AcceptanceTester $i
+     * @throws \Exception
+     */
+    public function createElement(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+        $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
+        $i->waitForText("Homepage", 5);
+        sleep(1);
+        $i->click("a.icon-home");
+        $i->click(['css' => 'label[for=component-lock-toggle]']);
+        $i->canSeeElement(['css' => 'span[class=icon-unlocked]']);
+        $i->click(['css' => 'a#add-component']);
+        sleep(1);
+        $i->canSeeElement(['css' => 'div#tabs-1']);
+        #Blog Test
+        $i->click(['css' => 'a[href=\#tabs-sub-1]']);
+        $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
+        $i->dragAndDrop("//*[@id='tabs-sub-1']/li[1]", "//div[@data-position='top']");
+        sleep(1);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
+        #News Test
+        $i->click(['css' => 'a[href=\#tabs-sub-1]']);
+        $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
+        $i->dragAndDrop("//*[@id='tabs-sub-1']/li[4]", "//div[@data-position='top']");
+        sleep(1);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
+        #Text box Test
+        $i->click(['css' => 'a[href=\#tabs-sub-1]']);
+        $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
+        $i->dragAndDrop("//*[@id='tabs-sub-1']/li[6]", "//div[@data-position='top']");
+        sleep(1);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
+    }
+
+    /**
+     * @depends createHomepage
+     * @depends createElement
+     * @param AcceptanceTester $i
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function useElement(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+        $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
+        $i->waitForText("Homepage", 5);
+        sleep(1);
+        $i->click("a.icon-home");
+        $home_page_url = $i->getCurrentUrl();
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
+        sleep(2);
+        $i->click("Add a blog post");
+        $i->canSee("Post Blog");
+        $i->fillField("heading", "Test Blog Title");
+        $i->fillCkEditorById('body', 'Interesting blog text');
+        $i->click(['css' => 'input[type=submit]']);
+        $i->amOnUrl($home_page_url);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
+        sleep(5);
+        $i->click("Post a news article");
+        $i->fillField("title", "Test News Title");
+        $i->fillCkEditorById('body', 'wow what interesting news');
+        sleep(5);
+        $i->click("Publish news");
+        sleep(5);
+        $i->amOnUrl($home_page_url);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        sleep(2);
+        $i->click("Add text and multimedia, or embed content");
+        sleep(5);
+        $i->fillField("textBoxHeading", "Test Text Box Title");
+        $i->fillCkEditorById('textBoxBody', 'wow what interesting Text box text');
+        $i->scrollTo(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        $i->waitForElementVisible(['css' => 'input[type=submit][value=Save\ Content]'], 5);
+        $i->click(['css' => 'input[type=submit][value=Save\ Content]']);
+    }
+
+    /**
+     * @depends createHomepage
+     * @depends useElement
+     * @param AcceptanceTester $i
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function viewElement(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+        $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
+        $i->waitForText("Homepage", 5);
+        sleep(1);
+        $i->click("a.icon-home");
+        $home_page_url = $i->getCurrentUrl();
+        $i->impersonate("Ms Jana Reed");
+        $i->amOnUrl($home_page_url);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
+        sleep(2);
+        $i->canSee("Test Blog Title");
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
+        sleep(2);
+        $i->canSee("Test News Title");
+        $i->canSeeElement(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        sleep(2);
+        $i->canSee("Test Text Box Title");
+    }
+
+    /**
+     * @depends createHomepage
+     * @depends viewElement
+     * @param AcceptanceTester $i
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function deleteElement(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+        $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
+        $i->click($testHomepage);
+        $i->waitForText("Homepage", 5);
+        sleep(1);
+        $i->click("a.icon-home");
+        $home_page_url = $i->getCurrentUrl();
+        $i->click(['css' => 'label[for=component-lock-toggle]']);
+        $i->canSeeElement(['css' => 'span[class=icon-unlocked]']);
+        sleep(2);
+        $i->click(['css' => 'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a.icon-close[data-state=closed][title=Close]']);
+        sleep(3);
+        $i->canSeeElement(['css' => 'a[class=button\ submit]']);
+        $i->click(['css' => 'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a[class=button\ submit]']);
+        sleep(1);
+        $i->click(['css' => 'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a.icon-close[data-state=closed][title=Close]']);
+        sleep(3);
+        $i->canSeeElement(['css' => 'a[class=button\ submit]']);
+        $i->click(['css' => 'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a[class=button\ submit]']);
+        sleep(1);
+        $i->click(['css' => 'div.component-container.Component_Homepage_TextBoxController a.icon-close[data-state=closed][title=Close]']);
+        sleep(3);
+        $i->canSeeElement(['css' => 'a[class=button\ submit]']);
+        $i->click(['css' => 'div.component-container.Component_Homepage_TextBoxController a[class=button\ submit]']);
+        echo "Not done yet";
+    }
+
+    /**
+     * @depends createHomepage
+     * @depends deleteElement
+     * @param AcceptanceTester $i
+     * @throws \Exception
+     */
+    public function deleteHomepageFail(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+        $i->click("Test Homepage");
+        $i->waitForText("Delete", 5);
+        $i->click("Delete");
+        $i->waitForText("Please Confirm", 5);
+        $i->click("No");
+        sleep(1);
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+    }
+
+    /**
+     * @depends createHomepage
+     * @depends deleteElement
+     * @param AcceptanceTester $i
+     * @throws \Exception
+     */
+    public function deleteHomepage(AcceptanceTester $i): void
+    {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->canSee("Test Homepage");
+        $i->click("Test Homepage");
+        $i->waitForText("Delete", 5);
+        $i->click("Delete");
+        $i->waitForText("Please Confirm", 5);
+        $i->click("Yes");
+        sleep(1);
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->cantSee("Test Homepage");
+    }
+}

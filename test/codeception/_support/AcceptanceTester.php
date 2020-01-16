@@ -1,6 +1,7 @@
 <?php
 
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Codeception\Module;
 
 /**
  * Inherited Methods
@@ -97,10 +98,12 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $i = $this;
         $i->amOnPage('/user/recoverSession');
-        $i->click('a#profile-drop');
-        $i->click($fullname, '#account-content');
+        $i->click(['css'=>'a[title=Schoolbox\ Admin]']);
+        $i->executeJS("var scrollableDiv = document.getElementById('account-content');
+        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+        $i->waitForText($fullname, 5);
+        $i->click($fullname, '#switch-user');
     }
-
 
     /**
      * Fill in CKEditor
@@ -191,5 +194,15 @@ class AcceptanceTester extends \Codeception\Actor
 
                 $webDriver->switchTo()->defaultContent();
             });
+    }
+
+    /**
+     * Get current url from WebDriver
+     * @return mixed
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function getCurrentUrl()
+    {
+        return $this->executeJS("return location.href");
     }
 }
