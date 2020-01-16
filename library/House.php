@@ -11,6 +11,7 @@ class House implements ValueLabelInterface, ISoftDeletable, Sequential
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
+    use ModelTrait\UpdatedBy;
     use ModelTrait\CreateCollection;
     use ModelTrait\HasSequence;
 
@@ -36,27 +37,6 @@ class House implements ValueLabelInterface, ISoftDeletable, Sequential
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @var int|null
-     */
-    private $updatedBy;
-
-    /**
-     * @return int|null
-     */
-    public function getUpdatedBy(): ?int
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * @param int|null $updatedBy
-     */
-    public function setUpdatedBy(?int $updatedBy): void
-    {
-        $this->updatedBy = $updatedBy;
     }
 
     /**
