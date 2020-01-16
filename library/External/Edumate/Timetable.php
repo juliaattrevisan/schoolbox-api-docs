@@ -15,6 +15,15 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /** @var array */
     protected $campusCache;
 
+    /** @var Group $groupHandler */
+    private $groupHandler;
+
+    public function __construct()
+    {
+        $this->groupHandler = new Group();
+        parent::__construct();
+    }
+
     /**
      * @inheritDoc
      */
@@ -202,13 +211,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return [];
         }
 
-        if ($this->getGroupHandler()->isStudent($userId)) {
+        if ($this->groupHandler->isStudent($userId)) {
             $type = 'STUDENT';
             $join = "
                 LEFT JOIN SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STUDENT_NUMBER = :sn
             ";
-        } elseif ($this->getGroupHandler()->isStaff($userId)) {
+        } elseif ($this->groupHandler->isStaff($userId)) {
             $type = 'STAFF';
             $join = "
                 LEFT JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
@@ -300,12 +309,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return [];
         }
 
-        if ($this->getGroupHandler()->isStudent($userId)) {
+        if ($this->groupHandler->isStudent($userId)) {
             $join = "
                 LEFT JOIN SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STUDENT_NUMBER = :sn
             ";
-        } elseif ($this->getGroupHandler()->isStaff($userId)) {
+        } elseif ($this->groupHandler->isStaff($userId)) {
             $join = "
                 LEFT JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STAFF_NUMBER = :sn
