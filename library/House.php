@@ -1,6 +1,19 @@
 <?php
 
-class House implements \Schoolbox\ValueLabelInterface {
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Sequential;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\ValueLabelInterface;
+
+class House implements ValueLabelInterface, ISoftDeletable, Sequential
+{
+
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\CreateCollection;
+    use ModelTrait\HasSequence;
 
     protected $id;
 

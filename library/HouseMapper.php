@@ -23,6 +23,12 @@ class HouseMapper extends Schoolbox\Mapper
             'property' => 'house',
             'type'     => self::TYPE_STRING,
         ]);
+
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -36,5 +42,11 @@ class HouseMapper extends Schoolbox\Mapper
     protected function raiseNotification($object, $verb, $previous = null)
     {
         return true;
+    }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }

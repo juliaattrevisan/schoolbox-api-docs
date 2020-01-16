@@ -51,8 +51,9 @@ class SchoolHouse extends SimpleStrategy
         return "
             SELECT id, house AS name, '{$entityType}' AS entity_type, null as entity_meta
             FROM house
-            WHERE house IS NOT NULL
+            WHERE house IS NOT NULL AND deleted_at IS NULL
             {$keywordFilter}
+            ORDER BY sequence
         ";
     }
 
