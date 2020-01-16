@@ -1173,31 +1173,31 @@ class DataSource
             $descriptorStatement = $this->database->prepare(
                 "
                     SELECT
-                        rg.id AS capability_id,
-                        rg.name AS capability_name,
-                        rgm.value AS capability_value,
+                        rc.id AS capability_id,
+                        rc.name AS capability_name,
+                        rcm.value AS capability_value,
                         rcu.max_value AS capability_max_value,
-                        rc.id AS indicator_id,
-                        rc.name AS indicator_name,
+                        ri.id AS indicator_id,
+                        ri.name AS indicator_name,
                         a.id AS assessment_id,
-                        a.title AS asessessment_title,
+                        a.title AS assessment_title,
                         sb.mark_type,
                         rl.name as level,
                         rd.description,
                         (SELECT MAX(rd2.max_value) FROM rubric_descriptor rd2 WHERE rd2.rubric_indicator_id = rd.rubric_indicator_id ) as max_value,
-                        rdm.value
-                    FROM       rubric_indicator_mark  rdm
-                    INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
-                    INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
-                    INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
+                        rim.value
+                    FROM       rubric_indicator_mark  rim
+                    INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
+                    INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
+                    INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
                     INNER JOIN rubric_level            rl ON rd.level_id = rl.id
-                    INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
-                    INNER JOIN submission_return       sr ON rgm.return_id = sr.id
+                    INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
+                    INNER JOIN submission_return       sr ON rcm.return_id = sr.id
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
-                    INNER JOIN rubric_capability_usage rcu ON rg.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
+                    INNER JOIN rubric_capability_usage rcu ON rc.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
-                    ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
+                    ORDER BY rc.name ASC, rc.name ASC, a.due_date DESC;
                 "
             );
             $descriptorStatement->execute($pb->getParams());
@@ -1223,7 +1223,7 @@ class DataSource
 
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
-                    'name'       => $row['asessessment_title'],
+                    'name'       => $row['assessment_title'],
                     'descriptor' => $row['description'],
                     'level'      => $row['level'],
                     'max_value'  => $row['max_value'],
@@ -1233,7 +1233,7 @@ class DataSource
 
             unset($pb);
 
-            // Find the most recent feedback for all students got the given assessments
+            // Find the most recent feedback for all students for the given assessments
             $pb = new Builder($this->database, '');
             $pb->in('a.id', $dueWorks->getPropertyValues('id'))
                ->isNull('a.deleted_at')
@@ -1270,20 +1270,20 @@ class DataSource
                 $averageStatement = $this->database->prepare(
                     "
                     SELECT
-                        rg.id AS capability_id,
-                        rc.id AS indicator_id,
+                        rc.id AS capability_id,
+                        ri.id AS indicator_id,
                         a.id AS assessment_id,
-                        rdm.value
-                    FROM       rubric_indicator_mark  rdm
-                    INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
-                    INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
-                    INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
-                    INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
-                    INNER JOIN submission_return       sr ON rgm.return_id = sr.id
+                        rim.value
+                    FROM       rubric_indicator_mark  rim
+                    INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
+                    INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
+                    INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
+                    INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
+                    INNER JOIN submission_return       sr ON rcm.return_id = sr.id
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
-                    ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
+                    ORDER BY rc.name ASC, ri.name ASC, a.due_date DESC;
                 "
                 );
                 $averageStatement->execute($pb->getParams());
@@ -1293,6 +1293,7 @@ class DataSource
                 }
             }
 
+            $assessmentList = [];
             //Insert the statistical summary data collated from all students results across all indicators in all activities
             foreach($allResults as $assessmentId => $assessment) {
                 foreach($assessment as $capabilityId => $capability) {

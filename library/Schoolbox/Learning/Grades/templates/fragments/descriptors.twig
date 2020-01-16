@@ -8,10 +8,11 @@
         returnUrlSuffix       string
 #}
 
-<table>
-    <tr><td>&nbsp;</td><td>&nbsp;</td>
+<table class="rb markable stack-for-medium-down">
+    <thead>
+    <tr><th colspan="2">&nbsp;</th>
         {% for activity_id, activity_name in rubricAssessmentList  %}
-            <td>
+            <th>
                 {% set activityAssessment = assessments.by('id', activity_id) %}
                 {% if activityAssessment %}
                     {%- set activityHref = routeLookupIfAuthorized(
@@ -31,23 +32,25 @@
                 {%- else -%}
                     {{ activity_name }}
                 {%- endif -%}
-            </td>
+            </th>
         {% endfor %}
     </tr>
+    </thead>
+    <tbody>
     {% for capability in longitudinalRubric %}
         <tr >
-        <td rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></td>
+        <th class="rb-group-name" rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></th>
         {% for indicator in capability.indicators %}
             {% if not loop.first %}
                 <tr>
             {% endif %}
-            <td><b>{{ indicator.name | nl2br }}</b></td>
+            <th class="rb-criterion-name"><b>{{ indicator.name | nl2br }}</b></th>
             {% for activity_id, activity_name in rubricAssessmentList %}
                 {% set activity = indicator.activities[activity_id] %}
-                <td><p>
+                <td><div><span class="rb-description">
                         {% if  activity.level %}<b>{{ activity.level }}</b><br />{% endif %}
                         {{ activity.descriptor }} {% if activity.value and config.rubric_show_points %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
-                    </p>
+                    </span></div>
                 </td>
 
             {% endfor %}
@@ -55,6 +58,7 @@
         {% endfor %}
         </tr>
     {% endfor %}
+    </tbody>
 </table>
 
 

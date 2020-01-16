@@ -26,8 +26,8 @@
                             enabled: false
                         },
                         yAxis: {
-                            min: -5,
-                            max: 105,
+                            min: -15,
+                            max: 115,
                             visible: false,
                             title: {
                                 text: null
@@ -43,6 +43,7 @@
                             shared: true,
                             outside: true,
                             valueSuffix: '',
+                            hideDelay: 0,
                             formatter: function() {
                                 /* Basic template for each outlier */
                                 var template =
@@ -90,7 +91,7 @@
                 <tr><td width="15%">&nbsp;</td>
             {% endif %}
             <th width="15%">{{ indicator.name | nl2br}}</th>
-            <td>
+            <td style="padding: 0px;">
                 <div id="rubricGraph{{ indicatorId }}"></div>
                 <script type="application/javascript">
                     $(function() {
