@@ -17,6 +17,9 @@ class HomepageInitialCest
 
     var $createFolderUrl = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
 
+    /**
+     * @param AcceptanceTester $i
+     */
     public function createHomepageFail(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
@@ -34,6 +37,9 @@ class HomepageInitialCest
         $i->cantSee("Test Homepage");
     }
 
+    /**
+     * @param AcceptanceTester $i
+     */
     public function createHomepage(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
@@ -51,7 +57,11 @@ class HomepageInitialCest
         $i->canSee("Test Homepage");
     }
 
-    #@depends createHomepage
+    /**
+     * @depends createHomepage
+     * @param AcceptanceTester $i
+     * @throws \Exception
+     */
     public function createElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
@@ -87,8 +97,12 @@ class HomepageInitialCest
         $i->canSeeElement(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
     }
 
-    #@depends createHomepage
-    #@depends createElement
+    /**
+     * @depends createHomepage
+     * @depends createElement
+     * @param AcceptanceTester $i
+     * @throws \Codeception\Exception\ModuleException
+     */
     public function useElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
@@ -128,8 +142,12 @@ class HomepageInitialCest
         $i->click(['css' => 'input[type=submit][value=Save\ Content]']);
     }
 
-    #@depends createHomepage
-    #@depends useElement
+    /**
+     * @depends createHomepage
+     * @depends useElement
+     * @param AcceptanceTester $i
+     * @throws \Codeception\Exception\ModuleException
+     */
     public function viewElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
@@ -154,8 +172,12 @@ class HomepageInitialCest
         $i->canSee("Test Text Box Title");
     }
 
-    #@depends createHomepage
-    #@depends viewElement
+    /**
+     * @depends createHomepage
+     * @depends viewElement
+     * @param AcceptanceTester $i
+     * @throws \Codeception\Exception\ModuleException
+     */
     public function deleteElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
@@ -187,8 +209,12 @@ class HomepageInitialCest
         echo "Not done yet";
     }
 
-    #@depends createHomepage
-    #@depends deleteElement
+    /**
+     * @depends createHomepage
+     * @depends deleteElement
+     * @param AcceptanceTester $i
+     * @throws \Exception
+     */
     public function deleteHomepageFail(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
@@ -204,8 +230,12 @@ class HomepageInitialCest
         $i->canSee("Test Homepage");
     }
 
-    #@depends createHomepage
-    #@depends deleteElement
+    /**
+     * @depends createHomepage
+     * @depends deleteElement
+     * @param AcceptanceTester $i
+     * @throws \Exception
+     */
     public function deleteHomepage(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
