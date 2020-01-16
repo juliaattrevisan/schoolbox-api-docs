@@ -28,11 +28,9 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
  * @method Model createModel($id = null)
- * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -126,43 +124,6 @@ class Mapper extends BaseMapper
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('am', '', 'am', true)}
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
-        ";
-    }
-
-
-    /**
-     * @param PDOStatement $statement
-     * @return GenericCollection
-     * @throws Schoolbox\Mapper\DefinitionException
-     * @throws Schoolbox\Mapper\Exception
-     */
-    public function hydrateSelect(PDOStatement $statement): GenericCollection
-    {
-        $collection = $this->createCollection();
-
-        /** @noinspection PhpAssignmentInConditionInspection */
-        while ($row = $statement->fetch()) {
-            $quiz = $this->hydrate($row)
-                         ->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'))
-                         ->setUser($this->hydrateJoin($row, 'user', 'u'))
-            ;
-            $collection[$quiz->getId()] = $quiz;
-        }
-
-        return $collection;
-    }
-
-
-
-    /** @inheritDoc */
-    public function getSelectString(): string
-    {
-        return "
-            SELECT
-                {$this->getColumnString()},
-                {$this->getJoinColumnString('am', 'am')}
-            FROM {$this->getTable()}
-            JOIN {$this->getJoinSql('am', '', 'am', true)}
         ";
     }
 
