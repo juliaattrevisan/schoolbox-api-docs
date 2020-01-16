@@ -540,15 +540,15 @@ abstract class Mapper implements IMapper, Serializable
                     if (!(isset($map['join']) && isset($mapper->joins[$map['join']]['multi']))) {
                         throw new Exception("Column must be declared if no multijoin set for it: " . json_encode($map));
                     }
-                    // Don't hydrate reverse multi joins on model instantiation
-                } elseif (!(isset($map['join']) && $map['type'] === self::TYPE_COLLECTION && ($map['join_def']['reverse'] ?? false))) {
+                    // Don't automatically hydrate reverse joins. Reverse joins must be hydrated explicitly.
+                } elseif (!(isset($map['join']) && ($map['join_def']['reverse'] ?? false))) {
                     $columnName = $map['column'];
 
                     if (!empty($alias)) {
                         $columnName = "$alias.$columnName";
                     }
 
-                    $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+                    $columnValue = $row[$columnName] ?? null;
 
                     $mapper->setModelProperty($model, $propertyName, $columnValue);
                 }
