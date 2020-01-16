@@ -222,7 +222,7 @@ class Controller extends Base
             if (count($diff) > 0) {
                 // Save the changes
                 if (method_exists($model, $mapper->getGetMethodName('updatedBy'))) {
-                    $model->setUpdatedBy($_SESSION['user']->getId());
+                    $model->setUpdatedBy($this->getUser()->getId());
                 }
                 $mapper->save($model);
             }
