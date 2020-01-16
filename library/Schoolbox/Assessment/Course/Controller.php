@@ -382,18 +382,11 @@ class Controller extends Base\Base
      * @since 160
      *
      * @param string|null $name
-     * @throws BaseMapper\DefinitionException
-     * @throws Deleted
-     * @throws MapperException
-     * @throws NotFound
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \LogicException
      */
     public function newCourse(string $name = null)
     {
         $this->courseTpl('course', [
+            'courseName'        => $name,
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'isValidFacultyRoot'=> $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
