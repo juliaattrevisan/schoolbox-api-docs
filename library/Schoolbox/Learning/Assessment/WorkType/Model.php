@@ -19,6 +19,7 @@ class Model implements ISoftDeletable, Sequential
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
+    use ModelTrait\UpdatedBy;
     use ModelTrait\CreateCollection;
     use ModelTrait\HasSequence;
 
@@ -44,11 +45,6 @@ class Model implements ISoftDeletable, Sequential
 
     /** @var bool */
     private $staffOrInstructorVisibleOnly;
-
-    /**
-     * @var int
-     */
-    private $updatedBy;
 
     /**
      * @return bool
@@ -167,24 +163,6 @@ class Model implements ISoftDeletable, Sequential
     public function setStaffOrInstructorVisibleOnly(bool $staffOrInstructorVisibleOnly): self
     {
         $this->staffOrInstructorVisibleOnly = $staffOrInstructorVisibleOnly;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getUpdatedBy(): ?int
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * @param int|null $updatedBy
-     * @return $this
-     */
-    public function setUpdatedBy(?int $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
         return $this;
     }
 }
