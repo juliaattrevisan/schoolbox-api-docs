@@ -168,6 +168,29 @@ class Mapper extends BaseMapper
 
 
     /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $quiz = $this->hydrate($row)
+                         ->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'))
+                         ->setUser($this->hydrateJoin($row, 'user', 'u'))
+            ;
+            $collection[$quiz->getId()] = $quiz;
+        }
+
+        return $collection;
+    }
+
+
+    /**
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
