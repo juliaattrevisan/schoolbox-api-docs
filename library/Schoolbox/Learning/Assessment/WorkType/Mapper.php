@@ -30,5 +30,17 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('external_result_type', self::TYPE_STRING);
         $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
         $this->uses('staff_or_instructor_visible_only', self::TYPE_BOOLEAN);
+
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Admin\Lists;
 
+use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -109,7 +110,6 @@ class Controller extends Base
         $nulls  = [];
         $radios = [];
         $checkboxes = [];
-        $empty_checkboxes = [];
         // for mandatory text fields
         $mandatoryValues = [];
 
@@ -130,8 +130,6 @@ class Controller extends Base
                 $radios[substr($field, 6)] = $value;
             } else if (substr($field, 0, 9) == "checkbox-") {
                 $checkboxes[substr($field, 9)] = $value;
-            } else if (substr($field, 0, 15) == "empty-checkbox-") {
-                $empty_checkboxes[substr($field, 15)] = $value;
             } else if ($field == "id") {
                 $ids = $value;
             }
@@ -147,13 +145,11 @@ class Controller extends Base
 
         foreach ($ids as $currentIndex => $id)
         {
-            $isRoleChanged = false;
             // Negative ID numbers indicate new records
-
             if ($id > 0) {
                 // Lookup existing record
                 $model = $mapper->findById($id);
-
+                $oldModel = clone $model;
             } else {
                 // Create new record
                 $model = $mapper->createModel();
@@ -182,7 +178,6 @@ class Controller extends Base
                     $setter = $mapper->getSetMethodName($field);
 
                     $model->$setter($value[$currentIndex]);
-                    $isRoleChanged = true;
                 }
             }
 
@@ -210,31 +205,25 @@ class Controller extends Base
                 }
             }
 
-            //Process all the lovely checkboxes
-            //First unset all models
-            foreach ($empty_checkboxes as $field => $value) {
-                $setter = $mapper->getSetMethodName($field);
-                $boolean = !isset($value[$currentIndex]);
-                $model->$setter($boolean);
-            }
-
-            //Then set models whose that are checked
+            //Set checkboxes whose that are checked
             foreach ($checkboxes as $field => $value) {
-                $setter = $mapper->getSetMethodName($field);
-                $boolean = isset($value[$currentIndex]);
+                $setter  = $mapper->getSetMethodName($field);
+                $boolean = (bool)$value[$currentIndex];
                 $model->$setter($boolean);
             }
 
-            if ($model->getSequence() !== $sequence) {
+            if (method_exists($model, $mapper->getGetMethodName('sequence')) && $model->getSequence() !== $sequence) {
                 $model->setSequence($sequence);
-                $isRoleChanged = true;
             }
             $sequence++;
 
-            // Update the role if there is changes
-            if ($isRoleChanged) {
+            // Update values if there is changes
+            $diff = (new Differ())->diff($mapper->dehydrate($model), $mapper->dehydrate($oldModel));
+            if (count($diff) > 0) {
                 // Save the changes
-                $model->setUpdatedBy($_SESSION['user']->getId());
+                if (method_exists($model, $mapper->getGetMethodName('updatedBy'))) {
+                    $model->setUpdatedBy($this->getUser()->getId());
+                }
                 $mapper->save($model);
             }
         }
@@ -482,6 +471,7 @@ class Controller extends Base
             'submission-type'    => [
                 'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
+                'delete'            => true,
                 'fields'            => [
                     'showOnGradesPage'       => [
                         'caption'   => 'Grades page',
