@@ -442,6 +442,7 @@ class Controller extends Base
             ],
             'event-type'           => [
                 'title'             => 'Event Types',
+                'delete'            => true,
                 'mapper'            => EventTypeMapper::class,
                 'fields'            => [
                     'type'          => [

@@ -10,9 +10,18 @@
 namespace Schoolbox\Calendar;
 
 use JsonSerializable;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Sequential;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class EventType implements JsonSerializable
+class EventType implements ISoftDeletable, JsonSerializable, Sequential
 {
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\CreateCollection;
+    use ModelTrait\HasSequence;
 
     /**
      * Event type id

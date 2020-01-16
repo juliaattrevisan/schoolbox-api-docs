@@ -268,7 +268,7 @@ class Calendar extends DeprecatedModel
 
     function getTypeList()
     {
-        $query = "SELECT eventTypeID, eventType, eventColour FROM luEventType";
+        $query = "SELECT eventTypeID, eventType, eventColour FROM luEventType WHERE deleted_at IS NULL ORDER BY sequence ASC";
         return $this->db->getAll($query);
     }
 

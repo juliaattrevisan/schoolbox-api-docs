@@ -46,5 +46,29 @@ class EventTypeMapper extends Schoolbox\Mapper
                 'type'     => self::TYPE_STRING,
             )
         );
+        $this->hasMap(
+            [
+                'column'   => 'sequence',
+                'property' => 'sequence',
+                'type'     => self::TYPE_INTEGER,
+            ]
+        );
+        $this->hasMap(
+            [
+                'column'   => 'updated_by',
+                'property' => 'updatedBy',
+                'type'     => self::TYPE_INTEGER,
+            ]
+        );
+
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }
