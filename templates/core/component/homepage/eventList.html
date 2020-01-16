@@ -18,7 +18,12 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to delete this '+eventName+'?',
                     confirmEvent: function() {
-                        window.location.href = $('#delete-single-'+eventId).val();
+                        $.post($('#delete-single-'+eventId).val(), {
+                            action: 'Delete',
+                            id: eventId
+                        }).done(function (response) {
+                            window.location.href = response.callbackUrl;
+                        });
                     }
                 });
             });
@@ -107,14 +112,24 @@
                             .on('click', function(e) {
                                 e.preventDefault();
                                 dialog.foundation('reveal', 'close');
-                                window.location.href = $('#delete-series-self-'+eventId).val();
+                                $.post($('#delete-series-self-'+eventId).val(), {
+                                    action: 'Delete',
+                                    id: eventId
+                                }).done(function (response) {
+                                    window.location.href = response.callbackUrl;
+                                });
                             });
                         dialog.find('[data-action="series"]')
                             .off('click')
                             .on('click', function(e) {
                                 e.preventDefault();
                                 dialog.foundation('reveal', 'close');
-                                window.location.href = $('#delete-series-all-'+eventId).val();
+                                $.post($('#delete-series-all-'+eventId).val(), {
+                                    action: 'Delete',
+                                    id: eventId
+                                }).done(function (response) {
+                                    window.location.href = response.callbackUrl;
+                                });
                             });
                         dialog.find('[data-action="cancel"]')
                             .off('click')

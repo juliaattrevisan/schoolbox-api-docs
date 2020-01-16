@@ -94,11 +94,21 @@
                         dialog,
                         function () {
                             // Add self to href
-                            location.href = deleteButton.attr('href') + '&efficacy=self';
+                            $.post(deleteButton.attr('href') + '&efficacy=self', {
+                                action: 'Delete',
+                                id: $('input[name=id]').val()
+                            }).done(function (response) {
+                                window.location.href = response.callbackUrl;
+                            });
                         },
                         function () {
                             // Add series to href
-                            location.href = deleteButton.attr('href') + '&efficacy=series';
+                            $.post(deleteButton.attr('href') + '&efficacy=series', {
+                                action: 'Delete',
+                                id: $('input[name=id]').val()
+                            }).done(function (response) {
+                                window.location.href = response.callbackUrl;
+                            });
                         }
                     );
                 });
@@ -107,7 +117,14 @@
                     event.preventDefault();
                     deleteButton.confirmDialog({
                         text: 'Are you sure you want to delete this event?',
-                        confirmEvent: $.confirmDialog.followHref
+                        confirmEvent: function () {
+                            $.post(deleteButton.attr('href'), {
+                                action: 'Delete',
+                                id: $('input[name=id]').val()
+                            }).done(function (response) {
+                                window.location.href = response.callbackUrl;
+                            });
+                        }
                     });
                 })
             }

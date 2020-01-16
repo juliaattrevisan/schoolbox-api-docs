@@ -67,7 +67,7 @@
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
                         modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=' + this.returnTo;
-                        deleteLink = this.eventModifyFormActionUrl + '?action=Delete&id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
+                        deleteLink = this.eventModifyFormActionUrl + '?id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
                     }
                 }
 
@@ -351,6 +351,7 @@
                 this.$refs.eventDeleteModal.close();
                 let data = {
                     id: this.eventExtendedProps.eventId,
+                    action: 'Delete',
                     efficacy: efficacy,
                 };
                 return axios
