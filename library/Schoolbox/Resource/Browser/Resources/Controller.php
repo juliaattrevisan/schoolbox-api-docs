@@ -139,6 +139,6 @@ class Controller extends AbstractController
     protected function getAccess($folderId)
     {
         // find out if we have access to the requested folder
-        return Access::getInstance()->getFolderAccess($this->getUser(), $folderId);
+        return Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId);
     }
 }

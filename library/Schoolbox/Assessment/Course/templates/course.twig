@@ -213,7 +213,7 @@ Usage:
                             <input type="text"
                                    name="name"
                                    id="name"
-                                   value="{{ courseSpec.folder.name }}"
+                                   value="{{ courseSpec.folder.name ?: courseName }}"
                                    placeholder="What's this course called?"
                                    required
                                    maxlength="255"
