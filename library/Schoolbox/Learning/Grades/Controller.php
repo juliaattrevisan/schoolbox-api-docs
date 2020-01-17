@@ -495,19 +495,47 @@ class Controller extends Base
 
         $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
 
+        /* Get Rubric Data for display */
         $longitudinalRubric = $this->getLongitudinalRubricData($assessments, $viewee);
         $rubricAssessmentList = $longitudinalRubric['assessments'];
         unset($longitudinalRubric['assessments']);
+
+
+        /* Build tabs for grade report */
+        $tabs = [];
+
+        if ($canSeeGraph) {
+            $tabs['graph'] = [
+                'label' => 'Activities',
+            ];
+        }
+
+        if ($longitudinalRubric) {
+            if ($this->getConfigLoader()->get('enable_grades_criteria')) {
+                $tabs['descriptors'] = ['label' => 'Learning Levels' ];
+            }
+
+            if ($this->getConfigLoader()->get('grade_capability_display')) {
+                $tabs['capabilities'] = ['label'=>'Capability Grades' ];
+            }
+
+            if ($this->getConfigLoader()->get('grade_progression_display')) {
+                $tabs['progression'] = ['label'=>'Progression' ];
+            }
+        }
+
+        /* Select the first of any combination of those elements
+         */
+        $selectedTab = array_shift(array_keys($tabs));
+
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
                 'student'               => $viewee,
                 'markbook'              => $filteredMarkbook,
-                'showActivityGraph'     => $canSeeGraph,
-                'showLearningLevels'    => $this->getConfigLoader()->get('enable_grades_criteria'),
-                'showCapabilityGrades'  => $this->getConfigLoader()->get('grade_capability_display'),
-                'showProgression'       => $this->getConfigLoader()->get('grade_progression_display'),
+                'tabs'                  => $tabs,
+                'selectedTab'          => $selectedTab,
                 'canSeeShowcaseButton'  => $canSeeShowcaseButton,
                 'graph'                 => $graph,
                 'longitudinalRubric' => $longitudinalRubric,

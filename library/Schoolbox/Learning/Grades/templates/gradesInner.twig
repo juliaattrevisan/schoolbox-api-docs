@@ -25,61 +25,33 @@
     });
 </script>
 {% if markbook.assessments | length %}
-{% set activeTab = 'active' %}
-{% set activeTabDiv = 'active' %}
-
 <div class="row">
     <div class="small-12 island">
         <dl class="tabs" data-tab>
-            {% if showActivityGraph %}<dd class="{{ activeTab }}"><a href="#assessments" aria-selected="false" tabindex="0">Activities</a></dd>{% set activeTab = '' %}{% endif %}
-            {% if longitudinalRubric %}
-                {% if showLearningLevels %}<dd class="{{ activeTab }}"><a href="#descriptors" aria-selected="false" tabindex="0">Learning Levels</a></dd>{% set activeTab = '' %}{% endif %}
-                {% if showCapabilityGrades %}<dd class="{{ activeTab }}"><a href="#capabilities" aria-selected="false" tabindex="0">{{ locale.rubricGroup.proper }} Grades</a></dd>{% set activeTab = '' %}{% endif %}
-                {% if showProgression %}<dd class="{{ activeTab }}"><a href="#progression" aria-selected="true" tabindex="0">Progression</a></dd>{% set activeTab = '' %}{% endif %}
-            {% endif %}
+            {% for key, data in tabs %}
+                <dd {% if key == selectedTab %}class="active"{% endif %} >
+                    <a href="#{{ key }}">{{ data.label }}</a>
+                </dd>
+            {% endfor %}
         </dl>
         <div class="tabs-content">
-            {% if showActivityGraph %}
-                <div class="content {{ activeTabDiv }}" id="assessments">{% set activeTabDiv = '' %}
-                    {% include '@learningGrades/fragments/graph.twig' with {graph: graph} only %}
-                </div>
-            {% endif %}
-            {% if longitudinalRubric %}
-                {% if showLearningLevels %}
-                <div class="content {{ activeTabDiv }}" id="descriptors">{% set activeTabDiv = '' %}
-                    {% include '@learningGrades/fragments/descriptors.twig' with {
-                        longitudinalRubric:     longitudinalRubric,
-                        rubricAssessmentList:   rubricAssessmentList,
-                        student:                student,
-                        assessments:            markbook.assessments,
-                        returnUrlSuffix:        returnUrlSuffix
-                    } only %}
-                </div>
-                {% endif %}
-                {% if showCapabilityGrades %}
-                <div class="content {{ activeTabDiv }}" id="capabilities">{% set activeTabDiv = '' %}
-                    {% include '@learningGrades/fragments/capabilities.twig' with {
-                        longitudinalRubric:     longitudinalRubric,
-                        rubricAssessmentList:   rubricAssessmentList,
-                        student:                student,
-                        assessments:            markbook.assessments,
-                        returnUrlSuffix:        returnUrlSuffix
-                    } only %}
-                </div>
-                {% endif %}
-                {% if showProgression %}
-                <div class="content {{ activeTabDiv }}" id="progression">{% set activeTabDiv = '' %}
-                    {% include '@learningGrades/fragments/progression.twig' with {
-                        longitudinalRubric:     longitudinalRubric,
-                        rubricAssessmentList:   rubricAssessmentList,
-                        activeTabDiv:           activeTabDiv,
-                        student:                student,
-                        assessments:            markbook.assessments,
-                        returnUrlSuffix:        returnUrlSuffix
+            {% for key, data in tabs %}
+                {% if key == 'graph' %}
+                    <div class="content {% if key == selectedTab %}active{% endif %}" id="{{ key }}">
+                        {% include '@learningGrades/fragments/graph.twig' with {graph: graph} only %}
+                    </div>
+                {% else %}
+                    <div class="content {% if key == selectedTab %}active{% endif %}" id="{{ key }}">
+                        {% include '@learningGrades/fragments/'~ key ~'.twig' with {
+                            longitudinalRubric:     longitudinalRubric,
+                            rubricAssessmentList:   rubricAssessmentList,
+                            student:                student,
+                            assessments:            markbook.assessments,
+                            returnUrlSuffix:        returnUrlSuffix
                         } only %}
-                </div>
+                    </div>
                 {% endif %}
-            {% endif %}
+            {% endfor %}
         </div>
     </div>
 </div>
