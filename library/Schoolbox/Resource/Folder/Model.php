@@ -33,6 +33,7 @@ use Schoolbox\ValueLabelInterface;
 use Schoolbox\YearLevel;
 use TypeError;
 use UnexpectedValueException;
+use function array_map;
 use function array_merge;
 use function explode;
 use function preg_match;
@@ -250,7 +251,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         // Rolled-over folder codes
         if (preg_match('/\[([^]]+)]/', $this->name, $matches)) {
-            return explode(',', $matches[1]);
+            return array_map('trim', explode(',', $matches[1]));
         }
         return [];
     }

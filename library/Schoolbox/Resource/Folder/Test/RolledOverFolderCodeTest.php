@@ -64,8 +64,17 @@ class RolledOverFolderCodeTest extends TestCase
     {
         return [
             ['A folder [ABC]', ['ABC']],
+            ['A folder [ ABC]', ['ABC']],
+            ['A folder [ABC ]', ['ABC']],
+            ['A folder [ ABC ]', ['ABC']],
             ['A folder [EN/ABC]', ['EN/ABC']],
+            ['A folder [ EN/ABC]', ['EN/ABC']],
+            ['A folder [EN/ABC ]', ['EN/ABC']],
+            ['A folder [ EN/ABC ]', ['EN/ABC']],
             ['A folder [EN/EN/ABC]', ['EN/EN/ABC']],
+            ['A folder [ EN/EN/ABC]', ['EN/EN/ABC']],
+            ['A folder [EN/EN/ABC ]', ['EN/EN/ABC']],
+            ['A folder [ EN/EN/ABC ]', ['EN/EN/ABC']],
         ];
     }
 
@@ -73,9 +82,21 @@ class RolledOverFolderCodeTest extends TestCase
     {
         return [
             ['A folder [ABC,XYZ]', ['ABC', 'XYZ']],
+            ['A folder [ ABC, XYZ]', ['ABC', 'XYZ']],
+            ['A folder [ABC ,XYZ ]', ['ABC', 'XYZ']],
+            ['A folder [ ABC , XYZ ]', ['ABC', 'XYZ']],
             ['A folder [EN/ABC,xxx]', ['EN/ABC', 'xxx']],
+            ['A folder [ EN/ABC, xxx]', ['EN/ABC', 'xxx']],
+            ['A folder [EN/ABC ,xxx ]', ['EN/ABC', 'xxx']],
+            ['A folder [ EN/ABC , xxx ]', ['EN/ABC', 'xxx']],
             ['A folder [EN/EN/ABC,xxx]', ['EN/EN/ABC', 'xxx']],
+            ['A folder [ EN/EN/ABC, xxx]', ['EN/EN/ABC', 'xxx']],
+            ['A folder [EN/EN/ABC ,xxx ]', ['EN/EN/ABC', 'xxx']],
+            ['A folder [ EN/EN/ABC , xxx ]', ['EN/EN/ABC', 'xxx']],
             ['A folder [EN/ABC,EN/EN/ABC,xxx]', ['EN/ABC', 'EN/EN/ABC', 'xxx']],
+            ['A folder [ EN/ABC, EN/EN/ABC, xxx]', ['EN/ABC', 'EN/EN/ABC', 'xxx']],
+            ['A folder [EN/ABC ,EN/EN/ABC ,xxx ]', ['EN/ABC', 'EN/EN/ABC', 'xxx']],
+            ['A folder [ EN/ABC , EN/EN/ABC , xxx ]', ['EN/ABC', 'EN/EN/ABC', 'xxx']],
         ];
     }
 }
