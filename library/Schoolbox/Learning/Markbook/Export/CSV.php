@@ -187,7 +187,7 @@ class CSV implements IExporter
      * @param IAssessable $assessment
      * @return string[]
      */
-    private function addHeaders(array $row, IAssessable $assessment)
+    public function addHeaders(array $row, IAssessable $assessment)
     {
         $title = "{$assessment->getTitle()} \r\n({$assessment->getTypeName()})";
 
@@ -286,7 +286,7 @@ class CSV implements IExporter
      * @param IAssessable $assessment
      * @return bool
      */
-    private function hasTotalMarkColumn(IAssessable $assessment)
+    public function hasTotalMarkColumn(IAssessable $assessment)
     {
         return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
     }
@@ -297,7 +297,7 @@ class CSV implements IExporter
      * @param IAssessable $assessment
      * @return bool
      */
-    private function hasNormalizedMarkColumn(IAssessable $assessment)
+    public function hasNormalizedMarkColumn(IAssessable $assessment)
     {
         return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
     }
@@ -308,7 +308,7 @@ class CSV implements IExporter
      * @param IAssessable $assessment
      * @return bool
      */
-    private function hasCommentColumn(IAssessable $assessment)
+    public function hasCommentColumn(IAssessable $assessment)
     {
         // Only DueWorks have comments at the moment
         return $assessment instanceof DueWork\Model;
@@ -320,7 +320,7 @@ class CSV implements IExporter
      * @param null|string $humanReadableMark
      * @return null|string
      */
-    private function parseNumerator($humanReadableMark)
+    public function parseNumerator($humanReadableMark)
     {
         if(preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)){
             return $markParts[1];
@@ -334,7 +334,7 @@ class CSV implements IExporter
      * @param null|string $humanReadableMark
      * @return null|string
      */
-    private function parseDenominator($humanReadableMark)
+    public function parseDenominator($humanReadableMark)
     {
         if(preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)){
             return $markParts[2];
@@ -350,7 +350,7 @@ class CSV implements IExporter
      * @param User        $student
      * @return null|string
      */
-    private function retrieveCommentField(IAssessable $assessment, User $student)
+    public function retrieveCommentField(IAssessable $assessment, User $student)
     {
         $participant = $assessment->getParticipantIfExtant($student);
         if (!$participant) {

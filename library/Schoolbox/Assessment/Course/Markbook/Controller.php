@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use Schoolbox\Assessment\Course\Markbook\Export\CSV;
 use Schoolbox\Filter\Codec;
 use function array_combine;
 use function func_get_args;
@@ -172,6 +173,25 @@ class Controller extends WebController\Base
         );
     }
 
+    /**
+     * Stream a filtered markbook in CSV format
+     *
+     * @api   GET /learning/courseMarkbook/export/:courseSpecId?{filterQueryArgs}
+     * @param CourseSpec\Model $courseSpec
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getMarkbookExport(CourseSpec\Model $courseSpec): void
+    {
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+
+        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
+
+        $csvExporter = new CSV();
+        $csvExporter->export($courseMarkbook, 'CourseMarkbook.csv');
+        exit;
+    }
 
     /**
      * Loads a filtered report into the Course Markbook page
@@ -199,6 +219,7 @@ class Controller extends WebController\Base
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@courseMarkbook/courseMarkbookInner.twig', [
+                    'courseSpecId'            => $courseSpec->getId(),
                     'collapsedAssessments'    => $courseMarkbook->getCollapsedAssessments(),
                     'unitSpecs'               => $courseMarkbook->getUnitSpecs(),
                     'courseImpls'             => $courseMarkbook->getCourseImpls(),
@@ -212,6 +233,7 @@ class Controller extends WebController\Base
                     'taskProgress'            => $courseMarkbook->getTaskProgress(),
                     'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
                     'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
+                    'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                 ])->getAsString(),
             ]));
 
