@@ -1181,6 +1181,7 @@ class DataSource
                         ri.name AS indicator_name,
                         a.id AS assessment_id,
                         a.title AS assessment_title,
+                        sb.rubric_mark_per_capability,
                         sb.mark_type,
                         rl.name as level,
                         rd.description,
@@ -1224,6 +1225,7 @@ class DataSource
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
                     'name'       => $row['assessment_title'],
+                    'rubric_mark_per_capability' => $row['rubric_mark_per_capability'],
                     'descriptor' => $row['description'],
                     'level'      => $row['level'],
                     'max_value'  => $row['max_value'],
@@ -1301,7 +1303,8 @@ class DataSource
                     foreach($capability as $indicatorId => $indicator) {
                         $boxPlot = new Summary($indicator);
                         $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['statistics'] = $boxPlot->getSummary();
-                        $assessmentList[$assessmentId] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['name'];
+                        $assessmentList[$assessmentId]['name'] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['name'];
+                        $assessmentList[$assessmentId]['rubric_mark_per_capability'] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['rubric_mark_per_capability'];
                     }
                 }
             }

@@ -535,12 +535,12 @@ class Controller extends Base
                 'student'               => $viewee,
                 'markbook'              => $filteredMarkbook,
                 'tabs'                  => $tabs,
-                'selectedTab'          => $selectedTab,
+                'selectedTab'           => $selectedTab,
                 'canSeeShowcaseButton'  => $canSeeShowcaseButton,
                 'graph'                 => $graph,
-                'longitudinalRubric' => $longitudinalRubric,
-                'rubricAssessmentList' => $rubricAssessmentList,
-                'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
+                'longitudinalRubric'    => $longitudinalRubric,
+                'rubricAssessmentList'  => $rubricAssessmentList,
+                'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getAsString(),
         ]));
 

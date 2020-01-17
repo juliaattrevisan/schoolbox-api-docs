@@ -11,7 +11,7 @@
 <table class="rb markable stack-for-medium-down">
     <thead>
     <tr><th colspan="2">&nbsp;</th>
-        {% for activity_id, activity_name in rubricAssessmentList  %}
+        {% for activity_id, activity in rubricAssessmentList  %}
             <th>
                 {% set activityAssessment = assessments.by('id', activity_id) %}
                 {% if activityAssessment %}
@@ -28,9 +28,9 @@
                     {%- set activityHref = '' -%}
                 {% endif %}
                 {%- if activityHref -%}
-                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity_name }}</a>
+                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
                 {%- else -%}
-                    {{ activity_name }}
+                    {{ activity.name }}
                 {%- endif -%}
             </th>
         {% endfor %}
@@ -45,7 +45,7 @@
                 <tr>
             {% endif %}
             <th class="rb-criterion-name"><b>{{ indicator.name | nl2br }}</b></th>
-            {% for activity_id, activity_name in rubricAssessmentList %}
+            {% for activity_id, activity in rubricAssessmentList %}
                 {% set activity = indicator.activities[activity_id] %}
                 <td><div><span class="rb-description">
                         {% if  activity.level %}<b>{{ activity.level }}</b><br />{% endif %}

@@ -9,7 +9,8 @@
 #}
 <table>
     <tr><td>&nbsp;</td>
-        {% for activity_id, activity_name in rubricAssessmentList  %}
+        {% for activity_id, activity in rubricAssessmentList  %}
+            {% if activity.rubric_mark_per_capability %}
             <td>
                 {% set activityAssessment = assessments.by('id', activity_id) %}
                 {% if activityAssessment %}
@@ -26,17 +27,19 @@
                     {%- set activityHref = '' -%}
                 {% endif %}
                 {%- if activityHref -%}
-                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity_name }}</a>
+                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
                 {%- else -%}
-                    {{ activity_name }}
+                    {{ activity.name }}
                 {%- endif -%}
             </td>
+            {% endif %}
         {% endfor %}
     </tr>
     {% for capability in longitudinalRubric %}
         <tr>
             <td><b>{{ capability.name | nl2br }}</b></td>
-            {% for activity_id, activity_name in rubricAssessmentList %}
+            {% for activity_id, activity in rubricAssessmentList %}
+                {% if activity.rubric_mark_per_capability %}
                 {% set activity = indicator.activities[activity_id] %}
                 <td>
                     {% if capability.value[activity_id] %}
@@ -45,6 +48,7 @@
                         &nbsp;
                     {% endif %}
                 </td>
+                {% endif %}
             {% endfor %}
         </tr>
     {% endfor %}
