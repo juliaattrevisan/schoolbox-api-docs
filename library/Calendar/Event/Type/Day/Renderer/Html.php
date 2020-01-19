@@ -22,6 +22,9 @@ class Html extends Base {
         $returnUrl = $_SERVER["REQUEST_URI"];
         $path = explode('/', $returnUrl);
         $returnStr = "&returnTo=";
+        if (isset($this->returnStr)) {
+            $returnStr = $this->returnStr;
+        }
         if ($returnUrl == "/") {
             $returnStr .= 'dashboard';
         }

@@ -110,11 +110,12 @@ class Renderer
     /**
      * @param EventInterface $event
      * @param string         $format
+     * @param string|null    $returnStr
      *
      * @return mixed
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderEvent($event, $format)
+    public function renderEvent($event, $format, ?string $returnStr = null)
     {
         $rendererClass = $event->getRendererClass($format);
         /** @var RendererInterface $renderObj */
@@ -124,6 +125,9 @@ class Renderer
             $this->user,
             $this->viewer
         );
+        if ($returnStr && method_exists($renderObj, 'setReturnStr')) {
+            $renderObj->setReturnStr($returnStr);
+        }
         return $renderObj->render();
     }
 

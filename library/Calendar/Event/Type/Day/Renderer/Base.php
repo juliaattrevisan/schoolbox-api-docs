@@ -26,6 +26,9 @@ abstract class Base extends RendererBase
      */
     private $calHandler;
 
+    /** @var string */
+    public $returnStr;
+
     /**
      * Constructor
      *
@@ -89,5 +92,14 @@ abstract class Base extends RendererBase
     protected function getEvent(): Day\Event
     {
         return $this->event;
+    }
+
+    /**
+     * Sets return string
+     * @param string $returnStr
+     */
+    public function setReturnStr(string $returnStr): void
+    {
+        $this->returnStr = $returnStr;
     }
 }

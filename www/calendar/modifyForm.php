@@ -72,7 +72,7 @@ switch ($_POST['action']) {
 
         /* Check user has permission to write the event with posted settings
          */
-        $groups = isset($_POST['group']) ? $_POST['group'] : [];
+        $groups = isset($_POST['group']) ? array_map('intval', $_POST['group']) : [];
         $campuses = isset($_POST['campus']) ? $_POST['campus'] : [];
 
         if ($eventAccess->checkDestination(
