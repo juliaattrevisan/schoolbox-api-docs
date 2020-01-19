@@ -82,42 +82,41 @@
 {% set audiencePlaceholder = 'Search for ' ~ availableNames|join(', ') ~ '...' %}
 {% endif %}
 
-<div class="row">
+<div class="actions-small-2 row">
     <div class="small-12 columns">
-        <div class="actions-small-2 row">
 
-            {% set hasDropDownRoutes = deleteRoute %}
+        {% set hasDropDownRoutes = deleteRoute %}
 
-            <nav>
-                {% if hasDropDownRoutes %}
-                    <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
-                {% endif %}
-            </nav>
-
+        <nav>
             {% if hasDropDownRoutes %}
-                <ul id="header-options" class="f-dropdown" data-dropdown-content>
-
-                    {% if deleteRoute %}
-                        <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}"
-                               data-delete="{{ article.title }}">Delete</a></li>
-                    {% endif %}
-
-                </ul>
+                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
             {% endif %}
+        </nav>
 
-            <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-            <ul class="meta">
-                {% if article.acceptedBy.id %}
-                    <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                        {% if article.isAccepted %}
-                            on {{ article.acceptedAt.local }}
-                        {% endif %}
-                    </li>
+        {% if hasDropDownRoutes %}
+            <ul id="header-options" class="f-dropdown" data-dropdown-content>
+
+                {% if deleteRoute %}
+                    <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}"
+                           data-delete="{{ article.title }}">Delete</a></li>
                 {% endif %}
+
             </ul>
-        </div>
+        {% endif %}
+
+        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+        <ul class="meta">
+            {% if article.acceptedBy.id %}
+                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                    {% if article.isAccepted %}
+                        on {{ article.acceptedAt.local }}
+                    {% endif %}
+                </li>
+            {% endif %}
+        </ul>
     </div>
 </div>
+
 <div class="row">
     <div class="small-12 island">
 
@@ -530,7 +529,7 @@
         $('#expiresAt').alaressDateTimePicker({
             staller: $submitButton
         });
-       
+
 
         {% if isAutoSavable %}
             // Init draft plugin
@@ -1288,7 +1287,7 @@
                     this.loadAudienceOptions(audienceOption, callback);
                 }
             },
-            
+
             /**
              * Populate and show a modal with info on a composite audience segment
              * @param {Brick} audienceBrick
