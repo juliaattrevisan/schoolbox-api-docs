@@ -21,7 +21,6 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     public function __construct()
     {
         $this->groupHandler = new Group();
-        parent::__construct();
     }
 
     /**

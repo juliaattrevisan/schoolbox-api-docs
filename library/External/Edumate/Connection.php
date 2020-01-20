@@ -12,18 +12,6 @@ use Schoolbox\Database\Factory as DatabaseFactory;
 
 class External_Edumate_Connection
 {
-    /** @var Connector $connector */
-    private $connector;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        /** @noinspection PhpDeprecationInspection */
-        $this->connector = DatabaseFactory::getInstanceExternal();
-    }
-
     /**
      * Internal DB2-specific code to turn CAPITALISEDFIELDS into NotCapitalisedFields
      *
@@ -49,7 +37,8 @@ class External_Edumate_Connection
      */
     protected function getConnection()
     {
-        return $this->connector;
+        /** @noinspection PhpDeprecationInspection */
+        return DatabaseFactory::getInstanceExternal();
     }
 
 
