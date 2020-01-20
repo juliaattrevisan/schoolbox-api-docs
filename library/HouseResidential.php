@@ -1,6 +1,18 @@
 <?php
- 
-class HouseResidential implements \Schoolbox\ValueLabelInterface {
+
+use Schoolbox\Mapper\Traits\Model\HasSequence;
+use Schoolbox\ValueLabelInterface;
+use Schoolbox\Sequential;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+
+class HouseResidential implements ValueLabelInterface, Sequential, ISoftDeletable
+{
+    use HasSequence;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\UpdatedBy;
 
     protected $id;
 
