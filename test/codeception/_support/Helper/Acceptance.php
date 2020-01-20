@@ -82,6 +82,21 @@ class Acceptance extends \Codeception\Module
         $db->updateInDatabase('config', ['value' => $value], ['name' => 'debug_mode']);
 
     }
+    
+    /**
+     * Adds a user to the schoolbox if he doesn't already exist.
+     * @param string $username
+     * @param string $password
+     */
+    public function addUser(string $username, string $password)
+    {
+        $db = $this->getDbModule();
+        $currentValue = $db->grabFromDatabase('user', 'username', ['username' => $username]);
+        if ($currentValue===NULL)
+        {
+            $db->_insertInDatabase('user', ['username' => $username], ['password' => $password]);
+        }
+    }
 
     /**
      * Resets database value back

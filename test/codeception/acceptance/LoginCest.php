@@ -16,6 +16,7 @@ class LoginCest
      */
     public function _before(AcceptanceTester $i)
     {
+        $i->addUser('drhodes', 'password');
         $i->runShellCommand('./test/codeception/_support/BashScripts/disable_ssl_SAML.sh');
         $i->changeDBConfig('saml_sso_url', 'https://ad.dev.schoolbox.cloud/adfs/ls');
         $i->changeDBConfig('saml_logout_url', 'https://ad.dev.schoolbox.cloud/adfs/ls/IdpInitiatedSignon.aspx');
