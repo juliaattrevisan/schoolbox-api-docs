@@ -35,6 +35,7 @@ class LoginCest
         $i->changeDBConfig('saml_logout_url', '');
         $i->changeDBConfig('saml_idp_metadata_url', '');
         $i->logout();
+        $i->restartBrowser();
     }
 
     /**

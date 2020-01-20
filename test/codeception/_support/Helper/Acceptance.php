@@ -563,7 +563,7 @@ class Acceptance extends \Codeception\Module
         }
         return null;
     }
-    
+
     /**
      * Get current url from WebDriver
      * @return mixed
@@ -635,4 +635,16 @@ class Acceptance extends \Codeception\Module
 //        $reflectionMethod->setAccessible(true);
 //        return $reflectionMethod->invoke($field);
 //    }
+
+    /**
+     * Restarts the Webdriver's browser.
+     *
+     * @param array $config Optional extra configuration for the browser to
+     *                      restart with.
+     */
+    public function restartBrowser(array $config = []): void
+    {
+        $i = $this->getWebDriverModule();
+        $i->_restart($config);
+    }
 }
