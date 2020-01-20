@@ -23,24 +23,24 @@
 {% set labelPublishedMark       = 'Mark Published' %}
 
 <div class="row">
-    <div class="small-12 island">
-        <nav style="float:right;">
-            <a class="icon-more" data-dropdown="header-options" title="Actions" style="float:right;"></a>
-            <div class="checklist" style="float:right;padding-right:20px">
-                <input type="checkbox" id="show-drafts">
-                <label for="show-drafts">
-                    Show Drafts
-                </label>
-            </div>
-            <div class="legend" style="float:right;">
+    <div class="actions-small-1 row">
+        <nav>
+            <div class="legend">
                 <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
                 <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
                 <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
+                <div class="checklist">
+                    <input type="checkbox" id="show-drafts">
+                    <label for="show-drafts">
+                        Show Drafts
+                    </label>
+                </div>
+                <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
             </div>
         </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content="">
             <li class="separator">Report</li>
-            <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpecId} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+            <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpecId} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a></li>
         </ul>
     </div>
     <div class="small-12 island" style="overflow-x: scroll;">
