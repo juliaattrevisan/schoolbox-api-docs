@@ -12,6 +12,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress_Byte_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
+use External_ClassInterface;
+use External_UserInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
@@ -24,11 +26,17 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Quiz;
+use Schoolbox\Learning\Quiz\Section as QuizSection;
+use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
+use Schoolbox\Learning\Quiz\Section\Question\QuestionType;
+use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use RuntimeException;
@@ -285,10 +293,24 @@ class CliImporter extends CliTool\App
 
         /** @var MapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
+        /** @var External_ClassInterface $externalClass */
         $externalClass = $this->getDi()->get('externalClass');
+        /** @var External_UserInterface $externalUser */
         $externalUser  = $this->getDi()->get('externalUser');
         /** @var MarkTypeMapper */
         $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
+        /** @var WorkType\Mapper */
+        $workTypeMapper = $mapperFactory->get(WorkType\Mapper::class);
+        /** @var Quiz\Mapper */
+        $quizMapper = $mapperFactory->get(Quiz\Mapper::class);
+        /** @var QuizSection\Mapper */
+        $quizSectionMapper = $mapperFactory->get(QuizSection\Mapper::class);
+        /** @var QuizQuestion\Mapper */
+        $quizQuestionMapper = $mapperFactory->get(QuizQuestion\Mapper::class);
+        /** @var QuestionType\Mapper */
+        $quizQuestionTypeMapper = $mapperFactory->get(QuestionType\Mapper::class);
+        /** @var QuizSolution\Mapper */
+        $quizSolutionMapper = $mapperFactory->get(QuizSolution\Mapper::class);
         /** @var SubmissionBoxMapper */
         $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
         /** @var Assessment\Mapper */
@@ -314,6 +336,12 @@ class CliImporter extends CliTool\App
             $externalClass,
             $externalUser,
             $markTypeMapper,
+            $workTypeMapper,
+            $quizMapper,
+            $quizSectionMapper,
+            $quizQuestionMapper,
+            $quizQuestionTypeMapper,
+            $quizSolutionMapper,
             $submissionBoxMapper,
             $assessmentMapper,
             $planMapper,

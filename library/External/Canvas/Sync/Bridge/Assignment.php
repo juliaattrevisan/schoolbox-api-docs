@@ -7,29 +7,69 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Learning\Quiz;
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function explode;
+use function strtolower;
 
 /**
- * Responsible for providing the link between a  Canvas Assignment to Schoolbox SubmissionBox Spec
+ * Responsible for providing the link between a Canvas Assignment/Quiz to Schoolbox SubmissionBox/Quiz Spec
  */
 class Assignment
 {
+    // These are Canvas `quiz_dim`.`quiz_type` enums
+    public const QUIZ_TYPE_PRACTICE      = 'practice_quiz';
+    public const QUIZ_TYPE_ASSIGNMENT    = 'assignment';
+    public const QUIZ_TYPE_GRADED_SURVEY = 'graded_survey';
+    public const QUIZ_TYPE_SURVEY        = 'survey';
+
+
+    /** @var string */
+    private $siteLocation;
 
     /** @var GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[] */
     private $markTypes;
 
+    /** @var GenericCollection<WorkType\Model>|WorkType\Model[] */
+    private $workTypes;
+
 
     /**
+     * @param string                                                             $siteLocation
      * @param GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[] $markTypes
+     * @param GenericCollection<WorkType\Model>|WorkType\Model[]                 $workTypes
      */
-    public function __construct(GenericCollection $markTypes)
+    public function __construct(string $siteLocation, GenericCollection $markTypes, GenericCollection $workTypes)
     {
-        $this->markTypes = $markTypes->shallowClone()->indexBy('slug');
+        $this->siteLocation = $siteLocation;
+        $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
+        $this->workTypes    = $workTypes->shallowClone()->indexBy('id');
+    }
+
+    public function syncCanvasAssignments(): bool
+    {
+        // For now, all instances sync assignments
+        return true;
+    }
+
+    public function syncCanvasQuizzes(): bool
+    {
+        switch (strtolower($this->siteLocation)) {
+            case 'staloy':
+                return false;
+            case 'demo':
+            default:
+                return true;
+        }
     }
 
 
@@ -39,7 +79,21 @@ class Assignment
      */
     public function getMaxMark(?float $pointsPossible): ?float
     {
-        return $pointsPossible;
+        return $pointsPossible ?? 0.0; // TODO think about this some more, and upgrade to documented constant
+    }
+
+
+    /**
+     * Returns a predicate for finding a suitable question type
+     *
+     * @return Builder
+     * @throws InvalidColumnException
+     */
+    public function getQuizQuestionTypePredicate(): Builder
+    {
+        return (new Builder(new Quoter(), ''))
+            ->equals('assess_luQuestionType.filename', 'short')
+            ->equals('assess_luQuestionType.availability', Quiz\Model::AVAILABILITY_ASSESS);
     }
 
 
@@ -69,6 +123,81 @@ class Assignment
     public function getSelfReviewability(): string
     {
         return SubmissionBox::SELF_REVIEWABILITY_NONE;
+    }
+
+
+    /**
+     * Returns the work type to assign to imported Canvas Assignments
+     *
+     * @return null|WorkType\Model
+     */
+    public function getSubmissionBoxWorkType(): ?WorkType\Model
+    {
+        return null;
+    }
+
+
+    /**
+     * Returns the weight to assign to Submission Boxes
+     *
+     * @return int
+     */
+    public function getSubmissionBoxWeight(): int
+    {
+        return 1;
+    }
+
+
+    /**
+     * Returns the weight to assign to Quizzes
+     *
+     * @return int
+     */
+    public function getQuizWeight(): int
+    {
+        return 1;
+    }
+
+
+    /**
+     * Returns the work type to assign to this quiz type
+     *
+     * @param string $quizType
+     * @return null|WorkType\Model
+     */
+    public function getQuizWorkType(string $quizType): ?WorkType\Model
+    {
+        switch (strtolower($this->siteLocation)) {
+            // Hard-coded for now to the staloy/demo dataset
+            case 'staloy':
+                $config = [
+                    self::QUIZ_TYPE_PRACTICE      => 5,
+                    self::QUIZ_TYPE_ASSIGNMENT    => 5,
+                    self::QUIZ_TYPE_SURVEY        => 5,
+                    self::QUIZ_TYPE_GRADED_SURVEY => 5,
+                ];
+                break;
+            case 'demo':
+                $config = [
+                    self::QUIZ_TYPE_PRACTICE      => 11,
+                    self::QUIZ_TYPE_ASSIGNMENT    => 11,
+                    self::QUIZ_TYPE_SURVEY        => 11,
+                    self::QUIZ_TYPE_GRADED_SURVEY => 11,
+                ];
+                break;
+            default:
+                $config = [];
+        }
+        if (!array_key_exists($quizType, $config)) {
+            return null;
+        }
+        $workTypeId = $config[$quizType];
+        foreach ($this->workTypes as $workType) {
+            if ($workType->getId() === $workTypeId) {
+                return $workType;
+            }
+        }
+        return null;
     }
 
 

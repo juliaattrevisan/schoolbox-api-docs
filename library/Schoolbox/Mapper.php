@@ -2043,6 +2043,35 @@ abstract class Mapper implements IMapper, Serializable
         return $this->executeSelect($this->getSelectString(), $this->getFromString(), $pb, [], $options);
     }
 
+
+    /**
+     * Finds a single model that matches the predicate and options, or throws an exception
+     *
+     * @param Builder $pb
+     * @param array   $options
+     * @return IModel
+     * @throws Exception\NotFound
+     * @throws Exception          If multiple models found that match predicate
+     */
+    public function findOneByPredicates(Builder $pb, array $options = []): IModel
+    {
+        $collection = $this->findByPredicates($pb, $options);
+
+        // Nothing found?
+        if ($collection->count() === 0) {
+            throw new Exception\NotFound();
+        }
+
+        // Single model found?
+        if ($collection->count() === 1) {
+            return $collection->first();
+        }
+
+        // Multiple found
+        throw new Exception("{$collection->count()} models found that match predicate and options");
+    }
+
+
     /**
      * Deletes (whether hard or soft) all records that match the given Predicates
      * Returns the number of records deleted.
@@ -2770,9 +2799,11 @@ abstract class Mapper implements IMapper, Serializable
                 )->getAll()
             );
 
-            foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
-                // index by ID
-                $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+            if (count($collectionIds)) {
+                foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
+                    // index by ID
+                    $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+                }
             }
         }
 

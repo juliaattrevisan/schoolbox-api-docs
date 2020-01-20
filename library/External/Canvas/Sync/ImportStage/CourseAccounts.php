@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\DataStructures\ObjectTree;
 use External\Canvas\Sync\Bridge;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -44,9 +45,6 @@ class CourseAccounts
     /** @var IConnector */
     private $canvasDb;
 
-    /** @var IConnector */
-    private $schoolboxDb;
-
     /** @var Folder\Mapper */
     private $folderMapper;
 
@@ -70,7 +68,6 @@ class CourseAccounts
 
     /**
      * @param IConnector      $canvasDb
-     * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
      * @param IConfigLoader   $config
      * @param LoggerInterface $log
@@ -79,14 +76,12 @@ class CourseAccounts
      */
     public function __construct(
         IConnector $canvasDb,
-        IConnector $schoolboxDb,
         Folder\Mapper $folderMapper,
         IConfigLoader $config,
         LoggerInterface $log,
         Bridge\Account $accountBridge
     ) {
         $this->canvasDb      = $canvasDb;
-        $this->schoolboxDb   = $schoolboxDb;
         $this->folderMapper  = $folderMapper;
         $this->accountBridge = $accountBridge;
         $this->log           = $log;
@@ -106,6 +101,7 @@ class CourseAccounts
      * @throws Mapper\Exception
      * @throws UnderflowException
      * @throws UnexpectedValueException
+     * @throws PDOException
      */
     public function synchronise(): void
     {
@@ -217,6 +213,8 @@ class CourseAccounts
      * @param array      $canvasAccount
      * @param ObjectTree $sbFolderTree
      * @throws Database\Exception
+     * @throws Mapper\Exception
+     * @throws PDOException
      * @throws UnexpectedValueException
      * @internal string $canvasAccount['id']                        '19400000000000217'
      * @internal string $canvasAccount['parent_account_id']         '19400000000000001'
@@ -264,7 +262,7 @@ class CourseAccounts
             $sbFolderTree->moveElement($folder, $parent);
         }
         if ($updateNeeded) {
-            $this->updateFolder($folder->getId(), $folder->getName(), $folder->getParent()->getId());
+            $this->folderMapper->save($folder);
         }
 
         foreach ($canvasAccount['children'] as $childAccount) {
@@ -279,35 +277,17 @@ class CourseAccounts
      * @param string       $name
      * @param Folder\Model $parent
      * @return Folder\Model
-     * @throws Database\Exception
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     * @throws PDOException
      */
     private function createFolder(string $name, Folder\Model $parent): Folder\Model
     {
-        $sql = "INSERT INTO folder (name, parent, inherit) VALUES (:name, :parent, 1)";
-        $this->schoolboxDb->executeQuery($sql, ['name' => $name, 'parent' => $parent->getId()]);
-        return (new Folder\Model())
-            ->setId((int)$this->schoolboxDb->lastInsertId())
+        $folder = (new Folder\Model())
             ->setName($name)
             ->setParent($parent);
-    }
-
-
-    /**
-     * Update a schoolbox folder
-     *
-     * @param int    $folderId
-     * @param string $folderName
-     * @param int    $parentId
-     * @throws Database\Exception
-     */
-    private function updateFolder(int $folderId, string $folderName, int $parentId): void
-    {
-        $sql = "UPDATE folder SET name = :name, parent = :parent WHERE id = :id";
-        $this->schoolboxDb->executeQuery($sql, [
-            'name'   => $folderName,
-            'parent' => $parentId,
-            'id'     => $folderId,
-        ]);
+        $this->folderMapper->save($folder);
+        return $folder;
     }
 
 

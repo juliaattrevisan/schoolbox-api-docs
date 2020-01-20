@@ -144,6 +144,9 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     protected $mark_visibility = 0;
 
+    /** @var null|string */
+    private $externalId;
+
     /**
      * Indexed by section.id
      * @var QuizSection[]|GenericCollection<QuizSection>
@@ -617,6 +620,27 @@ class Model implements ISoftDeletable, IAssessableDataModel
     {
         return $this->mark_visibility;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
+    }
+
 
     /**
      * Helper method for setting dates from a form.

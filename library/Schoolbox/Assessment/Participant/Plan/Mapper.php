@@ -24,13 +24,14 @@ use UnexpectedValueException;
  */
 class Mapper extends BaseMapper
 {
+    public const COL_ASSESSMENT_ID = 'assessment_id';
 
     public function mapping(): void
     {
         $this->hasTable('participant_plan');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('assessment_id', Assessment\Mapper::class, 'id', null, null, 'assessment', 'assessment');
+        $this->joins(self::COL_ASSESSMENT_ID, Assessment\Mapper::class, 'id', null, null, 'assessment', 'assessment');
         $this->joinsReverseMulti('participant_plan_id', Participant\Mapper::class, 'participants', 'participants');
         $this->uses('is_dynamic', self::TYPE_BOOLEAN);
         $this->uses('name', self::TYPE_STRING);

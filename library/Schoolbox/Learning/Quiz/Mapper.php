@@ -28,10 +28,10 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
  * @method Model createModel($id = null)
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
@@ -67,6 +67,7 @@ class Mapper extends BaseMapper
         $this->uses('availability', self::TYPE_STRING);
         $this->uses('anonymous_result', self::TYPE_BOOLEAN);
         $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('external_id', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
@@ -88,6 +89,8 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteAssessment']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteAssessment']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
@@ -182,6 +185,7 @@ class Mapper extends BaseMapper
     /**
      * Pre-save callback.
      *
+     * If not explicitly set to something else
      * Ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
      *
      * @param  Model $object
@@ -189,7 +193,9 @@ class Mapper extends BaseMapper
      */
     protected function setWorkType(Model $object)
     {
-        $object->setWorkType((new WorkType())->setId(self::WORK_TYPE_QUIZ));
+        if (!$object->getWorkType()) {
+            $object->setWorkType((new WorkType())->setId(self::WORK_TYPE_QUIZ));
+        }
         return true;
     }
 
@@ -273,6 +279,28 @@ class Mapper extends BaseMapper
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->deleteAssessment($object);
+    }
+
+
+    /**
+     * Post-delete callback.
+     *
+     * Delete's this quiz's assessment
+     *
+     * @param Model $object
+     * @return true
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    protected function deleteAssessment(Model $object): bool
+    {
+        $assessment = $object->getAssessmentModel();
+        if (!$assessment->isDeleted()) {
+            /** @var AssessmentMapper $assessmentMapper */
+            $assessmentMapper = $this->getJoinMapper('am');
+            $assessmentMapper->delete($assessment);
+        }
+        return true;
     }
 
 

@@ -14,6 +14,7 @@ namespace Schoolbox\Resource\Folder;
 use Alaress;
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\IModel;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
@@ -75,10 +76,11 @@ use function strnatcasecmp;
  * @method Model createModel($idValue = null)
  * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findOneByPredicates(PredicateBuilder $pb, array $options = [])
  * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findAll($options = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
- * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = []) *
+ * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = [])
  */
 class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {

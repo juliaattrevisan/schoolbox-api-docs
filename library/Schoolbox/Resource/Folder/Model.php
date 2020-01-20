@@ -10,6 +10,7 @@ namespace Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
+use Schoolbox\IModel;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -43,7 +44,7 @@ use UnexpectedValueException;
  * @method Model getParent()
  * @method static GenericCollection|self[] createCollection()
  */
-class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel
 {
     use Node\Traits\HasCurriculumNodes;
     use DeletedAtDate;

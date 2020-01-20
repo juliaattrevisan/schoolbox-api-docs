@@ -7,9 +7,11 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
+use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\IModel;
 use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
@@ -27,6 +29,7 @@ use Schoolbox\Resource\HomepageConfig;
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findOneByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends AbstractUnitMapper
 {

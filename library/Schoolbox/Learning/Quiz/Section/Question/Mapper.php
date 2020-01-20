@@ -17,18 +17,19 @@ use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 
 /**
- * Class Mapper
- * @package Schoolbox\Learning\Quiz\Section\Question
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {
+    public const COL_SECTION_ID = 'section_id';
+
     protected function mapping()
     {
         $this->hasTable('assess_question');
         $this->hasModel(QuizQuestion::class);
         $this->uses('question_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->joins('section_id', QuizSectionMapper::class, 'section_id', null, null, 'section', 'section');
+        $this->joins(self::COL_SECTION_ID, QuizSectionMapper::class, 'section_id', null, null, 'section', 'section');
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('type_id', QuizQuestionTypeMapper::class, 'type_id', null, null, 'type', 'type');
         $this->uses('marks', self::TYPE_DECIMAL);

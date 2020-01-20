@@ -15,10 +15,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
 use UnderflowException;
 use UnexpectedValueException;
-use function array_map;
 use function count;
 use function date;
-use function implode;
 use function preg_match;
 
 /**
@@ -26,7 +24,6 @@ use function preg_match;
  */
 class Course
 {
-
     /** @var IConnector */
     private $canvasDb;
 
@@ -57,17 +54,17 @@ class Course
 
 
     /**
-     * Return a predicate that can find a Schoolbox folder for specified Canvas Account
+     * Return a predicate that can find a Schoolbox folder for specified Canvas Course
      *
-     * @param int         $accountCanvasId
+     * @param int         $courseCanvasId
      * @param string|null $folderTableAlias
      * @return Builder
      * @throws InvalidColumnException
      */
-    public function equalsCanvasCourse(int $accountCanvasId, string $folderTableAlias = null): Builder
+    public function equalsCanvasCourse(int $courseCanvasId, string $folderTableAlias = null): Builder
     {
         return (new Builder($this->schoolboxDb, $folderTableAlias ?? 'folder'))
-            ->regex('name', "^.+\\({$this::canvasIdPrefix()}-{$accountCanvasId}\\)$");
+            ->regex('name', "^.+\\({$this::canvasIdPrefix()}-{$courseCanvasId}\\)$");
     }
 
 
@@ -129,16 +126,16 @@ class Course
         $canvasCourseFolderPb    = $this->equalsCanvasCourse($courseCanvasId, 'f');
         $canvasCourseFolderWhere = $canvasCourseFolderPb->getWhere()[0];
         $sql                     = "
-            SELECT 
-                   f.id 'f.id', 
-                   f.name 'f.name', 
+            SELECT
+                   f.id 'f.id',
+                   f.name 'f.name',
                    f.parent 'f.parent',
                    us.id 'us.id'
-            FROM folder f 
-            JOIN course_unit_specification us on f.id = us.folder_id
-            WHERE 
-                  $canvasCourseFolderWhere AND 
-                  f.deleted_at IS NULL AND 
+            FROM folder f
+            JOIN course_unit_specification us ON f.id = us.folder_id
+            WHERE
+                  {$canvasCourseFolderWhere} AND
+                  f.deleted_at IS NULL AND
                   us.deleted_at IS NULL
         ";
 
