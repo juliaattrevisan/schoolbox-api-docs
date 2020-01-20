@@ -519,12 +519,7 @@
                         <a :href="'/calendar/event/' + eventExtendedProps.eventId" title="Go to event page"><h2>{{ event.title }}</h2></a>
                     </template>
                     <template v-else>
-                        <template v-if="eventExtendedProps.classCancelled">
-                            <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
-                        </template>
-                        <template v-else>
-                            <h2>{{ event.title }}</h2>
-                        </template>
+                        <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
                     </template>
                     <meta-list>
                         <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
