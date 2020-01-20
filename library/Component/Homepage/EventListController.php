@@ -136,7 +136,12 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                 $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
-                $htmlEvent = $eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML);
+                $returnStr = null;
+                $context   = $this->getContext();
+                if ($context instanceof Schoolbox\Resource\Folder\Model) {
+                    $returnStr = "/homepage/{$this->getContext()->getId()}";
+                }
+                $htmlEvent = $eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML, $returnStr);
                 if  ($htmlEvent) {
                     $this->setVar('group_events', $htmlEvent);
                     $this->parse('group_events_block', 'group_events', true);
