@@ -1117,17 +1117,13 @@ class DataSource
      * @param User                              $student
      *
      * @return array $longitude
-     * @var array                               $longitude [$capability]
-     * @var string                              $longitude [$capability]['name']
-     * @var array                               $longitude [$capability][$indicator]
-     * @var string                              $longitude [$capability][$indicator]['name']
-     * @var array                               $longitude [$capability][$indicator]['activities']
-     * @var array                               $longitude [$capability][$indicator]['activities'][$assessmentId]
-     * @var int                                 $longitude [$capability][$indicator]['activities'][$assessmentId]['id']
-     * @var string                              $longitude [$capability][$indicator]['activities'][$assessmentId]['name']
-     * @var string                              $longitude [$capability][$indicator]['activities'][$assessmentId]['descriptor']
+     * @throws UnderflowException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \PDOException
+     * @throws \RangeException
      */
-    public function getLongitudinal(GenericCollection $dueWorks, User $student)
+    public function getLongitudinal(GenericCollection $dueWorks, User $student): array
     {
         if (0 === $dueWorks->count()) {
             return [];
@@ -1163,53 +1159,48 @@ class DataSource
         }
         unset($pb);
 
-
-        if(count($feedbackIds) > 0) {
+        if (count($feedbackIds) > 0) {
             // Find the descriptors selected for each of these feedback IDs
             $pb = new Builder($this->database, '');
             $pb->in('sr.id', $feedbackIds);
 
             $where = implode(' AND ', $pb->getWhere());
-            $descriptorStatement = $this->database->prepare(
-                "
-                    SELECT
-                        rc.id AS capability_id,
-                        rc.name AS capability_name,
-                        rcm.value AS capability_value,
-                        rcu.max_value AS capability_max_value,
-                        ri.id AS indicator_id,
-                        ri.name AS indicator_name,
-                        a.id AS assessment_id,
-                        a.title AS assessment_title,
-                        sb.rubric_mark_per_capability,
-                        sb.mark_type,
-                        rl.name as level,
-                        rd.description,
-                        (SELECT MAX(rd2.max_value) FROM rubric_descriptor rd2 WHERE rd2.rubric_indicator_id = rd.rubric_indicator_id ) as max_value,
-                        rim.value
-                    FROM       rubric_indicator_mark  rim
-                    INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
-                    INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
-                    INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-                    INNER JOIN rubric_level            rl ON rd.level_id = rl.id
-                    INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-                    INNER JOIN submission_return       sr ON rcm.return_id = sr.id
-                    INNER JOIN submission_box          sb ON sr.box_id = sb.id
-                    INNER JOIN rubric_capability_usage rcu ON rc.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
-                    INNER JOIN assessment               a ON sb.assessment_id = a.id
-                    WHERE {$where}
-                    ORDER BY a.due_date ASC;
-                "
-            );
+            $descriptorStatement = $this->database->prepare("
+                SELECT
+                    rc.id AS capability_id,
+                    rc.name AS capability_name,
+                    rcm.value AS capability_value,
+                    rcu.max_value AS capability_max_value,
+                    ri.id AS indicator_id,
+                    ri.name AS indicator_name,
+                    a.id AS assessment_id,
+                    a.title AS assessment_title,
+                    sb.rubric_mark_per_capability,
+                    sb.mark_type,
+                    rl.name as level,
+                    rd.description,
+                    (SELECT MAX(rd2.max_value) FROM rubric_descriptor rd2 WHERE rd2.rubric_indicator_id = rd.rubric_indicator_id ) as max_value,
+                    rim.value
+                FROM       rubric_indicator_mark  rim
+                INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
+                INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
+                INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
+                INNER JOIN rubric_level            rl ON rd.level_id = rl.id
+                INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
+                INNER JOIN submission_return       sr ON rcm.return_id = sr.id
+                INNER JOIN submission_box          sb ON sr.box_id = sb.id
+                INNER JOIN rubric_capability_usage rcu ON rc.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
+                INNER JOIN assessment               a ON sb.assessment_id = a.id
+                WHERE {$where}
+                ORDER BY a.due_date ASC;
+            ");
             $descriptorStatement->execute($pb->getParams());
-
 
             // Collate the selected descriptor values into longitudinal array
             $longitude = [];
             $markSchemeFactory = new MarkSchemeFactory();
 
             while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
-
                 $longitude[$row['capability_id']]['name']                             = $row['capability_name'];
                 $longitude[$row['capability_id']]['value'][$row['assessment_id']]     = $row['capability_value'];
                 $longitude[$row['capability_id']]['mark_type'][$row['assessment_id']] = $row['mark_type'];
@@ -1224,12 +1215,12 @@ class DataSource
 
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
-                    'name'       => $row['assessment_title'],
+                    'name'                       => $row['assessment_title'],
                     'rubric_mark_per_capability' => $row['rubric_mark_per_capability'],
-                    'descriptor' => $row['description'],
-                    'level'      => $row['level'],
-                    'max_value'  => $row['max_value'],
-                    'value'      => $row['value']
+                    'descriptor'                 => $row['description'],
+                    'level'                      => $row['level'],
+                    'max_value'                  => $row['max_value'],
+                    'value'                      => $row['value'],
                 ];
             }
 
@@ -1243,34 +1234,37 @@ class DataSource
                ->notNull('sr.published_at')
                ->isNull('sr.deleted_at');
 
-            $where             = implode(' AND ', $pb->getWhere());
+            $where = implode(' AND ', $pb->getWhere());
+
             $allFeedbackStatement = $this->database->prepare("
-            SELECT
-                sr.id AS feedbackId,
-                a.id  AS assessmentId
-            FROM submission_return sr
-            INNER JOIN submission_box sb ON sr.box_id = sb.id
-            INNER JOIN assessment      a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY sr.published_at ASC
-        ");
+                SELECT
+                    sr.id AS feedbackId,
+                    a.id  AS assessmentId
+                FROM submission_return sr
+                INNER JOIN submission_box sb ON sr.box_id = sb.id
+                INNER JOIN assessment      a ON sb.assessment_id = a.id
+                WHERE {$where}
+                ORDER BY sr.published_at ASC
+            ");
+
             $allFeedbackStatement->execute($pb->getParams());
 
             $allFeedbackIds = [];
+
             foreach ($allFeedbackStatement as $row) {
                 $allFeedbackIds[] = $row['feedbackId'];
             }
             unset($pb);
+
             $allResults = [];
 
-            if(count($allFeedbackIds) > 0) {
+            if (count($allFeedbackIds) > 0) {
                 // Find the descriptors selected for each of these feedback IDs
                 $pb = new Builder($this->database, '');
                 $pb->in('sr.id', $allFeedbackIds);
 
                 $where            = implode(' AND ', $pb->getWhere());
-                $averageStatement = $this->database->prepare(
-                    "
+                $averageStatement = $this->database->prepare("
                     SELECT
                         rc.id AS capability_id,
                         ri.id AS indicator_id,
@@ -1287,8 +1281,7 @@ class DataSource
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
                     WHERE {$where}
                     ORDER BY a.due_date ASC;
-                "
-                );
+                ");
                 $averageStatement->execute($pb->getParams());
 
                 while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
@@ -1314,8 +1307,10 @@ class DataSource
 
             return $longitude;
         }
+
         return [];
     }
+
 
     /**
      * Copies a Rubric from source DueWork to destination DueWork.
