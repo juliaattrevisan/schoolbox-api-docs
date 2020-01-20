@@ -15,6 +15,12 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.all-work.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
+<script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript">
     $(function () {
         // Set up comment abilities: post
@@ -24,6 +30,10 @@
                 folderId: '{{ subject.id }}'
             }
         });
+        $('[data-print]').click(function () {
+            window.print();
+            $('#container').highcharts().reflow();
+        });
     });
 </script>
 
@@ -31,10 +41,15 @@
 
 {{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ locale.grades.properPlural }} for {{ subject.name }}</h1>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{{ locale.grades.properPlural }} for {{ subject.name }}</h1>
+        </div>
     </div>
+    <nav>
+        <!-- <a href="#" data-print class="icon-print" title="Print Report"></a> -->
+    </nav>
 </div>
 
 <div class="row">
@@ -77,7 +92,7 @@
 
 {% if markbook.assessments | length %}
     <div class="row">
-        <div class="small-12 large-6 island">
+        <div class="small-12 medium-6 island">
             <h2 class="subheader">Teachers</h2>
             <section>
                 <ul class="action-list">
@@ -97,7 +112,7 @@
             </section>
         </div>
         {% if canSeeGradeAverage %}
-            <div class="small-12 large-6 island">
+            <div class="small-12 medium-6 island">
                 <h2 class="subheader">Current {{ locale.grades.proper }} Average</h2>
                 <section class="content">
                     <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}">

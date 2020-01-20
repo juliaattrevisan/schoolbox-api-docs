@@ -433,10 +433,11 @@ select.letter-grade-select {
             margin-bottom: 0.5rem;
         }
     }
-
 }
 
-
+td.rubric-progression-graph {
+  padding: 0;
+}
 
 @media print {
     .rb-selected p,
@@ -446,3 +447,5 @@ select.letter-grade-select {
         font-style: italic;
     }
 }
+
+

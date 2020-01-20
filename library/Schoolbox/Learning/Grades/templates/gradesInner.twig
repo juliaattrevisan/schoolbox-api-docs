@@ -17,12 +17,6 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
-<script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
-<script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
-<script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript">
     $(function () {
         $('[data-collapser="true"]').collapsable({
@@ -31,22 +25,40 @@
     });
 </script>
 {% if markbook.assessments | length %}
-    {% if canSeeGraph %}
-        {% include '@learningGrades/fragments/graph.twig' with {graph: graph} only %}
-    {% endif %}
-
-    {% if longitudinalRubric %}
-        {% include '@learningGrades/fragments/longitudinalRubric.twig' with {
-        longitudinalRubric: longitudinalRubric,
-        student:            student,
-        assessments:        markbook.assessments,
-        returnUrlSuffix:    returnUrlSuffix
-        } only %}
-    {% endif %}
+<div class="row">
+    <div class="small-12 island">
+        <dl class="tabs" data-tab>
+            {% for key, data in tabs %}
+                <dd {% if key == selectedTab %}class="active"{% endif %} >
+                    <a href="#{{ key }}">{{ data.label }}</a>
+                </dd>
+            {% endfor %}
+        </dl>
+        <div class="tabs-content">
+            {% for key, data in tabs %}
+                {% if key == 'graph' %}
+                    <div class="content {% if key == selectedTab %}active{% endif %}" id="{{ key }}">
+                        {% include '@learningGrades/fragments/graph.twig' with {graph: graph} only %}
+                    </div>
+                {% else %}
+                    <div class="content {% if key == selectedTab %}active{% endif %}" id="{{ key }}">
+                        {% include '@learningGrades/fragments/'~ key ~'.twig' with {
+                            longitudinalRubric:     longitudinalRubric,
+                            rubricAssessmentList:   rubricAssessmentList,
+                            student:                student,
+                            assessments:            markbook.assessments,
+                            returnUrlSuffix:        returnUrlSuffix
+                        } only %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
 
     <div class="row">
         <div class="small-12 island">
-            <h2 class="subheader">Assessments</h2>
+            <h2 class="subheader">Activities</h2>
             <section>
                 <ul class="action-list">
                     {% for assessment in markbook.assessments %}

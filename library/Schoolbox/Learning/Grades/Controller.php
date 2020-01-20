@@ -495,18 +495,52 @@ class Controller extends Base
 
         $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
 
+        /* Get Rubric Data for display */
         $longitudinalRubric = $this->getLongitudinalRubricData($assessments, $viewee);
+        $rubricAssessmentList = $longitudinalRubric['assessments'];
+        unset($longitudinalRubric['assessments']);
+
+
+        /* Build tabs for grade report */
+        $tabs = [];
+
+        if ($canSeeGraph) {
+            $tabs['graph'] = [
+                'label' => 'Activities',
+            ];
+        }
+
+        if ($longitudinalRubric) {
+            if ($this->getConfigLoader()->get('enable_grades_criteria')) {
+                $tabs['descriptors'] = ['label' => 'Learning Levels' ];
+            }
+
+            if ($this->getConfigLoader()->get('grade_capability_display')) {
+                $tabs['capabilities'] = ['label'=>'Capability Grades' ];
+            }
+
+            if ($this->getConfigLoader()->get('grade_progression_display')) {
+                $tabs['progression'] = ['label'=>'Progression' ];
+            }
+        }
+
+        /* Select the first of any combination of those elements
+         */
+        $selectedTab = array_shift(array_keys($tabs));
+
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
-                'student'            => $viewee,
-                'markbook'           => $filteredMarkbook,
-                'canSeeGraph'        => $canSeeGraph,
-                'canSeeShowcaseButton' => $canSeeShowcaseButton,
-                'graph'              => $graph,
-                'longitudinalRubric' => $longitudinalRubric,
-                'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
+                'student'               => $viewee,
+                'markbook'              => $filteredMarkbook,
+                'tabs'                  => $tabs,
+                'selectedTab'           => $selectedTab,
+                'canSeeShowcaseButton'  => $canSeeShowcaseButton,
+                'graph'                 => $graph,
+                'longitudinalRubric'    => $longitudinalRubric,
+                'rubricAssessmentList'  => $rubricAssessmentList,
+                'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getAsString(),
         ]));
 
@@ -659,7 +693,7 @@ class Controller extends Base
      */
     protected function getLongitudinalRubricData(GenericCollection $assessments, User $student): array
     {
-        if(!$this->getConfigLoader()->get('enable_grades_criteria')) {
+        if(!($this->getConfigLoader()->get('enable_grades_criteria') || $this->getConfigLoader()->get('grade_capability_display') || $this->getConfigLoader()->get('grade_progression_display'))) {
             // only populate this if we're actually allowed to see it
             return [];
         }
