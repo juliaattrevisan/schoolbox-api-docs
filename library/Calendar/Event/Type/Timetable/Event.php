@@ -139,17 +139,19 @@ class Event extends Day\Event
     /**
      * @return bool
      */
-    public function getPeriodCancelled()
+    public function getPeriodCancelled(): bool
     {
         return $this->periodCancelled;
     }
 
     /**
      * @param bool $periodCancelled
+     * @return $this
      */
-    public function setPeriodCancelled(bool $periodCancelled)
+    public function setPeriodCancelled(bool $periodCancelled): self
     {
         $this->periodCancelled = $periodCancelled;
+        return $this;
     }
 
     /**
