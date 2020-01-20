@@ -137,9 +137,9 @@ class Event extends Day\Event
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getPeriodCancelled(): bool
+    public function getPeriodCancelled(): ?bool
     {
         return $this->periodCancelled;
     }
