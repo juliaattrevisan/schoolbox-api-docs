@@ -11,17 +11,15 @@ use Schoolbox\Assessment\Course\Markbook\CourseMarkbook;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Markbook\Export\CSV as ClassMarkbookCSV;
+use Schoolbox\Learning\Markbook\AbstractCSV;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\User;
 
 /**
  * Exports a course markbook in CSV format
  */
-class CSV
+class CSV extends AbstractCSV
 {
-    /** File */
-    private $fp;
 
     /**
      * Exports
@@ -33,22 +31,8 @@ class CSV
         $this->initExport($filename);
         $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
 
-        $csvHelper = new ClassMarkbookCSV();
-
-
         // Column headings
-        $headings         = [
-            'Student Id',
-            'Student First Name',
-            'Student Last Name',
-            'Student Weighted Average',
-        ];
-        $assessmentTitles = [];
-        foreach ($assessmentSpecs as $assessmentSpec) {
-            $assessmentTitles = $csvHelper->addHeaders($assessmentTitles, $assessmentSpec);
-        }
-        $this->exportRow($headings, $assessmentTitles);
-
+        $this->writeHeader($assessmentSpecs);
 
         // Course Average
         $courseAverages    = $courseMarkbook->getAssessmentSpecAverages();
@@ -56,13 +40,13 @@ class CSV
         foreach ($assessmentSpecs as $assessmentSpec) {
             $mark = '';
             if (key_exists($assessmentSpec->getId(), $courseAverages)) {
-                $mark = sprintf("%6.2f", $courseAverages[$assessmentSpec->getId()]['published']);
+                $mark = sprintf("%6.2f %%", $courseAverages[$assessmentSpec->getId()]['published']);
             }
             $courseAverageData = $this->appendData($courseAverageData, $assessmentSpec, $mark);
         }
         $this->exportRow(['Course Average', '', '', ''], $courseAverageData);
 
-
+        // Class data for each class
         $classes               = $courseMarkbook->getCourseImpls();
         $studentMarks          = $courseMarkbook->getStudentMarks();
         $classAverages         = $courseMarkbook->getAssessmentImplAverages();
@@ -80,7 +64,7 @@ class CSV
                 $mark           = '';
                 $assessmentImpl = $classAssessments->offsetGet($assessmentSpec->getId());
                 if ($assessmentImpl && key_exists($assessmentImpl->getId(), $classAverages)) {
-                    $mark = sprintf("%6.2f", $classAverages[$assessmentImpl->getId()]['published']);
+                    $mark = sprintf("%6.2f %%", $classAverages[$assessmentImpl->getId()]['published']);
                 }
                 $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark);
             }
@@ -148,19 +132,19 @@ class CSV
      */
     private function appendData(array $row, IAssessable $assessment, string $mark): array
     {
-        $csvHelper = new ClassMarkbookCSV();
-        $row[]     = $mark;
-        if ($csvHelper->hasTotalMarkColumn($assessment)) {
+        $row[] = $mark;
+        if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = '';
         }
-        if ($csvHelper->hasNormalizedMarkColumn($assessment)) {
+        if ($this->hasNormalizedMarkColumn($assessment)) {
             $row[] = '';
         }
-        if ($csvHelper->hasCommentColumn($assessment)) {
+        if ($this->hasCommentColumn($assessment)) {
             $row[] = '';
         }
         return $row;
     }
+
 
     /**
      * Appends mark for Due work and Quiz
@@ -172,54 +156,21 @@ class CSV
      * @param User        $student
      * @return array
      */
-    private function appendStudentMarks(array $row, IAssessable $assessment, IAssessable $assessmentImpl, array $currentMark, User $student)
+    private function appendStudentMarks(array $row, IAssessable $assessment, IAssessable $assessmentImpl, array $currentMark, User $student): array
     {
-        $csvHelper = new ClassMarkbookCSV();
-
         $humanReadableMark = $currentMark['published']['hr'];
-        if ($csvHelper->hasTotalMarkColumn($assessment)) {
-            $row[] = $csvHelper->parseNumerator($humanReadableMark);
-            $row[] = $csvHelper->parseDenominator($humanReadableMark);
+        if ($this->hasTotalMarkColumn($assessment)) {
+            $row[] = $this->parseNumerator($humanReadableMark);
+            $row[] = $this->parseDenominator($humanReadableMark);
         } else {
             $row[] = $humanReadableMark;
         }
-        if ($csvHelper->hasNormalizedMarkColumn($assessment)) {
+        if ($this->hasNormalizedMarkColumn($assessment)) {
             $row[] = $currentMark['published']['norm'];
         }
-        if ($csvHelper->hasCommentColumn($assessment)) {
-            $row[] = $csvHelper->retrieveCommentField($assessmentImpl, $student);
+        if ($this->hasCommentColumn($assessment)) {
+            $row[] = $this->retrieveCommentField($assessmentImpl, $student);
         }
         return $row;
-    }
-
-    /**
-     * Opens file to export
-     * @param string $filename
-     */
-    private function initExport(string $filename): void
-    {
-        // set the output headers
-        header('Content-type: text/csv');
-        header('Content-disposition: attachment; filename="' . $filename . '');
-
-        $this->fp = fopen("php://output", 'r');
-    }
-
-    /**
-     * Exports a row
-     * @param $rowHeadings
-     * @param $rowData
-     */
-    private function exportRow(array $rowHeadings, array $rowData): void
-    {
-        fputcsv($this->fp, array_merge($rowHeadings, $rowData));
-    }
-
-    /**
-     * Closes exported file
-     */
-    private function closeExport(): void
-    {
-        fclose($this->fp);
     }
 }

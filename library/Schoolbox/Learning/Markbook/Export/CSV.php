@@ -4,57 +4,40 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Markbook\Export;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Markbook\IExporter;
+use Schoolbox\Learning\Markbook\AbstractCSV;
 use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Learning\MarkScheme\Completion;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\User;
 
 /**
  * Export a markbook in CSV format
  */
-class CSV implements IExporter
+class CSV extends AbstractCSV
 {
 
     /**
      * @inheritdoc
      */
-    public function export(Markbook $markbook, $filename)
+    public function export(Markbook $markbook, string $filename): void
     {
-        $this->sendHeaders($filename);
+        $this->initExport($filename);
 
         $students          = $this->getSortedStudents($markbook);
         $participants      = $this->getSortedParticipants($markbook);
         $sortedAssessments = $this->getSortedAssessments($markbook);
 
-        $out = fopen('php://output', 'wb');
+        $this->writeHeader($sortedAssessments);
+        $this->writeWeightedMean($sortedAssessments, $markbook);
+        $this->writeStudents($sortedAssessments, $markbook, $students, $participants);
 
-        $this->writeHeader($out, $sortedAssessments);
-        $this->writeWeightedMean($out, $sortedAssessments, $markbook);
-        $this->writeStudents($out, $sortedAssessments, $markbook, $students, $participants);
-
-        fclose($out);
-    }
-
-
-    /**
-     * Send HTTP headers to instruct client to treat as CSV file download
-     *
-     * @param string $filename
-     */
-    private function sendHeaders($filename)
-    {
-        header('Content-Disposition: attachment; filename="' . $filename . '";');
-        header('Content-Type: application/csv; charset=UTF-8');
+        $this->closeExport();
     }
 
 
@@ -64,7 +47,7 @@ class CSV implements IExporter
      * @param Markbook $markbook
      * @return GenericCollection|User[] $students
      */
-    private function getSortedStudents(Markbook $markbook)
+    private function getSortedStudents(Markbook $markbook): GenericCollection
     {
         return new GenericCollection(User::class, $markbook->getStudents()->indexBy('id')->getAll());
     }
@@ -108,102 +91,53 @@ class CSV implements IExporter
 
 
     /**
-     * Write CSV column headers
-     *
-     * @param resource                        $out
-     * @param GenericCollection|IAssessable[] $sortedAssessments
-     */
-    private function writeHeader($out, GenericCollection $sortedAssessments)
-    {
-        // Column headings
-        $row = [
-            'Student Id',
-            'Student First Name',
-            'Student Last Name',
-            'Student Average',
-        ];
-        foreach ($sortedAssessments as $assessment) {
-            $row = $this->addHeaders($row, $assessment);
-        }
-        fputcsv($out, $row);
-    }
-
-
-    /**
      * Write CSV row for weighted mean per assessment
      *
-     * @param resource                        $out
      * @param GenericCollection|IAssessable[] $sortedAssessments
      * @param Markbook                        $markbook
      */
-    private function writeWeightedMean($out, GenericCollection $sortedAssessments, Markbook $markbook)
+    private function writeWeightedMean(GenericCollection $sortedAssessments, Markbook $markbook): void
     {
         // Average row
-        $averageRow = [
+        $averageRowHeaders = [
             'Markbook Average',
             '',
             '',
             $markbook->getWeightedMean(),
         ];
+        $averageRow        = [];
         foreach ($sortedAssessments as $assessment) {
             $averageRow = $this->addAverage($averageRow, $markbook, $assessment);
         }
-        fputcsv($out, $averageRow);
+        $this->exportRow($averageRowHeaders, $averageRow);
     }
 
 
     /**
      * For each student, write a row of their human readable mark, normalised mark, and comment if it exists
      *
-     * @param resource                        $out
      * @param GenericCollection|IAssessable[] $sortedAssessments
      * @param Markbook                        $markbook
      * @param GenericCollection               $students
      * @param GenericCollection               $participants
      */
-    private function writeStudents($out, GenericCollection $sortedAssessments, Markbook $markbook, GenericCollection $students, GenericCollection $participants)
+    private function writeStudents(GenericCollection $sortedAssessments, Markbook $markbook, GenericCollection $students, GenericCollection $participants): void
     {
         // Student rows
         foreach ($students as $userId => $student) {
-            $studentRow = [
+            $studentRowHeaders = [
                 $student->getExternalId(),
                 $student->getFirstname(),
                 $student->getLastname(),
                 $markbook->getStudentStatistics()[$student->getId()]['weightedMean'],
             ];
 
+            $studentRow = [];
             foreach ($sortedAssessments as $assessmentId => $assessment) {
                 $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId);
             }
-            fputcsv($out, $studentRow);
+            $this->exportRow($studentRowHeaders, $studentRow);
         }
-    }
-
-
-    /**
-     * Append fields into header row for specified assessment
-     *
-     * @param string[]    $row
-     * @param IAssessable $assessment
-     * @return string[]
-     */
-    public function addHeaders(array $row, IAssessable $assessment)
-    {
-        $title = "{$assessment->getTitle()} \r\n({$assessment->getTypeName()})";
-
-        if ($this->hasTotalMarkColumn($assessment)) {
-            $row[] = "$title";
-            $row[] = "$title (Total)";
-        } else {
-            $row[] = "$title";
-        }
-        if ($this->hasNormalizedMarkColumn($assessment)) {
-            $row[] = "$title (Normalized)";
-        }
-        if ($this->hasCommentColumn($assessment)) {
-            $row[] = "$title (Comment)";
-        }
-        return $row;
     }
 
 
@@ -215,7 +149,7 @@ class CSV implements IExporter
      * @param IAssessable $assessment
      * @return string[]
      */
-    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment)
+    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment): array
     {
         $row[] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
         if ($this->hasTotalMarkColumn($assessment)) {
@@ -236,11 +170,11 @@ class CSV implements IExporter
      *
      * @param string[]                                              $row
      * @param GenericCollection|GenericCollection[]|Participant[][] $participants Indexed by assessment.id, then user.id
-     * @param IAssessable $assessment
+     * @param IAssessable                                           $assessment
      * @param int                                                   $userId
      * @return string[]
      */
-    private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId)
+    private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId): array
     {
         if ($participants[$assessment->getId()] instanceof Collection
             && $participants[$assessment->getId()][$userId] instanceof Participant
@@ -276,88 +210,4 @@ class CSV implements IExporter
         }
         return $row;
     }
-
-    /* Helper methods for building the markbook export.
-    */
-
-    /**
-     * Does this assessment have a total mark column?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    public function hasTotalMarkColumn(IAssessable $assessment)
-    {
-        return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
-    }
-
-    /**
-     * Does this assessment have a normalized mark column?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    public function hasNormalizedMarkColumn(IAssessable $assessment)
-    {
-        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
-    }
-
-    /**
-     * Does this assessment have a comment column?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    public function hasCommentColumn(IAssessable $assessment)
-    {
-        // Only DueWorks have comments at the moment
-        return $assessment instanceof DueWork\Model;
-    }
-
-    /**
-     * Parse the numerator from a total mark
-     *
-     * @param null|string $humanReadableMark
-     * @return null|string
-     */
-    public function parseNumerator($humanReadableMark)
-    {
-        if(preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)){
-            return $markParts[1];
-        }
-        return null;
-    }
-
-    /**
-     * Parse the denominator from a total mark
-     *
-     * @param null|string $humanReadableMark
-     * @return null|string
-     */
-    public function parseDenominator($humanReadableMark)
-    {
-        if(preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)){
-            return $markParts[2];
-        }
-        return null;
-    }
-
-
-    /**
-     * Retrieves comment field value for this assessment and student.
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @return null|string
-     */
-    public function retrieveCommentField(IAssessable $assessment, User $student)
-    {
-        $participant = $assessment->getParticipantIfExtant($student);
-        if (!$participant) {
-            return '';
-        }
-        $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
-        return $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
-    }
-
 }
