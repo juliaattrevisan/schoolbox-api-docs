@@ -38,7 +38,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         $parent = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($parent === false) {
+        if (!is_array($parent)) {
             return [];
         }
 
