@@ -20,6 +20,12 @@ These tests are currently configured to run within Schoolbox's Vagrant box.
 The acceptance tests are configured to automatically start chromedriver
 (the web driver for Chrome Headless).
 
+If the tests do not run properly due to compatibility of chrome driver with 
+your version of google chrome try updating the chromedriver with the one that
+vagrant downloads in its vendor folder.
+
+    cd /vagrant
+    sudo cp -f /vagrant/vendor/bin/chromedriver /usr/bin/chromedriver
 
 ### Configuration
 

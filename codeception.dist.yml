@@ -12,8 +12,9 @@ suites:
                     window_size: false
                     capabilities:
                         chromeOptions:
-                            args: ["--headless", "--disable-gpu", "--window-size=1920x1080"]
+                            args: ["--headless", "--disable-gpu", "--window-size=1920x1080", "--ignore-certificate-errors"]
                             binary: "/usr/lib/chromium-browser/chromium-browser"
+                        acceptInsecureCerts: true
                 - \Helper\Acceptance
                 - Asserts
                 - Db:
@@ -21,6 +22,8 @@ suites:
                     user: "root"
                     password: "tnp879"
                     # dump goes here
+                - Cli:
+
         extensions:
             enabled:
                 - Codeception\Extension\RunProcess:

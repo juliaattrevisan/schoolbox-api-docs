@@ -7,6 +7,7 @@ namespace Helper;
 use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\Module\WebDriver;
+use Codeception\Module\Cli;
 use Codeception\TestInterface;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -63,7 +64,7 @@ class Acceptance extends \Codeception\Module
      * @param string $name
      * @param string $value
      */
-    private function changeDBConfig(string $name, string $value)
+    public function changeDBConfig(string $name, string $value)
     {
         $db = $this->getDbModule();
         if (key_exists($name, $this->originalConfig)) {
@@ -80,12 +81,12 @@ class Acceptance extends \Codeception\Module
         $this->originalConfig[$name] = $currentValue;
         $db->updateInDatabase('config', ['value' => $value], ['name' => 'debug_mode']);
 
-    }
+    }    
 
     /**
      * Resets database value back
      */
-    private function restoreDBConfig()
+    public function restoreDBConfig()
     {
         $db = $this->getDbModule();
         foreach ($this->originalConfig as $name => $value) {
@@ -93,6 +94,15 @@ class Acceptance extends \Codeception\Module
         }
     }
 
+    /**
+     * Run command on Bash
+     * @param string $command
+     */
+    public function runShellCommand(string $command)
+    {
+        $cli=$this->getCliModule();
+        $cli->runShellCommand($command, false);
+    }
 
     /**
      * Find a checkbox to "click".
@@ -553,7 +563,7 @@ class Acceptance extends \Codeception\Module
         }
         return null;
     }
-    
+
     /**
      * Get current url from WebDriver
      * @return mixed
@@ -578,6 +588,22 @@ class Acceptance extends \Codeception\Module
         }
         return null;
     }
+
+    /**
+     * Return CLI module in a type-safe manner.
+     *
+     * @return Cli
+     */
+    private function getCliModule(): Cli
+    {
+        try {
+            return $this->getModule('Cli');
+        } catch (ModuleException $e) {
+            // Wasn't found: return null, let TypeError handle it
+        }
+        return null;
+    }
+
 
     /**
      * Verifies that the notification exists
@@ -609,4 +635,16 @@ class Acceptance extends \Codeception\Module
 //        $reflectionMethod->setAccessible(true);
 //        return $reflectionMethod->invoke($field);
 //    }
+
+    /**
+     * Restarts the Webdriver's browser.
+     *
+     * @param array $config Optional extra configuration for the browser to
+     *                      restart with.
+     */
+    public function restartBrowser(array $config = []): void
+    {
+        $i = $this->getWebDriverModule();
+        $i->_restart($config);
+    }
 }
