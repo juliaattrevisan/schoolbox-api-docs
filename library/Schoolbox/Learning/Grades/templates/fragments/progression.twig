@@ -96,12 +96,13 @@
                 <script type="application/javascript">
                     $(function() {
                         var assessments = [
-                            {% for activity_id, activity_name in rubricAssessmentList %}
-                            "{{ activity_name }}",
+                            {% for activity_id, activity in rubricAssessmentList %}
+                            "{{ activity.name }}",
                             {% endfor %}
                         ];
                         var grades = [
-                            {% for activity_id, activity_name in rubricAssessmentList %}
+                            {% for activity_id, activity in rubricAssessmentList %}
+                            {% set activity_name = activity.name %}
                             {% set activity = indicator.activities[activity_id] %}
                             {% if activity.max_value > 0  %}
                             {
