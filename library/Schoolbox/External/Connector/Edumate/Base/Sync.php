@@ -58,7 +58,7 @@ class Sync extends Base implements ISync
                 P.FULL_NAME              AS "student_contact_preferred",
                 NULL                     AS "student_contact_surname",
                 NULL                     AS "student_contact_home_email",
-                P.COMBINED_EMAIL_ADDRESS AS "student_contact_default_email",
+                P.EMAIL                  AS "student_contact_default_email",
                 NULL                     AS "student_contact_work_email",
                 S.STUDENT_NUMBER         AS "student_id",
                 S.YEAR_LEVEL             AS "student_year_level",
@@ -73,32 +73,6 @@ class Sync extends Base implements ISync
             INNER JOIN SCHOOLBOX_STUDENTS
                 AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
             WHERE P.CARER_NUMBER IS NOT NULL
-
-            UNION ALL
-
-            SELECT
-                P.SPOUSE_USERNAME        AS "student_contact_network_login",
-                P.SPOUSE_CARER_NUMBER    AS "student_contact_id",
-                NULL                     AS "student_contact_title",
-                P.SPOUSE_FULL_NAME       AS "student_contact_given_name",
-                P.SPOUSE_FULL_NAME       AS "student_contact_preferred",
-                NULL                     AS "student_contact_surname",
-                NULL                     AS "student_contact_home_email",
-                P.SPOUSE_EMAIL           AS "student_contact_default_email",
-                NULL                     AS "student_contact_work_email",
-                S.STUDENT_NUMBER         AS "student_id",
-                S.YEAR_LEVEL             AS "student_year_level",
-                NULL                     AS "student_campus",
-                S.HOUSE                  AS "student_house",
-                NULL                     AS "student_gender",
-                S.FIRSTNAME              AS "student_preferred",
-                S.SURNAME                AS "student_surname"
-            FROM SCHOOLBOX_PARENTS AS P
-            INNER JOIN SCHOOLBOX_PARENT_STUDENT
-                AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
-            INNER JOIN SCHOOLBOX_STUDENTS
-                AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
-            WHERE P.SPOUSE_CARER_NUMBER IS NOT NULL
         ';
 
         return new Iterator\Guardian(
@@ -130,8 +104,8 @@ class Sync extends Base implements ISync
                 NULL          AS "staff_house",
                 NULL          AS "staff_department",
                 NULL          AS "staff_year_level",
-                NULL          AS "staff_year_level_description"                
-                
+                NULL          AS "staff_year_level_description"
+
             FROM SCHOOLBOX_STAFF
             WHERE USERNAME IS NOT NULL
         ';
