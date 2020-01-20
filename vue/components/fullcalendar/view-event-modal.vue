@@ -520,10 +520,10 @@
                     </template>
                     <template v-else>
                         <template v-if="eventExtendedProps.classCancelled">
-                            <h2 class="strike">{{ event.title }} aaa </h2>
+                            <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
                         </template>
                         <template v-else>
-                            <h2>{{ event.title }} bb </h2>
+                            <h2>{{ event.title }}</h2>
                         </template>
                     </template>
                     <meta-list>
