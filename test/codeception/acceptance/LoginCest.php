@@ -62,7 +62,9 @@ class LoginCest
     public function loginSAMLFailure(AcceptanceTester $i, LoginPage $loginPage)
     {
         $loginPage->loginSAML('AD\drhodes', 'wrong');
-        $loginPage->verifyLoginFailure();
+
+        // SAML returns a different failure message
+        $loginPage->verifyLoginFailure('Incorrect user ID or password');
 
         // Test DB contents
         $i->dontSeeInDatabase('user', ['username' => 'wrong']);

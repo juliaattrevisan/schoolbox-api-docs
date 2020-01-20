@@ -86,10 +86,12 @@ class Login
 
     /**
      * Test that this user is not logged in.
+     *
+     * @param string|null $failureMessage If provided, look for a message other
+     *                                    than the default.
      */
-    public function verifyLoginFailure()
+    public function verifyLoginFailure(string $failureMessage = null)
     {
-        $this->tester->see("The username or password you typed is incorrect, please try again.");
+        $this->tester->see($failureMessage ?? "The username or password you typed is incorrect, please try again.");
     }
-
 }
