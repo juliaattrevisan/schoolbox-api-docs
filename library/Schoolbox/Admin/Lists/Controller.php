@@ -429,6 +429,7 @@ class Controller extends Base
             'campus'    => [
                 'title'             => 'Campus',
                 'mapper'            => CampusMapper::class,
+                'delete'            => true,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',

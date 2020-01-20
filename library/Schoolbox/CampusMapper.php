@@ -28,6 +28,11 @@ class CampusMapper extends Mapper {
         $this->uses('name', Mapper::TYPE_STRING);
         $this->uses('ext_timetable_code', Mapper::TYPE_STRING);
         $this->uses('timetable_day', Mapper::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
 	/**
@@ -171,4 +176,10 @@ class CampusMapper extends Mapper {
 		}
 		return $campusCollection;
 	}
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }

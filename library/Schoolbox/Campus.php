@@ -10,10 +10,16 @@
 namespace Schoolbox;
 
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Campus implements ValueLabelInterface, IModel
+class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
 {
 
+    use ModelTrait\HasSequence;
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
     use CreateCollection;
 
     /** @var string */
