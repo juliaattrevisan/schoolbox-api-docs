@@ -10,6 +10,8 @@ namespace Custom\Tigs\Summative\ParticipationReport;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
+use External_ClassInterface;
+use Schoolbox\UserMapper;
 use function array_column;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Report;
@@ -47,6 +49,9 @@ class AcademicTranscript
     /** @var External_UserInterface */
     private $externalUser;
 
+    /** @var External_ClassInterface */
+    private $externalClass;
+
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
 
@@ -55,6 +60,12 @@ class AcademicTranscript
 
     /** @var RubricDataModel\DataSource */
     private $rubricMapper;
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var Assessment\Mapper */
+    private $assessmentMapper;
 
     /** @var Textbox\Mapper */
     private $textBoxMapper;
@@ -76,9 +87,12 @@ class AcademicTranscript
      * @param IConfigLoader          $config
      * @param Folder\Mapper          $folderMapper
      * @param External_UserInterface $externalUser
+     * @param External_ClassInterface $externalClass
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
      * @param RubricDataModel\DataSource $rubricMapper
+     * @param UserMapper              $userMapper
+     * @param Assessment\Mapper       $assessmentMapper
      * @param Textbox\Mapper         $textBoxMapper
      * @param Access                 $access
      * @param IConnector             $database
@@ -89,9 +103,12 @@ class AcademicTranscript
         IConfigLoader $config,
         Folder\Mapper $folderMapper,
         External_UserInterface $externalUser,
+        External_ClassInterface $externalClass,
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         RubricDataModel\DataSource $rubricMapper,
+        UserMapper $userMapper,
+        Assessment\Mapper $assessmentMapper,
         Textbox\Mapper $textBoxMapper,
         Access $access,
         IConnector $database,
@@ -101,9 +118,12 @@ class AcademicTranscript
         $this->config                = $config;
         $this->folderMapper          = $folderMapper;
         $this->externalUser          = $externalUser;
+        $this->externalClass         = $externalClass;
         $this->courseImplMapper      = $courseImplMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricMapper          = $rubricMapper;
+        $this->userMapper            = $userMapper;
+        $this->assessmentMapper      = $assessmentMapper;
         $this->textBoxMapper         = $textBoxMapper;
         $this->access                = $access;
         $this->database              = $database;
@@ -140,9 +160,12 @@ class AcademicTranscript
             $subjectReport = new Report(
                 $this->config,
                 $this->externalUser,
+                $this->externalClass,
                 $this->courseImplMapper,
                 $this->assessmentMapperProxy,
                 $this->rubricMapper,
+                $this->userMapper,
+                $this->assessmentMapper,
                 $this->textBoxMapper,
                 new Visibility($this->access),
                 $this->database,

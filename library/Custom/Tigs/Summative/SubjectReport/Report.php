@@ -23,6 +23,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
 use DomainException;
+use External_ClassInterface;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
@@ -41,6 +42,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\UserMapper;
 use UnderflowException;
 use function strnatcasecmp;
 use UnexpectedValueException;
@@ -58,6 +60,9 @@ class Report
     /** @var External_UserInterface */
     private $externalUser;
 
+    /** @var External_ClassInterface */
+    private $externalClass;
+
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
 
@@ -66,6 +71,12 @@ class Report
 
     /** @var RubricDataModel\DataSource */
     private $rubricMapper;
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var Assessment\Mapper */
+    private $assessmentMapper;
 
     /** @var Textbox\Mapper */
     private $textBoxMapper;
@@ -87,9 +98,12 @@ class Report
     /**
      * @param IConfigLoader          $config
      * @param External_UserInterface $externalUser
+     * @param External_ClassInterface $externalClass
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
      * @param RubricDataModel\DataSource $rubricMapper
+     * @param UserMapper             $userMapper
+     * @param Assessment\Mapper      $assessmentMapper
      * @param Textbox\Mapper         $textboxMapper
      * @param Visibility             $visibility
      * @param IConnector             $database
@@ -100,9 +114,12 @@ class Report
     public function __construct(
         IConfigLoader $config,
         External_UserInterface $externalUser,
+        External_ClassInterface $externalClass,
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         RubricDataModel\DataSource $rubricMapper,
+        UserMapper $userMapper,
+        Assessment\Mapper $assessmentMapper,
         Textbox\Mapper $textboxMapper,
         Visibility $visibility,
         IConnector $database,
@@ -112,9 +129,12 @@ class Report
     ) {
         $this->config                = $config;
         $this->externalUser          = $externalUser;
+        $this->externalClass         = $externalClass;
         $this->courseImplMapper      = $courseImplMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricMapper          = $rubricMapper;
+        $this->userMapper            = $userMapper;
+        $this->assessmentMapper      = $assessmentMapper;
         $this->textBoxMapper         = $textboxMapper;
         $this->visibility            = $visibility;
         $this->database              = $database;
@@ -235,9 +255,11 @@ class Report
             );
         }
 
+        $teacherFetcher = new TeacherFetcher($this->externalClass, $this->userMapper, $this->assessmentMapper);
+
         return [
             'folder'                    => $folder,
-            'teachers'                  => $folder->loadTeachers()->getTeachers(),
+            'teachers'                  => $teacherFetcher->getTeachers($folder, $attributes),
             'courseSpec'                => $courseSpec,
             'showNoLongerEnrolledAlert' => !$attributes->isHistorical() && !$this->isCurrentEnrollment($user, $folder),
             'attributes'                => $attributes,
@@ -1009,7 +1031,7 @@ class Report
 
             SELECT a.id FROM `assessment` a
             JOIN project_assessment ap                     ON ap.assessment_id                  = a.id
-            JOIN project p                                 ON ap.project_id                     = p.id 
+            JOIN project p                                 ON ap.project_id                     = p.id
             JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
             JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
             WHERE {$whereClause}

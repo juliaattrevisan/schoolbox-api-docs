@@ -32,10 +32,13 @@ interface External_ClassInterface extends External\IConnector
      * Returns a list of *THE EXTERNAL IDs* of teachers that are associated
      * with a class
      *
-     * @param string $classCode  CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
+     * @param string                   $classCode CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
+     * @param Alaress_Date_Format|null $date      If provided, attempt to fetch teachers for the class at this point in time.
+     *                                            Defaults to 'NOW' if not provided.
+     *                                            No guarantee of being respected (only Synergetic for now)
      * @return string[]
      */
-    public function getTeachers(string $classCode): array;
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array;
 
     /**
      * @return array

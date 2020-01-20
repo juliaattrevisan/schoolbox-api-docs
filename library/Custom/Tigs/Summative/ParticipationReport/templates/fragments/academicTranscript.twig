@@ -6,8 +6,9 @@ Data:
     subjects[idx].name                                           string
     subjects[idx].codes                                          string[]
     subjects[idx].folderId                                       int
-    subjects[idx].teachers                                       User[]
     data[folderId]                                               array
+    data[folderId].folder                                        Folder\Model
+    data[folderId].teachers                                      User[]
     data[folderId]['falData']                                    array
     data[folderId]['falData']['data']                            float[]    eg, ['Criterion A' => 6.0, ...]
     data[folderId]['aasData']                                    array
@@ -86,7 +87,7 @@ Data:
             {% for subject in subjects %}
                 {% set folderId = subject.folderId %}
                 {% set folderData = data[folderId] %}
-                {% set firstTeacher = subject.teachers | first %}
+                {% set firstTeacher = folderData.teachers | first %}
                 <li class="subject-list-item">
                     <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
                         <div class="card small-12 medium-6">

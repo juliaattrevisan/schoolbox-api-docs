@@ -102,7 +102,7 @@ class External_Schooledge_Class implements External_ClassInterface
                 s.HomeGroup    AS StudentTutorDescription,
                 s.Code         AS synergy_id
             FROM fc.TimetableSubject ts
-            
+
             INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
             INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
             INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
@@ -112,9 +112,9 @@ class External_Schooledge_Class implements External_ClassInterface
             WHERE $classQuery
             AND   t.Enabled = 1
             AND   t.Name    {$timetableCodes}
-            
+
             UNION
-            
+
             SELECT DISTINCT
                 s.FirstName    AS firstname,
                 s.LastName     AS lastname,
@@ -137,7 +137,7 @@ class External_Schooledge_Class implements External_ClassInterface
             WHERE $classQuery
             AND   t.Enabled = 1
             AND   t.Name    {$timetableCodes}
-            
+
             ORDER BY synergy_id ASC
         ";
         return $this->database->getAll($query);
@@ -147,7 +147,7 @@ class External_Schooledge_Class implements External_ClassInterface
     /**
      * @inheritDoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
@@ -211,7 +211,7 @@ class External_Schooledge_Class implements External_ClassInterface
             AND   staff_replacement.Code IS NOT NULL
             AND   t.Enabled = 1
             AND   t.Name    {$timetableCodes}
-            
+
             ORDER BY code ASC
         ";
 

@@ -35,7 +35,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT 
+            SELECT
                 FIRSTNAME,
                 SURNAME AS LASTNAME,
                 $studentClass.STUDENT_NUMBER AS SYNERGY_ID,
@@ -70,7 +70,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
 
         // Setup handling multiple codes

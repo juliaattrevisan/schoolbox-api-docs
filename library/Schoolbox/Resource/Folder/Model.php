@@ -34,6 +34,10 @@ use Schoolbox\ValueLabelInterface;
 use Schoolbox\YearLevel;
 use TypeError;
 use UnexpectedValueException;
+use function array_map;
+use function array_merge;
+use function explode;
+use function preg_match;
 
 /**
  * Class Model
@@ -236,6 +240,21 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function wasClass(): bool
     {
         return (bool)preg_match('#\[.+\]$#', $this->name);
+    }
+
+
+    /**
+     * Returns any rolled over folder codes present in this folder's name
+     *
+     * @return string[]
+     */
+    public function getRolledOverCodes(): array
+    {
+        // Rolled-over folder codes
+        if (preg_match('/\[([^]]+)]/', $this->name, $matches)) {
+            return array_map('trim', explode(',', $matches[1]));
+        }
+        return [];
     }
 
 

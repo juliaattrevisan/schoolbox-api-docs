@@ -60,15 +60,15 @@ class External_Tass_Class implements External_ClassInterface {
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $query = "
-            SELECT DISTINCT 
-                studsub.stud_code as synergy_id, 
-                student.preferred_name as firstname, 
-                student.surname as lastname, 
-                student.year_grp as yearlevel, 
-                student.house, 
-                '' AS StudentMedicalAlert, 
+            SELECT DISTINCT
+                studsub.stud_code as synergy_id,
+                student.preferred_name as firstname,
+                student.surname as lastname,
+                student.year_grp as yearlevel,
+                student.house,
+                '' AS StudentMedicalAlert,
                 '' AS EnglishSecondFlag,
-                '' AS StudentSpecialNeedsFlag, 
+                '' AS StudentSpecialNeedsFlag,
                 '' as StudentTutorDescription
             FROM studsub
             JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
@@ -85,7 +85,7 @@ class External_Tass_Class implements External_ClassInterface {
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
@@ -114,7 +114,7 @@ class External_Tass_Class implements External_ClassInterface {
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-        $query = "SELECT DISTINCT tch_code FROM tchsub 
+        $query = "SELECT DISTINCT tch_code FROM tchsub
                     WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
                     AND ( $classQuery )";
 

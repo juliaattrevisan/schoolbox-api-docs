@@ -52,19 +52,19 @@ class External_Doublefirst_Class implements External_ClassInterface
 
         foreach ($arrayCodes as $code) {
             $query = "
-                SELECT DISTINCT 
-                    pbi.Surname as lastname, 
-                    pbi.ForeName as firstname, 
-                    pbi.YearGroup as yearlevel, 
-                    pbi.House as house, 
-                    CAST(pbi.UrgentNotes as NVARCHAR(max)) as StudentMedicalAlert, 
+                SELECT DISTINCT
+                    pbi.Surname as lastname,
+                    pbi.ForeName as firstname,
+                    pbi.YearGroup as yearlevel,
+                    pbi.House as house,
+                    CAST(pbi.UrgentNotes as NVARCHAR(max)) as StudentMedicalAlert,
                     0 as StudentSpecialNeedsFlag,
                     '' as EnglishSecondFlag,
                     null AS StudentTutorDescription,
                     pbi.PupilID as synergy_id
-                FROM PupilSubjects ps JOIN V_PupilBasicInformation pbi ON pbi.PupilID = ps.PupilID 
-                LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = ps.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = ps.SchoolYear 
-                JOIN TimetableClassRoom tcr ON tcr.YearGroup = ps.yeargroup AND tcr.SubjectID = ps.SubjectID AND tcr.DivisionID = ps.DivisionID AND tcr.AcademicYear = ps.SchoolYear 
+                FROM PupilSubjects ps JOIN V_PupilBasicInformation pbi ON pbi.PupilID = ps.PupilID
+                LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = ps.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = ps.SchoolYear
+                JOIN TimetableClassRoom tcr ON tcr.YearGroup = ps.yeargroup AND tcr.SubjectID = ps.SubjectID AND tcr.DivisionID = ps.DivisionID AND tcr.AcademicYear = ps.SchoolYear
                 JOIN TimetableMatrix tm ON tm.MatrixID = tcr.MatrixID
                 JOIN TimetableMaster ttm ON ttm.TimetableName = tm.TimetableName AND ttm.AcademicYear = tcr.AcademicYear AND ttm.IsWorking = 1 AND ttm.YearGroup = ps.YearGroup
                 WHERE ps.SchoolYear = {$year} AND ygsd.SubjectDivisionName = '{$code}'
@@ -100,7 +100,7 @@ class External_Doublefirst_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
@@ -114,10 +114,10 @@ class External_Doublefirst_Class implements External_ClassInterface
         $query =
             "
             SELECT DISTINCT tcs.StaffID
-            FROM PupilSubjects ps 
+            FROM PupilSubjects ps
             JOIN TimetableClassStaff tcs ON tcs.SchoolID = ps.SchoolID AND tcs.YearGroup = ps.YearGroup AND tcs.DivisionID = ps.DivisionID AND tcs.AcademicYear = ps.SchoolYear AND tcs.BatchID = ps.BatchID
             JOIN StaffPersonalDetails spd ON spd.StaffID = tcs.StaffID
-            
+
             LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcs.DivisionID AND ygsd.SubjectID = tcs.SubjectID AND ygsd.YearGroup = tcs.YearGroup AND ygsd.AcademicYear = tcs.AcademicYear
             WHERE ps.SchoolYear = {$year} and $classQuery
         ";

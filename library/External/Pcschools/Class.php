@@ -56,7 +56,7 @@ class External_Pcschools_Class implements External_ClassInterface
                     AND tf.TIME_PERIOD = su.PERIOD_ID
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
-                WHERE 
+                WHERE
                     st.CURRENT_YEAR <> '".self::LEFT_YEAR."' AND
                     {$codeQuery};";
 
@@ -66,7 +66,7 @@ class External_Pcschools_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
@@ -74,7 +74,7 @@ class External_Pcschools_Class implements External_ClassInterface
         }
 
         $query = $this->getTimefileFilter($classCode);
-        
+
         return array_map(
             function($v) { return $v['TEACHER']; },
             $this->getDatabase()->trimAll(
@@ -83,7 +83,7 @@ class External_Pcschools_Class implements External_ClassInterface
                         tf.TEACHER
                     FROM TIMEFILE tf
                     WHERE $query
-                    AND tf.STATUS != 'S' 
+                    AND tf.STATUS != 'S'
                 ")
             )
         );

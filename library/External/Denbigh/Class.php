@@ -40,10 +40,10 @@ class External_Denbigh_Class implements External_ClassInterface
         /** @noinspection SqlDialectInspection */
         $studentIterator = $this->externalDatabase->getQueryIterator(
             "
-                SELECT      p.denbighID, 
-                            p.surname, 
-                            p.preferred_name, 
-                            s.academicYear, 
+                SELECT      p.denbighID,
+                            p.surname,
+                            p.preferred_name,
+                            s.academicYear,
                             s.house
                 FROM        Classes c
                 JOIN        Enrolments e ON e.classCode = c.classCode
@@ -78,7 +78,7 @@ class External_Denbigh_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode): array
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
         $classCodes = array_filter(explode(',', $classCode));
 

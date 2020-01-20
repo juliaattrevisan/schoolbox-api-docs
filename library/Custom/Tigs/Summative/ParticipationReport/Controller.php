@@ -15,19 +15,15 @@ use Aura\Router\Exception\RouteNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use DomainException;
+use External_ClassInterface;
 use function implode;
 use LogicException;
-use PDO;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
-use Schoolbox\Assessment\Course\Task\Completion;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
@@ -43,7 +39,6 @@ use UnderflowException;
 use UnexpectedValueException;
 use Alaress\Database;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Mapper;
 
 class Controller extends Web\Controller\Base
 {
@@ -52,6 +47,9 @@ class Controller extends Web\Controller\Base
 
     /** @var External_UserInterface|External_User */
     private $externalUser;
+
+    /** @var External_ClassInterface */
+    private $externalClass;
 
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
@@ -62,10 +60,10 @@ class Controller extends Web\Controller\Base
     /** IConnector $externalDatabase */
     private $externalDatabase;
 
-    /** @var PastoralMapper $pastoralMapper */
+    /** @var PastoralMapper */
     private $pastoralMapper;
 
-    /** @var FolderMapper $folderMapper */
+    /** @var Folder\Mapper */
     private $folderMapper;
 
     /** @var Textbox\Mapper */
@@ -87,10 +85,11 @@ class Controller extends Web\Controller\Base
     /**
      * @param IConnector             $database
      * @param External_UserInterface $externalUser
+     * @param External_ClassInterface $externalClass
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param UserMapper             $userMapper
      * @param PastoralMapper         $pastoralMapper
-     * @param FolderMapper           $folderMapper
+     * @param Folder\Mapper          $folderMapper
      * @param Textbox\Mapper         $textBoxMapper
      * @param Access                 $access
      * @param IConnector             $externalDatabase
@@ -101,10 +100,11 @@ class Controller extends Web\Controller\Base
     public function __construct(
         IConnector $database,
         External_UserInterface $externalUser,
+        External_ClassInterface $externalClass,
         CourseImpl\Mapper $courseImplMapper,
         UserMapper $userMapper,
         PastoralMapper $pastoralMapper,
-        FolderMapper $folderMapper,
+        Folder\Mapper $folderMapper,
         Textbox\Mapper $textBoxMapper,
         Access $access,
         IConnector $externalDatabase,
@@ -114,6 +114,7 @@ class Controller extends Web\Controller\Base
     ) {
         $this->database              = $database;
         $this->externalUser          = $externalUser;
+        $this->externalClass         = $externalClass;
         $this->courseImplMapper      = $courseImplMapper;
         $this->userMapper            = $userMapper;
         $this->externalDatabase      = $externalDatabase;
@@ -191,8 +192,6 @@ class Controller extends Web\Controller\Base
      * @param User  $user
      * @param array $externalStudent
      * @return User[]
-     * @throws Mapper\Exception
-     * @throws UnexpectedValueException
      */
     private function getDeanAndMentor(User $user, array $externalStudent): array
     {
@@ -413,6 +412,7 @@ class Controller extends Web\Controller\Base
      * @throws LogicException
      * @throws DefinitionException
      * @throws UnderflowException
+     * @throws Database\Exception
      */
     private function getAcademicTranscript(User $student, StudentAttributes $attributes, array $subjectList, ?string $roleTypeOverride): array
     {
@@ -420,9 +420,12 @@ class Controller extends Web\Controller\Base
             $this->getConfigLoader(),
             $this->folderMapper,
             $this->externalUser,
+            $this->externalClass,
             $this->courseImplMapper,
             $this->assessmentMapperProxy,
             $this->rubricMapper,
+            $this->userMapper,
+            $this->assessmentMapper,
             $this->textBoxMapper,
             $this->access,
             $this->database,
@@ -442,11 +445,7 @@ class Controller extends Web\Controller\Base
      * @param null|string       $reportDate
      * @return array
      * @throws UnexpectedValueException
-     * @throws InvalidColumnException
      * @throws DefinitionException
-     * @throws UnderflowException
-     * @throws DomainException
-     * @throws Exception
      */
     private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate): array
     {
@@ -455,12 +454,10 @@ class Controller extends Web\Controller\Base
 
         $subjects = [];
         foreach ($folders as $folder) {
-            $this->loadTeachers($folder, $attributes);
             $subjects[] = [
                 'name'     => $folder->getName(),
                 'codes'    => $folder->getCodes()->getPropertyValues('code'),
                 'folderId' => $folder->getId(),
-                'teachers' => $folder->getTeachers(),
             ];
         }
 
@@ -469,120 +466,11 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Loads teachers onto folder model
-     *
-     * @param Folder\Model      $folder
-     * @param StudentAttributes $attributes
-     * @throws UnexpectedValueException
-     * @throws InvalidColumnException
-     * @throws DomainException
-     * @throws UnderflowException
-     * @throws Exception
-     */
-    private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes): void
-    {
-        if ($attributes->isCurrent()) {
-            // If viewing current, just use SIS values
-            $folder->loadTeachers();
-            return;
-        }
-
-        // Load teachers who gave feedback
-        $assessments = $this->findAssessmentsForFolderAndReport($folder, $attributes);
-        if (!$assessments->count()) {
-            return;
-        }
-
-        $userIds = $this->findUsersWhoGaveFeedback($assessments);
-        if (!\count($userIds)) {
-            return;
-        }
-
-        $columnList           = [
-            $this->userMapper->getIdentifierColumn() => $userIds,    // Users who gave feedback, and
-            'g.group_type'                           => Role::STAFF, // are staff
-        ];
-        $staffWhoGaveFeedback = $this->userMapper->findByColumnList($columnList);
-        $folder->setTeachers($staffWhoGaveFeedback);
-    }
-
-
-    /**
-     * Returns a set of assessments that belong to a folder and are due within the report's time period
-     *
-     * @param Folder\Model      $folder
-     * @param StudentAttributes $attributes
-     * @return Collection
-     * @throws InvalidColumnException
-     */
-    private function findAssessmentsForFolderAndReport(Folder\Model $folder, StudentAttributes $attributes): Collection
-    {
-        // Load all users who gave feedback to assessments due during report period
-        $dueDatePb = $this->assessmentMapper->getPredicateBuilder()
-            ->greaterThanOrEqualTo('due_date', $attributes->getCurriculumSemesterStart())
-            ->lessThan('due_date', $attributes->getCurriculumSemesterFinish());
-
-        return $this->assessmentMapper->findAllForFolderId($folder->getId(), $dueDatePb);
-    }
-
-
-    /**
-     * Returns the ids of users who gave feedback to the set of assessments
-     *
-     * @param Collection $assessments
-     * @return int[]
-     * @throws InvalidColumnException
-     * @throws UnderflowException
-     */
-    private function findUsersWhoGaveFeedback(Collection $assessments): array
-    {
-        $assessmentIdProperty = $this->assessmentMapper->getIdentifierProperty();
-
-        $taskPb = $this->assessmentMapper->getPredicateBuilder()
-                                         ->in('t_a.id', $assessments->getPropertyValues($assessmentIdProperty))
-                                         ->equals('tc.completion_status', Completion::STATUS_TEACHER_ASSESSED_COMPLETE);
-
-        $quizPb = $this->assessmentMapper->getPredicateBuilder()
-                                         ->in('q_a.id', $assessments->getPropertyValues($assessmentIdProperty));
-
-        $subBoxPb = $this->assessmentMapper->getPredicateBuilder()
-                                           ->in('sb_a.id', $assessments->getPropertyValues($assessmentIdProperty))
-                                           ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
-
-        $taskWhere   = implode(' AND ', $taskPb->getWhere());
-        $quizWhere   = implode(' AND ', $quizPb->getWhere());
-        $subBoxWhere = implode(' AND ', $subBoxPb->getWhere());
-
-        $sql = "
-            SELECT tc.marking_user_id AS user_id
-            FROM assessment t_a
-            JOIN task t on t_a.id = t.assessment_id
-            JOIN task_completion tc on t.id = tc.task_id
-            WHERE {$taskWhere}
-              UNION
-            SELECT aa.reviewer_id AS user_id
-            FROM assessment q_a
-            JOIN assess q ON q.assessment_id = q_a.id
-            JOIN assess_attempt aa
-            WHERE {$quizWhere}
-              UNION
-            SELECT sr.marker AS user_id
-            FROM assessment sb_a
-            JOIN submission_box sb on sb_a.id = sb.assessment_id
-            JOIN submission_return sr on sb.id = sr.box_id
-            WHERE {$subBoxWhere}
-        ";
-
-        $params = array_merge($taskPb->getParams(), $quizPb->getParams(), $subBoxPb->getParams());
-        return $this->folderMapper->getDatabase()->query($sql, $params)->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-
-    /**
      * Returns general comment of pastoral records of given attributes.
-     * @param User $user
+     * @param User              $user
      * @param StudentAttributes $attributes
      * @return array semester numbers -> comments
+     * @throws InvalidColumnException
      */
     private function getDeansComment(User $user, StudentAttributes $attributes): array
     {
