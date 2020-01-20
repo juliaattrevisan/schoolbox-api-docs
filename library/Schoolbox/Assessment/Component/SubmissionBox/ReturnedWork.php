@@ -78,6 +78,12 @@ class ReturnedWork implements ISoftDeletable
 
 
     /**
+     * @var bool
+     */
+    private $resubmissionRequired = false;
+
+
+    /**
      * @var \Alaress_Date_Format
      */
     protected $publishedAt;
@@ -280,6 +286,26 @@ class ReturnedWork implements ISoftDeletable
     public function setNormalizedMark($normalized_mark)
     {
         $this->normalized_mark = $normalized_mark;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getResubmissionRequired(): bool
+    {
+        return $this->resubmissionRequired;
+    }
+
+
+    /**
+     * @param bool $resubmissionRequired
+     * @return static
+     */
+    public function setResubmissionRequired(bool $resubmissionRequired): self
+    {
+        $this->resubmissionRequired = $resubmissionRequired;
         return $this;
     }
 
