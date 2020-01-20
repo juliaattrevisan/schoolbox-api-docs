@@ -89,22 +89,7 @@ class Definition extends Filter\AbstractDefinition
      */
     protected function sortFilterOptions(GenericCollection $options): GenericCollection
     {
-        // Keys represent WorkType IDs
-        return $options->sortByCallback(function (Filter\Page\Option\Model $left, Filter\Page\Option\Model $right) {
-            $leftKey  = $left->getKey();
-            $rightKey = $right->getKey();
-            if ($leftKey === $right) {
-                return 0;
-            }
-            if (self::KEY_NONE === $leftKey) {
-                return -1;
-            }
-            if (self::KEY_NONE === $rightKey) {
-                return +1;
-            }
-            // Sort concrete items by workType.id
-            return $leftKey - $rightKey;
-        }, true);
+        return $options;
     }
 
 
