@@ -75,7 +75,7 @@ Usage:
     <nav>
         <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ courseSpec.id }}"></a>
             {% if hasTot %}
-        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
+        <a href="#" class="icon-overflow" data-options="align:top" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
             {% endif %}
     </nav>
 
@@ -109,7 +109,6 @@ Usage:
         {% if USER.isSuperuser() %}
         <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: courseSpec.id}) }}" class="icon-delete" data-course-delete-id="{{ courseSpec.id }}" data-action="course-delete">Delete</a></li>
         {% endif %}
-
     </ul>
     {% endif %}
 </li>

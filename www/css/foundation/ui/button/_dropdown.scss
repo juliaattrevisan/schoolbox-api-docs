@@ -22,6 +22,11 @@ $f-dropdown-icon-align: 0.25rem;
 	@include box-shadow(-2px, 2px, 4px, rgba(0,0,0,0.15));
     overflow-y: auto;
     overflow-x: hidden;
+
+    &.drop-top {
+        overflow: visible;
+        z-index: 1002;
+    }
 	li{
 		display: block;
 		width: 100%;
