@@ -193,6 +193,24 @@ class Project extends AbstractAssessment implements AssessmentContext
 
 
     /**
+     * Resubmission is required on a project if resubmission is required on any
+     * of its sub-assessments.
+     *
+     * @inheritdoc
+     */
+    public function isResubmissionRequired(Participant $participant): bool
+    {
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            if ($subParticipant->isResubmissionRequired()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * If a student requires marking on ANY project sub-assessment, the project requires marking (Orange Diamond)
      *
      * @inheritdoc
@@ -709,5 +727,50 @@ class Project extends AbstractAssessment implements AssessmentContext
             $participatingUsers = $participatingUsers->mergeUnique($subAssessable->getParticipantUsers(), 'id');
         }
         return $participatingUsers;
+    }
+
+
+    /**
+     * Return an iterator over the set of assessables in which `$participant` is
+     * actually participating.
+     *
+     * @param Participant $participant
+     * @return iterable&Participant[] The iterator yields the Participant record
+     *                                for each sub-assessment in which
+     *                                `$participant` is participating
+     * @throws \DomainException       If `$participant`'s assessment is not this
+     *                                project
+     * @throws \DomainException       If there's at least one assessment in this
+     *                                project, and `$participant`'s user is not
+     *                                participating in any assessment in this
+     *                                project
+     */
+    private function iterateAssessablesForParticipant(Participant $participant): iterable
+    {
+        $this->assertSameAssessment($participant);
+
+        if (!$this->hasAssessments()) {
+            return;
+        }
+
+        $studentFoundInSubAssessments = false;
+        foreach ($this->assessables as $subAssessment) {
+            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
+            if ($subParticipant) {
+                yield $subParticipant;
+            }
+        }
+
+        // Logically, if student is a participant in a project,
+        // they must be a participant in at least 1 project sub-assessment
+        if (!$studentFoundInSubAssessments) {
+            throw new \DomainException(
+                sprintf(
+                    "Project (a.id: %d) participant (u.id: %d}) not found in project's sub-assessments",
+                    $this->id,
+                    $participant->getUser()->getId()
+                )
+            );
+        }
     }
 }
