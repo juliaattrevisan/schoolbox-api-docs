@@ -146,7 +146,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         }
 
                         $event->setLocation($period['room']);
-                        $event->setPeriodCancelled((bool)$period['ClassCancelled']);
+                        $event->setPeriodCancelled((bool)($period['ClassCancelled'] ?? false));
                         $event->setPublishDate(null);
                         $event->setTitle(sprintf('%s (%s)', $period['description'], $code));
                         $event->setCampusList($campusId);
