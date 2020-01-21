@@ -114,6 +114,7 @@ class RelationshipIterator implements Iterator
                 'gender' => $student['relationships']['person']['attributes']['gender'],
                 'dob' => $student['relationships']['person']['attributes']['dateOfBirth'],
                 'medical' => $this->lookups['medical'][$studentPersonId],
+                'emergencyContacts' => $this->lookups['emergencyContacts'][$studentPersonId],
                 'links' => $student['links']
             ] : null,
             'parent' => $parent ? [
