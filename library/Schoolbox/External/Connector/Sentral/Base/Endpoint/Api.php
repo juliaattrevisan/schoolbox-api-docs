@@ -9,6 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
 use Alaress_Curl_Url;
+use DomainException;
+use GuzzleHttp\Client;
+use InvalidArgumentException;
 use RuntimeException;
 use Zend\Uri\Exception;
 use Zend\Uri\Uri;
@@ -20,6 +23,24 @@ use Zend\Uri\Uri;
  */
 class Api implements IApi
 {
+
+    /**
+     * Default pagination limit - can go between 0 and 200
+     *
+     * It's not formally used in this class yet because you need to extra-futz with the $endpoint
+     * in order to facilitate this value as a querystring param
+     *
+     * It's pretty easy to forget it exists though, and we'll probably need to fiddle with this
+     * at some point in the future.
+     */
+    private const DEFAULT_LIMIT = 12;
+
+
+    /**
+     * Request timeout
+     */
+    private const DEFAULT_TIMEOUT = 300;
+
 
     /**
      * The host server
@@ -44,15 +65,53 @@ class Api implements IApi
 
 
     /**
+     * @var Client
+     */
+    private $client;
+
+
+    /**
      * Constructor
      *
      * @param string $host
      * @param string $apiKey
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
     public function __construct(string $host, string $apiKey)
     {
         $this->host   = $host;
         $this->apiKey = $apiKey;
+
+        $this->client = $this->initClient($this->host, $this->apiKey, self::DEFAULT_TIMEOUT);
+    }
+
+
+    /**
+     * Set up guzzle client
+     *
+     * @param string $dsn
+     * @param string $key
+     * @param int    $timeout
+     * @return Client
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     */
+    private function initClient(string $dsn, string $key, int $timeout): Client
+    {
+        $credentials = (new DSNCodec())->decode($dsn);
+
+        $headers = array_combine(
+            ['X-API-KEY', 'X-API-TENANT'],
+            [$key, $credentials['tenant']]
+        );
+
+        return new Client([
+            'headers' => $headers,
+            'base_uri' => $credentials['host'],
+            'timeout' => $timeout,
+            'http_errors' => false,
+        ]);
     }
 
 
