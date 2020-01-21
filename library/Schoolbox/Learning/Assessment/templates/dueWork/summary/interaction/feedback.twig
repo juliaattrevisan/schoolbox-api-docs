@@ -117,7 +117,13 @@ feedback: currentFeedback,
             </div>
             {% endblock card %}
             <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
-                <span>{{ currentFeedback.humanReadableMark }}</span>
+                <span>
+                    {% if currentFeedback.resubmissionRequired %}
+                        Resubmit ({{ currentFeedback.humanReadableMark }})
+                    {% else %}
+                        {{ currentFeedback.humanReadableMark }}
+                    {% endif %}
+                </span>
             </div>
         </div>
         <nav>
