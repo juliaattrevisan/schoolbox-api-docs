@@ -45,6 +45,8 @@
         <!-- deliberately empty  -->
     {% elseif participant.isFeedbackRequired %}
         <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
+    {% elseif participant.isResubmissionRequired %}
+        <span class="no-text progress-tick failed" title="Resubmission Required"></span>
     {% elseif participant.isReviewComplete %}
         <span class="no-text progress-tick reviewed" title="Complete"></span>
     {% endif %}
