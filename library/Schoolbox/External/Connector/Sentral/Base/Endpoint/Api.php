@@ -73,17 +73,16 @@ class Api implements IApi
     /**
      * Constructor
      *
-     * @param string $host
+     * @param string $dsn
      * @param string $apiKey
      * @throws DomainException
      * @throws InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $dsn, string $apiKey)
     {
-        $this->host   = $host;
         $this->apiKey = $apiKey;
 
-        $this->client = $this->initClient($this->host, $this->apiKey, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($dsn, $this->apiKey, self::DEFAULT_TIMEOUT);
     }
 
 
@@ -100,6 +99,10 @@ class Api implements IApi
     private function initClient(string $dsn, string $key, int $timeout): Client
     {
         $credentials = (new DSNCodec())->decode($dsn);
+
+        /* Remember the actual host value
+         */
+        $this->host = $credentials['host'];
 
         $headers = array_combine(
             ['X-API-KEY', 'X-API-TENANT'],
@@ -124,7 +127,13 @@ class Api implements IApi
      */
     public function retrieveDocument(string $endpoint): array
     {
-        $response = $this->client->request('GET', $endpoint);
+
+        /* Sentral's first/last/next pagination links are full urls containing the host
+         * but for brevity we've set base_uri to the host already so we need to replace it away
+         * every time we make a call to their pagination urls they provide to us ><
+         * FIXME Tell Sydney James?
+         */
+        $response = $this->client->request('GET', str_replace($this->host, '', $endpoint));
 
         try {
             $decoded = json_decode($response->getBody()->getContents(), true);
