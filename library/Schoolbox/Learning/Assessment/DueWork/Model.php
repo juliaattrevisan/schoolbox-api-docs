@@ -253,11 +253,23 @@ class Model extends AbstractAssessment implements ISelfAssessable
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
         }
 
-        /* Allow draft responses in single submission assessments
-         */
+        // Allow accept single submission if:
+        // * no participant provided
+        // ** don't know how this code path is valid, but it is apparently
+        // * no response is submitted
+        // * resubmission is required
         if ($this->isAcceptSingle()) {
-            $allResponses = $participant ? $participant->getAllResponses() : new Collection();
-            $this->assertNoPublishedResponses($allResponses);
+            if (!$participant) {
+                return;
+            }
+            if (!$participant->hasSubmittedResponse()) {
+                return;
+            }
+            if ($participant->isResubmissionRequired()) {
+                return;
+            }
+
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
     }
 
@@ -435,39 +447,13 @@ class Model extends AbstractAssessment implements ISelfAssessable
      */
     public function canLearnerCreateResponse(User $learner)
     {
-        // Not open ?
-        if(!$this->isOpen($learner)){
-            return false;
-        }
-
-        // Not a participant ?
-        $participant = $this->getParticipantIfExtant($learner);
-        if (!$participant) {
-            return false;
-        }
-
-        // Does this DueWork not accept online responses ?
-        if ($this->isAcceptNone()) {
-            return false;
-        }
-
-        if ($this->isAcceptMulti()) {
+        // Use assertAcceptSubmission to test whether this is submittable
+        try {
+            $this->assertAcceptSubmission($this->getParticipantIfExtant($learner));
             return true;
+        } catch (DomainException $e) {
+            return false;
         }
-
-        // Has student not submitted their single permitted response,
-        // or do they need to resubmit?
-        if ($this->isAcceptSingle()) {
-            if (!$participant->hasSubmittedResponse()) {
-                return true;
-            }
-            if ($participant->isResubmissionRequired()) {
-                return true;
-            }
-        }
-
-        // If all other cases are fallen through?
-        return false;
     }
 
 
