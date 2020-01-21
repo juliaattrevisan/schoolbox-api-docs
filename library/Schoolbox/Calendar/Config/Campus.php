@@ -49,7 +49,7 @@ class Campus extends Base
             $this->campusMapper->findCampusInvolvement($this->user)
                                ->merge($this->campusMapper->getAvailableCampusesForUser($this->user))
                                ->indexBy('id')
-                               ->sortBy('name', 'ASC')
+                               ->sortBy('sequence', 'ASC')
         );
 
         return $this;

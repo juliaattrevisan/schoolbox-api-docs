@@ -81,6 +81,8 @@ class CampusMapper extends Mapper {
 				WHERE userAccess.service = :calendarService
 				AND userAccess.uid = :userId
 				AND type >= :accessType
+				AND luCampus.deleted_at IS NULL
+                ORDER BY luCampus.sequence
 			";
 
 			$statement = $this->database->prepare($query);

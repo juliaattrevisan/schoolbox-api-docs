@@ -285,6 +285,8 @@ class Calendar extends DeprecatedModel
         $query = "
 			SELECT id, name
 			FROM luCampus
+            WHERE deleted_at IS NULL
+            ORDER BY sequence ASC
 		";
 
         if (!$_SESSION['su']) {
