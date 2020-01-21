@@ -435,6 +435,26 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * Most assessment types don't implement the resubmission state:
+     * therefore this will always return false.
+     *
+     * @inheritdoc
+     */
+    public function isResubmissionRequired(Participant $participant): bool
+    {
+        $this->assertSameAssessment($participant);
+
+        return false;
+
+//        // Resubmission is a state on the feedback, nowhere else
+//        $latestPublishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+//        if (!$latestPublishedFeedback) {
+//            return false;
+//        }
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function isReviewComplete(Participant $participant)
