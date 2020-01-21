@@ -119,7 +119,7 @@ feedback: currentFeedback,
             <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
                 <span>
                     {% if currentFeedback.resubmissionRequired %}
-                        Resubmit ({{ currentFeedback.humanReadableMark }})
+                        Resubmit {% if not currentFeedback.humanReadableMark is empty %}({{ currentFeedback.humanReadableMark }}){% endif %}
                     {% else %}
                         {{ currentFeedback.humanReadableMark }}
                     {% endif %}
