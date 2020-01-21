@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Medical;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
@@ -170,6 +171,10 @@ class Profile implements IStrategy
     private function importStudents(): void
     {
 
+        /* Compile medical records
+         */
+        $lookups['medical'] = (new Medical($this->api))->compile()->getRecords();
+
         /* Sentral gives you paginated data, at most, 200 per page
          * Though they give you 200 people per page, each person comes
          * with accessory data which you kind of have to manually compile
@@ -177,15 +182,10 @@ class Profile implements IStrategy
          * but regardless of how many elements you actually get, it's for
          * (at most) 200 people.
          */
-        $relationshipIterator = new RelationshipIterator($this->api->retrieveDocument('enrolments/student-contact?include=person,student,studentPerson&limit=200'));
-
-//        while (array_key_exists('next', $data['links'])) {
-//
-//            /* Process each page of data
-//             */
-//        }
-
-
+        $relationshipIterator = new RelationshipIterator(
+            $this->api->retrieveDocument('enrolments/student-contact?include=person,student,studentPerson&limit=200'),
+            $lookups
+        );
 
         /* TODO Get a set of students that we need to process
          */
