@@ -119,15 +119,15 @@ class Api implements IApi
      * Retrieves endpoint data representing the result from the API call.
      *
      * @param string $endpoint
-     * @return mixed
+     * @return array
      * @throws DomainException
      */
-    public function retrieveDocument(string $endpoint)
+    public function retrieveDocument(string $endpoint): array
     {
         $response = $this->client->request('GET', $endpoint);
 
         try {
-            $decoded = json_decode($response->getBody()->getContents());
+            $decoded = json_decode($response->getBody()->getContents(), true);
         } catch (\RuntimeException $e) {
             throw new \DomainException('Could not json_decode payload; did something snap?');
         }

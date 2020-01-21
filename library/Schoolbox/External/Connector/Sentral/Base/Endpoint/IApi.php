@@ -19,7 +19,7 @@ interface IApi
      * Retrieves data from an endpoint
      *
      * @param string $endpoint
-     * @return mixed
+     * @return array
      */
-    public function retrieveDocument(string $endpoint);
+    public function retrieveDocument(string $endpoint): array;
 }
