@@ -174,6 +174,8 @@ class Profile implements IStrategy
     {
 
         /* Compile lookup records
+         * If there's too much data here we can access each of these urls directly, per record,
+         * instead of trying to build a lookup. That's a lot of api calls though...
          */
         $lookups['medical'] = (new Medical($this->api))->compile()->getRecords();
         $lookups['emergencyContacts'] = (new EmergencyContacts($this->api))->compile()->getRecords();
