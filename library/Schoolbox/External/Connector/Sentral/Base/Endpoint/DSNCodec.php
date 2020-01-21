@@ -41,7 +41,14 @@ class DSNCodec
         preg_match(self::DSN_FORMAT, $dsn, $matches);
 
         if (!count($matches)) {
-            throw new DomainException('Could not decode Sentral DSN; check host and tenant format');
+            throw new DomainException('Sentral DSN: could not decode; check host and tenant format');
+        }
+
+        /* Check trailing slash in the host
+         * Without it you just get Generic Error in a valid payload struct
+         */
+        if ('/' !== substr($matches[1], -1)) {
+            throw new DomainException('Sentral DSN: host does not end with a forward slash /');
         }
 
         return [

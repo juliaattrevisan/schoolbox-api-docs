@@ -47,9 +47,9 @@ class ApiTest extends TestCase
     {
         return [
             'Valid DSN 1' => [
-                'host=http://schoolbox.sentral.school/restapi/v1;tenant=ABC12345abc',
+                'host=http://schoolbox.sentral.school/restapi/v1/;tenant=ABC12345abc',
                 [
-                    'host' => 'http://schoolbox.sentral.school/restapi/v1',
+                    'host' => 'http://schoolbox.sentral.school/restapi/v1/',
                     'tenant' => 'ABC12345abc'
                 ]
             ],
@@ -119,7 +119,15 @@ class ApiTest extends TestCase
             ],
             'Invalid DSN 13' => [
                 'host=http:// ;tenant=ab c123',
-            ]
+            ],
+
+            /* Interestingly the host must end with a trailing slash
+             * Otherwise sentral tells you "Generic error - Unknown error"
+             * which is so extremely unhelpful
+             */
+            'Invalid DSN 14' => [
+                'host=http://schoolbox.sentral.school/restapi/v1',
+            ],
         ];
     }
 }
