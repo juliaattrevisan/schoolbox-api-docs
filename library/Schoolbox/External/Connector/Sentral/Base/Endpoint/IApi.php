@@ -18,7 +18,8 @@ interface IApi
     /**
      * Retrieves data from an endpoint
      *
-     * @return string|null
+     * @param string $endpoint
+     * @return mixed
      */
-    public function retrieveDocument(): ?string;
+    public function retrieveDocument(string $endpoint);
 }

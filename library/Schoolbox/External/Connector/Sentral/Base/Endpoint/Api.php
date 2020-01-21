@@ -118,29 +118,28 @@ class Api implements IApi
     /**
      * Retrieves endpoint data representing the result from the API call.
      *
-     * @return string|null
-     * @throws RuntimeException if the retrieval of the endpoint failed
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @param string $endpoint
+     * @return mixed
+     * @throws DomainException
      */
-    public function retrieveDocument(): ?string
+    public function retrieveDocument(string $endpoint)
     {
-        $curl = $this->initCurl();
-        $curl->exec();
+        $response = $this->client->request('GET', $endpoint);
 
-        if (empty($curl->getErrors())) {
-            // Too big to parse
-            return $curl->getResult();
+        try {
+            $decoded = json_decode($response->getBody()->getContents());
+        } catch (\RuntimeException $e) {
+            throw new \DomainException('Could not json_decode payload; did something snap?');
         }
 
-        throw new RuntimeException(
-            sprintf(
-                'Endpoint retrieval failed: response code %d, message: %s',
-                $curl->getResponseCode(),
-                implode(', ', $curl->getErrors())
-            ),
-            $curl->getResponseCode()
-        );
+        /* When you can't decode the json, sentral's given you something unexpected
+         * like an error string, or lost in transmission, etc.
+         */
+        if ($decoded === null) {
+            throw new \DomainException('Could not json_decode payload in sentral api; did something snap?');
+        }
+
+        return $decoded;
     }
 
 
