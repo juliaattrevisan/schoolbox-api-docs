@@ -77,6 +77,14 @@ class DemoData
      * * User W - published self-assessed, draft instructor-given feedback
      * * User X - published self-assessed, published instructor-given feedback
      * * User Z - published self-assessed and instructor-given feedback, published self-assessed feedback
+     * * User 0 - no response, unpublished feedback requires resubmit
+     * * User 1 - no response, published feedback requires resubmit
+     * * User 2 - no response, first feedback requires resubmit, second doesn't
+     * * User 3 - no response, first feedback doesn't require resubmit, second does
+     * * User 4 - unpublished response, only feedback requires resubmit
+     * * User 5 - published response then a feedback requiring resubmit
+     * * User 6 - a feedback requiring resubmit, then an unpublished response
+     * * User 7 - a feedback requiring resubmit, then a published response
      *
      * @param int $id - The ID to assign to the assessment
      * @return DueWork
@@ -525,6 +533,114 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
         $participantZ->getAllFeedbacks()->add($feedbackZ3);
+
+
+        // User 0 - no response, unpublished feedback requires resubmit
+        $participant0 = $linker->createAndLinkParticipant(self::getDemoStudent('0'), $dueWorkPlan);
+        $feedback0    = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setResubmissionRequired(true);
+        $participant0->getAllFeedbacks()->add($feedback0);
+
+
+        // User 1 - no response, published feedback requires resubmit
+        $participant1 = $linker->createAndLinkParticipant(self::getDemoStudent('1'), $dueWorkPlan);
+        $feedback1    = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setResubmissionRequired(true);
+        $participant1->getAllFeedbacks()->add($feedback1);
+
+
+        // User 2 - no response, first feedback requires resubmit, second doesn't
+        $participant2 = $linker->createAndLinkParticipant(self::getDemoStudent('2'), $dueWorkPlan);
+        $feedback2a   = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setResubmissionRequired(true);
+        $participant2->getAllFeedbacks()->add($feedback2a);
+        $feedback2b   = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now()->addSeconds(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addSeconds(1))
+            ->setResubmissionRequired(false);
+        $participant2->getAllFeedbacks()->add($feedback2b);
+
+
+        // User 3 - no response, first feedback doesn't require resubmit, second does
+        $participant3 = $linker->createAndLinkParticipant(self::getDemoStudent('3'), $dueWorkPlan);
+        $feedback3a   = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setResubmissionRequired(false);
+        $participant3->getAllFeedbacks()->add($feedback3a);
+        $feedback3b   = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now()->addSeconds(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addSeconds(1))
+            ->setResubmissionRequired(true);
+        $participant3->getAllFeedbacks()->add($feedback3b);
+
+
+        // User 4 - unpublished response, only feedback requires resubmit
+        $participant4 = $linker->createAndLinkParticipant(self::getDemoStudent('4'), $dueWorkPlan);
+        $response4    = (new Response())
+            ->setSubmittedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $feedback4    = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setResubmissionRequired(true);
+        $participant4->getAllFeedbacks()->add($feedback4);
+        $participant4->getAllResponses()->add($response4);
+
+
+        // User 5 - published response then a feedback requiring resubmit
+        $participant5 = $linker->createAndLinkParticipant(self::getDemoStudent('5'), $dueWorkPlan);
+        $response5    = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $feedback5    = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now()->addSeconds(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addSeconds(1))
+            ->setResubmissionRequired(true);
+        $participant5->getAllFeedbacks()->add($feedback5);
+        $participant5->getAllResponses()->add($response5);
+
+
+        // User 6 - a feedback requiring resubmit, then an unpublished response
+        $participant6 = $linker->createAndLinkParticipant(self::getDemoStudent('6'), $dueWorkPlan);
+        $feedback6    = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setResubmissionRequired(true);
+        $response6    = (new Response())
+            ->setSubmittedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now()->addSeconds(1));
+        $participant6->getAllFeedbacks()->add($feedback6);
+        $participant6->getAllResponses()->add($response6);
+
+
+        // User 7 - a feedback requiring resubmit, then a published response
+        $participant7 = $linker->createAndLinkParticipant(self::getDemoStudent('7'), $dueWorkPlan);
+        $feedback7    = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setResubmissionRequired(true);
+        $response7    = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now()->addSeconds(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addSeconds(1));
+        $participant7->getAllFeedbacks()->add($feedback7);
+        $participant7->getAllResponses()->add($response7);
 
         return $dueWork;
     }
@@ -1200,6 +1316,18 @@ class DemoData
                 break;
             case 'Z':
                 $user->setFirstname('Zoe (Student)');
+                break;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                $user->setFirstname(sprintf('%d (Student)', $userChar));
                 break;
             default:
                 throw new InvalidArgumentException("Unknown userChar: $userChar");

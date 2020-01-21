@@ -37,6 +37,21 @@ class DueWorkStatus extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @dataProvider providerIsResubmissionRequired
+     * @param Participant $participant
+     * @param bool        $isResubmissionRequired
+     */
+    public function testIsResubmissionRequired(Participant $participant, bool $isResubmissionRequired): void
+    {
+        $expected = $isResubmissionRequired;
+        $actual   = $participant->isResubmissionRequired();
+        $message  = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+
     /**
      * @dataProvider provider_isFeedbackRequired
      * @param Participant $participant
@@ -146,6 +161,83 @@ class DueWorkStatus extends TestCase
                 [$dueWork->getParticipant(DemoData::getDemoStudent('Y')), false],
             "published self-assessed and instructor-given feedback, published self-assessed feedback" =>
                 [$dueWork->getParticipant(DemoData::getDemoStudent('Z')), false],
+        ];
+    }
+
+
+    public function providerIsResubmissionRequired()
+    {
+        $dueWork = DemoData::getDueWork(1)->setAcceptsNone();
+
+        return [
+            "no interaction" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('A')), false],
+            "draft response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('B')), false],
+            "submitted response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('C')), false],
+            "submitted response then draft response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('D')), false],
+            "draft feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('E')), false],
+            "published feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('F')), false],
+            "published feedback then draft feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('G')), false],
+            "submitted response with draft floating feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('H')), false],
+            "submitted response with later published floating feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('I')), false],
+            "submitted response with later draft linked feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('J')), false],
+            "submitted response with published linked feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('K')), false],
+            "submitted response with published linked feedback, then draft response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('L')), false],
+            "submitted response with published floating feedback, then later draft response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('M')), false],
+            "submitted response with published floating feedback, then later submitted response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('N')), false],
+            "draft floating feedback, then later draft response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('O')), false],
+            "draft floating feedback, then later submitted response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('P')), false],
+            "published floating feedback, then later draft response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('Q')), false],
+            "published floating feedback, then later submitted response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('R')), false],
+            "unpublished self-assessed feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('S')), false],
+            "published self-assessed feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('T')), false],
+            "unpublished self-assessed floating feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('U')), false],
+            "published self-assessed floating feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('V')), false],
+            "published self-assessed, draft instructor-given feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('W')), false],
+            "published self-assessed, published instructor-given feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('X')), false],
+            "published self-assessed and instructor-given feedback, draft self-assessed feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('Y')), false],
+            "published self-assessed and instructor-given feedback, published self-assessed feedback" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('Z')), false],
+            "no response, unpublished feedback requires resubmit" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('0')), false],
+            "no response, published feedback requires resubmit" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('1')), true],
+            "no response, first feedback requires resubmit, second doesn't" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('2')), false],
+            "no response, first feedback doesn't require resubmit, second does" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('3')), true],
+            "unpublished response, only feedback requires resubmit" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('4')), true],
+            "published response then a feedback requiring resubmit" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('5')), true],
+            "a feedback requiring resubmit, then an unpublished response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('6')), true],
+            "a feedback requiring resubmit, then a published response" =>
+                [$dueWork->getParticipant(DemoData::getDemoStudent('7')), false],
         ];
     }
 
