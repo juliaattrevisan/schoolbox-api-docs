@@ -31,6 +31,13 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     protected $allFiles;
 
     /**
+     * Is this feedback marked as requiring resubmission?
+     *
+     * @var bool
+     */
+    private $resubmissionRequired = false;
+
+    /**
      * By which work-flow was this feedback created?
      *
      * @var string
@@ -138,6 +145,27 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         $this->allFiles = $allFiles;
         return $this;
     }
+
+
+    /**
+     * @return bool
+     */
+    public function getResubmissionRequired(): bool
+    {
+        return $this->resubmissionRequired;
+    }
+
+
+    /**
+     * @param bool $resubmissionRequired
+     * @return static
+     */
+    public function setResubmissionRequired(bool $resubmissionRequired): self
+    {
+        $this->resubmissionRequired = $resubmissionRequired;
+        return $this;
+    }
+
 
 
     /**

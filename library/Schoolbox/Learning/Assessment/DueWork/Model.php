@@ -200,6 +200,35 @@ class Model extends AbstractAssessment implements ISelfAssessable
         return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
     }
 
+
+    /**
+     * The due work assessment type implements the resubmission state: resubmit
+     * is required if:
+     * * the most recent interaction is an instructor-given feedback
+     * * that feedback is marked as requiring resubmission
+     *
+     * @inheritdoc
+     */
+    public function isResubmissionRequired(Participant $participant): bool
+    {
+        $this->assertSameAssessment($participant);
+
+        // There must be a most recent feedback in order to determine resubmission
+        $mostRecentFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+        if (!$mostRecentFeedback instanceof Feedback\Model) {
+            return false;
+        }
+
+        // The feedback must be the most recent interaction
+        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
+        if (!$mostRecentResponse || $mostRecentResponse->getSubmittedAt()->lt($mostRecentFeedback->getPublishedAt())) {
+            return $mostRecentFeedback->getResubmissionRequired();
+        }
+
+        return false;
+    }
+
+
     /**
      * Work out if we are going to accept responses
      *

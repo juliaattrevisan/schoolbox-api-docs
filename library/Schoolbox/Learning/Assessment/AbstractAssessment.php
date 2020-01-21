@@ -445,12 +445,6 @@ abstract class AbstractAssessment implements IAssessable
         $this->assertSameAssessment($participant);
 
         return false;
-
-//        // Resubmission is a state on the feedback, nowhere else
-//        $latestPublishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
-//        if (!$latestPublishedFeedback) {
-//            return false;
-//        }
     }
 
 
