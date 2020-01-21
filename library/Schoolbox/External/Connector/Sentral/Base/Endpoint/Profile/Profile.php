@@ -200,17 +200,17 @@ class Profile implements IStrategy
 
             /* TODO Fill in these basic student vars
              */
-            $externalId = '';
+            $externalId = '';       // got this
             $username = '';
-            $title = '';
-            $firstname = '';
-            $lastname = '';
+            $title = '';            // got this
+            $firstname = '';        // got this
+            $lastname = '';         // got this
             $campus = '';
-            $dob = '';
-            $email = '';
+            $dob = '';              // got this
+            $email = '';            // got this
             $enrolmentDate = '';
             $form = '';
-            $gender = '';
+            $gender = '';           // got this
             $academicHouse = '';
             $leavingDate = '';
             $legal = '';
@@ -227,8 +227,8 @@ class Profile implements IStrategy
             $boardingStatus = false;
             $esl = false;
             $ib = false;
-            $ilp = false;
-            $medicalAlert = '';
+            $ilp = false;           // got this
+            $medicalAlert = '';     // got this
             $messages = '';
             $specialNeeds = false;
             $comments = '';
