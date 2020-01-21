@@ -70,6 +70,13 @@ class DemoData
      * * User P - draft floating feedback, then later submitted response
      * * User Q - published floating feedback, then later draft response
      * * User R - published floating feedback, then later submitted response
+     * * User S - unpublished self-assessed feedback
+     * * User T - published self-assessed feedback
+     * * User U - unpublished self-assessed floating feedback
+     * * User V - published self-assessed floating feedback
+     * * User W - published self-assessed, draft instructor-given feedback
+     * * User X - published self-assessed, published instructor-given feedback
+     * * User Z - published self-assessed and instructor-given feedback, published self-assessed feedback
      *
      * @param int $id - The ID to assign to the assessment
      * @return DueWork
