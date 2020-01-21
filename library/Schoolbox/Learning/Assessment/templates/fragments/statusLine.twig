@@ -56,7 +56,10 @@
         {% endspaceless -%}
     {% endset %}
 
-    <span data-assessment-status-light class="progress-tick no-text tiny {{ pStatusClass }}" title="{{ pTooltip }}"></span>
-    <span data-assessment-status-text>{{ pStatusText }}</span>
+    <span data-status
+          data-assessment-status-light
+          class="progress-tick no-text tiny {{ pStatusClass }}" title="{{ pTooltip }}"></span>
+    <span data-status-label
+          data-assessment-status-text>{{ pStatusText }}</span>
 
 {% endif %}
