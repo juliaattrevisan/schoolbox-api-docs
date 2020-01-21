@@ -455,12 +455,18 @@ class Model extends AbstractAssessment implements ISelfAssessable
             return true;
         }
 
-        // Has student not submitted their single permitted response ?
-        if ($this->isAcceptSingle() && !$participant->hasSubmittedResponse()) {
-            return true;
+        // Has student not submitted their single permitted response,
+        // or do they need to resubmit?
+        if ($this->isAcceptSingle()) {
+            if (!$participant->hasSubmittedResponse()) {
+                return true;
+            }
+            if ($participant->isResubmissionRequired()) {
+                return true;
+            }
         }
 
-        // Logically impossible - but be defensive
+        // If all other cases are fallen through?
         return false;
     }
 
