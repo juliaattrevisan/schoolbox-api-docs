@@ -13,3 +13,12 @@ ALTER TABLE `luResidentialHouse`
 # backfill sequence with id to mimic its current ordering
 UPDATE `luResidentialHouse`
 SET `luResidentialHouse`.sequence = `luResidentialHouse`.id;
+
+# backfill updated_by with Alaress user id
+UPDATE `luResidentialHouse`
+SET `updated_by` = (SELECT `user`.`id` FROM `user` WHERE username LIKE 'alaress');
+
+SET FOREIGN_KEY_CHECKS = 0;
+ALTER TABLE `luResidentialHouse`
+    MODIFY COLUMN `updated_by` INT(11) UNSIGNED NOT NULL;
+SET FOREIGN_KEY_CHECKS = 1;
