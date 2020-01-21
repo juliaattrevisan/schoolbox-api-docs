@@ -104,7 +104,6 @@ class EmergencyContacts
      */
     public function getRecords(): ?array
     {
-        new \Alaress_Probe($this->stack);
         return $this->stack;
     }
 }
