@@ -33,6 +33,23 @@ class CampusMapper extends Mapper {
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'campusHasUsers']);
+    }
+
+    /**
+     * This callback is to ensure the campus does not have
+     * any user assigned to it before soft deletion
+     *
+     * @param Campus $campus
+     * @return bool
+     */
+    public function campusHasUsers(Campus $campus): bool
+    {
+        if ($this->findUsersInCampus($campus)->count() > 0) {
+            return false;
+        }
+        return true;
     }
 
 	/**
