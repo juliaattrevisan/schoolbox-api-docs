@@ -65,7 +65,7 @@ class Medical
 
         /* Always process the first page
          */
-        $nextUrl = $this->processRecords('enrolments/medical-condition');
+        $nextUrl = $this->processRecords('enrolments/medical-condition?limit=200');
 
         /* If there are more pages, grab them too
          */

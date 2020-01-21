@@ -65,7 +65,7 @@ class EmergencyContacts
 
         /* Always process the first page
          */
-        $nextUrl = $this->processRecords('enrolments/emergency-contact-link');
+        $nextUrl = $this->processRecords('enrolments/emergency-contact-link?limit=200');
 
         /* If there are more pages, grab them too
          */
