@@ -20,6 +20,10 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper
         $this->uses('code', self::TYPE_STRING);
         $this->uses('display_as', self::TYPE_STRING);
         $this->uses('normalise_as', self::TYPE_DECIMAL);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
 
     /**
@@ -48,4 +52,9 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper
         return $disp;
     }
 
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }

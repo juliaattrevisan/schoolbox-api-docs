@@ -6,8 +6,16 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class DueWork_Error
+
+use \Schoolbox\Sequential;
+use \Schoolbox\Mapper\Traits\Model as ModelTrait;
+
+class DueWork_Error implements Sequential
 {
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\HasSequence;
 
     /**
      * @var int
