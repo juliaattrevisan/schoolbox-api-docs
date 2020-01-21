@@ -129,14 +129,31 @@ class Api implements IApi
         try {
             $decoded = json_decode($response->getBody()->getContents(), true);
         } catch (\RuntimeException $e) {
-            throw new \DomainException('Could not json_decode payload; did something snap?');
+            throw new \DomainException('Sentral Endpoint error: could not json_decode payload; did something snap?');
         }
 
         /* When you can't decode the json, sentral's given you something unexpected
          * like an error string, or lost in transmission, etc.
          */
         if ($decoded === null) {
-            throw new \DomainException('Could not json_decode payload in sentral api; did something snap?');
+            throw new \DomainException('Sentral Endpoint error: could not json_decode payload; did something snap?');
+        }
+
+        /* Check for error payload instead of data payload
+         */
+        if (array_key_exists('errors', $decoded)) {
+
+            /* Error Handling - sometimes their messages are unhelpful, but at least they return
+             * it in a synonymous data structure. There might be multiple errors (I haven't seen how)
+             * so we'll just return the first one in the list for starters
+             *
+             * Anyway, errors might get thrown if your host, tenant or key is incorrect
+             *   - The host should end with a trailing slash
+             */
+            throw new \DomainException(sprintf(
+                'Sentral Endpoint error: %s',
+                "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
+            ));
         }
 
         return $decoded;
