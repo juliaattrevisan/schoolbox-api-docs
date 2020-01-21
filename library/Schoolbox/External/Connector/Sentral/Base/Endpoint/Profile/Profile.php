@@ -170,6 +170,23 @@ class Profile implements IStrategy
     private function importStudents(): void
     {
 
+        /* Sentral gives you paginated data, at most, 200 per page
+         * Though they give you 200 people per page, each person comes
+         * with accessory data which you kind of have to manually compile
+         * Therefore you might get more elements per page than you thought,
+         * but regardless of how many elements you actually get, it's for
+         * (at most) 200 people.
+         */
+        $relationshipIterator = new RelationshipIterator($this->api->retrieveDocument('enrolments/student-contact?include=person,student,studentPerson&limit=200'));
+
+//        while (array_key_exists('next', $data['links'])) {
+//
+//            /* Process each page of data
+//             */
+//        }
+
+
+
         /* TODO Get a set of students that we need to process
          */
         $students = [];
