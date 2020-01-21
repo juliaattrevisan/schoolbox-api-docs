@@ -24,6 +24,7 @@ $f-dropdown-icon-align: 0.25rem;
     overflow-x: hidden;
 
     &.drop-top {
+        max-height: none;
         overflow: visible;
         z-index: 1002;
     }
