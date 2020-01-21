@@ -975,8 +975,8 @@ class DueWorkTest extends TestCase
      */
     public function testCanLearnerCreateResponseWhenFeedbackRequiresResubmission(): void
     {
-        $dueWorkOpenDate  = \Alaress_Date_Format::now()->addDays(-1);
-        $dueWorkCloseDate = \Alaress_Date_Format::now()->addDays(1);
+        $dueWorkOpenDate  = \Alaress_Date_Format::now()->addDays(-1)->startOfDay();
+        $dueWorkCloseDate = \Alaress_Date_Format::now()->addDays(1)->endOfDay();
         $dueWork          = $this->spawnDueWork()
                                  ->setAcceptsSingle()
                                  ->setContext(new FolderModel())
