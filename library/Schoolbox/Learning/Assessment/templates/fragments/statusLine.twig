@@ -39,6 +39,10 @@
                         late
                     {% endif %}
                 {% endif %}
+            {% elseif participant.resubmissionRequired %}
+                {% set pStatusClass = 'failed' %}
+                {% set pTooltip = 'Resubmission Required' %}
+                Resubmission Required
             {% else %}
                 {# implicitly 'ReviewComplete' state if not 'ResponseRequired' or 'FeedbackRequired' #}
                 {% set pStatusClass = 'reviewed' %}
