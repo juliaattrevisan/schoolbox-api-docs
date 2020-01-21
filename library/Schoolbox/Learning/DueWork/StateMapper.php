@@ -7,15 +7,20 @@
  */
 
 /**
- * @method DueWork_Error findOneByColumn($columnName, $columnValue, array $options = [])
+ * @method State findOneByColumn($columnName, $columnValue, array $options = [])
  */
-class DueWork_ErrorMapper extends Schoolbox\Mapper
+
+namespace Schoolbox\Learning\DueWork;
+
+use Schoolbox\Mapper;
+
+class StateMapper extends Mapper
 {
 
     protected function mapping()
     {
         $this->hasTable('submission_errors');
-        $this->hasModel(DueWork_Error::class);
+        $this->hasModel(State::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('code', self::TYPE_STRING);
         $this->uses('display_as', self::TYPE_STRING);
@@ -46,7 +51,7 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper
         $errs = $this->findAll();
         $disp = array();
         foreach ($errs as $e) {
-            /* @var $e DueWork_Error */
+            /* @var $e State */
             $disp[] = $e->getDisplayAs();
         }
         return $disp;

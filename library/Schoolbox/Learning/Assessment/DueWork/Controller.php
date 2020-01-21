@@ -12,7 +12,7 @@ use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
-use DueWork_ErrorMapper;
+use StateMapper;
 use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
@@ -166,7 +166,7 @@ class Controller extends Assessment\Controller
         // Only display download link if there are actually files to download
 
         $twigData = [
-            'errors'         => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'errors'         => StateMapper::getInstance()->listDisplayValues(),
             'type'           => Assessment\AssessmentType::objectToString($assessment),
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),

@@ -7,10 +7,12 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Schoolbox\Learning\DueWork;
+
 use \Schoolbox\Sequential;
 use \Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class DueWork_Error implements Sequential
+class State implements Sequential
 {
     use ModelTrait\UpdatedBy;
     use ModelTrait\CreatedAtDate;

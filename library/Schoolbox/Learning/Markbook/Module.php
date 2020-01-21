@@ -22,7 +22,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term;
 use Schoolbox\UserMapper;
 use Schoolbox\Error;
-use DueWork_ErrorMapper;
+use StateMapper;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Filter;
 
@@ -111,8 +111,8 @@ class Module extends BaseModule
                 'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-                'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
-                'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
+                'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(StateMapper::class),
+                'access'                     => $this->getMapperFactory()->getLazy(Access::class),// Has a static 'getInstance()' method
                 'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
                 'filterFactoryFactory'       => $injector->lazyGet('filters.factoryFactory'),
             ])

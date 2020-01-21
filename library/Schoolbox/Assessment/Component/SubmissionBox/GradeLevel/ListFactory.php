@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
-use DueWork_ErrorMapper;
+use StateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 
@@ -21,7 +21,7 @@ class ListFactory
     protected $gradeLevelMapper;
 
     /**
-     * @var DueWork_ErrorMapper
+     * @var StateMapper
      */
     protected $errorGradeMapper;
 
@@ -33,7 +33,7 @@ class ListFactory
     public function __construct()
     {
         $this->gradeLevelMapper = new Mapper();
-        $this->errorGradeMapper = new DueWork_ErrorMapper();
+        $this->errorGradeMapper = new StateMapper();
     }
 
     /**
@@ -78,7 +78,7 @@ class ListFactory
             ));
 
             // Options built from errors
-            foreach (\DueWork_ErrorMapper::getInstance()->findAll() as $errorGrade) {
+            foreach (\StateMapper::getInstance()->findAll() as $errorGrade) {
                 $errorOption = new Model();
                 $errorOption
                     ->setId($errorGrade->getDisplayAs())

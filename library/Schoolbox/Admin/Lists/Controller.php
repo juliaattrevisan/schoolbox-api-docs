@@ -19,7 +19,7 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 use Component_DefinitionMapper;
-use DueWork_ErrorMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use HouseMapper;
 use HouseResidentialMapper;
 use ReflectionClass;
@@ -504,7 +504,7 @@ class Controller extends Base
             ],
             'submission-errors'     => [
                 'title'             => 'Submission States',
-                'mapper'            => DueWork_ErrorMapper::class,
+                'mapper'            => StateMapper::class,
                 'fields'            => [
                     'code'          => [
                         'caption'   => 'Code',

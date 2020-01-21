@@ -194,7 +194,7 @@ class Factory
                     ->setHumanReadableMark($humanReadableMark);
             }
             catch (\InvalidArgumentException $e) {
-                $code = \DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $this->mark);
+                $code = \StateMapper::getInstance()->findOneByColumn('display_as', $this->mark);
 
                 $feedback
                     ->setNormalisedMark($code->getNormaliseAs())
