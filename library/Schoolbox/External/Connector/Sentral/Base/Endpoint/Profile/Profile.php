@@ -431,7 +431,7 @@ class Profile implements IStrategy
 
             /* Add their parents' profile data
              */
-            $this->importParentsOfStudent($externalId, $studentBaseProfile);
+            $this->importParentsOfStudent($student, $studentBaseProfile);
         }
     }
 
@@ -623,36 +623,32 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param string            $studentExternalId
+     * @param array             $student
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws PDOException
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(array $student, UserProfile\Model $studentBaseProfile): void
     {
-        $parents = [];
+        $parents = [$student['parent']];
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
          */
         foreach ($parents as $parent) {
-
-            /* TODO Fill in these basic parent vars
-             */
-            $externalId = '';
-            $username = '';
-            $firstname = '';
-            $lastname = '';
-            $email = '';
-            $phoneHome = '';
-            $phoneWork = '';
-            $phoneMobile = '';
-            $relationship = '';
-            $title = '';
+            $externalId = $parent['externalId'];
+            $username = $parent['externalId'];
+            $title = $parent['title'];
+            $firstname = $parent['firstnaem'];
+            $lastname = $parent['lastname'];
+            $email = $parent['email'];
+            $phoneHome = $parent['phone']['home telephone number'] ? $parent['phone']['home telephone number'][0] : null;
+            $phoneWork = $parent['phone']['work telephone number'] ? $parent['phone']['work telephone number'][0] : null;
+            $phoneMobile = $parent['phone']['mobile'] ? $parent['phone']['mobile'][0] : null;
+            $relationship = $parent['relation'];
 
             /* Parents without usernames are skipped
              */
