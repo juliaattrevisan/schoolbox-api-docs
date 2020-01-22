@@ -15,6 +15,7 @@ use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\EmergencyContacts;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Enrolment;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\LearningPlans;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Medical;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -180,6 +181,7 @@ class Profile implements IStrategy
         $lookups['medical'] = (new Medical($this->api))->compile()->getRecords();
         $lookups['emergencyContacts'] = (new EmergencyContacts($this->api))->compile()->getRecords();
         $lookups['learningPlans'] = (new LearningPlans($this->api))->compile()->getRecords();
+        $lookups['enrolment'] = (new Enrolment($this->api))->compile()->getRecords();
 
         /* Sentral gives you paginated data, at most, 200 per page
          * Though they give you 200 people per page, each person comes
@@ -210,23 +212,23 @@ class Profile implements IStrategy
             $campus = '';
             $dob = '';              // got this
             $email = '';            // got this
-            $enrolmentDate = '';
+            $enrolmentDate = '';    // got this
             $form = '';
             $gender = '';           // got this
             $academicHouse = '';
-            $leavingDate = '';
+            $leavingDate = '';      // got this
             $legal = '';
             $mobile = '';
             $studiesCode = '';
             $tutor = '';
             $tutorGroup = '';
-            $yearLevel = '';
+            $yearLevel = '';        // got this
 
             /* Flags
              */
             /* TODO Fill in these flag vars
              */
-            $boardingStatus = false;
+            $boardingStatus = false;// got this
             $esl = false;
             $ib = false;
             $ilp = false;           // got this

@@ -54,7 +54,7 @@ class EmergencyContacts
 
 
     /**
-     * Compile a lookup of medical data
+     * Compile a lookup of emergency contact
      *
      * @return $this
      * @throws UnexpectedValueException
