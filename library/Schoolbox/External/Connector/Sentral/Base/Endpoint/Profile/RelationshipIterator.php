@@ -133,6 +133,7 @@ class RelationshipIterator implements Iterator
                 'email' => $parent['attributes']['email'],
                 'gender' => $parent['attributes']['gender'],
                 'phone' => $this->lookups['phone'][$parentPersonId],
+                'relation' => $current['attributes']['relationName'],
                 'links' => $parent['links'],
             ] : null,
         ];
