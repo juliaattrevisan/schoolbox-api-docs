@@ -46,6 +46,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Prevent infinite loop of api calls
+     */
+    private const MAX_CALLS = 1000;
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -197,16 +203,34 @@ class Profile implements IStrategy
         ));
 
         /* Sentral gives you paginated data, at most, 200 per page
-         * Though they give you 200 people per page, each person comes
-         * with accessory data which you kind of have to manually compile
-         * Therefore you might get more elements per page than you thought,
-         * but regardless of how many elements you actually get, it's for
-         * (at most) 200 people.
+         *
+         * Process multiple pages until there are none remaining, or if something is really stuffed,
+         * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $relationshipIterator = new RelationshipIterator(
-            $this->api->retrieveDocument('enrolments/student-contact?include=person,student,studentPerson&limit=200'),
-            $lookups
-        );
+        $nextUrl = 'enrolments/student-contact?include=person,student,studentPerson&limit=200';
+
+        for ($i =0 ; $nextUrl && $i < self::MAX_CALLS; $i++) {
+            $nextUrl = $this->processOne($nextUrl, $lookups);
+        }
+    }
+
+
+    /**
+     * Process one page of user data
+     *
+     * @param string $nextUrl
+     * @param array  $lookups
+     * @return string|null
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function processOne(string $nextUrl, array $lookups): ?string
+    {
+        $payload = $this->api->retrieveDocument($nextUrl);
+
+        $relationshipIterator = new RelationshipIterator($payload, $lookups);
 
         /** @var Student $student */
         foreach ($relationshipIterator as $relation) {
@@ -440,6 +464,8 @@ class Profile implements IStrategy
              */
             $this->importParentsOfStudent($relation, $studentBaseProfile);
         }
+
+        return $payload['links']['next'];
     }
 
 
