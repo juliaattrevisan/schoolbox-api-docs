@@ -264,24 +264,24 @@ class Profile implements IStrategy
 
             $dob = $relation['student']['dob'];
             $email = $relation['student']['email'];
-            $enrolmentDate = $relation['student']['enrolment']['startDate'] ?? null;
+            $enrolmentDate = $relation['student']['enrolment']['startDate'];
             $form = '';
             $gender = $relation['student']['gender'];
             $academicHouse = '';
-            $leavingDate = $relation['student']['enrolment']['endDate'] ?? null;
+            $leavingDate = $relation['student']['enrolment']['endDate'];
             $legal = '';
-            $mobile = $relation['student']['phone']['mobile'][0] ?? null;
+            $mobile = $relation['student']['phone']['mobile'][0];
             $studiesCode = '';
 
             // rollclass, maybe?
             $tutor = '';
             $tutorGroup = '';
 
-            $yearLevel = $relation['student']['enrolment']['year'] ?? null;
+            $yearLevel = $relation['student']['enrolment']['year'];
 
             /* Flags
              */
-            $boardingStatus = (bool)($relation['student']['enrolment']['isBoarding'] ?? false);
+            $boardingStatus = (bool)$relation['student']['enrolment']['isBoarding'];
             $esl = false;
             $ib = false;
             $ilp = false;
@@ -677,9 +677,9 @@ class Profile implements IStrategy
             $firstname = $parent['firstname'];
             $lastname = $parent['lastname'];
             $email = $parent['email'];
-            $phoneHome = $parent['phone']['home telephone number'][0] ?? null;
-            $phoneWork = $parent['phone']['work telephone number'][0] ?? null;
-            $phoneMobile = $parent['phone']['mobile'][0] ?? null;
+            $phoneHome = $parent['phone']['home telephone number'][0];
+            $phoneWork = $parent['phone']['work telephone number'][0];
+            $phoneMobile = $parent['phone']['mobile'][0];
             $relationship = $parent['relation'];
 
             /* Parents without usernames are skipped

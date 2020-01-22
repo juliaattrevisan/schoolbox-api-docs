@@ -113,11 +113,21 @@ class RelationshipIterator implements Iterator
                 'dob' => $student['relationships']['person']['attributes']['dateOfBirth'],
                 'email' => $student['relationships']['person']['attributes']['email'],
                 'emergencyContacts' => $this->lookups['emergencyContacts'][$studentPersonId] ?? [],
-                'enrolment' => $this->lookups['enrolment'][$studentId] ?? [],
+                'enrolment' => $this->lookups['enrolment'][$studentId] ?? [
+                    'startDate' => null,
+                    'endDate' => null,
+                    'year' => null,
+                    'isBoarding' => false,
+                    'isActive' => false,
+                ],
                 'gender' => $student['relationships']['person']['attributes']['gender'],
                 'learningPlans' => $this->lookups['learningPlans'][$studentId] ?? 0,
                 'medical' => $this->lookups['medical'][$studentPersonId] ?? [],
-                'phone' => $this->lookups['phone'][$studentPersonId] ?? [],
+                'phone' => $this->lookups['phone'][$studentPersonId] ?? [
+                    'mobile' => [
+                        null
+                    ]
+                ],
                 'links' => $student['links']
             ] : null,
             'parent' => $parent ? [
@@ -132,7 +142,17 @@ class RelationshipIterator implements Iterator
                 'dob' => $parent['attributes']['dateOfBirth'],
                 'email' => $parent['attributes']['email'],
                 'gender' => $parent['attributes']['gender'],
-                'phone' => $this->lookups['phone'][$parentPersonId] ?? [],
+                'phone' => $this->lookups['phone'][$parentPersonId] ??  [
+                    'mobile' => [
+                        null
+                    ],
+                    'home telephone number' => [
+                        null
+                    ],
+                    'work telephone number' => [
+                        null
+                    ]
+                ],
                 'relation' => $current['attributes']['relationName'],
                 'links' => $parent['links'],
             ] : null,
