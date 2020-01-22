@@ -94,6 +94,7 @@
                 publishedText: 'Feedback published',
 
                 reviewedText: 'Reviewed',
+                resubmissionRequiredText: 'Resubmission Required',
 
                 // Callbacks to execute upon initiation and successful completion of Draft and Publish actions
                 onPreDraftCallback: $.noop,
@@ -158,15 +159,16 @@
                 });
 
                 // Publish submits everything
-                var formData = $form.serializeArray();
+                var formData             = $form.serializeArray(),
+                    resubmissionRequired = false;
                 formData.push({name: 'publish', value: 1});
 
                 config.onPrePublishCallback(participantId, formData);
 
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
-                    data:  formData,
-                    type: 'post'
+                    data:     formData,
+                    type:     'post'
                 }).done(function (response) {
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
@@ -181,16 +183,21 @@
 
                     // Update this participant's status:
                     // need to be able to differentiate between reviewed and resubmit required somehow
-                    $participant.attr('data-status', config.statusReviewed);
+                    var status = resubmissionRequired ? config.statusResubmissionRequired : config.statusReviewed,
+                        title  = resubmissionRequired ? config.resubmissionRequiredText   : config.reviewedText;
+                    $participant.attr('data-status', status);
 
                     // Update the icon
                     $participant.find('[data-status]')
-                        .removeClass(config.statusIncomplete + ' ' + config.statusPending)
-                        .addClass(config.statusReviewed)
-                        .attr('title', config.reviewedText);
+                        .removeClass(config.statusPending)
+                        .removeClass(config.statusIncomplete)
+                        .removeClass(config.statusReviewed)
+                        .removeClass(config.statusResubmissionRequired)
+                        .addClass(status)
+                        .attr('title', title);
 
                     // Update the text
-                    $participant.find('[data-status-label]').html(config.reviewedText);
+                    $participant.find('[data-status-label]').html(title);
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
