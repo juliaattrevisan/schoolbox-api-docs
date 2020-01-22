@@ -258,7 +258,7 @@ class Profile implements IStrategy
             $academicHouse = '';
             $leavingDate = $relation['student']['enrolment']['endDate'];
             $legal = '';
-            $mobile = $relation['student']['phone']['mobile'][0];
+            $mobile = $relation['student']['phone']['mobile'][0] ?? null;
             $studiesCode = '';
 
             // rollclass, maybe?
@@ -687,9 +687,9 @@ class Profile implements IStrategy
             $firstname = $parent['firstname'];
             $lastname = $parent['lastname'];
             $email = $parent['email'];
-            $phoneHome = $parent['phone']['home telephone number'][0];
-            $phoneWork = $parent['phone']['work telephone number'][0];
-            $phoneMobile = $parent['phone']['mobile'][0];
+            $phoneHome = $parent['phone']['home telephone number'][0] ?? null;
+            $phoneWork = $parent['phone']['work telephone number'][0] ?? null;
+            $phoneMobile = $parent['phone']['mobile'][0] ?? null;
             $relationship = $parent['relation'];
 
             /* Parents without externalIds are skipped

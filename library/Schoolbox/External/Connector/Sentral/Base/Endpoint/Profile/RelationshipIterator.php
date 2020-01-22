@@ -123,11 +123,7 @@ class RelationshipIterator implements Iterator
                 'gender' => $student['relationships']['person']['attributes']['gender'],
                 'learningPlans' => $this->lookups['learningPlans'][$studentId] ?? 0,
                 'medical' => $this->lookups['medical'][$studentPersonId] ?? [],
-                'phone' => $this->lookups['phone'][$studentPersonId] ?? [
-                    'mobile' => [
-                        null
-                    ]
-                ],
+                'phone' => $this->lookups['phone'][$studentPersonId] ?? [],
                 'links' => $student['links']
             ] : null,
             'parent' => $parent ? [
@@ -142,17 +138,7 @@ class RelationshipIterator implements Iterator
                 'dob' => $parent['attributes']['dateOfBirth'],
                 'email' => $parent['attributes']['email'],
                 'gender' => $parent['attributes']['gender'],
-                'phone' => $this->lookups['phone'][$parentPersonId] ??  [
-                    'mobile' => [
-                        null
-                    ],
-                    'home telephone number' => [
-                        null
-                    ],
-                    'work telephone number' => [
-                        null
-                    ]
-                ],
+                'phone' => $this->lookups['phone'][$parentPersonId] ?? [],
                 'relation' => $current['attributes']['relationName'],
                 'links' => $parent['links'],
             ] : null,
