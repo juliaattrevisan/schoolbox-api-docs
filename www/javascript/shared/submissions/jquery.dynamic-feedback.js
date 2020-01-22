@@ -272,10 +272,12 @@
             // We passed in  a 'this' to apply() which was already a jquery object
             var $this = this;
 
-            // Ignore if not an attach-zone or rubric mark, and the value has not changed since previously saved
-            var isAttachZoneOrRubricMark = $this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 );
-            if (!isAttachZoneOrRubricMark && $this.val() == $this.data('preval')) {
-                return;
+            // Don't ignore if an attachzone, rubric mark or resubmit required checkbox
+            // Otherwise, ignore if its value hasn't changed since last save
+            if (!($this.is('.attachzone') || $this.is('[name="resubmissionRequired"]') || $this.is('[name^="rubric"]'))) {
+                if ($this.val() == $this.data('preval')) {
+                    return;
+                }
             }
 
             // update the pre-value
