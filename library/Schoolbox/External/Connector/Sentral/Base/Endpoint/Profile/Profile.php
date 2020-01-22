@@ -692,6 +692,17 @@ class Profile implements IStrategy
             $phoneMobile = $parent['phone']['mobile'][0] ?? null;
             $relationship = $parent['relation'];
 
+            /* Disregard inactive parents
+             */
+            if (!$relation['parent']['active']) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for parent %s - parent is inactive',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
+
             /* Parents without externalIds are skipped
              */
             if ('' === $externalId) {
