@@ -209,7 +209,7 @@ class Profile implements IStrategy
          */
         $nextUrl = 'enrolments/student-contact?include=person,student,studentPerson&limit=200';
 
-        for ($i =0 ; $nextUrl && $i < self::MAX_CALLS; $i++) {
+        for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $nextUrl = $this->processOne($nextUrl, $lookups);
         }
     }
@@ -475,7 +475,7 @@ class Profile implements IStrategy
             $this->importParentsOfStudent($relation, $studentBaseProfile);
         }
 
-        return $payload['links']['next'];
+        return $payload['links']['next'] ?? null;
     }
 
 
