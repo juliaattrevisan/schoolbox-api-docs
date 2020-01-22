@@ -292,6 +292,7 @@ class Queue extends ResourceVideo
             " -y" .
             ' -nostats' .
             " -i {$filenameSourceEscaped}" .
+            ' -max_muxing_queue_size 1024'.
             " -c:v libx264 {$videoMetadata["videoScale"]}" .
             " -preset slow" .
             " -b:v {$videoBitrateEscaped}" .
@@ -332,6 +333,7 @@ class Queue extends ResourceVideo
                 " -y" .
                 ' -nostats' .
                 " -i {$filenameSourceEscaped}" .
+                ' -max_muxing_queue_size 1024'.
                 " -f image2 " .
                 " -ss {$thumbnailSecondsEscaped}" .
                 " -vf {$videoMetadata["thumbScale"]}crop=64:64" .
@@ -354,6 +356,7 @@ class Queue extends ResourceVideo
                 " -y" .
                 ' -nostats' .
                 " -i {$filenameSourceEscaped}" .
+                ' -max_muxing_queue_size 1024'.
                 " -f image2 " .
                 " -ss {$thumbnailSecondsEscaped}" .
                 " -frames:v 1" .
