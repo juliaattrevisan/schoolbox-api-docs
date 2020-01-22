@@ -234,24 +234,12 @@ class Profile implements IStrategy
 
         /** @var Student $student */
         foreach ($relationshipIterator as $relation) {
-
-            /* Disregard inactive students
-             */
-            if (!$relation['student']['active']) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for student %s - student is inactive',
-                    trim("{$relation['student']['firstname']} {$relation['student']['lastname']}")
-                ));
-
-                continue;
-            }
-
-            $externalId = $relation['student']['externalId'];
+            $externalId = (string)$relation['student']['externalId'];
 
             /* Didn't find this, so I guess it's externalId for now
              * Otherwise set it from UPS
              */
-            $username = $relation['student']['externalId'];
+            $username = (string)$relation['student']['externalId'];
 
             $title = $relation['student']['title'];
             $firstname = $relation['student']['firstname'];
@@ -289,6 +277,28 @@ class Profile implements IStrategy
             $messages = '';
             $specialNeeds = false;
             $comments = '';
+
+            /* Disregard inactive students
+             */
+            if (!$relation['student']['active']) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for student %s - student is inactive',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
+
+            /* Disregard inactive students
+             */
+            if ('' === $externalId) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for student %s - no externalId detected',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
 
             /* Students without usernames are skipped
              */
@@ -671,8 +681,8 @@ class Profile implements IStrategy
          * Otherwise make a new one for the given id
          */
         foreach ($parents as $parent) {
-            $externalId = $parent['externalId'];
-            $username = $parent['externalId'];
+            $externalId = (string)$parent['externalId'];
+            $username = (string)$parent['externalId'];
             $title = $parent['title'];
             $firstname = $parent['firstname'];
             $lastname = $parent['lastname'];
@@ -681,6 +691,17 @@ class Profile implements IStrategy
             $phoneWork = $parent['phone']['work telephone number'][0];
             $phoneMobile = $parent['phone']['mobile'][0];
             $relationship = $parent['relation'];
+
+            /* Parents without externalIds are skipped
+             */
+            if ('' === $externalId) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for parent %s - no externalId detected',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
 
             /* Parents without usernames are skipped
              */
