@@ -211,7 +211,7 @@ class Profile implements IStrategy
             $title = '';            // got this
             $firstname = '';        // got this
             $lastname = '';         // got this
-            $campus = '';
+            $campus = '';           // derived from year level, it seems
             $dob = '';              // got this
             $email = '';            // got this
             $enrolmentDate = '';    // got this
