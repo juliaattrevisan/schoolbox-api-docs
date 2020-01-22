@@ -171,6 +171,7 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
+     * @throws \InvalidArgumentException
      */
     private function importStudents(): void
     {
@@ -204,37 +205,52 @@ class Profile implements IStrategy
         /** @var Student $student */
         foreach ($students as $student) {
 
-            /* TODO Fill in these basic student vars
+            /* Disregard inactive students
              */
-            $externalId = '';       // got this
-            $username = '';         // didn't find this, so I guess it's externalId for now
-            $title = '';            // got this
-            $firstname = '';        // got this
-            $lastname = '';         // got this
-            $campus = '';           // derived from year level, it seems
-            $dob = '';              // got this
-            $email = '';            // got this
-            $enrolmentDate = '';    // got this
+            if (!$student['active']) {
+                continue;
+            }
+
+            $externalId = $student['externalId'];
+
+            /* Didn't find this, so I guess it's externalId for now
+             * Otherwise set it from UPS
+             */
+            $username = $student['externalId'];
+
+            $title = $student['title'];
+            $firstname = $student['firstname'];
+            $lastname = $student['lastname'];
+
+            /* Derived from year level, it seems
+             * Set it in UPS
+             */
+            $campus = '';
+
+            $dob = $student['dob'];
+            $email = $student['email'];
+            $enrolmentDate = $student['enrolment']['startDate'];
             $form = '';
-            $gender = '';           // got this
+            $gender = $student['gender'];
             $academicHouse = '';
-            $leavingDate = '';      // got this
+            $leavingDate = $student['enrolment']['endDate'];
             $legal = '';
-            $mobile = '';           // got this
+            $mobile = $student['phone']['mobile'][0];
             $studiesCode = '';
+
+            // rollclass, maybe?
             $tutor = '';
-            $tutorGroup = '';       // rollclass, maybe?
-            $yearLevel = '';        // got this
+            $tutorGroup = '';
+
+            $yearLevel = $student['enrolment']['year'];
 
             /* Flags
              */
-            /* TODO Fill in these flag vars
-             */
-            $boardingStatus = false;// got this
+            $boardingStatus = (bool)$student['enrolment'];
             $esl = false;
             $ib = false;
-            $ilp = false;           // got this (sort of)
-            $medicalAlert = '';     // got this
+            $ilp = false;
+            $medicalAlert = $this->findMedicalAlert($student);
             $messages = '';
             $specialNeeds = false;
             $comments = '';
@@ -297,7 +313,7 @@ class Profile implements IStrategy
 
             /* Fish out medical alerts
              */
-            $alertMedical = $this->findMedicalAlert();
+            $alertMedical = $this->findMedicalAlert($student);
 
             /* Fish out campus name
              */
@@ -305,7 +321,7 @@ class Profile implements IStrategy
 
             /* Emergency Contacts
              */
-            $emergencyContacts = $this->findEmergencyContacts();
+            $emergencyContacts = $this->findEmergencyContacts($student);
 
             /* Find out a staff member via their user code
              */
@@ -373,7 +389,7 @@ class Profile implements IStrategy
              */
             if ($dob) {
                 $studentProfile
-                    ->setDateOfBirth(new Alaress_Date_Format($dob, 'Ymd'));
+                    ->setDateOfBirth($this->findDate($dob));
             }
 
             /**
@@ -464,22 +480,20 @@ class Profile implements IStrategy
     /**
      * Find all the meaningful emergency contacts for a student
      *
+     * @param array $student
      * @return array
      */
-    public function findEmergencyContacts(): array
+    public function findEmergencyContacts(array $student): array
     {
-        $emergencyContacts = [];
+        $emergencyContacts = $student['emergencyContacts'];
         $contacts = [];
         $n = 0;
 
         foreach ($emergencyContacts as $emergencyContact) {
             if ($n < self::MAX_EMERGENCY_CONTACTS) {
-
-                /* TODO Fill in these emergency contact vars
-                 */
-                $fullname = '';
-                $relation = '';
-                $phone = '';
+                $fullname = $emergencyContact['name'];
+                $relation = $emergencyContact['relationship'];
+                $phone = $emergencyContact['phone'];
 
                 /* Suffix the $relation if provided
                  */
@@ -552,13 +566,12 @@ class Profile implements IStrategy
     /**
      * Find medical data for student
      *
+     * @param array $student
      * @return string|null
      */
-    private function findMedicalAlert(): ?string
+    private function findMedicalAlert(array $student): ?string
     {
-        /* TODO Fill in these medical alert vars
-         */
-        return null;
+        return is_array($student['medical']) ? implode("\n", $student['medical']) : null;
     }
 
 
