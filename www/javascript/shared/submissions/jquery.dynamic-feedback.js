@@ -160,7 +160,7 @@
 
                 // Publish submits everything
                 var formData             = $form.serializeArray(),
-                    resubmissionRequired = false;
+                    resubmissionRequired = $form.find('[name="resubmissionRequired"]').prop('checked');
                 formData.push({name: 'publish', value: 1});
 
                 config.onPrePublishCallback(participantId, formData);
