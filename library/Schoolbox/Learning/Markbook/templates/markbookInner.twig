@@ -140,12 +140,12 @@
                         <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
                             {% if participant and not participant.isExcluded %}
                                 {% if assessment is task %}
-                                   {# An icon that shows if the student has attempted the task or not #}
+                                    {# An icon that shows if the student has attempted the task or not #}
                                     {% if studentCount < functionDegradeLimit %}
-                                   {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                        assessment: assessment,
-                                        student: participant.user
-                                    } only %}
+                                        {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                            assessment: assessment,
+                                            student: participant.user
+                                        } only %}
                                     {% else %}
                                         {% if participant.isResponseRequired %}
                                             <div
@@ -166,7 +166,15 @@
                                     {% endif %}
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(true) %}
-                                    {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback ? "Pending" : participant.humanReadableMark(true) | default('–') %}
+                                    {% set label %}
+                                        {% if participant.resubmissionRequired %}
+                                            Resubmit
+                                        {% elseif participant.hasSubmittedResponse and not participant.hasPublishedFeedback %}
+                                            Pending
+                                        {% else %}
+                                            {{ participant.humanReadableMark(true) | default('–') }}
+                                        {% endif %}
+                                    {% endset %}
 
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
