@@ -90,17 +90,19 @@ class Enrolment
         $data = $this->api->retrieveDocument($endpoint);
 
         foreach ($data['data'] as $record) {
-            $studentId = $record['relationships']['student']['data']['id'];
+            if (isset($record['relationships']['student'])) {
+                $studentId = $record['relationships']['student']['data']['id'];
 
-            /* TODO: There's a link to a House here
-             */
-            $this->stack[$studentId] = [
-                'startDate' => $record['attributes']['startDate'],
-                'endDate' => $record['attributes']['endDate'],
-                'year' => $record['attributes']['schoolYear'],
-                'isBoarding' => $record['attributes']['isBoarding'],
-                'isActive' => $record['attributes']['isActive'],
-            ];
+                /* TODO: There's a link to a House here
+                 */
+                $this->stack[$studentId] = [
+                    'startDate' => $record['attributes']['startDate'],
+                    'endDate' => $record['attributes']['endDate'],
+                    'year' => $record['attributes']['schoolYear'],
+                    'isBoarding' => $record['attributes']['isBoarding'],
+                    'isActive' => $record['attributes']['isActive'],
+                ];
+            }
         }
 
         return $data['links']['next'] ?? null;
