@@ -63,6 +63,8 @@ if (count($this->arg) < 3) {
 $classCode         = urldecode(urldecode(urldecode($classCode)));
 $attendancePeriods = explode(',', $attendancePeriods);
 
+$classCampus = empty($classCampus) ? null : $classCampus;
+
 // Finagle PHPLib
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
@@ -168,7 +170,7 @@ if ($class) {
 
     $this->setVar([
         'FILETYPE' => $fileType,
-        'CLASS_CODE' => $class['ClassCampus'] . '/' . $class['ClassCode'],
+        'CLASS_CODE' => $class['ClassCampus'] ? $class['ClassCampus'] . '/' . $class['ClassCode'] : $class['ClassCode'],
         'ATTENDANCE_START' => $startTime,
         'ATTENDANCE_END' => $endTime,
         'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
