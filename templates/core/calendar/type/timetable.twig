@@ -2,7 +2,7 @@
 
 
 {% block eventBubbleSummary %}
-    <h3>{{ event.title }}</h3>
+    <h3 {% if event.periodCancelled %}class="strike"{% endif %}>{{ event.title }}</h3>
     <ul class="meta">
         {# raw HTML reluctantly sanctioned - getEventSpan() should be updated to not output htmlentities #}
         <li class="icon-calendar" title="Date">{% if event.allDay %} {{ event.date | raw }} {% else %} {% if  event.periodName | length %} {{ event.periodName }}: {% endif %}<time>{{ event.eventSpan|raw }}</time> {% endif %}</li>

@@ -77,6 +77,7 @@
                     editable: metadata?.editable,
                     detail: metadata?.detail,
                     location: metadata?.location,
+                    classCancelled: data?.styles?.visible,
                     author: {
                         id: Math.max(0, metadata?.authorId || 0),
                         name: metadata?.author,
@@ -518,7 +519,7 @@
                         <a :href="'/calendar/event/' + eventExtendedProps.eventId" title="Go to event page"><h2>{{ event.title }}</h2></a>
                     </template>
                     <template v-else>
-                        <h2>{{ event.title }}</h2>
+                        <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
                     </template>
                     <meta-list>
                         <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
