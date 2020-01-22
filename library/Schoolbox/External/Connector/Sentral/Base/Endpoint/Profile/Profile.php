@@ -264,11 +264,11 @@ class Profile implements IStrategy
 
             $dob = $relation['student']['dob'];
             $email = $relation['student']['email'];
-            $enrolmentDate = $relation['student']['enrolment']['startDate'];
+            $enrolmentDate = $relation['student']['enrolment']['startDate'] ?? null;
             $form = '';
             $gender = $relation['student']['gender'];
             $academicHouse = '';
-            $leavingDate = $relation['student']['enrolment']['endDate'];
+            $leavingDate = $relation['student']['enrolment']['endDate'] ?? null;
             $legal = '';
             $mobile = $relation['student']['phone']['mobile'][0] ?? null;
             $studiesCode = '';
@@ -277,11 +277,11 @@ class Profile implements IStrategy
             $tutor = '';
             $tutorGroup = '';
 
-            $yearLevel = $relation['student']['enrolment']['year'];
+            $yearLevel = $relation['student']['enrolment']['year'] ?? null;
 
             /* Flags
              */
-            $boardingStatus = (bool)$relation['student']['enrolment'];
+            $boardingStatus = (bool)($relation['student']['enrolment']['isBoarding'] ?? false);
             $esl = false;
             $ib = false;
             $ilp = false;
@@ -750,7 +750,7 @@ class Profile implements IStrategy
             $this->log->info(sprintf(
                 'Adding relation between %s, the %s of %s',
                 trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
-                trim($relationship),
+                trim((string)$relationship),
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
 
@@ -760,7 +760,7 @@ class Profile implements IStrategy
                 $relationship = $this->relationshipMapper->createModel()
                     ->setUserProfile($parentBaseProfile)
                     ->setChildProfile($studentBaseProfile)
-                    ->setType($relationship);
+                    ->setType((string)$relationship);
 
                 $this->relationshipMapper->save($relationship);
             }

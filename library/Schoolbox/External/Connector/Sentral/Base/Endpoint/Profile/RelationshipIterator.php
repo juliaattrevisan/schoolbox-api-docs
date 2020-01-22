@@ -91,9 +91,9 @@ class RelationshipIterator implements Iterator
 
         /* Find parent in the data[included] stack and manually join in their details
          */
-        $parentPersonId = $current['relationships']['person']['data']['id'];
+        $parentPersonId = $current['relationships']['person']['data']['id'] ?? null;
 
-        if (isset($this->relational['person'][$parentPersonId])) {
+        if ($parentPersonId && isset($this->relational['person'][$parentPersonId])) {
             $parent = $this->relational['person'][$parentPersonId];
         }
 
@@ -113,7 +113,7 @@ class RelationshipIterator implements Iterator
                 'dob' => $student['relationships']['person']['attributes']['dateOfBirth'],
                 'email' => $student['relationships']['person']['attributes']['email'],
                 'emergencyContacts' => $this->lookups['emergencyContacts'][$studentPersonId] ?? [],
-                'enrolment' => $this->lookups['enrolment'][$studentId],
+                'enrolment' => $this->lookups['enrolment'][$studentId] ?? [],
                 'gender' => $student['relationships']['person']['attributes']['gender'],
                 'learningPlans' => $this->lookups['learningPlans'][$studentId] ?? 0,
                 'medical' => $this->lookups['medical'][$studentPersonId] ?? [],
