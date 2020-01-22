@@ -613,7 +613,7 @@ class Profile implements IStrategy
      */
     private function findMedicalAlert(?array $medical): ?string
     {
-        return is_array($medical) ? implode("\n", $medical) : null;
+        return is_array($medical) ? implode('; ', array_unique($medical)) : null;
     }
 
 
