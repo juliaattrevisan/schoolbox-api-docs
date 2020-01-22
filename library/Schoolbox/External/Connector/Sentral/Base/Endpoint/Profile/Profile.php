@@ -151,7 +151,7 @@ class Profile implements IStrategy
          */
         $this->log->info('Processing staff.');
 
-        $this->importStaff();
+//        $this->importStaff();
 
         /* Remove any orphaned profiles
          */
@@ -171,7 +171,10 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
-     * @throws \InvalidArgumentException
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function importStudents(): void
     {
