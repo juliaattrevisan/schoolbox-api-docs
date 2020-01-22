@@ -92,7 +92,12 @@ class EmergencyContacts
             $studentPersonId = $record['relationships']['person']['data']['id'];
             $contactPersonId = $record['relationships']['personToContact']['data']['id'];
 
-            $this->stack[$studentPersonId][] = $contactPersonId;
+            $this->stack[$studentPersonId][] = [
+                'contactPersonId' => $contactPersonId,
+                'name' => $record['attributes']['name'],
+                'phone' => $record['attributes']['phone'] ?? $record['attributes']['altPhone'],
+                'relationship' => $record['attributes']['relationship'],
+            ];
         }
 
         return $data['links']['next'] ?? null;
