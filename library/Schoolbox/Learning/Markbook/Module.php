@@ -111,7 +111,7 @@ class Module extends BaseModule
                 'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-                'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(StateMapper::class),
+                'dueWorkStateMapper'         => $this->getMapperFactory()->getLazy(StateMapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class),// Has a static 'getInstance()' method
                 'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
                 'filterFactoryFactory'       => $injector->lazyGet('filters.factoryFactory'),

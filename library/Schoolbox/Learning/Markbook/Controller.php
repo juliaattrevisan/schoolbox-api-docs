@@ -37,7 +37,7 @@ class Controller extends Base
     private $termMapper;
 
     /**  @var StateMapper */
-    private $dueWorkErrorMapper;
+    private $dueWorkStateMapper;
 
     /** @var Access */
     private $access;
@@ -53,7 +53,7 @@ class Controller extends Base
      * @param AssessmentMapperProxy              $assessmentMapperProxy
      * @param GradeGroup\Model                   $defaultGradeGroup
      * @param Term\Mapper                        $termMapper
-     * @param StateMapper                        $dueWorkErrorMapper
+     * @param StateMapper                        $dueWorkStateMapper
      * @param Access                             $access
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\IFactoryFactory             $filterFactoryFactory
@@ -62,7 +62,7 @@ class Controller extends Base
         AssessmentMapperProxy $assessmentMapperProxy,
         GradeGroup\Model $defaultGradeGroup,
         Term\Mapper $termMapper,
-        StateMapper $dueWorkErrorMapper,
+        StateMapper $dueWorkStateMapper,
         Access $access,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Filter\IFactoryFactory $filterFactoryFactory
@@ -70,7 +70,7 @@ class Controller extends Base
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->defaultGradeGroup     = $defaultGradeGroup;
         $this->termMapper            = $termMapper;
-        $this->dueWorkErrorMapper    = $dueWorkErrorMapper;
+        $this->dueWorkStateMapper    = $dueWorkStateMapper;
         $this->access                = $access;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterFactoryFactory  = $filterFactoryFactory;
