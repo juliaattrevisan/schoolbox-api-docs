@@ -12,19 +12,18 @@
     <div class="small-12 island">
         <section class="content">
             <p>
-                This page will allow you to add user data to the School Data Store.
-                The data can then be used by the <a href="{{ routeLookupIfAuthorized('upsRuleset.intro') }}">User Provisioning System</a> to create users in Schoolbox.
-                Additionally, once a user has been added to your instance, information from the database
-                will be visible on the User Profile page.
+                This page allows you to populate your user data into the School User Data Store.
+                This data can then be used by the <a href="{{ routeLookupIfAuthorized('upsRuleset.intro') }}">User Provisioning System</a>
+                to create and update users in Schoolbox and Profile data will be shown on the User Profile screen.
             </p>
 
             <h2>Important Information</h2>
 
             <ul>
                 <li>The files must be in CSV format.</li>
-                <li>When you upload a file, all previous records of the uploaded type will be removed from the database, so the CSV must contain the entire list of current records.</li>
-                <li>All fields are required, empty fields will clear that field’s data for each user.</li>
-                <li>The fields must have the same heading as provided in the template. The order of the headings is not relevant.</li>
+                <li>When you upload a file, all previous data of the uploaded role type will be removed from the database, so the CSV must contain the entire list of current records.</li>
+                <li>Empty fields will clear that field's data for each user.</li>
+                <li>The fields must have the same heading as provided in the template.</li>
             </ul>
         </section>
 
