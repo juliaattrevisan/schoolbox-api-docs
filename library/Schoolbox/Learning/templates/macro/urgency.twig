@@ -11,7 +11,7 @@
         {% set acceptOnline = participant.plan.assessable.acceptOnline|default(true) %}
 
         {# Datetime urgency only has meaning to the logged-in user #}
-        {% if participant.user.id == USER.id and participant.submittedResponses|length == 0 %}
+        {% if participant.user.id == USER.id and (participant.responseRequired or participant.resubmissionRequired) %}
             {% set currentTimestamp = NOW.unixTimestamp %}
             {% set urgency = (participant.dueDate.unixTimestamp - currentTimestamp) / 86400 %}
 
