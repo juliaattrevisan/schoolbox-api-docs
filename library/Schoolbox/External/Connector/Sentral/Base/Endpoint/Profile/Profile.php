@@ -207,7 +207,7 @@ class Profile implements IStrategy
             /* TODO Fill in these basic student vars
              */
             $externalId = '';       // got this
-            $username = '';
+            $username = '';         // didn't find this, so I guess it's externalId for now
             $title = '';            // got this
             $firstname = '';        // got this
             $lastname = '';         // got this
@@ -223,7 +223,7 @@ class Profile implements IStrategy
             $mobile = '';           // got this
             $studiesCode = '';
             $tutor = '';
-            $tutorGroup = '';
+            $tutorGroup = '';       // rollclass, maybe?
             $yearLevel = '';        // got this
 
             /* Flags
@@ -233,7 +233,7 @@ class Profile implements IStrategy
             $boardingStatus = false;// got this
             $esl = false;
             $ib = false;
-            $ilp = false;           // got this
+            $ilp = false;           // got this (sort of)
             $medicalAlert = '';     // got this
             $messages = '';
             $specialNeeds = false;
