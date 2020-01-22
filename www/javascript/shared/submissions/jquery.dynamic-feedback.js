@@ -83,6 +83,7 @@
                 statusIncomplete: 'incomplete',
                 statusPending: 'pending',
                 statusReviewed: 'reviewed',
+                statusResubmissionRequired: 'failed',
 
                 /* - The text to display on the publish button
                  * - When publishing is taking place
@@ -178,7 +179,8 @@
                         });
                     }
 
-                    // Update this participant's status
+                    // Update this participant's status:
+                    // need to be able to differentiate between reviewed and resubmit required somehow
                     $participant.attr('data-status', config.statusReviewed);
 
                     // Update the icon
