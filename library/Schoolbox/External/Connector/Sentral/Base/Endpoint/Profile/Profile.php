@@ -183,11 +183,18 @@ class Profile implements IStrategy
          * If there's too much data here we can access each of these urls directly, per record,
          * instead of trying to build a lookup. That's a lot of api calls though...
          */
+        $this->log->info('Fetching sideloads as lookups.');
+
         $lookups['medical'] = (new Medical($this->api))->compile()->getRecords();
         $lookups['emergencyContacts'] = (new EmergencyContacts($this->api))->compile()->getRecords();
         $lookups['learningPlans'] = (new LearningPlans($this->api))->compile()->getRecords();
         $lookups['enrolment'] = (new Enrolment($this->api))->compile()->getRecords();
         $lookups['phone'] = (new Phone($this->api))->compile()->getRecords();
+
+        $this->log->info(sprintf(
+            'Fetched lookups: %s',
+            implode(', ', array_keys($lookups))
+        ));
 
         /* Sentral gives you paginated data, at most, 200 per page
          * Though they give you 200 people per page, each person comes
@@ -201,59 +208,60 @@ class Profile implements IStrategy
             $lookups
         );
 
-        /* TODO Get a set of students that we need to process
-         */
-        $students = [];
-
         /** @var Student $student */
-        foreach ($students as $student) {
+        foreach ($relationshipIterator as $relation) {
 
             /* Disregard inactive students
              */
-            if (!$student['active']) {
+            if (!$relation['student']['active']) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for student %s - student is inactive',
+                    trim("{$relation['student']['firstname']} {$relation['student']['lastname']}")
+                ));
+
                 continue;
             }
 
-            $externalId = $student['externalId'];
+            $externalId = $relation['student']['externalId'];
 
             /* Didn't find this, so I guess it's externalId for now
              * Otherwise set it from UPS
              */
-            $username = $student['externalId'];
+            $username = $relation['student']['externalId'];
 
-            $title = $student['title'];
-            $firstname = $student['firstname'];
-            $lastname = $student['lastname'];
+            $title = $relation['student']['title'];
+            $firstname = $relation['student']['firstname'];
+            $lastname = $relation['student']['lastname'];
 
             /* Derived from year level, it seems
              * Set it in UPS
              */
             $campus = '';
 
-            $dob = $student['dob'];
-            $email = $student['email'];
-            $enrolmentDate = $student['enrolment']['startDate'];
+            $dob = $relation['student']['dob'];
+            $email = $relation['student']['email'];
+            $enrolmentDate = $relation['student']['enrolment']['startDate'];
             $form = '';
-            $gender = $student['gender'];
+            $gender = $relation['student']['gender'];
             $academicHouse = '';
-            $leavingDate = $student['enrolment']['endDate'];
+            $leavingDate = $relation['student']['enrolment']['endDate'];
             $legal = '';
-            $mobile = $student['phone']['mobile'][0];
+            $mobile = $relation['student']['phone']['mobile'][0] ?? null;
             $studiesCode = '';
 
             // rollclass, maybe?
             $tutor = '';
             $tutorGroup = '';
 
-            $yearLevel = $student['enrolment']['year'];
+            $yearLevel = $relation['student']['enrolment']['year'];
 
             /* Flags
              */
-            $boardingStatus = (bool)$student['enrolment'];
+            $boardingStatus = (bool)$relation['student']['enrolment'];
             $esl = false;
             $ib = false;
             $ilp = false;
-            $medicalAlert = $this->findMedicalAlert($student);
+            $medicalAlert = $relation['student']['medical'];
             $messages = '';
             $specialNeeds = false;
             $comments = '';
@@ -302,10 +310,6 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
 
-            /* TODO Customise these find* methods to suit your implementation
-             *  Maintain the methods' return signature for easiest resolution
-             *  though you are free to customise it as you see fit
-             */
             /* Fish out alert comments
              */
             $alertComments = $this->findComments();
@@ -316,7 +320,7 @@ class Profile implements IStrategy
 
             /* Fish out medical alerts
              */
-            $alertMedical = $this->findMedicalAlert($student);
+            $alertMedical = $this->findMedicalAlert($medicalAlert);
 
             /* Fish out campus name
              */
@@ -324,7 +328,7 @@ class Profile implements IStrategy
 
             /* Emergency Contacts
              */
-            $emergencyContacts = $this->findEmergencyContacts($student);
+            $emergencyContacts = $this->findEmergencyContacts($relation['student']['emergencyContacts']);
 
             /* Find out a staff member via their user code
              */
@@ -434,7 +438,7 @@ class Profile implements IStrategy
 
             /* Add their parents' profile data
              */
-            $this->importParentsOfStudent($student, $studentBaseProfile);
+            $this->importParentsOfStudent($relation, $studentBaseProfile);
         }
     }
 
@@ -467,10 +471,10 @@ class Profile implements IStrategy
     /**
      * Convert a date from possibly null/empty value
      *
-     * @param string $date
+     * @param string|null $date
      * @return Alaress_Date_Format|null
      */
-    public function findDate(string $date): ?Alaress_Date_Format
+    public function findDate(?string $date): ?Alaress_Date_Format
     {
         if ($date) {
             return Alaress_Date_Format::newFromTimestamp(strtotime($date));
@@ -483,12 +487,11 @@ class Profile implements IStrategy
     /**
      * Find all the meaningful emergency contacts for a student
      *
-     * @param array $student
+     * @param array|null $emergencyContacts
      * @return array
      */
-    public function findEmergencyContacts(array $student): array
+    public function findEmergencyContacts(?array $emergencyContacts): array
     {
-        $emergencyContacts = $student['emergencyContacts'];
         $contacts = [];
         $n = 0;
 
@@ -569,12 +572,12 @@ class Profile implements IStrategy
     /**
      * Find medical data for student
      *
-     * @param array $student
+     * @param array|null $medical
      * @return string|null
      */
-    private function findMedicalAlert(array $student): ?string
+    private function findMedicalAlert(?array $medical): ?string
     {
-        return is_array($student['medical']) ? implode("\n", $student['medical']) : null;
+        return is_array($medical) ? implode("\n", $medical) : null;
     }
 
 
@@ -626,16 +629,16 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param array             $student
+     * @param array             $relation
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(array $student, UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(array $relation, UserProfile\Model $studentBaseProfile): void
     {
-        $parents = [$student['parent']];
+        $parents = [$relation['parent']];
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
@@ -645,12 +648,12 @@ class Profile implements IStrategy
             $externalId = $parent['externalId'];
             $username = $parent['externalId'];
             $title = $parent['title'];
-            $firstname = $parent['firstnaem'];
+            $firstname = $parent['firstname'];
             $lastname = $parent['lastname'];
             $email = $parent['email'];
-            $phoneHome = $parent['phone']['home telephone number'] ? $parent['phone']['home telephone number'][0] : null;
-            $phoneWork = $parent['phone']['work telephone number'] ? $parent['phone']['work telephone number'][0] : null;
-            $phoneMobile = $parent['phone']['mobile'] ? $parent['phone']['mobile'][0] : null;
+            $phoneHome = $parent['phone']['home telephone number'][0] ?? null;
+            $phoneWork = $parent['phone']['work telephone number'][0] ?? null;
+            $phoneMobile = $parent['phone']['mobile'][0] ?? null;
             $relationship = $parent['relation'];
 
             /* Parents without usernames are skipped
