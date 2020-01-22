@@ -9,15 +9,17 @@
 
 namespace Schoolbox\Learning\DueWork;
 
+use Schoolbox\ISoftDeletable;
 use \Schoolbox\Sequential;
 use \Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class State implements Sequential
+class State implements Sequential, ISoftDeletable
 {
+    use ModelTrait\HasSequence;
     use ModelTrait\UpdatedBy;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
-    use ModelTrait\HasSequence;
+    use ModelTrait\DeletedAtDate;
 
     /**
      * @var int

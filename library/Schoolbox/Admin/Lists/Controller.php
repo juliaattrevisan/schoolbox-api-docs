@@ -505,6 +505,7 @@ class Controller extends Base
             'submission-errors'     => [
                 'title'             => 'Submission States',
                 'mapper'            => StateMapper::class,
+                'delete'            => true,
                 'fields'            => [
                     'code'          => [
                         'caption'   => 'Code',
