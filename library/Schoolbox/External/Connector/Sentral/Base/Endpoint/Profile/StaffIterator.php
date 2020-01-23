@@ -76,7 +76,7 @@ class StaffIterator implements Iterator
 
         $staff = $this->relational['person'][$staffPersonId];
 
-        $tuple = [
+        return [
             'active' => $current['attributes']['isActive'],
             'externalId' => trim((string)$staff['attributes']['externalId']),
             'title' => trim((string)$staff['attributes']['title']),
@@ -89,8 +89,6 @@ class StaffIterator implements Iterator
             'jobTitle' => trim((string)$current['attributes']['jobTitle']),
             'phone' => $this->lookups['phone'][$staffPersonId] ?? [],
         ];
-
-        return $tuple;
     }
 
 
