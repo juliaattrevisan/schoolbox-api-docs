@@ -149,15 +149,15 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
-
-        $this->importStudents();
+//        $this->log->info('Processing students and their parents.');
+//
+//        $this->importStudents();
 
         /* Import staff profile data
          */
         $this->log->info('Processing staff.');
 
-//        $this->importStaff();
+        $this->importStaff();
 
         /* Remove any orphaned profiles
          */
@@ -792,13 +792,16 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-        $staffs = [];
+        /* Sentral gives you paginated data, at most, 200 per page
+         *
+         * Process multiple pages until there are none remaining, or if something is really stuffed,
+         * until MAX_CALLS is reached, to prevent infinite calls to a third party.
+         */
+        $nextUrl = 'enrolments/staff?include=person,qualifications&limit=200';
 
-        /** @var Staff $staff */
-        foreach ($staffs as $staff) {
+        for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
+            $payload = $this->api->retrieveDocument($nextUrl);
 
-            /* TODO Fill in basic staff vars
-             */
             $externalId = '';
             $username = '';
             $title = '';
@@ -880,6 +883,10 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->staffProfileMapper->save($staffProfile);
             }
+
+            /* Prepare for next page if it exists
+             */
+            $nextUrl =  $payload['links']['next'] ?? null;
         }
     }
 }
