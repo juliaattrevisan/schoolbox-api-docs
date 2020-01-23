@@ -22,7 +22,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term;
 use Schoolbox\UserMapper;
 use Schoolbox\Error;
-use StateMapper;
+use \Schoolbox\Learning\DueWork\StateMapper;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Filter;
 

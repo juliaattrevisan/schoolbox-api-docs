@@ -6,11 +6,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Schoolbox\Learning\DueWork;
+
 /**
  * @method State findOneByColumn($columnName, $columnValue, array $options = [])
  */
-
-namespace Schoolbox\Learning\DueWork;
 
 use Schoolbox\Mapper;
 

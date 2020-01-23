@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
-use StateMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 
@@ -78,7 +78,7 @@ class ListFactory
             ));
 
             // Options built from errors
-            foreach (\StateMapper::getInstance()->findAll() as $errorGrade) {
+            foreach (StateMapper::getInstance()->findAll() as $errorGrade) {
                 $errorOption = new Model();
                 $errorOption
                     ->setId($errorGrade->getDisplayAs())

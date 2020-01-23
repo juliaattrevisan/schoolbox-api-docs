@@ -12,7 +12,7 @@ use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
-use StateMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;

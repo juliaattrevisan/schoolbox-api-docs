@@ -18,7 +18,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
-use StateMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Filter;
 use Schoolbox\User;
 use Schoolbox\GenericCollection;

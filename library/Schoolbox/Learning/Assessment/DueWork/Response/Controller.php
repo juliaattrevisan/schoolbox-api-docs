@@ -8,7 +8,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use StateMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
