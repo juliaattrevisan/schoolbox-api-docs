@@ -37,8 +37,10 @@ $app = new class extends CliTool\App {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Finds schema columns that aren't known by their corresponding mappers (finds unmapped columns).
-Originally used to identify deprecated columns.
+Schema check tool for mappers.
+
+* finds schema columns that aren't known by their corresponding mappers
+* tests default hydration of mapper rows by attempting a count and then a find
 
 Usage: schema-check.php
 
@@ -47,7 +49,13 @@ HELP;
             exit;
         }
 
-//        $this->getLogger()->info('Unmapped:');
+        // The mapper will only error on attempting to hydrate a join not in a
+        // retrieved row if debug mode is off.
+        if (!$this->getConfig()->get('debug_mode')) {
+            $this->getLogger()->notice(
+                'Config setting "debug_mode" is off: the count and find query may return false positives'
+            );
+        }
 
         $classes = array_map(
             static function ($v) {
@@ -55,8 +63,6 @@ HELP;
             },
             $this->allMapperClassFiles()
         );
-
-        $output = [];
 
         foreach ($classes as $classname) {
             // Output the name: skip if not usable
@@ -66,7 +72,7 @@ HELP;
             } catch (InvalidArgumentException $e) {
                 $this->getLogger()->notice("    {$e->getMessage()}");
                 continue;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->getLogger()->warning("    {$e->getMessage()}");
                 continue;
             }
@@ -82,7 +88,7 @@ HELP;
                         $this->getLogger()->info("        {$field}");
                     }
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->getLogger()->warning("    Unmapped fields: error ({$e->getMessage()})");
             }
 
@@ -95,7 +101,7 @@ HELP;
                 } else {
                     $this->getLogger()->notice('    Count test: skip (count = 0)');
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->getLogger()->warning("    Count test: error ({$e->getMessage()})");
             }
 
@@ -109,7 +115,7 @@ HELP;
                 } else {
                     $this->getLogger()->notice('    Find test: skip (count = 0)');
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->getLogger()->warning("    Find test: error ({$e->getMessage()})");
             }
         }
