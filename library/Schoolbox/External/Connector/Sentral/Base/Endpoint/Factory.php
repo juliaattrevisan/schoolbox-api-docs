@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
+use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
@@ -212,6 +213,7 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws DomainException
      * @throws InvalidArgumentException
      */
     public function produce(): GenericCollection
