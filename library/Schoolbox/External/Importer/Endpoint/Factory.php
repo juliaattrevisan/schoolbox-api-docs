@@ -39,10 +39,10 @@ class Factory
     /**
      * The family of importers that we can spawn
      */
-    public const CSV = 'csv';
     public const ISAMS = 'isams';
     public const KAMAR = 'kamar';
     public const SENTRAL = 'sentral';
+    public const CSV = 'csv';
 
 
     /**
@@ -101,107 +101,71 @@ class Factory
     public function produce(?string $file, string $type): ?GenericCollection
     {
         switch ($type) {
-            case self::ISAMS:
-                return $this->produceIsams($file);
 
+            /* Produce the composites with optional Mock api connection
+             * (use a locally-stored file path)
+             */
+            case self::ISAMS:
+                return (new IsamsEndpoint\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+                    $file,
+
+                    /* Profile pieces
+                     */
+                    UserProfile\Mapper::getInstance(),
+                    UserProfile\Student\Mapper::getInstance(),
+                    UserProfile\Parent\Mapper::getInstance(),
+                    UserProfile\Staff\Mapper::getInstance(),
+                    UserProfile\Relationship\Mapper::getInstance(),
+
+                    /* Timetable pieces
+                     */
+                    CampusMapper::getInstance(),
+                    UserMapper::getInstance(),
+                    TimetableCampusMapper::getInstance(),
+                    TimetableCycleMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance()
+                ))->produce();
+
+            /* We never reach out to kamar so we technically don't need the $file option
+             */
             case self::KAMAR:
-                return $this->produceKamar();
+                return (new KamarEndpoint\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    Loader::getInstance()->get('stream_dir'),
+
+                    /* Profile pieces
+                     */
+                    UserProfile\Mapper::getInstance(),
+                    UserProfile\Student\Mapper::getInstance(),
+                    UserProfile\Parent\Mapper::getInstance(),
+                    UserProfile\Staff\Mapper::getInstance(),
+                    UserProfile\Relationship\Mapper::getInstance(),
+
+                    /* Timetable pieces
+                     */
+                    CampusMapper::getInstance(),
+                    TimetableCampusMapper::getInstance(),
+                    TimetableCycleMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance(),
+                    Term\Mapper::getInstance()
+                ))->produce();
 
             case self::SENTRAL:
             default:
                 // Use manual csv imports
                 return null;
         }
-    }
-
-
-    /**
-     * Produce the composites with optional Mock api connection
-     * (use a locally-stored file path)
-     *
-     * @param string|null $file
-     * @return GenericCollection
-     * @throws UnexpectedValueException
-     */
-    private function produceIsams(?string $file): GenericCollection
-    {
-        if ($file) {
-            $this->logger->info("Loading from locally-cached xml file: {$file}");
-            $api = new IsamsEndpoint\MockApi($file);
-        } else {
-            $this->logger->info('Accessing api endpoint');
-            $api = new IsamsEndpoint\Api($this->host, $this->key);
-        }
-
-        /* Connect and shank data
-         */
-        $batchxml = new IsamsEndpoint\Batchxml($api);
-
-        /* Import each piece of the puzzle: Profiles and Timetable
-         *
-         * They're distinct pieces so instead of making a super-composite, I just
-         * do them in sequence, which gives me more dexterity later
-         */
-        return (new GenericCollection(IStrategy::class))
-            ->add(new IsamsEndpoint\Profile\Composite(
-                $this->logger,
-                $this->perform,
-                $batchxml,
-                UserProfile\Mapper::getInstance(),
-                UserProfile\Student\Mapper::getInstance(),
-                UserProfile\Parent\Mapper::getInstance(),
-                UserProfile\Staff\Mapper::getInstance(),
-                UserProfile\Relationship\Mapper::getInstance()
-            ))
-            ->add(new IsamsEndpoint\Timetable\Composite(
-                $this->logger,
-                $this->perform,
-                $batchxml,
-                CampusMapper::getInstance(),
-                UserMapper::getInstance(),
-                TimetableCampusMapper::getInstance(),
-                TimetableCycleMapper::getInstance(),
-                TimetablePeriodMapper::getInstance(),
-                ClassEntryMapper::getInstance(),
-                ClassInvolvementMapper::getInstance(),
-                ClassPeriodMapper::getInstance()
-            ));
-    }
-
-
-    /**
-     * We never reach out to kamar so we technically don't need the $file option
-     *
-     * @return GenericCollection
-     * @throws UnexpectedValueException
-     * @throws RuntimeException
-     */
-    private function produceKamar(): GenericCollection
-    {
-        return (new KamarEndpoint\Factory(
-            $this->logger,
-            $this->perform,
-            $this->host,
-            Loader::getInstance()->get('stream_dir'),
-
-            /* Profile pieces
-             */
-            UserProfile\Mapper::getInstance(),
-            UserProfile\Student\Mapper::getInstance(),
-            UserProfile\Parent\Mapper::getInstance(),
-            UserProfile\Staff\Mapper::getInstance(),
-            UserProfile\Relationship\Mapper::getInstance(),
-
-            /* Timetable pieces
-             */
-            CampusMapper::getInstance(),
-            TimetableCampusMapper::getInstance(),
-            TimetableCycleMapper::getInstance(),
-            TimetablePeriodMapper::getInstance(),
-            ClassEntryMapper::getInstance(),
-            ClassInvolvementMapper::getInstance(),
-            ClassPeriodMapper::getInstance(),
-            Term\Mapper::getInstance()
-        ))->produce();
     }
 }
