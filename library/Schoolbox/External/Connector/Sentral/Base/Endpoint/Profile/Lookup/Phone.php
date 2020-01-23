@@ -96,10 +96,14 @@ class Phone
 
                 $type = strtolower($record['attributes']['typeName'] ?? '');
 
-                $this->stack[$personId][$type][] = trim(implode(' ', [
-                    $record['attributes']['extension'],
-                    $record['attributes']['number'],
-                ]));
+                /* Only remember one of these numbers
+                 */
+                if (!isset($this->stack[$personId][$type])) {
+                    $this->stack[$personId][$type] = trim(implode(' ', [
+                        $record['attributes']['extension'],
+                        $record['attributes']['number'],
+                    ]));
+                }
             }
         }
 
