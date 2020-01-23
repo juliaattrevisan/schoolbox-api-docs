@@ -38,7 +38,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         $parent = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($parent === false) {
+        if (!is_array($parent)) {
             return [];
         }
 
@@ -225,9 +225,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         );
 
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT P.CARER_NUMBER AS STUDENTCONTACTID, P.FULL_NAME, P.COMBINED_EMAIL_ADDRESS AS STUDENTCONTACTDEFAULTEMAIL,
-              P.MOBILE AS STUDENTCONTACTMOBILEPHONE, P.SPOUSE_CARER_NUMBER AS STUDENTCONTACTSPOUSEID, P.SPOUSE_FULL_NAME,
-              P.SPOUSE_MOBILE AS STUDENTCONTACTSPOUSEMOBILEPHONE, P.COMBINED_EMAIL_ADDRESS AS STUDENTCONTACTSPOUSEDEFAULTEMAIL
+            SELECT P.CARER_NUMBER AS STUDENTCONTACTID, P.FULL_NAME, P.EMAIL AS STUDENTCONTACTDEFAULTEMAIL,
+              P.MOBILE AS STUDENTCONTACTMOBILEPHONE
             FROM SCHOOLBOX_PARENTS P
             INNER JOIN SCHOOLBOX_PARENT_STUDENT PS ON P.CARER_NUMBER = PS.CARER_NUMBER
             WHERE PS.STUDENT_NUMBER IN ({$predicate['placeholders']})

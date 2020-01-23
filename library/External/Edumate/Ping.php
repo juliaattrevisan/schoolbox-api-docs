@@ -16,7 +16,7 @@ class External_Edumate_Ping extends External_Edumate_Connection implements Exter
     public function isResponsive(): bool
     {
         try {
-            $this->connect();
+            $this->getConnection();
             return true;
         } catch (Exception $e) {
         }

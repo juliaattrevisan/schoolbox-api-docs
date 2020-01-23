@@ -168,6 +168,15 @@ class Factory
             // IBM DB2
             case 'edumate':
                 $connectorExternal = $this->factory->createDb2();
+                list($host, $schema) = explode('/', $config->get('external_db_host'), 2);
+                $connectorExternal->connect(
+                    $host,
+                    $config->get('external_db_db'),
+                    $config->get('external_db_user'),
+                    $config->get('external_db_passwd'),
+                    ['schema' => $schema]
+                );
+                return $connectorExternal;
                 break;
         }
 
