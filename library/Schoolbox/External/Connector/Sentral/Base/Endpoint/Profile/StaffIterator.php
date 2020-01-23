@@ -78,15 +78,15 @@ class StaffIterator implements Iterator
 
         $tuple = [
             'active' => $current['attributes']['isActive'],
-            'externalId' => $staff['attributes']['externalId'],
-            'title' => $staff['attributes']['title'],
-            'preferredName' => $staff['attributes']['preferredName'],
-            'firstname' => $staff['attributes']['firstName'],
-            'lastname' => $staff['attributes']['lastName'],
-            'classification' => $current['attributes']['employmentClassification'],
-            'email' => $staff['attributes']['email'],
-            'employmentStatus' => $current['attributes']['employmentStatus'],
-            'jobTitle' => $current['attributes']['jobTitle'],
+            'externalId' => trim((string)$staff['attributes']['externalId']),
+            'title' => trim((string)$staff['attributes']['title']),
+            'preferredName' =>trim((string)$staff['attributes']['preferredName']),
+            'firstname' => trim((string)$staff['attributes']['firstName']),
+            'lastname' => trim((string)$staff['attributes']['lastName']),
+            'classification' => trim((string)$current['attributes']['employmentClassification']),
+            'email' => trim((string)$staff['attributes']['email']),
+            'employmentStatus' => trim((string)$current['attributes']['employmentStatus']),
+            'jobTitle' => trim((string)$current['attributes']['jobTitle']),
             'phone' => $this->lookups['phone'][$staffPersonId] ?? [],
         ];
 
