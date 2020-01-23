@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\EmergencyContacts;
@@ -20,14 +19,10 @@ use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\LearningPl
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Medical;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\Normalise\User\Staff;
-use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Profile
@@ -807,7 +802,6 @@ class Profile implements IStrategy
              */
             $staffIterator = new StaffIterator($payload, $lookups);
 
-            /** @var Student $student */
             foreach ($staffIterator as $staff) {
                 $externalId = $staff['externalId'];
                 $username = $staff['externalId'];
