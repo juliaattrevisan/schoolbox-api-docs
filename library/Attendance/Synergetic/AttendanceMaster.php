@@ -69,8 +69,9 @@ class Attendance_Synergetic_AttendanceMaster
         $this->connector = $connector;
 
         // Store the stuff we'll use again
+        $classCampus = empty($class['ClassCampus']) ? null : $class['ClassCampus'];
 
-        $this->setClassCampus($class['ClassCampus']);
+        $this->setClassCampus($classCampus);
         $this->setClassCode($class['ClassCode']);
         $this->setClassFileType($class['FileType']);
         $this->attendanceDay = $attendanceDay;
@@ -87,7 +88,7 @@ class Attendance_Synergetic_AttendanceMaster
             'FileType' => $this->getClassFileType(),
             'FileYear' => $this->getFileYear(),
             'FileSemester' => $this->getFileSemester(),
-            'ClassCampus' => $class['ClassCampus'],
+            'ClassCampus' => $classCampus,
             'ClassCode' => $this->getClassCode(),
             'AttendanceDate' => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
             'AttendancePeriod' => $this->getAttendancePeriod(),
