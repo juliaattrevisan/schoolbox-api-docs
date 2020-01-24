@@ -590,10 +590,10 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      *
      * @param Campus              $campus
      * @param Alaress_Date_Format $dateObject
-     * @return array the timetable date, or null if it doesn't exist
+     * @return array|null the timetable date, or null if it doesn't exist
      * @throws InvalidArgumentException
      */
-    protected function getTimetableDate(Campus $campus, Alaress_Date_Format $dateObject): array
+    protected function getTimetableDate(Campus $campus, Alaress_Date_Format $dateObject): ?array
     {
         $timetableDates = $this->getTimetableDates($campus);
         $key            = $dateObject->getDatabaseDate();
