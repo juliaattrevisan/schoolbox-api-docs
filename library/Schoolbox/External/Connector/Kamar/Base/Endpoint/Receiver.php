@@ -48,7 +48,7 @@ class Receiver
     public function __construct($dir)
     {
         $this->dir = $dir;
-        $this->suffix = uniqid('_', true) . '.xml';
+        $this->suffix = '_' . date('YmdHis') . uniqid('_', true) . '.xml';
     }
 
 
@@ -103,13 +103,22 @@ XML;
          * stored in $prefix.
          *
          * For now, while we're testing,
-         *   Profile data will end up in /mnt/data/schoolbox/cache/stream/full_YYYMMDD_HHIISS.xml
-         *   Timetable data will end up in /mnt/data/schoolbox/cache/stream/studenttimetables_YYYMMDD_HHIISS.xml
+         *   Profile data will end up in /mnt/data/schoolbox/cache/stream/full_YYYMMDDHHIISS_xxxxx.xml
+         *   Timetable data will end up in /mnt/data/schoolbox/cache/stream/studenttimetables_YYYMMDDHHIISS_xxxxx.xml
+         *   Partial Timetable data will end up in /mnt/data/schoolbox/cache/stream/part_studenttimetables_YYYMMDDHHIISS_xxxxx.xml
          *
          * I'll probably have to remove the datetime later (reasons will become clear) but we need to record
          * each push attempt that the school makes while we're figuring out this integration.
          */
         $prefix = (string)$nodes->xpath('/SMSDirectoryData/@sync')[0];
+
+        /* Inspect a studenttimetables file to find out how many nodes it has
+         * If it's just one node, it's actually a part_studenttimetables file and we want to disregard it
+         */
+        if ((self::XML_STUDENTTIMETABLES === $prefix) && 1 === (int)$nodes->xpath('/SMSDirectoryData/timetables/@count')[0]) {
+            $prefix = 'part_studenttimetables_';
+        }
+
         $path = "{$this->dir}/{$prefix}{$this->suffix}";
 
         /* Write xml file
