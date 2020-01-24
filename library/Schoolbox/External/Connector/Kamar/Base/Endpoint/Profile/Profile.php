@@ -521,6 +521,7 @@ class Profile implements IStrategy
             $firstname = trim((string)$staff->firstname);
             $lastname = trim((string)$staff->lastname);
             $campus = $this->campus;
+            $category = trim((string)$staff->classification);
             $email = trim((string)$staff->email);
             $phone = trim((string)$staff->mobile);
             $position = trim((string)$staff->position);
@@ -582,7 +583,7 @@ class Profile implements IStrategy
             $staffProfile
                 ->setBuilding(null)
                 ->setCampusName($campus)
-                ->setCategory(null)
+                ->setCategory($category)
                 ->setDepartment(implode(', ', $departments))
                 ->setEmail($email)
                 ->setPhone($phone)
