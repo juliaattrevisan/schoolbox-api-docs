@@ -44,6 +44,7 @@ class Module extends \Alaress\Module\Module
         // Course Markbook page and filtered report
         $this->register('GET', '/{courseSpecId:\d+}', 'getMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
         $this->register('POST', '/{courseSpecId:\d+}', 'postMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
+        $this->register('GET', '/export/{courseSpecId:\d+}', 'getMarkbookExport', $canSeeCourseMarkbook, $preloadCourseSpec);
     }
 
     /**

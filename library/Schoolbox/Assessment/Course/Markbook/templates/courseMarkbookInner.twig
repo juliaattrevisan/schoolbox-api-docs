@@ -1,4 +1,5 @@
 {#
+    courseSpecId             int                 Course Spec Id
     collapsedAssessments     IAssessable[]       Column headers. Will be specs if imported from spec, impl if created in class's unit-import
     unitSpecs                UnitSpec/Model[]    The unit-specs to display as column header groups
     courseImpls              CourseImpl/Model[]  The vertical sections of the table.
@@ -12,6 +13,7 @@
     taskProgress             int[][][]           Indexed by [courseImplId][assessmentId][userId]
     taskProgressPending      int                 Student has claimed completion
     taskProgressComplete     int                 Teacher has verified completion
+    queryArgs                string              The filters used to generate this report, so we can export the exact same report
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
@@ -21,18 +23,25 @@
 {% set labelPublishedMark       = 'Mark Published' %}
 
 <div class="row">
-    <div class="small-12 island">
-        <div class="checklist" style="float:right;">
-            <input type="checkbox" id="show-drafts">
-            <label for="show-drafts">
-                Show Drafts
-            </label>
-        </div>
-        <div class="legend" style="float:right;">
-            <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
-            <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
-            <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
-        </div>
+    <div class="actions-small-1 row">
+        <nav>
+            <div class="legend">
+                <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
+                <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
+                <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
+                <div class="checklist">
+                    <input type="checkbox" id="show-drafts">
+                    <label for="show-drafts">
+                        Show Drafts
+                    </label>
+                </div>
+                <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+            </div>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content="">
+            <li class="separator">Report</li>
+            <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpecId} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a></li>
+        </ul>
     </div>
     <div class="small-12 island" style="overflow-x: scroll;">
         <table class="square-grid marksheet" data-mark-sheet>
@@ -101,7 +110,7 @@
                                 {% set draftMark     = marks.any %}
                                 <span {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</span>
                                 {% if marks.any is defined %}
-                                    <span data-draft-mark class="meta" style="display: none;">{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }}%{% endif %}</span>
+                                    <span data-draft-mark class="meta" style="display: none;">{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</span>
                                 {% endif %}
                             {% endif %}
                         </td>
@@ -111,7 +120,6 @@
                 {% endfor %}
             </tr>
             {% for courseImpl in courseImpls %}
-                {% set courseImplAssessements = courseAssessments[courseImpl.id] %}
                 <tr>
                     <td colspan="2" class="class-row class-row-heading"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></td>
                     {% for assessment in collapsedAssessments %}
@@ -127,7 +135,7 @@
                                     {% set draftMark     = marks.any %}
                                     <a href="{{ statusRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</a>
                                     {% if marks.any is defined %}
-                                        <a href="{{ statusRoute }}" class="meta" style="display: none;" data-draft-mark>{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }}%{% endif %}</a>
+                                        <a href="{{ statusRoute }}" class="meta" style="display: none;" data-draft-mark>{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</a>
                                     {% endif %}
                                 {% endif %}
                             </td>
