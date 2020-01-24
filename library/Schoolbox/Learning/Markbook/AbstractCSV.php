@@ -16,7 +16,7 @@ use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\User;
 
 /**
- * Each implementation of this interface is able to export a markbook object to some format
+ * Abstract class to help exporting markbook to some format
  */
 class AbstractCSV
 {
