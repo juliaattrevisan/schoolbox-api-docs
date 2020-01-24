@@ -164,8 +164,14 @@ class Controller extends Base
                 $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
             } else {
                 // Redirect somewhere (locally only?)
-                // TODO accept redirect URL in a GET/POST param
-                $this->response->redirect->to('/');
+                $page = $this->getRequest()->query->get('page');
+
+                //Determine if page redirect is valid
+                if ($page && preg_match('#^[\w_=%\-:\/.\&\?]+$#i', $page)) {
+                    $this->response->redirect->to($page);
+                } else {
+                    $this->response->redirect->to('/');
+                }
             }
         }
     }
@@ -275,7 +281,7 @@ class Controller extends Base
         return $this->buildJsonOutput([
             'id'   => $user->getId(),
             'key'  => $user->getKey(),
-            'role' => $user->getRole()->getType(),
+            'role' => $user->getRole()->getType()
         ]);
     }
 }
