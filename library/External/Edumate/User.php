@@ -157,7 +157,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $student['STUDENTYEARLEVEL'] = preg_replace('/[^0-9]/', '', $student['STUDENTYEARLEVEL']) + 0;
 
         // sometimes Edumate will return blank emergency contact on the first record...
-        if (strlen($student['STUDENTEMERGENCYNAME'])) {
+        if (empty($student['STUDENTEMERGENCYNAME'])) {
             $start = 2;
         } else {
             $start = 1;
