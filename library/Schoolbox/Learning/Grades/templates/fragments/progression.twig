@@ -78,18 +78,13 @@
     });
 </script>
 <table>
-    <colgroup>
-        <col style="width: 15%" />
-        <col style="width: 15%" />
-        <col />
-    </colgroup>
     {% for capability in longitudinalRubric %}
-        <tr><th>{{ capability.name | nl2br }}</th>
+        <tr><th class="rubric-progression-capability">{{ capability.name | nl2br }}</th>
         {% for indicatorId,indicator in capability.indicators %}
             {% if not loop.first %}
-                <tr><th>&nbsp;</th>
+                <tr><th class="rubric-progression-capability">&nbsp;</th>
             {% endif %}
-            <th>{{ indicator.name | nl2br}}</th>
+            <th class="rubric-progression-indicator">{{ indicator.name | nl2br}}</th>
             <td class="rubric-progression-graph">
                 <div id="rubricGraph{{ indicatorId }}"></div>
                 <script type="application/javascript">

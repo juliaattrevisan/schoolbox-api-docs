@@ -435,6 +435,10 @@ select.letter-grade-select {
     }
 }
 
+// Rubric progression graph
+th.rubric-progression-capability, th.rubric-progression-indicator {
+  width: 15%;
+}
 td.rubric-progression-graph {
   padding: 0;
 }
