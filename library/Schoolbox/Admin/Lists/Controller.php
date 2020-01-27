@@ -347,6 +347,7 @@ class Controller extends Base
             'residential-house'    => [
                 'title'             => 'Residential Houses',
                 'mapper'            => HouseResidentialMapper::class,
+                'delete'            => true,
                 'fields'            => [
                     'house'         => [
                         'caption'   => 'Name',

@@ -568,6 +568,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
                 ON leave_request.user_id = `user`.id
                 AND leave_request.authorisation_datetime IS NOT NULL
                 AND leave_request.status NOT IN (:deleted, :rejected)
+			WHERE luResidentialHouse.deleted_at IS NULL
 			GROUP BY residential_house_id
 			ORDER BY luResidentialHouse.name
 		"
