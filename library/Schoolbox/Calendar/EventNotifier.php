@@ -180,7 +180,7 @@ class EventNotifier extends AbstractModuleNotifier
     {
 
         // If the event is not yet published, the update never happened
-        if($event->getPublishDateTime() > Alaress_Date_Format::now()) {
+        if($event->getPublishDateTime()->gt(Alaress_Date_Format::now())) {
             return;
         }
 
