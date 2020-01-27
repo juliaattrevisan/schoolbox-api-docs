@@ -14,22 +14,39 @@ This file is internal use and is not shipped to clients.
 * templates - default and per client skins
 * test - PHP and other tests (not deployed to clients)
 * tools - Build, update and maintenance tools. Also includes cli scripts for sync.
-* updates - per release update files, primarily sql schema changes 
+* updates - per release update files, primarily sql schema changes
 * www
 * data - client data and caches (client side only)
 * vendor - directory for external libraries loaded via Composer
 
 ## Installation
 
-Deployed using packages with Puppet
+###Development Environment with Vagrant
 
-Installing from the package will place the following directories in new locations.
+* Install [Virtualbox](https://www.virtualbox.org/) (sudo apt install virtualbox)
+* Install [vagrant](https://vagrantup.com/downloads)
+* Create an SSH key and add to Github
+* Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github
+* `git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox` your schoolbox repo to local machine
+* `git remote add upstream git@github.com:alaress/schoolbox.git`
+* `git fetch upstream`
+* `git checkout origin/master`
+* `git checkout -b master`
+* create vagrant.yaml for overrides if needed
+* `vagrant up`
+* (optional) install the [gitsync script](https://github.com/alaress/git-scripts) to keep upstream insync with origin
+
+## Live environment deployed using packages with Puppet
+
+For full information on the build process of making a APT package and deploying [please refer to this guide](https://schoolbox.atlassian.net/wiki/spaces/SUP/pages/350257186/Building+Schoolbox+Releases+and+Packages).
+
 This is to follow the standard packaging process linux distributions use for web applications.
 
 /etc/schoolbox
 * contents from www/conf/* copied to /etc/schoolbox/examples
 * www/conf symlinked to /etc/schoolbox
 * client side conf.php to be located in /etc/schoolbox
+* Cron files copied to /etc/cron.d/schoolbox
 
 /usr/share/schoolbox
 * dav
