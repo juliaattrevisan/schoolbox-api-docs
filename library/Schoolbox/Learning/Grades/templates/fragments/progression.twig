@@ -2,10 +2,8 @@
     Render a bar graph of a single student's assessment results
 
     Usage:
+        rubricAssessmentList  array
         longitudinalRubric    array
-        student               User
-        assessments           IAssessable[]
-        returnUrlSuffix       string
 #}
 <script type="text/javascript">
     $(function() {
@@ -81,12 +79,12 @@
 </script>
 <table>
     {% for capability in longitudinalRubric %}
-        <tr><td width="15%"><b>{{ capability.name | nl2br }}</b></td>
+        <tr><th class="rubric-progression-capability">{{ capability.name | nl2br }}</th>
         {% for indicatorId,indicator in capability.indicators %}
             {% if not loop.first %}
-                <tr><td width="15%">&nbsp;</td>
+                <tr><th class="rubric-progression-capability">&nbsp;</th>
             {% endif %}
-            <th width="15%">{{ indicator.name | nl2br}}</th>
+            <th class="rubric-progression-indicator">{{ indicator.name | nl2br}}</th>
             <td class="rubric-progression-graph">
                 <div id="rubricGraph{{ indicatorId }}"></div>
                 <script type="application/javascript">
