@@ -11,12 +11,14 @@ namespace Schoolbox\Pastoral\Tag;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\UsableAsTagSource;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Class Mapper
@@ -135,7 +137,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
             return $this->createCollection();
         }
 
-        $query = "{$this->getSelectString()} WHERE `deleted_at` IS NULL AND `name` LIKE :search";
+        $query = "{$this->getSelectString()} WHERE `deleted_at` IS NULL AND `name` LIKE :search ORDER BY name";
 
         if ($offset > 0) {
             $query .= ' LIMIT :limit OFFSET :offset';
