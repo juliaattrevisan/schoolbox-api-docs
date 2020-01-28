@@ -562,7 +562,8 @@
                     $.ajax({
                         url: '/ajax/tags/pastoral?sort=numUsages',
                         type: 'GET',
-                        dataType: 'json'
+                        dataType: 'json',
+                        data: { query: query }
                     }).done(function(result) {
                         callback(result)
                     }).fail(function() {

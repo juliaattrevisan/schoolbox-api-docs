@@ -27,6 +27,14 @@ use UnexpectedValueException;
  */
 class Mapper extends BaseMapper implements UsableAsTagSource
 {
+
+    /**
+     * When you click into Filter By Tags it suggests the top ten most commonly
+     * used pastoral tags across all non-deleted pastoral records
+     */
+    private const DEFAULT_SUGGESTION_MAX_ITEMS = 10;
+
+
     /**
      * Setup mapper
      */
@@ -134,12 +142,30 @@ class Mapper extends BaseMapper implements UsableAsTagSource
      */
     public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0): GenericCollection
     {
-        /* Default list of keywords, sorted by number of usages across pastoral records
+        /* Default list of 10 keywords, sorted by number of usages across pastoral records
          */
         if ((string)$keyword === '') {
-            return $this->createCollection();
+            $query = "
+                SELECT
+                    t.*,
+                    COUNT(*) AS numUsages
+                FROM {$this->getTable()} t
+                INNER JOIN pastoral_tags pt ON t.id = pt.tag_id
+                WHERE t.`deleted_at` IS NULL
+                GROUP BY pt.tag_id
+                ORDER BY numUsages DESC
+                LIMIT :limit
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->bindValue('limit', self::DEFAULT_SUGGESTION_MAX_ITEMS, PDO::PARAM_INT);
+            $statement->execute();
+
+            return $this->hydrateSelect($statement);
         }
 
+        /* Otherwise match on $keyword
+         */
         $query = "{$this->getSelectString()} WHERE `deleted_at` IS NULL AND `name` LIKE :search ORDER BY name";
 
         if ($offset > 0) {
