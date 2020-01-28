@@ -15,6 +15,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
+use PDOException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -55,6 +56,7 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -614,6 +616,8 @@ class Controller extends Base
      * @param Model  $record
      * @param string $tagCsv
      * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function assignTagsToRecord(Model $record, $tagCsv): void
     {
