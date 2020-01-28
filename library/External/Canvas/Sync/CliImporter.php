@@ -21,6 +21,7 @@ use PDOException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External;
@@ -327,6 +328,9 @@ class CliImporter extends CliTool\App
         /** @var UnitImpl\Mapper */
         $unitImplMapper = $mapperFactory->get(UnitImpl\Mapper::class);
         $unitSpecMapper = $mapperFactory->get(UnitSpec\Mapper::class);
+        $returnedWorkMapper = $mapperFactory->get(ReturnedWorkMapper::class);
+        /** @var Assessment\MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
         /** @var IConfigLoader */
         $config = $this->getDi()->get('config');
 
@@ -343,6 +347,8 @@ class CliImporter extends CliTool\App
             $quizQuestionTypeMapper,
             $quizSolutionMapper,
             $submissionBoxMapper,
+            $returnedWorkMapper,
+            $assessmentDataSource,
             $assessmentMapper,
             $planMapper,
             $participantMapper,

@@ -126,7 +126,7 @@ abstract class AbstractFeedback implements IFeedback
     }
 
     /**
-     * @param float $humanReadableMark
+     * @param string $humanReadableMark
      * @return $this
      */
     public function setHumanReadableMark($humanReadableMark)

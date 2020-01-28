@@ -961,7 +961,7 @@ abstract class SectionAssessmentAbstract
      * @internal string      $return[$courseCanvasId]['sections'][$sectionCanvasId]['sis_source_id']
      * @internal string      $return[$courseCanvasId]['sections'][$sectionCanvasId]['students'][$sectionStudentCanvasId]['sis_user_id']
      */
-    private function loadCanvasSectionStudentData(array $sectionSisSourceIds): array
+    protected function loadCanvasSectionStudentData(array $sectionSisSourceIds): array
     {
         if (!count($sectionSisSourceIds)) {
             return [];

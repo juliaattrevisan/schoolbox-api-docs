@@ -1098,7 +1098,7 @@ class MapperProxy
     {
         $builder = $this->baseMapper->getPredicateBuilder();
         // Term filter (overrides due before/after)
-        if ($options['term'] instanceof Term) {
+        if (isset($options['term']) && $options['term'] instanceof Term) {
             $term                  = $options['term'];
             $options['due_after']  = $term->getStart();
             $options['due_before'] = $term->getActualFinish();
@@ -1119,25 +1119,25 @@ class MapperProxy
 
 
         // Due before / after filter (an ADF)
-        if ($options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
+        if (isset($options['due_after']) && $options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
             $builder->notLessThan($dueDateColumn, $options['due_after']->getDatabase());
         }
-        if ($options['due_before'] instanceof \Alaress_Date_Format && !$options['due_before']->isNull()) {
+        if (isset($options['due_before']) && $options['due_before'] instanceof \Alaress_Date_Format && !$options['due_before']->isNull()) {
             $builder->notGreaterThan($dueDateColumn, $options['due_before']->getDatabase());
         }
 
         // Close before / after filter (an ADF)
-        if ($options['closed_after'] instanceof \Alaress_Date_Format && !$options['closed_after']->isNull()) {
+        if (isset($options['closed_after']) && $options['closed_after'] instanceof \Alaress_Date_Format && !$options['closed_after']->isNull()) {
             $builder->notLessThan($closeDateColumn, $options['closed_after']->getDatabase());
         }
 
-        if ($options['close_before'] instanceof \Alaress_Date_Format && !$options['close_before']->isNull()) {
+        if (isset($options['close_before']) && $options['close_before'] instanceof \Alaress_Date_Format && !$options['close_before']->isNull()) {
             $builder->notGreaterThan($closeDateColumn, $options['close_before']->getDatabase());
         }
 
         // Window before / after filter (an ADF)
-        if ($options['window_open'] instanceof \Alaress_Date_Format
-            && $options['window_close'] instanceof \Alaress_Date_Format
+        if (isset($options['window_open']) && $options['window_open'] instanceof \Alaress_Date_Format
+            && isset($options['window_close']) && $options['window_close'] instanceof \Alaress_Date_Format
             && !$options['window_open']->isNull()
             && !$options['window_close']->isNull()
         ) {
@@ -1150,25 +1150,27 @@ class MapperProxy
         }
 
         // Assessment type filter
-        switch ($options['type']) {
-            case AssessmentType::TYPE_DUE_WORK:
-                $builder->notNull('d.id');
-                break;
+        if (isset($options['type'])) {
+            switch ($options['type']) {
+                case AssessmentType::TYPE_DUE_WORK:
+                    $builder->notNull('d.id');
+                    break;
 
-            case AssessmentType::TYPE_TASK:
-                $builder->notNull('t.id');
-                break;
+                case AssessmentType::TYPE_TASK:
+                    $builder->notNull('t.id');
+                    break;
 
-            case AssessmentType::TYPE_QUIZ:
-                $builder->notNull('q.assess_id');
-                break;
+                case AssessmentType::TYPE_QUIZ:
+                    $builder->notNull('q.assess_id');
+                    break;
 
-            case AssessmentType::TYPE_PROJECT:
-                $builder->notNull('p.id');
-                break;
+                case AssessmentType::TYPE_PROJECT:
+                    $builder->notNull('p.id');
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
 
         // Work type filter
