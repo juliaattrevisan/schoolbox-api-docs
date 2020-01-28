@@ -10,14 +10,19 @@
 namespace Schoolbox\Pastoral\Tag;
 
 use PDO;
-use Schoolbox\Collection;
+use PDOException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\UsableAsTagSource as UsableAsTagSource;
+use Schoolbox\Mapper\UsableAsTagSource;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Pastoral\Tag
+ */
 class Mapper extends BaseMapper implements UsableAsTagSource
 {
     /**
@@ -26,7 +31,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
     protected function mapping()
     {
         $this->hasTable('lu_pastoral_tag');
-        $this->hasModel(Model::class);
+        $this->hasModel(PastoralTag::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -34,17 +39,20 @@ class Mapper extends BaseMapper implements UsableAsTagSource
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
+
     /**
      * Assign a pastoral tag to a pastoral record
      *
      * @param Pastoral    $pastoral
      * @param PastoralTag $tag
+     * @throws PDOException
      */
     public function assignToRecord(Pastoral $pastoral, PastoralTag $tag): void
     {
-        $statement = $this->getDatabase()->prepare("
-            INSERT IGNORE INTO pastoral_tags (pastoral_id, tag_id) VALUES (:pastoralId, :tagId)
-        ");
+        $statement = $this->getDatabase()->prepare('
+            INSERT IGNORE INTO pastoral_tags (pastoral_id, tag_id)
+            VALUES (:pastoralId, :tagId)
+        ');
 
         $statement->execute([
             'pastoralId' => $pastoral->getId(),
@@ -52,19 +60,19 @@ class Mapper extends BaseMapper implements UsableAsTagSource
         ]);
     }
 
+
     /**
      * Find a collection of tags associated with pastoral record
      *
      * @param Pastoral $pastoral
      *
      * @return GenericCollection
+     * @throws PDOException
      */
     public function findForRecord($pastoral): GenericCollection
     {
         $statement = $this->getDatabase()->prepare("
-        
             {$this->getSelectString()}
-            
             INNER JOIN      `pastoral_tags` ON `pastoral_tags`.`tag_id` = `{$this->getTable()}`.`id`
             WHERE           `pastoral_tags`.`pastoral_id` = :pastoralId
             ORDER BY        `name`
@@ -75,20 +83,23 @@ class Mapper extends BaseMapper implements UsableAsTagSource
         return $this->hydrateSelect($statement);
     }
 
+
     /**
      * Remove all tags from a pastoral record
      *
      * @param Pastoral $pastoral
+     * @throws PDOException
      */
     public function deleteForRecord($pastoral): void
     {
-        $statement = $this->getDatabase()->prepare("
-            DELETE FROM `pastoral_tags` 
+        $statement = $this->getDatabase()->prepare('
+            DELETE FROM `pastoral_tags`
             WHERE       `pastoral_id` = :pastoralId
-        ");
+        ');
 
         $statement->execute(['pastoralId' => $pastoral->getId()]);
     }
+
 
     /**
      * Once a pastoral tag has been removed from all records in the database it should no longer appear in the
@@ -106,6 +117,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
         $statement->execute();
     }
 
+
     /**
      * Find pastoral tags that contain the specified keyword
      *
@@ -115,10 +127,11 @@ class Mapper extends BaseMapper implements UsableAsTagSource
      * @param int    $limit
      *
      * @return GenericCollection
+     * @throws PDOException
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0): GenericCollection
     {
-        if (strlen($keyword) === 0) {
+        if ((string)$keyword === '') {
             return $this->createCollection();
         }
 
@@ -134,10 +147,10 @@ class Mapper extends BaseMapper implements UsableAsTagSource
         $statement->bindValue('search', '%' . $keyword . '%', PDO::PARAM_STR);
 
         if ($offset > 0) {
-            $statement->bindValue('offset', intval($offset), PDO::PARAM_INT);
-            $statement->bindValue('limit', intval($limit), PDO::PARAM_INT);
+            $statement->bindValue('offset', (int)$offset, PDO::PARAM_INT);
+            $statement->bindValue('limit', (int)$limit, PDO::PARAM_INT);
         } elseif ($limit > 0) {
-            $statement->bindValue('limit', intval($limit), PDO::PARAM_INT);
+            $statement->bindValue('limit', (int)$limit, PDO::PARAM_INT);
         }
 
         $statement->execute();
