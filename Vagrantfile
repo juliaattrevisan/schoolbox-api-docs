@@ -21,6 +21,8 @@ data_source = default["data_source"]
 data_filename = default["data_filename"]
 enable_xdebug = default["enable_xdebug"]
 bridged_network_interface = default["bridged_network_interface"]
+puppet_dir = default["puppet_dir"]
+puppet_debug = default["puppet_debug"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -65,6 +67,12 @@ if File.file?('vagrant.yaml')
   if !conf["bridged_network_interface"].nil?
     bridged_network_interface = conf["bridged_network_interface"]
   end
+  if !conf["puppet_dir"].nil?
+    puppet_dir = conf["puppet_dir"]
+  end
+  if !conf["puppet_debug"].nil?
+    puppet_debug = conf["puppet_debug"]
+  end
 
 end
 
@@ -91,6 +99,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider "vmware_fusion" do |vf|
     vf.vmx["memsize"] = memory
+  end
+
+  # Puppet Apply Provisioner (without a puppet master)
+  # See https://www.vagrantup.com/docs/provisioning/puppet_apply.html
+  config.vm.synced_folder "#{puppet_dir}/environments/staging/hieradata/node", "/etc/puppetlabs/code/hieradata/node"
+
+  config.vm.provision "puppet" do |puppet|
+    puppet.hiera_config_path = "#{puppet_dir}/environments/staging/hiera.yaml"
+    puppet.manifest_file = "site.pp"
+    puppet.manifests_path = "#{puppet_dir}/environments/staging/manifests"
+    puppet.module_path = "#{puppet_dir}/environments/staging/modules"
+    puppet.environment_path = "#{puppet_dir}/environments"
+    puppet.environment = "staging"
+    puppet.working_directory = "/tmp/vagrant-puppet"
+    if puppet_debug
+        puppet.options = "--verbose --debug"
+    end
   end
 
   config.vm.provision "shell" do |s|
