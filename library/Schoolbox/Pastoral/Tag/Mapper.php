@@ -134,6 +134,8 @@ class Mapper extends BaseMapper implements UsableAsTagSource
      */
     public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0): GenericCollection
     {
+        /* Default list of keywords, sorted by number of usages across pastoral records
+         */
         if ((string)$keyword === '') {
             return $this->createCollection();
         }

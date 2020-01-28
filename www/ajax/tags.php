@@ -35,9 +35,7 @@ $registry = [
 
 // Validate params
 $errors = [];
-if(empty($_GET['query'])){
-    $errors[] = 'Query fragment not supplied';
-}
+
 if(empty($this->arg[0])){
     $errors[] = 'Tag type not supplied';
 }
