@@ -73,7 +73,7 @@ class CSV extends AbstractCSV
             // Per Students
             foreach (($courseMarkbook->getCourseImportStudents())[$class->getId()] as $student) {
                 $studentData = [
-                    $student->getId(),
+                    $student->getExternalId(),
                     $student->getFirstname(),
                     $student->getLastname(),
                     isset($studentAverageMarks[$student->getId()]) ? $studentAverageMarks[$student->getId()]['published']['hr'] : '-',
