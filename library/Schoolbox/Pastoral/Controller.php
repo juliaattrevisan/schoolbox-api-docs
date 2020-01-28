@@ -619,6 +619,8 @@ class Controller extends Base
     {
         $tags = explode(",", $tagCsv);
 
+        $canCreate = (bool)$this->getConfigLoader()->get('pastoral_create_tag_enable');
+
         foreach ($tags as $tagCurrent) {
             if (trim($tagCurrent) != '') {
                 try {
@@ -636,9 +638,11 @@ class Controller extends Base
                 } catch (MapperException $e) {
                     /* Tag doesn't exist - spawn it, save it, then assign it
                      */
-                    $tag = new PastoralTagsModel();
-                    $tag->setName($tagCurrent);
-                    $this->pastoralTagMapper->save($tag);
+                    if ($canCreate) {
+                        $tag = new PastoralTagsModel();
+                        $tag->setName($tagCurrent);
+                        $this->pastoralTagMapper->save($tag);
+                    }
                 }
 
                 $this->pastoralTagMapper->assignToRecord($record, $tag);
