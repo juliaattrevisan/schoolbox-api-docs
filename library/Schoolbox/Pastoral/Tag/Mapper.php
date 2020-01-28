@@ -11,14 +11,12 @@ namespace Schoolbox\Pastoral\Tag;
 
 use PDO;
 use PDOException;
-use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\UsableAsTagSource;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Class Mapper
