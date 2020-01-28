@@ -6,12 +6,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
- *         ,--.--._
- * ------" _, \___)
- *       2 / _/____)
- *       x \//(____)
- * ------\     (__)
- *        `-----"
  */
 
 use Schoolbox\Campus as CampusModel;
@@ -54,7 +48,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $fileYear = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
 
         /**
-         * TODO: Doublefirst has timetable definitions for each year level- shoot me now. This is likely to cause
+         * Doublefirst has timetable definitions for each year level. This is likely to cause
          * problems with teachers as they most likely don't have a year level.
          */
 
@@ -88,28 +82,28 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         $query = "
             SELECT DISTINCT
-            p.PeriodID as PeriodNumber, 
-            1 AS PeriodNumberSeq, 
+            p.PeriodID as PeriodNumber,
+            1 AS PeriodNumberSeq,
             CASE WHEN n.PeriodName IS NULL THEN CONCAT('Lesson ', p.PeriodID) ELSE n.PeriodName END AS Description,
-            1 AS DayNumber, 
+            1 AS DayNumber,
             p.PeriodDuration,
             b.BreakDuration
 
-            FROM AttendancePeriods p 
-            LEFT JOIN PeriodNames n ON 
-            p.AcademicYear = n.AcademicYear AND 
+            FROM AttendancePeriods p
+            LEFT JOIN PeriodNames n ON
+            p.AcademicYear = n.AcademicYear AND
             p.PeriodID = n.PeriodNumber AND
-            n.yeargroupid = p.yeargroup 
+            n.yeargroupid = p.yeargroup
 
-            LEFT JOIN AttendanceBreaks b ON 
-            b.AcademicYear = p.AcademicYear AND 
-            b.DayOfWeek = p.DayOfWeek AND 
-            b.BreakPeriodID = p.PeriodID AND 
-            b.YearGroup = p.yeargroup 
+            LEFT JOIN AttendanceBreaks b ON
+            b.AcademicYear = p.AcademicYear AND
+            b.DayOfWeek = p.DayOfWeek AND
+            b.BreakPeriodID = p.PeriodID AND
+            b.YearGroup = p.yeargroup
 	    ";
 
         if ($type == 'student') {
-            $query .= "   
+            $query .= "
 	            WHERE
 	            p.AcademicYear = '{$fileYear}' AND
 	            p.YearGroup = '{$studentDetails['YearGroupID']}' AND
@@ -126,7 +120,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 		        WHERE
                     p.AcademicYear = '{$fileYear}' AND
                     p.YearGroup IN ({$yearGroups}) AND
-                    p.DayOfWeek = 1           
+                    p.DayOfWeek = 1
     		";
         }
 
@@ -145,10 +139,10 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         $queryTimes = "
             SELECT TOP 1 SchoolStartTime, NoOfPeriods
-            FROM AttendancePeriodStructure 
+            FROM AttendancePeriodStructure
             WHERE YearGroup = '{$studentDetails['YearGroupID']}'
             AND AcademicYear = '{$fileYear}'
-            AND DayOfWeek = 1    
+            AND DayOfWeek = 1
         ";
 
         $times = $this->getDatabase()->getRow($queryTimes);
@@ -281,50 +275,50 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $query =
             "
             SELECT DISTINCT
-            m.PeriodNumber, 
-            1 AS PeriodNumberSeq, 
-            n.PeriodName AS Description, 
+            m.PeriodNumber,
+            1 AS PeriodNumberSeq,
+            n.PeriodName AS Description,
             m.DayOfWeek AS DayNumber,
             p.PeriodDuration
-            
-            FROM 
+
+            FROM
             TimetableMatrix m
-            
-            INNER JOIN PeriodNames n ON 
-            n.PeriodNumber = m.PeriodNumber AND 
-            n.YearGroupID = m.YearGroup AND 
+
+            INNER JOIN PeriodNames n ON
+            n.PeriodNumber = m.PeriodNumber AND
+            n.YearGroupID = m.YearGroup AND
             n.AcademicYear = m.AcademicYear
-            
+
             INNER JOIN AttendancePeriods p ON
             p.AcademicYear = m.AcademicYear AND
             p.YearGroup = m.YearGroup AND
             p.DayOfWeek = m.DayOfWeek AND
             p.PeriodID = m.PeriodNumber
-            
-            WHERE 
+
+            WHERE
             n.AcademicYear = '{$this->helper->getCurrentYear()}' AND
             n.YearGroupID = '{$campus->getExtTimetableCode()}' AND
             m.DayOfWeek = 1
-            
+
             UNION
-            
-            SELECT 
+
+            SELECT
             BreakPeriodID AS PeriodNumber,
             2 AS PeriodNumberSeq,
             BreakName AS Description,
             DayOfWeek AS DayNumber,
             BreakDuration AS PeriodDuration
-            
+
             FROM
             AttendanceBreaks
-            
+
             WHERE
             AcademicYear = '{$this->helper->getCurrentYear()}' AND
             YearGroup = '{$campus->getExtTimetableCode()}' AND
             DayOfWeek = 1
-            
-            ORDER BY 
-            PeriodNumber, 
+
+            ORDER BY
+            PeriodNumber,
             PeriodNumberSeq
         ";
 
@@ -338,10 +332,10 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $queryTimes =
             "
             SELECT TOP 1 SchoolStartTime
-            FROM AttendancePeriodStructure 
+            FROM AttendancePeriodStructure
             WHERE YearGroup = '{$studentDetails['YearGroupID']}'
             AND AcademicYear = '{$this->helper->getCurrentYear()}'
-            AND DayOfWeek = 1                    
+            AND DayOfWeek = 1
         ";
 
         $times = $this->getDatabase()->getRow($queryTimes);
@@ -445,52 +439,52 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 '' AS StaffTitle,
                 '' AS StaffPreferredName,
                 '' AS StaffSurname
-                
+
                 FROM TimetableClassRoom tcr
-    
+
                 LEFT JOIN YearGroupSubjectDivision ygsd ON
                 ygsd.DivisionID = tcr.DivisionID AND
                 ygsd.SubjectID = tcr.SubjectID AND
                 ygsd.YearGroup = tcr.YearGroup AND
                 ygsd.AcademicYear = tcr.AcademicYear
-                
+
                 LEFT JOIN SchoolSiteBlock ssb ON
                 ssb.SiteID = tcr.SiteID AND
                 ssb.BlockID = tcr.BlockID
-                
+
                 LEFT JOIN SchoolSiteBlockRooms ssbr ON
                 ssbr.SiteID = tcr.SiteID AND
                 ssbr.BlockID = tcr.BlockID AND
                 ssbr.RoomID = tcr.RoomID
-                
+
                 LEFT JOIN BatchMaster bm ON
                 bm.YearGroup = tcr.YearGroup AND
                 bm.SubjectID = tcr.SubjectID AND
                 bm.DivisionID = tcr.DivisionID
-                
+
                 JOIN PupilSubjects ps ON
                 ps.YearGroup = tcr.YearGroup AND
                 ps.SubjectID = tcr.SubjectID AND
                 ps.DivisionID = tcr.DivisionID AND
-                ps.SchoolYear = tcr.AcademicYear		
-           
+                ps.SchoolYear = tcr.AcademicYear
+
                 JOIN TimetableMatrix tm ON
                 tm.MatrixID = tcr.MatrixID AND
                 tm.AcademicYear = tcr.AcademicYear AND
                 tm.YearGroup = tcr.YearGroup
-          
+
                 JOIN TimetableMaster tn ON
                 tn.TimetableName = tm.TimetableName AND
                 tn.IsWorking = 1
-    
-          
+
+
                 JOIN SubjectMaster sm ON
                 sm.SubjectID = tcr.SubjectID
-                
+
                 WHERE tcr.AcademicYear = '{$fileYear}'
                 AND ps.PupilID = '{$externalUserId}'
                 AND tm.DayOfWeek + ((tm.WeekNumber - 1) * {$campus->getTimetableDay()}) = {$dayNumber}
-                
+
                 ORDER BY DayNumber, PeriodNumber
             ";
 
@@ -502,54 +496,54 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 '' AS StaffTitle,
                 spd.ForeName AS StaffPreferredName,
                 spd.SurName AS StaffSurname
-                
+
                 FROM TimetableClassRoom tcr
-    
+
                 LEFT JOIN YearGroupSubjectDivision ygsd ON
                 ygsd.DivisionID = tcr.DivisionID AND
                 ygsd.SubjectID = tcr.SubjectID AND
                 ygsd.YearGroup = tcr.YearGroup AND
                 ygsd.AcademicYear = tcr.AcademicYear
-                
+
                 LEFT JOIN SchoolSiteBlock ssb ON
                 ssb.SiteID = tcr.SiteID AND
                 ssb.BlockID = tcr.BlockID
-                
+
                 LEFT JOIN SchoolSiteBlockRooms ssbr ON
                 ssbr.SiteID = tcr.SiteID AND
                 ssbr.BlockID = tcr.BlockID AND
                 ssbr.RoomID = tcr.RoomID
-                
+
                 LEFT JOIN BatchMaster bm ON
                 bm.YearGroup = tcr.YearGroup AND
                 bm.SubjectID = tcr.SubjectID AND
                 bm.DivisionID = tcr.DivisionID
-    
+
                 JOIN TimetableMatrix tm ON
                 tm.MatrixID = tcr.MatrixID AND
                 tm.AcademicYear = tcr.AcademicYear AND
                 tm.YearGroup = tcr.YearGroup
-    
+
                 JOIN TimetableClassStaff tcs ON
                 tcs.YearGroup = tcr.YearGroup AND
                 tcs.SubjectID = tcr.SubjectID AND
                 tcs.DivisionID = tcr.DivisionID AND
                 tcs.AcademicYear = tcr.AcademicYear AND
                 tcs.MatrixID = tm.MatrixID
-             
+
                 LEFT JOIN StaffPersonalDetails spd ON
                 spd.StaffID = tcs.StaffID
-                
+
                 JOIN SubjectMaster sm ON
                 sm.SubjectID = tcr.SubjectID
-    
+
                 JOIN TimetableMaster tn ON
                 tn.TimetableName = tm.TimetableName AND
                 tn.IsWorking = 1
-                
+
                 WHERE tcr.AcademicYear = '{$fileYear}'
                 AND tcs.StaffID = '{$externalUserId}'
-                AND tcr.YearGroup IN ({$yearGroups})    
+                AND tcr.YearGroup IN ({$yearGroups})
                 AND tm.DayOfWeek + ((tm.WeekNumber - 1) * {$campus->getTimetableDay()}) = {$dayNumber}
                 ORDER BY DayNumber, PeriodNumber
             ";
@@ -665,51 +659,51 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 '' AS StaffTitle,
                 '' AS StaffPreferredName,
                 '' AS StaffSurname
-                
+
                 FROM TimetableClassRoom tcr
-    
+
                 LEFT JOIN YearGroupSubjectDivision ygsd ON
                 ygsd.DivisionID = tcr.DivisionID AND
                 ygsd.SubjectID = tcr.SubjectID AND
                 ygsd.YearGroup = tcr.YearGroup AND
                 ygsd.AcademicYear = tcr.AcademicYear
-                
+
                 LEFT JOIN SchoolSiteBlock ssb ON
                 ssb.SiteID = tcr.SiteID AND
                 ssb.BlockID = tcr.BlockID
-                
+
                 LEFT JOIN SchoolSiteBlockRooms ssbr ON
                 ssbr.SiteID = tcr.SiteID AND
                 ssbr.BlockID = tcr.BlockID AND
                 ssbr.RoomID = tcr.RoomID
-                
+
                 LEFT JOIN BatchMaster bm ON
                 bm.YearGroup = tcr.YearGroup AND
                 bm.SubjectID = tcr.SubjectID AND
                 bm.DivisionID = tcr.DivisionID
-                
+
                 JOIN PupilSubjects ps ON
                 ps.YearGroup = tcr.YearGroup AND
                 ps.SubjectID = tcr.SubjectID AND
                 ps.DivisionID = tcr.DivisionID AND
-                ps.SchoolYear = tcr.AcademicYear		
-           
+                ps.SchoolYear = tcr.AcademicYear
+
                 JOIN TimetableMatrix tm ON
                 tm.MatrixID = tcr.MatrixID AND
                 tm.AcademicYear = tcr.AcademicYear AND
                 tm.YearGroup = tcr.YearGroup
-          
+
                 JOIN TimetableMaster tn ON
                 tn.TimetableName = tm.TimetableName AND
                 tn.IsWorking = 1
-    
-          
+
+
                 JOIN SubjectMaster sm ON
                 sm.SubjectID = tcr.SubjectID
-                
+
                 WHERE tcr.AcademicYear = '{$fileYear}'
                 AND ps.PupilID = '{$externalUserId}'
-                
+
                 ORDER BY DayNumber, PeriodNumber
             ";
 
@@ -721,54 +715,54 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 '' AS StaffTitle,
                 spd.ForeName AS StaffPreferredName,
                 spd.SurName AS StaffSurname
-                
+
                 FROM TimetableClassRoom tcr
-    
+
                 LEFT JOIN YearGroupSubjectDivision ygsd ON
                 ygsd.DivisionID = tcr.DivisionID AND
                 ygsd.SubjectID = tcr.SubjectID AND
                 ygsd.YearGroup = tcr.YearGroup AND
                 ygsd.AcademicYear = tcr.AcademicYear
-                
+
                 LEFT JOIN SchoolSiteBlock ssb ON
                 ssb.SiteID = tcr.SiteID AND
                 ssb.BlockID = tcr.BlockID
-                
+
                 LEFT JOIN SchoolSiteBlockRooms ssbr ON
                 ssbr.SiteID = tcr.SiteID AND
                 ssbr.BlockID = tcr.BlockID AND
                 ssbr.RoomID = tcr.RoomID
-                
+
                 LEFT JOIN BatchMaster bm ON
                 bm.YearGroup = tcr.YearGroup AND
                 bm.SubjectID = tcr.SubjectID AND
                 bm.DivisionID = tcr.DivisionID
-    
+
                 JOIN TimetableMatrix tm ON
                 tm.MatrixID = tcr.MatrixID AND
                 tm.AcademicYear = tcr.AcademicYear AND
                 tm.YearGroup = tcr.YearGroup
-    
+
                 JOIN TimetableClassStaff tcs ON
                 tcs.YearGroup = tcr.YearGroup AND
                 tcs.SubjectID = tcr.SubjectID AND
                 tcs.DivisionID = tcr.DivisionID AND
                 tcs.AcademicYear = tcr.AcademicYear AND
                 tcs.MatrixID = tm.MatrixID
-             
+
                 LEFT JOIN StaffPersonalDetails spd ON
                 spd.StaffID = tcs.StaffID
-                
+
                 JOIN SubjectMaster sm ON
                 sm.SubjectID = tcr.SubjectID
-    
+
                 JOIN TimetableMaster tn ON
                 tn.TimetableName = tm.TimetableName AND
                 tn.IsWorking = 1
-                
+
                 WHERE tcr.AcademicYear = '{$fileYear}'
                 AND tcs.StaffID = '{$externalUserId}'
-                AND tcr.YearGroup IN ({$yearGroups})    
+                AND tcr.YearGroup IN ({$yearGroups})
                 ORDER BY DayNumber, PeriodNumber
             ";
         }
