@@ -405,6 +405,7 @@ class CourseSections
                 'title'     => $unitImpl->getTitle(),
                 'open_date' => $unitImpl->getOpenDate()->getDatabaseDate(),
                 'due_date'  => $unitImpl->getDueDate()->getDatabaseDate(),
+                'id'        => $unitImpl->getId(),
             ]);
         }
 
