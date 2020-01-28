@@ -549,11 +549,26 @@
         });
 
         $('#filterTags').selectizeSelector({
-            multiple: true,
             ajax: {
                 url: '/ajax/tags/pastoral',
                 type: 'GET',
                 dataType: 'json'
+            },
+            multiple: true,
+            selectize: {
+                preload: true,
+                load: function(query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    $.ajax({
+                        url: '/ajax/tags/pastoral?sort=numUsages',
+                        type: 'GET',
+                        dataType: 'json'
+                    }).done(function(result) {
+                        callback(result)
+                    }).fail(function() {
+                        callback()
+                    })
+                }
             },
             value: [
                 {% for tag in tagsSelected %}

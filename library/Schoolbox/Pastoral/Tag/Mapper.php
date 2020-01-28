@@ -123,15 +123,16 @@ class Mapper extends BaseMapper implements UsableAsTagSource
     /**
      * Find pastoral tags that contain the specified keyword
      *
-     * @param User   $user
-     * @param string $keyword
-     * @param int    $offset
-     * @param int    $limit
+     * @param User        $user
+     * @param string      $keyword
+     * @param string|null $sort
+     * @param int         $offset
+     * @param int         $limit
      *
      * @return GenericCollection
      * @throws PDOException
      */
-    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0): GenericCollection
+    public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0): GenericCollection
     {
         if ((string)$keyword === '') {
             return $this->createCollection();

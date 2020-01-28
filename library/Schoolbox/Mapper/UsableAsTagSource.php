@@ -26,14 +26,15 @@ interface UsableAsTagSource
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * @param User   $user    The user performing the search.
-     *                        (Some results aren't viewable by all users)
-     * @param string $keyword Search string
-     * @param int    $offset  Number of results to offset result by
-     * @param int    $limit   Max number of results to retrieve, or 0 if no limit
+     * @param User        $user    The user performing the search.
+     *                             (Some results aren't viewable by all users)
+     * @param string      $keyword Search string
+     * @param string|null $sort    A column upon which to sort results, if specified
+     * @param int         $offset  Number of results to offset result by
+     * @param int         $limit   Max number of results to retrieve, or 0 if no limit
      * @return Collection|object[] A collection of objects.
      */
-    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0);
+    public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0);
 
     // Below methods removed from interface for now, as I no longer believe
     // they are necessary.

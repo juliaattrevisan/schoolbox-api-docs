@@ -74,7 +74,7 @@ class TagCloud implements BaseMapper\UsableAsTagSource
     {
         $tagTuple = $this->parseTag($tag);
         if ($tagTuple) {
-            list($tagType, $identifier) = $tagTuple;
+            [$tagType, $identifier] = $tagTuple;
             $newModel = null;
             switch ($tagType) {
                 case Model::PREFIX_EXISTING_TAG:
@@ -136,13 +136,17 @@ class TagCloud implements BaseMapper\UsableAsTagSource
     /**
      * Retrieves a list of items for a tag cloud.
      *
-     * @param User $user
-     * @param string $keyword
-     * @param int $offset
-     * @param int $limit
+     * @param User        $user
+     * @param string      $keyword
+     * @param string|null $sort
+     * @param int         $offset
+     * @param int         $limit
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws \PDOException
      */
-    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
+    public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0)
     {
         if (strlen($keyword) === 0) {
             return new Collection();

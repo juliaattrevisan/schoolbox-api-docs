@@ -53,7 +53,13 @@ if ($errors) {
     /** @var \Schoolbox\Mapper\UsableAsTagSource $mapper */
     $mapper = $registry[$this->arg[0]]();
     if ($mapper instanceof \Schoolbox\Mapper\UsableAsTagSource) {
-        $tagsArray = $mapper->findForTag($_SESSION['user'], $_GET['query']);
+
+        /* Optionally provide a column name by which to sort
+         */
+        $sort = $_GET['sort'] ?? null;
+        $query = (string)$_GET['query'];
+
+        $tagsArray = $mapper->findForTag($_SESSION['user'], $query, $sort);
     } else {
         http_response_code(500);
     }
