@@ -678,6 +678,16 @@ Usage:
             fetchReport();
         }
 
+        $(document).on('click', '#show-drafts', function () {
+            if ($(this).prop("checked")) {
+                $("[data-draft-mark]").show();
+                $("[data-actual-mark]").hide();
+            } else {
+                $("[data-draft-mark]").hide();
+                $("[data-actual-mark]").show();
+            }
+        });
+
         init();
     });
 
