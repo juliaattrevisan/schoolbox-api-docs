@@ -153,6 +153,7 @@ class Controller extends Base
             } else {
                 // Create new record
                 $model = $mapper->createModel();
+                $oldModel = null;
 
                 foreach ($fixed as $field => $value) {
                     $setter = $mapper->getSetMethodName($field);
@@ -218,8 +219,12 @@ class Controller extends Base
             $sequence++;
 
             // Update values if there is changes
-            $diff = (new Differ())->diff($mapper->dehydrate($model), $mapper->dehydrate($oldModel));
-            if (count($diff) > 0) {
+            $persist = true;
+            if ($oldModel) {
+                $diff = (new Differ())->diff($mapper->dehydrate($model), $mapper->dehydrate($oldModel));
+                $persist = count($diff) > 0;
+            }
+            if ($persist) {
                 // Save the changes
                 if (method_exists($model, $mapper->getGetMethodName('updatedBy'))) {
                     $model->setUpdatedBy($this->getUser()->getId());
