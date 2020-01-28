@@ -174,12 +174,11 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     /**
      * @param User        $user
      * @param string      $keyword
-     * @param string|null $sort
      * @param int         $offset
      * @param int         $limit
      * @return Collection|Model[]
      */
-    public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0)
+    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {
         return $this->getTagLike($keyword, $offset, $limit);
     }

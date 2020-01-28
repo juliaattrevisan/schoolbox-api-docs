@@ -54,10 +54,9 @@ if ($errors) {
 
         /* Optionally provide a column name by which to sort
          */
-        $sort = $_GET['sort'] ?? null;
         $query = (string)$_GET['query'];
 
-        $tagsArray = $mapper->findForTag($_SESSION['user'], $query, $sort);
+        $tagsArray = $mapper->findForTag($_SESSION['user'], $query);
     } else {
         http_response_code(500);
     }

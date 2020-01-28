@@ -138,7 +138,6 @@ class TagCloud implements BaseMapper\UsableAsTagSource
      *
      * @param User        $user
      * @param string      $keyword
-     * @param string|null $sort
      * @param int         $offset
      * @param int         $limit
      * @return Collection|Model[]
@@ -146,7 +145,7 @@ class TagCloud implements BaseMapper\UsableAsTagSource
      * @throws BaseMapper\Exception
      * @throws \PDOException
      */
-    public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0)
+    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {
         if (strlen($keyword) === 0) {
             return new Collection();

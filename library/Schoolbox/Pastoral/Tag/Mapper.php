@@ -133,14 +133,13 @@ class Mapper extends BaseMapper implements UsableAsTagSource
      *
      * @param User        $user
      * @param string      $keyword
-     * @param string|null $sort
      * @param int         $offset
      * @param int         $limit
      *
      * @return GenericCollection
      * @throws PDOException
      */
-    public function findForTag(User $user, $keyword, ?string $sort, $offset = 0, $limit = 0): GenericCollection
+    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0): GenericCollection
     {
         /* Default list of 10 keywords, sorted by number of usages across pastoral records
          */
