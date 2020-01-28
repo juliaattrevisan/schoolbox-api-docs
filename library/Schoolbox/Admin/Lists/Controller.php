@@ -33,9 +33,14 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
+use Schoolbox\Pastoral;
 use Schoolbox\YearLevel;
 use Timetable_ColourMapper;
 
+/**
+ * Class Controller
+ * @package Schoolbox\Admin\Lists
+ */
 class Controller extends Base
 {
     /** @var MapperFactory */
@@ -688,6 +693,23 @@ class Controller extends Base
                 ]
             ];
         }
+
+        /* Allow superusers to add/remove pastoral tags
+         */
+        $return['pastoral-tags'] = [
+            'title' => 'Pastoral Record Tags',
+            'mapper' => Pastoral\Tag\Mapper::class,
+            'delete' => true,
+            'deleteWarning' => 'Deleting pastoral tags may affect existing reports. Are you sure?',
+            'fields' => [
+                'name' => [
+                    'caption' => 'Name',
+                    'width' => 12,
+                    'maxLength' => 100,
+                    'mandatory' => true,
+                ],
+            ]
+        ];
 
         $return['year-levels'] = [
             'title'  => 'Year Levels',
