@@ -60,7 +60,7 @@ class Factory extends FolderFilter\Factory
             throw new InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
         }
 
-        $getClasses = $options[Definition::KEY_CLASSES]->getAvailable() && $viewee->getRole()->isStudent();
+        $getClasses = $options[Definition::KEY_CLASSES]->getAvailable() && $viewee->getRole()->isStudent() && !$viewee->getHideTimetable();
         $getGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
 
         if ($getClasses || $getGroups) {
