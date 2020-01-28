@@ -528,6 +528,7 @@ class Controller extends Base
             'template' => '@pastoral/modify.twig',
             'data'     => [
                 'record'            => $record,
+                'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                 'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                 'allowParents'      => $allowParents,
                 'types'             => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),

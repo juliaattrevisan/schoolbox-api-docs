@@ -17,12 +17,17 @@
         $('#tags').selectizeSelector({
             multiple: true,
             selectize: {
+
+                {% if canCreate %}
                 create: function (input) {
                     return {
                         id: input,
                         name: input
                     }
                 },
+                {% else %}
+                create: false,
+                {% endif %}
                 preload: true,
                 load: function(query, callback) {
 
