@@ -628,12 +628,11 @@ class Controller extends Base
                     /** @var PastoralTagsModel $tag */
                     $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, ['cache' => false]);
                 } catch (MapperDeletedException $e) {
-                    /* Restore this tag to active duty
-                     */
-                    $tag = $e->getDeletedObject();
 
-                    $tag->setDeletedAt(null);
-                    $this->pastoralTagMapper->save($tag);
+                    /* Restore this tag to active duty SA-2737
+                     * This was put here to reduce dupe tags from original implementation
+                     */
+
                 } catch (MapperException $e) {
                     /* Tag doesn't exist - spawn it, save it, then assign it
                      */
