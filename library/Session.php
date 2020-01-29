@@ -530,7 +530,7 @@ class Session
                                 if ($cat instanceof Folder && !\in_array($cat->getId(), $subjectIDList, false)) {
                                     $subject['id']   = $cat->getId();
                                     $subject['name'] = $cat->getName();
-                                    $subject['perm'] = $this->access->getFolderAccess($_SESSION['user'], $cat->getId());
+                                    $subject['perm'] = $this->access->getFolderAccess($user, $cat->getId());
                                     // TODO Lawn mow student subjects and parent children subjects to have same format and semantics.
                                     // TODO Currently, a student's $subject['code'] is the SB folder code,
                                     // TODO whereas a parent's child $subject['code'] is the SIS code.
@@ -554,7 +554,7 @@ class Session
                 }
             } else {
                 //user is not parent so get timetable information
-                if(!$_SESSION['user']->getHideTimetable()) {
+                if (!$user->getHideTimetable()) {
                     $subjectList = $synUser->getSubjectList($_SESSION['user']);
                 }
                 else {
@@ -575,7 +575,7 @@ class Session
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
-                                $subject['perm'] = $this->access->getSisClassRoleTypeAccess($user->getRole()->getType());
+                                $subject['perm'] = $this->access->getFolderAccess($user, $result->getId());;
                                 $subject['code'] = $result->getMatchedCode();
                                 $_SESSION['subjects'][] = $subject;
 
