@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Side\Mapper as MenuItemMapper;
 use Schoolbox\Menu\Side\Section\Mapper as MenuSectionMapper;
 use Schoolbox\Menu\Side\Section\Model as MenuSideSection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 /**
@@ -104,10 +105,12 @@ class SideMenu implements IDataGenerator
         $subjects = $this->session->get('subjects');
         if (\is_iterable($subjects)) {
             foreach ($subjects as $subject) {
-                if (!isset($subjectGroups[$subject['classType']])) {
-                    $subjectGroups[$subject["classType"]] = [];
+                if($subject['perm'] >= UserAccess::ACCESS_READ) {
+                    if (!isset($subjectGroups[$subject['classType']])) {
+                        $subjectGroups[$subject['classType']] = [];
+                    }
+                    $subjectGroups[$subject['classType']][] = $subject;
                 }
-                $subjectGroups[$subject['classType']][] = $subject;
             }
             uksort($subjectGroups, function ($a, $b) {
                 return strnatcmp($a, $b);
