@@ -8,11 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
-use Alaress_Curl_Url;
 use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
-use RuntimeException;
+use UnexpectedValueException;
 use Zend\Uri\Exception;
 use Zend\Uri\Uri;
 
@@ -73,17 +72,16 @@ class Api implements IApi
     /**
      * Constructor
      *
-     * @param string $host
+     * @param string $dsn
      * @param string $apiKey
-     * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws DomainException
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $dsn, string $apiKey)
     {
-        $this->host   = $host;
         $this->apiKey = $apiKey;
 
-        $this->client = $this->initClient($this->host, $this->apiKey, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($dsn, $this->apiKey, self::DEFAULT_TIMEOUT);
     }
 
 
@@ -94,12 +92,16 @@ class Api implements IApi
      * @param string $key
      * @param int    $timeout
      * @return Client
-     * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws DomainException
      */
     private function initClient(string $dsn, string $key, int $timeout): Client
     {
         $credentials = (new DSNCodec())->decode($dsn);
+
+        /* Remember the actual host value
+         */
+        $this->host = $credentials['host'];
 
         $headers = array_combine(
             ['X-API-KEY', 'X-API-TENANT'],
@@ -120,23 +122,29 @@ class Api implements IApi
      *
      * @param string $endpoint
      * @return array
-     * @throws DomainException
+     * @throws UnexpectedValueException
      */
     public function retrieveDocument(string $endpoint): array
     {
-        $response = $this->client->request('GET', $endpoint);
+
+        /* Sentral's first/last/next pagination links are full urls containing the host
+         * but for brevity we've set base_uri to the host already so we need to replace it away
+         * every time we make a call to their pagination urls they provide to us ><
+         * FIXME Tell Sydney James?
+         */
+        $response = $this->client->request('GET', str_replace($this->host, '', $endpoint));
 
         try {
             $decoded = json_decode($response->getBody()->getContents(), true);
         } catch (\RuntimeException $e) {
-            throw new \DomainException('Sentral Endpoint error: could not json_decode payload; did something snap?');
+            throw new UnexpectedValueException('Sentral Endpoint error: could not json_decode payload; did something snap?');
         }
 
         /* When you can't decode the json, sentral's given you something unexpected
          * like an error string, or lost in transmission, etc.
          */
         if ($decoded === null) {
-            throw new \DomainException('Sentral Endpoint error: could not json_decode payload; did something snap?');
+            throw new UnexpectedValueException('Sentral Endpoint error: could not json_decode payload; did something snap?');
         }
 
         /* Check for error payload instead of data payload
@@ -150,7 +158,7 @@ class Api implements IApi
              * Anyway, errors might get thrown if your host, tenant or key is incorrect
              *   - The host should end with a trailing slash
              */
-            throw new \DomainException(sprintf(
+            throw new UnexpectedValueException(sprintf(
                 'Sentral Endpoint error: %s',
                 "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
             ));
@@ -184,14 +192,24 @@ class Api implements IApi
 
 
     /**
-     * Set up curl instance
+     * Have a look around
      *
-     * @return Alaress_Curl_Url
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @throws UnexpectedValueException
      */
-    private function initCurl(): \Alaress_Curl_Url
+    public function schemaExplorer(): void
     {
-        return new Alaress_Curl_Url($this->getUrl());
+        $schema = $this->retrieveDocument('sentral/schema');
+
+        foreach ($schema['paths'] as $path => $data) {
+            new \Alaress_Probe('<hr>');
+
+            $example = $data['get']['responses'][200]['content']['application/json']['examples']['validResponse']['value']['data'];
+
+            if (null === $example) {
+                new \Alaress_Probe($path, $data);
+            } else {
+                new \Alaress_Probe($path, $example);
+            }
+        }
     }
 }

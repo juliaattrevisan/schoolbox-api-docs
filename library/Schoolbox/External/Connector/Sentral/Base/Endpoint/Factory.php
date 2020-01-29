@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
+use DomainException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
@@ -211,9 +213,13 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
+        $api = new Api($this->host, $this->key);
+
         return (new GenericCollection(IStrategy::class))
 
             /* Purge previously-imported profile relationships and classes
@@ -236,6 +242,7 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
+                $api,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
