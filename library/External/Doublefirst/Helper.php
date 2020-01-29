@@ -83,6 +83,9 @@ class External_Doublefirst_Helper
     public function getDayNumber($date)
     {
         // Work out what day of the week the term started on
+        if($date->isWeekend()) {
+            return 0;
+        }
 
         $query =
             "
