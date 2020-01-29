@@ -6,8 +6,20 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class DueWork_Error
+
+namespace Schoolbox\Learning\DueWork;
+
+use Schoolbox\ISoftDeletable;
+use \Schoolbox\Sequential;
+use \Schoolbox\Mapper\Traits\Model as ModelTrait;
+
+class State implements Sequential, ISoftDeletable
 {
+    use ModelTrait\HasSequence;
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
 
     /**
      * @var int

@@ -11,7 +11,6 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -22,9 +21,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term;
 use Schoolbox\UserMapper;
 use Schoolbox\Error;
-use DueWork_ErrorMapper;
-use \Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Filter;
 
 
 class Module extends BaseModule
@@ -111,8 +107,7 @@ class Module extends BaseModule
                 'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-                'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
-                'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
+                'access'                     => $this->getMapperFactory()->getLazy(Access::class),// Has a static 'getInstance()' method
                 'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
                 'filterFactoryFactory'       => $injector->lazyGet('filters.factoryFactory'),
             ])

@@ -8,7 +8,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use DueWork_ErrorMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -297,7 +297,7 @@ class Controller extends Base
 
             /* For saving feedbacks
              */
-            'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'errors' => StateMapper::getInstance()->listDisplayValues(),
             'participant' => $participant,
 
             /* Plagscan status

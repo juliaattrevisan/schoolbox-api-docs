@@ -21,6 +21,7 @@ use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
+use Schoolbox\Learning\DueWork\StateMapper;
 
 class Factory
 {
@@ -194,7 +195,7 @@ class Factory
                     ->setHumanReadableMark($humanReadableMark);
             }
             catch (\InvalidArgumentException $e) {
-                $code = \DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $this->mark);
+                $code = StateMapper::getInstance()->findOneByColumn('display_as', $this->mark);
 
                 $feedback
                     ->setNormalisedMark($code->getNormaliseAs())

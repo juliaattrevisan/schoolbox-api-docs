@@ -6,20 +6,30 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Schoolbox\Learning\DueWork;
+
 /**
- * @method DueWork_Error findOneByColumn($columnName, $columnValue, array $options = [])
+ * @method State findOneByColumn($columnName, $columnValue, array $options = [])
  */
-class DueWork_ErrorMapper extends Schoolbox\Mapper
+
+use Schoolbox\Mapper;
+
+class StateMapper extends Mapper
 {
 
     protected function mapping()
     {
         $this->hasTable('submission_errors');
-        $this->hasModel(DueWork_Error::class);
+        $this->hasModel(State::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('code', self::TYPE_STRING);
         $this->uses('display_as', self::TYPE_STRING);
         $this->uses('normalise_as', self::TYPE_DECIMAL);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -42,10 +52,15 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper
         $errs = $this->findAll();
         $disp = array();
         foreach ($errs as $e) {
-            /* @var $e DueWork_Error */
+            /* @var $e State */
             $disp[] = $e->getDisplayAs();
         }
         return $disp;
     }
 
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }
