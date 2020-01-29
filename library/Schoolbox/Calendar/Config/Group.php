@@ -47,7 +47,7 @@ class Group extends Base
         $groups = new Collection();
 
         $folders = $this->folderMapper
-            ->findForUser($this->user)
+            ->findForUser($this->user, !$this->user->getHideTimetable())
             ->sortByCallback(function (\Schoolbox\Resource\Folder\Model $a, \Schoolbox\Resource\Folder\Model $b) {
                 return strnatcasecmp($a->getName(), $b->getName());
             });
