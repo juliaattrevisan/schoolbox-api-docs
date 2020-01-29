@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
+use DomainException;
+use InvalidArgumentException;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -28,6 +30,8 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
     public function __construct(string $host, string $key)
     {
@@ -53,8 +57,10 @@ class Status implements IStatus
      */
     public function getReport(): string
     {
+        $specification = new Specification(null, $this->api);
+
         try {
-            return '';
+            return implode("\n", $specification->check());
         } catch (\RuntimeException $e) {
             return "Cannot access api endpoint: {$e->getMessage()}";
         }
