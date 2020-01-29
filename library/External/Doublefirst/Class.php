@@ -7,12 +7,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
- *         ,--.--._
- * ------" _, \___)
- *       2 / _/____)
- *       x \//(____)
- * ------\     (__)
- *        `-----"
  */
 class External_Doublefirst_Class implements External_ClassInterface
 {

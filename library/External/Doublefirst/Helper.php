@@ -83,13 +83,16 @@ class External_Doublefirst_Helper
     public function getDayNumber($date)
     {
         // Work out what day of the week the term started on
+        if($date->isWeekend()) {
+            return 0;
+        }
 
         $query =
             "
-            SELECT      StartDate, 
-                        EndDate 
-            FROM        SchoolTerms 
-            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59' AND 
+            SELECT      StartDate,
+                        EndDate
+            FROM        SchoolTerms
+            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59' AND
                         EndDate >= '" . $date->getDatabaseDate() . " 00:00:00'
         ";
 
@@ -103,10 +106,10 @@ class External_Doublefirst_Helper
 
             $query =
                 "
-	            SELECT      TOP 1 StartDate, 
-	                        EndDate 
-	            FROM        SchoolTerms 
-	            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59'  
+	            SELECT      TOP 1 StartDate,
+	                        EndDate
+	            FROM        SchoolTerms
+	            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59'
 			    ORDER BY 	StartDate DESC
 	        ";
 
@@ -137,6 +140,7 @@ class External_Doublefirst_Helper
         $query = "SELECT TimetableWeekLength FROM TimetableParameters WHERE AcademicYear = {$year}";
         $weekLength = $this->getDatabase()->getRow($query);
 
+
         for ($i = $start; $i <= $current; $i++) {
             $day++;
 
@@ -149,7 +153,7 @@ class External_Doublefirst_Helper
 
                 $week++;
 
-                if ($week > $weekLength["TimeTableWeekLength"]) {
+                if ($week > $weekLength["TimetableWeekLength"]) {
                     $week = 1;
                 }
             }
