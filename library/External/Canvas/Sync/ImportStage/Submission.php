@@ -139,19 +139,21 @@ class Submission extends SectionAssignment
 
                 $assessments       = $this->assessmentDataSource->findAllImplementationsBySpecificationId($sbSubmissionBoxSpec->getAssessmentModel()->getId());
                 $canvasSubmissions = $this->loadCanvasSubmissions($assessmentCanvasId);
-                $this->log->info("Processing " . count($canvasSubmissions) . " submissions for Canvas Assignment '{$canvasAssessment['title']}' (CanvasId: $assessmentCanvasId)");
+                $this->log->info("Processing submissions for Canvas Assignment '{$canvasAssessment['title']}' (CanvasId: $assessmentCanvasId)");
 
                 // reset plan cache
-                $this->dueWorkPlanCache = [];
+                $this->dueWorkPlanCache   = [];
+                $assessmentHasSubmissions = false;
                 foreach ($canvasSubmissions as $canvasSubmission) {
                     $sbAssessments = $this->findCorrespondingAssessments($canvasSubmission, $assessments);
                     foreach ($sbAssessments as $sbAssessment) {
+                        $assessmentHasSubmissions = true;
 
                         try {
                             $reviewee = $this->userMapper->findByExternalId($canvasSubmission['reviewee_id']);
                         } catch (Mapper\Exception $e) {
                             // If the reviewee (i.e. student) does not exist, skip this canvas submission
-                            $this->log->debug("Reviewee (ExternalId: {$canvasSubmission['reviewee_id']}) of canvas submission {$canvasSubmission['submission_id']} does not exist in Schoolbox");
+                            $this->log->debug("Reviewee (ExternalId: {$canvasSubmission['reviewee_id']}) does not exist in Schoolbox");
                             continue;
                         }
 
@@ -160,7 +162,7 @@ class Submission extends SectionAssignment
                         } catch (Mapper\Exception $e) {
                             $reviewer = $this->userMapper->findById($this->getSchoolboxAdminUserId());
                         }
-                        $this->log->debug("Synchronising Canvas mark for {$reviewee->getFullName()}[{$reviewee->getId()}] for {$sbAssessment->getTitle()}[{$sbAssessment->getId()}]");
+                        $this->log->debug("Synchronising Canvas mark for {$reviewee->getFullName()} [{$reviewee->getId()}]");
 
                         $submissionBox = $this->submissionBoxMapper->findOneByColumn('assessment_id', $sbAssessment->getId());
 
@@ -185,6 +187,10 @@ class Submission extends SectionAssignment
                         $this->saveModel($this->returnedWorkMapper, $feedback, false, false);
                         $this->syncMarkCount++;
                     }
+                }
+
+                if (!$assessmentHasSubmissions) {
+                    $this->log->debug("This Canvas assignment has no marks to sync");
                 }
             }
         }
