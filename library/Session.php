@@ -554,7 +554,7 @@ class Session
                 }
             } else {
                 //user is not parent so get timetable information
-                if(!$user->getHideTimetable()) {
+                if (!$user->getHideTimetable()) {
                     $subjectList = $synUser->getSubjectList($_SESSION['user']);
                 }
                 else {

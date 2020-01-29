@@ -656,7 +656,7 @@ class MapperProxy
         $classFolderIds = $folderMapper->findForUser(
             $student,
             // Only actual students have classes
-            $student->getRole()->isStudent(),
+            $student->getRole()->isStudent() && !$student->getHideTimetable(),
             UserAccess::ACCESS_READ,
             true
         )->getPropertyValues('id');
