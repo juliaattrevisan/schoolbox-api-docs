@@ -42,7 +42,7 @@ class Specification
     /**
      * Number of spaces for output formatting
      */
-    private const PADDING = 20;
+    private const PADDING = 10;
 
 
     /**
