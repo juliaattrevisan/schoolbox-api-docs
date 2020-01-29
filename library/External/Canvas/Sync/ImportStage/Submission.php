@@ -63,9 +63,6 @@ class Submission extends SectionAssignment
     /** @var UserMapper */
     private $userMapper;
 
-    /** @var Bridge\Course */
-    private $courseBridge;
-
     /** @var array */
     private $dueWorkPlanCache;
 
@@ -118,7 +115,6 @@ class Submission extends SectionAssignment
         $this->assessmentDataSource = $assessmentDataSource;
         $this->userMapper           = $userMapper;
         $this->log                  = $log;
-        $this->courseBridge         = $courseBridge;
         $this->courseSectionBridge  = $courseSectionBridge;
     }
 
@@ -143,6 +139,7 @@ class Submission extends SectionAssignment
 
                 $assessments       = $this->assessmentDataSource->findAllImplementationsBySpecificationId($sbSubmissionBoxSpec->getAssessmentModel()->getId());
                 $canvasSubmissions = $this->loadCanvasSubmissions($assessmentCanvasId);
+                $this->log->info("Processing " . count($canvasSubmissions) . " submissions for Canvas Assignment '{$canvasAssessment['title']}' (CanvasId: $assessmentCanvasId)");
 
                 // reset plan cache
                 $this->dueWorkPlanCache = [];
@@ -153,8 +150,8 @@ class Submission extends SectionAssignment
                         try {
                             $reviewee = $this->userMapper->findByExternalId($canvasSubmission['reviewee_id']);
                         } catch (Mapper\Exception $e) {
-                            // If the reviewee (i.e. student) does not exists, skip this canvas submission
-                            $this->log->debug("Reviewee does not exist for canvas submission {$canvasSubmission['submission_id']}");
+                            // If the reviewee (i.e. student) does not exist, skip this canvas submission
+                            $this->log->debug("Reviewee (ExternalId: {$canvasSubmission['reviewee_id']}) of canvas submission {$canvasSubmission['submission_id']} does not exist in Schoolbox");
                             continue;
                         }
 
@@ -165,7 +162,6 @@ class Submission extends SectionAssignment
                         }
                         $this->log->debug("Synchronising Canvas mark for {$reviewee->getFullName()}[{$reviewee->getId()}] for {$sbAssessment->getTitle()}[{$sbAssessment->getId()}]");
 
-                        // TODO: there should be a better way
                         $submissionBox = $this->submissionBoxMapper->findOneByColumn('assessment_id', $sbAssessment->getId());
 
                         // ReturnWork version
@@ -199,7 +195,7 @@ class Submission extends SectionAssignment
     /**
      * @inheritDoc
      */
-    function resetCounts(): void
+    protected function resetCounts(): void
     {
         $this->syncMarkCount = 0;
     }
@@ -238,12 +234,8 @@ class Submission extends SectionAssignment
             ORDER BY submission_dim.id
         ";
 
-        $data      = [];
         $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
-        while ($row = $statement->fetch()) {
-            $data[] = $row;
-        }
-        return $data;
+        return $statement->fetchAll();
     }
 
     /**
