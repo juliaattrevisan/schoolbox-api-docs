@@ -21,18 +21,25 @@
 {% set labelPublishedMark       = 'Mark Published' %}
 
 <div class="row">
-    <div class="small-12 island">
-        <div class="checklist" style="float:right;">
-            <input type="checkbox" id="show-drafts">
-            <label for="show-drafts">
-                Show Drafts
-            </label>
-        </div>
-        <div class="legend" style="float:right;">
-            <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
-            <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
-            <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
-        </div>
+    <div class="actions-small-1 row">
+        <nav>
+            <div class="legend">
+                <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
+                <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
+                <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
+                <div class="checklist">
+                    <input type="checkbox" id="show-drafts">
+                    <label for="show-drafts">
+                        Show Drafts
+                    </label>
+                </div>
+                <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+            </div>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+            <li class="separator">Report</li>
+            <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+        </ul>q
     </div>
 </div>
 <div id="report_actions" class="actions-small-1 row">
@@ -43,13 +50,6 @@
         </ul>
     </div>
     {% endif %}
-    <nav>
-        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li class="separator">Report</li>
-        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
-    </ul>
 </div>
 
 <div class="row">
