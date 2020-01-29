@@ -89,6 +89,13 @@
         {% endspaceless -%}
     {% endset %}
 
+    {% set inputNo = 1 %}
+    {% if 'none' == markSchemeName | lower %}
+        {% set inputsPerFeedback = 2 %}
+    {% else %}
+        {% set inputsPerFeedback = 3 %}
+    {% endif %}
+
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
         <div class="small-12 column">
             <div class="row actions-small-{{ pActionCount }}">
@@ -134,10 +141,11 @@
                                     participant: participant,
                                     feedback: participant.findMostRecentInstructorGivenFeedback,
                                     markScheme:  assessment.markScheme,
-                                    tabIndex:    (loop.index0 * 2) + 1,
+                                    tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                                     errors:      errors,
                                     readonly:    readonly
                                 } only %}
+                                {% set inputNo = inputNo + 1 %}
                             </label>
                         </div>
                     {% endif %}
@@ -146,18 +154,20 @@
                         {% include '@learningAssessment/dueWork/comment.twig' with {
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
-                            tabIndex:    (loop.index0 * 2) + 2,
+                            tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                             readonly:    readonly
                         } only %}
+                        {% set inputNo = inputNo + 1 %}
                     </div>
 
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9 medium-offset-3{% endif %} column">
                         {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
-                            tabIndex:    (loop.index0 * 2) + 3,
+                            tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                             readonly:    readonly
                         } only %}
+                        {% set inputNo = inputNo + 1 %}
                     </div>
                 </div>
             {% if fbUrl %}
