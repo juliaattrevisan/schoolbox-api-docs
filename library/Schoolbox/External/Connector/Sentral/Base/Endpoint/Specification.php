@@ -74,8 +74,6 @@ class Specification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
-     *
-     * @throws RuntimeException
      */
     public function check(): array
     {
