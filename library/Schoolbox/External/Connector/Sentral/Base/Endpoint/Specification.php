@@ -8,8 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
+use RuntimeException;
+use UnexpectedValueException;
 
 /**
  * Class Specification
@@ -34,6 +34,12 @@ class Specification
 
 
     /**
+     * Status text for existing nodes that are empty but probably should contain something
+     */
+    private const STATUS_EMPTY = 'EMPTY';
+
+
+    /**
      * Number of spaces for output formatting
      */
     private const PADDING = 20;
@@ -46,13 +52,21 @@ class Specification
 
 
     /**
+     * @var Api
+     */
+    private $api;
+
+
+    /**
      * Specification constructor.
      *
      * @param LoggerInterface|null $log
+     * @param Api                  $api
      */
-    public function __construct(?LoggerInterface $log)
+    public function __construct(?LoggerInterface $log, Api $api)
     {
         $this->log = $log;
+        $this->api = $api;
     }
 
 
@@ -61,9 +75,7 @@ class Specification
      *
      * @return array
      *
-     * @throws \RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
+     * @throws RuntimeException
      */
     public function check(): array
     {
@@ -72,7 +84,13 @@ class Specification
             /**
              * Student Profile nodes
              */
-
+            'enrolments/student-contact?include=person,student,studentPerson&limit=1',
+            'enrolments/emergency-contact-link?limit=1',
+            'enrolments/enrolment?limit=1',
+            'plans/student-plan?limit=1',
+            'plans/student-plan-type?limit=1',
+            'enrolments/medical-condition?limit=1',
+            'enrolments/person-phone?limit=1',
 
             /**
              * Parent Profile nodes
@@ -82,6 +100,7 @@ class Specification
             /**
              * Staff Profile nodes
              */
+            'enrolments/staff?include=person,qualifications&limit=1',
 
 
             /**
@@ -97,13 +116,23 @@ class Specification
         foreach ($paths as $path) {
             $paddedPath = str_pad($path, $paddedLength);
 
-            if ($this->batchxml->fetchXml($path)) {
-                $message = "{$paddedPath} " . self::STATUS_OK;
+            try {
+                $result = $this->api->retrieveDocument($path);
 
-                if ($this->log) {
-                    $this->log->info($message);
+                if (\count($result['data'])) {
+                    $message = "{$paddedPath} " . self::STATUS_OK;
+
+                    if ($this->log) {
+                        $this->log->info($message);
+                    }
+                } else {
+                    $message = "{$paddedPath} " . self::STATUS_EMPTY;
+
+                    if ($this->log) {
+                        $this->log->warning($message);
+                    }
                 }
-            } else {
+            } catch (UnexpectedValueException $e) {
                 $message = "{$paddedPath} " . self::STATUS_MISSING;
 
                 if ($this->log) {
