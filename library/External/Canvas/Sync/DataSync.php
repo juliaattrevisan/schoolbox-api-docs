@@ -16,6 +16,7 @@ use Alaress\Database;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -81,6 +82,12 @@ class DataSync
     /** @var Assessment\Mapper */
     private $assessmentMapper;
 
+    /** @var ReturnedWorkMapper */
+    private $returnedWorkMapper;
+
+    /** @var Assessment\MapperProxy */
+    private $assessmentDataSource;
+
     /** @var Participant\Plan\Mapper */
     private $planMapper;
 
@@ -128,6 +135,8 @@ class DataSync
      * @param QuestionType\Mapper     $quizQuestionTypeMapper
      * @param QuizSolution\Mapper     $quizSolutionMapper
      * @param SubmissionBoxMapper     $submissionBoxMapper
+     * @param ReturnedWorkMapper      $returnedWorkMapper
+     * @param Assessment\MapperProxy  $assessmentDataSource
      * @param Assessment\Mapper       $assessmentMapper
      * @param Participant\Plan\Mapper $planMapper
      * @param Participant\Mapper      $participantMapper
@@ -154,6 +163,8 @@ class DataSync
         QuestionType\Mapper $quizQuestionTypeMapper,
         QuizSolution\Mapper $quizSolutionMapper,
         SubmissionBoxMapper $submissionBoxMapper,
+        ReturnedWorkMapper $returnedWorkMapper,
+        Assessment\MapperProxy $assessmentDataSource,
         Assessment\Mapper $assessmentMapper,
         Participant\Plan\Mapper $planMapper,
         Participant\Mapper $participantMapper,
@@ -179,6 +190,8 @@ class DataSync
         $this->quizQuestionTypeMapper = $quizQuestionTypeMapper;
         $this->quizSolutionMapper     = $quizSolutionMapper;
         $this->submissionBoxMapper    = $submissionBoxMapper;
+        $this->returnedWorkMapper     = $returnedWorkMapper;
+        $this->assessmentDataSource   = $assessmentDataSource;
         $this->assessmentMapper       = $assessmentMapper;
         $this->planMapper             = $planMapper;
         $this->participantMapper      = $participantMapper;
@@ -245,6 +258,7 @@ class DataSync
         $this->syncCourseSections($courseBridge, $courseGroupBridge, $sectionBridge);
         $this->syncClassAssignments($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
         $this->syncClassQuiz($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
+        $this->syncSubmission($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
 
         if (!$this->persist) {
             $this->schoolboxDb->rollBack();
@@ -467,6 +481,41 @@ class DataSync
             $courseBridge,
             $courseSectionBridge,
             $assignmentOverrideBridge
+        ))->synchronise();
+    }
+
+    /**
+     * @param Bridge\AssignmentDates    $assignmentDatesBridge
+     * @param Bridge\Course             $courseBridge
+     * @param Bridge\CourseSection      $courseSectionBridge
+     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
+     * @throws Mapper\Exception
+     */
+    private function syncSubmission(
+        Bridge\AssignmentDates $assignmentDatesBridge,
+        Bridge\Course $courseBridge,
+        Bridge\CourseSection $courseSectionBridge,
+        Bridge\AssignmentOverride $assignmentOverrideBridge
+    ): void {
+        (new ImportStage\Submission(
+            $this->canvasDb,
+            $this->schoolboxDb,
+            $this->externalClass,
+            $this->externalUser->getCurrentYear(),
+            $this->unitImplMapper,
+            $this->unitSpecMapper,
+            $this->submissionBoxMapper,
+            $this->assessmentMapper,
+            $this->planMapper,
+            $this->participantMapper,
+            $this->userMapper,
+            $this->log,
+            $assignmentDatesBridge,
+            $courseBridge,
+            $courseSectionBridge,
+            $assignmentOverrideBridge,
+            $this->returnedWorkMapper,
+            $this->assessmentDataSource
         ))->synchronise();
     }
 }
