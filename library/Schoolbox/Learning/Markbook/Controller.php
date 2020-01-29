@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Filter;
 use Schoolbox\User;
 use Schoolbox\GenericCollection;
@@ -36,9 +35,6 @@ class Controller extends Base
     /** @var Term\Mapper */
     private $termMapper;
 
-    /**  @var StateMapper */
-    private $dueWorkStateMapper;
-
     /** @var Access */
     private $access;
 
@@ -53,7 +49,6 @@ class Controller extends Base
      * @param AssessmentMapperProxy              $assessmentMapperProxy
      * @param GradeGroup\Model                   $defaultGradeGroup
      * @param Term\Mapper                        $termMapper
-     * @param StateMapper                        $dueWorkStateMapper
      * @param Access                             $access
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\IFactoryFactory             $filterFactoryFactory
@@ -62,7 +57,6 @@ class Controller extends Base
         AssessmentMapperProxy $assessmentMapperProxy,
         GradeGroup\Model $defaultGradeGroup,
         Term\Mapper $termMapper,
-        StateMapper $dueWorkStateMapper,
         Access $access,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Filter\IFactoryFactory $filterFactoryFactory
@@ -70,7 +64,6 @@ class Controller extends Base
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->defaultGradeGroup     = $defaultGradeGroup;
         $this->termMapper            = $termMapper;
-        $this->dueWorkStateMapper    = $dueWorkStateMapper;
         $this->access                = $access;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterFactoryFactory  = $filterFactoryFactory;
