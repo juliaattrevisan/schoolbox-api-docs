@@ -25,6 +25,10 @@
         (by consensus of the Product Team)
       * introduces a change which necessitates a change management effort by the
         Professional Services team (i.e., it changes a process or user interface)
+    * In rare cases, a PR will be required for a Schoolbox version previous to master
+      (i.e., a fix for a critical security or privacy issue,
+       which cannot wait for all schools to upgrade to current master).
+      * This PR will be based off the `$majorVersionNumber-STABLE` tag (e.g. `19.0-STABLE`).
 
 * A different developer reviews the PRs, static reviewing the code, and functional testing the area. In most cases there will be changes required, in which case the reviewer leaves comments on GitHub, and pushes the ticket back to 'In Progress' in Jira.
 
