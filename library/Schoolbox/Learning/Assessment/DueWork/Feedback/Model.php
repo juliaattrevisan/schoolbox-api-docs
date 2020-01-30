@@ -210,6 +210,14 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
 
     /**
      * Checks whether is empty, excluding Rubric
+     *
+     * A feedback is empty only if all these conditions are true:
+     * * It has no files
+     * * It has no normalized mark
+     * * It has no human-readable mark
+     * * It has no comment
+     * * It is not marked as requiring resubmission
+     *
      * @return bool
      */
     public function isEmpty(): bool
@@ -217,7 +225,8 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         return ($this->getAllFiles()->count() === 0)
             && ($this->getNormalisedMark() === null)
             && ($this->getHumanReadableMark() === null || trim($this->getHumanReadableMark()) === '')
-            && ($this->getComment() === null || trim($this->getComment()) === '');
+            && ($this->getComment() === null || trim($this->getComment()) === '')
+            && !$this->resubmissionRequired;
     }
 
 
