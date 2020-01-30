@@ -116,15 +116,22 @@ feedback: currentFeedback,
                 {% endif %}
             </div>
             {% endblock card %}
-            <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
-                <span>
-                    {% if currentFeedback.resubmissionRequired %}
+
+            {%- set gradeOutput -%}
+                {% spaceless %}
+                    {%- if currentFeedback.resubmissionRequired -%}
                         Resubmit {% if not currentFeedback.humanReadableMark is empty %}({{ currentFeedback.humanReadableMark }}){% endif %}
-                    {% else %}
+                    {%- else -%}
                         {{ currentFeedback.humanReadableMark }}
-                    {% endif %}
-                </span>
+                    {%- endif -%}
+                {% endspaceless %}
+            {%- endset -%}
+
+            {% if gradeOutput %}
+            <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
+                <span>{{ gradeOutput }}</span>
             </div>
+            {% endif %}
         </div>
         <nav>
             {% if hasCollapser %}
