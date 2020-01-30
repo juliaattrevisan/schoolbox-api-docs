@@ -22,11 +22,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         // prepare
 
-        $caseSensitiveFields = array('ID', 'Email', 'MobilePhone', 'SpouseID', 'SpouseMobilePhone', 'DirectoryIncludeFlag');
+        $caseSensitiveFields = array('ID', 'Email', 'MobilePhone');
 
         $stmt = $this->getConnection()->prepareQuery('
-            SELECT CARER_NUMBER AS ID, FULL_NAME, COMBINED_EMAIL_ADDRESS AS EMAIL, MOBILE AS MOBILEPHONE, SPOUSE_CARER_NUMBER AS SPOUSEID, SPOUSE_FULL_NAME,
-              SPOUSE_MOBILE AS SPOUSEMOBILEPHONE, 1 AS DIRECTORYINCLUDEFLAG
+            SELECT CARER_NUMBER AS ID, FULL_NAME, EMAIL, MOBILE AS MOBILEPHONE
             FROM SCHOOLBOX_PARENTS
             WHERE CARER_NUMBER = :id
         ');
@@ -48,10 +47,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         if ($selfName = $this->guessNamePartsFromFull($parent['FULL_NAME'])) {
             $parent = array_merge($parent, $selfName);
             unset($parent['FULL_NAME']);
-        }
-        if ($spouseName = $this->guessNamePartsFromFull($parent['SPOUSE_FULL_NAME'], 'Spouse')) {
-            $parent = array_merge($parent, $spouseName);
-            unset($parent['SPOUSE_FULL_NAME']);
         }
 
         return $this->normaliseFields($parent, $caseSensitiveFields);
@@ -368,6 +363,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return array_values($children);
     }
 
+
     /**
      * {@inheritDoc}
      *
@@ -377,6 +373,88 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getPortrait(User $user): ?Storage\Model
     {
         return $user->getPortrait();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudentUserAccountInfo(): array
+    {
+        $stmt = $this->getConnection()->prepareQuery('
+            SELECT
+            STUDENT_NUMBER AS "StudentID",
+            USERNAME       AS "NetworkLogin",
+            NULL           AS "StudentTitle",
+            FIRSTNAME      AS "StudentPreferred",
+            SURNAME        AS "StudentSurname",
+            EMAIL_ADDRESS  AS "StudentEmail",
+            NULL           AS "StudentOccupEmail",
+            YEAR_LEVEL     AS "StudentYearLevel",
+            HOUSE          AS "StudentHouse",
+            NULL           AS "StudentCampus"
+            FROM SCHOOLBOX_STUDENTS
+        ');
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getParentUserAccountInfo(): array
+    {
+        $stmt = $this->getConnection()->prepareQuery('
+            SELECT
+            P.CARER_NUMBER        AS "StudentContactID",
+            NULL                  AS "StudentContactTitle",
+            P.FULL_NAME           AS "StudentContactPreferred",
+            NULL                  AS "StudentContactSurname",
+            P.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
+            P.SPOUSE_CARER_NUMBER AS "StudentContactSpouseID",
+            NULL                  AS "StudentContactSpouseTitle",
+            P.SPOUSE_FULL_NAME    AS "StudentContactSpousePreferred",
+            NULL                  AS "StudentContactSpouseSurname",
+            P.SPOUSE_EMAIL        AS "StudentContactSpouseDefaultEmail",
+            S.YEAR_LEVEL          AS "StudentYearLevel",
+            S.STUDENT_NUMBER      AS "StudentID"
+            FROM SCHOOLBOX_PARENTS AS P
+            INNER JOIN SCHOOLBOX_PARENT_STUDENT
+                AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
+            INNER JOIN SCHOOLBOX_STUDENTS
+                AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
+            ORDER BY INTEGER(P.CARER_NUMBER) ASC, INTEGER(S.STUDENT_NUMBER) ASC
+        ');
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws \Alaress\Database\Exception
+     */
+    public function getStaffUserAccountInfo(): array
+    {
+        $stmt = $this->getConnection()->prepareQuery('
+            SELECT
+                STAFF_NUMBER  AS "StaffID",
+                USERNAME      AS "NetworkLogin",
+                1             AS "ActiveFlag",
+                SALUTATION    AS "StaffTitle",
+                FIRSTNAME     AS "StaffPreferredName",
+                SURNAME       AS "StaffSurname",
+                NULL          AS "DefaultEmailCode",
+                EMAIL_ADDRESS AS "OccupEmail",
+                EMAIL_ADDRESS AS "Email",
+                CAMPUS        AS "StaffCampus",
+                NULL          AS "StaffCategoryType",
+                NULL          AS "StaffCategory"
+             FROM SCHOOLBOX_STAFF
+             WHERE USERNAME IS NOT NULL
+        ');
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -410,6 +488,15 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @inheritdoc
      * @deprecated
      */
+    public function getParentSync(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated
+     */
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         return [];
@@ -422,6 +509,15 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function determineBoarderType(?string $boarderValue): string
     {
         return '';
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated
+     */
+    public function getHousemasterByHouseId(string $houseID): ?string
+    {
+        return null;
     }
 
     /**
