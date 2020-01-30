@@ -197,14 +197,22 @@
                                     {% set comment            = participant.authoritativeFeedback(true).comment %}
                                     {% set mark               = participant.humanReadableMark(true) %}
                                     {% set isMarkPublished    = participant.hasPublishedFeedback %}
-                                    {% set draftMark          = (participant.hasSubmittedResponse and not isMarkPublished) %}
+                                    {% set latestFeedback             = participant.findMostRecentInstructorGivenFeedback %}
+                                    {% set latestPublishedFeedback    = participant.findMostRecentInstructorGivenPublishedFeedback %}
 
-                                    {% if isMarkPublished %}
-                                        {% set indicator = 'published' %}
-                                        {% set notchTitle = labelPublishedMark %}
-                                    {% elseif draftMark %}
+                                    {% if latestFeedback.id != latestPublishedFeedback.id and assessment.typeName != 'Quiz' %}
+                                        {% set draftMark      = true %}
+                                    {% else %}
+                                        {% set draftMark      = false %}
+                                    {% endif %}
+
+
+                                    {% if draftMark %}
                                         {% set indicator = 'pending' %}
                                         {% set notchTitle = labelPubMarkDraftPending %}
+                                    {% elseif isMarkPublished %}
+                                        {% set indicator = 'published' %}
+                                        {% set notchTitle = labelPublishedMark %}
                                     {% else %}
                                         {% set indicator = 'none' %}
                                         {% set notchTitle = labelNoPublishedMark %}
@@ -212,19 +220,19 @@
 
 
                                     {% if isMarkPublished %}
-                                        <a href="{{ participationRoute }}" {% if draftMark %}data-actual-mark{% endif %}
+                                        <a href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
                                            title="{{ comment }}">{{ mark | default('–') }}</a>
                                     {% elseif draftMark %}
                                         <a href="{{ participationRoute }}"
-                                           {% if draftMark %}data-actual-mark{% endif %}>Pending</a>
+                                                {% if draftMark %} data-actual-mark {% endif %}>Pending</a>
                                     {% else %}
                                         <a href="{{ participationRoute }}"
-                                           {% if draftMark %}data-actual-mark{% endif %}>–</a>
+                                                {% if draftMark %} data-actual-mark {% endif %}>–</a>
                                     {% endif %}
 
                                     {% if draftMark %}
                                         <a href="{{ participationRoute }}" data-draft-mark style="display: none"
-                                           data-tooltip="right"
+                                           data-tooltip="right" class="meta"
                                            title="Draft Mark">{{ participant.humanReadableMark(false) | default('–') }}</a>
                                     {% endif %}
 
