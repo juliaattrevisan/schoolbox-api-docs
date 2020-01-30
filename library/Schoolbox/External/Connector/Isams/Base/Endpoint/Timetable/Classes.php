@@ -295,7 +295,7 @@ class Classes implements IStrategy
                      */
                     if (!isset($users[$student['username']])) {
                         $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox account %s to class %s %s',
+                            'Tried to assign nonexistent schoolbox account %s to class %s %s; username might not exist in schoolbox user table',
                             $student['username'],
                             $timetableClass->getName(),
                             $timetableClass->getCode()
@@ -374,7 +374,7 @@ class Classes implements IStrategy
          */
         if (!isset($users[$class['teachers']['username']])) {
             $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s',
+                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; username might not exist in schoolbox user table',
                 $class['teachers']['username'],
                 $timetableClass->getName(),
                 $timetableClass->getCode()
