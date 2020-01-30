@@ -7,7 +7,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\IMapper;use Schoolbox\Mapper;
+use Schoolbox\Mapper;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -15,8 +15,7 @@ require_once __DIR__ . '/../conf/core/require.php';
  * Finds schema columns that aren't known by their corresponding mappers (finds unmapped columns).
  * Originally used to identify deprecated columns.
  */
-$app = new class extends CliTool\App
-{
+$app = new class extends CliTool\App {
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -38,8 +37,10 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Finds schema columns that aren't known by their corresponding mappers (finds unmapped columns).
-Originally used to identify deprecated columns.
+Schema check tool for mappers.
+
+* finds schema columns that aren't known by their corresponding mappers
+* tests default hydration of mapper rows by attempting a count and then a find
 
 Usage: schema-check.php
 
@@ -48,40 +49,74 @@ HELP;
             exit;
         }
 
-        $this->getLogger()->info('Unmapped:');
+        // The mapper will only error on attempting to hydrate a join not in a
+        // retrieved row if debug mode is off.
+        if (!$this->getConfig()->get('debug_mode')) {
+            $this->getLogger()->notice(
+                'Config setting "debug_mode" is off: the count and find query may return false positives'
+            );
+        }
 
         $classes = array_map(
-            function ($v)
-            {
+            static function ($v) {
                 return str_replace('/', "\\", substr($v, 0, -4));
             },
             $this->allMapperClassFiles()
         );
 
-        $output = [];
-
         foreach ($classes as $classname) {
+            // Output the name: skip if not usable
+            $this->getLogger()->info("{$classname}:");
             try {
-                $unmapped = $this->dumpClassSpec($classname);
+                $mapper = $this->retrieveMapper($classname);
+            } catch (InvalidArgumentException $e) {
+                $this->getLogger()->notice("    {$e->getMessage()}");
+                continue;
+            } catch (Throwable $e) {
+                $this->getLogger()->warning("    {$e->getMessage()}");
+                continue;
+            }
 
+            // Unmapped fields
+            try {
+                $unmapped = $mapper->listUnmappedFields();
                 if (\count($unmapped) === 0) {
-                    continue;
+                    $this->getLogger()->info('    Unmapped fields: none');
+                } else {
+                    $this->getLogger()->info('    Unmapped fields:');
+                    foreach ($unmapped as $field) {
+                        $this->getLogger()->info("        {$field}");
+                    }
                 }
+            } catch (Throwable $e) {
+                $this->getLogger()->warning("    Unmapped fields: error ({$e->getMessage()})");
+            }
 
-                $output[$classname] = [
-                    'unmapped' => $unmapped
-                ];
 
-                $this->getLogger()->info("    {$classname}:");
-
-                foreach($unmapped as $field){
-                    $this->getLogger()->info("        {$field}");
+            // Query test: count
+            try {
+                $count = $mapper->countAll();
+                if ($count > 0) {
+                    $this->getLogger()->info('    Count test: pass');
+                } else {
+                    $this->getLogger()->notice('    Count test: skip (count = 0)');
                 }
-            } catch (\Exception $e) {
-                // for information of what was excluded and why, uncomment this
-                // $output[$classname] = [
-                //     get_class($e) => $e->getMessage()
-                // ];
+            } catch (Throwable $e) {
+                $this->getLogger()->warning("    Count test: error ({$e->getMessage()})");
+            }
+
+
+            // Query test: find
+            try {
+                $rows  = $mapper->findAll(['limit' => 1]);
+                $count = count($rows);
+                if ($count > 0) {
+                    $this->getLogger()->info('    Find test: pass');
+                } else {
+                    $this->getLogger()->notice('    Find test: skip (count = 0)');
+                }
+            } catch (Throwable $e) {
+                $this->getLogger()->warning("    Find test: error ({$e->getMessage()})");
             }
         }
     }
@@ -91,16 +126,17 @@ HELP;
      * @param string $prefix
      * @return array
      */
-    private function listIn($dir, $prefix = ''): array {
-        $dir = rtrim($dir, '\\/');
-        $result = array();
+    private function listIn($dir, $prefix = ''): array
+    {
+        $dir    = rtrim($dir, '\\/');
+        $result = [];
 
         foreach (scandir($dir) as $f) {
             if ($f !== '.' and $f !== '..') {
                 if (is_dir("$dir/$f")) {
                     $result = array_merge($result, $this->listIn("{$dir}/{$f}", "{$prefix}{$f}/"));
                 } else {
-                    $result[] = $prefix.$f;
+                    $result[] = $prefix . $f;
                 }
             }
         }
@@ -117,8 +153,7 @@ HELP;
         return array_values(
             array_filter(
                 $this->listIn(dirname(__DIR__) . '/library'),
-                function ($v)
-                {
+                static function ($v) {
                     return strpos($v, 'Schoolbox') === 0 && substr($v, -10) === 'Mapper.php';
                 }
             )
@@ -128,14 +163,14 @@ HELP;
 
     /**
      * @param string $classname
-     * @return array
+     * @return Mapper
      * @throws InvalidArgumentException
      */
-    private function dumpClassSpec($classname): array
+    private function retrieveMapper($classname): Mapper
     {
         $rc = new ReflectionClass($classname);
 
-        if (!$rc->implementsInterface(IMapper::class)) {
+        if (!$rc->isSubclassOf(Mapper::class)) {
             throw new InvalidArgumentException('Class is not a Schoolbox Mapper');
         }
 
@@ -146,13 +181,11 @@ HELP;
         $constructor = $rc->getConstructor();
 
         // Don't attempt to construct if it's requires args
-        if($constructor->getNumberOfRequiredParameters()){
-            return [];
+        if ($constructor->getNumberOfRequiredParameters() > 0) {
+            throw new InvalidArgumentException('Mapper constructor requires params: not sure what they are');
         }
-        /** @var Mapper $mapper */
-        $mapper = $rc->newInstance();
 
-        return $mapper->listUnmappedFields();
+        return $rc->newInstance();
     }
 };
 
