@@ -240,6 +240,54 @@ class NNIANTest extends TestCase
     }
 
 
+    /**
+     * Tests that the code throws an appropriate exception if a circular inheritance graph is encountered.
+     *
+     * @dataProvider providerDetectCycle
+     * @param bool $beforeCycle Should we test a node prior to cycle, or inside cycle?
+     * @param int  $n           Number of nodes in cycle. Must be >= 2
+     * @throws Framework\Exception
+     * @throws InsufficientHydrationException
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws ReflectionException
+     * @throws UnexpectedValueException
+     * @expectedException MapperException
+     */
+    public function testDetectCycle(bool $beforeCycle, int $n): void
+    {
+        $this->expectException(MapperException::class);
+
+        // Create a loop of N folders, eg, 1 > N > 4 > 3 > 2 ... N
+        // Note here that 1 is not part of the loop, N IS part of the loop
+        // Note we go backwards from N to 2 to ensure we don't confuse array position with array index
+
+        $leaf       = (new Folder\Model())
+            ->setId(1)
+            ->setName("Folder 1")
+            ->setInherit(true);
+        $prevFolder = $leaf;
+
+        // Build a straight branch
+        for ($i = $n; $i >= 2; $i--) {
+            $prevFolder->setParent(
+                (new Folder\Model())
+                    ->setId($i)
+                    ->setName("Folder $i")
+                    ->setInherit(true)
+            );
+            $prevFolder = $prevFolder->getParent();
+        }
+
+        // Now loop the branch
+        $prevFolder->setParent($leaf->getParent());
+
+        $nnian = $this->newNnian([], false);
+
+        $nnian->findNearestNonInheritingAncestralNode($beforeCycle ? $leaf : $leaf->getParent());
+    }
+
+
     // ===================================== Data Providers =====================================
 
 
@@ -282,6 +330,22 @@ class NNIANTest extends TestCase
         ];
     }
 
+
+    /**
+     * @return array
+     */
+    public function providerDetectCycle(): array
+    {
+        // bool $beforeCycle, int $n
+        return [
+            [true, 2],
+            [false, 2],
+            [true, 10],
+            [false, 10],
+            [true, 1000],
+            [false, 1000],
+        ];
+    }
 
     // ===================================== Helpers =====================================
 

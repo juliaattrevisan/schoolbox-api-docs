@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use UnexpectedValueException;
+use function array_key_exists;
 
 /**
  * Responsible for resolving a folder to it's "Nearest Non Inheriting Ancestral Node"
@@ -73,7 +74,7 @@ class NNIAN
      * @return Model
      * @throws DefinitionException
      * @throws Deleted
-     * @throws Exception
+     * @throws MapperException
      * @throws Exception\InsufficientHydrationException
      * @throws Exception\NotFound
      * @throws InvalidArgumentException
@@ -134,14 +135,24 @@ class NNIAN
         $node         = $folder;
         while ($node->getInherit()) {
 
+            // Check we don't have a cyclic inheritance tree (where cycle composed of 3+ nodes)
+            if (array_key_exists($node->getId(), array_slice($interimNodes->keys(), 1))) {
+                throw new MapperException("Circular dependency detected");
+            }
+
             // Climb ancestry tree using cheapest mechanism available.
             if ($node->getParent()->getParent() && $node->getParent()->getParent()->getId() !== null) {
                 // Has this folder's parent already been sufficiently hydrated?
-                $node = $node->getParent();
+                $parent = $node->getParent();
             } else {
                 // Else load it cheaply
-                $node = $this->folderMapper->findCheaplyById($node->getParent()->getId());
+                $parent = $this->folderMapper->findCheaplyById($node->getParent()->getId());
             }
+            if ($node->getId() === $parent->getId()) {
+                // Check we don't have a cyclic ancestry graph (where cycle has 1 node)
+                throw new MapperException("Circular dependency detected. Node is own parent.");
+            }
+            $node = $parent;
 
             // Make sure we aren't hitting the root.
             // (There is a business rule that all top-level nodes must not inherit permissions)
@@ -149,7 +160,7 @@ class NNIAN
                 throw new MapperException("Folder has no NNIAN");
             }
 
-            // Check we don't have a cyclic ancestry graph
+            // Check we don't have a cyclic ancestry graph (where cycle has 2 nodes)
             if ($node->getId() === $folder->getId()) {
                 throw new MapperException("Circular dependency detected");
             }
