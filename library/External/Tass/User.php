@@ -499,7 +499,7 @@ class External_Tass_User implements External_UserInterface
 
             $query = "
                 SELECT DISTINCT
-                    sf.stud_codes AS RelatedID
+                    RTRIM(sf.stud_codes) AS RelatedID
                 FROM parent AS p
                 INNER JOIN paraddress as pa
                     ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
@@ -520,7 +520,7 @@ class External_Tass_User implements External_UserInterface
                     UNION
 
                     SELECT DISTINCT
-                        scr.stud_code AS RelatedID
+                        RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
                     WHERE cmpy_code = {$this->companyCode}
                     AND par_code = {$this->database->smartQuote($parentCode)}
@@ -561,7 +561,7 @@ class External_Tass_User implements External_UserInterface
                     UNION
 
                     SELECT DISTINCT
-                        scr.stud_code AS RelatedID
+                        RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
                     WHERE cmpy_code = {$this->companyCode}
                     AND par_code = {$this->database->smartQuote($id)}
