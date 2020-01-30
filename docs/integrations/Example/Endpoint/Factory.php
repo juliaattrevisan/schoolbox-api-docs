@@ -258,6 +258,15 @@ class Factory
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper,
                 $this->userMapper
+            ))
+            ->add(new Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
             ));
     }
 }
