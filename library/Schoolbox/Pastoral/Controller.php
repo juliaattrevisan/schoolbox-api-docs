@@ -843,7 +843,6 @@ class Controller extends Base
 
             $this->pastoralTagMapper->deleteForRecord($record);
             $this->assignTagsToRecord($record, $post["tags"]);
-            $this->pastoralTagMapper->purgeUnassociated();
 
             // Save permissions/visibility
 

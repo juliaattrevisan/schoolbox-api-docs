@@ -105,7 +105,6 @@ class Mapper extends BaseMapper
 
         $pastoralPastoralTagMapper = PastoralTagMapper::getInstance();
         $pastoralPastoralTagMapper->deleteForRecord($model);
-        $pastoralPastoralTagMapper->purgeUnassociated();
     }
 
     /**

@@ -110,23 +110,6 @@ class Mapper extends BaseMapper implements UsableAsTagSource
 
 
     /**
-     * Once a pastoral tag has been removed from all records in the database it should no longer appear in the
-     * selectize as an available option. This finds all unassociated tags and deletes them.
-     */
-    public function purgeUnassociated(): void
-    {
-        $statement = $this->getDatabase()->prepare("
-            UPDATE    {$this->getTable()}
-            SET       `deleted_at` = NOW()
-            WHERE     {$this->getTable()}.`id` NOT IN (SELECT `tag_id` FROM `pastoral_tags`)
-            AND       `deleted_at` IS NULL;
-        ");
-
-        $statement->execute();
-    }
-
-
-    /**
      * Find pastoral tags that contain the specified keyword
      *
      * @param User        $user
