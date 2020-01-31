@@ -96,17 +96,18 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     private function fetchTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         // check if there is a calendar event remapping the day number for this specific date
-
         if ($date != null)
         {
-            $statement = $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE 'D=D%'");
-
+            $statement = $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE '%=D%'");
             if ($row = $statement->fetch()) {
-                $overrideDay = trim(substr($row["CalendarType"], 3));
+                // Extract the Calendar Type and explode it to its two different parts
+                $definitionDayOverride = explode("=",$row["CalendarType"]);
+                $overrideDay = trim(substr($definitionDayOverride[1], 1));
+
+                // Only use the second part of the string and ignore the first characted.
+                // This makes assumptions that Synergetic setup correctly with either D=D# or D#=D#, and the explode doesn't get a row without =
                 if (!empty($overrideDay) && is_numeric($overrideDay)) {
-
                     // Yep, found overriding day number. Use this instead
-
                     $day = $overrideDay;
                 }
             }
@@ -417,7 +418,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         $periodList = [];
-        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date->getDatabaseDate());
 
         if (!is_array($timetabledef['desc'])) {
             return [];
