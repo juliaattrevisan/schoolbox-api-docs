@@ -275,6 +275,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                             WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
                                     AND studsub.stud_code = '$externalUserId'
+                                    AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
+                                    AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                             ORDER BY prd_code, day_code";
 
         } else {
