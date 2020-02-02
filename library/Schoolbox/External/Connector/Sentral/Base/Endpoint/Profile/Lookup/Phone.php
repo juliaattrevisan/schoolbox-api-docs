@@ -94,14 +94,14 @@ class Phone
             if ((bool)$record['attributes']['canContact']) {
                 $personId = $record['relationships']['owner']['data']['id'];
 
-                $type = strtolower($record['attributes']['typeName'] ?? '');
+                $type = trim(strtolower($record['attributes']['typeName'] ?? ''));
 
                 /* Only remember one of these numbers
                  */
                 if (!isset($this->stack[$personId][$type])) {
                     $this->stack[$personId][$type] = trim(implode(' ', [
-                        $record['attributes']['extension'],
-                        $record['attributes']['number'],
+                        trim((string)$record['attributes']['extension']),
+                        trim((string)$record['attributes']['number']),
                     ]));
                 }
             }

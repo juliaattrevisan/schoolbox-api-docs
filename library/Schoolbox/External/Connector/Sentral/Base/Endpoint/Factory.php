@@ -249,6 +249,15 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
              ))
+            ->add(new Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
