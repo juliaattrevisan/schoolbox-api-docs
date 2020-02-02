@@ -47,6 +47,13 @@ class Profile implements IStrategy
 
 
     /**
+     * Employment status for departed staff: if a staff member is departed, they
+     * should not be synced.
+     */
+    private const STAFF_EMPLOYMENT_STATUS_DEPARTED = 'left';
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -830,7 +837,7 @@ class Profile implements IStrategy
 
                 /* Disregard departed staff
                  */
-                if ('left' === $staff['employmentStatus']) {
+                if (self::STAFF_EMPLOYMENT_STATUS_DEPARTED === $staff['employmentStatus']) {
                     $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - staff is departed',
                         trim("{$firstname} {$lastname}")
