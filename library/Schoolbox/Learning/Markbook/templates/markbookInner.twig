@@ -39,7 +39,7 @@
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
             <li class="separator">Report</li>
             <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
-        </ul>q
+        </ul>
     </div>
 </div>
 <div id="report_actions" class="actions-small-1 row">
@@ -200,12 +200,13 @@
                                     {% set latestFeedback             = participant.findMostRecentInstructorGivenFeedback %}
                                     {% set latestPublishedFeedback    = participant.findMostRecentInstructorGivenPublishedFeedback %}
 
+                                    {% set hasSubmittedResponse = participant.hasSubmittedResponse %}
+
                                     {% if latestFeedback.id != latestPublishedFeedback.id and assessment.typeName != 'Quiz' %}
                                         {% set draftMark      = true %}
                                     {% else %}
                                         {% set draftMark      = false %}
                                     {% endif %}
-
 
                                     {% if draftMark %}
                                         {% set indicator = 'pending' %}
@@ -222,7 +223,7 @@
                                     {% if isMarkPublished %}
                                         <a href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
                                            title="{{ comment }}">{{ mark | default('–') }}</a>
-                                    {% elseif draftMark %}
+                                    {% elseif (hasSubmittedResponse) %}
                                         <a href="{{ participationRoute }}"
                                                 {% if draftMark %} data-actual-mark {% endif %}>Pending</a>
                                     {% else %}
@@ -230,13 +231,15 @@
                                                 {% if draftMark %} data-actual-mark {% endif %}>–</a>
                                     {% endif %}
 
+                                    <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
+
                                     {% if draftMark %}
                                         <a href="{{ participationRoute }}" data-draft-mark style="display: none"
                                            data-tooltip="right" class="meta"
                                            title="Draft Mark">{{ participant.humanReadableMark(false) | default('–') }}</a>
+                                        <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
                                     {% endif %}
 
-                                    <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
                                     {% if not participant.plan.isDynamic %}
                                         <span class="individualisation has-tip tip-top" data-tooltip
                                               title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
