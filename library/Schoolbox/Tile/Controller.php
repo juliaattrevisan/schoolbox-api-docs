@@ -257,13 +257,7 @@ class Controller extends Base
                 'data'     => array(
                     'item'       => $item,
                     'layout'     => $item->getTileLayout(),
-                    'component'  => $component,
                     'attachzone' => $this->getAttachZoneData($item),
-                    'folder'     => $this->getFolderForComponent($component),
-                    'formAction' => $this->getRouter()->generate(
-                        'tile.update:post',
-                        ['id' => $item->getId()]
-                    ),
                 ),
             )
         );
