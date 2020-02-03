@@ -32,7 +32,8 @@ This file is internal use and is not shipped to clients.
 * `git fetch upstream`
 * `git checkout origin/master`
 * `git checkout -b master`
-* create vagrant.yaml for overrides if needed
+* create `vagrant.yaml` for overrides if needed
+* Place your `.env` file in the project's root directory
 * `vagrant up`
 * (optional) install the [gitsync script](https://github.com/alaress/git-scripts) to keep upstream insync with origin
 
