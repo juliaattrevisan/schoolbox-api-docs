@@ -144,7 +144,7 @@ class Api implements IApi
          * like an error string, or lost in transmission, etc.
          */
         if ($decoded === null) {
-            throw new UnexpectedValueException('Sentral Endpoint error: could not json_decode payload; did something snap?');
+            throw new UnexpectedValueException('Sentral Endpoint error: could not json_decode payload - it is null; did something snap?');
         }
 
         /* Check for error payload instead of data payload

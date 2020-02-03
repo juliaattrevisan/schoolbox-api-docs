@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use UnexpectedValueException;
 
 /**
  * Class Status
@@ -43,10 +44,16 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws UnexpectedValueException
      */
     public function isReachable(): bool
     {
-        return false;
+
+        /* There is a sentral/ping route, but it deliberately returns no data
+         * but the api connectivity doesn't recognise this as valid; instead
+         * of making it understand this scenario, pick a different one instead
+         */
+        return (bool)$this->api->retrieveDocument('sentral/status');
     }
 
 
