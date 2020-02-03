@@ -100,16 +100,15 @@ class Controller extends Base
      */
     public function layoutForm(Layout\Model $layout)
     {
-        $code   = 200;
+        $code = 200;
         $layout
             ->setHeading($this->request->post->get('heading', ''))
-            ->setGridWidth(intval($this->getRequest()->post['grid_width']))
-            ->setGridPadding(intval($this->getRequest()->post['grid_padding']))
-            ->setColumnCount(intval($this->getRequest()->post['column_count']))
-            ->setColumnPadding(intval($this->getRequest()->post['column_padding']))
-            ->setAspectRatioX(intval($this->getRequest()->post['aspect_ratio_x']))
-            ->setAspectRatioY(intval($this->getRequest()->post['aspect_ratio_y']))
-        ;
+            ->setGridWidth((int)$this->request->post['grid_width'])
+            ->setGridPadding((int)$this->request->post['grid_padding'])
+            ->setColumnCount((int)$this->request->post['column_count'])
+            ->setColumnPadding((int)$this->request->post['column_padding'])
+            ->setAspectRatioX((int)$this->request->post['aspect_ratio_x'])
+            ->setAspectRatioY((int)$this->request->post['aspect_ratio_y']);
         switch ($this->getRequest()->post['layout_type']) {
             case 'grid':
                 $layout->setLayoutType(Layout\Model::LAYOUT_TYPE_GRID);
@@ -140,10 +139,10 @@ class Controller extends Base
         // XHR: return a simple JSON response
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set(
-                array(
+                [
                     'format' => 'json',
                     'data'   => $layout,
-                )
+                ]
             );
             $this->getResponse()->status->setCode($code);
             return;
@@ -174,15 +173,15 @@ class Controller extends Base
         /** @var Model $model */
         $model = $this->mapper->createModel();
         $this->getResponse()->content->set(
-            array(
+            [
                 'title'    => 'Add Tile',
                 'template' => '@tile/modify.twig',
-                'data'     => array(
+                'data'     => [
                     'item'       => $model,
                     'layout'     => $layout,
                     'attachzone' => $this->getAttachZoneData($model),
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -221,10 +220,7 @@ class Controller extends Base
     {
         /** @var Model $item */
         $item = $this->mapper->createModel();
-        $this->updateItemWithFormValues(
-            $item,
-            $this->getRequest()->post
-        );
+        $this->updateItemWithFormValues($item, $this->request->post);
 
         // updateItemWithFormValues() doesn't set the layout item - set it here.
         if (!($layout->getId())) {
@@ -236,7 +232,7 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'tile.layout',
-                array('layoutId' => $layout->getId())
+                ['layoutId' => $layout->getId()]
             )
         );
     }
@@ -250,15 +246,15 @@ class Controller extends Base
     public function edit(Model $item, Component_Instance $component)
     {
         $this->getResponse()->content->set(
-            array(
+            [
                 'title'    => 'Add Tile',
                 'template' => '@tile/modify.twig',
-                'data'     => array(
+                'data'     => [
                     'item'       => $item,
                     'layout'     => $item->getTileLayout(),
                     'attachzone' => $this->getAttachZoneData($item),
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -297,10 +293,10 @@ class Controller extends Base
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
-                array(
+                [
                     'format' => 'json',
                     'data'   => [],
-                )
+                ]
             );
         } else {
             $this->getResponse()->redirect->afterPost(
@@ -339,8 +335,8 @@ class Controller extends Base
     /**
      * Updates an item with values passed from the form.
      *
-     * @param Model        $item  The tile to update
-     * @param \ArrayObject $post  An array-like object that abstracts $_POST
+     * @param Model        $item The tile to update
+     * @param \ArrayObject $post An array-like object that abstracts $_POST
      */
     protected function updateItemWithFormValues(Model $item, $post)
     {
@@ -362,7 +358,7 @@ class Controller extends Base
         if (is_array($post['attachment'])) {
             try {
                 $factory = new CollectorFactory();
-                $image = $factory->build($post['attachment'])->getFirst();
+                $image   = $factory->build($post['attachment'])->getFirst();
                 $item->setBackgroundImage($image);
             } catch (\Schoolbox\Resource\Exception $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
@@ -377,7 +373,7 @@ class Controller extends Base
      * Retrieves the model layout object associated with this component, or an
      * empty one if none is associated.
      *
-     * @param  Component_Instance $component
+     * @param Component_Instance $component
      * @return Layout\Model
      * @throws MapperException if no component exists
      */
@@ -427,7 +423,7 @@ class Controller extends Base
         $layoutConfigDefinition = $component->getConfigByKey('layoutId');
         $config                 = $this->componentConfigMapper->findByColumnList([
             'component_config_definition_id' => $layoutConfigDefinition->getId(),
-            'component_instance_id'          => $component->getId()
+            'component_instance_id'          => $component->getId(),
         ])->first();
         if (!($config instanceof Component_Config)) {
             $config = new Component_Config();
