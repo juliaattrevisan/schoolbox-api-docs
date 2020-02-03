@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
@@ -47,7 +46,7 @@ class Status implements IStatus
         /* We cached the file locally so if it exists, then it's reachable
          * Whether or not it contains valid data is a different question altogether
          */
-        $expectedXmls = $this->findSpecimens();
+        $expectedXmls = (new Collator())->collate($this->path);
 
         $numFound = \count(array_filter(array_values($expectedXmls)));
 
@@ -56,47 +55,13 @@ class Status implements IStatus
 
 
     /**
-     * Find a specimen xml for each fo the $expectedXmls
-     *
-     * @return array
-     */
-    private function findSpecimens(): array
-    {
-        $expectedXmls = [
-            Receiver::XML_FULL => '',
-            Receiver::XML_STUDENTTIMETABLES => ''
-        ];
-
-        $dirhandle = opendir($this->path);
-
-        while ($xmlFile = readdir($dirhandle)) {
-            if ($xmlFile !== '.' && $xmlFile !== '..') {
-                $path = "{$this->path}/{$xmlFile}";
-
-                /* There's at least one profile xml and one student timetables xml
-                 * and they are both readable
-                 */
-                if ((new Api($path))->isXmlFileExtant()) {
-                    foreach ($expectedXmls as $key => $value) {
-                        if (strpos($xmlFile, $key) !== false) {
-                            $expectedXmls[$key] = $path;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $expectedXmls;
-    }
-
-    /**
      * @inheritDoc
      *
      * @return array
      */
     public function getReport(): array
     {
-        $expectedXmls = $this->findSpecimens();
+        $expectedXmls = (new Collator())->collate($this->path);
 
         $specifications = [
             Receiver::XML_FULL => new Profile\Specification(new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
