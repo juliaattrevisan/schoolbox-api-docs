@@ -1,0 +1,18 @@
+<ul class="breadcrumb">
+    {% if layout.dashboardRole %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/dashboard#{{ layout.dashboardRole.id }}">Dashboard</a></li>
+    {% elseif layout.homepageTemplate %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/homepage#{{ layout.homepageTemplate.id }}">Homepages</a></li>
+    {% elseif layout.folder %}
+        <li><a href="/homepage/{{ layout.folder.id }}">{{ layout.folder.name }}</a></li>
+    {% endif %}
+
+    {% if tile is not empty %}
+        <li><a href="{{ routeLookup('tile.layout', {layoutId: layout.id}) }}">Tiles</a></li>
+        <li class="active"><a href="#">{% if tile.id %}Modify Tile{% else %}Add Tile{% endif %}</a></li>
+    {% else %}
+        <li class="active"><a href="#">Tiles</a></li>
+    {% endif %}
+</ul>

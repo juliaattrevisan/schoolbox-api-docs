@@ -179,18 +179,7 @@
 })(jQuery);
 </script>
 
-<ul class="breadcrumb">
-    {% if item.dashboardRole %}
-        <li><a href="/adminv2/home">Admin</a></li>
-        <li><a href="/adminv2/dashboard#{{ item.dashboardRole.id }}">Dashboard</a></li>
-    {% elseif item.homepageTemplate %}
-        <li><a href="/adminv2/home">Admin</a></li>
-        <li><a href="/adminv2/homepage#{{ item.homepageTemplate.id }}">Homepages</a></li>
-    {% elseif item.folder %}
-        <li><a href="/homepage/{{ item.folder.id }}">{{ item.folder.name }}</a></li>
-    {% endif %}
-    <li class="active"><a href="#">Tiles</a></li>
-</ul>
+{% include '@tile/sub/breadcrumbs.twig' with {layout: item} only %}
 
 <div class="row">
     <div class="small-12 column">
