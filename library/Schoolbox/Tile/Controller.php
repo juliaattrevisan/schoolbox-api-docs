@@ -189,11 +189,10 @@ class Controller extends Base
     /**
      * Displays a form for adding a tile
      *
-     * @param Layout\Model       $layout
-     * @param Component_Instance $component
+     * @param Layout\Model $layout
      * @throws MapperException
      */
-    public function add(Layout\Model $layout, Component_Instance $component)
+    public function add(Layout\Model $layout)
     {
         /** @var Model $model */
         $model = $this->mapper->createModel();
@@ -204,13 +203,7 @@ class Controller extends Base
                 'data'     => array(
                     'item'       => $model,
                     'layout'     => $layout,
-                    'component'  => $component,
                     'attachzone' => $this->getAttachZoneData($model),
-                    'folder'     => $this->getFolderForComponent($component),
-                    'formAction' => $this->getRouter()->generate(
-                        'tile.create',
-                        ['layoutId' => $layout->getId()]
-                    ),
                 ),
             )
         );

@@ -65,7 +65,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="tile-modify-form" name='form' action="{{ formAction }}" method="post" enctype="multipart/form-data">
+        <form id="tile-modify-form" name='form' action="{{ routeLookup('tile.create', {layoutId: layout.id}) }}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
 
             <h2 class="subheader">Title</h2>
