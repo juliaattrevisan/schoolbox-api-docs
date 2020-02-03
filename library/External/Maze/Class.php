@@ -54,7 +54,8 @@ class External_Maze_Class implements External_ClassInterface {
                 MEDICAL AS MedicalAlert,
                 '' AS SpecialNeedsFlag,
                 '' AS EnglishSecondFlag,
-                '' AS StudentTutorDescription
+                '' AS StudentTutorDescription,
+                '' AS ClassCampus
             FROM STMA
             LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
             LEFT JOIN ST ON STMA.SKEY = ST.STKEY
@@ -94,6 +95,7 @@ class External_Maze_Class implements External_ClassInterface {
                 KGH.DESCRIPTION AS House,
                 MEDICAL AS MedicalAlert,
                 '' AS SpecialNeedsFlag,
+                '' AS EnglishSecondFlag,
                 '' AS StudentTutorDescription,
                 '' AS ClassCampus
             FROM ST
