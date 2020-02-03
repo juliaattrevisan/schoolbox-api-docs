@@ -390,10 +390,13 @@ class EventNotifier extends AbstractModuleNotifier
      */
     private function isNewlyPublished(?array $diff): bool
     {
-        $oldPublishDateTime = $diff['publishDateTime'][1] ?? null;
-        if (!$oldPublishDateTime) {
+        $publishDiff = $diff['publishDateTime'] ?? null;
+        if (!isset($publishDiff)) {
             return false;
         }
-        return Alaress_Date_Format::newDatabaseDate($oldPublishDateTime)->lte(Alaress_Date_Format::now());
+        $now                       = Alaress_Date_Format::now();
+        [$newPublish, $oldPublish] = $diff['publishDateTime'];
+        return Alaress_Date_Format::newDatabaseDate($oldPublish)->gt($now)
+            && Alaress_Date_Format::newDatabaseDate($newPublish)->lte($now);
     }
 }
