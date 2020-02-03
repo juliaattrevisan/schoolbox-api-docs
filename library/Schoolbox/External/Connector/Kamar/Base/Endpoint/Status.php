@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
+use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -106,9 +107,12 @@ class Status implements IStatus
 
         foreach ($specifications as $key => $specification) {
             try {
-                $result[] = $specification->check();
+                $result = array_merge($result, $specification->check());
             } catch (\RuntimeException $e) {
-                $result[] = "Cannot access api endpoint: cannot open/read at least one {$key} xml";
+                $result = array_merge($result, [
+                    'message' => "Cannot access api endpoint: cannot open/read at least one {$key} xml",
+                    'status' => CliRenderer::STATUS_EMPTY
+                ]);
             }
         }
 
