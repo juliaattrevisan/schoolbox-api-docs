@@ -64,26 +64,28 @@ class EventNotifier extends AbstractModuleNotifier
             // advise 10 minutes before start
             $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
-            // advise 10 minutes before start, and only advise updated once published
-            $pubstamp = $event->getPublishDateTime() instanceof Alaress_Date_Format
-                ? $event->getPublishDateTime()->getUnixTimeStamp()
-                : self::IMMEDIATELY;
+            // Bundle the updated trigger,
+            // but only if the event isn't newly published.
+            // This is because if the event wasn't published, it's new to the
+            // audience (and thus has never been updated).
+            if (!$this->isNewlyPublished($bundle->getEvent()->getDiff())) {
+                // advise 10 minutes before start, and only advise updated once published
+                $pubstamp = $event->getPublishDateTime() instanceof Alaress_Date_Format
+                    ? $event->getPublishDateTime()->getUnixTimeStamp()
+                    : self::IMMEDIATELY;
 
+                $bundle->attach(self::TRIGGER_UPDATED, $pubstamp);
+            }
+
+            // Bundle the upcoming trigger
             if ($event->inSeries()) {
                 // attach a custom trigger for handling the event recurrence
                 $upcoming = array($this, 'getNextSeriesTime');
-
             } else {
                 $upcoming = $start - (60 * self::UPCOMING_WINDOW);
-
             }
+            $bundle->attach(self::TRIGGER_UPCOMING, $upcoming);
 
-            $bundle->attachEach(
-                array(
-                    self::TRIGGER_UPCOMING => $upcoming,
-                    self::TRIGGER_UPDATED  => $pubstamp
-                )
-            );
         }
     }
 
@@ -191,10 +193,7 @@ class EventNotifier extends AbstractModuleNotifier
         // If the event is published now but wasn't before:
         // the recipient didn't know there was ever an event to receive updates
         // on, so don't notify.
-        $oldPublishDateTime = $diff['publishDateTime'][1] ?? null;
-        if ($oldPublishDateTime
-            && Alaress_Date_Format::newDatabaseDate($oldPublishDateTime)->gt(Alaress_Date_Format::now())
-        ) {
+        if ($this->isNewlyPublished($diff)) {
             return new Envelope();
         }
 
@@ -382,4 +381,19 @@ class EventNotifier extends AbstractModuleNotifier
         return $this->notifyUpdated(Role::PARENT, $event, $author, $diff);
     }
 
+
+    /**
+     * Has the event gone from not published to published?
+     *
+     * @param array|null $diff
+     * @return bool
+     */
+    private function isNewlyPublished(?array $diff): bool
+    {
+        $oldPublishDateTime = $diff['publishDateTime'][1] ?? null;
+        if (!$oldPublishDateTime) {
+            return true;
+        }
+        return Alaress_Date_Format::newDatabaseDate($oldPublishDateTime)->lte(Alaress_Date_Format::now());
+    }
 }
