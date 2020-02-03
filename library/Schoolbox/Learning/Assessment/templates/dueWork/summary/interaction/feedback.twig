@@ -90,6 +90,8 @@ feedback: currentFeedback,
     {% set prefix = prefix ~ ' '~ locale.selfAssessment.proper %}
 {% elseif currentFeedback.isSelfReflectionOnly %}
     {% set prefix = prefix ~ ' '~ locale.selfReflection.proper %}
+{% elseif currentFeedback.resubmissionRequired %}
+    {% set prefix = prefix ~ ' Resubmission required by ' ~ currentFeedback.reviewer.fullname  %}
 {% else %}
     {% set prefix = prefix ~ ' Feedback by ' ~  currentFeedback.reviewer.fullname  %}
 {% endif %}
@@ -117,19 +119,9 @@ feedback: currentFeedback,
             </div>
             {% endblock card %}
 
-            {%- set gradeOutput -%}
-                {% spaceless %}
-                    {%- if currentFeedback.resubmissionRequired -%}
-                        Resubmit {% if not currentFeedback.humanReadableMark is empty %}({{ currentFeedback.humanReadableMark }}){% endif %}
-                    {%- else -%}
-                        {{ currentFeedback.humanReadableMark }}
-                    {%- endif -%}
-                {% endspaceless %}
-            {%- endset -%}
-
-            {% if gradeOutput %}
+            {% if currentFeedback.humanReadableMark %}
             <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
-                <span>{{ gradeOutput }}</span>
+                <span>{{ currentFeedback.humanReadableMark }}</span>
             </div>
             {% endif %}
         </div>
