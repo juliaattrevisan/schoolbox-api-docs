@@ -40,7 +40,7 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'layout', $basePath, '/layout/{layoutId}');
-        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{layoutId}');
+        $this->addPostRoute($router, 'layoutForm', $basePath, '/layout/{layoutId}');
 
         // Attach standard REST routes...
         $this->attachResourceRoutes($router, $basePath);
@@ -169,7 +169,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 TileController::class,
                 [
