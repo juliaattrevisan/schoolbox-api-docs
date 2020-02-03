@@ -75,10 +75,9 @@ class Controller extends Base
     /**
      * Displays a form for editing a tile layout.
      *
-     * @param Layout\Model       $layout
-     * @param Component_Instance $component
+     * @param Layout\Model $layout
      */
-    public function layout(Layout\Model $layout, Component_Instance $component)
+    public function layout(Layout\Model $layout)
     {
         // Load layout
         $this->getResponse()->content->set(
@@ -87,8 +86,8 @@ class Controller extends Base
                 'template' => '@tile/layout.twig',
                 'data'     => array(
                     'item'      => $layout,
-                    'component' => $component,
-                    'folder'    => $this->getFolderForComponent($component),
+//                    'component' => $component,
+//                    'folder'    => $this->getFolderForComponent($component),
                 ),
             )
         );
@@ -120,12 +119,11 @@ class Controller extends Base
     /**
      * Save form for tile layout.
      *
-     * @param Layout\Model       $layout
-     * @param Component_Instance $component
+     * @param Layout\Model $layout
      * @throws MapperException
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function layoutForm(Layout\Model $layout, Component_Instance $component)
+    public function layoutForm(Layout\Model $layout)
     {
         $code   = 200;
         $layout
@@ -164,6 +162,7 @@ class Controller extends Base
             $code = 500;
         }
 
+        // XHR: return a simple JSON response
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set(
                 array(
@@ -172,22 +171,21 @@ class Controller extends Base
                 )
             );
             $this->getResponse()->status->setCode($code);
-        } else {
-            // redirect back to wherever
-            switch ($component->getModule()) {
-                case 'dashboard':
-                    $href = '/adminv2/dashboard#'.$component->getIdentifier();
-                    break;
-                case 'homepage_template':
-                    $href = '/adminv2/homepage#'.$component->getIdentifier();
-                    break;
-                case 'homepage':
-                default:
-                    $href = '/homepage/'.$component->getIdentifier();
-                    break;
-            }
-            $this->getResponse()->redirect->afterPost($href);
+            return;
         }
+
+        // Otherwise: redirect back to wherever
+        if ($layout->getHomepageTemplate()) {
+            $href = '/adminv2/dashboard#' . $layout->getHomepageTemplate()->getId();
+        } elseif ($layout->getDashboardRole()) {
+            $href = '/adminv2/homepage#' . $layout->getDashboardRole()->getId();
+        } elseif ($layout->getFolder()) {
+            $href = '/homepage/' . $layout->getFolder()->getId();
+        } else {
+            // Should never happen
+            $href = '#';
+        }
+        $this->getResponse()->redirect->afterPost($href);
     }
 
     /**
