@@ -1,4 +1,7 @@
 #!/bin/bash
+
+cachedir='/vagrant/vagrantcache';
+
 helpmsg() {
     echo "save-data.sh OPTIONS save-name";
     echo "Options:";
@@ -6,6 +9,10 @@ helpmsg() {
     echo "  -i | --initial   prepare data for using as an initial dataset (more cleaning)";
     echo "  -u | --upload    upload the data for other to use on completion";
     echo "  -v | --verbose   verbose mode for easier debugging";
+}
+
+logMessage() {
+    echo "[SB][`date +%Y-%m-%d\ %X`] $1";
 }
 
 stopservices() {
@@ -20,13 +27,28 @@ stopservices() {
 
 restartservices() {
     echo "Restarting Services";
-    mysql schoolbox < /vagrant/vagrantcache/vagrant.sql;
     service nginx restart >/dev/null 2>&1;
     service schoolbox-socketd restart >/dev/null 2>&1;
     service schoolbox-routed restart >/dev/null 2>&1;
     service schoolbox-digestd restart >/dev/null 2>&1;
     service schoolbox-scheduled restart >/dev/null 2>&1;
     mv /tmp/vagrant /etc/cron.d/vagrant;
+}
+
+localiseVagrant() {
+    echo "Re-localising vagrant"
+    mysql schoolbox < /vagrant/sql/vagrant.sql;
+    mysql schoolbox < "${cachedir}"/vagrant-secrets.sql;
+    /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+}
+
+cleanupVagrant() {
+    echo "Reverting vagrant-specific changes";
+    mysql --defaults-extra-file=~/.my.cnf schoolbox < /vagrant/sql/vagrant-cleanup.sql;
+    mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup-secrets.sql;
+
+    logMessage "Applying data dir sql fixes";
+    /vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox /usr/share/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 }
 
 if [ -z $1 ];
@@ -93,7 +115,6 @@ fi
 
 
 echo "Saving data as: $filename";
-cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 
 stopservices;
@@ -122,20 +143,19 @@ rm -f$longverbose -R /vagrant/data/storage/css;
 /vagrant/tools/create-data-dirs.sh /vagrant/data >/dev/null;
 echo "Cleaning: old sql backups";
 rm -f$longverbose /vagrant/data/*.sql{,.gz};
-echo "Reverting vagrant specific changes";
-mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup.sql;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes";
-/vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox /usr/share/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cleanupVagrant;
 
 echo "Exporting database";
 mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
 if [ $? -ne 0 ];
 then
     echo "Error: exporting database failed";
+    localiseVagrant;
     restartservices;
     exit 1;
 fi
+
+localiseVagrant;
 
 echo "Creating tarball package";
 cd $cachedir/../;

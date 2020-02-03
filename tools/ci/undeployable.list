@@ -7,6 +7,8 @@ package.json
 phpunit.xml
 README.md
 *.log
+sql/vagrant.sql
+sql/vagrant-cleanup.sql
 test
 tools/vagrant*
 tools/pkg-build*

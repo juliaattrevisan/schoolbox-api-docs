@@ -141,8 +141,8 @@ getS3file() {
     fi
 }
 
-S3file='vagrant.sql'
-S3file_short='vagrant.sql'
+S3file='vagrant-secrets.sql'
+S3file_short='vagrant-secrets.sql'
 getS3file;
 if [ ! -f $cachedir/$S3file_short ];
 then
@@ -150,8 +150,8 @@ then
     exit 1;
 fi
 
-S3file='vagrant-cleanup.sql'
-S3file_short='vagrant-cleanup.sql'
+S3file='vagrant-cleanup-secrets.sql'
+S3file_short='vagrant-cleanup-secrets.sql'
 getS3file;
 if [ ! -f $cachedir/$S3file_short ];
 then
@@ -310,7 +310,8 @@ cd tools;
 cd /vagrant;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-cat $cachedir/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat /vagrant/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes";
 /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
@@ -323,7 +324,8 @@ rm -R /var/lib/vagrant > /dev/null;
 rm -f /vagrant/www/conf/pre*conf.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-cat $cachedir/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat /vagrant/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes (post version upgrade)";
 /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
