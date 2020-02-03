@@ -81,15 +81,13 @@ class Controller extends Base
     {
         // Load layout
         $this->getResponse()->content->set(
-            array(
+            [
                 'title'    => 'Tile Component Layout',
                 'template' => '@tile/layout.twig',
-                'data'     => array(
-                    'item'      => $layout,
-//                    'component' => $component,
-//                    'folder'    => $this->getFolderForComponent($component),
-                ),
-            )
+                'data'     => [
+                    'item' => $layout,
+                ],
+            ]
         );
     }
 
@@ -228,35 +226,16 @@ class Controller extends Base
     {
         // Does a layout exist for this component?
         // Yes: redirect to add($layout)
-        // No:  render this page
+        // No:  Create a layout, and redirect to it
         try {
             $layout = $this->findLayoutForComponent($component);
-            $this->response->redirect->found(
-                $this->getRouter()->generate(
-                    'tile.add',
-                    ['layoutId' => $layout->getId()]
-                )
-            );
         } catch (MapperException $e) {
-            // continue
+            $layout = $this->buildLayoutForComponent($component);
         }
-
-        /** @var Model $model */
-        $model = $this->mapper->createModel();
-        $this->getResponse()->content->set(
-            array(
-                'title'    => 'Add Tile',
-                'template' => '@tile/modify.twig',
-                'data'     => array(
-                    'item'       => $model,
-                    'component'  => $component,
-                    'attachzone' => $this->getAttachZoneData($model),
-                    'folder'     => $this->getFolderForComponent($component),
-                    'formAction' => $this->getRouter()->generate(
-                        'tile.createForComponent',
-                        ['componentId' => $component->getId()]
-                    ),
-                ),
+        $this->response->redirect->found(
+            $this->getRouter()->generate(
+                'tile.add',
+                ['layoutId' => $layout->getId()]
             )
         );
     }
