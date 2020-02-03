@@ -66,6 +66,16 @@ class CliRenderer
     public function render(array $endpoints): void
     {
 
+        /* Exit early if nothing to do
+         */
+        if (!\count($endpoints)) {
+            if ($this->log) {
+                $this->log->critical('No endpoints found.');
+            }
+
+            return;
+        }
+
         /* Find the longest message and pad it out
          */
         $paddedLength = max(array_map('\strlen', array_column($endpoints, 'message'))) + self::PADDING;
