@@ -51,10 +51,6 @@ class Module extends BaseModule
 
         // also have separate paths for adding a tile to a component (will create a new layout)
         $this->addGetRoute($router, 'addToComponent', $basePath, '/add/component/{componentId}');
-        $this->addPostRoute($router, 'createForComponent', $basePath , '/add/component/{componentId}');
-
-        // also have separate paths for layouts for component
-        $this->addGetRoute($router, 'layoutForComponent', $basePath , '/layout/component/{componentId}');
     }
 
     /**
@@ -104,30 +100,18 @@ class Module extends BaseModule
         // Component-related routes only: look up homepage from component
         $this->addRoutePreload(
             $matcher,
-            '(?:addToComponent|createForComponent|createForComponent:post|layoutForComponent)',
+            '(?:addToComponent)',
             function ($params) {
                 // Load component first
                 $component = null;
                 if ($params['componentId']) {
                     $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
-
-                } elseif ($params['layout'] instanceof Layout\Model) {
-                    $layoutId  = $params['layout']->getId();
-                    $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
-                        'layoutId',
-                        $layoutId
-                    )->first();
                 }
 
                 // Load homepage from component
                 $extraParams = [];
                 if ($component instanceof Component_Instance) {
                     $extraParams['component'] = $component;
-                    if ($component->isHomepage()) {
-                        $extraParams['homepage'] = $this->getFolderMapper()->findByIdWithFallback(
-                            $component->getIdentifier()
-                        );
-                    }
                 }
                 return $extraParams;
             }

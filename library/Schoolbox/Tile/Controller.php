@@ -92,29 +92,6 @@ class Controller extends Base
     }
 
     /**
-     * Action for rendering a layout for a component.
-     *
-     * (This is implemented as a redirect to the layout form, creating the
-     *  layout if it doesn't exist.)
-     *
-     * @param Component_Instance $component
-     */
-    public function layoutForComponent(Component_Instance $component)
-    {
-        try {
-            $layout = $this->findLayoutForComponent($component);
-        } catch (MapperException $e) {
-            $layout = $this->buildLayoutForComponent($component);
-        }
-        $this->response->redirect->found(
-            $this->getRouter()->generate(
-                'tile.layout',
-                ['layoutId' => $layout->getId()]
-            )
-        );
-    }
-
-    /**
      * Save form for tile layout.
      *
      * @param Layout\Model $layout
@@ -253,39 +230,6 @@ class Controller extends Base
         // updateItemWithFormValues() doesn't set the layout item - set it here.
         if (!($layout->getId())) {
             throw new \RuntimeException('Layout must be created before adding a tile');
-        }
-        $item->setTileLayout($layout);
-
-        $this->mapper->save($item);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'tile.layout',
-                array('layoutId' => $layout->getId())
-            )
-        );
-    }
-
-    /**
-     * Create form for a new tile.
-     *
-     * @param Component_Instance $component
-     * @throws MapperException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     */
-    public function createForComponent(Component_Instance $component)
-    {
-        /** @var Model $item */
-        $item = $this->mapper->createModel();
-        $this->updateItemWithFormValues(
-            $item,
-            $this->getRequest()->post
-        );
-
-        // Find and build layout from the component
-        try {
-            $layout = $this->findLayoutForComponent($component);
-        } catch (MapperException $e) {
-            $layout = $this->buildLayoutForComponent($component);
         }
         $item->setTileLayout($layout);
 
