@@ -1603,15 +1603,13 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
 
     &.failed {
         background-color: $alert-color;
-        border-radius: $progress-tick-size-regular;
-        transform: rotate(360deg);
+      //border-radius: $progress-tick-size-regular;
         &:before {
             visibility: visible;
             content: '\0021';
             font-weight: bolder;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
-
     }
 }
 
