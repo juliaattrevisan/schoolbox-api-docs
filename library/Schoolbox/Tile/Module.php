@@ -101,11 +101,10 @@ class Module extends BaseModule
             }
         );
 
-        // All routes: look up homepage from component
-        // (if this component belongs to the homepage!)
+        // Component-related routes only: look up homepage from component
         $this->addRoutePreload(
             $matcher,
-            '.*',
+            '(?:addToComponent|createForComponent|createForComponent:post|layoutForComponent)',
             function ($params) {
                 // Load component first
                 $component = null;
