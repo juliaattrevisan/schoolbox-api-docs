@@ -65,7 +65,6 @@ class CliRenderer
      */
     public function render(array $endpoints): void
     {
-        $messages = [];
 
         /* Find the longest message and pad it out
          */
