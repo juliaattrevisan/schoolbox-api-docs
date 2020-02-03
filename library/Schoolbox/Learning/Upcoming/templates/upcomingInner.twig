@@ -34,7 +34,11 @@
                                 {{ upcoming.typeName }}
                             </p>
                         {% endif %}
-                        <p class="meta">{{ dueDate.forParticipant(upcoming.participant(student)) }}</p>
+                        {% if upcoming.participantIfExtant(student).isResubmissionRequired %}
+                            <span data-status data-assessment-status-light class="progress-tick no-text tiny failed" title="Resubmission Required"></span><span data-status-label data-assessment-status-text>Resubmission required</span>
+                        {% else %}
+                            <p class="meta">{{ dueDate.forParticipant(upcoming.participant(student)) }}</p>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
