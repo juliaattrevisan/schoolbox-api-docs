@@ -10,9 +10,11 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Specification;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Zend\Uri\Exception\InvalidUriPartException;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
 
@@ -61,20 +63,59 @@ HELP;
         /* Spawn api based on args
          */
         $this->getLogger()->info('Accessing local api endpoint');
-        $api = new Api($this->getConfig()->get('schooldata_import_endpoint_host'));
 
-        $specification = new Specification(new Batchxml($api));
+        $expectedXmls = [
+            Receiver::XML_FULL => '',
+            Receiver::XML_STUDENTTIMETABLES => ''
+        ];
+
+        $rootPath = $this->getConfig()->get('schooldata_import_endpoint_host');
+
+        $dirhandle = opendir($rootPath);
+
+        while ($xmlFile = readdir($dirhandle)) {
+            if ($xmlFile !== '.' && $xmlFile !== '..') {
+                $path = "{$rootPath}/{$xmlFile}";
+
+                /* There's at least one profile xml and one student timetables xml
+                 * and they are both readable
+                 */
+                if ((new Api($path))->isXmlFileExtant()) {
+                    foreach ($expectedXmls as $key => $value) {
+                        if (strpos($xmlFile, $key) !== false) {
+                            $expectedXmls[$key] = $path;
+                        }
+                    }
+                }
+            }
+        }
+
+        $specifications = [
+            Receiver::XML_FULL => new Profile\Specification(new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
+            Receiver::XML_STUDENTTIMETABLES => new Timetable\Specification(new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
+        ];
+
         $renderer = new CliRenderer($this->getLogger());
 
-        try {
-            $renderer->render($specification->check());
-        } catch (\RuntimeException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
-        } catch (InvalidUriPartException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
-        } catch (InvalidArgumentException $e) {
-            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
+        $result = [];
+
+        foreach ($specifications as $key => $specification) {
+            try {
+                $result = array_merge($result, $specification->check());
+            } catch (\RuntimeException $e) {
+                $result[] = [
+                    'message' => "Cannot access api endpoint: cannot open/read at least one {$key} xml",
+                    'status' => CliRenderer::STATUS_EMPTY
+                ];
+            } catch (InvalidUriPartException|InvalidArgumentException $e) {
+                $result[] = [
+                    'message' => "Cannot access api endpoint, bad url: {$e->getMessage()}",
+                    'status' => CliRenderer::STATUS_EMPTY
+                ];
+            }
         }
+
+        $renderer->render($result);
     }
 };
 

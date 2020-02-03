@@ -15,7 +15,7 @@ use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
  *
  * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
-class Specification
+abstract class Specification
 {
 
     /**
