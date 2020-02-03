@@ -10,7 +10,6 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Specification;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 

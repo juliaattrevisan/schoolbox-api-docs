@@ -58,7 +58,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-ISAMS XML Specification validator
+iSAMS XML Specification validator
 
 Usage: specification.php [--file]
         --file      Optional path to a locally-cached xml file e.g. ../../../www/test.xml
