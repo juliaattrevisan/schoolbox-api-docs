@@ -157,6 +157,11 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpcoming($roleType, $event, $author)
     {
+        // If the event is not yet published, do not notify
+        if ($event->getPublishDateTime()->gt(Alaress_Date_Format::now())) {
+            return new Envelope();
+        }
+
         /** @var Event $event */
         $event = $this->mapper->findById($event->getId());
 
