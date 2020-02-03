@@ -213,12 +213,11 @@ class Controller extends Base
     /**
      * Create form for a new tile.
      *
-     * @param Layout\Model       $layout
-     * @param Component_Instance $component
+     * @param Layout\Model $layout
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function create(Layout\Model $layout, Component_Instance $component)
+    public function create(Layout\Model $layout)
     {
         /** @var Model $item */
         $item = $this->mapper->createModel();
