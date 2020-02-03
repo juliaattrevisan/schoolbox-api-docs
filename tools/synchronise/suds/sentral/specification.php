@@ -10,8 +10,9 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Specification;
+use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../../../conf/core/require.php';
 
 /**
  * Validate xml
@@ -61,7 +62,10 @@ HELP;
         $this->getLogger()->info('Accessing remote api endpoint');
         $api = new Api($this->getConfig()->get('schooldata_import_endpoint_host'), $this->getConfig()->get('schooldata_import_endpoint_key'));
 
-        (new Specification($this->getLogger(), $api))->check();
+        $specification = (new Specification($api));
+        $renderer = new CliRenderer($this->getLogger());
+
+        $renderer->render($specification->check());
     }
 };
 

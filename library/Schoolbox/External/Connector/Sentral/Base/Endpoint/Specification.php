@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
-use Psr\Log\LoggerInterface;
+use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use UnexpectedValueException;
 
 /**
@@ -21,36 +21,6 @@ class Specification
 {
 
     /**
-     * Status text for existing nodes
-     */
-    private const STATUS_OK = 'OK';
-
-
-    /**
-     * Status text for missing nodes
-     */
-    private const STATUS_MISSING = 'MISSING';
-
-
-    /**
-     * Status text for existing nodes that are empty but probably should contain something
-     */
-    private const STATUS_EMPTY = 'EMPTY';
-
-
-    /**
-     * Number of spaces for output formatting
-     */
-    private const PADDING = 10;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private $log;
-
-
-    /**
      * @var Api
      */
     private $api;
@@ -59,12 +29,10 @@ class Specification
     /**
      * Specification constructor.
      *
-     * @param LoggerInterface|null $log
-     * @param Api                  $api
+     * @param Api $api
      */
-    public function __construct(?LoggerInterface $log, Api $api)
+    public function __construct(Api $api)
     {
-        $this->log = $log;
         $this->api = $api;
     }
 
@@ -106,40 +74,31 @@ class Specification
 
         ];
 
-        $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
-
-        $messages = [];
+        $endpoints = [];
 
         foreach ($paths as $path) {
-            $paddedPath = str_pad($path, $paddedLength);
-
             try {
                 $result = $this->api->retrieveDocument($path);
 
                 if (\count($result['data'])) {
-                    $message = "{$paddedPath} " . self::STATUS_OK;
-
-                    if ($this->log) {
-                        $this->log->info($message);
-                    }
+                    $endpoints[] = [
+                        'message' => $path,
+                        'status' => CliRenderer::STATUS_OK
+                    ];
                 } else {
-                    $message = "{$paddedPath} " . self::STATUS_EMPTY;
-
-                    if ($this->log) {
-                        $this->log->warning($message);
-                    }
+                    $endpoints[] = [
+                        'message' => $path,
+                        'status' => CliRenderer::STATUS_EMPTY
+                    ];
                 }
             } catch (UnexpectedValueException $e) {
-                $message = "{$paddedPath} " . self::STATUS_MISSING;
-
-                if ($this->log) {
-                    $this->log->warning($message);
-                }
+                $endpoints[] = [
+                    'message' => $path,
+                    'status' => CliRenderer::STATUS_MISSING
+                ];
             }
-
-            $messages[] = $message;
         }
 
-        return $messages;
+        return $endpoints;
     }
 }

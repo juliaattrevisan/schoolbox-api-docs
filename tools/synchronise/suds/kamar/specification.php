@@ -11,9 +11,10 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Specification;
+use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Zend\Uri\Exception\InvalidUriPartException;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../../../conf/core/require.php';
 
 /**
  * Validate xml
@@ -62,10 +63,11 @@ HELP;
         $this->getLogger()->info('Accessing local api endpoint');
         $api = new Api($this->getConfig()->get('schooldata_import_endpoint_host'));
 
-        $specification = new Specification($this->getLogger(), new Batchxml($api));
+        $specification = new Specification(new Batchxml($api));
+        $renderer = new CliRenderer($this->getLogger());
 
         try {
-            $specification->check();
+            $renderer->render($specification->check());
         } catch (\RuntimeException $e) {
             $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
         } catch (InvalidUriPartException $e) {

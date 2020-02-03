@@ -91,27 +91,27 @@ class Status implements IStatus
     /**
      * @inheritDoc
      *
-     * @return string
+     * @return array
      */
-    public function getReport(): string
+    public function getReport(): array
     {
         $expectedXmls = $this->findSpecimens();
 
         $specifications = [
-            Receiver::XML_FULL => new Profile\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
-            Receiver::XML_STUDENTTIMETABLES => new Timetable\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
+            Receiver::XML_FULL => new Profile\Specification(new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
+            Receiver::XML_STUDENTTIMETABLES => new Timetable\Specification(new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
         ];
 
         $result = [];
 
         foreach ($specifications as $key => $specification) {
             try {
-                $result[] = implode("\n", $specification->check());
+                $result[] = $specification->check();
             } catch (\RuntimeException $e) {
                 $result[] = "Cannot access api endpoint: cannot open/read at least one {$key} xml";
             }
         }
 
-        return implode("\n", $result);
+        return $result;
     }
 }

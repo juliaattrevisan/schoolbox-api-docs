@@ -7,7 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
-use Psr\Log\LoggerInterface;
+use RuntimeException;
+use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -22,30 +23,6 @@ class Specification
 {
 
     /**
-     * Status text for existing nodes
-     */
-    private const STATUS_OK = 'OK';
-
-
-    /**
-     * Status text for missing nodes
-     */
-    private const STATUS_MISSING = 'MISSING';
-
-
-    /**
-     * Number of spaces for output formatting
-     */
-    private const PADDING = 20;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private $log;
-
-
-    /**
      * @var Batchxml
      */
     private $batchxml;
@@ -54,12 +31,10 @@ class Specification
     /**
      * Specification constructor.
      *
-     * @param LoggerInterface|null $log
-     * @param Batchxml             $batchxml
+     * @param Batchxml $batchxml
      */
-    public function __construct(?LoggerInterface $log, Batchxml $batchxml)
+    public function __construct(Batchxml $batchxml)
     {
-        $this->log = $log;
         $this->batchxml = $batchxml;
     }
 
@@ -69,7 +44,7 @@ class Specification
      *
      * @return array
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
      */
@@ -239,28 +214,20 @@ class Specification
             '/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id]',
         ];
 
-        $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
-
-        $messages = [];
+        $endpoints = [];
 
         foreach ($paths as $path) {
-            $paddedPath = str_pad($path, $paddedLength);
-
             if ($this->batchxml->fetchXml($path)) {
-                $message = "{$paddedPath} " . self::STATUS_OK;
-
-                if ($this->log) {
-                    $this->log->info($message);
-                }
+                $endpoints[] = [
+                    'message' => $path,
+                    'status' => CliRenderer::STATUS_OK
+                ];
             } else {
-                $message = "{$paddedPath} " . self::STATUS_MISSING;
-
-                if ($this->log) {
-                    $this->log->warning($message);
-                }
+                $endpoints[] = [
+                    'message' => $path,
+                    'status' => CliRenderer::STATUS_MISSING
+                ];
             }
-
-            $messages[] = $message;
         }
 
         /* Find the timetable identifier, for reference, in the status screen
@@ -273,11 +240,10 @@ class Specification
         /* If there aren't any timetables, log it and exit
          */
         if (!\count($timetables)) {
-            $messages[] = 'No PublishedTimetables detected.';
-
-            if ($this->log) {
-                $this->log->warning('No PublishedTimetables detected.');
-            }
+            $endpoints[] = [
+                'message' => 'No PublishedTimetables detected.',
+                'status' => CliRenderer::STATUS_MISSING
+            ];
         }
 
         foreach ($timetables as $timetable) {
@@ -287,13 +253,12 @@ class Specification
                 trim((string)$timetable->xpath('@Id')[0]->Id)
             );
 
-            $messages[] = $timetableMessage;
-
-            if ($this->log) {
-                $this->log->info($timetableMessage);
-            }
+            $endpoints[] = [
+                'message' => $timetableMessage,
+                'status' => CliRenderer::STATUS_OK
+            ];
         }
 
-        return $messages;
+        return $endpoints;
     }
 }
