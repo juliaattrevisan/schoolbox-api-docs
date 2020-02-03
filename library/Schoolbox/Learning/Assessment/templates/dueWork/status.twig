@@ -147,21 +147,18 @@
                                 } only %}
                                 {% set inputNo = inputNo + 1 %}
                             </label>
+                            {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
+                                feedback:    participant.findMostRecentInstructorGivenFeedback,
+                                participant: participant,
+                                tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
+                                readonly:    readonly
+                            } only %}
+                            {% set inputNo = inputNo + 1 %}
                         </div>
                     {% endif %}
 
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
-                            feedback:    participant.findMostRecentInstructorGivenFeedback,
-                            participant: participant,
-                            tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:    readonly
-                        } only %}
-                        {% set inputNo = inputNo + 1 %}
-                    </div>
-
-                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9 medium-offset-3{% endif %} column">
-                        {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
                             tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,

@@ -253,6 +253,16 @@ Usage:
                                         rubricId: assessment.rubricGrid.id,
                                     } only %}
                                 {% endif %}
+
+                                {# Resubmission required checkbox #}
+                                {% block resubmissionRequired %}
+                                    {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
+                                        participant: participant,
+                                        feedback: feedback,
+                                        tabIndex: 3,
+                                        readonly: readonly
+                                    } only %}
+                                {% endblock resubmissionRequired %}
                             </div>
                         {% endif %}
                     {% endblock %}
@@ -269,17 +279,7 @@ Usage:
                         </div>
                     {% endblock %}
 
-                    {# Resubmission required checkbox #}
-                    {% block resubmissionRequired %}
-                        <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9 medium-offset-3{% endif %} column">
-                            {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
-                                participant: participant,
-                                feedback: feedback,
-                                tabIndex: 3,
-                                readonly: readonly
-                            } only %}
-                        </div>
-                    {% endblock resubmissionRequired %}
+
                 </fieldset>
 
                 {# Maybe files may be uploaded here? #}
