@@ -178,10 +178,19 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
     {
-
         // If the event is not yet published, the update never happened
-        if($event->getPublishDateTime()->gt(Alaress_Date_Format::now())) {
-            return;
+        if ($event->getPublishDateTime()->gt(Alaress_Date_Format::now())) {
+            return new Envelope();
+        }
+
+        // If the event is published now but wasn't before:
+        // the recipient didn't know there was ever an event to receive updates
+        // on, so don't notify.
+        $oldPublishDateTime = $diff['publishDateTime'][1] ?? null;
+        if ($oldPublishDateTime
+            && Alaress_Date_Format::newDatabaseDate($oldPublishDateTime)->gt(Alaress_Date_Format::now())
+        ) {
+            return new Envelope();
         }
 
         /** @var Event $event */
