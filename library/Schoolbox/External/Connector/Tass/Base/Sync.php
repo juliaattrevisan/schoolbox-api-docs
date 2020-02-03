@@ -86,13 +86,37 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
+        $query = $this->getParentQuery(false);
+        $params = [
+            'companyCode'  => $this->companyCode,
+            'companyCode2' => $this->companyCode,
+        ];
+
+        if ($this->config->get('external_tass_commrules')) {
+            $query .= ' UNION ALL ' . $this->getParentQuery(true);
+            $params['companyCodeComm'] = $this->companyCode;
+            $params['companyCodeComm2'] = $this->companyCode;
+        }
+
+        $query .= '   ORDER BY student_contact_id ASC';
+        $iterator = $this->databaseExternal->getQueryIterator($query, $params);
+        return new Iterator\Guardian($iterator);
+    }
+
+    /**
+     * Returns query to get parents
+     * @param bool $useCommRules
+     * @return string
+     */
+    private function getParentQuery(bool $useCommRules) : string
+    {
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
          */
-        if ($this->config->get('external_tass_commrules')) {
-
-            $addnum = $this->helper->getAddNum();
-            $typecode = $this->helper->getTypeCode();
+        if ($useCommRules) {
+            $companyCode = 'companyCodeComm';
+            $addnum      = $this->helper->getAddNum();
+            $typecode    = $this->helper->getTypeCode();
 
             $studentjoin = "LEFT JOIN studcommrules as scr
                     ON p.par_code = scr.par_code
@@ -105,17 +129,15 @@ class Sync extends Base implements ISync
 
             $studentjoin .= "
                 LEFT JOIN student as s
-                    ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-                    OR (scr.stud_code = s.stud_code AND scr.cmpy_code = s.cmpy_code)";
+                    ON (scr.stud_code = s.stud_code AND scr.cmpy_code = s.cmpy_code)";
         } else {
+            $companyCode = 'companyCode';
             $studentjoin = "LEFT JOIN student as s
                     ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
         }
 
         // Single Tuple contains data for [P]arent and [S]pouse
-        $iterator = $this->databaseExternal->getQueryIterator
-        (
-            "
+        return "
                 SELECT DISTINCT
                     CASE
                         WHEN
@@ -154,7 +176,7 @@ class Sync extends Base implements ISync
                 INNER JOIN persondefs pd
                     ON pd.person_num = f.person_num
                     AND pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL
-                WHERE p.cmpy_code = :companyCode
+                WHERE p.cmpy_code = :{$companyCode}
                 AND   p.f_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
@@ -201,22 +223,14 @@ class Sync extends Base implements ISync
                 INNER JOIN persondefs pd
                     ON pd.person_num = f.person_num
                     AND pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL
-                WHERE p.cmpy_code = :companyCode2
+                WHERE p.cmpy_code = :{$companyCode}2
                 AND   p.m_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
 
-                ORDER BY student_contact_id ASC
-            ",
-            [
-                'companyCode' => $this->companyCode,
-                'companyCode2' => $this->companyCode
-            ]
-        );
-
-        return new Iterator\Guardian($iterator);
+            ";
     }
 
     /**
