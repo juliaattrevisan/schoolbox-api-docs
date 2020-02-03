@@ -239,7 +239,6 @@ class Controller extends Base
         $this->getParticularResponse($assessment, $student, $response, true);
     }
 
-
     /**
      * Get the contents of a particular $response for instructor marking.
      *

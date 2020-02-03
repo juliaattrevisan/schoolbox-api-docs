@@ -10,6 +10,8 @@
      - markSchemeName:   string    filename of markScheme template fragment
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
      - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
+     - selfAssess:        bool            Is this being viewed in a self assessment context?
+     - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
 #}
 {% extends '@learningAssessment/status.twig' %}
@@ -183,6 +185,8 @@
                             participant: participant,
                             tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                             readonly:    readonly,
+                            selfAssessment: selfAssess,
+                            selfReflection: selfReflect,
                             blindMode:   false
                         } only %}
                         {% set inputNo = inputNo + 1 %}

@@ -183,7 +183,6 @@ class Controller extends Assessment\Controller
             'teacherAssessed' => 'incomplete',
         ];
 
-
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [

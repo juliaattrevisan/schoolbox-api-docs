@@ -118,7 +118,6 @@ class Module extends BaseModule
 
         $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasWriteAccess, $preloadParticipant); // a || r
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
-        $this->register('GET', $participantPattern . '/responses/self/{responseId:\d+}', 'getParticularResponseForSelfReflection', $hasSelfAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r

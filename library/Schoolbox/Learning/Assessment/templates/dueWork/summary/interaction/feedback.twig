@@ -49,12 +49,45 @@ Data:
             }) %}
             {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
         {% endif %}
+    {% endif %}
+{% endif %}
+
+{% set selfReflectText = assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper %}
+
+{% set instructorReviewRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
+    assessmentId: currentFeedback.assessable.id,
+    studentId: currentFeedback.response.submittedOnBehalfOf.id,
+    responseId: responseId,
+    response: currentFeedback.response,
+    assessment: assessment,
+    student: currentFeedback.response.submittedOnBehalfOf,
+}) %}
+
+{% set instructorFloatingReviewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {
+    assessmentId: currentFeedback.assessable.id,
+    assessment: currentFeedback.assessable
+}) %}
+
+{% set studentSelfReviewRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+    assessmentId: currentFeedback.assessable.id,
+    assessment: currentFeedback.assessable,
+    studentId: currentFeedback.response.submittedOnBehalfOf.id,
+    student: currentFeedback.response.submittedOnBehalfOf
+}) %}
+
+{# if the feedback is a draft... #}
+{% if not currentFeedback.isPublished %}
+    {# and it's not a floating feedback (aka the feedback has been created for a particular submission) #}
+    {% if currentFeedback.response.id %}
+        {# if the current user is the student who submitted the feedback, give them a link to resume working on it #}
+        {# otherwise, if it's an instructor, take them to the inline grader for the particular draft #}
+        {% set url = instructorReviewRoute ?: studentSelfReviewRoute %}
+        {% set tooltip = instructorReviewRoute ? 'Resume Inline ' ~ locale.grading.proper : 'Resume ' ~ selfReflectText %}
     {% else %}
-        {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {
-        assessmentId: currentFeedback.assessable.id,
-        assessment: currentFeedback.assessable
-        }) %}
-        {% set tooltip = 'Resume Quickmark' %}
+        {# floating draft feedback? take the instructor to the quickmark screen to resume working on it.
+           There is no workflow I know of where a student can create a floating draft #}
+        {% set url = instructorFloatingReviewRoute %}
+        {% set tooltip = instructorFloatingReviewRoute ? 'Resume Quickmark' : 'Resume ' ~ selfReflectText %}
     {% endif %}
 {% endif %}
 

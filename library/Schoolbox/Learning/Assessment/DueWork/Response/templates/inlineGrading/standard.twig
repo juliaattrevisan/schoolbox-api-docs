@@ -40,7 +40,6 @@ Usage:
  #}
 {% set readonly = interactionLocked and not USER.superUser %}
 
-{# Breadcrumbs are always present #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
@@ -298,6 +297,8 @@ Usage:
                                 feedback: feedback,
                                 tabIndex: 2,
                                 readonly: readonly,
+                                selfAssessment: selfAssess,
+                                selfReflection: selfReflect,
                                 blindMode: blindMode ?? false
                             } only %}
 

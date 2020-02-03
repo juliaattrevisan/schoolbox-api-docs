@@ -86,12 +86,6 @@ class CanSelfAssess extends AbstractParticipationRule
             throw new Unauthorized('', Error\Mapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
         }
 
-        // Error out if participant has no Draft responses to complete
-        // Nothing to do in that case
-        if ($mostRecentResponse->isSubmitted()) {
-            throw new Unauthorized('', Error\Mapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
-        }
-
         // If a due work passes this gauntlet: it's self-assessable
         return true;
     }

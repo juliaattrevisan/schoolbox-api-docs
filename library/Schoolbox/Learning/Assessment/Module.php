@@ -40,6 +40,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
+use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
@@ -409,6 +410,7 @@ class Module extends BaseModule
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
         $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(RubricDataSource::class);
         $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(RubricResultSetMapper::class);
+        $dc['feedbackDataSource']       = $injector->lazyGet('feedbackDataSource');
 
         $dc['dueWorkResponseMapper'] = $injector->lazyGet('submissionDataSource');
         $dc['participantMapper'] = $injector->lazyNew(ParticipantDataSource::class);
@@ -582,6 +584,7 @@ class Module extends BaseModule
      * - students cannot if not open
      * - Students cannot submit if reached response limit
      * - students cannot if not participant, or a different student to that indicated in URL
+     * - Students cannot submit if assessment does not accept online submissions AND self-reflect is off
      *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException If required object not found in route params
@@ -613,7 +616,10 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
-                    new CanRespondToAssessment($this->getAccess())
+                    new Rule\Any(
+                        new CanRespondToAssessment($this->getAccess()),
+                        new CanSelfAssess()
+                    )
                 )
             )
         );
