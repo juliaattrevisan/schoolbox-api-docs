@@ -309,12 +309,11 @@ cd tools;
 ./build-sql-update.sh >/dev/null;
 cd /vagrant;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes";
-cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/vagrant.sql;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
+cat $cachedir/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes";
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Upgrading demo data with latest SQL updates";
 mkdir /var/lib/vagrant -p > /dev/null;
@@ -323,12 +322,11 @@ rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -R /var/lib/vagrant > /dev/null;
 rm -f /vagrant/www/conf/pre*conf.php;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes (post version upgrade)";
-cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/vagrant.sql;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
+cat $cachedir/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes (post version upgrade)";
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;

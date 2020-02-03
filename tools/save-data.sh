@@ -125,6 +125,9 @@ rm -f$longverbose /vagrant/data/*.sql{,.gz};
 echo "Reverting vagrant specific changes";
 mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup.sql;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes";
+/vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox /usr/share/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+
 echo "Exporting database";
 mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
 if [ $? -ne 0 ];
