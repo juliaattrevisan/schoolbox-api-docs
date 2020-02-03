@@ -1,6 +1,9 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% if not assessment.dueAt.isNull %}
     {% spaceless %}
+    {% if student and assessment.participantIfExtant(student).isResubmissionRequired %}
+        <li class="icon-alert">Resubmission required</li>
+    {% endif %}
     <li class="icon-calendar">
         {% if student %}
             {{ dueDate.dueDate(assessment, student) }}
