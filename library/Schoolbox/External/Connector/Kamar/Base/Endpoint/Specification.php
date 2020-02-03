@@ -15,7 +15,7 @@ use RuntimeException;
  *
  * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
-abstract class Specification
+class Specification
 {
     /**
      * Status text for existing nodes

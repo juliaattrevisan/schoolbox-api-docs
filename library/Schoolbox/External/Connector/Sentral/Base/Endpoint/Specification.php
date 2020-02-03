@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use UnexpectedValueException;
 
 /**
