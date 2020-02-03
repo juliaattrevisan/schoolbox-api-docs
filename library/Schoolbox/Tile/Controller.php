@@ -313,7 +313,7 @@ class Controller extends Base
      * @param Model $model
      * @return array
      */
-    protected function getAttachZoneData(Model $model)
+    private function getAttachZoneData(Model $model)
     {
         $zone = new Zone('tile');
         $zone
@@ -338,7 +338,7 @@ class Controller extends Base
      * @param Model        $item The tile to update
      * @param \ArrayObject $post An array-like object that abstracts $_POST
      */
-    protected function updateItemWithFormValues(Model $item, $post)
+    private function updateItemWithFormValues(Model $item, $post)
     {
         $colorFactory = new ColorFactory();
         $item
@@ -377,32 +377,13 @@ class Controller extends Base
      * @return Layout\Model
      * @throws MapperException if no component exists
      */
-    protected function findLayoutForComponent(Component_Instance $component)
+    private function findLayoutForComponent(Component_Instance $component)
     {
         $config   = $component->getConfigArray();
         $layoutId = $config['layoutId']['value'];
         return $this->layoutMapper->findById($layoutId);
     }
 
-    /**
-     * Loads the folder that relates to this component, if there is one.
-     *
-     * @param Component_Instance $component
-     *
-     * @return Folder\Model|null
-     */
-    protected function getFolderForComponent(Component_Instance $component)
-    {
-        if ($component->getModule() === 'homepage') {
-
-            // Support tile alt source to potentially soft-deleted homepage
-            $folderId   = $component->getIdentifier();
-            $columnName = $this->folderMapper->getIdentifierColumn();
-
-            return $this->folderMapper->findByColumn($columnName, $folderId, ['deleted' => true])->first();
-        }
-        return null;
-    }
 
     /**
      * Build a layout object for the given component.
