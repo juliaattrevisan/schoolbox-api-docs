@@ -74,10 +74,10 @@ class Status implements IStatus
             try {
                 $result = array_merge($result, $specification->check());
             } catch (\RuntimeException $e) {
-                $result = array_merge($result, [
+                $result[] = [
                     'message' => "Cannot access api endpoint: cannot open/read at least one {$key} xml",
                     'status' => CliRenderer::STATUS_EMPTY
-                ]);
+                ];
             }
         }
 
