@@ -219,6 +219,13 @@ class Markbook
                 );
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
                     $weightedSummator->summate($visibleAssessments, $student, true);
+
+            $this->studentStatistics[$student->getId()]['draftWeightedMean'] =
+                $overallMarkScheme->getHumanReadableMark(
+                    $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, false)
+                );
+            $this->studentStatistics[$student->getId()]['meanDraftNormalised'] =
+                $weightedSummator->summate($visibleAssessments, $student, false);
         }
 
         // Summate overall statistics:
@@ -271,11 +278,13 @@ class Markbook
 
         // Just get marks for all students, and let the summators do the rest.
         $normMarks = [];
+        $draftNormMarks = [];
 
         // Only collate stats for assessments whose feedback may be viewed by this user
         if ($assessment->isFeedbackVisibleToUser($this->viewingUser)) {
             foreach ($assessment->getAllParticipants() as $participant) {
-                $normMarks[] = $participant->getNormalisedMark(true);
+                $normMarks[]      = $participant->getNormalisedMark(true);
+                $draftNormMarks[] = $participant->getNormalisedMark(false);
             }
         }
 
@@ -303,6 +312,7 @@ class Markbook
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
             $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
+            $statistics['draftMean']        = $markScheme->getHumanReadableMark($meanSummator->summateList($draftNormMarks));
             $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
         }

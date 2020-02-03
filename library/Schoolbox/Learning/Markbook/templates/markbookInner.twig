@@ -89,8 +89,13 @@
                     </th>
                     {% for assessment in markbook.assessments %}
                         {% set stats = markbook.assessmentStatistics[assessment.id] %}
-                        <th class="{{ urgency.marks(stats.meanNormalized) }}-bg" data-assessment="{{ assessment.id }}">
+                        <th data-assessment="{{ assessment.id }}">
+                            <span {% if stats.draftMean is defined %} data-actual-mark {% endif %}>
                                 {{ stats.mean | default('–') }}
+                            </span>
+                            <span data-draft-mark style="display:none;">
+                                {{ stats.draftMean | default('–') }}
+                            </span>
                         </th>
                     {% endfor %}
                 </tr>
@@ -144,14 +149,30 @@
                         </div>
                     </td>
 
-                    {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
-                    {% set meanNormalised = markbook.studentStatistics[student.id].meanNormalised %}
-                    <td class="{{ urgency.marks(meanNormalised) }}-bg">
+                    {% set studentMean         = markbook.studentStatistics[student.id].weightedMean %}
+                    {% set draftWeightedMean   = markbook.studentStatistics[student.id].draftWeightedMean %}
+                    {% set meanNormalised      = markbook.studentStatistics[student.id].meanNormalised %}
+                    {% set meanDraftNormalised = markbook.studentStatistics[student.id].meanDraftNormalised %}
+
+                    {% set draftsOffClass      = meanNormalised is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
+                    {% set draftsOnClass       = meanDraftNormalised is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
+
+                    <td class="{{ draftsOffClass }}"
+                        {% if draftWeightedMean is defined %}data-student-average{% endif %}
+                        data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
+                        {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
                         {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                         <a class="{{ urgency.marks(meanNormalised) }}-bg"
-                           href="{{ routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
+                           href="{{ gradesRoute }}" {% if draftWeightedMean is defined %}data-actual-mark{% endif %}
+                           title="View students {{ locale.grades.plural }}">
                             {{ studentMean | default('–') }}
                         </a>
+                        {% if draftWeightedMean %}
+                            <a class="{{ urgency.marks(meanDraftNormalised) }}-bg"
+                               href="{{ gradesRoute }}" data-draft-mark style="display: none"
+                               title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('–') }}
+                            </a>
+                        {% endif %}
                     </td>
 
                     {% for assessment in markbook.assessments %}
@@ -235,9 +256,10 @@
 
                                     {% if draftMark %}
                                         <a href="{{ participationRoute }}" data-draft-mark style="display: none"
-                                           data-tooltip="right" class="meta"
-                                           title="Draft Mark">{{ participant.humanReadableMark(false) | default('–') }}</a>
-                                        <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
+                                           class="meta"
+                                           title="{{ participant.authoritativeFeedback(false).comment }}">{{ participant.humanReadableMark(false) | default('–') }}</a>
+                                        <span class="indicator indicator-{{ indicator }}"
+                                              title="{{ notchTitle }}"></span>
                                     {% endif %}
 
                                     {% if not participant.plan.isDynamic %}
