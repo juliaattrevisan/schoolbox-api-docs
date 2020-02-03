@@ -25,6 +25,7 @@ use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -304,6 +305,7 @@ class Importer
         $courseSpecFolder = $this->folderMapper->createModel()
             ->setParent($baseFolder)
             ->setName($curriculum->getTitle())
+            ->setCurriculumNodes(new GenericCollection(Node::class))
             ->setInherit((bool)$this->config->get('course_builder_default_course_page_inherit'));
         $this->folderMapper->save($courseSpecFolder);
 
@@ -341,6 +343,7 @@ class Importer
         $unitSpecFolder = $this->folderMapper->createModel()
             ->setParent($courseSpec->getFolder())
             ->setName($unit->getTitle())
+            ->setCurriculumNodes(new GenericCollection(Node::class))
             ->setInherit((bool)$this->config->get('course_builder_default_unit_page_inherit'));
         $this->folderMapper->save($unitSpecFolder);
 
