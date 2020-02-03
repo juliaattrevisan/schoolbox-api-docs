@@ -14,7 +14,6 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
-use Calendar;
 use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -80,7 +79,7 @@ class EventNotifier extends AbstractModuleNotifier
             // Bundle the upcoming trigger
             if ($event->inSeries()) {
                 // attach a custom trigger for handling the event recurrence
-                $upcoming = array($this, 'getNextSeriesTime');
+                $upcoming = [$this, 'getNextSeriesTime'];
             } else {
                 $upcoming = $start - (60 * self::UPCOMING_WINDOW);
             }
@@ -98,7 +97,7 @@ class EventNotifier extends AbstractModuleNotifier
     public function getNextSeriesTime($event)
     {
         /** @var Event $object */
-        $object   = $event->getObject();
+        $object = $event->getObject();
 
         try {
             $next = EventMapper::getInstance()->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
@@ -128,19 +127,19 @@ class EventNotifier extends AbstractModuleNotifier
     /**
      * @param string $trigger
      * @param string $roleType
-     * @param Event $event
+     * @param Event  $event
      * @return Builder
      */
     protected function newBuilder($trigger, $roleType, $event)
     {
         $bob = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)
-            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_CALENDAR)
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=" . NSMapper::NS_CALENDAR)
             // we need to stack based on series if that's possible
             ->setHref("/calendar/event/" . $event->getId())
             ->setBody($event->getDetail())
             ->addTopic("calendar.{$event->getType()->getId()}.{$event->getId()}.$trigger")
-            ->addFilter('roletype', array($roleType))
+            ->addFilter('roletype', [$roleType])
             ->setSeverity(Logger::INFO);
 
         if ($event->getAccess() == Event::ACCESS_CAMPUS) {
@@ -153,8 +152,8 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $roleType
-     * @param Event $event
-     * @param User $author
+     * @param Event  $event
+     * @param User   $author
      * @return Envelope
      */
     protected function notifyUpcoming($roleType, $event, $author)
@@ -168,19 +167,19 @@ class EventNotifier extends AbstractModuleNotifier
         $event = $this->mapper->findById($event->getId());
 
         $bob = $this->newBuilder(self::TRIGGER_UPCOMING, $roleType, $event)
-            ->setTitle(':name is about to start')
-            ->setTimestamp($event->getStartDateTime()->getUnixTimeStamp() - (60 * self::UPCOMING_WINDOW))
-            ->setParam('name', new Param($event->getTitle()));
+                    ->setTitle(':name is about to start')
+                    ->setTimestamp($event->getStartDateTime()->getUnixTimeStamp() - (60 * self::UPCOMING_WINDOW))
+                    ->setParam('name', new Param($event->getTitle()));
 
-        return $this->notify($event, array($bob->build()));
+        return $this->notify($event, [$bob->build()]);
     }
 
 
     /**
      * @param string $roleType
-     * @param Event $event
-     * @param User $effector
-     * @param array $diff
+     * @param Event  $event
+     * @param User   $effector
+     * @param array  $diff
      * @return Envelope
      */
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
@@ -200,17 +199,17 @@ class EventNotifier extends AbstractModuleNotifier
         /** @var Event $event */
         $event     = $this->mapper->findById($event->getId());
         $bob       = $this->newBuilder(self::TRIGGER_UPDATED, $roleType, $event);
-        $instances = array();
+        $instances = [];
 
         // title changed
         if (isset($diff['title'])) {
             $bob->setTitle(':user renamed the event :old to :new')
                 ->setParams(
-                    array(
+                    [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
                         'old'  => new Param($diff['title'][1]),
-                        'new'  => new Param($event->getTitle())
-                    )
+                        'new'  => new Param($event->getTitle()),
+                    ]
                 );
             $instances[] = $bob->build();
             unset($diff['title']);
@@ -220,11 +219,11 @@ class EventNotifier extends AbstractModuleNotifier
         if (isset($diff['location'])) {
             $bob->setTitle(':event has moved from :old to :new')
                 ->setParams(
-                    array(
+                    [
                         'event' => new Param($event->getTitle()),
                         'old'   => new Param($diff['location'][1]),
-                        'new'   => new Param($event->getLocation())
-                    )
+                        'new'   => new Param($event->getLocation()),
+                    ]
                 );
             $instances[] = $bob->build();
             unset($diff['location']);
@@ -234,11 +233,11 @@ class EventNotifier extends AbstractModuleNotifier
         if (isset($diff['start_datetime'])) {
             $bob->setTitle(':user changed the start time of :name to :time')
                 ->setParams(
-                    array(
+                    [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
                         'name' => new Param($event->getTitle()),
-                        'time' => new Param($event->getStartDateTime()->getShort())
-                    )
+                        'time' => new Param($event->getStartDateTime()->getShort()),
+                    ]
                 );
 
             $instances[] = $bob->build();
@@ -249,10 +248,10 @@ class EventNotifier extends AbstractModuleNotifier
         if (count($diff)) {
             $bob->setTitle(':user updated the event :name')
                 ->setParams(
-                    array(
+                    [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                        'name' => new Param($event->getTitle())
-                    )
+                        'name' => new Param($event->getTitle()),
+                    ]
                 );
 
             $instances[] = $bob->build();
@@ -263,7 +262,7 @@ class EventNotifier extends AbstractModuleNotifier
 
 
     /**
-     * @param Event $event
+     * @param Event      $event
      * @param Instance[] $instances
      * @return Envelope
      */
@@ -315,7 +314,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User $author
+     * @param User  $author
      * @return Envelope
      */
     public function notifyStudentUpcoming($event, $author)
@@ -326,7 +325,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User $author
+     * @param User  $author
      * @return Envelope
      */
     public function notifyStaffUpcoming($event, $author)
@@ -337,7 +336,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User $author
+     * @param User  $author
      * @return Envelope
      */
     public function notifyParentUpcoming($event, $author)
@@ -348,7 +347,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User $author
+     * @param User  $author
      * @param array $diff
      * @return Envelope
      */
@@ -360,7 +359,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User $author
+     * @param User  $author
      * @param array $diff
      * @return Envelope
      */
@@ -372,7 +371,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User $author
+     * @param User  $author
      * @param array $diff
      * @return Envelope
      */
@@ -394,7 +393,7 @@ class EventNotifier extends AbstractModuleNotifier
         if (!isset($publishDiff)) {
             return false;
         }
-        $now                       = Alaress_Date_Format::now();
+        $now = Alaress_Date_Format::now();
         [$newPublish, $oldPublish] = $diff['publishDateTime'];
         return Alaress_Date_Format::newDatabaseDate($oldPublish)->gt($now)
             && Alaress_Date_Format::newDatabaseDate($newPublish)->lte($now);
