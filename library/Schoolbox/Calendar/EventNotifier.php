@@ -392,7 +392,7 @@ class EventNotifier extends AbstractModuleNotifier
     {
         $oldPublishDateTime = $diff['publishDateTime'][1] ?? null;
         if (!$oldPublishDateTime) {
-            return true;
+            return false;
         }
         return Alaress_Date_Format::newDatabaseDate($oldPublishDateTime)->lte(Alaress_Date_Format::now());
     }
