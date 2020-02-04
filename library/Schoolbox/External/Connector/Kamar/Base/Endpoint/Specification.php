@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use RuntimeException;
-use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 
 /**
@@ -63,12 +62,12 @@ abstract class Specification implements ISpecification
             if ($this->batchxml->fetchXml($path)) {
                 $endpoints[] = [
                     'message' => $path,
-                    'status' => CliRenderer::STATUS_OK
+                    'status' => ISpecification::STATUS_OK
                 ];
             } else {
                 $endpoints[] = [
                     'message' => $path,
-                    'status' => CliRenderer::STATUS_MISSING
+                    'status' => ISpecification::STATUS_MISSING
                 ];
             }
         }

@@ -17,23 +17,6 @@ use Psr\Log\LoggerInterface;
 class CliRenderer
 {
 
-    /**
-     * Status text for existing nodes
-     */
-    public const STATUS_OK = 'OK';
-
-
-    /**
-     * Status text for missing nodes
-     */
-    public const STATUS_MISSING = 'MISSING';
-
-
-    /**
-     * Status text for existing nodes that are empty but probably should contain something
-     */
-    public const STATUS_EMPTY = 'EMPTY';
-
 
     /**
      * Number of spaces for output formatting
@@ -85,12 +68,12 @@ class CliRenderer
             /* Format log messages
              */
             switch ($endpoint['status']) {
-                case self::STATUS_OK:
+                case ISpecification::STATUS_OK:
                     $this->log->info($message);
                     break;
 
-                case self::STATUS_MISSING:
-                case self::STATUS_EMPTY:
+                case ISpecification::STATUS_MISSING:
+                case ISpecification::STATUS_EMPTY:
                 default:
                     $this->log->warning($message);
                     break;

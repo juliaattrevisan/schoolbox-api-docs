@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
-use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use UnexpectedValueException;
 
@@ -84,18 +83,18 @@ class Specification implements ISpecification
                 if (\count($result['data'])) {
                     $endpoints[] = [
                         'message' => $path,
-                        'status' => CliRenderer::STATUS_OK
+                        'status' => ISpecification::STATUS_OK
                     ];
                 } else {
                     $endpoints[] = [
                         'message' => $path,
-                        'status' => CliRenderer::STATUS_EMPTY
+                        'status' => ISpecification::STATUS_EMPTY
                     ];
                 }
             } catch (UnexpectedValueException $e) {
                 $endpoints[] = [
                     'message' => $path,
-                    'status' => CliRenderer::STATUS_MISSING
+                    'status' => ISpecification::STATUS_MISSING
                 ];
             }
         }
