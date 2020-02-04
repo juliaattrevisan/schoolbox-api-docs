@@ -118,13 +118,17 @@ feedback: currentFeedback,
                 {% endif %}
             </div>
             {% endblock card %}
-
             {% if currentFeedback.humanReadableMark %}
-            <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
-                <span>{{ currentFeedback.humanReadableMark }}</span>
-            </div>
+                <div class="grade grade-large {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
+                    <span>{{ currentFeedback.humanReadableMark }}</span>
+                </div>
             {% endif %}
         </div>
+        {% if currentFeedback.humanReadableMark %}
+            <div class="grade grade-small {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
+                <span>{{ currentFeedback.humanReadableMark }}</span>
+            </div>
+        {% endif %}
         <nav>
             {% if hasCollapser %}
                 <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
