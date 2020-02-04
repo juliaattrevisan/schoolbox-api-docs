@@ -116,7 +116,11 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
-        $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+        try {
+            $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+        } catch (\DomainException|\InvalidArgumentException $e) {
+            $status = null;
+        }
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
             'isReachable' => $status ? $status->isReachable() : false
