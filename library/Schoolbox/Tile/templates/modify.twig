@@ -67,7 +67,10 @@
     <div class="small-12 island">
         <form id="tile-modify-form"
               name='form'
-              action="{{ item.id ? routeLookup('tile.update', {id: item.id}) : routeLookup('tile.create', {layoutId: layout.id}) }}"
+              action="{{ item.id
+                  ? routeLookup('tile.update', {id: item.id})
+                  : routeLookup('tile.create', {layoutId: layout.id})
+              }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
               method="post">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
 

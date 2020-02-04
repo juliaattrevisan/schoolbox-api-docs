@@ -77,7 +77,7 @@
            class="button icon-delete right"
            data-role="delete"
            title="Delete"></a>
-        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}"
+        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
            class="button icon-modify right"
            title="Modify"></a>
     </div>

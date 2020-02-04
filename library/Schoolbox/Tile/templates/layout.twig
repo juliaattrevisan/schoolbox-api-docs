@@ -189,7 +189,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="{{ routeLookup('tile.layoutForm', {layoutId: item.id}) }}"
+        <form action="{{ routeLookup('tile.layoutForm', {layoutId: item.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
               method="post"
               data-role="layoutForm">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
