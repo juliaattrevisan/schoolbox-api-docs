@@ -837,19 +837,14 @@ $rotate-span-width: 11rem;
         display: inline-block;
         transition-duration: .2s;
     }
+    &.icon-up-arrow:before {
+        @extend .icon-up-arrow;
+    }
     &:hover{
         cursor: pointer;
     }
     &.expanded:before {
         transform: rotate(180deg);
-    }
-
-    // Alternate .expander using different arrows
-    &.alt:before {
-        @extend .icon-next;
-    }
-    &.alt.expanded:before {
-        transform: rotate(90deg);
     }
 }
 
