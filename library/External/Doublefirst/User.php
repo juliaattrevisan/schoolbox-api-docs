@@ -167,22 +167,22 @@ class External_Doublefirst_User implements External_UserInterface
                 cm.Greeting                 AS Preferred,
                 c.Surname                   AS Surname,
                 ceh.EmailID         AS Email,
-                cew.EmailID         AS OccupEmail,        
+                cew.EmailID         AS OccupEmail,
                 ''                          AS DefaultEmailCode,
                 ct.HomeTelephoneNumber      AS HomePhone,
-                
+
                 LTRIM(
                   RTRIM(
                     COALESCE(
-                      NULLIF(ct.Mobile, ''), 
-                      NULLIF(ctPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                      NULLIF(ctPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                      NULLIF(ctPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                      NULLIF(ctPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
+                      NULLIF(ct.Mobile, ''),
+                      NULLIF(ctPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                      NULLIF(ctPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                      NULLIF(ctPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'),
+                      NULLIF(ctPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'),
                       NULLIF(ctPhoneMobile5.TelephoneNumber, '')
-                    ) 
+                    )
                   )
-                ) AS MobilePhone, 
+                ) AS MobilePhone,
                 0                           AS SilentPhoneFlag,
                 0                           AS SilentMobilePhoneFlag,
                 1                           AS DirectoryIncludeFlag,
@@ -195,22 +195,22 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                          AS SpouseDefaultEmailCode,
                 ''                          AS SpouseMobilePhone,
                 0                           AS SpouseDirectoryIncludeFlag
-            
+
             FROM        VLPupilContact      pc
             LEFT JOIN   VLContact           c on c.ContactID = pc.ContactID
             LEFT JOIN   ContactMaster       cm on c.ContactID = cm.ContactID
             LEFT JOIN   ContactEmailInformation      ceh on ceh.ContactID = pc.ContactID AND ceh.EmailType = '001' AND ceh.PrimaryEmail = 1
             LEFT JOIN   ContactEmailInformation      cew on cew.ContactID = pc.ContactID AND cew.EmailType = '002' AND cew.PrimaryEmail = 1
-            LEFT JOIN   VLContactTelephone  ct on ct.ContactID = pc.ContactID 
-                        
+            LEFT JOIN   VLContactTelephone  ct on ct.ContactID = pc.ContactID
+
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile    ON ctPhoneMobile.ContactID = pc.ContactID AND ctPhoneMobile.TelephoneType = 'M'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile2   ON ctPhoneMobile2.ContactID = pc.ContactID AND ctPhoneMobile2.TelephoneType = '003'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile3   ON ctPhoneMobile3.ContactID = pc.ContactID AND ctPhoneMobile3.TelephoneType = '004'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile4   ON ctPhoneMobile4.ContactID = pc.ContactID AND ctPhoneMobile4.TelephoneType = '005'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile5   ON ctPhoneMobile5.ContactID = pc.ContactID AND ctPhoneMobile5.TelephoneType = '006'
-            
-            WHERE       pc.IsContactParental = 1 
-            AND         pc.ContactID = '{$externalUserId}'    
+
+            WHERE       pc.IsContactParental = 1
+            AND         pc.ContactID = '{$externalUserId}'
             ORDER BY    pc.Priority
         ";
 
@@ -264,7 +264,7 @@ class External_Doublefirst_User implements External_UserInterface
                               cei.EmailID             AS DefaultEmail
             FROM              VLPupilContact          pc
             LEFT JOIN         ContactEmailInformation cei ON cei.ContactID = pc.ContactID
-            WHERE             pc.PupilID IN ($id_list) 
+            WHERE             pc.PupilID IN ($id_list)
             AND 	          pc.IsContactParental = 1
             AND               pc.ContactID <> ''
             AND               cei.EmailID <> ''
@@ -290,8 +290,8 @@ class External_Doublefirst_User implements External_UserInterface
 
         $ecQuery =
             "
-            SELECT LookupDetailsID 
-            FROM LookupDetails                
+            SELECT LookupDetailsID
+            FROM LookupDetails
             WHERE LookupID = 2100 AND Description LIKE '%EM Contact 1%';
         ";
 
@@ -308,13 +308,13 @@ class External_Doublefirst_User implements External_UserInterface
 
         $query = "
             SELECT TOP 1
-            
+
                 p.PupilID                                           AS StudentID,
                 p.AdmissionNo                                       AS AdmissionNo,
                 ForeName                                            AS StudentGiven1,
                 Surname                                             AS StudentSurname,
                 ''                                                  AS StudentGender,
-                CONVERT(nvarchar(30), BirthDate, ".self::FORMAT_ISO8601." )              AS StudentBirthDate,                
+                CONVERT(nvarchar(30), BirthDate, ".self::FORMAT_ISO8601." )              AS StudentBirthDate,
                 ''                                                  AS StudentTutorName,
                 ''                                                  AS StudentHeadOfHouse,
                 ''                                                  AS HeadOfHouseID,
@@ -330,14 +330,14 @@ class External_Doublefirst_User implements External_UserInterface
                 LTRIM(
                   RTRIM(
                     COALESCE(
-                      NULLIF(ecmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                      NULLIF(ecmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                      NULLIF(ecmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                      NULLIF(ecmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
-                      NULLIF(ecmPhoneMobile5.TelephoneNumber, '')                      
-                    ) 
+                      NULLIF(ecmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                      NULLIF(ecmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                      NULLIF(ecmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'),
+                      NULLIF(ecmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'),
+                      NULLIF(ecmPhoneMobile5.TelephoneNumber, '')
+                    )
                   )
-                )                                                   AS StudentEmergencyPhone, 
+                )                                                   AS StudentEmergencyPhone,
                 ecmPhoneHome.TelephoneNumber                        AS StudentEmergencyPhoneAlt,
                 m.Comments                                          AS StudentMedicalAlert,
                 ''                                                  AS StudentMobilePhone,
@@ -358,7 +358,7 @@ class External_Doublefirst_User implements External_UserInterface
             FROM V_PupilBasicInformation                            p
             LEFT JOIN PupilCareAuthority pca                        ON pca.PupilID = p.PupilID
             LEFT JOIN LookupDetails pcad                            ON pcad.LookupID = 3025 AND LookupDetailsID = pca.ResponsibleForCustody
-            LEFT JOIN PupilMedicalInformation m                     ON m.PupilID = p.PupilID                
+            LEFT JOIN PupilMedicalInformation m                     ON m.PupilID = p.PupilID
             LEFT JOIN PupilContacts ec                              ON ec.RelationshipToPupil IN ('{$assignation}') AND ec.PupilID = p.PupilID
             LEFT JOIN ContactMaster ecm                             ON ecm.ContactID = ec.ContactID
             LEFT JOIN ContactTelephoneInformation ecmPhoneMobile    ON ecmPhoneMobile.ContactID = ecm.ContactID AND ecmPhoneMobile.TelephoneType = 'M'
@@ -407,7 +407,7 @@ class External_Doublefirst_User implements External_UserInterface
             FROM            StaffPersonalDetails s
 		    JOIN            CurrentStaff cs ON cs.StaffID = s.StaffID
             LEFT JOIN       LookupDetails cat ON cat.LookupID = 1203 AND cat.LookupDetailsID = s.StaffCategory
-            LEFT JOIN       StaffTelephones tMobile on tMobile.StaffID = s.StaffID AND TelephoneType = 'M' 
+            LEFT JOIN       StaffTelephones tMobile on tMobile.StaffID = s.StaffID AND TelephoneType = 'M'
             WHERE           s.StaffId = '{$this->database->quote($externalUserId)}'
         ";
 
@@ -428,7 +428,7 @@ class External_Doublefirst_User implements External_UserInterface
                         p.House AS StudentHouse,
                         pcs.BoarderStatus AS StudentBoarder,
                         p.Form AS StudentForm,
-                        
+
                         c.ContactID AS StudentContactID,
                         c.Title AS StudentContactTitle,
                         cm.Greeting AS StudentContactPreferred,
@@ -436,7 +436,7 @@ class External_Doublefirst_User implements External_UserInterface
                         c.Surname StudentContactSurname,
                         ceh.EmailID AS StudentContactDefaultEmail,
                         1 AS ValidAddressFlag,
-        
+
                         a.SubDwelling AS StudentContactAddress1,
                         a.Street AS StudentContactAddress2,
                         a.Locality AS StudentContactAddress3,
@@ -444,7 +444,7 @@ class External_Doublefirst_User implements External_UserInterface
                         a.Postcode AS StudentContactPostCode,
                         a.County AS StudentContactState,
                         a.Country AS StudentContactCountryCode,
-                        
+
                         a.SubDwelling AS StudentContactHomeAddress1,
                         a.Street AS StudentContactHomeAddress2,
                         a.Locality AS StudentContactHomeAddress3,
@@ -452,34 +452,34 @@ class External_Doublefirst_User implements External_UserInterface
                         a.PostCode AS StudentContactHomePostCode,
                         a.County AS StudentContactHomeState,
                         a.Country AS StudentContactHomeCountryCode,
-                        
+
                         LTRIM(
                           RTRIM(
                             COALESCE(
-                              NULLIF(cp.Mobile, ''), 
-                              NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                              NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                              NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                              NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
+                              NULLIF(cp.Mobile, ''),
+                              NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                              NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                              NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'),
+                              NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'),
                               NULLIF(cmPhoneMobile5.TelephoneNumber, '')
                             )
                           )
-                        ) AS StudentContactMobilePhone, 
-                        
+                        ) AS StudentContactMobilePhone,
+
                         LTRIM(
                           RTRIM(
                             COALESCE(
-                              NULLIF(cp.Mobile, ''), 
-                              NULLIF(cmPhoneWork.TelephoneNumber + '', ''), 
-                              NULLIF(cmPhoneWork2.TelephoneNumber + '', ''), 
-                              NULLIF(cmPhoneWork3.TelephoneNumber + '', ''), 
-                              NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'), 
-                              NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                              NULLIF(cp.Mobile, ''),
+                              NULLIF(cmPhoneWork.TelephoneNumber + '', ''),
+                              NULLIF(cmPhoneWork2.TelephoneNumber + '', ''),
+                              NULLIF(cmPhoneWork3.TelephoneNumber + '', ''),
+                              NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'),
+                              NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'),
                               NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
                             )
                           )
-                        ) AS StudentContactOccupPhone, 
-                        
+                        ) AS StudentContactOccupPhone,
+
                         pc.RelationshipToPupil AS StudentContactRelation,
                         '' AS StudentContactSpouseID,
                         '' AS StudentContactSpouseTitle,
@@ -489,20 +489,20 @@ class External_Doublefirst_User implements External_UserInterface
                         LTRIM(
                           RTRIM(
                             COALESCE(
-                              NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                              NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'),
                               NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)')
                             )
                           )
-                        ) AS StudentContactSpouseMobilePhone, 
-    
+                        ) AS StudentContactSpouseMobilePhone,
+
                         LTRIM(
                           RTRIM(
                             COALESCE(
-                              NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                              NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'),
                               NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
-                            ) 
+                            )
                           )
-                        ) AS StudentContactSpouseOccupPhone, 
+                        ) AS StudentContactSpouseOccupPhone,
 
 
                         cew.EmailID AS StudentContactSpouseDefaultEmail,
@@ -513,9 +513,9 @@ class External_Doublefirst_User implements External_UserInterface
                         1 AS SpouseDirectoryIncludeFlag,
                         0 AS SilentHomeAddressFlag,
                         0 AS StudentParentsSeparatedFlag
-            
+
             FROM      V_PupilBasicInformation p
-            JOIN      VLPupilContact                pc ON pc.PupilID = p.PupilID AND pc.IsContactParental = 1 
+            JOIN      VLPupilContact                pc ON pc.PupilID = p.PupilID AND pc.IsContactParental = 1
             LEFT JOIN PupilCurrentSchool            pcs ON pcs.PupilID = p.PupilID
             LEFT JOIN VLContactAddress              a ON a.ContactID = pc.ContactID AND a.AddressType = 'Current'
             LEFT JOIN VLContact                     c ON c.ContactID = pc.ContactID
@@ -531,10 +531,10 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation cmPhoneWork4   ON cmPhoneWork4.ContactID = pc.ContactID AND cmPhoneWork4.TelephoneType = '007'
             LEFT JOIN ContactTelephoneInformation cmPhoneWork5   ON cmPhoneWork5.ContactID = pc.ContactID AND cmPhoneWork5.TelephoneType = '008'
             LEFT JOIN ContactTelephoneInformation cmPhoneWork6   ON cmPhoneWork6.ContactID = pc.ContactID AND cmPhoneWork6.TelephoneType = '009'
-            LEFT JOIN VLContactTelephone            cp ON cp.ContactID = pc.ContactID 
+            LEFT JOIN VLContactTelephone            cp ON cp.ContactID = pc.ContactID
             LEFT JOIN VLContactEmail                ce ON ce.ContactID = pc.ContactID
             LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype IN ('001','1') and ceh.primaryemail = 1
-            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype IN ('002','2') and cew.primaryemail = 1 
+            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype IN ('002','2') and cew.primaryemail = 1
             WHERE
         ";
 
@@ -650,34 +650,34 @@ class External_Doublefirst_User implements External_UserInterface
                       ceh.EmailID AS StudentContactDefaultEmail,
                       cp.HomeTelephoneNumber AS StudentContactPhoneActual,
                       0 AS StudentContactSilentPhoneFlag,
-                      
-                      LTRIM(
-                        RTRIM(
-                          COALESCE(
-                            NULLIF(cp.Mobile, ''), 
-                            NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                            NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                            NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                            NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
-                            NULLIF(cmPhoneMobile5.TelephoneNumber, '')
-                          )
-                        )
-                      ) AS StudentContactMobilePhone, 
 
                       LTRIM(
                         RTRIM(
                           COALESCE(
-                            NULLIF(cp.Mobile, ''), 
-                            NULLIF(cmPhoneWork.TelephoneNumber + '', ''), 
-                            NULLIF(cmPhoneWork2.TelephoneNumber + '', ''), 
-                            NULLIF(cmPhoneWork3.TelephoneNumber + '', ''), 
-                            NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'), 
-                            NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                            NULLIF(cp.Mobile, ''),
+                            NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                            NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'),
+                            NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'),
+                            NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'),
+                            NULLIF(cmPhoneMobile5.TelephoneNumber, '')
+                          )
+                        )
+                      ) AS StudentContactMobilePhone,
+
+                      LTRIM(
+                        RTRIM(
+                          COALESCE(
+                            NULLIF(cp.Mobile, ''),
+                            NULLIF(cmPhoneWork.TelephoneNumber + '', ''),
+                            NULLIF(cmPhoneWork2.TelephoneNumber + '', ''),
+                            NULLIF(cmPhoneWork3.TelephoneNumber + '', ''),
+                            NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'),
+                            NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'),
                             NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
                           )
                         )
-                      ) AS StudentContactOccupPhone, 
-                      
+                      ) AS StudentContactOccupPhone,
+
                       pc.RelationshipToPupil AS StudentContactRelation,
                       '' AS StudentContactSpouseID,
                       '' AS StudentContactSpouseTitle,
@@ -687,24 +687,24 @@ class External_Doublefirst_User implements External_UserInterface
                       LTRIM(
                         RTRIM(
                           COALESCE(
-                            NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                            NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'),
                             NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)')
                           )
                         )
-                      ) AS StudentContactSpouseMobilePhone, 
+                      ) AS StudentContactSpouseMobilePhone,
 
                       LTRIM(
                         RTRIM(
                           COALESCE(
-                            NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                            NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'),
                             NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
                           )
                         )
-                      ) AS StudentContactSpouseOccupPhone, 
+                      ) AS StudentContactSpouseOccupPhone,
 
                       cew.EmailID AS StudentContactSpouseDefaultEmail,
                       '' AS StudentContactSpouseRelation
-            
+
             FROM      V_PupilBasicInformation p
             JOIN      VLPupilContact                pc ON pc.PupilID = p.PupilID AND pc.IsContactParental = 1
             LEFT JOIN PupilCurrentSchool            pcs ON pcs.PupilID = p.PupilID
@@ -722,11 +722,11 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation cmPhoneWork4   ON cmPhoneWork4.ContactID = pc.ContactID AND cmPhoneWork4.TelephoneType = '007'
             LEFT JOIN ContactTelephoneInformation cmPhoneWork5   ON cmPhoneWork5.ContactID = pc.ContactID AND cmPhoneWork5.TelephoneType = '008'
             LEFT JOIN ContactTelephoneInformation cmPhoneWork6   ON cmPhoneWork6.ContactID = pc.ContactID AND cmPhoneWork6.TelephoneType = '009'
-            LEFT JOIN   VLContactTelephone            cp ON cp.ContactID = pc.ContactID 
+            LEFT JOIN   VLContactTelephone            cp ON cp.ContactID = pc.ContactID
             LEFT JOIN   VLContactEmail                ce ON ce.ContactID = pc.ContactID
             LEFT JOIN ContactEmailInformation ceh  ON ceh.contactid = pc.contactid and ceh.emailtype IN ('001','1') and ceh.primaryemail = 1
-            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype IN ('002','2') and cew.primaryemail = 1 
-            
+            LEFT JOIN ContactEmailInformation cew  ON cew.contactid = pc.contactid and cew.emailtype IN ('002','2') and cew.primaryemail = 1
+
             WHERE p.PupilID IN ($ids)
             ORDER BY pc.Priority
         ";
@@ -784,26 +784,22 @@ class External_Doublefirst_User implements External_UserInterface
 
             $sql =
                 "
-              SELECT DISTINCT     ssb.BlockName + ' - ' + ssbr.RoomName AS Room, 
-                                  sm.Name AS name, 
-                                  ygsd.SubjectDivisionName AS ClassCode, 
+              SELECT DISTINCT     sm.Name AS name,
+                                  ygsd.SubjectDivisionName AS ClassCode,
                                   '' AS ClassCampus,
-                                  '' AS StaffID, 
-                                  '' AS StaffTitle, 
-                                  '' AS StaffPreferredName, 
-                                  '' AS StaffSurname 
-                                  
-              FROM                TimetableClassRoom tcr 
-              LEFT JOIN           YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcr.DivisionID AND ygsd.SubjectID = tcr.SubjectID AND ygsd.YearGroup = tcr.YearGroup AND ygsd.AcademicYear = tcr.AcademicYear 
-              LEFT JOIN           SchoolSiteBlock ssb ON ssb.SiteID = tcr.SiteID AND ssb.BlockID = tcr.BlockID 
-              LEFT JOIN           SchoolSiteBlockRooms ssbr ON ssbr.SiteID = tcr.SiteID AND ssbr.BlockID = tcr.BlockID AND ssbr.RoomID = tcr.RoomID 
-              LEFT JOIN           BatchMaster bm ON bm.YearGroup = tcr.YearGroup AND bm.SubjectID = tcr.SubjectID AND bm.DivisionID = tcr.DivisionID 
-              JOIN                PupilSubjects ps ON ps.YearGroup = tcr.YearGroup AND ps.SubjectID = tcr.SubjectID AND ps.DivisionID = tcr.DivisionID AND ps.SchoolYear = tcr.AcademicYear	
-              JOIN                TimetableMatrix tm ON tm.MatrixID = tcr.MatrixID AND tm.AcademicYear = tcr.AcademicYear AND tm.YearGroup = tcr.YearGroup 
-              JOIN                TimetableMaster tn ON tn.TimetableName = tm.TimetableName AND tn.IsWorking = 1 
-              JOIN                SubjectMaster sm ON sm.SubjectID = tcr.SubjectID 
-              WHERE               tcr.AcademicYear = '{$year}' AND 
-                                  ps.PupilID = '{$externalId}' 
+                                  '' AS classType
+
+              FROM                TimetableClassRoom tcr
+              LEFT JOIN           YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcr.DivisionID AND ygsd.SubjectID = tcr.SubjectID AND ygsd.YearGroup = tcr.YearGroup AND ygsd.AcademicYear = tcr.AcademicYear
+              LEFT JOIN           SchoolSiteBlock ssb ON ssb.SiteID = tcr.SiteID AND ssb.BlockID = tcr.BlockID
+              LEFT JOIN           SchoolSiteBlockRooms ssbr ON ssbr.SiteID = tcr.SiteID AND ssbr.BlockID = tcr.BlockID AND ssbr.RoomID = tcr.RoomID
+              LEFT JOIN           BatchMaster bm ON bm.YearGroup = tcr.YearGroup AND bm.SubjectID = tcr.SubjectID AND bm.DivisionID = tcr.DivisionID
+              JOIN                PupilSubjects ps ON ps.YearGroup = tcr.YearGroup AND ps.SubjectID = tcr.SubjectID AND ps.DivisionID = tcr.DivisionID AND ps.SchoolYear = tcr.AcademicYear
+              JOIN                TimetableMatrix tm ON tm.MatrixID = tcr.MatrixID AND tm.AcademicYear = tcr.AcademicYear AND tm.YearGroup = tcr.YearGroup
+              JOIN                TimetableMaster tn ON tn.TimetableName = tm.TimetableName AND tn.IsWorking = 1
+              JOIN                SubjectMaster sm ON sm.SubjectID = tcr.SubjectID
+              WHERE               tcr.AcademicYear = '{$year}' AND
+                                  ps.PupilID = '{$externalId}'
             ";
         } else if ($user->getRole()->isStaff()) {
             // Get staff subjects
@@ -815,25 +811,25 @@ class External_Doublefirst_User implements External_UserInterface
                 '' AS ClassCampus,
                 sm.Name AS name,
                 '' AS classType
-                
+
                 FROM TimetableClassRoom tcr
-    
+
                 LEFT JOIN YearGroupSubjectDivision ygsd ON
                 ygsd.DivisionID = tcr.DivisionID AND
                 ygsd.SubjectID = tcr.SubjectID AND
                 ygsd.YearGroup = tcr.YearGroup AND
                 ygsd.AcademicYear = tcr.AcademicYear
-                
+
                 LEFT JOIN BatchMaster bm ON
                 bm.YearGroup = tcr.YearGroup AND
                 bm.SubjectID = tcr.SubjectID AND
                 bm.DivisionID = tcr.DivisionID
-    
+
                 JOIN TimetableMatrix tm ON
                 tm.MatrixID = tcr.MatrixID AND
                 tm.AcademicYear = tcr.AcademicYear AND
                 tm.YearGroup = tcr.YearGroup
-    
+
                 JOIN TimetableClassStaff tcs ON
                 tcs.YearGroup = tcr.YearGroup AND
                 tcs.SubjectID = tcr.SubjectID AND
@@ -843,11 +839,11 @@ class External_Doublefirst_User implements External_UserInterface
 
                 JOIN SubjectMaster sm ON
                 sm.SubjectID = tcr.SubjectID
-    
+
                 JOIN TimetableMaster tn ON
                 tn.TimetableName = tm.TimetableName AND
                 tn.IsWorking = 1
-                
+
                 WHERE tcr.AcademicYear = '{$year}'
                 AND tcs.StaffID = '{$externalId}' ORDER BY name
             ";
@@ -881,24 +877,24 @@ class External_Doublefirst_User implements External_UserInterface
     {
         $query =
             "
-            SELECT  pcs.PupilID as RelatedID 
-            FROM    PupilCurrentSchool pcs 
-            JOIN    VLPupilContact vpc ON vpc.PupilID = pcs.PupilID 
-            WHERE   ReasonForLeaving IN ('', '00', '0000') AND 
+            SELECT  pcs.PupilID as RelatedID
+            FROM    PupilCurrentSchool pcs
+            JOIN    VLPupilContact vpc ON vpc.PupilID = pcs.PupilID
+            WHERE   ReasonForLeaving IN ('', '00', '0000') AND
                     vpc.RelationshipToPupil IN (
-                      'Parents', 
-                      'Mother', 
-                      'Father', 
-                      'Guardians', 
-                      'Male Guardian', 
-                      'Female Guardian', 
-                      'Foster Parent', 
-                      'Father Post', 
-                      'Mother & Step Father', 
-                      'Parents Post', 
-                      'Step Parent', 
-                      'Grandmother & Guardian', 
-                      'Biological Father - no/little contact', 
+                      'Parents',
+                      'Mother',
+                      'Father',
+                      'Guardians',
+                      'Male Guardian',
+                      'Female Guardian',
+                      'Foster Parent',
+                      'Father Post',
+                      'Mother & Step Father',
+                      'Parents Post',
+                      'Step Parent',
+                      'Grandmother & Guardian',
+                      'Biological Father - no/little contact',
                       'Biological Mother - no/little contact'
                     ) AND
                     vpc.ContactId = '{$externalUserId}'
@@ -940,10 +936,10 @@ class External_Doublefirst_User implements External_UserInterface
 	        JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
             LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = 'D321'
-            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'                        
+            LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
-            ORDER BY    spd.SurName, 
+            ORDER BY    spd.SurName,
                         spd.ForeName
         ";
 
@@ -990,13 +986,13 @@ class External_Doublefirst_User implements External_UserInterface
             SELECT DISTINCT   Form AS Code,
                               Form AS Description
             FROM              V_PupilBasicInformation
-            
+
             UNION
-	        
-	        SELECT            '' AS Code, 
+
+	        SELECT            '' AS Code,
 	                          '' AS Description
-	                          
-	        ORDER BY	      Description 	    
+
+	        ORDER BY	      Description
         ";
 
         return $this->getDatabase()->getAll($query);
