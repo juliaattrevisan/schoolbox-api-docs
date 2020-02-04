@@ -169,29 +169,6 @@ class Api implements IApi
 
 
     /**
-     * Cache a url definition then return its value
-     *
-     * @return Uri
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
-     */
-    public function getUrl(): Uri
-    {
-        /* TODO Set Path
-         */
-        if (!$this->url) {
-            $this->url = (new Uri())
-                ->setScheme('https')
-                ->setHost($this->host)
-                ->setPath('')
-                ->setQuery(['apikey' => $this->apiKey]);
-        }
-
-        return $this->url;
-    }
-
-
-    /**
      * Have a look around
      *
      * @throws UnexpectedValueException
