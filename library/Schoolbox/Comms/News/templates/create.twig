@@ -84,26 +84,6 @@
 
 <div class="actions-small-2 row">
     <div class="small-12 columns">
-
-        {% set hasDropDownRoutes = deleteRoute %}
-
-        <nav>
-            {% if hasDropDownRoutes %}
-                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
-            {% endif %}
-        </nav>
-
-        {% if hasDropDownRoutes %}
-            <ul id="header-options" class="f-dropdown" data-dropdown-content>
-
-                {% if deleteRoute %}
-                    <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}"
-                           data-delete="{{ article.title }}">Delete</a></li>
-                {% endif %}
-
-            </ul>
-        {% endif %}
-
         <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
         <ul class="meta">
             {% if article.acceptedBy.id %}
@@ -115,6 +95,20 @@
             {% endif %}
         </ul>
     </div>
+    {% set hasDropDownRoutes = deleteRoute %}
+    {% if hasDropDownRoutes %}
+        <nav>
+            <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+
+            {% if deleteRoute %}
+                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}"
+                       data-delete="{{ article.title }}">Delete</a></li>
+            {% endif %}
+
+        </ul>
+    {% endif %}
 </div>
 
 <div class="row">
