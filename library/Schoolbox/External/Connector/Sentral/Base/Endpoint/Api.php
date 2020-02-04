@@ -122,7 +122,7 @@ class Api implements IApi
      *
      * @param string $endpoint
      * @return array
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function retrieveDocument(string $endpoint): array
     {
@@ -137,14 +137,14 @@ class Api implements IApi
         try {
             $decoded = json_decode($response->getBody()->getContents(), true);
         } catch (\RuntimeException $e) {
-            throw new UnexpectedValueException('Sentral Endpoint error: could not json_decode payload; did something snap?');
+            throw new InvalidArgumentException('Sentral Endpoint error: could not json_decode payload; did something snap?');
         }
 
         /* When you can't decode the json, sentral's given you something unexpected
          * like an error string, or lost in transmission, etc.
          */
         if ($decoded === null) {
-            throw new UnexpectedValueException('Sentral Endpoint error: could not json_decode payload - it is null; did something snap?');
+            throw new InvalidArgumentException('Sentral Endpoint error: could not json_decode payload - it is null; did something snap?');
         }
 
         /* Check for error payload instead of data payload
@@ -158,7 +158,7 @@ class Api implements IApi
              * Anyway, errors might get thrown if your host, tenant or key is incorrect
              *   - The host should end with a trailing slash
              */
-            throw new UnexpectedValueException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Sentral Endpoint error: %s',
                 "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
             ));
@@ -171,7 +171,7 @@ class Api implements IApi
     /**
      * Have a look around
      *
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function schemaExplorer(): void
     {
