@@ -123,6 +123,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0): GenericCollection
     {
         /* Default list of 10 keywords, sorted by number of usages across pastoral records
+         * If tags have the same number of occurrences, subsort those alphabetically
          */
         if ((string)$keyword === '') {
             $query = "
@@ -133,7 +134,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
                 INNER JOIN pastoral_tags pt ON t.id = pt.tag_id
                 WHERE t.`deleted_at` IS NULL
                 GROUP BY pt.tag_id
-                ORDER BY numUsages DESC
+                ORDER BY numUsages DESC, t.name
                 LIMIT :limit
             ";
 
