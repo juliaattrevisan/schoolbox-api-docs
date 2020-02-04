@@ -22,9 +22,6 @@ class Html extends Base {
         $returnUrl = $_SERVER["REQUEST_URI"];
         $path = explode('/', $returnUrl);
         $returnStr = "&returnTo=";
-        if (isset($this->returnStr)) {
-            $returnStr = $this->returnStr;
-        }
         if ($returnUrl == "/") {
             $returnStr .= 'dashboard';
         }
@@ -38,6 +35,9 @@ class Html extends Base {
             elseif($path[2] == "list") {
                 $returnStr .= "list&userId=".$path[3]."&returnDate=".$path[4];
             }
+        }
+        elseif (isset($this->returnStr)) {
+            $returnStr .= $this->returnStr;
         }
         //Return the URL as is
         else {
