@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
+use InvalidArgumentException;
+
 /**
  * Class Collator
  *
@@ -22,6 +24,7 @@ class Collator
      *
      * @param string $rootPath
      * @return array
+     * @throws InvalidArgumentException
      */
     public function collate(string $rootPath): array
     {
@@ -29,6 +32,10 @@ class Collator
             Receiver::XML_FULL => '',
             Receiver::XML_STUDENTTIMETABLES => ''
         ];
+
+        if (!is_dir($rootPath)) {
+            throw new InvalidArgumentException("Kamar xml path does not exist: {$rootPath}");
+        }
 
         $dirhandle = opendir($rootPath);
 

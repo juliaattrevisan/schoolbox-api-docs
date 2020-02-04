@@ -7,13 +7,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
+use InvalidArgumentException;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
  * Class Status
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
 class Status implements IStatus
 {
@@ -39,6 +40,7 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws InvalidArgumentException
      */
     public function isReachable(): bool
     {
@@ -58,6 +60,7 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getReport(): array
     {

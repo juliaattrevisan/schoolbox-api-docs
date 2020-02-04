@@ -117,14 +117,20 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
+        $isReachable = false;
+
         try {
             $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
+            if ($status) {
+                $isReachable = $status->isReachable();
+            }
         } catch (\DomainException|\InvalidArgumentException $e) {
-            $status = null;
+            // noop
         }
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
-            'isReachable' => $status ? $status->isReachable() : false
+            'isReachable' => $isReachable
         ]));
     }
 
@@ -138,18 +144,22 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
-        $status = null;
+        $report = null;
         $message = null;
 
         try {
             $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
+            if ($status) {
+                $report = $status->getReport();
+            }
         } catch (\DomainException|\InvalidArgumentException $e) {
             $message = $e->getMessage();
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
             'pageCurrent' => 'import/schoolDataImport',
-            'report' => $status ? $status->getReport(): [[
+            'report' => $report ?: [[
                 'message' => $message,
                 'status' => ISpecification::STATUS_ERROR
             ]]
