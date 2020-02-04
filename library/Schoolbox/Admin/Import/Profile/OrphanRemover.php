@@ -81,7 +81,7 @@ class OrphanRemover
     public function remove(): int
     {
         $statement = $this->baseProfileMapper->getDatabase()->query("
-            SELECT GROUP_CONCAT(profile.id) AS orphans
+            SELECT profile.id
             FROM {$this->baseProfileMapper->getTable()} profile
             LEFT JOIN {$this->studentProfileMapper->getTable()} student ON profile.id = student.sis_user_profile_id
             LEFT JOIN {$this->staffProfileMapper->getTable()} staff ON profile.id = staff.sis_user_profile_id
@@ -91,9 +91,15 @@ class OrphanRemover
             AND parent.sis_user_profile_id IS NULL
         ");
 
-        $orphans = $statement->fetch(\PDO::FETCH_ASSOC)['orphans'];
+        $orphanIds = [];
 
-        if ($orphans) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $orphanIds[] = $row['id'];
+        }
+
+        $orphans = implode(',', $orphanIds);
+
+        if ('' !== $orphans) {
 
             /* Remove orphaned profiles' relationships
              *

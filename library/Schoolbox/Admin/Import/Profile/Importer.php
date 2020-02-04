@@ -316,12 +316,11 @@ class Importer
              */
             $dob = null;
 
+            /* TODO: This is throwing a lot of Laravel Trailing Data warnings
+             *  but I think the answer is going to be in alaress date format
+             */
             if ($row['Date of Birth']) {
-                $dobTimestamp = strtotime($row['Date of Birth']);
-
-                if (false !== $dobTimestamp) {
-                    $dob = \Alaress_Date_Format::newFromTimestamp($dobTimestamp);
-                }
+                $dob = new \Alaress_Date_Format($row['Date of Birth'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
             }
 
             $studentProfile
@@ -409,18 +408,26 @@ class Importer
         $ids = implode(',', $affectedProfileIds);
 
         /* Find student profiles that weren't created/updated
+         * Remove those from both tables
+         *
+         * Note that GROUP_CONCAT has a maximum limit of 1024 so if you compile a lot of ids you can
+         * expect some of them to be truncated away from the end of the intended string
          */
-        $statement = $this->database->executeQuery("
-            SELECT GROUP_CONCAT(sis_user_profile_id) AS deletions
+        $deletionsStatement = $this->database->executeQuery("
+            SELECT sis_user_profile_id
             FROM {$mapper->getTable()}
             WHERE sis_user_profile_id NOT IN ({$ids})
         ");
 
-        /* Remove those from both tables
-         */
-        $deletions = $statement->fetch(\PDO::FETCH_ASSOC)['deletions'];
+        $deletionIds = [];
 
-        if ($deletions) {
+        while ($row = $deletionsStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $deletionIds[] = $row['sis_user_profile_id'];
+        }
+
+        $deletions = implode(',', $deletionIds);
+
+        if ('' !== $deletions) {
 
             /* Remove relationships that they once held
              */
