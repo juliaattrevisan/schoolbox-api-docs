@@ -6,7 +6,8 @@
         <li><a href="/adminv2/home">Admin</a></li>
         <li><a href="/adminv2/homepage#{{ layout.homepageTemplate.id }}">Homepages</a></li>
     {% elseif layout.folder %}
-        <li><a href="/homepage/{{ layout.folder.id }}">{{ layout.folder.name }}</a></li>
+        {# We may have come from an alt-sourced component, so use that component's URL #}
+        <li><a href="{{ RETURN_URL.previous.decoded ?? ('/homepage/' ~ layout.folder.id) }}">{{ layout.folder.name }}</a></li>
     {% endif %}
 
     {% if tile is not empty %}
