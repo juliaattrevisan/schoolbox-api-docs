@@ -21,8 +21,8 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
             return [];
         }
 
-        array_walk($codes, function(&$n) {
-            $n = "'".$this->quote($n)."'";
+        array_walk($codes, function (&$n) {
+            $n = "'" . $this->quote($n) . "'";
         });
 
         // prepare
@@ -47,8 +47,8 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         $stmt->execute();
 
         // manipulate
-        $students = array();
-        while($student = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $students = [];
+        while ($student = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $students[$student['SYNERGY_ID']] = array_change_key_case($student, CASE_LOWER);
         }
         return array_values($students);

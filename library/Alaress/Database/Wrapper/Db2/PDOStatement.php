@@ -93,13 +93,11 @@ class PDOStatement extends BasePDOStatement
                 // We need to slot the values of the parameters into a numerically 0-indexed array that matches the
                 // order of the parameters used in the query
 
-                if(isset($this->bindings[$parameterName]["value"])) {
+                if (isset($this->bindings[$parameterName]["value"])) {
                     $variables[$currentParameterIndex] = $this->bindings[$parameterName]["value"];
-                }
-                elseif(isset($this->bindings[':'.$parameterName]["value"])) {
-                    $variables[$currentParameterIndex] = $this->bindings[':'.$parameterName]["value"];
-                }
-                else {
+                } elseif (isset($this->bindings[':' . $parameterName]["value"])) {
+                    $variables[$currentParameterIndex] = $this->bindings[':' . $parameterName]["value"];
+                } else {
                     throw new Exception("Required parameter '{$parameterName}' was not supplied.'");
                 }
 
