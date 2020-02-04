@@ -1,28 +1,17 @@
 #!/bin/bash
-# SQL Update Script
+# DB Backup script
 # Description:
-#       Updates the database schema and values to match the installed version
-#       Completes all the updates between the current and new versions
-#       For each update release, the sql scripts are run first, then the php scripts
+#       Backs up the database contents to a file.
+#       Places file in configured 'file_dir' directory.
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
 #
-#
-
-versionlist="/tmp/sb_version_list";
-
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
 conffile=`readlink -f $fullpath/../www/conf/conf.php`;
-
-instdir=`readlink -f $fullpath/../`;
-baselength=`echo $instdir/updates/ | wc -m`;
-package=${instdir##*/};
-
-curdir=`pwd`;
 
 echo "Starting DB backup process";
 
