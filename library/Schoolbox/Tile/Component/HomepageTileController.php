@@ -17,16 +17,15 @@ use SitePage;
 
 class HomepageTileController extends Component_Homepage_ControllerAbstract implements TileControllerInterface
 {
-
     /**
      * @var Layout\Model|null
      */
-    protected $layout;
+    private $layout;
 
     /**
      * @var TileControllerDelegate
      */
-    protected $delegate;
+    private $delegate;
 
     /**
      * Injectable constructor

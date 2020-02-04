@@ -21,12 +21,12 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     /**
      * @var Layout\Model
      */
-    protected $layout;
+    private $layout;
 
     /**
      * @var TileControllerDelegate
      */
-    protected $delegate;
+    private $delegate;
 
     /**
      * Injectable constructor
@@ -55,7 +55,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
             return false;
         }
 
-        $this->setLayout($this->delegate->fetchLayout($this));
+        $this->layout = $this->delegate->fetchLayout($this);
         return true;
     }
 
@@ -66,7 +66,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->getLayout()->getTileList()->count()) {
+        if ($this->layout->getTileList()->count()) {
             return $this->renderTwigTemplate(
                 $templateHandle,
                 '@tile/component/tile.twig',
@@ -84,20 +84,12 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     }
 
     /**
+     * Required so that Twig may access this component's layout.
+     *
      * @return Layout\Model
      */
     public function getLayout()
     {
         return $this->layout;
-    }
-
-    /**
-     * @param Layout\Model $layout
-     * @return $this
-     */
-    public function setLayout($layout)
-    {
-        $this->layout = $layout;
-        return $this;
     }
 }
