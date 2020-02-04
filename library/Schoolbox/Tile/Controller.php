@@ -15,6 +15,7 @@ use Component_Config;
 use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -154,7 +155,11 @@ class Controller extends Base
         } elseif ($layout->getDashboardRole()) {
             $href = '/adminv2/homepage#' . $layout->getDashboardRole()->getId();
         } elseif ($layout->getFolder()) {
-            $href = '/homepage/' . $layout->getFolder()->getId();
+            // Use the return URL only for the homepage variant?
+            $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+            $href      = isset($returnUrl)
+                ? Redirect::decode($returnUrl)
+                : '/homepage/' . $layout->getFolder()->getId();
         } else {
             // Should never happen
             $href = '#';
@@ -205,7 +210,7 @@ class Controller extends Base
             $this->getRouter()->generate(
                 'tile.add',
                 ['layoutId' => $layout->getId()]
-            )
+            ) . $this->buildReturnUrl()
         );
     }
 
@@ -233,7 +238,7 @@ class Controller extends Base
             $this->getRouter()->generate(
                 'tile.layout',
                 ['layoutId' => $layout->getId()]
-            )
+            ) . $this->buildReturnUrl()
         );
     }
 
@@ -275,7 +280,7 @@ class Controller extends Base
             $this->getRouter()->generate(
                 'tile.layout',
                 ['layoutId' => $item->getTileLayout()->getId()]
-            )
+            ) . $this->buildReturnUrl()
         );
     }
 
@@ -303,7 +308,7 @@ class Controller extends Base
                 $this->getRouter()->generate(
                     'tile.layout',
                     ['layoutId' => $item->getTileLayout()->getId()]
-                )
+                ) . $this->buildReturnUrl()
             );
         }
     }
@@ -414,5 +419,20 @@ class Controller extends Base
         $config->setValue($model->getId());
         $this->componentConfigMapper->save($config);
         return $model;
+    }
+
+
+    /**
+     * Builds the return URL out of what was passed via GET.
+     *
+     * @return string
+     */
+    private function buildReturnUrl(): string
+    {
+        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        if (!isset($encodedReturnUrl)) {
+            return '';
+        }
+        return '?' . Redirect::RETURN_URL . '=' . $encodedReturnUrl;
     }
 }
