@@ -173,6 +173,10 @@ Data:
                 {% endif %}
 
                 {# Were we given HSC Task Marks data for this unit? #}
+                {% if hscTaskMatrix.data is defined and hscTaskMatrix.data[unitSpecId] is defined %}
+                    {% include '@tigsSubjectReport/components/hscTaskMatrix.twig' with hscTaskMatrix.data[unitSpecId]|merge(extraComponentData) only %}
+                {% endif %}
+                {# Were we given HSC Task Marks data for this unit? #}
                 {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
                     {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
                 {% endif %}

@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\SubjectReport;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
@@ -18,6 +19,7 @@ use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\SubjectReport\Components\FinalAchievementLevels;
+use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
@@ -33,6 +35,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -157,13 +160,13 @@ class Report
      * @param string|null       $roleTypeOverride
      * @return array
      * @throws InvalidArgumentException
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      * @throws DomainException
      * @throws LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws DefinitionException
+     * @throws MapperException
      * @throws UnderflowException
      * @throws Database\Exception
      */
@@ -186,7 +189,7 @@ class Report
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = [];
+            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = [];
             $falData   = $ibGraphData = $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
@@ -203,6 +206,7 @@ class Report
             $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
+            $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes,$unitSpecs, $courseSpec, $user, $roleTypeOverride);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
 
             // Filter out unit specs without any data
@@ -272,6 +276,7 @@ class Report
             'ibGraphData'               => $ibGraphData,
             'nesaGraphData'             => $nesaGraphData,
             'hscTaskMarks'              => $hscTaskMarks,
+            'hscTaskMatrix'             => $hscTaskMatrix,
             'hscRankData'               => $hscRankData,
         ];
     }
@@ -319,10 +324,10 @@ class Report
      * Loads assessments and participation for all users into the specified course implementations
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws DomainException
      * @throws LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      * @throws \UnexpectedValueException
      */
     private function loadParticipation(GenericCollection $courseImplsWithUnits): void
@@ -414,7 +419,7 @@ class Report
      * @return array
      * @throws InvalidArgumentException
      * @throws RouteNotFound
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     private function buildAcademicAchievementMatrixData(
         Folder\Model $folder,
@@ -423,6 +428,11 @@ class Report
         User $student,
         ?string $roleTypeOverride
     ): array {
+        // HSC Yr 11 students uses rubric from Hsc Task Mark
+        if ($attributes->getYearLevel() === 11 && $attributes->isHsc()) {
+            return null;
+        }
+
         $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
 
         try {
@@ -464,7 +474,7 @@ class Report
      * @return array
      * @throws InvalidArgumentException
      * @throws RouteNotFound
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     private function buildAcademicAchievementSummaryData(
         Folder\Model $folder,
@@ -517,7 +527,7 @@ class Report
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @throws RouteNotFound
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     private function buildFinalAchievementLevelsData(
         Folder\Model $folder,
@@ -564,7 +574,7 @@ class Report
      *
      * @param CourseSpec\Model $courseSpec
      * @return string|null
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      */
     private function buildCourseDescription(CourseSpec\Model $courseSpec): ?string
     {
@@ -611,7 +621,7 @@ class Report
      * @param string|null       $roleTypeOverride
      * @return null|array
      * @throws InvalidArgumentException
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      * @throws DomainException
@@ -731,7 +741,7 @@ class Report
      * @param string|null       $roleTypeOverride
      * @return array|null
      * @throws InvalidArgumentException
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      * @throws DomainException
@@ -815,6 +825,59 @@ class Report
 
 
     /**
+     * @param Folder\Model                       $folder
+     * @param StudentAttributes                  $attributes
+     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
+     * @param CourseSpec\Model                   $courseSpec
+     * @param User                               $student
+     * @param string|null                        $roleTypeOverride
+     * @return array|null
+     * @throws RouteNotFound
+     * @throws MapperException
+     */
+    private function buildHscTaskMatrixData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        GenericCollection $unitSpecs,
+        CourseSpec\Model $courseSpec,
+        User $student,
+        ?string $roleTypeOverride
+    ): ?array {
+        // Only relevant for HSC Yr 11 students
+        if (!$attributes->getYearLevel() === 11 || !$attributes->isHsc()) {
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType(
+                Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK,
+                "Cannot render 'HSC Task Marks' components. Work type not set.",
+                "Set 'HSC Assessment Task' Work Type"
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 1, $attributes->getCurriculumSemester());
+
+        $hscTaskMarks = new HscAssessmentMatrix(
+            $attributes,
+            $unitSpecs,
+            $student,
+            $folder,
+            $this->visibility,
+            $this->viewer,
+            $workTypeId,
+            $this->rubricMapper,
+            $this->authorizer,
+            $this->router,
+            $roleTypeOverride
+        );
+        return $hscTaskMarks->toContext();
+    }
+
+
+    /**
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
      * @param CourseSpec\Model  $courseSpec
@@ -822,7 +885,7 @@ class Report
      * @param string|null       $roleTypeOverride
      * @return array|null
      * @throws InvalidArgumentException
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      * @throws DomainException
@@ -879,7 +942,7 @@ class Report
      * @param string|null       $roleTypeOverride
      * @return array|null
      * @throws InvalidArgumentException
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      * @throws DomainException
@@ -941,7 +1004,7 @@ class Report
      * @return GenericCollection<IAssessable>|IAssessable[]
      * @throws Database\Exception
      * @throws InvalidArgumentException
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException
      * @throws DomainException
      * @throws LogicException
@@ -974,10 +1037,10 @@ class Report
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
      * @return GenericCollection|UnitImpl\Model[]
      * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws DomainException
      * @throws LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     private function loadAssessmentsIntoUnitImpls(GenericCollection $unitImpls): GenericCollection
     {
@@ -1000,7 +1063,7 @@ class Report
      * @param int|null          $semesterFrom
      * @param int|null          $semesterTo
      * @return array
-     * @throws Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws \Alaress\Database\Exception
      * @throws UnderflowException
      */
