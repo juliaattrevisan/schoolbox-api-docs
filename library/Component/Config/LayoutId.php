@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 
 /**
@@ -56,7 +57,11 @@ class Component_Config_LayoutId extends Component_Config_Abstract
 
 
         // Render the buttons
-        $page->setVar('COMPONENT_CONFIG_LAYOUTID', $layoutId);
+        $page->setVar([
+            'COMPONENT_CONFIG_LAYOUTID' => $layoutId,
+            'RETURN_URL_NAME'           => Redirect::RETURN_URL,
+            'RETURN_URL_CURRENT'        => Scrub::text(Redirect::encode($_GET["page"])),
+        ]);
         $page->setVar('buttons_for_layout_block', '');
         $page->setVar('buttons_for_component_block', '');
         $page->setVar('no_buttons_deleted_layout_block', '');

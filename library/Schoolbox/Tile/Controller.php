@@ -149,17 +149,16 @@ class Controller extends Base
             return;
         }
 
-        // Otherwise: redirect back to wherever
-        if ($layout->getHomepageTemplate()) {
+        // Otherwise: redirect back to a return URL if there is one
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        if (isset($returnUrl)) {
+            $href = Redirect::decode($returnUrl);
+        } elseif ($layout->getHomepageTemplate()) {
             $href = '/adminv2/dashboard#' . $layout->getHomepageTemplate()->getId();
         } elseif ($layout->getDashboardRole()) {
             $href = '/adminv2/homepage#' . $layout->getDashboardRole()->getId();
         } elseif ($layout->getFolder()) {
-            // Use the return URL only for the homepage variant?
-            $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-            $href      = isset($returnUrl)
-                ? Redirect::decode($returnUrl)
-                : '/homepage/' . $layout->getFolder()->getId();
+            $href = '/homepage/' . $layout->getFolder()->getId();
         } else {
             // Should never happen
             $href = '#';
