@@ -89,60 +89,19 @@
         {% endspaceless -%}
     {% endset %}
 
-    {# Progress icon tool tip
-     # A tooltip explaining the status marker
-     # This is the tooltip that appears when you hover over the green dot/grey square/oj diamond
-     #}
-    {% set pTooltip %}
-        {% if participant.responseRequired %}
-            {{ labelIncomplete }}
-        {% elseif participant.feedbackRequired %}
-            {{ labelPending }}
-        {% else %}
-            {{ labelReviewed }}
-        {% endif %}
-    {% endset %}
-
-    {# The description to output under the user's name #}
-    {% set pStatusText %}
-        {##
-          # TODO move CSS/label generation to participant class, and dedupe usages
-          # (see \Schoolbox\Learning\InlineGrader\StudentCarousel::getAllPeople)
-          #}
-        {%- spaceless %}
-            {% if participant.reviewComplete %}
-                {{ labelReviewed }}
-            {% elseif not latestResponse %}
-                {% if assessment.acceptNone %}
-                    Not reviewed
-                {% else %}
-                    Not submitted
-                {% endif %}
-            {% else %}
-                {% if multipleResponses %}
-                    Resubmitted
-                {% else %}
-                    Submitted
-                {% endif %}
-
-                {% if latestResponse.submittedOnTime %}
-                    on time
-                {% else %}
-                    late
-                {% endif %}
-            {% endif %}
-        {% endspaceless -%}
-    {% endset %}
+    {% set inputNo = 1 %}
+    {% if 'none' == markSchemeName | lower %}
+        {% set inputsPerFeedback = 2 %}
+    {% else %}
+        {% set inputsPerFeedback = 3 %}
+    {% endif %}
 
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
         <div class="small-12 column">
             <div class="row actions-small-{{ pActionCount }}">
                 <div class="list-item">
                     {% include '@learningAssessment/fragments/participantStatus.twig' with {
-                        participant: participant,
-                        statusClass: pStatusClass,
-                        statusText: pStatusText,
-                        statusTip: pTooltip
+                        participant: participant
                     } only %}
                 </div>
                 {% if pActionCount %}
@@ -182,11 +141,19 @@
                                     participant: participant,
                                     feedback: participant.findMostRecentInstructorGivenFeedback,
                                     markScheme:  assessment.markScheme,
-                                    tabIndex:    (loop.index0 * 2) + 1,
+                                    tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                                     errors:      errors,
                                     readonly:    readonly
                                 } only %}
+                                {% set inputNo = inputNo + 1 %}
                             </label>
+                            {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
+                                feedback:    participant.findMostRecentInstructorGivenFeedback,
+                                participant: participant,
+                                tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
+                                readonly:    readonly
+                            } only %}
+                            {% set inputNo = inputNo + 1 %}
                         </div>
                     {% endif %}
 
@@ -194,9 +161,10 @@
                         {% include '@learningAssessment/dueWork/comment.twig' with {
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
-                            tabIndex:    (loop.index0 * 2) + 2,
+                            tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                             readonly:    readonly
                         } only %}
+                        {% set inputNo = inputNo + 1 %}
                     </div>
                 </div>
             {% if fbUrl %}

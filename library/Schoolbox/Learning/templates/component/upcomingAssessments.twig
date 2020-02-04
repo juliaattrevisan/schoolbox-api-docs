@@ -27,7 +27,11 @@ Usage:
                     {% endif %}
                 </p>
                 <p class="meta">
+                    {% if assessment.participantIfExtant(USER).isResubmissionRequired %}
+                        <span data-status data-assessment-status-light class="progress-tick no-text tiny failed" title="Resubmission Required"></span><span data-status-label data-assessment-status-text>Resubmission required</span>
+                    {% else %}
                     {{ dueDate.dueDate(assessment, USER) }}
+                    {% endif %}
                 </p>
             </div>
         </li>

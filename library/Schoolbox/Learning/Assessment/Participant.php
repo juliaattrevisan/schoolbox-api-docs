@@ -128,6 +128,25 @@ class Participant
 
 
     /**
+     * Does the learner need to resubmit feedback for this participation?
+     *
+     * Represented in UI as RED CIRCLE w/ CROSS
+     *
+     * @return bool
+     */
+    public function isResubmissionRequired(): ?bool
+    {
+        try {
+            return $this->plan->getAssessable()->isResubmissionRequired($this);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return null;
+        }
+    }
+
+
+    /**
      * Has the teacher marked this participant as not-explicitly-incomplete, and
      * the student has not subsequently submitted/re-submitted.
      *

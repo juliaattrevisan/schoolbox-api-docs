@@ -57,6 +57,11 @@ class Factory
     private $mark;
 
     /**
+     * @var bool
+     */
+    private $resubmissionRequired;
+
+    /**
      * @var string
      */
     private $comment;
@@ -100,6 +105,7 @@ class Factory
      * @param Participant                                   $participant
      * @param User                                          $currentUser
      * @param string                                        $mark
+     * @param bool                                          $resubmissionRequired
      * @param string                                        $comment
      * @param string|null                                   $publish   one of [null|'0'|'1']
      * @param array|null                                    $files
@@ -113,6 +119,7 @@ class Factory
         Participant $participant,
         User $currentUser,
         $mark,
+        bool $resubmissionRequired,
         $comment,
         $publish,
         $files,
@@ -126,6 +133,7 @@ class Factory
         $this->currentUser               = $currentUser;
         $this->mostRecentFeedback        = $mostRecentFeedback;
         $this->mark                      = ($mark === null || $mark === '') ? null : trim($mark);
+        $this->resubmissionRequired      = $resubmissionRequired;
         $this->comment                   = $comment ? trim($comment) : '';
         $this->publish                   = $publish === '1';
         $this->files                     = $files;
@@ -177,7 +185,8 @@ class Factory
             ->setReviewer($this->currentUser)
             ->setReviewRoute($this->reviewRoute)
             ->setUpdatedAt(\Alaress_Date_Format::now())
-            ->setComment($this->comment);
+            ->setComment($this->comment)
+            ->setResubmissionRequired($this->resubmissionRequired);
 
         if ($this->mark !== null && $this->mark !== '') {
 

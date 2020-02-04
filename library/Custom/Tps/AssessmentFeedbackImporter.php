@@ -233,6 +233,7 @@ class AssessmentFeedbackImporter extends CliTool\App
                     $participant,
                     $staff,
                     '',
+                    false,
                     $comment,
                     '1',
                     $attachments,
@@ -309,17 +310,17 @@ SYNOPSIS:
 DESCRIPTION
     $yellow-h, --help$white
         Print this help and exit
-        
+
     $yellow-v[v[v]]$white
         Log verbosity. Max 3 levels, eg -vvv
 
     $yellow-p, --perform$white
         If set, updates DB - otherwise, performs a dry run.
-    
+
     $yellow--file=FILE$white (required)
         Path to a spreadsheet file which contains the following data:
         Assessment ID, Student ID (external), Staff ID (external), Comment
-        
+
     $yellow--folder=FOLDER$white
         Path of a folder which has files to be attached to feedback.
         Name of the files should be in the format of “studentExternalID-assessmentID.pdf”.

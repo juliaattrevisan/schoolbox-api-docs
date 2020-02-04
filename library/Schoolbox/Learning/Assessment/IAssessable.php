@@ -357,6 +357,17 @@ interface IAssessable extends ISoftDeletable
      */
     public function isFeedbackRequired(Participant $participant);
 
+
+    /**
+     * Does the participant need to resubmit a response?
+     *
+     * @param Participant $participant
+     * @throws DomainException if participant's assessment is not this assessment
+     * @return bool
+     */
+    public function isResubmissionRequired(Participant $participant): bool;
+
+
     /**
      * Has the participant been marked as not-incomplete, and has not subsequently re-submitted ?
      *

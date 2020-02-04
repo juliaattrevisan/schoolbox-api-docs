@@ -350,13 +350,14 @@ class Controller extends Base
             $participant,
             $this->getUser(),
             $postVars['mark'],
+            (bool)($postVars['resubmissionRequired'] ?? false),
             $postVars['comment'],
             $postVars['publish'],
             $postVars['attachment'],
             $fromInlineGrader,
             $reviewRoute,
             $mostRecentFeedback,
-            $response
+            $response instanceof DueWork\Response\Model ? $response : null
         );
 
         $feedback      = $dueWorkFeedbackFactory->produce();

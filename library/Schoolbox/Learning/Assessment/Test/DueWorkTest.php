@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -960,4 +961,80 @@ class DueWorkTest extends TestCase
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
 
+
+    /**
+     * Test whether a learner can create a response when feedback is marked as
+     * requiring resubmission.
+     *
+     * Only the due work accepts single case is tested:
+     * * due work accepts none: learner can never respond
+     * * due work accepts multiple: learner can always respond, as long as due
+     *   work is open
+     *
+     * @covers \Schoolbox\Learning\Assessment\DueWork\Model::canLearnerCreateResponse
+     */
+    public function testCanLearnerCreateResponseWhenFeedbackRequiresResubmission(): void
+    {
+        $dueWorkOpenDate  = \Alaress_Date_Format::now()->addDays(-1)->startOfDay();
+        $dueWorkCloseDate = \Alaress_Date_Format::now()->addDays(1)->endOfDay();
+        $dueWork          = $this->spawnDueWork()
+                                 ->setAcceptsSingle()
+                                 ->setContext(new FolderModel())
+                                 ->setPublishAt($dueWorkOpenDate)
+                                 ->setOpenAt($dueWorkOpenDate)
+                                 ->setDueAt($dueWorkCloseDate)
+                                 ->setCloseAt($dueWorkCloseDate);
+        $feedbackDate = (clone $dueWorkOpenDate)->addHours(6);
+        $feedback     = (new DueWorkFeedback())
+            ->setId(3385)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(-3)
+            ->setResubmissionRequired(true)
+            ->setComment('This does not require resubmission')
+            ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt($feedbackDate)
+            ->setCreatedAt($feedbackDate)
+            ->setUpdatedAt($feedbackDate);
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
+
+
+        // Student hasn't submitted at all yet: learner must create response
+        $this->assertTrue($dueWork->canLearnerCreateResponse($this->hodes));
+
+
+        // Add a submission _before_ the feedback
+        $submission1Date = (clone $feedbackDate)->addHours(-1);
+        $submission1     = (new DueWorkSubmission())
+            ->setId(553)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($submission1Date)
+            ->setCreatedAt($submission1Date)
+            ->setUpdatedAt($submission1Date);
+        $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission1);
+
+
+        // Submission, then feedback: learner must create response
+        $this->assertTrue($dueWork->canLearnerCreateResponse($this->hodes));
+
+
+        // Add a submission _after_ the feedback
+        $submission2Date = (clone $feedbackDate)->addHours(1);
+        $submission2 = (new DueWorkSubmission())
+            ->setId(553)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($submission2Date)
+            ->setCreatedAt($submission2Date)
+            ->setUpdatedAt($submission2Date);
+        $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission2);
+
+
+        // Feedback, then submission: learner cannot create another response
+        $this->assertFalse($dueWork->canLearnerCreateResponse($this->hodes));
+    }
 }

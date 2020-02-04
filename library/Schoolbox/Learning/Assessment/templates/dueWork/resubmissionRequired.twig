@@ -1,0 +1,20 @@
+{#
+    Renders an input where teachers can check whether the learner must resubmit.
+
+    Usage: [
+        participant:        Participant
+        feedback:           IFeedback
+        tabIndex:           int
+    ]
+#}
+
+<input type="checkbox"
+       value="1"
+       tabindex="{{ tabIndex }}"
+       id="resubmissionRequired-{{ participant.user.id }}"
+       name="resubmissionRequired"
+       {% if readonly %}readonly{% endif %}
+       {% if feedback.resubmissionRequired %}checked{% endif %}
+/>
+<label for="resubmissionRequired-{{ participant.user.id }}"
+       class="checkbox-label">Resubmission required</label>

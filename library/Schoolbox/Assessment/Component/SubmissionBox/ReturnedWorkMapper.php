@@ -62,6 +62,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->uses('comment', self::TYPE_STRING);
         $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark');
         $this->uses('norm_mark', self::TYPE_DECIMAL, null, 'normalizedMark');
+        $this->uses('resubmission_required', self::TYPE_BOOLEAN);
         $this->uses('published_at', self::TYPE_DATETIME);
         $this->uses('review_route', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

@@ -90,6 +90,8 @@ feedback: currentFeedback,
     {% set prefix = prefix ~ ' '~ locale.selfAssessment.proper %}
 {% elseif currentFeedback.isSelfReflectionOnly %}
     {% set prefix = prefix ~ ' '~ locale.selfReflection.proper %}
+{% elseif currentFeedback.resubmissionRequired %}
+    {% set prefix = prefix ~ ' Resubmission required by ' ~ currentFeedback.reviewer.fullname  %}
 {% else %}
     {% set prefix = prefix ~ ' Feedback by ' ~  currentFeedback.reviewer.fullname  %}
 {% endif %}
@@ -116,9 +118,12 @@ feedback: currentFeedback,
                 {% endif %}
             </div>
             {% endblock card %}
+
+            {% if currentFeedback.humanReadableMark %}
             <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
                 <span>{{ currentFeedback.humanReadableMark }}</span>
             </div>
+            {% endif %}
         </div>
         <nav>
             {% if hasCollapser %}

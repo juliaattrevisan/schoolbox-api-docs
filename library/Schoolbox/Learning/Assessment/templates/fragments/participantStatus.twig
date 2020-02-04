@@ -1,9 +1,6 @@
 {# usage:
-    - user:        (User)   object, typically derived from Participant
-    - statusClass: (string) one of [ incomplete, pending, complete ]
-    - statusText:  (string) caption to display next to status indicator
-    - statusTip:   (string) tooltip for status indicator
-    - cardSize:    (string) sizing for foundation
+    - participant: (Participant) object
+    - cardSize:    (string)      sizing for foundation
  #}
 <div class="{{ cardSize ?: 'small-12' }} card">
     <a href="/search/user/{{ participant.user.id }}" title="View Profile">
@@ -20,8 +17,9 @@
         <h3>{{ participant.user.fullName }}</h3>
     {% endif %}
     <p class="meta">
-        <span title="{{ statusTip }}" data-status class="progress-tick tiny {{ statusClass }}"></span>
-        <span data-status-label>{{ statusText }}</span>
+        {% include '@learningAssessment/fragments/statusLine.twig' with {
+            assessable: participant.assessable,
+            student:    participant.user
+        } only %}
     </p>
 </div>
-

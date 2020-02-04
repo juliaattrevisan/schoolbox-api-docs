@@ -83,6 +83,7 @@
                 statusIncomplete: 'incomplete',
                 statusPending: 'pending',
                 statusReviewed: 'reviewed',
+                statusResubmissionRequired: 'failed',
 
                 /* - The text to display on the publish button
                  * - When publishing is taking place
@@ -93,6 +94,7 @@
                 publishedText: 'Feedback published',
 
                 reviewedText: 'Reviewed',
+                resubmissionRequiredText: 'Resubmission Required',
 
                 // Callbacks to execute upon initiation and successful completion of Draft and Publish actions
                 onPreDraftCallback: $.noop,
@@ -157,15 +159,16 @@
                 });
 
                 // Publish submits everything
-                var formData = $form.serializeArray();
+                var formData             = $form.serializeArray(),
+                    resubmissionRequired = $form.find('[name="resubmissionRequired"]').prop('checked');
                 formData.push({name: 'publish', value: 1});
 
                 config.onPrePublishCallback(participantId, formData);
 
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
-                    data:  formData,
-                    type: 'post'
+                    data:     formData,
+                    type:     'post'
                 }).done(function (response) {
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
@@ -178,17 +181,23 @@
                         });
                     }
 
-                    // Update this participant's status
-                    $participant.attr('data-status', config.statusReviewed);
+                    // Update this participant's status:
+                    // need to be able to differentiate between reviewed and resubmit required somehow
+                    var status = resubmissionRequired ? config.statusResubmissionRequired : config.statusReviewed,
+                        title  = resubmissionRequired ? config.resubmissionRequiredText   : config.reviewedText;
+                    $participant.attr('data-status', status);
 
                     // Update the icon
                     $participant.find('[data-status]')
-                        .removeClass(config.statusIncomplete + ' ' + config.statusPending)
-                        .addClass(config.statusReviewed)
-                        .attr('title', config.reviewedText);
+                        .removeClass(config.statusPending)
+                        .removeClass(config.statusIncomplete)
+                        .removeClass(config.statusReviewed)
+                        .removeClass(config.statusResubmissionRequired)
+                        .addClass(status)
+                        .attr('title', title);
 
                     // Update the text
-                    $participant.find('[data-status-label]').html(config.reviewedText);
+                    $participant.find('[data-status-label]').html(title);
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
@@ -263,10 +272,12 @@
             // We passed in  a 'this' to apply() which was already a jquery object
             var $this = this;
 
-            // Ignore if not an attach-zone or rubric mark, and the value has not changed since previously saved
-            var isAttachZoneOrRubricMark = $this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 );
-            if (!isAttachZoneOrRubricMark && $this.val() == $this.data('preval')) {
-                return;
+            // Don't ignore if an attachzone, rubric mark or resubmit required checkbox
+            // Otherwise, ignore if its value hasn't changed since last save
+            if (!($this.is('.attachzone') || $this.is('[name="resubmissionRequired"]') || $this.is('[name^="rubric"]'))) {
+                if ($this.val() == $this.data('preval')) {
+                    return;
+                }
             }
 
             // update the pre-value

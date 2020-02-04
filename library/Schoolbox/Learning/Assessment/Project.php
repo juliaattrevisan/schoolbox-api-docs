@@ -147,41 +147,23 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isResponseRequired(Participant $participant)
     {
-        $this->assertSameAssessment($participant);
-
-        // Don't need to respond to an empty project
-        if (!$this->hasAssessments()) {
-            return false;
-        }
-
         // Would a single sub-response indicate the student has responded ?
         $canCompleteAny  = $this->summator->impliesOptionality();
         $mustCompleteAll = !$canCompleteAny;
 
-        $studentFoundInSubAssessments = false;
-        foreach ($this->assessables as $subAssessment) {
-            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
-            if (!$subParticipant) {
-                continue;
-            }
-            $studentFoundInSubAssessments = true;
-            $subResponseRequired          = $subParticipant->isResponseRequired();
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            $subResponseRequired = $subParticipant->isResponseRequired();
 
             // Does the project require all sub-assessments to be responded to, and this sub-assessment requires a response?
             if ($mustCompleteAll && $subResponseRequired) {
                 // Project requires a response
                 return true;
-            } // Else does the project require any sub-assessment to be responded to, and this sub-assessment does not require a response?
-            elseif ($canCompleteAny && !$subResponseRequired) {
+            }
+            // Else does the project require any sub-assessment to be responded to, and this sub-assessment does not require a response?
+            if ($canCompleteAny && !$subResponseRequired) {
                 // Project does not require a response
                 return false;
             }
-
-        }
-
-        // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessment
-        if (!$studentFoundInSubAssessments) {
-            throw new \DomainException("Project (a.id: {$this->id}) participant (u.id: {$participant->getUser()->getId()}) not found in project's sub-assessments");
         }
 
         /* We did not return during loop, so we can conclude that either:
@@ -193,6 +175,24 @@ class Project extends AbstractAssessment implements AssessmentContext
 
 
     /**
+     * Resubmission is required on a project if resubmission is required on any
+     * of its sub-assessments.
+     *
+     * @inheritdoc
+     */
+    public function isResubmissionRequired(Participant $participant): bool
+    {
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            if ($subParticipant->isResubmissionRequired()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * If a student requires marking on ANY project sub-assessment, the project requires marking (Orange Diamond)
      *
      * @inheritdoc
@@ -200,28 +200,12 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isFeedbackRequired(Participant $participant)
     {
-        $this->assertSameAssessment($participant);
-
-        // Don't need feedback on an empty project
-        if (!$this->hasAssessments()) {
-            return false;
-        }
-
-        $studentFoundInSubAssessments = false;
-        foreach ($this->getAssessables() as $subAssessment) {
-            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
-            if (!$subParticipant) {
-                continue;
-            }
-            $studentFoundInSubAssessments = true;
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
             if ($subParticipant->isFeedbackRequired()) {
                 return true;
             }
         }
-        // Ensure student was a participant in at least one sub-assessment
-        if (!$studentFoundInSubAssessments) {
-            throw new \DomainException("Project (a.id: {$this->id}) participant (u.id: {$participant->getUser()->getId()}) not found in project's sub-assessments");
-        }
+
         return false;
     }
 
@@ -242,27 +226,13 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isReviewComplete(Participant $participant)
     {
-        $this->assertSameAssessment($participant);
-
-        // Empty project is complete, I guess
-        if (!$this->hasAssessments()) {
-            return true;
-        }
-
         // Would a single sub-response indicate the student has responded ?
-        $canCompleteAny  = $this->summator->impliesOptionality();
-        $mustCompleteAll = !$canCompleteAny;
-
-        $studentFoundInSubAssessments = false;
-        $subReviewCompleteFound       = false;
-        foreach ($this->assessables as $subAssessment) {
-            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
-            if (!$subParticipant) {
-                continue;
-            }
-            $studentFoundInSubAssessments = true;
-            $subFeedbackRequired          = $subParticipant->isFeedbackRequired();
-            $subReviewComplete            = $subParticipant->isReviewComplete();
+        $canCompleteAny         = $this->summator->impliesOptionality();
+        $mustCompleteAll        = !$canCompleteAny;
+        $subReviewCompleteFound = false;
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            $subFeedbackRequired = $subParticipant->isFeedbackRequired();
+            $subReviewComplete   = $subParticipant->isReviewComplete();
 
             // Does sub-assessment require feedback ? Or does project require all to be review-complete and the sub-assessment in not review-complete?
             if ($subFeedbackRequired || ($mustCompleteAll && !$subReviewComplete)) {
@@ -273,11 +243,6 @@ class Project extends AbstractAssessment implements AssessmentContext
             if ($subReviewComplete) {
                 $subReviewCompleteFound = true;
             }
-        }
-
-        // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessment
-        if (!$studentFoundInSubAssessments) {
-            throw new \DomainException("Project (a.id: {$this->id}) participant (u.id: {$participant->getUser()->getId()}) not found in project's sub-assessments");
         }
 
         /* We did not return during loop, so we can conclude that either:
@@ -301,41 +266,22 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function hasSubmittedResponse(Participant $participant)
     {
-        $this->assertSameAssessment($participant);
-
-        // Student hasn't submitted anything to a empty project
-        if (!$this->hasAssessments()) {
-            return false;
-        }
-
         // Would a single sub-assessment completion imply the project is complete ?
         $canResponseToAny = $this->summator->impliesOptionality();
         $mustRespondToAll = !$canResponseToAny;
-
-        $studentFoundInSubAssessments = false;
-
-        foreach ($this->assessables as $subAssessment) {
-            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
-            if (!$subParticipant) {
-                continue;
-            }
-            $studentFoundInSubAssessments = true;
-            $hasSubmittedSubResponse      = $subParticipant->hasSubmittedResponse();
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            $hasSubmittedSubResponse = $subParticipant->hasSubmittedResponse();
 
             // Does project require all sub-assessment to be completed, and student didn't respond ?
             if ($mustRespondToAll && !$hasSubmittedSubResponse) {
                 // We can conclude they have not responded to the project
                 return false;
-            } // Else does project require any, and student has responded ?
-            elseif ($canResponseToAny && $hasSubmittedSubResponse) {
+            }
+            // Else does project require any, and student has responded ?
+            if ($canResponseToAny && $hasSubmittedSubResponse) {
                 // We can conclude they have responded to the project
                 return true;
             }
-        }
-
-        // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessment
-        if (!$studentFoundInSubAssessments) {
-            throw new \DomainException("Project (a.id: {$this->id}) participant (u.id: {$participant->getUser()->getId()}) not found in project's sub-assessments");
         }
 
         /* Since we did not return early, we can conclude either:
@@ -359,42 +305,23 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function hasPublishedFeedback(Participant $participant)
     {
-        $this->assertSameAssessment($participant);
-
-        // I can't have feedback in an empty project
-        if (!$this->hasAssessments()) {
-            return false;
-        }
-
         // Would a single sub-assessment completion imply the project is complete ?
         $canGiveFeedbackToAny  = $this->summator->impliesOptionality();
         $mustGiveFeedbackToAll = !$canGiveFeedbackToAny;
 
-        $studentFoundInSubAssessments = false;
-
-        foreach ($this->assessables as $subAssessment) {
-            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
-
-            if (!$subParticipant) {
-                continue;
-            }
-            $studentFoundInSubAssessments = true;
-            $hasPublishedSubFeedback      = $subParticipant->hasPublishedFeedback();
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            $hasPublishedSubFeedback = $subParticipant->hasPublishedFeedback();
 
             // Does project require all sub-assessment to be completed, and student hasn't received published feedback ?
             if ($mustGiveFeedbackToAll && !$hasPublishedSubFeedback) {
                 // We can conclude they have not received published feedback for the project
                 return false;
-            } // Else does project require any, and student has received published feedback for a sub-assessment ?
-            elseif ($canGiveFeedbackToAny && $hasPublishedSubFeedback) {
+            }
+            // Else does project require any, and student has received published feedback for a sub-assessment ?
+            if ($canGiveFeedbackToAny && $hasPublishedSubFeedback) {
                 // We can conclude they have received published feedback to the project
                 return true;
             }
-        }
-
-        // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessment
-        if (!$studentFoundInSubAssessments) {
-            throw new \DomainException("Project (a.id: {$this->getId()}) participant (u.id: {$participant->getUser()->getId()}) not found in project's sub-assessments");
         }
 
         /* Since we did not return early, we can conclude either:
@@ -410,11 +337,9 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool
     {
-        $this->assertSameAssessment($participant);
-
         // A project participant has pending draft feedback if any sub-assessable has pending draft feedback.
-        foreach ($this->assessables as $subAssessable) {
-            $subParticipant = $subAssessable->getParticipantIfExtant($participant->getUser());
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            $subAssessable = $subParticipant->getAssessable();
             if ($subParticipant && $subAssessable->hasPendingDraftAuthoritativeFeedback($subParticipant)) {
                 return true;
             }
@@ -432,32 +357,11 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function hasMark(Participant $participant)
     {
-        $this->assertSameAssessment($participant);
-
-        // I can't have a mark on an empty project
-        if (!$this->hasAssessments()) {
-            return false;
-        }
-
-        $studentFoundInSubAssessments = false;
-
-        foreach ($this->assessables as $subAssessment) {
-            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
-
-            if (!$subParticipant) {
-                continue;
-            }
-            $studentFoundInSubAssessments = true;
-
+        foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
             // Does student have a mark for the sub-assessment ?
             if ($subParticipant->hasMark()) {
                 return true;
             }
-        }
-
-        // Logically, if student is a participant in a project, they must be a participant in at least 1 project sub-assessment
-        if (!$studentFoundInSubAssessments) {
-            throw new \DomainException("Project (a.id: {$this->id}) participant (u.id: {$participant->getUser()->getId()}) not found in project's sub-assessments");
         }
         return false;
     }
@@ -709,5 +613,51 @@ class Project extends AbstractAssessment implements AssessmentContext
             $participatingUsers = $participatingUsers->mergeUnique($subAssessable->getParticipantUsers(), 'id');
         }
         return $participatingUsers;
+    }
+
+
+    /**
+     * Return an iterator over the set of assessables in which `$participant` is
+     * actually participating.
+     *
+     * @param Participant $participant
+     * @return iterable&Participant[] The iterator yields the Participant record
+     *                                for each sub-assessment in which
+     *                                `$participant` is participating
+     * @throws \DomainException       If `$participant`'s assessment is not this
+     *                                project
+     * @throws \DomainException       If there's at least one assessment in this
+     *                                project, and `$participant`'s user is not
+     *                                participating in any assessment in this
+     *                                project
+     */
+    private function iterateAssessablesForParticipant(Participant $participant): iterable
+    {
+        $this->assertSameAssessment($participant);
+
+        if (!$this->hasAssessments()) {
+            return;
+        }
+
+        $studentFoundInSubAssessments = false;
+        foreach ($this->assessables as $subAssessment) {
+            $subParticipant = $subAssessment->getParticipantIfExtant($participant->getUser());
+            if ($subParticipant) {
+                $studentFoundInSubAssessments = true;
+                yield $subParticipant;
+            }
+        }
+
+        // Logically, if student is a participant in a project,
+        // they must be a participant in at least 1 project sub-assessment
+        if (!$studentFoundInSubAssessments) {
+            throw new \DomainException(
+                sprintf(
+                    "Project (a.id: %d) participant (u.id: %d}) not found in project's sub-assessments",
+                    $this->id,
+                    $participant->getUser()->getId()
+                )
+            );
+        }
     }
 }

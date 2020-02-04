@@ -1,0 +1,95 @@
+@startuml
+
+note as n1
+    <b>Resubmit on feedback</b>
+
+    + more intuitive workflow for instructor
+      (requiring resubmit and marking are one action)
+    - more difficult logic on whether a response requires resubmit
+      (still need to know for showing on submission history)
+
+    ----
+    <b>Get state of participant</b>
+
+    if not participant.open:
+        return "not open"
+
+    lastResponse = particpant.responses.lastPublished
+    lastFeedback = particpant.feedbacks.lastPublished
+
+    if lastResponse is null:
+        return "response required"
+
+    if lastFeedback is null:
+        return "feedback required"
+
+    if lastResponse.date > lastFeedback.date:
+        return "feedback required"
+
+    return lastFeedback.requiresResubmit
+        ? "requires resubmit"
+        : "review complete"
+
+    ----
+    <b>Resubmit allowed?</b>
+
+    if participant.assessment.submitOnline = "multiple"
+        return true
+    if participant.assessment.submitOnline = "none"
+        return false
+
+    // submit type is single: check the last response
+    // If there is none, allow resubmit
+    lastResponse = particpant.responses.lastPublished
+    if lastResponse is null
+        return true
+
+    // If there is a last response, check the last feedback:
+    // If it doesn't exist, don't allow resubmit
+    // If that feedback requires resubmit:
+    // allow resubmit if the last response is after the last feedback
+    lastFeedback = particpant.feedbacks.lastPublished
+    if lastFeedback is null
+        return false
+    if not lastFeedback.requiresResubmit
+        return false
+    else
+        return lastFeedback.date < lastResponse.date
+
+    ----
+    <b>Does response require resubmit?</b>
+
+    feedback = response.mostRecentFeedback
+    return feedback is not null and feedback.requiresResubmit
+end note
+
+state "Response Required" as RR
+RR : \
+* no interaction exists
+
+state "Feedback Required" as FR
+FR : \
+* most recent interaction is a response
+
+state "Review Complete" as RC
+RC : \
+* most recent interaction is a feedback\n\
+* most recent feedback doesn't require resubmit
+
+state "Resubmit Required" as RS
+RS : \
+* most recent interaction is a feedback\n\
+* most recent feedback requires resubmit
+
+[*] --> RR : assessment opens
+RR --> FR  : participant submits\nresponse
+RR --> FR  : instructor marks as submitted\nwithout waiting for response
+RR --> RC  : instructor marks feedback\nas not requiring re-response\nwithout waiting for response
+RR --> RS  : instructor marks feedback\nas requiring re-response\nwithout waiting for response
+RS --> RC  : instructor creates a new feedback\nnot requiring re-response
+FR --> RC  : instructor marks feedback\nas not requiring re-response
+FR -left-> RS : instructor marks feedback\nas requiring re-response
+RS -right-> FR  : participant resubmits\nresponse
+RC --> [*]
+
+@enduml
