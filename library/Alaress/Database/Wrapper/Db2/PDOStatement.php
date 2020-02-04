@@ -65,13 +65,13 @@ class PDOStatement extends BasePDOStatement
             // No parameters were passed, extract named parameters from the SQL statement and use the values
             // that should have been previously bound using the Db2/PDOStatement functions.
 
-            $parameters = preg_match_all("#:([A-Za-z0-9-_]+)#", $this->sql, $matches) ? $matches[1] : null;
+            $parameters = preg_match_all('#:([A-Za-z0-9-_]+)#', $this->sql, $matches) ? $matches[1] : null;
 
         }
 
         // Replace the named parameters in the SQL string with anonymous '?' placeholder
 
-        $sql = preg_replace("#:[A-Za-z0-9-_]+#", '?', $this->sql);
+        $sql = preg_replace('#:[A-Za-z0-9-_]+#', '?', $this->sql);
 
         // Create the prepared statement from the SQL with anonymous placeholders
 
@@ -93,29 +93,17 @@ class PDOStatement extends BasePDOStatement
                 // We need to slot the values of the parameters into a numerically 0-indexed array that matches the
                 // order of the parameters used in the query
 
-                $variables[$currentParameterIndex] = $this->bindings[$parameterName]["value"];
-
-                // Make sure us idiot developers actually supplied all of the required named parameters or this thing
-                // is going to fall over into a sticky mess
-
-                if (!isset($this->bindings[$parameterName])) {
+                if (isset($this->bindings[$parameterName]["value"])) {
+                    $variables[$currentParameterIndex] = $this->bindings[$parameterName]["value"];
+                } elseif (isset($this->bindings[':' . $parameterName]["value"])) {
+                    $variables[$currentParameterIndex] = $this->bindings[':' . $parameterName]["value"];
+                } else {
                     throw new Exception("Required parameter '{$parameterName}' was not supplied.'");
                 }
-
-                //    $parameterVariableName = "variables['{$parameterName}']";
-                //
-                //    db2_bind_param(
-                //        $this->statement,
-                //        $currentParameterIndex,
-                //        $parameterVariableName,
-                //        $this->bindings[$parameterName]["type"]
-                //    );
 
                 $currentParameterIndex++;
             }
         }
-
-        // return db2_execute($this->statement);
 
         return db2_execute($this->statement, $variables);
     }

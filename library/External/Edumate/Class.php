@@ -15,39 +15,31 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
      */
     public function getStudents(string $classCode): array
     {
-
-        // fully qualified table names
-        $studentClass = 'SCHOOLBOX_STUDENTCLASS';
-        $students = 'SCHOOLBOX_STUDENTS';
-
-
         // Setup handling multiple codes
         $codes = explode(',', $classCode);
         if (empty($codes)) {
             return [];
         }
 
-        $db = $this->getConnection();
-        array_walk($codes, function(&$n) use($db) {
-            $n = "'".$this->quote($n)."'";
+        array_walk($codes, function (&$n) {
+            $n = "'" . $this->quote($n) . "'";
         });
-
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
             SELECT
                 FIRSTNAME,
                 SURNAME AS LASTNAME,
-                $studentClass.STUDENT_NUMBER AS SYNERGY_ID,
+                SCHOOLBOX_STUDENTCLASS.STUDENT_NUMBER AS SYNERGY_ID,
                 YEAR_LEVEL AS YEARLEVEL,
                 HOUSE,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
                 '' AS EnglishSecondFlag,
                 '' AS StudentTutorDescription
-            FROM  $studentClass
-            LEFT JOIN $students ON $studentClass.STUDENT_NUMBER = $students.STUDENT_NUMBER
-            WHERE $studentClass.CLASS_CODE IN (".implode(',',$codes).")
+            FROM  SCHOOLBOX_STUDENTCLASS
+            LEFT JOIN SCHOOLBOX_STUDENTS ON SCHOOLBOX_STUDENTCLASS.STUDENT_NUMBER = SCHOOLBOX_STUDENTS.STUDENT_NUMBER
+            WHERE SCHOOLBOX_STUDENTCLASS.CLASS_CODE IN (".implode(',',$codes).")
             ORDER BY SURNAME ASC
         ");
 
@@ -55,13 +47,9 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         $stmt->execute();
 
         // manipulate
-        $students = array();
-        while($student = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // distinct-ify
-            if(is_numeric($student['SYNERGY_ID'])) {
-                $student['YEARLEVEL'] = preg_replace("/[^0-9]/", '', $student['YEARLEVEL']);
-                $students[$student['SYNERGY_ID']] = array_change_key_case($student, CASE_LOWER);
-            }
+        $students = [];
+        while ($student = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $students[$student['SYNERGY_ID']] = array_change_key_case($student, CASE_LOWER);
         }
         return array_values($students);
     }

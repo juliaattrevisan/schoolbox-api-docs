@@ -22,11 +22,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         // prepare
 
-        $caseSensitiveFields = array('ID', 'Email', 'MobilePhone', 'SpouseID', 'SpouseMobilePhone', 'DirectoryIncludeFlag');
+        $caseSensitiveFields = ['ID', 'Email', 'MobilePhone'];
 
         $stmt = $this->getConnection()->prepareQuery('
-            SELECT CARER_NUMBER AS ID, FULL_NAME, COMBINED_EMAIL_ADDRESS AS EMAIL, MOBILE AS MOBILEPHONE, SPOUSE_CARER_NUMBER AS SPOUSEID, SPOUSE_FULL_NAME,
-              SPOUSE_MOBILE AS SPOUSEMOBILEPHONE, 1 AS DIRECTORYINCLUDEFLAG
+            SELECT CARER_NUMBER AS ID, FULL_NAME, EMAIL, MOBILE AS MOBILEPHONE
             FROM SCHOOLBOX_PARENTS
             WHERE CARER_NUMBER = :id
         ');
@@ -48,10 +47,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         if ($selfName = $this->guessNamePartsFromFull($parent['FULL_NAME'])) {
             $parent = array_merge($parent, $selfName);
             unset($parent['FULL_NAME']);
-        }
-        if ($spouseName = $this->guessNamePartsFromFull($parent['SPOUSE_FULL_NAME'], 'Spouse')) {
-            $parent = array_merge($parent, $spouseName);
-            unset($parent['SPOUSE_FULL_NAME']);
         }
 
         return $this->normaliseFields($parent, $caseSensitiveFields);
