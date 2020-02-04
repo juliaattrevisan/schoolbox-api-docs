@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -32,6 +32,12 @@ class Mapper extends \Schoolbox\Mapper {
                 'property' => 'sequence',
                 'type' => Mapper::TYPE_STRING,
             ));
+
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
 	}
 
     protected function getDefaultOrderByParams(): array

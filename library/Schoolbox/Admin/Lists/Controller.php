@@ -466,6 +466,7 @@ class Controller extends Base
             ],
             'news-topic'             => [
                 'title'             => 'News Topics',
+                'delete'            => true,
                 'mapper'            => Topic\Mapper::class,
                 'fields'            => [
                     'name'          => [
