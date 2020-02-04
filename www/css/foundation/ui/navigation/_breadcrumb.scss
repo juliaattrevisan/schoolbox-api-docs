@@ -136,7 +136,7 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
       }
     }
   }
-  @media #{$medium-up} {
+  @media #{$large-up} {
     margin: 0 0 1rem -1rem;
   }
 }
