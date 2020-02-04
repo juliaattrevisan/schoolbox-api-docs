@@ -11,7 +11,6 @@ namespace Schoolbox\Tile\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Tile\Layout;
 use Schoolbox\User;
 use SitePage;
@@ -73,10 +72,10 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
             return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
             $twigTemplate = '@tile/component/tile.twig';
-            $twigData = array(
+            $twigData     = [
                 'component'   => $this,
                 'writeAccess' => $this->hasWriteAccess(),
-            );
+            ];
             $renderHeader = !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
             return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
         }

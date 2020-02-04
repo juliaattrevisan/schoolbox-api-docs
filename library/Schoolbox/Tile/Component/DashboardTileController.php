@@ -11,9 +11,7 @@ namespace Schoolbox\Tile\Component;
 
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Tile\Layout;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
 
@@ -53,7 +51,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function execute()
     {
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+        if ($this->isUsingAltSource() && $this->getSource()->isDeleted()) {
             return false;
         }
 
@@ -72,11 +70,11 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
             return $this->renderTwigTemplate(
                 $templateHandle,
                 '@tile/component/tile.twig',
-                array(
+                [
                     'component'   => $this,
                     'showButtons' => false,
                     'writeAccess' => false,
-                ),
+                ],
                 !$this->getConfig('compactMode'),
                 false
             );
@@ -94,7 +92,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     }
 
     /**
-     * @param  Layout\Model $layout
+     * @param Layout\Model $layout
      * @return $this
      */
     public function setLayout($layout)
