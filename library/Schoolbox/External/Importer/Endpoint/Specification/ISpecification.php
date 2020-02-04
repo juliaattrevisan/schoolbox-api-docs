@@ -34,6 +34,12 @@ interface ISpecification
 
 
     /**
+     * Status text for when the nodes' endpoints couldn't be reached due to some api-related error
+     */
+    public const STATUS_ERROR = 'ERROR';
+
+
+    /**
      * Get a list of nodes that did (or didn't) get configured properly
      *
      * @return array

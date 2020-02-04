@@ -27,11 +27,16 @@
                             <tr>
                                 <td>{{ endpoint.message }}</td>
                                 <td>
+
                                     {% if endpoint.status == 'OK' %}
-                                        <span class="full-width success label">{{ endpoint.status }}</span>
+                                        {% set css = 'success' %}
+                                    {% elseif endpoint.status == 'ERROR' %}
+                                        {% set css = 'alert' %}
                                     {% else %}
-                                        <span class="full-width warning label">{{ endpoint.status }}</span>
+                                        {% set css = 'warning' %}
                                     {% endif %}
+
+                                    <span class="full-width {{ css }} label">{{ endpoint.status }}</span>
                                 </td>
                             </tr>
                         {% endfor %}
