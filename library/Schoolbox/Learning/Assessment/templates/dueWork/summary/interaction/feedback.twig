@@ -129,9 +129,6 @@ feedback: currentFeedback,
                 <span>{{ currentFeedback.humanReadableMark }}</span>
             </div>
         {% endif %}
-        <div class="grade grade-small {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
-                <span>{{ currentFeedback.humanReadableMark }}</span>
-            </div>
         <nav>
             {% if hasCollapser %}
                 <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
