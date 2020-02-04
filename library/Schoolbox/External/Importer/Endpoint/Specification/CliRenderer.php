@@ -50,9 +50,9 @@ class CliRenderer
     /**
      * CliRenderer constructor.
      *
-     * @param LoggerInterface|null $log
+     * @param LoggerInterface $log
      */
-    public function __construct(?LoggerInterface $log)
+    public function __construct(LoggerInterface $log)
     {
         $this->log = $log;
     }
@@ -69,9 +69,7 @@ class CliRenderer
         /* Exit early if nothing to do
          */
         if (!\count($endpoints)) {
-            if ($this->log) {
-                $this->log->critical('No endpoints found.');
-            }
+            $this->log->critical('No endpoints found.');
 
             return;
         }
@@ -86,18 +84,16 @@ class CliRenderer
 
             /* Format log messages
              */
-            if ($this->log) {
-                switch ($endpoint['status']) {
-                    case self::STATUS_OK:
-                        $this->log->info($message);
-                        break;
+            switch ($endpoint['status']) {
+                case self::STATUS_OK:
+                    $this->log->info($message);
+                    break;
 
-                    case self::STATUS_MISSING:
-                    case self::STATUS_EMPTY:
-                    default:
-                        $this->log->warning($message);
-                        break;
-                }
+                case self::STATUS_MISSING:
+                case self::STATUS_EMPTY:
+                default:
+                    $this->log->warning($message);
+                    break;
             }
         }
     }
