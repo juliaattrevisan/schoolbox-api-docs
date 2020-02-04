@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use UnexpectedValueException;
 
 /**
@@ -17,7 +18,7 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
  */
-class Specification
+class Specification implements ISpecification
 {
 
     /**

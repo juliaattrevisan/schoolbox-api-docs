@@ -9,13 +9,14 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
 use RuntimeException;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 
 /**
  * Class Specification
  *
  * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
-abstract class Specification
+abstract class Specification implements ISpecification
 {
 
     /**
