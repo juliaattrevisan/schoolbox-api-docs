@@ -118,7 +118,7 @@ class Factory extends FolderFilter\Factory
             }
 
             // If configured to display groups, we need to re-hydrate to check whether folder is a group
-            if ($pageFilter->getOptions()[Definition::KEY_GROUPS]->getAvailable()) {
+            if ($availableFolders->count() && $pageFilter->getOptions()[Definition::KEY_GROUPS]->getAvailable()) {
                 $availableFolders = $this->getFolderMapper()->findByColumn('id', $availableFolders->getPropertyValues('id'));
             }
 

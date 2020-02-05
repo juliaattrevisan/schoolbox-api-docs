@@ -20,6 +20,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\HomepageConfig;
+use function is_array;
 
 /**
  * Mapper for the data model for Unit Implementations.
@@ -76,6 +77,9 @@ class Mapper extends AbstractUnitMapper
      */
     public function findAllByCourseId($courseId, array $options = [])
     {
+        if (is_array($courseId) && !count($courseId)) {
+            return $this->createCollection();
+        }
         return $this->findByColumn('course_implementation_id', $courseId, $options);
     }
 
