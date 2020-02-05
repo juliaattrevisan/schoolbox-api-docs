@@ -159,7 +159,7 @@ class EventNotifier extends AbstractModuleNotifier
     protected function notifyUpcoming($roleType, $event, $author)
     {
         // If the event is not yet published, do not notify
-        if ($event->getPublishDateTime()->gt(Alaress_Date_Format::now())) {
+        if (!$event->isPublished()) {
             return new Envelope();
         }
 
@@ -185,7 +185,7 @@ class EventNotifier extends AbstractModuleNotifier
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
     {
         // If the event is not yet published, the update never happened
-        if ($event->getPublishDateTime()->gt(Alaress_Date_Format::now())) {
+        if (!$event->isPublished()) {
             return new Envelope();
         }
 
