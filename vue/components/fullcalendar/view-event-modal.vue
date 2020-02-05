@@ -547,7 +547,7 @@
                             Attendance: {{ eventExtendedProps.attendance.status }}
                         </meta-item>
                     </meta-list>
-                    <article style="white-space: pre-line">
+                    <article>
                         <span v-html="eventExtendedProps.detail"></span>
                     </article>
 
