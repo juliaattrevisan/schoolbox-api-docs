@@ -69,7 +69,7 @@ class EventNotifier extends AbstractModuleNotifier
             // audience (and thus has never been updated).
             if (!$this->isNewlyPublished($bundle->getEvent()->getDiff())) {
                 // advise 10 minutes before start, and only advise updated once published
-                $pubstamp = $event->getPublishDateTime() instanceof Alaress_Date_Format
+                $pubstamp = ($event->getPublishDateTime() instanceof Alaress_Date_Format && !$event->getPublishDateTime()->isNull())
                     ? $event->getPublishDateTime()->getUnixTimeStamp()
                     : self::IMMEDIATELY;
 
