@@ -387,7 +387,21 @@ class EventNotifier extends AbstractModuleNotifier
         }
         $now = Alaress_Date_Format::now();
         [$newPublish, $oldPublish] = $diff['publishDateTime'];
-        return Alaress_Date_Format::newDatabaseDate($oldPublish)->gt($now)
-            && Alaress_Date_Format::newDatabaseDate($newPublish)->lte($now);
+
+        // New publish date is null: event is published as of now
+        if (isset($newPublish)) {
+            $newPublish = Alaress_Date_Format::newDatabaseDate($newPublish);
+        } else {
+            $newPublish = $now;
+        }
+
+        // Old publish date is null: event was published, and thus not newly published
+        if (isset($oldPublish)) {
+            $oldPublish = Alaress_Date_Format::newDatabaseDate($oldPublish);
+        } else {
+            return false;
+        }
+
+        return $oldPublish->gt($now) && $newPublish->lte($now);
     }
 }
