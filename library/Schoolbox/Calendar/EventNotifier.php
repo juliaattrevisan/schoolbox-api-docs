@@ -63,17 +63,9 @@ class EventNotifier extends AbstractModuleNotifier
             // advise 10 minutes before start
             $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
-            // Bundle the updated trigger,
-            // but only if the event isn't newly published.
-            // This is because if the event wasn't published, it's new to the
-            // audience (and thus has never been updated).
-            if (!$this->isNewlyPublished($bundle->getEvent()->getDiff())) {
-                // advise 10 minutes before start, and only advise updated once published
-                $pubstamp = ($event->getPublishDateTime() instanceof Alaress_Date_Format && !$event->getPublishDateTime()->isNull())
-                    ? $event->getPublishDateTime()->getUnixTimeStamp()
-                    : self::IMMEDIATELY;
-
-                $bundle->attach(self::TRIGGER_UPDATED, $pubstamp);
+            // Bundle the updated trigger only if event was and is published
+            if ($event->isPublished() && !$this->isNewlyPublished($bundle->getEvent()->getDiff())) {
+                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
             }
 
             // Bundle the upcoming trigger
