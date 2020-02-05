@@ -270,6 +270,28 @@ class Event implements ISoftDeletable
         return $this->getAccess() == self::ACCESS_CAMPUS;
     }
 
+    /**
+     * Is this event published as of `$date`?
+     *
+     * @param Alaress_Date_Format|null $date The date to check, or now if not
+     *                                       provided.
+     * @return bool
+     */
+    public function isPublished(?Alaress_Date_Format $date = null): bool
+    {
+        // An event without a publish date is considered published
+        if (!$this->publishDateTime || $this->publishDateTime->isNull()) {
+            return true;
+        }
+
+        // What date was passed in?
+        // (I really hope you didn't pass in a null date)
+        if (!$date || $date->isNull()) {
+            $date = Alaress_Date_Format::now();
+        }
+        return $this->publishDateTime->lte($date);
+    }
+
     /* Auxiliary methods which don't belong anywhere else
      */
 
@@ -295,7 +317,7 @@ class Event implements ISoftDeletable
             $minute = $matches['i'];
             $this->setAllDay(false);
         } else {
-            list($day, $month, $year) = explode("-", $date);
+            [$day, $month, $year] = explode("-", $date);
             $hour = 0;
             $minute = 0;
             $this->setAllDay(true);
@@ -748,7 +770,7 @@ class Event implements ISoftDeletable
     public function setEndDate($endDate)
     {
         // preserve time if already set
-        list($year, $month, $day) = explode('-',$endDate);
+        [$year, $month, $day] = explode('-',$endDate);
         $this->getEndDateTime()->setDate($year,$month,$day);
 
         return $this;
@@ -764,7 +786,7 @@ class Event implements ISoftDeletable
     public function setEndTime($endTime)
     {
         // preserve date if already set
-        list($hour, $min, $sec) = explode(':',$endTime);
+        [$hour, $min, $sec] = explode(':',$endTime);
         $this->getEndDateTime()->setTime($hour,$min,$sec);
 
         return $this;
@@ -780,7 +802,7 @@ class Event implements ISoftDeletable
     public function setStartDate($startDate)
     {
         // preserve time if set
-        list($year, $month, $day) = explode('-',$startDate);
+        [$year, $month, $day] = explode('-',$startDate);
         $this->getStartDateTime()->setDate($year,$month,$day);
         return $this;
     }
@@ -794,7 +816,7 @@ class Event implements ISoftDeletable
      */
     public function setStartTime($startTime)
     {
-        list($hour, $min, $sec) = explode(':',$startTime);
+        [$hour, $min, $sec] = explode(':',$startTime);
         $this->getStartDateTime()->setTime($hour,$min,$sec);
         return $this;
     }
