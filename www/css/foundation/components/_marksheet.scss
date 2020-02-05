@@ -32,7 +32,12 @@
         }
         .checklist {
             display: inline-block;
+            margin-right: 2rem;
         }
+    }
+
+    .empty-state {
+        margin:0 1rem 1rem;
     }
 
     // Indicators: used in legend, so don't put in .marksheet

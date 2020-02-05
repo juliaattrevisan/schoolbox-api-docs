@@ -23,7 +23,7 @@
 {% set labelPublishedMark       = 'Mark Published' %}
 
 <div class="row">
-    <div class="actions-small-1 row">
+    <div class="actions-small-1">
         {% if not courseSpec.courseImplementations|length %}
         {% set importUrl = routeLookup('courseImport.getImport', {courseSpecId: courseSpec.id, folderId: 0, componentId: 0}) %}
         <div class="empty-state">
@@ -41,7 +41,7 @@
         </div>
         {% else %}
         <nav>
-            <div class="legend">
+            <div class="legend right">
                 <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
                 <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
                 <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
@@ -261,6 +261,6 @@
             {% endfor %}
             </tbody>
         </table>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
