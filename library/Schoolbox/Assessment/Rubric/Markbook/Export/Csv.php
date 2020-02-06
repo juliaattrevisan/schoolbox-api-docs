@@ -88,34 +88,36 @@ class Csv extends AbstractCSV
             foreach ($assessment['capabilities'] as $capabilityId => $capability) {
                 $capabilityName = $capability['name'];
 
-                // Output mark-per-capability
+                // Output mark-per-capability, only if using it
                 $capabilityMarks = [];
                 if ($assessment['usesMarkPerCap']) {
                     foreach ($this->students as $studentId => $student) {
-                        $excluded    = $this->exclusions[$assessmentId][$studentId] ?? false;
-                        $studentMark = '-';
+                        $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
                         if (!$excluded) {
                             $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
+                        } else {
+                            $studentMark = '(excluded)';
                         }
                         $capabilityMarks[$studentId] = $studentMark;
                     }
-                } else {
-                    $capabilityMarks = array_fill(0, count($this->students), '-');
+                    $this->exportRow(
+                        [$assessmentName, $capabilityName, '(mark per capability)'],
+                        $capabilityMarks
+                    );
                 }
-                $this->exportRow(
-                    [$assessmentName, $capabilityName, '-'],
-                    $capabilityMarks
-                );
+
+                // Output indicator marks
                 foreach ($capability['indicators'] as $indicatorId => $indicator) {
                     $indicatorName = $indicator['name'];
 
                     // Put together assessment data
                     $indicatorMarks = [];
                     foreach ($this->students as $studentId => $student) {
-                        $excluded    = $this->exclusions[$assessmentId][$studentId] ?? false;
-                        $studentMark = '-';
+                        $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
                         if (!$excluded) {
                             $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
+                        } else {
+                            $studentMark = '(excluded)';
                         }
                         $indicatorMarks[$studentId] = $studentMark;
                     }
