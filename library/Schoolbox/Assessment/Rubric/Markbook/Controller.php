@@ -158,7 +158,19 @@ class Controller extends Base
      */
     public function getMarkbookExport(Folder\Model $folder): void
     {
-        // TODO implement export
+        $request       = $this->request->post['filter_selection'] ?: [];
+        $assessmentIds = $this->getAssessmentIds($folder->getId(), $request);
+
+        [
+            $assessments,
+            $exclusions,
+            $students,
+            $overallMarks
+        ] = $this->buildMarkbookData($folder, $request, $assessmentIds);
+
+        $csv = new Export\Csv($students, $assessments, $exclusions, $overallMarks);
+        $csv->export('Markbook.csv');
+        exit;
     }
 
 
@@ -190,7 +202,7 @@ class Controller extends Base
         [
             $assessments,
             $exclusions,
-            $linkedMarks,
+            $students,
             $overallMarks
         ] = $this->buildMarkbookData($folder, $request, $assessmentIds);
 
@@ -201,7 +213,7 @@ class Controller extends Base
                 [
                     'folder'      => $folder,
                     'isFiltered'  => (new Filter\RequestChecker())->isFilteredRequest($request),
-                    'students'    => $linkedMarks,
+                    'students'    => $students,
                     'assessments' => $assessments,
                     'exclusions'  => $exclusions,
                     'overall'     => $overallMarks,
