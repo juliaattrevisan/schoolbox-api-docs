@@ -13,3 +13,12 @@ ALTER TABLE `luEventType`
 # backfill sequence with id to mimic its current ordering
 UPDATE `luEventType`
 SET `luEventType`.sequence = `luEventType`.eventTypeID;
+
+# backfill updated_by with Alaress user id
+UPDATE `luEventType`
+SET `updated_by` = (SELECT `user`.`id` FROM `user` WHERE username LIKE 'alaress');
+
+SET FOREIGN_KEY_CHECKS = 0;
+ALTER TABLE `luEventType`
+    MODIFY COLUMN `updated_by` INT(11) UNSIGNED NOT NULL;
+SET FOREIGN_KEY_CHECKS = 1;
