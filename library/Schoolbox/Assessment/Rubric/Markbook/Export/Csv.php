@@ -125,18 +125,9 @@ class Csv extends AbstractCSV
         foreach ($assessment['capabilities'] as $capabilityId => $capability) {
             $capabilityName = $capability['name'];
 
-            // Output mark-per-capability, only if using it
-            $capabilityMarks = [];
+            // Output capability marks only if this assessment uses them
             if ($assessment['usesMarkPerCap']) {
-                foreach ($this->students as $studentId => $student) {
-                    $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
-                    if (!$excluded) {
-                        $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
-                    } else {
-                        $studentMark = '(excluded)';
-                    }
-                    $capabilityMarks[$studentId] = $studentMark;
-                }
+                $capabilityMarks = $this->retrieveAssessmentCapabilityMarks($assessmentId, $capabilityId);
                 $this->exportRow(
                     [$assessmentName, $capabilityName, '(capability mark)'],
                     $capabilityMarks
@@ -145,22 +136,9 @@ class Csv extends AbstractCSV
 
             // Output indicator marks
             foreach ($capability['indicators'] as $indicatorId => $indicator) {
-                $indicatorName = $indicator['name'];
-
-                // Put together assessment data
-                $indicatorMarks = [];
-                foreach ($this->students as $studentId => $student) {
-                    $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
-                    if (!$excluded) {
-                        $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
-                    } else {
-                        $studentMark = '(excluded)';
-                    }
-                    $indicatorMarks[$studentId] = $studentMark;
-                }
                 $this->exportRow(
-                    [$assessmentName, $capabilityName, $indicatorName],
-                    $indicatorMarks
+                    [$assessmentName, $capabilityName, $indicator['name']],
+                    $this->retrieveAssessmentIndicatorMarks($assessmentId, $capabilityId, $indicatorId)
                 );
             }
         }
@@ -198,5 +176,52 @@ class Csv extends AbstractCSV
                 );
             }
         }
+    }
+
+
+    /**
+     * Retrieve the capability marks for this assessment out of student data.
+     *
+     * @param int $assessmentId
+     * @param int $capabilityId
+     * @return array
+     */
+    private function retrieveAssessmentCapabilityMarks(int $assessmentId, int $capabilityId): array
+    {
+        $capabilityMarks = [];
+        foreach ($this->students as $studentId => $student) {
+            $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
+            if (!$excluded) {
+                $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
+            } else {
+                $studentMark = '(excluded)';
+            }
+            $capabilityMarks[$studentId] = $studentMark;
+        }
+        return $capabilityMarks;
+    }
+
+
+    /**
+     * Retrieve the indicator marks for this assessment out of student data.
+     *
+     * @param int $assessmentId
+     * @param int $capabilityId
+     * @param int $indicatorId
+     * @return array
+     */
+    private function retrieveAssessmentIndicatorMarks(int $assessmentId, $capabilityId, $indicatorId): array
+    {
+        $indicatorMarks = [];
+        foreach ($this->students as $studentId => $student) {
+            $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
+            if (!$excluded) {
+                $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
+            } else {
+                $studentMark = '(excluded)';
+            }
+            $indicatorMarks[$studentId] = $studentMark;
+        }
+        return $indicatorMarks;
     }
 }
