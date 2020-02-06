@@ -29,6 +29,7 @@ use Schoolbox\Column\Integer;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage;
+use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Mapper;
@@ -82,6 +83,12 @@ class Controller extends Base
 
 
     /**
+     * @var Translator
+     */
+    private $translator;
+
+
+    /**
      * Constructor
      *
      * @param IConnector                         $internalDb
@@ -99,7 +106,8 @@ class Controller extends Base
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Selection\Mapper $filterSelectionMapper,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Mapper $filterMapper
+        Filter\Mapper $filterMapper,
+        Translator $translator
     ) {
         $this->internalDb            = $internalDb;
         $this->gradeGroupMapper      = $gradeGroupMapper;
@@ -108,6 +116,7 @@ class Controller extends Base
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterMapper          = $filterMapper;
+        $this->translator            = $translator;
     }
 
 
@@ -168,7 +177,7 @@ class Controller extends Base
             $overallMarks
         ] = $this->buildMarkbookData($folder, $request, $assessmentIds);
 
-        $csv = new Export\Csv($students, $assessments, $exclusions, $overallMarks);
+        $csv = new Export\Csv($students, $assessments, $exclusions, $overallMarks, $this->translator);
         $csv->export('Markbook.csv');
         exit;
     }

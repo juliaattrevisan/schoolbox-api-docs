@@ -8,10 +8,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook\Export;
 
+use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\Markbook\AbstractCSV;
 
 /**
- * Output a set of assessments as a csv
+ * Output a set of assessments as a csv.
  */
 class Csv extends AbstractCSV
 {
@@ -49,23 +50,32 @@ class Csv extends AbstractCSV
 
 
     /**
+     * @var Translator
+     */
+    private $translator;
+
+
+    /**
      * Constructor
      *
-     * @param array $students
-     * @param array $assessments
-     * @param array $exclusions
-     * @param array $overallMarks
+     * @param array      $students
+     * @param array      $assessments
+     * @param array      $exclusions
+     * @param array      $overallMarks
+     * @param Translator $translator
      */
     public function __construct(
         array $students,
         array $assessments,
         array $exclusions,
-        array $overallMarks
+        array $overallMarks,
+        Translator $translator
     ) {
         $this->students     = $students;
         $this->assessments  = $assessments;
         $this->exclusions   = $exclusions;
         $this->overallMarks = $overallMarks;
+        $this->translator   = $translator;
     }
 
 

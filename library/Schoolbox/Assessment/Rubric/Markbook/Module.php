@@ -97,6 +97,7 @@ class Module extends BaseModule
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
             'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
             'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
+            'translator'            => $injector->lazyGet('l10n'),
         ];
     }
 
