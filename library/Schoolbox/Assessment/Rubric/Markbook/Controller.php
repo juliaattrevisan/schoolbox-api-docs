@@ -194,6 +194,7 @@ class Controller extends Base
         $exclusions    = $this->getExclusions($assessmentIds);
         $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
         $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks);
+        $codec         = new Codec($this->filterMapper, $this->filterSelectionMapper);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
@@ -206,6 +207,13 @@ class Controller extends Base
                     'assessments' => $assessments,
                     'exclusions'  => $exclusions,
                     'overall'     => $overallMarks,
+                    'queryArgs'   => $codec->convertSelectionsToQueryString(
+                        $codec->convertRequestToSelections(
+                            $this->getUser(),
+                            Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK,
+                            $request
+                        )
+                    ),
                 ]
             )->getAsString(),
         ]));
