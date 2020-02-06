@@ -76,60 +76,102 @@ class Csv extends AbstractCSV
     {
         $this->initExport($filename);
 
-        // Header: a list of students
+        $this->exportHeader();
+        foreach ($this->assessments as $assessmentId => $assessment) {
+            $this->exportAssessment($assessmentId, $assessment);
+        }
+        $this->exportOverallMarks();
+
+        $this->closeExport();
+    }
+
+
+    /**
+     * Helper for exporting a student's name.
+     *
+     * @param array $student
+     * @return string
+     */
+    private function exportStudentName(array $student): string
+    {
+        $nameParts = [$student['lastname'] ?? '', $student['firstname'] ?? ''];
+        return implode(', ', array_filter($nameParts));
+    }
+
+
+    /**
+     * Export the header row for this CSV.
+     */
+    private function exportHeader(): void
+    {
         $this->exportRow(
             ['Assessment', 'Capability', 'Indicator'],
-            array_map(function ($student) { return $this->exportStudentName($student); }, $this->students)
+            array_map(function ($student) {
+                return $this->exportStudentName($student);
+            }, $this->students)
         );
+    }
 
-        // Each row: assessment, capability/indicator
-        foreach ($this->assessments as $assessmentId => $assessment) {
-            $assessmentName = $assessment['name'];
-            foreach ($assessment['capabilities'] as $capabilityId => $capability) {
-                $capabilityName = $capability['name'];
 
-                // Output mark-per-capability, only if using it
-                $capabilityMarks = [];
-                if ($assessment['usesMarkPerCap']) {
-                    foreach ($this->students as $studentId => $student) {
-                        $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
-                        if (!$excluded) {
-                            $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
-                        } else {
-                            $studentMark = '(excluded)';
-                        }
-                        $capabilityMarks[$studentId] = $studentMark;
+    /**
+     * Export all rows for a single assessment for this CSV.
+     *
+     * @param int   $assessmentId
+     * @param array $assessment
+     */
+    private function exportAssessment(int $assessmentId, array $assessment): void
+    {
+        $assessmentName = $assessment['name'];
+        foreach ($assessment['capabilities'] as $capabilityId => $capability) {
+            $capabilityName = $capability['name'];
+
+            // Output mark-per-capability, only if using it
+            $capabilityMarks = [];
+            if ($assessment['usesMarkPerCap']) {
+                foreach ($this->students as $studentId => $student) {
+                    $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
+                    if (!$excluded) {
+                        $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
+                    } else {
+                        $studentMark = '(excluded)';
                     }
-                    $this->exportRow(
-                        [$assessmentName, $capabilityName, '(capability mark)'],
-                        $capabilityMarks
-                    );
+                    $capabilityMarks[$studentId] = $studentMark;
                 }
+                $this->exportRow(
+                    [$assessmentName, $capabilityName, '(capability mark)'],
+                    $capabilityMarks
+                );
+            }
 
-                // Output indicator marks
-                foreach ($capability['indicators'] as $indicatorId => $indicator) {
-                    $indicatorName = $indicator['name'];
+            // Output indicator marks
+            foreach ($capability['indicators'] as $indicatorId => $indicator) {
+                $indicatorName = $indicator['name'];
 
-                    // Put together assessment data
-                    $indicatorMarks = [];
-                    foreach ($this->students as $studentId => $student) {
-                        $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
-                        if (!$excluded) {
-                            $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
-                        } else {
-                            $studentMark = '(excluded)';
-                        }
-                        $indicatorMarks[$studentId] = $studentMark;
+                // Put together assessment data
+                $indicatorMarks = [];
+                foreach ($this->students as $studentId => $student) {
+                    $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
+                    if (!$excluded) {
+                        $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
+                    } else {
+                        $studentMark = '(excluded)';
                     }
-                    $this->exportRow(
-                        [$assessmentName, $capabilityName, $indicatorName],
-                        $indicatorMarks
-                    );
+                    $indicatorMarks[$studentId] = $studentMark;
                 }
+                $this->exportRow(
+                    [$assessmentName, $capabilityName, $indicatorName],
+                    $indicatorMarks
+                );
             }
         }
+    }
 
-        // Output overall marks
+
+    /**
+     * Export overall mark rows for this CSV.
+     */
+    private function exportOverallMarks(): void
+    {
         foreach ($this->overallMarks as $capabilityId => $capability) {
             $overallHeader  = '(overall)';
             $capabilityName = $capability['name'];
@@ -156,20 +198,5 @@ class Csv extends AbstractCSV
                 );
             }
         }
-
-        $this->closeExport();
-    }
-
-
-    /**
-     * Helper for exporting a student's name.
-     *
-     * @param array $student
-     * @return string
-     */
-    private function exportStudentName(array $student): string
-    {
-        $nameParts = [$student['lastname'] ?? '', $student['firstname'] ?? ''];
-        return implode(', ', array_filter($nameParts));
     }
 }
