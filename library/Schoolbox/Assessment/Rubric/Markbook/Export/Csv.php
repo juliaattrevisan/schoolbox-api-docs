@@ -101,7 +101,7 @@ class Csv extends AbstractCSV
                         $capabilityMarks[$studentId] = $studentMark;
                     }
                     $this->exportRow(
-                        [$assessmentName, $capabilityName, '(mark per capability)'],
+                        [$assessmentName, $capabilityName, '(capability mark)'],
                         $capabilityMarks
                     );
                 }
