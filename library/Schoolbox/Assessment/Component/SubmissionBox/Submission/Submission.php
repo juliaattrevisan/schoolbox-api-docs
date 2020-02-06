@@ -145,21 +145,12 @@ class Submission implements IStorage, ISoftDeletable
                 }
             }
 
-            // Individual user permissions
-            if($userAccessMapper->userHasMinimumAccessToAll(
-                $user->getId(),
-                [$this->getSubmissionBox()->getCategory()->getId(),],
-                UserAccess::ACCESS_WRITE
-            )){
-                return true;
-            }
-
-            // Role permissions
-            $roleAccessLevel = Access::getInstance()->getFolderAccessForRole(
-                $user->getRole()->getId(),
+            // Folder permissions
+            $accessLevel = Access::getInstance()->getFolderAccess(
+                $user,
                 $this->getSubmissionBox()->getCategory()->getId()
             );
-            if ($roleAccessLevel >= UserAccess::ACCESS_WRITE) {
+            if ($accessLevel >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
         }
