@@ -115,7 +115,11 @@ class Csv extends AbstractCSV
     private function exportHeader(): void
     {
         $this->exportRow(
-            ['Assessment', 'Capability', 'Indicator'],
+            [
+                $this->translator->translate('assessment', false, true),
+                $this->translator->translate('rubricGroup', false, true),
+                $this->translator->translate('rubricCriterion', false, true),
+            ],
             array_map(function ($student) {
                 return $this->exportStudentName($student);
             }, $this->students)
@@ -139,7 +143,7 @@ class Csv extends AbstractCSV
             if ($assessment['usesMarkPerCap']) {
                 $capabilityMarks = $this->retrieveAssessmentCapabilityMarks($assessmentId, $capabilityId);
                 $this->exportRow(
-                    [$assessmentName, $capabilityName, '(capability mark)'],
+                    [$assessmentName, $capabilityName, $this->translator->translateSentence('({:rubricGroup} mark)')],
                     $capabilityMarks
                 );
             }
@@ -168,7 +172,7 @@ class Csv extends AbstractCSV
             if ($capability['show']) {
                 $capabilityMarks = $this->retrieveOverallCapabilityMarks($capability);
                 $this->exportRow(
-                    [$overallHeader, $capabilityName, '(capability mark)'],
+                    [$overallHeader, $capabilityName, $this->translator->translateSentence('({:rubricGroup} mark)')],
                     $capabilityMarks
                 );
             }
