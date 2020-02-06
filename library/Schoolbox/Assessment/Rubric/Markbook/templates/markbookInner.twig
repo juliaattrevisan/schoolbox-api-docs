@@ -4,6 +4,7 @@
     students     array       Student and rubric mark data
     exclusions   int[][]     User ids, grouped by assessment.id
     overall      array       Summated student capability/indicator marks across all assessments
+    queryArgs    string      The filters used to generate this report, so we can export the exact same report
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
