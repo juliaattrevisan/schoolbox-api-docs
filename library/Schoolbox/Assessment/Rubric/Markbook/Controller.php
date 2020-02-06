@@ -149,6 +149,20 @@ class Controller extends Base
 
 
     /**
+     * Output the rubric report as a cool CSV for extra-Schoolbox data wrangling,
+     * for those that are into that sort of thing.
+     *
+     * @api   GET /learning/rubricMarkbook/export/{folderId}
+     * @since 192
+     * @param Folder\Model $folder Folder for this class
+     */
+    public function getMarkbookExport(Folder\Model $folder): void
+    {
+        // TODO implement export
+    }
+
+
+    /**
      * Displays a list of rubric marks for students and learners associated with the specified folder
      *
      * @api   POST /learning/rubricMarkbook/{folderId}

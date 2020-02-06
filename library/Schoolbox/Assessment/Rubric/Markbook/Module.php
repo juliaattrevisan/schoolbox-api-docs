@@ -70,6 +70,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/{folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
         $this->register('POST', '/{folderId:\d+}', 'postMarkbook', $canViewPage, $preloadFolder);
+        $this->register('GET',  '/export/{folderId:\d+}', 'getMarkbookExport', $canViewPage, $preloadFolder);
     }
 
 
