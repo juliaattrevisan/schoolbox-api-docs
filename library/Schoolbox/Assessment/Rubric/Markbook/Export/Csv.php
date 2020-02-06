@@ -129,6 +129,34 @@ class Csv extends AbstractCSV
             }
         }
 
+        // Output overall marks
+        foreach ($this->overallMarks as $capabilityId => $capability) {
+            $overallHeader  = '(overall)';
+            $capabilityName = $capability['name'];
+
+            if ($capability['show']) {
+                $capabilityMarks = [];
+                foreach ($this->students as $studentId => $student) {
+                    $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'] ?? '-';
+                }
+                $this->exportRow(
+                    [$overallHeader, $capabilityName, '(capability mark)'],
+                    $capabilityMarks
+                );
+            }
+            foreach ($capability['indicators'] as $indicatorId => $indicator) {
+                $indicatorName  = $indicator['name'];
+                $indicatorMarks = [];
+                foreach ($this->students as $studentId => $student) {
+                    $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'] ?? '-';
+                }
+                $this->exportRow(
+                    [$overallHeader, $capabilityName, $indicatorName],
+                    $indicatorMarks
+                );
+            }
+        }
+
         $this->closeExport();
     }
 
