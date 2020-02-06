@@ -200,6 +200,7 @@ class Controller extends Base
             'content' => $this->buildUnthemedHtmlOutput(
                 '@rubricMarkbook/markbookInner.twig',
                 [
+                    'folder'      => $folder,
                     'isFiltered'  => $isFiltered,
                     'students'    => $linkedMarks,
                     'assessments' => $assessments,
