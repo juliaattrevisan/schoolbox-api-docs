@@ -14,7 +14,11 @@ ALTER TABLE `house`
 UPDATE `house`
 SET `house`.sequence = `house`.id;
 
+# backfill updated_by with Alaress user id
+UPDATE `house`
+SET `updated_by` = (SELECT `user`.`id` FROM `user` WHERE username LIKE 'alaress');
+
 SET FOREIGN_KEY_CHECKS = 0;
 ALTER TABLE `house`
-    MODIFY COLUMN `updated_by` INT(11) UNSIGNED NULL;
+    MODIFY COLUMN `updated_by` INT(11) UNSIGNED NOT NULL;
 SET FOREIGN_KEY_CHECKS = 1;
