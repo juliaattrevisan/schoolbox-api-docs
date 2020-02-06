@@ -154,6 +154,7 @@ class Csv extends AbstractCSV
             $overallHeader  = '(overall)';
             $capabilityName = $capability['name'];
 
+            // Output capability marks only if they are to be shown
             if ($capability['show']) {
                 $capabilityMarks = $this->retrieveOverallCapabilityMarks($capability);
                 $this->exportRow(
@@ -161,6 +162,8 @@ class Csv extends AbstractCSV
                     $capabilityMarks
                 );
             }
+
+            // Output indicator marks
             foreach ($capability['indicators'] as $indicatorId => $indicator) {
                 $this->exportRow(
                     [$overallHeader, $capabilityName, $indicator['name']],
@@ -182,8 +185,7 @@ class Csv extends AbstractCSV
     {
         $capabilityMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
-            if (!$excluded) {
+            if (empty($this->exclusions[$assessmentId][$studentId])) {
                 $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
             } else {
                 $studentMark = '(excluded)';
@@ -202,12 +204,11 @@ class Csv extends AbstractCSV
      * @param int $indicatorId
      * @return array
      */
-    private function retrieveAssessmentIndicatorMarks(int $assessmentId, $capabilityId, $indicatorId): array
+    private function retrieveAssessmentIndicatorMarks(int $assessmentId, int $capabilityId, int $indicatorId): array
     {
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $excluded = $this->exclusions[$assessmentId][$studentId] ?? false;
-            if (!$excluded) {
+            if (empty($this->exclusions[$assessmentId][$studentId])) {
                 $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
             } else {
                 $studentMark = '(excluded)';
