@@ -87,22 +87,41 @@ class Csv extends AbstractCSV
             $assessmentName = $assessment['name'];
             foreach ($assessment['capabilities'] as $capabilityId => $capability) {
                 $capabilityName = $capability['name'];
+
+                // Output mark-per-capability
+                $capabilityMarks = [];
+                if ($assessment['usesMarkPerCap']) {
+                    foreach ($this->students as $studentId => $student) {
+                        $excluded    = $this->exclusions[$assessmentId][$studentId] ?? false;
+                        $studentMark = '-';
+                        if (!$excluded) {
+                            $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
+                        }
+                        $capabilityMarks[$studentId] = $studentMark;
+                    }
+                } else {
+                    $capabilityMarks = array_fill(0, count($this->students), '-');
+                }
+                $this->exportRow(
+                    [$assessmentName, $capabilityName, '-'],
+                    $capabilityMarks
+                );
                 foreach ($capability['indicators'] as $indicatorId => $indicator) {
                     $indicatorName = $indicator['name'];
 
                     // Put together assessment data
-                    $studentMarks = [];
+                    $indicatorMarks = [];
                     foreach ($this->students as $studentId => $student) {
                         $excluded    = $this->exclusions[$assessmentId][$studentId] ?? false;
                         $studentMark = '-';
                         if (!$excluded) {
                             $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
                         }
-                        $studentMarks[$studentId] = $studentMark;
+                        $indicatorMarks[$studentId] = $studentMark;
                     }
                     $this->exportRow(
                         [$assessmentName, $capabilityName, $indicatorName],
-                        $studentMarks
+                        $indicatorMarks
                     );
                 }
             }
