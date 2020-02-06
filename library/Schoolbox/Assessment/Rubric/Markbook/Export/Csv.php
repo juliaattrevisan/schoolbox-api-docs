@@ -155,24 +155,16 @@ class Csv extends AbstractCSV
             $capabilityName = $capability['name'];
 
             if ($capability['show']) {
-                $capabilityMarks = [];
-                foreach ($this->students as $studentId => $student) {
-                    $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'] ?? '-';
-                }
+                $capabilityMarks = $this->retrieveOverallCapabilityMarks($capability);
                 $this->exportRow(
                     [$overallHeader, $capabilityName, '(capability mark)'],
                     $capabilityMarks
                 );
             }
             foreach ($capability['indicators'] as $indicatorId => $indicator) {
-                $indicatorName  = $indicator['name'];
-                $indicatorMarks = [];
-                foreach ($this->students as $studentId => $student) {
-                    $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'] ?? '-';
-                }
                 $this->exportRow(
-                    [$overallHeader, $capabilityName, $indicatorName],
-                    $indicatorMarks
+                    [$overallHeader, $capabilityName, $indicator['name']],
+                    $this->retrieveOverallIndicatorMarks($indicator)
                 );
             }
         }
@@ -221,6 +213,38 @@ class Csv extends AbstractCSV
                 $studentMark = '(excluded)';
             }
             $indicatorMarks[$studentId] = $studentMark;
+        }
+        return $indicatorMarks;
+    }
+
+
+    /**
+     * Retrieve the capability marks out of overall data.
+     *
+     * @param array $capability
+     * @return array
+     */
+    private function retrieveOverallCapabilityMarks(array $capability): array
+    {
+        $capabilityMarks = [];
+        foreach ($this->students as $studentId => $student) {
+            $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'] ?? '-';
+        }
+        return $capabilityMarks;
+    }
+
+
+    /**
+     * Retrieve the indicator marks out of overall data.
+     *
+     * @param array $indicator
+     * @return array
+     */
+    private function retrieveOverallIndicatorMarks(array $indicator): array
+    {
+        $indicatorMarks = [];
+        foreach ($this->students as $studentId => $student) {
+            $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'] ?? '-';
         }
         return $indicatorMarks;
     }
