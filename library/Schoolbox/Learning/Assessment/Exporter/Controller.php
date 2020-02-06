@@ -8,6 +8,10 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Web\Controller\Exception;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use DomainException;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -16,12 +20,17 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 use InvalidArgumentException;
 use Alaress_Date_Format;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use UnexpectedValueException;
+use function count;
+use function get_class;
 
 /**
  * Controller for assessment export actions.
@@ -50,6 +59,8 @@ class Controller extends BaseController
     /** @var AssessmentFilter\IdFinder */
     private $assessmentIdFinder;
 
+    /** @var FolderMapper */
+    private $folderMapper;
 
     /**
      * Constructor
@@ -59,19 +70,22 @@ class Controller extends BaseController
      * @param UnitImplementation\Mapper $unitImplementationMapper
      * @param Replicator                $replicator
      * @param AssessmentFilter\IdFinder $assessmentIdFinder
+     * @param FolderMapper              $folderMapper
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
         UnitImplementation\Mapper $unitImplementationMapper,
         Replicator $replicator,
-        AssessmentFilter\IdFinder $assessmentIdFinder
+        AssessmentFilter\IdFinder $assessmentIdFinder,
+        FolderMapper $folderMapper
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
         $this->unitImplementationMapper = $unitImplementationMapper;
         $this->replicator               = $replicator;
         $this->assessmentIdFinder       = $assessmentIdFinder;
+        $this->folderMapper             = $folderMapper;
     }
 
 
@@ -91,7 +105,8 @@ class Controller extends BaseController
      * @since 165
      *
      * @param IAssessable $assessmentSpec
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
+     * @throws MapperException
      */
     public function getExportForm(IAssessable $assessmentSpec)
     {
@@ -127,6 +142,7 @@ class Controller extends BaseController
      *
      * @param IAssessable[]|GenericCollection $assessmentImpls
      * @return bool[] Indexed by folder.id
+     * @throws MapperException
      */
     private function buildFolderWritePermissions(GenericCollection $assessmentImpls): array
     {
@@ -148,11 +164,11 @@ class Controller extends BaseController
      * @param IAssessable $assessmentSpec
      *
      * @throws InvalidArgumentException
-     * @throws \Alaress\Web\Controller\Exception
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws MapperException
+     * @throws UnexpectedValueException
      * @internal param string $_GET ['returnUrl']            a URL to return to once done
      * @internal param int[] $_POST ['unitImplementation']   unit implementations to push this into.
      *                                           key:   unit implementation id
@@ -179,7 +195,7 @@ class Controller extends BaseController
             }
         }
 
-        if (\count($errors)) {
+        if (count($errors)) {
             $folderIds = '[' . implode(',', array_keys($errors)) . ']';
             $this->sendError(
                 "You do not have permission to write to the selected classes: $folderIds",
@@ -268,9 +284,9 @@ class Controller extends BaseController
      * @param Alaress_Date_Format|null $closeDate
      * @return IAssessable
      * @throws InvalidArgumentException
-     * @throws \DomainException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws DomainException
+     * @throws MapperException
+     * @throws UnexpectedValueException
      */
     protected function exportToNewContext(
         IAssessable $assessmentSpec,
@@ -293,7 +309,7 @@ class Controller extends BaseController
             $dueDate     = $dueDate ?? $context->getDueAt();
             $closeDate   = $closeDate ?? $context->getDueAt();
         } else {
-            throw new \DomainException('Invalid context: ' . \get_class($context));
+            throw new DomainException('Invalid context: ' . get_class($context));
         }
 
         // Set sensible defaults for dates
@@ -328,6 +344,8 @@ class Controller extends BaseController
      *
      * @param IAssessable $assessment
      * @return IAssessable[]|GenericCollection
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     protected function buildImplementationsForSpecification(IAssessable $assessment): GenericCollection
     {
@@ -363,6 +381,10 @@ class Controller extends BaseController
             // Not yet imported?
             if (!$isAlreadyImported) {
                 $assessmentImpl = $assessment->cloneForCopy();
+                // hydrate folder to get folder code
+                $folder = $unitImplementation->getBaseContext()->getFolder();
+                $this->folderMapper->findById($folder->getId());
+                $unitImplementation->setFolder($folder);
                 $assessmentImpl->setContext($unitImplementation);
                 $assessmentImpl->setPublishAt($unitImplementation->getOpenDate());
                 $assessmentImpl->setOpenAt($unitImplementation->getOpenDate());
