@@ -172,10 +172,10 @@ class Sync extends Base implements ISync
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
                 INNER JOIN family f
-                    ON f.entity_code = p.par_code AND f.entity_gender = 'M'
-                INNER JOIN persondefs pd
+                    ON f.entity_code = p.par_code
+                LEFT JOIN persondefs pd
                     ON pd.person_num = f.person_num
-                    AND pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL
+                    AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
                 WHERE p.cmpy_code = :{$companyCode}
                 AND   p.f_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
@@ -219,10 +219,10 @@ class Sync extends Base implements ISync
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
                 INNER JOIN family f
-                    ON f.entity_code = p.par_code AND f.entity_gender = 'F'
-                INNER JOIN persondefs pd
+                    ON f.entity_code = p.par_code
+                LEFT JOIN persondefs pd
                     ON pd.person_num = f.person_num
-                    AND pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL
+                    AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
                 WHERE p.cmpy_code = :{$companyCode}2
                 AND   p.m_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
