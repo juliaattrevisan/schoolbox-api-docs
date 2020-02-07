@@ -90,7 +90,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     {
         $query = "
             SELECT {$this->getColumnString()}
-            FROM {$this->getTable()} 
+            FROM {$this->getTable()}
             WHERE {$this->fieldName} LIKE :search
             AND `deleted_at` IS NULL
             ORDER BY {$this->fieldName} ASC
@@ -172,10 +172,10 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
-     * @param User $user
-     * @param string $keyword
-     * @param int $offset
-     * @param int $limit
+     * @param User        $user
+     * @param string      $keyword
+     * @param int         $offset
+     * @param int         $limit
      * @return Collection|Model[]
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)

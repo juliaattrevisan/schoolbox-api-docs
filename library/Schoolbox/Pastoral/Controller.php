@@ -15,6 +15,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
+use PDOException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -55,6 +56,7 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -526,6 +528,7 @@ class Controller extends Base
             'template' => '@pastoral/modify.twig',
             'data'     => [
                 'record'            => $record,
+                'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                 'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                 'allowParents'      => $allowParents,
                 'types'             => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),
@@ -614,10 +617,14 @@ class Controller extends Base
      * @param Model  $record
      * @param string $tagCsv
      * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function assignTagsToRecord(Model $record, $tagCsv): void
     {
         $tags = explode(",", $tagCsv);
+
+        $canCreate = (bool)$this->getConfigLoader()->get('pastoral_create_tag_enable');
 
         foreach ($tags as $tagCurrent) {
             if (trim($tagCurrent) != '') {
@@ -628,18 +635,19 @@ class Controller extends Base
                     /** @var PastoralTagsModel $tag */
                     $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, ['cache' => false]);
                 } catch (MapperDeletedException $e) {
-                    /* Restore this tag to active duty
-                     */
-                    $tag = $e->getDeletedObject();
 
-                    $tag->setDeletedAt(null);
-                    $this->pastoralTagMapper->save($tag);
+                    /* Restore this tag to active duty SA-2737
+                     * This was put here to reduce dupe tags from original implementation
+                     */
+
                 } catch (MapperException $e) {
                     /* Tag doesn't exist - spawn it, save it, then assign it
                      */
-                    $tag = new PastoralTagsModel();
-                    $tag->setName($tagCurrent);
-                    $this->pastoralTagMapper->save($tag);
+                    if ($canCreate) {
+                        $tag = new PastoralTagsModel();
+                        $tag->setName($tagCurrent);
+                        $this->pastoralTagMapper->save($tag);
+                    }
                 }
 
                 $this->pastoralTagMapper->assignToRecord($record, $tag);
@@ -835,7 +843,6 @@ class Controller extends Base
 
             $this->pastoralTagMapper->deleteForRecord($record);
             $this->assignTagsToRecord($record, $post["tags"]);
-            $this->pastoralTagMapper->purgeUnassociated();
 
             // Save permissions/visibility
 

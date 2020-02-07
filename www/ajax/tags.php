@@ -35,9 +35,7 @@ $registry = [
 
 // Validate params
 $errors = [];
-if(empty($_GET['query'])){
-    $errors[] = 'Query fragment not supplied';
-}
+
 if(empty($this->arg[0])){
     $errors[] = 'Tag type not supplied';
 }
@@ -53,7 +51,12 @@ if ($errors) {
     /** @var \Schoolbox\Mapper\UsableAsTagSource $mapper */
     $mapper = $registry[$this->arg[0]]();
     if ($mapper instanceof \Schoolbox\Mapper\UsableAsTagSource) {
-        $tagsArray = $mapper->findForTag($_SESSION['user'], $_GET['query']);
+
+        /* Optionally provide a column name by which to sort
+         */
+        $query = (string)$_GET['query'];
+
+        $tagsArray = $mapper->findForTag($_SESSION['user'], $query);
     } else {
         http_response_code(500);
     }

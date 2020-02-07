@@ -550,10 +550,26 @@
 
         $('#filterTags').selectizeSelector({
             multiple: true,
-            ajax: {
-                url: '/ajax/tags/pastoral',
-                type: 'GET',
-                dataType: 'json'
+            selectize: {
+                preload: true,
+                load: function(query, callback) {
+
+                    /* This provides a preliminary list of suggestions for when selectize gets focus
+                     * but there's no parameter upon which to search (initial conditions). This also
+                     * happens to provide a list of filtered suggestions as you type using the optional
+                     * $query var
+                     */
+                    $.ajax({
+                        url: '/ajax/tags/pastoral',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    }).done(function(result) {
+                        callback(result)
+                    }).fail(function() {
+                        callback()
+                    })
+                }
             },
             value: [
                 {% for tag in tagsSelected %}
