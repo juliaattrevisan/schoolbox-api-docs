@@ -319,7 +319,13 @@ class Classes implements IStrategy
 
                     /* Throw warning, but assign them anyway
                      */
-                    if (null === $student || !isset($users[$student['username']])) {
+                    if (null === $student) {
+                        $this->log->warning(sprintf(
+                            'No student data for %s %s',
+                            $timetableClass->getName(),
+                            $timetableClass->getCode()
+                        ));
+                    } elseif (!isset($users[$student['username']])) {
                         $this->log->warning(sprintf(
                             'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
                             $student['username'],
@@ -327,9 +333,9 @@ class Classes implements IStrategy
                             $timetableClass->getName(),
                             $timetableClass->getCode()
                         ));
+                    } else {
+                        $this->createTimetableClassInvolvement($student, $timetableClass);
                     }
-
-                    $this->createTimetableClassInvolvement($student, $timetableClass);
 
                     /* Process additional teachers (we already dealt with the first one)
                      */
