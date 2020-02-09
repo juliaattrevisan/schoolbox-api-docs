@@ -248,7 +248,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
             if ($period["TYPE"] != "Y") {
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $periodNumber = "01." . str_pad($period['CODE'], 2, '0');
+                $periodNumber = '01.' . $period['CODE'];
 
                 $timetable[$periodNumber]['periodName']     = $period['HEADING'];
                 $timetable[$periodNumber]['periodStart']    = $period['TIME_START'];
@@ -266,7 +266,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         foreach ($dayClasses as $dayClass) {
             if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00") {
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+                $period = '01.' . $dayClass['PERIOD'];
 
                 $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
 
@@ -343,7 +343,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             // TODO: Possibly make a config variable of types to include
             if ($period["TYPE"] != "Y") {
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $periodNumber = "01." . str_pad($period['CODE'], 2, '0');
+                $periodNumber = '01.' . $period['CODE'];
 
                 $timetable[$periodNumber]['periodName']     = $period['HEADING'];
                 $timetable[$periodNumber]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
@@ -377,7 +377,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         foreach ($dayClasses as $dayClass) {
             if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00") {
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+                $period = '01.' . $dayClass['PERIOD'];
 
                 $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
 
@@ -457,7 +457,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             // TODO: Possibly make a config variable of types to include
             if ($period["TYPE"] != "Y") {
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $periodNumber = "01." . str_pad($period['CODE'], 2, '0');
+                $periodNumber = '01.' . $period['CODE'];
 
                 $timetable[$periodNumber]['periodName']     = $period['HEADING'];
                 $timetable[$periodNumber]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
@@ -475,7 +475,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 $day = $dayClass['DAY'];
 
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+                $period = '01.' . $dayClass['PERIOD'];
 
                 $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
 
@@ -552,9 +552,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
               LEFT JOIN TIMEROOM ON TIMEROOM.ABBREV = TIMEFILE.ROOM
               LEFT JOIN TIMEPDHD ON TIMEPDHD.DAY = TIMEFILE.DAY AND TIMEPDHD.TIMEOFDAY = CAST(TIMEFILE.PERIOD AS VARCHAR(5)) AND
               CASE
-                WHEN TIMEPDHD.RESTRICT_YR = '*C' THEN 1                                                                            
-                WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) <> '*' AND TIMEFILE.YEAR = TIMEPDHD.RESTRICT_YR THEN 1                          
-                WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) = '*' AND TIMEPDHD.INCLUDES LIKE '%|' + TIMEFILE.YEAR + '|%' THEN 1             
+                WHEN TIMEPDHD.RESTRICT_YR = '*C' THEN 1
+                WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) <> '*' AND TIMEFILE.YEAR = TIMEPDHD.RESTRICT_YR THEN 1
+                WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) = '*' AND TIMEPDHD.INCLUDES LIKE '%|' + TIMEFILE.YEAR + '|%' THEN 1
                 ELSE 0
               END = 1
             WHERE TIME_PERIOD = '{$timePeriod}' AND TIMEFILE.ROOM IN ({$roomCodesCsv})
