@@ -139,6 +139,9 @@ class Mapper extends AbstractUnitMapper
 
             // Folder Codes: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
             if ($row['cfc.code']) {
+                if (!$courseFolder->getCodes()) {
+                    $courseFolder->setCodes($this->getJoinMapper('course.folder.codes')->createCollection());
+                }
                 $folderCode = $this->hydrateJoin($row, 'course.folder.codes', 'cfc');
                 $courseFolder->getCodes()[$folderCode->getCode()] = $folderCode;
             }
