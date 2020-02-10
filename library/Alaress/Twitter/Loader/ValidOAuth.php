@@ -5,6 +5,8 @@
  */
 declare(strict_types=1);
 
+namespace Alaress\Twitter\Loader;
+
 /**
  * Class ValidOAuth
  *
@@ -34,9 +36,9 @@ class ValidOAuth
         ?string $oauthSecret
     ): bool
     {
-        return (string)$consumerKey !== ''
-            && (string)$consumerSecret !== ''
-            && (string)$oauthToken !== ''
-            && (string)$oauthSecret !== '';
+        return trim((string)$consumerKey) !== ''
+            && trim((string)$consumerSecret) !== ''
+            && trim((string)$oauthToken) !== ''
+            && trim((string)$oauthSecret) !== '';
     }
 }

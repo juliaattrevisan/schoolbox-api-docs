@@ -1,4 +1,7 @@
 <?php
+
+use Alaress\Twitter\Loader\ValidOAuth;
+
 /**
  * Created by Steve Chan.
  *
