@@ -7,13 +7,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
+use InvalidArgumentException;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
  * Class Status
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
 class Status implements IStatus
 {
@@ -39,6 +40,7 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws InvalidArgumentException
      */
     public function isReachable(): bool
     {
@@ -46,7 +48,7 @@ class Status implements IStatus
         /* We cached the file locally so if it exists, then it's reachable
          * Whether or not it contains valid data is a different question altogether
          */
-        $expectedXmls = $this->findSpecimens();
+        $expectedXmls = (new Collator())->collate($this->path);
 
         $numFound = \count(array_filter(array_values($expectedXmls)));
 
@@ -55,63 +57,33 @@ class Status implements IStatus
 
 
     /**
-     * Find a specimen xml for each fo the $expectedXmls
-     *
-     * @return array
-     */
-    private function findSpecimens(): array
-    {
-        $expectedXmls = [
-            Receiver::XML_FULL => '',
-            Receiver::XML_STUDENTTIMETABLES => ''
-        ];
-
-        $dirhandle = opendir($this->path);
-
-        while ($xmlFile = readdir($dirhandle)) {
-            if ($xmlFile !== '.' && $xmlFile !== '..') {
-                $path = "{$this->path}/{$xmlFile}";
-
-                /* There's at least one profile xml and one student timetables xml
-                 * and they are both readable
-                 */
-                if ((new Api($path))->isXmlFileExtant()) {
-                    foreach ($expectedXmls as $key => $value) {
-                        if (strpos($xmlFile, $key) !== false) {
-                            $expectedXmls[$key] = $path;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $expectedXmls;
-    }
-
-    /**
      * @inheritDoc
      *
-     * @return string
+     * @return array
+     * @throws InvalidArgumentException
      */
-    public function getReport(): string
+    public function getReport(): array
     {
-        $expectedXmls = $this->findSpecimens();
+        $expectedXmls = (new Collator())->collate($this->path);
 
         $specifications = [
-            Receiver::XML_FULL => new Profile\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
-            Receiver::XML_STUDENTTIMETABLES => new Timetable\Specification(null, new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
+            Receiver::XML_FULL => new Profile\Specification(new Batchxml(new Api($expectedXmls[Receiver::XML_FULL]))),
+            Receiver::XML_STUDENTTIMETABLES => new Timetable\Specification(new Batchxml(new Api($expectedXmls[Receiver::XML_STUDENTTIMETABLES]))),
         ];
 
         $result = [];
 
         foreach ($specifications as $key => $specification) {
             try {
-                $result[] = implode("\n", $specification->check());
+                $result = array_merge($result, $specification->check());
             } catch (\RuntimeException $e) {
-                $result[] = "Cannot access api endpoint: cannot open/read at least one {$key} xml";
+                $result[] = [
+                    'message' => "Cannot access api endpoint: cannot open/read at least one {$key} xml",
+                    'status' => ISpecification::STATUS_ERROR
+                ];
             }
         }
 
-        return implode("\n", $result);
+        return $result;
     }
 }

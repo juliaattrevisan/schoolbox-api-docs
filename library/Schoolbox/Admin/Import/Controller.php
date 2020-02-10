@@ -19,6 +19,7 @@ use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -116,10 +117,20 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
-        $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+        $isReachable = false;
+
+        try {
+            $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
+            if ($status) {
+                $isReachable = $status->isReachable();
+            }
+        } catch (\DomainException|\InvalidArgumentException $e) {
+            // noop
+        }
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
-            'isReachable' => $status ? $status->isReachable() : false
+            'isReachable' => $isReachable
         ]));
     }
 
@@ -133,11 +144,25 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = $this->getConfigLoader()->get('schooldata_import_data_source');
 
-        $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+        $report = null;
+        $message = null;
+
+        try {
+            $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+
+            if ($status) {
+                $report = $status->getReport();
+            }
+        } catch (\DomainException|\InvalidArgumentException $e) {
+            $message = $e->getMessage();
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
             'pageCurrent' => 'import/schoolDataImport',
-            'report' => $status ? $status->getReport() : ''
+            'report' => $report ?: [[
+                'message' => $message,
+                'status' => ISpecification::STATUS_ERROR
+            ]]
         ]));
     }
 }

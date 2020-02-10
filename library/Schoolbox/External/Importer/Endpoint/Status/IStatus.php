@@ -26,7 +26,7 @@ interface IStatus
     /**
      * Get a report that explains the current status of the endpoint
      *
-     * @return string|null
+     * @return array|null
      */
-    public function getReport(): ?string;
+    public function getReport(): ?array;
 }

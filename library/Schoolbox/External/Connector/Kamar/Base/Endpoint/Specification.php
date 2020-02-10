@@ -7,39 +7,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
-use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 
 /**
  * Class Specification
  *
  * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
-abstract class Specification
+abstract class Specification implements ISpecification
 {
-    /**
-     * Status text for existing nodes
-     */
-    protected const STATUS_OK = 'OK';
-
-
-    /**
-     * Status text for missing nodes
-     */
-    protected const STATUS_MISSING = 'MISSING';
-
-
-    /**
-     * Number of spaces for output formatting
-     */
-    protected const PADDING = 10;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $log;
-
 
     /**
      * @var Batchxml
@@ -56,12 +33,10 @@ abstract class Specification
     /**
      * Specification constructor.
      *
-     * @param LoggerInterface|null $log
-     * @param Batchxml             $batchxml
+     * @param Batchxml $batchxml
      */
-    public function __construct(?LoggerInterface $log, Batchxml $batchxml)
+    public function __construct(Batchxml $batchxml)
     {
-        $this->log = $log;
         $this->batchxml = $batchxml;
     }
 
@@ -75,36 +50,28 @@ abstract class Specification
      */
     public function check(): array
     {
-        $messages = [];
+        $endpoints = [];
 
         /* No paths, no trabajo
          */
         if (!\count($this->paths)) {
-            return $messages;
+            return $endpoints;
         }
-
-        $paddedLength = max(array_map('\strlen', $this->paths)) + self::PADDING;
 
         foreach ($this->paths as $path) {
-            $paddedPath = str_pad($path, $paddedLength);
-
             if ($this->batchxml->fetchXml($path)) {
-                $message = "{$paddedPath} " . self::STATUS_OK;
-
-                if ($this->log) {
-                    $this->log->info($message);
-                }
+                $endpoints[] = [
+                    'message' => $path,
+                    'status' => ISpecification::STATUS_OK
+                ];
             } else {
-                $message = "{$paddedPath} " . self::STATUS_MISSING;
-
-                if ($this->log) {
-                    $this->log->warning($message);
-                }
+                $endpoints[] = [
+                    'message' => $path,
+                    'status' => ISpecification::STATUS_MISSING
+                ];
             }
-
-            $messages[] = $message;
         }
 
-        return $messages;
+        return $endpoints;
     }
 }

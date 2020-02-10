@@ -19,9 +19,29 @@
     <div class="small-12 island">
         <h3 class="subheader">Status Report</h3>
 
-        <section class="content">
+        <section>
             <div class="scrollable schooldata-statusreport-container">
-                <pre>{{ report }}</pre>
+                <table>
+                    <tbody>
+                        {% for endpoint in report %}
+                            <tr>
+                                <td>{{ endpoint.message }}</td>
+                                <td>
+
+                                    {% if endpoint.status == 'OK' %}
+                                        {% set css = 'success' %}
+                                    {% elseif endpoint.status == 'ERROR' %}
+                                        {% set css = 'alert' %}
+                                    {% else %}
+                                        {% set css = 'warning' %}
+                                    {% endif %}
+
+                                    <span class="full-width {{ css }} label">{{ endpoint.status }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </section>
     </div>

@@ -7,9 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
-use Psr\Log\LoggerInterface;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
+use UnexpectedValueException;
 
 /**
  * Class Specification
@@ -18,41 +17,23 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
  */
-class Specification
+class Specification implements ISpecification
 {
 
     /**
-     * Status text for existing nodes
+     * @var Api
      */
-    private const STATUS_OK = 'OK';
-
-
-    /**
-     * Status text for missing nodes
-     */
-    private const STATUS_MISSING = 'MISSING';
-
-
-    /**
-     * Number of spaces for output formatting
-     */
-    private const PADDING = 20;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private $log;
+    private $api;
 
 
     /**
      * Specification constructor.
      *
-     * @param LoggerInterface|null $log
+     * @param Api $api
      */
-    public function __construct(?LoggerInterface $log)
+    public function __construct(Api $api)
     {
-        $this->log = $log;
+        $this->api = $api;
     }
 
 
@@ -60,10 +41,6 @@ class Specification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
-     *
-     * @throws \RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function check(): array
     {
@@ -72,7 +49,13 @@ class Specification
             /**
              * Student Profile nodes
              */
-
+            'enrolments/student-contact?include=person,student,studentPerson&limit=1',
+            'enrolments/emergency-contact-link?limit=1',
+            'enrolments/enrolment?limit=1',
+            'plans/student-plan?limit=1',
+            'plans/student-plan-type?limit=1',
+            'enrolments/medical-condition?limit=1',
+            'enrolments/person-phone?limit=1',
 
             /**
              * Parent Profile nodes
@@ -82,6 +65,7 @@ class Specification
             /**
              * Staff Profile nodes
              */
+            'enrolments/staff?include=person,qualifications&limit=1',
 
 
             /**
@@ -90,30 +74,31 @@ class Specification
 
         ];
 
-        $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
-
-        $messages = [];
+        $endpoints = [];
 
         foreach ($paths as $path) {
-            $paddedPath = str_pad($path, $paddedLength);
+            try {
+                $result = $this->api->retrieveDocument($path);
 
-            if ($this->batchxml->fetchXml($path)) {
-                $message = "{$paddedPath} " . self::STATUS_OK;
-
-                if ($this->log) {
-                    $this->log->info($message);
+                if (\count($result['data'])) {
+                    $endpoints[] = [
+                        'message' => $path,
+                        'status' => ISpecification::STATUS_OK
+                    ];
+                } else {
+                    $endpoints[] = [
+                        'message' => $path,
+                        'status' => ISpecification::STATUS_EMPTY
+                    ];
                 }
-            } else {
-                $message = "{$paddedPath} " . self::STATUS_MISSING;
-
-                if ($this->log) {
-                    $this->log->warning($message);
-                }
+            } catch (UnexpectedValueException $e) {
+                $endpoints[] = [
+                    'message' => $path,
+                    'status' => ISpecification::STATUS_MISSING
+                ];
             }
-
-            $messages[] = $message;
         }
 
-        return $messages;
+        return $endpoints;
     }
 }

@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint\Status;
 
+use DomainException;
+use InvalidArgumentException;
 use Schoolbox\External\Connector;
 use Schoolbox\External\Importer\Endpoint;
 
@@ -49,6 +51,8 @@ class Factory
      * @param string $type
      *
      * @return IStatus|null
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
     public function produce(string $type): ?IStatus
     {
@@ -60,6 +64,8 @@ class Factory
                 return new Connector\Kamar\Base\Endpoint\Status($this->host);
 
             case Endpoint\Factory::SENTRAL:
+                return new Connector\Sentral\Base\Endpoint\Status($this->host, $this->key);
+
             default:
                 // Use manual csv imports
                 return null;

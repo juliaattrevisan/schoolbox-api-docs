@@ -12,9 +12,10 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Specification;
+use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Zend\Uri\Exception\InvalidUriPartException;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../../../conf/core/require.php';
 
 /**
  * Validate xml
@@ -58,7 +59,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-ISAMS XML Specification validator
+iSAMS XML Specification validator
 
 Usage: specification.php [--file]
         --file      Optional path to a locally-cached xml file e.g. ../../../www/test.xml
@@ -84,10 +85,11 @@ HELP;
             $api = new Api($this->getConfig()->get('schooldata_import_endpoint_host'), $this->getConfig()->get('schooldata_import_endpoint_key'));
         }
 
-        $specification = new Specification($this->getLogger(), new Batchxml($api));
+        $specification = new Specification(new Batchxml($api));
+        $renderer = new CliRenderer($this->getLogger());
 
         try {
-            $specification->check();
+            $renderer->render($specification->check());
         } catch (\RuntimeException $e) {
             $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
         } catch (InvalidUriPartException $e) {

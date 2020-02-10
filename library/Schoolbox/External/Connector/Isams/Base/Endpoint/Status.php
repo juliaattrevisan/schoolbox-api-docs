@@ -64,18 +64,18 @@ class Status implements IStatus
     /**
      * @inheritDoc
      *
-     * @return string
+     * @return array
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
      */
-    public function getReport(): string
+    public function getReport(): array
     {
-        $specification = new Specification(null, new Batchxml($this->api));
+        $specification = new Specification(new Batchxml($this->api));
 
         try {
-            return implode("\n", $specification->check());
+            return $specification->check();
         } catch (\RuntimeException $e) {
-            return "Cannot access api endpoint: {$e->getMessage()}";
+            return ["Cannot access api endpoint: {$e->getMessage()}"];
         }
     }
 }
