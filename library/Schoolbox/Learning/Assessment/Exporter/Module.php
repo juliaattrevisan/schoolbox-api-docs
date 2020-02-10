@@ -9,12 +9,7 @@ namespace Schoolbox\Learning\Assessment\Exporter;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ContainerLocked;
 use Aura\Di\Exception\ServiceNotFound;
-use Aura\Di\Exception\ServiceNotObject;
-use Exception;
-use InvalidArgumentException;
-use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -30,6 +25,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
  * Module for assessment export options.
@@ -46,8 +43,9 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws InvalidArgumentException
-     * @throws ApplicationException
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     protected function registerRoutes(): void
     {
@@ -71,10 +69,9 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws ServiceNotFound
-     * @throws InvalidArgumentException
-     * @throws ApplicationException
-     * @throws Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     protected function preloadAssessment(array $params): array
     {
@@ -82,6 +79,8 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
         } catch (MapperException\Deleted $e){
             $assessment = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         // If the assessment isn't a specification - it can't be imported anywhere
@@ -104,10 +103,8 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
-     * @param ContainerInterface $injector
+     * @throws \InvalidArgumentException
      * @throws ServiceNotFound
-     * @throws ContainerLocked
-     * @throws ServiceNotObject
      */
     public function initControllers(ContainerInterface $injector): void
     {
@@ -125,7 +122,6 @@ class Module extends BaseModule
                         'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
                     ]),
                     'assessmentIdFinder'        => $injector->lazyGet('filters.assessmentIdFinder'),
-                    'folderMapper'              => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 ]
             )
         );
@@ -136,7 +132,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getUserMapper()
     {
@@ -146,7 +142,7 @@ class Module extends BaseModule
 
     /**
      * @return QuizMapper|Mapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getQuizMapper()
     {
@@ -156,7 +152,7 @@ class Module extends BaseModule
 
     /**
      * @return ErrorMapper|Mapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getErrorMapper()
     {
@@ -166,7 +162,7 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentMapperProxy
-     * @throws ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getAssessmentMapperProxy()
     {
@@ -176,7 +172,7 @@ class Module extends BaseModule
 
     /**
      * @return UnitImplementation\Mapper|Mapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getUnitImplementationMapper()
     {
@@ -186,7 +182,7 @@ class Module extends BaseModule
 
     /**
      * @return UnitSpecification\Mapper|Mapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getUnitSpecificationMapper()
     {
@@ -196,7 +192,7 @@ class Module extends BaseModule
 
     /**
      * @return StudentSubmissionMapper|Mapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getStudentSubmissionMapper()
     {
@@ -206,7 +202,7 @@ class Module extends BaseModule
 
     /**
      * @return SubmissionReturnMapper|Mapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getSubmissionReturnMapper()
     {
@@ -216,7 +212,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|StorageMapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getStorageMapper()
     {
@@ -226,7 +222,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getFolderMapper()
     {
