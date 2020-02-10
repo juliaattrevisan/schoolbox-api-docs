@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
@@ -68,13 +69,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     /**
      * Redirect the standard assessment URL to a user specific version
-     * @api GET /learning/assessment/{assessmentId}
+     * @api   GET /learning/assessment/{assessmentId}
      * @since 165
-     *
+     * @param IAssessable $assessment
+     * @throws RouteNotFound
      */
     public function getAssessment(IAssessable $assessment)
     {
-        $url = $this->getRouter()->generate('learningAssessment.getSummary', [ 'assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId() ]);
+        $url = $this->getRouter()->generate('learningAssessment.getSummary', [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $this->getUser()->getId()
+        ]);
+
         $this->redirect($url);
     }
 
