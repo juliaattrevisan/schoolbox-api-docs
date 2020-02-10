@@ -90,12 +90,14 @@
                     {% for assessment in markbook.assessments %}
                         {% set stats = markbook.assessmentStatistics[assessment.id] %}
                         <th data-assessment="{{ assessment.id }}">
-                            <span {% if stats.draftMean is defined %} data-actual-mark {% endif %}>
+                            <span {% if stats.draftMean and (stats.draftMean != stats.mean) %} data-actual-mark {% endif %}>
                                 {{ stats.mean | default('–') }}
                             </span>
-                            <span data-draft-mark style="display:none;">
-                                {{ stats.draftMean | default('–') }}
-                            </span>
+                            {% if stats.draftMean and (stats.draftMean != stats.mean) %}
+                                <span data-draft-mark class="meta" style="display:none;">
+                                    {{ stats.draftMean | default('–') }}
+                                </span>
+                            {% endif %}
                         </th>
                     {% endfor %}
                 </tr>
@@ -163,7 +165,7 @@
                         {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
                         {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                         <a class="{{ urgency.marks(meanNormalised) }}-bg"
-                           href="{{ gradesRoute }}" {% if draftWeightedMean is defined %}data-actual-mark{% endif %}
+                           href="{{ gradesRoute }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
                            title="View students {{ locale.grades.plural }}">
                             {{ studentMean | default('–') }}
                         </a>
