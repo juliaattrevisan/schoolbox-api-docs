@@ -79,7 +79,7 @@
      #}
     {% set pStatusClass %}
         {%- spaceless %}
-            {% if participant.responseRequired %}
+            {% if participant.responseRequired or participant.resubmissionRequired %}
                 {{ statusIncomplete }}
             {% elseif participant.feedbackRequired %}
                 {{ statusPending }}
