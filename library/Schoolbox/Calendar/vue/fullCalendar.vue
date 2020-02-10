@@ -14,7 +14,7 @@
     import CreateEventModal           from './createEventModal';
     import ExportModal                from "./exportModal";
     import FilterModal                from "./filterModal";
-    import FlatPickr                  from "./flatPickr";
+    import FlatPickr                  from '@schoolbox/fullcalendar/flatPickr';
     import axios                      from 'axios'
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";

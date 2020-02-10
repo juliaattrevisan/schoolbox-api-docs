@@ -21,8 +21,25 @@
                 }"
                 :event-time-format="helper.eventTimeFormat"
                 :content-height="this.contentHeight"
+                :custom-buttons="{
+                    quickSwitchButton: {
+                        text: ' ',
+                    },
+                    customPrev: {
+                        icon: 'chevron-left',
+                        click: this.clickPrev.bind(this),
+                    },
+                    customNext: {
+                        icon: 'chevron-right',
+                        click: this.clickNext.bind(this),
+                    },
+                    customToday: {
+                        text: 'Today',
+                        click: this.clickToday.bind(this),
+                    },
+                }"
                 :header="{
-                    left: 'today,prev,next',
+                    left: 'quickSwitchButton,customToday,customPrev,customNext',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 }"
@@ -38,6 +55,16 @@
                 @loading="onLoading"
                 @eventClick="onEventClick"
         />
+
+        <flat-pickr
+                ref="flatPickr"
+                :config="{
+                    defaultDate: config.defaultDate,
+                    selector: '.fc-quickSwitchButton-button'
+                }"
+                @dateSelected="onQuickSwitch"
+        />
+
     </div>
 </template>
 
@@ -50,6 +77,7 @@
     import momentPlugin       from '@fullcalendar/moment'
     import RevealModal        from '@schoolbox/reveal-modal'
     import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
+    import FlatPickr          from '@schoolbox/fullcalendar/flatPickr';
     import axios              from 'axios'
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
     import {stringify}        from 'qs';
@@ -72,6 +100,7 @@
             ViewEventModal,
             FullCalendar,
             RevealModal,
+            FlatPickr,
         },
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
@@ -125,6 +154,41 @@
                 // TODO this method should be unnecessary
                 // (for the same reason as `onLoading` in the main fullCalendar)
                 return this.helper.dayTitleFormat(dateObject);
+            },
+
+            /**
+             * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickPrev() {
+                let api = this.$refs.fullCalendar.getApi();
+                api.prev();
+                this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickNext() {
+                let api = this.$refs.fullCalendar.getApi();
+                api.next();
+                this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickToday() {
+                let api = this.$refs.fullCalendar.getApi();
+                api.today();
+                this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for quick month switch button.
+             * When the user clicks on the flatpickr's date, we'll trigger fullcalendar's gotoDate.
+             */
+            onQuickSwitch(value) {
+                this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
             },
 
             /**
@@ -210,6 +274,14 @@
                 this.selectedFilters = selectedFilters;
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
+        },
+        mounted() {
+            // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
+            let quickSwitchIcon = document.createElement('a');
+            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
+
+            document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
         }
     }
 </script>
