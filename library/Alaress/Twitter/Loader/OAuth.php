@@ -80,6 +80,9 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface
             // Log errors somewhere, and return an empty array?
             return [];
         }
-        return $result->statuses;
+
+        /* Coerce return type to conform to expected data structure
+         */
+        return $result->statuses ?? [];
     }
 }
