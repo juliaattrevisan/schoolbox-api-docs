@@ -4,6 +4,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Alaress\Twitter\Loader\ValidOAuth;
 use Zend\Uri\UriFactory;
 use \Schoolbox\Permission\Access\UserAccess;
 
@@ -41,15 +43,18 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
         $noApiKey = false;
         $noConfig = false;
 
-        if (
-            strlen(Config::get('twitter_api_consumer_key')) == 0
-            || strlen(Config::get('twitter_api_consumer_secret')) == 0
-            || strlen(Config::get('twitter_api_oauth_token')) == 0
-            || strlen(Config::get('twitter_api_oauth_token_secret')) == 0
-        ) {
+        /* Only display when all four pieces are provided
+         */
+        if (!(new ValidOAuth())->isSatisfiedBy(
+            Config::get('twitter_api_consumer_key'),
+            Config::get('twitter_api_consumer_secret'),
+            Config::get('twitter_api_oauth_token'),
+            Config::get('twitter_api_oauth_token_secret')
+        )) {
             $emptyState = true;
             $noApiKey = true;
         }
+
 
         /**
          * Check if any username or hashtag has been set
