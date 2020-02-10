@@ -29,6 +29,7 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface
      */
     private $resource = 'statuses/user_timeline';
 
+
     /**
      * An array of params passed to the twitter connection,
      * typically the search params
@@ -36,6 +37,7 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface
      * @var array
      */
     private $params;
+
 
     /**
      * @var TwitterOAuth
@@ -46,16 +48,25 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface
     /**
      * Load required classes, instantiate a new connection using the four
      * variables we obtained by running connect.php
-     * @param string      $consumer_key
-     * @param string      $consumer_secret
+     *
+     * @param string|null $consumer_key
+     * @param string|null $consumer_secret
      * @param string|null $oauth_token
      * @param string|null $oauth_secret
+     * @throws InvalidArgumentException
      */
-    public function __construct(string $consumer_key, string $consumer_secret, ?string $oauth_token, ?string $oauth_secret)
+    public function __construct(?string $consumer_key, ?string $consumer_secret, ?string $oauth_token, ?string $oauth_secret)
     {
+        /* Need all four puzzle pieces to continue
+         */
+        if (!(new ValidOAuth())->isSatisfiedBy($consumer_key, $consumer_secret, $oauth_token, $oauth_secret)) {
+            throw new \InvalidArgumentException('Twitter OAuth credentials incomplete');
+        }
+
         require_once 'oauth/TwitterOAuth.php';
         $this->connection = new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
     }
+
 
     /**
      * Load results. Preprocess them to get rid of unwanted data and to format
@@ -70,11 +81,14 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface
         if (null === $resource) {
             $resource = $this->resource;
         }
+
         if (null === $params) {
             $params = $this->params;
         }
+
         $result = $this->connection->get($resource, $params);
         $code   = (int)$this->connection->http_code;
+
         if ($code >= 400) {
             //
             // Log errors somewhere, and return an empty array?
