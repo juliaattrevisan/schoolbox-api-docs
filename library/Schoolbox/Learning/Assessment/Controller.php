@@ -76,6 +76,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getAssessment(IAssessable $assessment)
     {
+
+        /* If you're a parent, find the first child who can visit this url
+         * and pass that id into the router
+         */
+
+        /* Remove the twig variant which also happens to do this
+         */
+
+        /* If you're a staff or student, just use your id
+         */
+
         $url = $this->getRouter()->generate('learningAssessment.getSummary', [
             'assessmentId' => $assessment->getId(),
             'studentId' => $this->getUser()->getId()
