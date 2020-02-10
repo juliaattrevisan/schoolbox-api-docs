@@ -81,6 +81,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* If you're a parent,
          * find the first child who can visit this url
          * and pass that id into the router instead so you can witness details
+         *
+         * TODO But what about that Hide Due Work Details config?
          */
         if ($this->getUser()->getRole()->isParent()) {
             foreach ($this->getUser()->getChildren() as $child) {
@@ -105,8 +107,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]);
         }
 
-        /* Remove the twig variant which also happens to do this
-         */
         $this->redirect($url);
     }
 
