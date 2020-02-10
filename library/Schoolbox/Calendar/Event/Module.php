@@ -17,6 +17,7 @@ use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use External\Tass\Api\Exception\Unauthorised;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Relation\Campus;
@@ -53,7 +54,15 @@ class Module extends BaseModule
                     new Callback(function (array $params) {
                         /** @var Event $event */
                         $event = $params['event'];
-                        $loggedInUser   = $this->getAuthorizer()->getUser();
+
+                        /* Unknown event; it could be deleted or nonexistent
+                         * In either case there's nothing to see
+                         */
+                        if (null === $event) {
+                            throw new Unauthorized();
+                        }
+
+                        $loggedInUser = $this->getAuthorizer()->getUser();
 
                         /**
                          * Personal Event: owner, parent of owner and staff can see event
