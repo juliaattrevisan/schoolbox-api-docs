@@ -155,8 +155,8 @@
                             } only %}
                             {% set inputNo = inputNo + 1 %}
                         </div>
-                    {% endif %}
 
+                    {% endif %}
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
@@ -165,6 +165,15 @@
                             readonly:    readonly
                         } only %}
                         {% set inputNo = inputNo + 1 %}
+                        {% if 'none' == markSchemeName | lower %}
+                            {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
+                                feedback:    participant.findMostRecentInstructorGivenFeedback,
+                                participant: participant,
+                                tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
+                                readonly:    readonly
+                            } only %}
+                            {% set inputNo = inputNo + 1 %}
+                        {% endif %}
                     </div>
                 </div>
             {% if fbUrl %}
