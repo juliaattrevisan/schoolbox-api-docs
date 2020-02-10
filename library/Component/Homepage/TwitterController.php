@@ -4,6 +4,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Alaress\Twitter\Loader\ValidOAuth;
 use Zend\Uri\UriFactory;
 use \Schoolbox\Permission\Access\UserAccess;
 
@@ -40,12 +42,14 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         $noApiKey = false;
         $noConfig = false;
 
-        if (
-            strlen(Config::get('twitter_api_consumer_key')) == 0
-            || strlen(Config::get('twitter_api_consumer_secret')) == 0
-            || strlen(Config::get('twitter_api_oauth_token')) == 0
-            || strlen(Config::get('twitter_api_oauth_token_secret')) == 0
-        ) {
+        /* Only display when all four pieces are provided
+         */
+        if (!(new ValidOAuth())->isSatisfiedBy(
+            Config::get('twitter_api_consumer_key'),
+            Config::get('twitter_api_consumer_secret'),
+            Config::get('twitter_api_oauth_token'),
+            Config::get('twitter_api_oauth_token_secret')
+        )) {
             $emptyState = true;
             $noApiKey = true;
         }
@@ -61,12 +65,14 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         /**
          * Search for tweets
          */
-        $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
-        $allTweets->setMaxTweets($this->getConfig('size'))->load();
-        $allResults = $allTweets->getTweets();
+        if (!$emptyState) {
+            $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
+            $allTweets->setMaxTweets($this->getConfig('size'))->load();
+            $allResults = $allTweets->getTweets();
 
-        if (empty($allResults)) {
-            $emptyState = true;
+            if (empty($allResults)) {
+                $emptyState = true;
+            }
         }
 
         /**
