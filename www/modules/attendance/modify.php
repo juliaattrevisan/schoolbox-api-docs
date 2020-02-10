@@ -9,12 +9,12 @@
  */
 
 use Schoolbox\Campus;
-use Schoolbox\Config\Loader as Config;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Parse date/time strings to get the time only
@@ -70,6 +70,7 @@ $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock(TEMPLATE_content, 'attendance_period', 'attendance_period_block');
+$this->setBlock(TEMPLATE_content, 'class_list_link', 'class_list_link_block');
 
 // Dropdowns and such for each student
 
@@ -402,9 +403,21 @@ if ($class) {
             $this->setVar('absence_options_block', '');
             $this->setVar('reason_options_block', '');
         }
-    } else {
 
+        $folderMapper = FolderMapper::getInstance();
+        $folder       = $folderMapper->findForCampusAndClass($class['ClassCampus'], $class['ClassCode']);
+        if ($folder) {
+            $this->setVar([
+                'ID' => $folder->getId(),
+            ]);
+            $this->parse('class_list_link_block', 'class_list_link', true);
+        } else {
+            $this->setVar('class_list_link_block', '');
+        }
+
+    } else {
         $this->setVar('student_block', '');
+        $this->setVar('class_list_link_block', '');
     }
 
     $this->setVar('ATTENDANCE_COUNT', $attendanceCount);
