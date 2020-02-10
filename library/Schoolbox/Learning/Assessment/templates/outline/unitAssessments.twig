@@ -64,17 +64,17 @@
                             student: USER
                         }) %}
 
-                        {# No route for own participation, what about children? #}
-                        {% if not viewRoute %}
-                            {% for child in USER.children if not viewRoute %}
-                                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                                    assessmentId: assessment.id,
-                                    assessment: assessment,
-                                    studentId: child.id,
-                                    student: child
-                                }) %}
-                            {% endfor %}
-                        {% endif %}
+{#                        #}{# No route for own participation, what about children? #}
+{#                        {% if not viewRoute %}#}
+{#                            {% for child in USER.children if not viewRoute %}#}
+{#                                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {#}
+{#                                    assessmentId: assessment.id,#}
+{#                                    assessment: assessment,#}
+{#                                    studentId: child.id,#}
+{#                                    student: child#}
+{#                                }) %}#}
+{#                            {% endfor %}#}
+{#                        {% endif %}#}
 
                         {# Don't render a link if you are unable to view the details #}
                         {% if viewRoute %}

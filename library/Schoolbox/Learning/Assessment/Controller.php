@@ -76,22 +76,37 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getAssessment(IAssessable $assessment)
     {
+        $url = '';
 
-        /* If you're a parent, find the first child who can visit this url
-         * and pass that id into the router
+        /* If you're a parent,
+         * find the first child who can visit this url
+         * and pass that id into the router instead so you can witness details
          */
+        if ($this->getUser()->getRole()->isParent()) {
+            foreach ($this->getUser()->getChildren() as $child) {
+                $url = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId(),
+                    'student' => $child,
+                    'studentId' => $child->getId()
+                ]);
+
+                if ($url) {
+                    break;
+                }
+            }
+        } else {
+
+            /* If you're a staff or student, just use your id
+             */
+            $url = $this->getRouter()->generate('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $this->getUser()->getId()
+            ]);
+        }
 
         /* Remove the twig variant which also happens to do this
          */
-
-        /* If you're a staff or student, just use your id
-         */
-
-        $url = $this->getRouter()->generate('learningAssessment.getSummary', [
-            'assessmentId' => $assessment->getId(),
-            'studentId' => $this->getUser()->getId()
-        ]);
-
         $this->redirect($url);
     }
 
