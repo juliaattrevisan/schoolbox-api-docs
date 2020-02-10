@@ -1,14 +1,6 @@
 <?php
 namespace Payload\ResourceBooking\Category;
 
-
-//to https://vagrant.dev.schoolbox.cloud/
-//from https://vagrant.dev.schoolbox.cloud/resource-booking/category/add
-/*
- * id	
-name	Stuff
- */
-
 use Payload;
 
 use Payload\PostTrait;
