@@ -71,6 +71,10 @@
             },
         },
         methods: {
+            contentHeight() {
+                return this.helper.contentHeight();
+            },
+
             /**
              * Open the export modal.
              */
@@ -287,7 +291,7 @@
                     }
                 }"
                 :event-time-format="helper.eventTimeFormat"
-                content-height="auto"
+                :content-height="this.contentHeight"
                 :custom-buttons="{
                     customExport: {
                         text: 'Export',

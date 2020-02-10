@@ -128,6 +128,10 @@
                 this.helper.onLoading(isLoading);
             },
 
+            contentHeight() {
+                return this.helper.contentHeight();
+            },
+
             /**
              * Event source.
              * @see https://fullcalendar.io/docs/events-function
@@ -675,7 +679,7 @@
                 }
             }"
             :event-time-format="helper.eventTimeFormat"
-            content-height="auto"
+            :content-height="this.contentHeight"
             :custom-buttons="{
                 customExport: {
                     text: 'Export',

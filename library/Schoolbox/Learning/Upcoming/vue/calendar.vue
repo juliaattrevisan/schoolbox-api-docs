@@ -20,7 +20,7 @@
                     }
                 }"
                 :event-time-format="helper.eventTimeFormat"
-                content-height="auto"
+                :content-height="this.contentHeight"
                 :header="{
                     left: 'today,prev,next',
                     center: 'title',
@@ -97,6 +97,10 @@
             },
         },
         methods: {
+            contentHeight() {
+                return this.helper.contentHeight();
+            },
+
             /**
              * Event loading callback: show a spinner whilst events are loading,
              * remove the spinner once they have finished.
