@@ -24,6 +24,7 @@ use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Zend\Uri\Uri;
 
 class Controller extends Base
 {
@@ -165,9 +166,10 @@ class Controller extends Base
             } else {
                 // Redirect somewhere (locally only?)
                 $page = $this->getRequest()->query->get('page');
+                $pageUri = new Uri($page);
 
                 //Determine if page redirect is valid
-                if ($page && preg_match('#^[\w_=%\-:\/.\&\?]+$#i', $page)) {
+                if ($page && $pageUri->isValidRelative()) {
                     $this->response->redirect->to($page);
                 } else {
                     $this->response->redirect->to('/');

@@ -37,7 +37,7 @@ class Controller extends Base
 
         $samlAuth = $this->getRequest()->query->get('samlAuth');
         $page = $page ?: $this->getRequest()->query->get('page');
-        $pageUri = $page ? new Uri($page) : null;
+        $pageUri = new Uri($page);
 
         // Don't output login screen if XHR request
         if ($this->isJsonRequest() || $this->isXhrRequest()) {
@@ -55,7 +55,7 @@ class Controller extends Base
             && $samlAuth !== '0'
             && (!$this->samlBlacklist() || $samlAuth === '1')) {
             $redirectUrl = '/saml/index.php';
-            if (isset($pageUri) && $pageUri->isValidRelative()) {
+            if ($pageUri->isValidRelative()) {
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
             }
             $this->getResponse()->redirect->to($redirectUrl, 303);
@@ -66,7 +66,7 @@ class Controller extends Base
         $data['requestParams'] = http_build_query($getParams);
 
         //Determine if page redirect is valid
-        if ($pageUri && $pageUri->isValidRelative()) {
+        if ($pageUri->isValidRelative() && $page !== '/login' && $page !== '/login/' ) {
             $data['page'] = $pageUri->toString();
         } else {
             $data['page'] = '';
@@ -111,7 +111,7 @@ class Controller extends Base
         $username = trim($this->getRequest()->post['username']);
         $password = $this->getRequest()->post['password'];
         $page = $this->getRequest()->post['page'];
-        $pageUri = $page ? new Uri($page) : null;
+        $pageUri = new Uri($page);
         $tandc = $this->getRequest()->post['tandc'] === '1';
         $remember = $this->getRequest()->post['rememberme'] === '1';
 
