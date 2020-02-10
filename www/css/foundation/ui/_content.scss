@@ -1400,6 +1400,12 @@ tr:hover{
         overflow-y: auto;
     }
 
+    #internal-browse {
+        max-height: rem-calc(420);
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
     .close-reveal-modal {
         right: $reveal-close-right;
     }
