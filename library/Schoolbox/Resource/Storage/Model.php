@@ -10,12 +10,14 @@ namespace Schoolbox\Resource\Storage;
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
+use Config;
 use League\Flysystem\File;
 use League\Flysystem\FileNotFoundException;
 use RuntimeException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Resource\FilesystemFactory;
 
 /**
  * Class Model
@@ -327,5 +329,17 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
         $vars = get_class_vars(get_class($this));
         unset($vars['filesystem']);
         return array_keys($vars);
+    }
+
+
+    /**
+     * On wakeup, resurrect the filesystem that was not serialized in `__sleep`.
+     */
+    public function __wakeup()
+    {
+        // TODO this really should not hit config. We don't even know if config exists at this point
+        $this->filesystem = (new FilesystemFactory())
+            ->build(Config::get('storage_dir'))
+            ->getFilesystem(Manager::FS_STORAGE);
     }
 }
