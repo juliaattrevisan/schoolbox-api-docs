@@ -65,12 +65,14 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         /**
          * Search for tweets
          */
-        $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
-        $allTweets->setMaxTweets($this->getConfig('size'))->load();
-        $allResults = $allTweets->getTweets();
+        if (!$emptyState) {
+            $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
+            $allTweets->setMaxTweets($this->getConfig('size'))->load();
+            $allResults = $allTweets->getTweets();
 
-        if (empty($allResults)) {
-            $emptyState = true;
+            if (empty($allResults)) {
+                $emptyState = true;
+            }
         }
 
         /**
