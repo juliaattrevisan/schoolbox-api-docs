@@ -14,6 +14,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Csrf;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
 use ReflectionMethod;
@@ -335,8 +336,8 @@ class Kernel extends WebKernelAbstract
         $isXhr                = $controller->getRequest()->isXhr();
         $redirect             = $controller->getResponse()->headers->get('location');
         $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
-
-        if (!($isXhr || $redirect || !$allowBackToTheFuture)) {
+        $isJson               = $output instanceof Json;
+        if (!($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
             $session->pushHistory($_SERVER['REQUEST_URI']);
         }
 
