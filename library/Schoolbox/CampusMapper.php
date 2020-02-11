@@ -169,7 +169,7 @@ class CampusMapper extends Mapper {
                 {$this->getColumnString('c')}
             FROM
                 `{$this->getTable()}` c
-            WHERE c.name LIKE :name
+            WHERE c.name LIKE :name AND c.deleted_at IS NULL
             ORDER BY c.name
         ";
 
@@ -195,6 +195,7 @@ class CampusMapper extends Mapper {
 	{
 	    $pb = $this->getPredicateBuilder();
         $pb->equals('userCampus.uid', $user->getId());
+        $pb->notNull('luCampus.deleted_at');
 		$query = "
             SELECT
             	userCampus.*,

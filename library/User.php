@@ -45,7 +45,7 @@ class User extends DeprecatedModel
      */
     public function getCampusID($name)
     {
-        $query = "SELECT id FROM luCampus WHERE name LIKE '$name'";
+        $query = "SELECT id FROM luCampus WHERE name LIKE '$name' AND luCampus.deleted_at IS NULL";
         return $this->db->getOne($query);
     }
 
@@ -68,9 +68,9 @@ class User extends DeprecatedModel
 
     public function getManagers($categoryID)
     {
-        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id 
+        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
                   FROM user, userAccess
-                  WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "' 
+                  WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "'
                   and type in(3,2)
                   AND user.deleted_at IS NULL
                   ORDER BY lastname, firstname";
@@ -101,7 +101,7 @@ class User extends DeprecatedModel
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN superusers ON user.id = superusers.id
-                WHERE user.username = " . $this->db->smartQuote($username) . " 
+                WHERE user.username = " . $this->db->smartQuote($username) . "
                 AND user.deleted_at IS NULL
                 ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
@@ -140,7 +140,7 @@ class User extends DeprecatedModel
                 FROM user
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
-                WHERE user.synergy_id = '$sid' 
+                WHERE user.synergy_id = '$sid'
                 AND user.deleted_at IS NULL
                 ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
@@ -422,7 +422,7 @@ class User extends DeprecatedModel
 
     public function getCampusList()
     {
-        $query = "SELECT * FROM luCampus";
+        $query = "SELECT * FROM luCampus WHERE luCampus.deleted_at IS NULL";
         return $this->db->getAll($query);
     }
 
@@ -642,8 +642,8 @@ class User extends DeprecatedModel
             $query .= " AND synergy_id IS NOT NULL
                         AND synergy_id > 0 ";
         }
-        $query .= " 
-            AND deleted_at IS NULL 
+        $query .= "
+            AND deleted_at IS NULL
             ORDER BY lastname ASC, firstname ASC";
         if ($limit) {
             $query .= " LIMIT $index, $limit";
@@ -672,7 +672,7 @@ class User extends DeprecatedModel
               */
         if ($hasSynergy) {
             $query .= " AND synergy_id IS NOT NULL
-                        AND synergy_id > 0 
+                        AND synergy_id > 0
                         AND user.deleted_at IS NULL";
         }
         return $this->db->getAll($query);

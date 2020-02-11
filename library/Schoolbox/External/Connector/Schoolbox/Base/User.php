@@ -77,51 +77,51 @@ class User extends Base implements IUser
                         `user`.`enabled` AS `active`,
                         `user`.`position_title` AS `positionTitle`,
                         1 - `user`.`hide_contacts` AS `visible`,
-                        
+
                         -- This returns a list of the guardians campus IDs sorted by campus ID
-                        
+
                         (
                             SELECT    GROUP_CONCAT(`userCampus`.`campus` SEPARATOR 0x1E)
                             FROM      `userCampus`
                             WHERE     `userCampus`.`uid` = `user`.`id`
                             ORDER BY  `userCampus`.campus
-                        ) 
+                        )
                         AS `campusIds`,
-                      
+
                         -- This returns the campus names for the above IDs (must be sorted the same as above)
-                      
+
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`name` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
+                        )
                         AS `campusNames`,
-                        
+
                         -- This returns the campus external codes for the above IDs (must be sorted the same as above)
-                      
+
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`ext_timetable_code` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
-                        AS `campusCodes`,                        
-                        
+                        )
+                        AS `campusCodes`,
+
                         -- This returns a list of the students related to this guardian
-                        
+
                         (
                           SELECT      GROUP_CONCAT(`userStudent`.`synergy_id` SEPARATOR 0x1E)
                           FROM        `user_relation`
                           JOIN        `user` as `userStudent` ON `userStudent`.`id` = `user_relation`.`relation_id`
-                          WHERE       `user_relation`.`relation_type` = :guardianType AND 
+                          WHERE       `user_relation`.`relation_type` = :guardianType AND
                                       `user_relation`.`user_id` = `user`.`id`
                           ORDER BY    `user_relation`.`relation_id`
                         )
                         AS `studentIds`
-                        
+
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             WHERE       `user`.`synergy_id` IN ({$externalIdBindings['sql']})
@@ -242,7 +242,7 @@ class User extends Base implements IUser
                         `user`.`username` as `username`,
                         `user`.`enabled` as `active`,
                         1 - `user`.`hide_contacts` as `visible`,
-                      
+
                         `house`.`id` AS `houseId`,
                         `house`.`house` AS `houseName`,
 
@@ -251,39 +251,39 @@ class User extends Base implements IUser
                             FROM      `userCampus`
                             WHERE     `userCampus`.`uid` = `user`.`id`
                             ORDER BY  `userCampus`.campus
-                        ) 
-                        
+                        )
+
                         AS `campusIds`,
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`name` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
+                        )
                         AS `campusNames`,
 
                         -- This returns the campus external codes for the above IDs (must be sorted the same as above)
-                      
+
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`ext_timetable_code` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
-                        AS `campusCodes`,      
+                        )
+                        AS `campusCodes`,
 
                         (
                           SELECT      GROUP_CONCAT(`userGuardian`.`synergy_id` SEPARATOR 0x1E)
                           FROM        `user_relation`
                           JOIN        `user` as `userGuardian` ON `userGuardian`.`id` = `user_relation`.`user_id`
-                          WHERE       `user_relation`.`relation_type` = :guardianType AND 
+                          WHERE       `user_relation`.`relation_type` = :guardianType AND
                                       `user_relation`.`relation_id` = `user`.`id`
                           ORDER BY    `user_relation`.`user_id`
                         )
-                        AS `guardianIds`                        
-                        
+                        AS `guardianIds`
+
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             JOIN        `user_profile` ON `user_id` = `user`.`id`
@@ -325,7 +325,7 @@ class User extends Base implements IUser
                         `user`.`username` AS `username`,
                         `user`.`enabled` AS `active`,
                         1 - `user`.`hide_contacts` AS `visible`,
-                        
+
                         `house`.`id` AS `houseId`,
                         `house`.`house` AS `houseName`,
 
@@ -334,39 +334,39 @@ class User extends Base implements IUser
                             FROM      `userCampus`
                             WHERE     `userCampus`.`uid` = `user`.`id`
                             ORDER BY  `userCampus`.campus
-                        ) 
+                        )
                         AS `campusIds`,
-                        
+
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`name` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
+                        )
                         AS `campusNames`,
 
                         -- This returns the campus external codes for the above IDs (must be sorted the same as above)
-                      
+
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`ext_timetable_code` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
-                        AS `campusCodes`,      
+                        )
+                        AS `campusCodes`,
 
                         (
                           SELECT      GROUP_CONCAT(`userGuardian`.`synergy_id` SEPARATOR 0x1E)
                           FROM        `user_relation`
                           JOIN        `user` as `userGuardian` ON `userGuardian`.`id` = `user_relation`.`user_id`
-                          WHERE       `user_relation`.`relation_type` = :guardianType AND 
+                          WHERE       `user_relation`.`relation_type` = :guardianType AND
                                       `user_relation`.`relation_id` = `user`.`id`
                           ORDER BY    `user_relation`.`user_id`
                         )
                         AS `guardianIds`
-                        
+
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
@@ -417,7 +417,7 @@ class User extends Base implements IUser
                         `user`.`username` AS `username`,
                         `user`.`enabled` AS `active`,
                         1 - `user`.`hide_contacts` AS `visible`,
-                        
+
                         `house`.`id` AS `houseId`,
                         `house`.`house` AS `houseName`,
 
@@ -426,45 +426,45 @@ class User extends Base implements IUser
                             FROM      `userCampus`
                             WHERE     `userCampus`.`uid` = `user`.`id`
                             ORDER BY  `userCampus`.campus
-                        ) 
+                        )
                         AS `campusIds`,
-                        
+
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`name` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
+                        )
                         AS `campusNames`,
-                        
+
                         -- This returns the campus external codes for the above IDs (must be sorted the same as above)
-                      
+
                         (
                             SELECT    GROUP_CONCAT(`luCampus`.`ext_timetable_code` SEPARATOR 0x1E)
                             FROM      `luCampus`
                             JOIN      `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE     `userCampus`.`uid` = `user`.`id`
+                            WHERE     `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY  `userCampus`.campus
-                        ) 
-                        AS `campusCodes`,                              
-                        
+                        )
+                        AS `campusCodes`,
+
                         (
                           SELECT      GROUP_CONCAT(`userGuardian`.`synergy_id` SEPARATOR 0x1E)
                           FROM        `user_relation`
                           JOIN        `user` as `userGuardian` ON `userGuardian`.`id` = `user_relation`.`user_id`
-                          WHERE       `user_relation`.`relation_type` = :guardianType AND 
+                          WHERE       `user_relation`.`relation_type` = :guardianType AND
                                       `user_relation`.`relation_id` = `user`.`id`
                           ORDER BY    `user_relation`.`user_id`
                         )
-                        AS `guardianIds`   
-                        
+                        AS `guardianIds`
+
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
-            WHERE       `user`.`id` IN (            
-                SELECT    `user_id` 
-                FROM      `user_relation` 
+            WHERE       `user`.`id` IN (
+                SELECT    `user_id`
+                FROM      `user_relation`
                 WHERE     `relation_id` = (
                     SELECT    `userGuardian`.`id`
                     FROM      `user` AS `userGuardian`
@@ -510,7 +510,7 @@ class User extends Base implements IUser
                         `user`.`enabled` AS `active`,
                         `user`.`position_title` AS `positionTitle`,
                         1 - `user`.`hide_contacts` AS `visible`,
-                        
+
                         `house`.`id` AS `houseId`,
                         `house`.`house` AS `houseName`,
 
@@ -519,18 +519,18 @@ class User extends Base implements IUser
                             FROM        `userCampus`
                             WHERE       `userCampus`.`uid` = `user`.`id`
                             ORDER BY    `userCampus`.campus
-                        ) 
+                        )
                         AS `campusIds`,
-                        
+
                         (
                             SELECT      GROUP_CONCAT(`luCampus`.`name` SEPARATOR 0x1E)
                             FROM        `luCampus`
                             JOIN        `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE       `userCampus`.`uid` = `user`.`id`
+                            WHERE       `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY    `userCampus`.campus
-                        ) 
+                        )
                         AS `campusNames`
-                        
+
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
@@ -581,7 +581,7 @@ class User extends Base implements IUser
                         `user`.`enabled` AS `active`,
                         `user`.`position_title` AS `positionTitle`,
                         1 - `user`.`hide_contacts` AS `visible`,
-                        
+
                         `house`.`id` AS `houseId`,
                         `house`.`house` AS `houseName`,
 
@@ -590,18 +590,18 @@ class User extends Base implements IUser
                             FROM        `userCampus`
                             WHERE       `userCampus`.`uid` = `user`.`id`
                             ORDER BY    `userCampus`.campus
-                        ) 
+                        )
                         AS `campusIds`,
-                        
+
                         (
                             SELECT      GROUP_CONCAT(`luCampus`.`name` SEPARATOR 0x1E)
                             FROM        `luCampus`
                             JOIN        `userCampus` ON `userCampus`.`campus` = `luCampus`.`id`
-                            WHERE       `userCampus`.`uid` = `user`.`id`
+                            WHERE       `userCampus`.`uid` = `user`.`id` AND `luCampus`.`deleted_at` IS NULL
                             ORDER BY    `userCampus`.campus
-                        ) 
+                        )
                         AS `campusNames`
-                        
+
             FROM        `user`
             JOIN        `groups` ON `groups`.`id` = `user`.`group_id` AND `groups`.`group_type` = :groupType
             LEFT JOIN   `house` ON `house`.`id` = `user`.`house`
@@ -645,9 +645,9 @@ class User extends Base implements IUser
         $externalIdBindings = $this->databaseExternal->prepareInBindings($externalIds);
 
         $statement = $this->databaseExternal->executeQuery("
-                SELECT      CONCAT(lastname, ', ' , firstname) AS `name`, 
+                SELECT      CONCAT(lastname, ', ' , firstname) AS `name`,
                             `alt_email` as `email`
-                FROM        `user` 
+                FROM        `user`
                 WHERE       `synergy_id` IN ({$externalIdBindings['sql']})
             ",
             $externalIdBindings['bindings']
@@ -677,15 +677,15 @@ class User extends Base implements IUser
         $campusIterator = $this->databaseExternal->getQueryIterator(
             "
                 SELECT DISTINCT
-                          `luCampus`.`id` as `id`, 
-                          `luCampus`.`ext_timetable_code` as `code`, 
+                          `luCampus`.`id` as `id`,
+                          `luCampus`.`ext_timetable_code` as `code`,
                           `luCampus`.`name` as `name`
                 FROM      `luCampus`
-                JOIN      `userCampus` ON `userCampus`.`uid` IN 
+                JOIN      `userCampus` ON `userCampus`.`uid` IN
                 (
                     SELECT    `user`.`id`
                     FROM      `user`
-                    WHERE     `user`.`synergy_id` IN ({$externalIdBindings['sql']})
+                    WHERE     `user`.`synergy_id` IN ({$externalIdBindings['sql']}) AND `luCampus`.`deleted_at` IS NULL
                 )
                 GROUP BY  `luCampus`.`id`
             ",

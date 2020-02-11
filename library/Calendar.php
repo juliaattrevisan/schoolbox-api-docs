@@ -292,7 +292,7 @@ class Calendar extends DeprecatedModel
         if (!$_SESSION['su']) {
             $query .= "
 				LEFT JOIN userCampus ON userCampus.campus = luCampus.id
-				WHERE userCampus.uid = '$userId'
+				WHERE userCampus.uid = '$userId' AND luCampus.deleted_at IS NULL
 			";
         }
 
