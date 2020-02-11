@@ -11,6 +11,8 @@ namespace Schoolbox;
 
 use \PDO;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
+use UnexpectedValueException;
 
 /**
  * @method Campus hydrate(array $row, $alias = '', $callback = null)
@@ -35,7 +37,7 @@ class CampusMapper extends Mapper {
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'campusHasUsers']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUPSRules']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeDeletedCampusFromUPSRules']);
     }
 
     /**
@@ -48,50 +50,22 @@ class CampusMapper extends Mapper {
     public function campusHasUsers(Campus $campus): bool
     {
         if ($this->findUsersInCampus($campus)->count() > 0) {
-            return false;
+            throw new UnexpectedValueException('This campus cannot be deleted as it has users assigned to it.');
         }
         return true;
     }
 
     /**
-     * This function will scan through UPS effects and remove the campus from any rules that contain the deleted campus
+     * Removes deleted campus from any UPS rule
      *
      * @param Campus $campus
      * @return bool
      *
      */
-    public function removeUPSRules(Campus $campus): bool
+    public function removeDeletedCampusFromUPSRules(Campus $campus): bool
     {
-        $statement        = $this->getDatabase()->query("SELECT id, effect_type_id, arguments FROM ups_effect WHERE user_property = 'campusCollection' OR user_property = 'campusCollectionRemove' ");
-        $upsCampusEffects = $statement->fetchAll();
-        foreach ($upsCampusEffects as $campusEffectJson) {
-            $campusEffect = json_decode($campusEffectJson['arguments']);
-
-            $key = 0;
-            if ($campusEffectJson['effect_type_id'] == 1) {
-                $key = 1;
-            }
-
-            if (!isset($campusEffect[$key])){
-                return false;
-            }
-            // convert stdClass to array before array_filter
-            $campusEffectIds = get_object_vars($campusEffect[$key]);
-
-            // Remove campus element from list if it is deleted
-            $campusEffectIds = array_filter($campusEffectIds, function ($value) use ($campus) {
-                return $value != $campus->getId();
-            });
-
-            $campusEffect[$key] = $campusEffectIds;
-
-
-            //Store updated effects back into the database
-            $statement = $this->database->prepare("UPDATE ups_effect SET arguments = :arguments WHERE id = :effect_id");
-            $statement->bindParam(':arguments', json_encode($campusEffect));
-            $statement->bindParam(':effect_id', $campusEffectJson['id']);
-            $statement->execute();
-        }
+        (new UPSEffectMapper())->removeRules('campusCollection', $campus->getId());
+        (new UPSEffectMapper())->removeRules('campusCollectionRemove', $campus->getId());
         return true;
     }
 
