@@ -19,6 +19,13 @@ else
     exit 1;
 fi;
 
+# Ensure .env environment file is present
+if [ ! -f /vagrant/.env ];
+then
+    echo "Error: '.env' environment file missing";
+    exit 1;
+fi
+
 cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 cd $cachedir;
@@ -68,6 +75,20 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing Composer";
 apt-get install -y composer
 
 
+# Function to fetch value from .env file by key
+# Usage: value=$(read_var $key)
+read_var() {
+    VAR=$(grep -E "^\s*$1" /vagrant/.env | xargs)
+    IFS="=" read -ra VAR <<< "$VAR"
+    echo "${VAR[1]}"
+}
+
+s3Referer=$(read_var AWS_S3_REFERER)
+if [[ -z $s3Referer ]]; then
+    echo "Unable to derive S3 Referer secret from .env environment file."
+    exit 1;
+fi
+
 # function to retrieve latest files from S3, needs $S3file set first
 S3file_short='';
 getS3file() {
@@ -78,7 +99,7 @@ getS3file() {
         predir=`pwd`;
         cd $cachedir;
 
-        curletag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' $data_source/$S3file 2>/dev/null`;
+        curletag=$(curl -I -H "Referer: $s3Referer" $data_source/$S3file 2>/dev/null);
         if [ $? -eq 0 ];
         then
             responsecode=`echo "$curletag" | egrep 'HTTP/(1.0|1.1|2)' | cut -d' ' -f2`;
@@ -96,7 +117,7 @@ getS3file() {
                 then
                     # New/updated version available - download it
                     echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file_short";
-                    wget --no-verbose --header="Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF" $data_source/$S3file -O $S3file_short 2>&1;
+                    wget --no-verbose --header="Referer: $s3Referer" $data_source/$S3file -O $S3file_short 2>&1;
                     if [ $? -eq 0 ];
                     then
                         # This is a new file, so remove old references
@@ -120,8 +141,8 @@ getS3file() {
     fi
 }
 
-S3file='vagrant.sql'
-S3file_short='vagrant.sql'
+S3file='vagrant-secrets.sql'
+S3file_short='vagrant-secrets.sql'
 getS3file;
 if [ ! -f $cachedir/$S3file_short ];
 then
@@ -129,8 +150,8 @@ then
     exit 1;
 fi
 
-S3file='vagrant-cleanup.sql'
-S3file_short='vagrant-cleanup.sql'
+S3file='vagrant-cleanup-secrets.sql'
+S3file_short='vagrant-cleanup-secrets.sql'
 getS3file;
 if [ ! -f $cachedir/$S3file_short ];
 then
@@ -223,7 +244,7 @@ then
             # Check if we've already found a matching file
             if [ "$vendorfile" == '' ];
             then
-                etag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                etag=$(curl -I -H "Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
@@ -231,7 +252,7 @@ then
                     then
                         # New/updated version available - download it
                         echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
-                        wget --no-verbose --header="Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
+                        wget --no-verbose --header="Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
                         if [ $? -eq 0 ];
                         then
                             # This is a new file, so remove old references
@@ -288,12 +309,12 @@ cd tools;
 ./build-sql-update.sh >/dev/null;
 cd /vagrant;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes";
-cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/vagrant.sql;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
+cat /vagrant/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes";
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Upgrading demo data with latest SQL updates";
 mkdir /var/lib/vagrant -p > /dev/null;
@@ -302,12 +323,12 @@ rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -R /var/lib/vagrant > /dev/null;
 rm -f /vagrant/www/conf/pre*conf.php;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes (post version upgrade)";
-cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/vagrant.sql;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
+cat /vagrant/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes (post version upgrade)";
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;
@@ -370,7 +391,7 @@ then
             # Check if we've already found a matching file
             if [ "$npmfile" == '' ];
             then
-                etag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                etag=$(curl -I -H "Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
@@ -378,7 +399,7 @@ then
                     then
                         # New/updated version available - download it
                         echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
-                        wget --no-verbose --header="Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
+                        wget --no-verbose --header="Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
                         if [ $? -eq 0 ];
                         then
                             # This is a new file, so remove old references
@@ -460,7 +481,7 @@ then
             # Check if we've already found a matching file
             if [ "$bowerfile" == '' ];
             then
-                etag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                etag=$(curl -I -H "Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag bower.etag.cache 2>/dev/null | wc -l`;
@@ -468,7 +489,7 @@ then
                     then
                         # New/updated version available - download it
                         echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest Javascript build: $branch-bower.tar.gz";
-                        wget --no-verbose --header="Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz -O $branch-bower.tar.gz 2>&1;
+                        wget --no-verbose --header="Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz -O $branch-bower.tar.gz 2>&1;
                         if [ $? -eq 0 ];
                         then
                             # This is a new file, so remove old references

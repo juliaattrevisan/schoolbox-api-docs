@@ -48,3 +48,4 @@ codeception.yml
 v8-compile-cache-0/
 /.maintenance
 datepicker-fullcalendar.css
+.env
