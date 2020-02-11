@@ -115,7 +115,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         }
 
-        $this->redirect($parentUrl ?? $defaultUrl);
+        $this->redirect($parentUrl ?: $defaultUrl);
     }
 
     /**
