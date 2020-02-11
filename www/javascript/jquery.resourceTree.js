@@ -61,9 +61,9 @@
      * @param nodeTypeIconMap Maps nodeTypes to CSS class
      * @param options
      *   data:
-     *     cache:         A set of preloaded nodes (see jstree.data)
-     *     ajaxParams:    Parameters passed to jQuery.ajax to load child nodes
-     *     ajaxDataParam: the parameter to put the node ID to load into
+     *     cache:            A set of preloaded nodes (see jstree.data)
+     *     ajaxParams:       Parameters passed to jQuery.ajax to load child nodes
+     *     ajaxParams.token: Replace this string in ajaxParams.url to load a particular child node
      *   jstree: Any and all jstree parameters
      * @constructor
      */
@@ -73,11 +73,11 @@
             data: {
                 cache: [],
                 ajaxParams: {
-                    url:      '/ajax/jstree.php',
+                    url:      '/resources/{folderId}/nodes',
                     type:     'GET',
                     data:     {},
                     dataType: 'json',
-                    token:    null
+                    token:    '{folderId}',
                 },
                 ajaxDataParam: 'parent'
             },

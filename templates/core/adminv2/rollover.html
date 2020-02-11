@@ -15,6 +15,10 @@
                     {
                     data: {
                         cache: {TREEDATA}
+                    },
+                    ajaxParams: {
+                        url: '/resources/{folderId}/nodes',
+                        token: '{folderId}'
                     }
                 })
                 .on('select_node.jstree', function(event, jstree) {
