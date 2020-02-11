@@ -76,7 +76,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getAssessment(IAssessable $assessment)
     {
-        $url = '';
+
+        /* Presume a default url. If you're a parent you'll end up at a dead end
+         * if you don't have any children which can unlock the summary screen
+         * but that would be an unusual scenario (what are you even doing here then?)
+         *
+         *  - you could be given read access to a class page and view its course outline
+         *    but you don't have any children associated with your session
+         *
+         *  - or you don't have any children participating in them
+         */
+        $defaultUrl = $this->getRouter()->generate('learningAssessment.getSummary', [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $this->getUser()->getId()
+        ]);
 
         /* If you're a parent,
          * find the first child who can visit this url
@@ -85,30 +98,24 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * That Hide Due Work Details config is defined in buildAuthRuleCanViewSummary()
          * which uses CanSeeParticipation()
          */
+        $parentUrl = null;
+
         if ($this->getUser()->getRole()->isParent()) {
             foreach ($this->getUser()->getChildren() as $child) {
-                $url = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
+                $parentUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
                     'assessment' => $assessment,
                     'assessmentId' => $assessment->getId(),
                     'student' => $child,
                     'studentId' => $child->getId()
                 ]);
 
-                if ($url) {
+                if ($parentUrl) {
                     break;
                 }
             }
-        } else {
-
-            /* If you're a staff or student, just use your id
-             */
-            $url = $this->getRouter()->generate('learningAssessment.getSummary', [
-                'assessmentId' => $assessment->getId(),
-                'studentId' => $this->getUser()->getId()
-            ]);
         }
 
-        $this->redirect($url);
+        $this->redirect($parentUrl ?? $defaultUrl);
     }
 
     /**
