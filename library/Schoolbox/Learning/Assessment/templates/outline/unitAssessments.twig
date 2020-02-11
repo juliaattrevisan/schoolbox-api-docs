@@ -66,7 +66,7 @@
 
                         {# Don't render a link if you are unable to view the details #}
                         {% if viewRoute %}
-                            <a title="{{ title }}" href="{{ viewRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
+                            <a title="{{ title }}" href="{{ viewRoute }}">
                                 <span class="{{ icon.renderClass(assessment) }}"></span>
                                 <p>{{ assessment.title }}</p>
                             </a>
