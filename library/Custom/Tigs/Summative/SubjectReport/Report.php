@@ -430,7 +430,7 @@ class Report
     ): array {
         // HSC Yr 11 students uses rubric from Hsc Task Mark
         if ($attributes->getYearLevel() === 11 && $attributes->isHsc()) {
-            return null;
+            return [];
         }
 
         $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
@@ -844,7 +844,7 @@ class Report
         ?string $roleTypeOverride
     ): ?array {
         // Only relevant for HSC Yr 11 students
-        if (!$attributes->getYearLevel() === 11 || !$attributes->isHsc()) {
+        if ($attributes->getYearLevel() !== 11 || !$attributes->isHsc()) {
             return null;
         }
 
