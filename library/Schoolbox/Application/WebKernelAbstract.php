@@ -235,7 +235,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $output
                         ->setTitle('Error Encountered')
                         ->setData($args)
-                        ->setTemplate($code === 404
+                        ->setTemplate($code === 404 || $code === 410
                             ? 'common/error/404.twig'
                             : 'common/error/general.twig'
                         );

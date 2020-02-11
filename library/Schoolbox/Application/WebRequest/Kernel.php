@@ -203,10 +203,10 @@ class Kernel extends WebKernelAbstract
                 // always throw this, even if there was preloader exception
                 throw $ue;
 
-            } catch (\Exception $ae) {
+            } catch (\Throwable $ae) {
                 // Some other exception (including unauthorized):
                 // throw the preloader exception in preference to this
-                if ($preloaderException instanceof \Exception) {
+                if ($preloaderException instanceof \Throwable) {
                     throw $preloaderException;
                 }
                 throw $ae;
@@ -214,7 +214,7 @@ class Kernel extends WebKernelAbstract
 
             // No auth exception:
             // throw the preloader exception if there was one
-            if ($preloaderException instanceof \Exception) {
+            if ($preloaderException instanceof \Throwable) {
                 throw $preloaderException;
             }
 

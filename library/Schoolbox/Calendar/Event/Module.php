@@ -54,13 +54,6 @@ class Module extends BaseModule
                         /** @var Event $event */
                         $event = $params['event'];
 
-                        /* Unknown event; it could be deleted or nonexistent
-                         * In either case there's nothing to see
-                         */
-                        if (null === $event) {
-                            throw new Unauthorized();
-                        }
-
                         $loggedInUser = $this->getAuthorizer()->getUser();
 
                         /**
@@ -147,11 +140,7 @@ class Module extends BaseModule
      */
     private function preloadEvent(array $params): ?array
     {
-        try {
-            return ['event' => $this->getEventMapper()->findById($params['eventId'])];
-        } catch (Mapper\Exception $e) {
-            throw new NotFound('Event not found');
-        }
+        return ['event' => $this->getEventMapper()->findById($params['eventId'])];
     }
 
     /**
