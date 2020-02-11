@@ -82,7 +82,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * find the first child who can visit this url
          * and pass that id into the router instead so you can witness details
          *
-         * TODO But what about that Hide Due Work Details config?
+         * That Hide Due Work Details config is defined in buildAuthRuleCanViewSummary()
+         * which uses CanSeeParticipation()
          */
         if ($this->getUser()->getRole()->isParent()) {
             foreach ($this->getUser()->getChildren() as $child) {
