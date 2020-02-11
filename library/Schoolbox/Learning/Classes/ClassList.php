@@ -124,6 +124,9 @@ class ClassList
                 $homepageUrls[$folder->getId()] = false;
             }
         }
+        $folderList->sortByCallback(static function (Folder\Model $a, Folder\Model $b): int {
+            return \strnatcasecmp($a->getCodeString(), $b->getCodeString());
+        }, true);
 
         return [
             'term'         => $term,
