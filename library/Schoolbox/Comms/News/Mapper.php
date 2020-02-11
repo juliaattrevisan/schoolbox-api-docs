@@ -530,7 +530,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             FROM {$this->table}
             {$join}
             WHERE {$where}
-            ORDER BY publish_at DESC, created_at DESC
+            ORDER BY {$this->table}.publish_at DESC, {$this->table}.created_at DESC
         ";
 
         if ($offset !== null) {

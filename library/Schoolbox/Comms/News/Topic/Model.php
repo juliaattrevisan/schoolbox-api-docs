@@ -9,16 +9,22 @@
 
 namespace Schoolbox\Comms\News\Topic;
 
+use Alaress\Json\Serializable;
 use Alaress\Json\SerializeTrait;
-use Schoolbox\Mapper\Traits\Model\HasSequence;
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Sequential;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Model implements \Alaress\Json\Serializable, Sequential
+class Model implements Serializable, Sequential, ISoftDeletable
 {
-    use Id;
-    use HasSequence;
+    use ModelTrait\Id;
+    use ModelTrait\HasSequence;
     use SerializeTrait;
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+
 
     /** @var string */
     private $name;
