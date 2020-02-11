@@ -77,14 +77,21 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getAssessment(IAssessable $assessment)
     {
 
-        /* Presume a default url. If you're a parent you'll end up at a dead end
-         * if you don't have any children which can unlock the summary screen
-         * but that would be an unusual scenario (what are you even doing here then?)
+        /* Presume a default url.
+         *
+         * If you're a parent you'll end up at a dead end if you don't have
+         * any children which can unlock the summary screen but that would
+         * be an unusual scenario (what are you even doing here then?)
          *
          *  - you could be given read access to a class page and view its course outline
          *    but you don't have any children associated with your session
          *
          *  - or you don't have any children participating in them
+         *
+         *  - the Hide Due Work Details config is activated
+         *
+         * If you're a student, you'll end up at a dead end if you've been excluded
+         * from participating in the assessment but try to get there anyway
          */
         $defaultUrl = $this->getRouter()->generate('learningAssessment.getSummary', [
             'assessmentId' => $assessment->getId(),
