@@ -10,7 +10,7 @@ Data:
     {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
     {% if description|length %}
         <article class="content">
-            {{ description | purifyAddDomain }}
+            {{ description | purify }}
         </article>
     {% endif %}
 
