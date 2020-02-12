@@ -16,6 +16,7 @@ use Evaluation_Section;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
+use HTMLPurifier;
 use PDO;
 use PDOException;
 use Psr\Log\LoggerInterface;
@@ -52,6 +53,9 @@ class CourseQuiz
 
     /** @var LoggerInterface */
     private $log;
+
+    /** @var HTMLPurifier */
+    private $htmlPurifier;
 
     /** @var Bridge\Course */
     private $courseBridge;
@@ -99,6 +103,7 @@ class CourseQuiz
      * @param Assessment\Mapper   $assessmentMapper
      * @param Folder\Mapper       $folderMapper
      * @param LoggerInterface     $log
+     * @param HTMLPurifier       $htmlPurifier
      * @param Bridge\Assignment   $assignmentBridge
      * @param Bridge\Course       $courseBridge
      */
@@ -113,12 +118,14 @@ class CourseQuiz
         Assessment\Mapper $assessmentMapper,
         Folder\Mapper $folderMapper,
         LoggerInterface $log,
+        HTMLPurifier $htmlPurifier,
         Bridge\Assignment $assignmentBridge,
         Bridge\Course $courseBridge
     ) {
         $this->canvasDb           = $canvasDb;
         $this->schoolboxDb        = $schoolboxDb;
         $this->log                = $log;
+        $this->htmlPurifier        = $htmlPurifier;
         $this->assignmentBridge   = $assignmentBridge;
         $this->quizMapper         = $quizMapper;
         $this->quizSectionMapper  = $quizSectionMapper;
@@ -840,6 +847,11 @@ class CourseQuiz
         string $updatedAt,
         int $position
     ): Assessment\Model {
+
+        if ($description && strpos($description, '/courses/')) {
+            $description = $this->htmlPurifier->purify($description);
+        }
+
         $assessment = (new Assessment\Model())
             ->setContextUnitSpecification($unitSpec)
             ->setTitle($title)

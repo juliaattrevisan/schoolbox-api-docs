@@ -15,12 +15,14 @@ use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
+use HTMLPurifier;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -49,6 +51,9 @@ class CourseAssignments
 
     /** @var LoggerInterface */
     private $log;
+
+    /** @var HTMLPurifier */
+    private $htmlPurifier;
 
     /** @var Bridge\Account */
     private $accountBridge;
@@ -82,6 +87,7 @@ class CourseAssignments
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param Assessment\Mapper   $assessmentMapper
      * @param LoggerInterface     $log
+     * @param HTMLPurifier       $htmlPurifier
      * @param Bridge\Assignment   $assignmentBridge
      * @param Bridge\Course       $courseBridge
      * @param Folder\Mapper       $folderMapper
@@ -92,6 +98,7 @@ class CourseAssignments
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         LoggerInterface $log,
+        HTMLPurifier $htmlPurifier,
         Bridge\Assignment $assignmentBridge,
         Bridge\Course $courseBridge,
         Folder\Mapper $folderMapper
@@ -99,6 +106,7 @@ class CourseAssignments
         $this->canvasDb            = $canvasDb;
         $this->schoolboxDb         = $schoolboxDb;
         $this->log                 = $log;
+        $this->htmlPurifier        = $htmlPurifier;
         $this->assignmentBridge    = $assignmentBridge;
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->assessmentMapper    = $assessmentMapper;
@@ -529,6 +537,11 @@ class CourseAssignments
         string $updatedAt,
         int $position
     ): Assessment\Model {
+
+        if ($description && strpos($description, '/courses/')) {
+            $description = $this->htmlPurifier->purify($description);
+        }
+
         $assessment = (new Assessment\Model())
             ->setContextUnitSpecification($unitSpec)
             ->setTitle($title)

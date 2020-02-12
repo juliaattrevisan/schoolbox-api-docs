@@ -11,6 +11,8 @@ use Alaress\Database\Connector\IConnector;
 use DomainException;
 use External_ClassInterface;
 use External_UserInterface;
+use HTMLPurifier;
+use HTMLPurifier_Config;
 use InvalidArgumentException;
 use Alaress\Database;
 use PDOException;
@@ -121,6 +123,8 @@ class DataSync
     /** @var LoggerInterface */
     private $log;
 
+    /** @var HTMLPurifier */
+    private $htmlPurifier;
 
     /**
      * @param IConnector              $canvasDb
@@ -240,6 +244,11 @@ class DataSync
         $assignmentDatesBridge    = new Bridge\AssignmentDates();
         $assignmentOverrideBridge = new Bridge\AssignmentOverride($this->schoolboxDb);
 
+        $htmlPurifierConfig = HTMLPurifier_Config::createDefault();
+        $htmlPurifierConfig->set('URI.Base', $this->config->get('external_portal'));
+        $htmlPurifierConfig->set('URI.MakeAbsolute', true);
+        $this->htmlPurifier = new HTMLPurifier($htmlPurifierConfig);
+
         $this->syncAccounts($accountBridge);
         $this->syncCourses($accountBridge, $courseBridge, $courseGroupBridge);
         $this->syncCourseAssignments($assignmentBridge, $courseBridge);
@@ -332,6 +341,7 @@ class DataSync
             $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->log,
+            $this->htmlPurifier,
             $assignmentBridge,
             $courseBridge,
             $this->folderMapper
@@ -362,6 +372,7 @@ class DataSync
             $this->assessmentMapper,
             $this->folderMapper,
             $this->log,
+            $this->htmlPurifier,
             $assignmentBridge,
             $courseBridge
         ))->synchronise();
