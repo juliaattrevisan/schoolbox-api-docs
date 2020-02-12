@@ -389,4 +389,30 @@ class Scrub
             Config::get('scrub_html_cache_timeout')
         );
     }
+
+    /**
+     * Variant of html
+     * @param string $html
+     * @return mixed
+     */
+    static public function htmlChangeDomain($html): string
+    {
+        $domain = '';
+        if (Config::get('canvas_data_api_key')) {
+            $domain = Config::get('external_portal');
+        }
+        return Alaress\Redis::getInstance()->cacheFunctionCall(
+            'scrub.htmlChangeDomain',
+            function ($params) {
+                $purifier             = self::getHtmlPurifierInstance();
+                $def                  = $purifier->config->getDefinition('URI');
+                $customFilter         = new Schoolbox\HTMLPurifierURIFilterAddDomain();
+                $customFilter->domain = $params[1];
+                $def->addFilter($customFilter, $purifier->config);
+                return self::htmlDomModify($purifier->purify($params[0]));
+            },
+            ["$html", $domain],
+            Config::get('scrub_html_cache_timeout')
+        );
+    }
 }

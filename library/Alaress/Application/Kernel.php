@@ -810,6 +810,14 @@ abstract class Kernel
                         )
                     );
 
+                    $twig->addFilter(
+                        new TwigFilter(
+                            'purifyAddDomain',
+                            array('Scrub', 'htmlChangeDomain'),
+                            array('is_safe' => array('html'))
+                        )
+                    );
+
                     // HTML2Text filter
                     $twig->addFilter(
                         new TwigFilter(
