@@ -133,7 +133,7 @@ class Kernel extends WebKernelAbstract
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Exception
+     * @throws \Throwable
      */
     private function outputAuraContent(Route $route, string $path): void
     {
