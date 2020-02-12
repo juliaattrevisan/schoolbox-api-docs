@@ -289,6 +289,8 @@ if ($class) {
             'DROPDOWN_HASH' => json_encode($reasonStack)
         ]);
 
+        $localeSpecialNeeds = $this->getDi()->get('l10n')->translate('specialNeeds', false, true);
+
         // Iterate each student
 
         foreach ($allStudents as $currentStudent) {
@@ -352,7 +354,7 @@ if ($class) {
                     'SpecialNeedsFlag'=> [
                         'icon' => 'info',
                         'descriptionField' => 'SpecialNeedsDescription',
-                        'defaultDescription' => 'Special Needs'
+                        'defaultDescription' => $localeSpecialNeeds,
                     ],
                     'CommentWarningFlag'=> [
                         'icon' => 'comment',

@@ -26,6 +26,11 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
 {
     use External_MssqlConnector;
 
+    /**
+     * This is the value hardcoded by the synergetic stored proc
+     */
+    private const SPECIAL_NEEDS_SYNERGETIC_STOR_PROC = 'Special Needs';
+
     /** @var Attendance_Synergetic_AttendanceMaster $attendanceMaster An instance of Attendance_Synergetic_AttendanceMaster_Abstract */
     private $attendanceMaster;
 
@@ -89,6 +94,9 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         $result = $statement->fetchAll();
 
         if (count($result) > 0) {
+            array_walk($result, function (&$val) {
+                $val['SpecialNeedsDescription'] = preg_replace('/^' . self::SPECIAL_NEEDS_SYNERGETIC_STOR_PROC . '$/', '', $val['SpecialNeedsDescription']);
+            });
             return $result;
         }
 
