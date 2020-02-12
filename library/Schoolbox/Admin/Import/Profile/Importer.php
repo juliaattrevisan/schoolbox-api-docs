@@ -360,7 +360,7 @@ class Importer
                 ->setLeavingDate($row['Leaving Date'] ? \Alaress_Date_Format::newFromTimestamp(strtotime($row['Leaving Date'])) : null)
                 ->setIb((bool)$row['IB'])
                 ->setIndividualLearningPlans((bool)$row['ILP'])
-                ->setEsl((bool)$row['ESL'])
+                ->setEsl((bool)$row['EAL'])
                 ->setSpecialNeeds((bool)$row['Special Needs'])
                 ->setBoardingStatus((bool)$row['Boarding Status'])
                 ->setBaseProfile($baseProfile);
