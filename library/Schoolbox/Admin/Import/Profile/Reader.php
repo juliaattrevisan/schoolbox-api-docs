@@ -336,6 +336,26 @@ class Reader implements \Iterator
             $this->currentRow[$key] = trim($this->currentRow[$key]);
         }
 
+        /* FIXME Temporary backward compatibility for the ESL column which got renamed to EAL
+         *  We need to support legacy usage of the ESL column for those still stuck with csv imports.
+         *  Instead of breaking it for them, support synonymous usage until they can update their csv imports.
+         */
+        if (isset($combined['esl'])) {
+            if (isset($combined['eal'])) {
+
+                /* Both columns exist; use the EAL column's value as modern usage
+                 * should take precedent over legacy usage (noop)
+                 */
+
+            } else {
+
+                /* ESL column exists, but EAL column doesn't
+                 * Map the ESL value into the EAL column
+                 */
+                $this->currentRow['EAL'] = trim($combined['esl']);
+            }
+        }
+
         /* Remember this as the new previousRow
          */
         $this->previousRow = $this->currentRow;
