@@ -4,6 +4,7 @@
     students     array       Student and rubric mark data
     exclusions   int[][]     User ids, grouped by assessment.id
     overall      array       Summated student capability/indicator marks across all assessments
+    queryArgs    string      The filters used to generate this report, so we can export the exact same report
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
@@ -98,6 +99,15 @@
     }
 </style>
 
+<div id="report_actions" class="actions-small-1 row">
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Report</li>
+        <li><a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folderId: folder.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+    </ul>
+</div>
 
 <div class="row">
     <div class="small-12 columns">

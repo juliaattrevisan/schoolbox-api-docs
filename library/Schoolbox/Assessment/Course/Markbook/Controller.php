@@ -189,7 +189,7 @@ class Controller extends WebController\Base
         $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
         $csvExporter = new CSV();
-        $csvExporter->export($courseMarkbook, 'CourseMarkbook.csv');
+        $csvExporter->export($courseMarkbook, $courseSpec->getTitle() .' - Markbook.csv');
         exit;
     }
 

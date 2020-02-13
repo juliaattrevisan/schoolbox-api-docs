@@ -7,46 +7,47 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
+use Alaress\Database;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router;
+use DomainException;
+use InvalidArgumentException;
+use LogicException;
+use PDOException;
+use RangeException;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
+use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Column\Boolean;
+use Schoolbox\Column\Decimal;
+use Schoolbox\Column\Integer;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
+use Schoolbox\Filter\Filters\Assessment\RubricUsage;
+use Schoolbox\L10n\RosettaStone as Translator;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\MarkScheme;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
+use UnderflowException;
+use UnexpectedValueException;
 use function array_key_exists;
 use function array_keys;
 use function array_merge;
-use Aura\Di\Exception\ServiceNotFound;
 use function count;
 use function func_get_args;
 use function implode;
 use function in_array;
 use function is_array;
-use LogicException;
-use RangeException;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Alaress\Database\Connector\IConnector;
-use Schoolbox\Column\Boolean;
-use Schoolbox\Column\Decimal;
-use Schoolbox\Column\Integer;
-use Schoolbox\Learning\MarkScheme;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
-use Schoolbox\Assessment\Rubric\RowSet\Capability;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Alaress\Database;
-use InvalidArgumentException;
-use PDOException;
-use Schoolbox\Mapper;
 use function strnatcmp;
 use function uasort;
-use UnderflowException;
-use Schoolbox\Filter;
-use Aura\Router;
-use DomainException;
-use UnexpectedValueException;
-use Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 class Controller extends Base
 {
@@ -82,6 +83,12 @@ class Controller extends Base
 
 
     /**
+     * @var Translator
+     */
+    private $translator;
+
+
+    /**
      * Constructor
      *
      * @param IConnector                         $internalDb
@@ -99,7 +106,8 @@ class Controller extends Base
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Selection\Mapper $filterSelectionMapper,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Mapper $filterMapper
+        Filter\Mapper $filterMapper,
+        Translator $translator
     ) {
         $this->internalDb            = $internalDb;
         $this->gradeGroupMapper      = $gradeGroupMapper;
@@ -108,6 +116,7 @@ class Controller extends Base
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterMapper          = $filterMapper;
+        $this->translator            = $translator;
     }
 
 
@@ -149,6 +158,33 @@ class Controller extends Base
 
 
     /**
+     * Output the rubric report as a cool CSV for extra-Schoolbox data wrangling,
+     * for those that are into that sort of thing.
+     *
+     * @api   GET /learning/rubricMarkbook/export/{folderId}
+     * @since 192
+     * @param Folder\Model $folder Folder for this class
+     */
+    public function getMarkbookExport(Folder\Model $folder): void
+    {
+        $queryArgs = $this->request->query->getArrayCopy();
+        unset($queryArgs['page']);
+        $assessmentIds = $this->getAssessmentIds($folder->getId(), $queryArgs);
+
+        [
+            $assessments,
+            $exclusions,
+            $students,
+            $overallMarks
+        ] = $this->buildMarkbookData($folder, $queryArgs, $assessmentIds);
+
+        $csv = new Export\Csv($students, $assessments, $exclusions, $overallMarks, $this->translator);
+        $csv->export($folder->getNameWithCodes() . ' - Rubric Markbook.csv');
+        exit;
+    }
+
+
+    /**
      * Displays a list of rubric marks for students and learners associated with the specified folder
      *
      * @api   POST /learning/rubricMarkbook/{folderId}
@@ -171,26 +207,33 @@ class Controller extends Base
     {
         $request       = $this->request->post['filter_selection'] ?: [];
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $request);
-        $isFiltered    = (new Filter\RequestChecker())->isFilteredRequest($request);
-        [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
-        $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
-        $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
-        $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
-        $exclusions    = $this->getExclusions($assessmentIds);
-        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
-        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks);
+        $codec         = new Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        [
+            $assessments,
+            $exclusions,
+            $students,
+            $overallMarks
+        ] = $this->buildMarkbookData($folder, $request, $assessmentIds);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput(
                 '@rubricMarkbook/markbookInner.twig',
                 [
-                    'isFiltered'  => $isFiltered,
-                    'students'    => $linkedMarks,
+                    'folder'      => $folder,
+                    'isFiltered'  => (new Filter\RequestChecker())->isFilteredRequest($request),
+                    'students'    => $students,
                     'assessments' => $assessments,
                     'exclusions'  => $exclusions,
                     'overall'     => $overallMarks,
+                    'queryArgs'   => $codec->convertSelectionsToQueryString(
+                        $codec->convertRequestToSelections(
+                            $this->getUser(),
+                            Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK,
+                            $request
+                        )
+                    ),
                 ]
             )->getAsString(),
         ]));
@@ -904,5 +947,35 @@ class Controller extends Base
             }
         }
         return $overallMarks;
+    }
+
+
+    /**
+     * Build data required by both the HTML and CSV form of the rubric markbook.
+     *
+     * @param Folder\Model $folder
+     * @param array        $request
+     * @param array        $assessmentIds
+     * @return array 0: array A list of assessment data
+     *               1: int[][] A list of IDs of students excluded from each
+     *                  assessment, grouped by assessment ID
+     *               2: array A list of summary links to assessments for
+     *                  each student partaking
+     *               3: array A summation of marks for each capability
+     *
+     * @throws Mapper\Exception
+     * @throws Router\Exception\RouteNotFound
+     */
+    private function buildMarkbookData(Folder\Model $folder, array $request, $assessmentIds): array
+    {
+        [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
+        $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
+        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
+        $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
+        $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
+        $exclusions    = $this->getExclusions($assessmentIds);
+        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
+        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks);
+        return [$assessments, $exclusions, $linkedMarks, $overallMarks];
     }
 }
