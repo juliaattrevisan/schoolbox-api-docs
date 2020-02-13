@@ -179,7 +179,7 @@ class Controller extends Base
         ] = $this->buildMarkbookData($folder, $queryArgs, $assessmentIds);
 
         $csv = new Export\Csv($students, $assessments, $exclusions, $overallMarks, $this->translator);
-        $csv->export('Markbook.csv');
+        $csv->export($folder->getNameWithCodes() . ' - Rubric Markbook.csv');
         exit;
     }
 
