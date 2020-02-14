@@ -73,10 +73,15 @@ class StudentCarousel
 
             // CSS/label rules
             // TODO move CSS/label generation to participant class, and dedupe usages
-            if ($currentParticipant->isReviewComplete()) {
+            if($currentParticipant->isResubmissionRequired()) {
+             $css = 'alert';
+             $label = 'Resubmit Required';
+            }
+            else if ($currentParticipant->isReviewComplete()) {
                 // Is review complete? Always say "Reviewed"
                 $css   = 'reviewed';
                 $label = 'Reviewed';
+
 
             } else {
                 $latestSubmission = $currentParticipant->findMostRecentSubmittedResponse();
