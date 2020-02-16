@@ -53,7 +53,7 @@ class External_Synergetic_User implements External_UserInterface
 
         $queryPhoto = $this->getConnector()->executeQuery(
             'SELECT TOP 1 vPhotos.ModifiedDate
-            FROM dbo.vPhotos vPhotos 
+            FROM dbo.vPhotos vPhotos
             WHERE vPhotos.ID = :externalId
             ORDER BY ModifiedDate DESC',
             ['externalId' => $user->getExternalId()]
@@ -131,7 +131,7 @@ class External_Synergetic_User implements External_UserInterface
             SELECT      Contact.Title,
                         Contact.Preferred,
                         Contact.Surname,
-                        CASE 
+                        CASE
                           WHEN Contact.DefaultEmailCode = 'O' THEN Contact.OccupEmail
                           ELSE Contact.Email
                         END AS Email,
@@ -146,10 +146,10 @@ class External_Synergetic_User implements External_UserInterface
                         Spouse.Title SpouseTitle,
                         Spouse.Preferred SpousePreferred,
                         Spouse.Surname SpouseSurname,
-                        CASE 
+                        CASE
                           WHEN Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
                           ELSE Spouse.Email
-                        END AS SpouseEmail,                        
+                        END AS SpouseEmail,
                         Spouse.OccupEmail SpouseOccupEmail,
                         Spouse.DefaultEmailCode SpouseDefaultEmailCode,
                         Spouse.MobilePhone SpouseMobilePhone,
@@ -206,7 +206,7 @@ class External_Synergetic_User implements External_UserInterface
         $query =
         "
             SELECT DISTINCT RelatedID,
-                        CASE 
+                        CASE
                             WHEN UseEmail = 'O' THEN OccupEmail
                             WHEN UseEmail = 'P' THEN Email
                             WHEN UseEmail = 'D' THEN DefaultEmail
@@ -214,7 +214,7 @@ class External_Synergetic_User implements External_UserInterface
                         END AS Email
             FROM        dbo.RelationShips r
             JOIN        dbo.vCommunityAddresses ON RelatedID = vCommunityAddresses.ID
-            WHERE		CASE 
+            WHERE		CASE
                             WHEN UseEmail = 'O' THEN OccupEmail
                             WHEN UseEmail = 'P' THEN Email
                             WHEN UseEmail = 'D' THEN DefaultEmail
@@ -254,7 +254,7 @@ class External_Synergetic_User implements External_UserInterface
 
         if($this->config->get('external_learning_plans')) {
             $learningPlanQuery = "(
-                            SELECT    COUNT(*) 
+                            SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
                             WHERE     IEP.ID = vStudentsAll.ID AND
                             StartDate <= CURRENT_TIMESTAMP AND
@@ -293,7 +293,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentEmergency3Name,
                         vStudentsAll.StudentEmergency3Phone,
                         vStudentsAll.StudentEmergency3PhoneAlt,
-                        CASE WHEN vStudentsAll.StudentMedicalAlertFlag= 1 THEN vStudentsAll.StudentMedicalAlert ELSE '' END as StudentMedicalAlert,  
+                        CASE WHEN vStudentsAll.StudentMedicalAlertFlag= 1 THEN vStudentsAll.StudentMedicalAlert ELSE '' END as StudentMedicalAlert,
                         vStudentsAll.StudentMobilePhone,
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.EnglishSecondFlag,
@@ -301,29 +301,29 @@ class External_Synergetic_User implements External_UserInterface
                         AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
                         vStudentsAll.StudentBoarder,
-                        vStudentsAll.StudentsComment as Comment,   
+                        vStudentsAll.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
                         vStudentsAll.StudentIBFlag,
                         $learningPlanQuery
             FROM        dbo.vStudentsAll vStudentsAll
-            LEFT JOIN   CommunityAlerts ON 
-                            CommunityAlerts.ID = StudentID AND 
+            LEFT JOIN   CommunityAlerts ON
+                            CommunityAlerts.ID = StudentID AND
                             (
-                                CommunityAlerts.AlertDateFrom IS NULL OR 
+                                CommunityAlerts.AlertDateFrom IS NULL OR
                                 CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE)
-                            ) AND 
+                            ) AND
                             (
-                                CommunityAlerts.AlertDateTo IS NULL OR 
+                                CommunityAlerts.AlertDateTo IS NULL OR
                                 CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE)
                             )
             LEFT JOIN   luForm ON vStudentsAll.StudentForm = luForm.Code
             LEFT JOIN   luTutor ON vStudentsAll.StudentTutor = luTutor.Code
-            LEFT JOIN   luYearLevel ON 
-                            vStudentsAll.StudentCampus = luYearLevel.Campus AND 
+            LEFT JOIN   luYearLevel ON
+                            vStudentsAll.StudentCampus = luYearLevel.Campus AND
                             vStudentsAll.StudentYearLevel = luYearLevel.Code
-            LEFT JOIN   luHouse House ON 
-                            StudentCampus = House.Campus AND 
+            LEFT JOIN   luHouse House ON
+                            StudentCampus = House.Campus AND
                             StudentHouse = House.Code
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = vStudentsAll.FileSemester AND
@@ -388,15 +388,30 @@ class External_Synergetic_User implements External_UserInterface
         $query =
         "
             SELECT      SchoolStaffCode,
-                        luBuilding.Description AS StaffBuilding,
+                        CASE
+                            WHEN ISNULL(luBuilding.Code, '') = '' THEN ''
+                            ELSE luBuilding.Description
+                        END AS StaffBuilding,
                         StaffRoom,
-                        luHouse.Description AS StaffHouseDescription,
+                        CASE
+                            WHEN ISNULL(luHouse.Code, '') = '' THEN ''
+                            ELSE luHouse.Description
+                        END AS StaffHouseDescription,
                         StaffExtension,
                         StaffMobilePhone,
                         StaffDefaultMobilePhone,
-                        StaffCampusDescription,
-                        StaffCategoryDescription,
-                        luDepartment.Description AS StaffDepartment,
+                        CASE
+                            WHEN ISNULL(StaffCampus, '') = '' THEN ''
+                            ELSE StaffCampusDescription
+                        END AS StaffCampusDescription,
+                        CASE
+                            WHEN ISNULL(StaffCategory, '') = '' THEN ''
+                            ELSE StaffCategoryDescription
+                        END AS StaffCategoryDescription,
+                        CASE
+                            WHEN ISNULL(luDepartment.Code, '') = '' THEN ''
+                            ELSE luDepartment.Description
+                        END AS StaffDepartment,
                         StaffVoiceMail
              FROM       dbo.vStaff vStaff
              LEFT JOIN  dbo.luHouse ON luHouse.Code = vStaff.StaffHouse AND luHouse.Campus = vStaff.StaffCampus
@@ -563,8 +578,8 @@ class External_Synergetic_User implements External_UserInterface
                             Semester.SystemCurrentFlag = 1
             WHERE       StudentContactType IN ({$contactTypes['placeholders']})
                         {$filters}
-            ORDER BY    StudentSurname, 
-                        StudentID, 
+            ORDER BY    StudentSurname,
+                        StudentID,
                         StudentContactType
         ";
 
@@ -654,10 +669,10 @@ class External_Synergetic_User implements External_UserInterface
                             Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
                             Semester.FileYear = vStudentContactAllAddress.FileYear AND
                             Semester.SystemCurrentFlag = 1
-            WHERE       StudentContactType IN ({$contactTypes['placeholders']}) AND 
+            WHERE       StudentContactType IN ({$contactTypes['placeholders']}) AND
                         StudentBoarder = 'B'
-            ORDER BY    StudentSurname, 
-                        StudentID, 
+            ORDER BY    StudentSurname,
+                        StudentID,
                         StudentContactType
         ";
 
@@ -717,7 +732,7 @@ class External_Synergetic_User implements External_UserInterface
                             CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE rs.UseEmail END AS StudentContactSpouseUseEmail
             FROM            dbo.vStudentContactAllAddress a
             LEFT JOIN       Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
-            LEFT JOIN       Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID            
+            LEFT JOIN       Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID
             JOIN            FileSemesters Semester ON
                                 Semester.FileSemester = a.FileSemester AND
                                 Semester.FileYear = a.FileYear AND
@@ -822,7 +837,7 @@ class External_Synergetic_User implements External_UserInterface
                 WHERE             StudentClasses.StartDate <= getdate() AND
                                   (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
                                   {$allowedFileTypesSql}
-                ORDER BY          SubjectClasses.FileType ASC, 
+                ORDER BY          SubjectClasses.FileType ASC,
                                   SubjectClasses.Description ASC
             ";
         } else if ($user->getRole()->isStaff()) {
@@ -850,7 +865,7 @@ class External_Synergetic_User implements External_UserInterface
                                       Semester.SystemCurrentFlag = 1
                 LEFT JOIN         luFileType ON c2.FileType = luFileType.Code
                 {$allowedFileTypesSql}
-                ORDER BY          luFileType.Description ASC, 
+                ORDER BY          luFileType.Description ASC,
                                   c2.Description ASC
             ";
         } else {
@@ -990,7 +1005,7 @@ class External_Synergetic_User implements External_UserInterface
                         StaffDepartmentDescription as StaffDepartment,
                         JobPositions.StaffJobPositionStartDate,
                         JobPositions.StaffJobPositionEndDate,
-                        Community.OccupDesc AS JobPositionDescriptionAlternate,                
+                        Community.OccupDesc AS JobPositionDescriptionAlternate,
                         {$select}
             FROM        dbo.vStaff vStaff
             JOIN        dbo.Community ON Community.ID = vStaff.StaffID
@@ -1028,9 +1043,9 @@ class External_Synergetic_User implements External_UserInterface
 
         return $this->getConnector()->executeQuery(
             "
-                SELECT DISTINCT     ClassCampus AS campus 
-                FROM                timetable 
-                WHERE               StaffID = :id AND 
+                SELECT DISTINCT     ClassCampus AS campus
+                FROM                timetable
+                WHERE               StaffID = :id AND
                                     FileYear = :fileYear AND
                                     ClassCampus <> ''
             ",
@@ -1084,7 +1099,7 @@ class External_Synergetic_User implements External_UserInterface
         $where = implode(' AND ', $predicateBuilder->getWhere());
 
         $sql = "
-            SELECT DISTINCT OccupEmail FROM Community 
+            SELECT DISTINCT OccupEmail FROM Community
             JOIN luHouse ON HeadOfHouseID = Community.ID
             JOIN StudentYears ON StudentYears.House = luHouse.Code
             WHERE {$where}
