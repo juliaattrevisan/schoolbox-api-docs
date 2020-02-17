@@ -96,7 +96,7 @@ class Mapping
         'Leaving Date' => 'leaving_date',
         'IB' => 'ib',
         'ILP' => 'individual_learning_plans',
-        'ESL' => 'esl',
+        'EAL' => 'eal',
         'Special Needs' => 'special_needs',
         'Boarding Status' => 'boarding_status'
     ];
