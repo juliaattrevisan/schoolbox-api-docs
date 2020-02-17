@@ -848,7 +848,7 @@ class CourseQuiz
         int $position
     ): Assessment\Model {
 
-        if ($description && strpos($description, '/courses/')) {
+        if ($description) {
             $description = $this->htmlPurifier->purify($description);
         }
 
