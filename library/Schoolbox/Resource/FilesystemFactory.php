@@ -51,15 +51,14 @@ class FilesystemFactory
         $otfs_s3_region = trim($config->get('otfs_s3_region'));
         $otfs_s3_version = trim($config->get('otfs_s3_version'));
         $otfs_s3_bucket = trim($config->get('otfs_s3_bucket'));
-        $otfs_s3_prefix = trim($config->get('otfs_s3_prefix'));
 
-        if (!empty($otfs_s3_cred_key) &&
+        if (
+            !empty($otfs_s3_cred_key) &&
             !empty($otfs_s3_cred_secret) &&
             !empty($otfs_s3_region) &&
             !empty($otfs_s3_version) &&
-            !empty($otfs_s3_bucket) &&
-            !empty($otfs_s3_prefix))
-        {
+            !empty($otfs_s3_bucket)
+        ) {
             // Use AWS S3 for storage
 
             $client = S3Client::factory([
@@ -71,7 +70,7 @@ class FilesystemFactory
                 'version' => $otfs_s3_version,
             ]);
 
-            $fs_storage = new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, $otfs_s3_prefix . INSTANCE_ID));
+            $fs_storage = new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket));
         }
         else
         {
