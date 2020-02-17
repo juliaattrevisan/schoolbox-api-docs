@@ -11,6 +11,8 @@ namespace Schoolbox;
 
 use \PDO;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
+use UnexpectedValueException;
 
 /**
  * @method Campus hydrate(array $row, $alias = '', $callback = null)
@@ -28,7 +30,45 @@ class CampusMapper extends Mapper {
         $this->uses('name', Mapper::TYPE_STRING);
         $this->uses('ext_timetable_code', Mapper::TYPE_STRING);
         $this->uses('timetable_day', Mapper::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'campusHasUsers']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeDeletedCampusFromUPSRules']);
     }
+
+    /**
+     * This callback is to ensure the campus does not have
+     * any user assigned to it before soft deletion
+     *
+     * @param Campus $campus
+     * @return bool
+     */
+    public function campusHasUsers(Campus $campus): bool
+    {
+        if ($this->findUsersInCampus($campus)->count() > 0) {
+            throw new UnexpectedValueException('This campus cannot be deleted as it has users assigned to it.');
+        }
+        return true;
+    }
+
+    /**
+     * Removes deleted campus from any UPS rule
+     *
+     * @param Campus $campus
+     * @return bool
+     *
+     */
+    public function removeDeletedCampusFromUPSRules(Campus $campus): bool
+    {
+        (new UPSEffectMapper())->removeRules('campusCollection', $campus->getId());
+        (new UPSEffectMapper())->removeRules('campusCollectionRemove', $campus->getId());
+        return true;
+    }
+
 
 	/**
 	 * Get a list of campuses that is accessible by $user
@@ -59,6 +99,8 @@ class CampusMapper extends Mapper {
 				WHERE userAccess.service = :calendarService
 				AND userAccess.uid = :userId
 				AND type >= :accessType
+				AND luCampus.deleted_at IS NULL
+                ORDER BY luCampus.sequence
 			";
 
 			$statement = $this->database->prepare($query);
@@ -127,7 +169,7 @@ class CampusMapper extends Mapper {
                 {$this->getColumnString('c')}
             FROM
                 `{$this->getTable()}` c
-            WHERE c.name LIKE :name
+            WHERE c.name LIKE :name AND c.deleted_at IS NULL
             ORDER BY c.name
         ";
 
@@ -153,12 +195,13 @@ class CampusMapper extends Mapper {
 	{
 	    $pb = $this->getPredicateBuilder();
         $pb->equals('userCampus.uid', $user->getId());
+
 		$query = "
             SELECT
             	userCampus.*,
             	{$this->getColumnString('c')}
             FROM userCampus
-            INNER JOIN luCampus c ON userCampus.campus = c.id
+            INNER JOIN luCampus c ON userCampus.campus = c.id AND c.deleted_at IS NULL
         ";
         $query .= ' WHERE ' . implode(' AND ', $pb->getWhere());
 
@@ -171,4 +214,10 @@ class CampusMapper extends Mapper {
 		}
 		return $campusCollection;
 	}
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }

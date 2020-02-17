@@ -87,24 +87,7 @@ class Definition extends Filter\AbstractDefinition
      */
     protected function sortFilterOptions(GenericCollection $options): GenericCollection
     {
-        return $options->sortByCallback(
-            function (Filter\Page\Option\Model $left, Filter\Page\Option\Model $right) {
-                $leftKey  = $left->getKey();
-                $rightKey = $right->getKey();
-                if ($leftKey === $right) {
-                    return 0;
-                }
-
-                // Find the keys in the list of labels
-                $leftCampus  = $this->campuses->getBy('id', $leftKey);
-                $rightCampus = $this->campuses->getBy('id', $rightKey);
-                if (!($leftCampus instanceof CampusModel && $rightCampus instanceof CampusModel)) {
-                    return 0;
-                }
-                return strnatcasecmp($leftCampus->getName(), $rightCampus->getName());
-            },
-            true
-        );
+        return $options;
     }
 
 

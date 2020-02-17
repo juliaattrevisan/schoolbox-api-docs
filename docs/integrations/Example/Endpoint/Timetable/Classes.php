@@ -150,6 +150,7 @@ class Classes implements IStrategy
             LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
             LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
             LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
+            WHERE luCampus.deleted_at IS NULL
         ');
 
         $periods = [];

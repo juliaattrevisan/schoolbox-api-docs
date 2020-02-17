@@ -54,8 +54,9 @@ class Campus extends SimpleStrategy
         return "
             SELECT id, name, '{$entityType}' AS entity_type, null as entity_meta
             FROM luCampus
-            WHERE name IS NOT NULL
+            WHERE name IS NOT NULL AND deleted_at IS NULL
             {$keywordFilter}
+            ORDER BY sequence
         ";
     }
 
@@ -70,7 +71,7 @@ class Campus extends SimpleStrategy
             SELECT DISTINCT cna.entity_type, cna.entity_value, luCampus.name
             FROM comms_news_audience cna
             INNER JOIN luCampus ON cna.entity_type = '{$entityType}' AND cna.entity_value = luCampus.id
-            WHERE cna.id IN ($segmentIdsPlaceholder)
+            WHERE cna.id IN ($segmentIdsPlaceholder) AND luCampus.deleted_at IS NULL
         ";
     }
 

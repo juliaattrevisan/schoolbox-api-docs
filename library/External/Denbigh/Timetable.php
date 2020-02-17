@@ -321,6 +321,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             "
               SELECT    ext_timetable_code
               FROM      luCampus
+              WHERE deleted_at IS NULL
               LIMIT     1
             "
         );

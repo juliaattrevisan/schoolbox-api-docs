@@ -148,7 +148,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             LEFT JOIN `house` `h` ON `u`.`house`=`h`.`id`
             LEFT JOIN `luResidentialHouse` `rh` ON `u`.`residential_house_id`=`rh`.`id`
             WHERE `u`.`group_id` = '$filterString'
-            AND   `u`.`deleted_at` IS NULL
+            AND   `u`.`deleted_at` IS NULL AND `c`.`deleted_at` IS NULL
             GROUP BY `u`.`id`
             ORDER BY $orderBy $orderDir
         ";

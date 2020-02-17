@@ -11,12 +11,12 @@
             value: [
                 {% if preselected is iterable %}
                     {% for current in preselected %}
-                        {% if current in entireDataset|keys %}
+                {% if (current in entireDataset|keys) and  entireDataset[current] %}
                             {% autoescape 'js' %}{"id":{{ current }},"name":"{{ entireDataset[current] }}"}{% endautoescape %}
                         {% endif %}
                         {% if not loop.last %},{% endif %}
                     {% endfor %}
-                {% elseif preselected != '' %}
+                {% elseif preselected != '' and entireDataset[preselected] %}
                 {% autoescape 'js' %}{"id":{{ preselected }},"name":"{{ entireDataset[preselected] }}"}{% endautoescape %}
                 {% endif %}
             ],

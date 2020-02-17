@@ -75,18 +75,18 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     public function getPeriodList(Campus $campus, $day): array
     {
         $query = '
-            SELECT        tp.id, 
-                          tp.title, 
-                          tp.day, 
-                          tp.sequence, 
-                          tp.start, 
-                          tp.finish, 
+            SELECT        tp.id,
+                          tp.title,
+                          tp.day,
+                          tp.sequence,
+                          tp.start,
+                          tp.finish,
                           tp.usable
             FROM          sis_timetable_campus tc
             LEFT JOIN     sis_timetable_cycle ty ON ty.id = tc.cycle_id
             LEFT JOIN     sis_timetable_period tp ON tp.cycle_id = ty.id
-            WHERE         tc.campus_id = :campusId AND 
-                          tc.start <= DATE(NOW()) AND 
+            WHERE         tc.campus_id = :campusId AND
+                          tc.start <= DATE(NOW()) AND
                           tc.finish >= DATE(NOW())
         ';
 
@@ -140,12 +140,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $periodStatement = $this->internalDatabase->executeQuery(
             '
-                SELECT      tp.id, 
-                            tp.title, 
-                            tp.day, 
-                            tp.sequence, 
-                            tp.start, 
-                            tp.finish, 
+                SELECT      tp.id,
+                            tp.title,
+                            tp.day,
+                            tp.sequence,
+                            tp.start,
+                            tp.finish,
                             tp.usable
                 FROM        sis_timetable_campus tc
                 LEFT JOIN   sis_timetable_cycle ty ON ty.id = tc.cycle_id
@@ -267,21 +267,21 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     {
         // Get classes for which this user is involved, or is a teacher.
         $query = '
-            SELECT      c.name, 
-                        c.code, 
+            SELECT      c.name,
+                        c.code,
                         c.description,
-                        cp.period_id, 
-                        cp.room, 
+                        cp.period_id,
+                        cp.room,
                         cp.teacher_external_id,
-                        u.synergy_id, 
-                        u.title, 
-                        u.firstname, 
+                        u.synergy_id,
+                        u.title,
+                        u.firstname,
                         u.lastname
             FROM        sis_class c
             LEFT JOIN   sis_class_user cl ON c.id = cl.class_id
             LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
             LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
-            WHERE       cp.teacher_external_id = :userId OR 
+            WHERE       cp.teacher_external_id = :userId OR
                         cl.external_id = :userId2
         ';
 
@@ -401,7 +401,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 INNER JOIN  sis_class ON sis_class_period.class_id = sis_class.id
                 WHERE       sis_timetable_campus.start <= DATE(NOW()) AND
                             sis_timetable_campus.finish >= DATE(NOW()) AND
-                            sis_class_period.room IN ({$predicate["placeholders"]})
+                            sis_class_period.room IN ({$predicate["placeholders"]}) AND
+                            luCampus.deleted_at IS NULL
                 ORDER BY    sis_timetable_period.day ASC,
                             sis_timetable_period.sequence ASC
             ",
