@@ -275,8 +275,8 @@ class CourseSection
         $whereClause = implode(' AND ', $outerPb->getWhere());
 
         $sql = "
-            SELECT f.id 'f.id', f.name 'f.name', fc.code 'fc.code' 
-            FROM folder f 
+            SELECT f.id 'f.id', f.name 'f.name', fc.code 'fc.code'
+            FROM folder f
             LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             WHERE {$whereClause}";
 
@@ -289,6 +289,10 @@ class CourseSection
 
             /** @var Folder\Model $folder */
             $folder = $this->folderTree->getElementByHash($folderId);
+            if (!$folder) {
+                $this->log->debug("Folder {$folderId} does not exist in folder tree.");
+                continue;
+            }
 
             $folder->setCodes(new GenericCollection(Folder\Code\Model::class));
 
