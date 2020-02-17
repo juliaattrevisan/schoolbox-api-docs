@@ -68,7 +68,7 @@
         <form id="tile-modify-form"
               name='form'
               action="{{ item.id
-                  ? routeLookup('tile.update', {id: item.id})
+                  ? routeLookup('tile.update:post', {id: item.id})
                   : routeLookup('tile.create', {layoutId: layout.id})
               }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
               method="post">
