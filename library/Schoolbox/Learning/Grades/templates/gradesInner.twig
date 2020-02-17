@@ -65,92 +65,95 @@
                         {% set participant = assessment.participantIfExtant(student) %}
                         {% if participant %}
                             {% set folder = assessment.baseContext.folder %}
-                            <li class="actions-small-1">
-                                <div class="list-item content">
-                                    <div class="row">
-                                        <div class="small-12 large-6 card column xl">
-                                            {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessment.id, assessment: assessment, studentId: student.id, student: student}) %}
+                            <li>
+                                <div class="flex-grade">
+                                    <div class="small-12 card columns">
+                                        {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessment.id, assessment: assessment, studentId: student.id, student: student}) %}
 
-                                            {% if summaryRoute %}
-                                            <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
-                                                <h3>{{ assessment.title }}</h3>
-                                            </a>
-                                            {% else %}
-                                                <h3>{{ assessment.title }}</h3>
+                                        {% if summaryRoute %}
+                                        <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
+                                            <h3>{{ assessment.title }}</h3>
+                                        </a>
+                                        {% else %}
+                                            <h3>{{ assessment.title }}</h3>
+                                        {% endif %}
+
+                                        <p>
+                                            <span class="meta">{{ assessment.typeName }}</span>
+                                            <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
+
+                                            {% if assessment is quiz and participant.allResponses | length %}
+                                            <span class="pipe meta">
+                                                <a href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, userId: student.id}) }}"
+                                                   title="View Attempts">View Attempts</a>
+                                            </span>
                                             {% endif %}
-
-                                            <p>
-                                                <span class="meta">{{ assessment.typeName }}</span><span
-                                                        class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
-                                            </p>
-                                            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
-                                        </div>
-
-                                        <div class="small-12 large-6 columns">
-                                            {% if assessment.isFeedbackVisibleToUser(USER) %}
-                                                {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
-
-                                                {% if assessment is task %}
-                                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                                    assessment: assessable,
-                                                    student: participant.user
-                                                    } only %}
-                                                {% else %}
-                                                    <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}">
-                                                        <span>{{ assessment.humanReadableMark(participant, true) }}</span>
-                                                    </div>
-                                                {% endif %}
-                                                {% if feedback %}
-                                                    <p class="comment">{{ feedback.comment | nl2br }}</p>
-                                                    {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
-                                                        <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
-                                                            View more feedback</a>
-                                                    {% endif %}
-                                                {% endif %}
-                                            {% endif %}
-                                        </div>
+                                        </p>
                                     </div>
-                                </div>
+                                    {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
+                                    {% if assessment.isFeedbackVisibleToUser(USER) %}
+                                        {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
 
-                                <nav>
-                                    {% if assessment is quiz and participant.allResponses | length %}
-                                        <a class="icon-view"
-                                           href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, userId: student.id}) }}"
-                                           title="View Attempts"></a>
-                                    {% endif %}
-                                    {% if assessment is dueWork and feedback and student.eportfolioEnable %}
-                                        {% if canSeeShowcaseButton %}
-                                            <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"
-                                               title="Publish to ePortfolio"></a>
-                                            <form action="/eportfolio/showcase/modifyForm.php" method="post"
-                                                  data-publish-to-eportfolio-form="{{ assessment.id }}">
-                                                <input type="hidden" name="action" value="publish">
-                                                <input type="hidden" name="userId" value="{{ student.id }}">
-                                                <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
-                                            </form>
-                                            <script type="text/javascript">
-                                                $(function () {
-                                                    {# Publish to ePortfolio #}
-                                                    $('[data-publish-to-eportfolio]').click(function (event) {
-                                                        event.preventDefault();
-
-                                                        var assessmentId = $(this).data('publishToEportfolio');
-
-                                                        $(this).confirmDialog({
-                                                            header: "Publish to ePortfolio Showcase",
-                                                            text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
-                                                            confirmEvent: function () {
-                                                                $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({
-                                                                    activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'
-                                                                });
-                                                            }
-                                                        });
-                                                    });
-                                                });
-                                            </script>
+                                        {% if assessment is task %}
+                                            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                            assessment: assessable,
+                                            student: participant.user
+                                            } only %}
+                                        {% else %}
+                                            <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
+                                                <span>{{ assessment.humanReadableMark(participant, true) }}</span>
+                                            </div>
                                         {% endif %}
                                     {% endif %}
-                                </nav>
+                                </div>
+
+{#                                <nav>#}
+{#                                    {% if assessment is dueWork and feedback and student.eportfolioEnable %}#}
+{#                                        {% if canSeeShowcaseButton %}#}
+{#                                            <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"#}
+{#                                               title="Publish to ePortfolio"></a>#}
+{#                                            <form action="/eportfolio/showcase/modifyForm.php" method="post"#}
+{#                                                  data-publish-to-eportfolio-form="{{ assessment.id }}">#}
+{#                                                <input type="hidden" name="action" value="publish">#}
+{#                                                <input type="hidden" name="userId" value="{{ student.id }}">#}
+{#                                                <input type="hidden" name="assessmentId" value="{{ assessment.id }}">#}
+{#                                            </form>#}
+{#                                            <script type="text/javascript">#}
+{#                                                $(function () {#}
+{#                                                    #}{# Publish to ePortfolio #}
+{#                                                    $('[data-publish-to-eportfolio]').click(function (event) {#}
+{#                                                        event.preventDefault();#}
+
+{#                                                        var assessmentId = $(this).data('publishToEportfolio');#}
+
+{#                                                        $(this).confirmDialog({#}
+{#                                                            header: "Publish to ePortfolio Showcase",#}
+{#                                                            text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',#}
+{#                                                            confirmEvent: function () {#}
+{#                                                                $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({#}
+{#                                                                    activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'#}
+{#                                                                });#}
+{#                                                            }#}
+{#                                                        });#}
+{#                                                    });#}
+{#                                                });#}
+{#                                            </script>#}
+{#                                        {% endif %}#}
+{#                                    {% endif %}#}
+{#                                </nav>#}
+
+                                {% if assessment.isFeedbackVisibleToUser(USER) %}
+                                    {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+                                    {% if feedback %}
+                                    <div class="content">
+                                        <p class="comment">{{ feedback.comment | nl2br }}</p>
+                                        {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
+                                            <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
+                                                View assessment details</a>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
                             </li>
                         {% endif %}
                     {% endfor %}

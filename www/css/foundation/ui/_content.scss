@@ -1169,12 +1169,16 @@ $selector-width: 2.25rem;
         flex: 1;
     }
     .txt {
-      flex: 0 auto;
-      padding: 0 1rem;
+        flex: 0 auto;
+        padding: 0 1rem;
 
-      p {
-        margin-bottom: 0;
-      }
+        p {
+            margin-bottom: 0;
+        }
+    }
+    .assess-status {
+        flex: 1 0 auto;
+        padding: .5rem 1rem;
     }
 
     .gradient-none-bg {
