@@ -285,8 +285,6 @@ class Calendar extends DeprecatedModel
         $query = "
 			SELECT id, name
 			FROM luCampus
-            WHERE deleted_at IS NULL
-            ORDER BY sequence ASC
 		";
 
         if (!$_SESSION['su']) {
@@ -295,6 +293,7 @@ class Calendar extends DeprecatedModel
 				WHERE userCampus.uid = '$userId' AND luCampus.deleted_at IS NULL
 			";
         }
+
 
         $allCampuses = $this->db->getAll($query);
 

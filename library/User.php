@@ -422,7 +422,7 @@ class User extends DeprecatedModel
 
     public function getCampusList()
     {
-        $query = "SELECT * FROM luCampus WHERE luCampus.deleted_at IS NULL";
+        $query = "SELECT * FROM luCampus WHERE luCampus.deleted_at IS NULL ORDER BY sequence";
         return $this->db->getAll($query);
     }
 

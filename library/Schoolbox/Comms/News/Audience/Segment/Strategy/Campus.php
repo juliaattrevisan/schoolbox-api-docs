@@ -56,6 +56,7 @@ class Campus extends SimpleStrategy
             FROM luCampus
             WHERE name IS NOT NULL AND deleted_at IS NULL
             {$keywordFilter}
+            ORDER BY sequence
         ";
     }
 

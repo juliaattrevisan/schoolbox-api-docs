@@ -195,13 +195,13 @@ class CampusMapper extends Mapper {
 	{
 	    $pb = $this->getPredicateBuilder();
         $pb->equals('userCampus.uid', $user->getId());
-        $pb->notNull('luCampus.deleted_at');
+
 		$query = "
             SELECT
             	userCampus.*,
             	{$this->getColumnString('c')}
             FROM userCampus
-            INNER JOIN luCampus c ON userCampus.campus = c.id
+            INNER JOIN luCampus c ON userCampus.campus = c.id AND c.deleted_at IS NULL
         ";
         $query .= ' WHERE ' . implode(' AND ', $pb->getWhere());
 
