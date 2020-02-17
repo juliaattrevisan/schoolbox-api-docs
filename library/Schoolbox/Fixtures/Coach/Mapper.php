@@ -65,12 +65,16 @@ class Mapper extends BaseMapper
                 $model = $this->createModel();
             }
 
-            $user = $this->hydrateJoin($row, 'user', 'u');
-            if ($user instanceof User) {
-                $model->setUser($user);
-                $role = $this->hydrateJoin($row, 'user.role', 'ur');
-                if ($role instanceof Role) {
-                    $user->setRole($role);
+            if ($row['u.id']) {
+                $user = $this->hydrateJoin($row, 'user', 'u');
+                if ($user instanceof User) {
+                    $model->setUser($user);
+                    if ($row['ur.id']) {
+                        $role = $this->hydrateJoin($row, 'user.role', 'ur');
+                        if ($role instanceof Role) {
+                            $user->setRole($role);
+                        }
+                    }
                 }
             }
             $collection->add($model);
