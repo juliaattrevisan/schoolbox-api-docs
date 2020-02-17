@@ -1,0 +1,300 @@
+openapi: 3.0.2
+
+
+info:
+  title:       Schoolbox API Common Properties
+  description: |
+    Common properties shared between all Schoolbox APIs
+  x-api-id:    8e6116e3-d39a-4d4c-a7a1-3e5273ed591b
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+
+servers:
+  - url: https://{hostname}.{domain}/
+    variables:
+      hostname:
+        description: The subdomain of the school's domain name on which Schoolbox is hosted.
+        default: demo
+      domain:
+        description: The school's domain name.
+        default: schoolbox.com.au
+
+
+# The common properties schema defines no paths:
+# it acts only as a source for other documents to reference.
+paths: {}
+
+
+components:
+  schemas:
+    id:
+      title: ID
+      description: Identifying ID number for most objects within Schoolbox
+      readOnly: true
+      type: integer
+      format: int32
+      minimum: 1
+
+    cursor:
+      title: Cursor
+      description: |
+        A generated but decodable pointer to the first record to return.
+
+        Each endpoint whose data accepts a cursor will return a cursor that
+        points to the next page of the result set.
+      type: string
+
+    listMetadata:
+      title: List metadata
+      description: Metadata for lists of items retrieved
+      readOnly: true
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+          description: If provided, the number of items in the result set.
+        cursor:
+          type: object
+          properties:
+            current:
+              allOf:
+                - $ref: '#/components/schemas/cursor'
+              nullable: true
+              description: |
+                If set, a cursor to the current page of results.
+                Seems redundant, but it does generate a cursor to a request
+                made without one.
+            next:
+              allOf:
+                - $ref: '#/components/schemas/cursor'
+              nullable: true
+              description: If set, a cursor to the next page of results.
+          required:
+            - current
+            - next
+
+    problem:
+      title: Problem Details
+      description: Schema for RFC 7807 (Problem Details for HTTP APIs)
+      readOnly: true
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI reference that identifies the problem type
+          default: 'about:blank'
+        title:
+          type: string
+          description: A short human-readable summary of the problem type
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 503
+          description: The HTTP status code
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence of the problem
+      required:
+        - type
+        - title
+        - status
+
+    dateTime:
+      title: Datetime
+      description: |
+        A JSON representation of a datetime.
+        For compatibility with existing code, can be defined as either:
+        * a RFC3339 string
+        * an object, which contains a datetime in several formats
+      oneOf:
+        - type: string
+          format: date-time
+        - type: object
+          readOnly: true
+          deprecated: true
+          description: |
+            This read-only object representation is deprectaed and will be
+            removed eventually: it exists only for compatibility with existing
+            API endpoints.
+
+            If using this object representation, please use the "json" property
+            and perform localization using client-side libraries.
+          required:
+            - json
+          properties:
+            database:
+              type: string
+              description: |
+                A database representation of the date.
+            unixTimestamp:
+              type: integer
+              format: int64
+              description: |
+                The date as a Unix timestamp.
+            local:
+              type: string
+              description: |
+                A string representation of the date, localized to the Schoolbox
+                instance's settings.
+            json:
+              type: string
+              format: date-time
+              description: |
+                The date as a RFC3339 string.
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        This API supports authentication via a JWT provided by a trusted oAuth provider.
+
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+      description: |
+        This API supports authentication via a standard session ID cookie.
+
+    # TODO enable when/if Schoolbox implements an oAuth provider
+#    # Will a separate security scheme be required per provider? Seems like it
+#    schoolboxOauth:
+#      type: oauth2
+#      description: |
+#        This API supports authentication via Schoolbox's own oAuth provider.
+#      flows:
+#        authorizationCode:
+#          authorizationUrl: /oauth/authorize
+#          tokenUrl: /oauth/token
+#          refreshUrl: /oauth/refresh
+#        clientCredentials:
+#          tokenUrl: /oauth/token
+
+
+  responses:
+    problem:
+      description: RFC 7807 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+          examples:
+            badRequestUpdate:
+              $ref: '#/components/examples/problemBadRequestUpdate'
+            badRequestDelete:
+              $ref: '#/components/examples/problemBadRequestDelete'
+            unauthorized:
+              $ref: '#/components/examples/problemUnauthorized'
+            forbidden:
+              $ref: '#/components/examples/problemForbidden'
+            notFound:
+              $ref: '#/components/examples/problemNotFound'
+            internalServerError:
+              $ref: '#/components/examples/problemInternalServerError'
+
+
+  parameters:
+    id:
+      name:        id
+      in:          path
+      description: |
+        The ID of an item to act upon.
+
+        The type of item that is acted upon is dependent on the endpoint in which
+        it is included.
+      required:    true
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+
+    limit:
+      name:        sort
+      in:          query
+      description: Maximum number of records to return
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    cursor:
+      name:        cursor
+      in:          query
+      description: |
+        A generated but decodable pointer to the first record to return.
+
+        Each endpoint whose data accepts a cursor will return a cursor that
+        points to the next page of the result set.
+      schema:
+        $ref: '#/components/schemas/cursor'
+
+    token:
+      name:        token
+      in:          query
+      description: |
+        A token for user authentication.
+        This is temporary, and will be replaced with oAuth/JWT authentication.
+      schema:
+        type: string
+
+
+  examples:
+
+    problemBadRequestUpdate:
+      value:
+        type:   about:blank
+        title:  Bad Request
+        status: 400
+        detail: This resource may not have its created at time modified.
+
+    problemBadRequestDelete:
+      value:
+        type:   about:blank
+        title:  Bad Request
+        status: 400
+        detail: This resource may not be deleted.
+
+    problemUnauthorized:
+      value:
+        type:   about:blank
+        title:  Unauthorized Access
+        status: 401
+        detail: Authorization is required to access resource with ID=1.
+
+    problemForbidden:
+      value:
+        type:   about:blank
+        title:  Forbidden
+        status: 403
+        detail: You do not have permission to access resource with ID=1.
+
+    problemNotFound:
+      value:
+        type:   about:blank
+        title:  Not Found
+        status: 404
+        detail: The resource with ID=1 was not found.
+
+    problemInternalServerError:
+      value:
+        type:   about:blank
+        title:  Internal Server Error
+        status: 500
+        detail: An unexpected error occured when accessing resource with ID=1. This error has been logged.

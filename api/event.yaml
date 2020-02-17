@@ -1,0 +1,68 @@
+openapi: 3.0.2
+
+
+info:
+  title:       Schoolbox Event API
+  description: |
+    Schoolbox Event API
+  x-api-id:    a8ab6ab8-3be8-4493-b30f-0afe49ea360e
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+
+paths:
+  {}
+
+
+components:
+  schemas:
+    event:
+      title: Event
+      description: A Schoolbox calendar event
+      # TODO consider adding _links
+      type: object
+      properties:
+        id:
+          # TODO who knows, events might have different identifiers
+          # should the API fetch non-Schoolbox events too?
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        allDay:
+          type: boolean
+        start:
+          $ref: '#/components/schemas/eventDateOrDateTime'
+        end:
+          $ref: '#/components/schemas/eventDateOrDateTime'
+
+    eventDateOrDateTime:
+      title: Event date or date+time
+      description: |
+        An event's date, with or without a time component.
+
+        Which one is used depends on the event's "allDay" field: if it's true,
+        only the date is shown.
+      oneOf:
+        - $ref: '#/components/schemas/date'
+        - $ref: '#/components/schemas/dateTime'
+      discriminator:
+        propertyName: allDay
+        mapping:
+          true: '#/components/schemas/date'
+          false: '#/components/schemas/dateTime'
+
+    date:
+      title: Event date
+      description: An event's date, without a time component.
+      type: string
+      format: date
+
+    dateTime:
+      title: Event date+time
+      description: An event's date, with a time component.
+      type: string
+      format: date-time

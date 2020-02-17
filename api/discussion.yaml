@@ -12,6 +12,26 @@ info:
     url:   https://schoolbox.com.au
     email: developers@schoolbox.com.au
 
+
+# TODO reference servers to common.yaml once this is actually possible
+# See https://github.com/OAI/OpenAPI-Specification/issues/1527 for why it's not
+servers:
+  - url: https://{hostname}.{domain}/
+    variables:
+      hostname:
+        description: The subdomain of the school's domain name on which Schoolbox is hosted.
+        default: demo
+      domain:
+        description: The school's domain name.
+        default: schoolbox.com.au
+
+
+security:
+  # Authorization is handled by Schoolbox itself once a user is authenticated:
+  # therefore, no scopes are defined for any security scheme.
+  - bearerAuth:     []
+
+
 paths:
 
   /discussion/{contextType}/{contextId}/comments/{id}:
@@ -22,13 +42,12 @@ paths:
         '204':
           description: The resource was deleted successfully.
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
 
     parameters:
       - $ref: '#/components/parameters/contextType'
       - $ref: '#/components/parameters/contextId'
-      - $ref: '#/components/parameters/id'
-      - $ref: '#/components/parameters/token'
+      - $ref: 'common.yaml#/components/parameters/id'
 
   /discussion/{contextType}/{contextId}/comments/{id}/comments:
     get:
@@ -38,16 +57,15 @@ paths:
         '200':
           $ref: '#/components/responses/commentList'
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
 
     parameters:
       - $ref: '#/components/parameters/contextType'
       - $ref: '#/components/parameters/contextId'
-      - $ref: '#/components/parameters/id'
-      - $ref: '#/components/parameters/cursor'
-      - $ref: '#/components/parameters/limit'
-      - $ref: '#/components/parameters/token'
-      - $ref: '#/components/parameters/depth'
+      - $ref: 'common.yaml#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/cursor'
+#      - $ref: '#/components/parameters/limit'
+#      - $ref: '#/components/parameters/depth'
 
   /discussion/{contextType}/{contextId}/threads/{id}:
     get:
@@ -57,12 +75,12 @@ paths:
         '200':
           $ref: '#/components/responses/thread'
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
 
     parameters:
       - $ref: '#/components/parameters/contextType'
       - $ref: '#/components/parameters/contextId'
-      - $ref: '#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/id'
 
   /discussion/{contextType}/{contextId}/threads:
     post:
@@ -76,7 +94,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/thread'
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
       requestBody:
         content:
           application/json:
@@ -95,7 +113,7 @@ paths:
         '200':
           $ref: '#/components/responses/commentList'
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
 
     post:
       operationId: createCommentInThread
@@ -108,7 +126,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/comment'
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
       requestBody:
         content:
           application/json:
@@ -118,11 +136,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/contextType'
       - $ref: '#/components/parameters/contextId'
-      - $ref: '#/components/parameters/id'
-      - $ref: '#/components/parameters/cursor'
-      - $ref: '#/components/parameters/limit'
-      - $ref: '#/components/parameters/token'
-      - $ref: '#/components/parameters/depth'
+      - $ref: 'common.yaml#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/cursor'
 
   /discussion/{contextType}/{contextId}/threads/{id}/open:
     put:
@@ -132,7 +147,7 @@ paths:
         '200':
           description: Enable the thread
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
       requestBody:
         content:
           application/json:
@@ -141,7 +156,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/contextType'
       - $ref: '#/components/parameters/contextId'
-      - $ref: '#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/id'
 
   /discussion/{contextType}/{contextId}/threads/{id}/close:
     put:
@@ -151,7 +166,7 @@ paths:
         '200':
           description: Disable the thread
         default:
-          $ref: '#/components/responses/problem'
+          $ref: 'common.yaml#/components/responses/problem'
       requestBody:
         content:
           application/json:
@@ -160,32 +175,24 @@ paths:
     parameters:
       - $ref: '#/components/parameters/contextType'
       - $ref: '#/components/parameters/contextId'
-      - $ref: '#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/id'
 
 components:
   schemas:
-    id:
-      type: integer
-      format: int32
-
     thread:
       title: Thread
       description: Common fields for discussion threads
       type: object
       properties:
         id:
-          $ref: '#/components/schemas/id'
-#        context:
-#          type: array
-#          items:
-#            $ref: '#/components/schemas/threadContext'
+          $ref: 'common.yaml#/components/schemas/id'
         open:
           type: boolean
           description: Is the thread open for further comments?
         created:
-          $ref: '#/components/schemas/dateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         updated:
-          $ref: '#/components/schemas/dateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         children:
           allOf:
             - $ref: '#/components/schemas/commentList'
@@ -194,47 +201,25 @@ components:
         - id
         - open
 
-    # Thread context doesn't exist for now, and will likely be removed
-#    threadContext:
-#      title: Thread Context
-#      description: |
-#        A brief description of the context of a discussion thread, i.e. the
-#        object with which it is associated.
-#        Discussion threads may be associated with arbitrary items: therefore,
-#        the ID and type of object must be stored.
-#      type: object
-#      properties:
-#        type:
-#          description: |
-#            The type of the context for a given thread. Currently, only comms is
-#            supported.
-#          type: string
-#          enum: [comms]
-#        id:
-#          allOf:
-#            - $ref: '#/components/schemas/id'
-#          description: The ID of the item
-
     comment:
       title: Comment
       description: Common fields for discussion comments
       type: object
       properties:
         id:
-          $ref: '#/components/schemas/id'
+          $ref: 'common.yaml#/components/schemas/id'
         thread:
           $ref: '#/components/schemas/thread'
-          # Usually a comment will be retrieved within the context of a thread
         author:
           allOf:
-            - $ref: '#/components/schemas/user'
+            - $ref: 'user.yaml#/components/schemas/user'
           nullable: true
         content:
           type: string
         created:
-          $ref: '#/components/schemas/dateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         updated:
-          $ref: '#/components/schemas/dateTime'
+          $ref: 'common.yaml#/components/schemas/dateTime'
         parent:
           allOf:
             - $ref: '#/components/schemas/comment'
@@ -265,96 +250,6 @@ components:
         - thread
         - content
 
-    user:
-      title: User
-      description: Common fields for users
-      type: object
-      properties:
-        id:
-          $ref: '#/components/schemas/id'
-        externalId:
-          type: string
-        title:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        _links:
-          type: object
-          properties:
-            profile:
-              type: string
-              format: uri-reference
-            avatar:
-              type: string
-              format: uri-reference
-              nullable: true
-      required:
-        - id
-
-    problem:
-      title: Problem Details
-      description: Schema for RFC 7807 (Problem Details for HTTP APIs)
-      readOnly: true
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-          description: A URI reference that identifies the problem type
-          default: 'about:blank'
-        title:
-          type: string
-          description: A short human-readable summary of the problem type
-        status:
-          type: integer
-          format: int32
-          minimum: 100
-          maximum: 600
-          exclusiveMaximum: true
-          example: 503
-          description: The HTTP status code
-        detail:
-          type: string
-          description: A human-readable explanation specific to this occurrence of the problem
-        instance:
-          type: string
-          format: uri
-          description: A URI reference that identifies the specific occurrence of the problem
-      required:
-        - type
-        - title
-        - status
-
-    listMetadata:
-      title: List metadata
-      description: Metadata for lists of items retrieved
-      readOnly: true
-      type: object
-      properties:
-        count:
-          type: integer
-          format: int32
-          description: If provided, the number of items in the result set.
-        cursor:
-          type: object
-          properties:
-            current:
-              type: string
-              nullable: true
-              description: |
-                If set, a cursor to the current page of results.
-                Seems redundant, but it does generate a cursor to a request
-                made without one.
-            next:
-              type: string
-              nullable: true
-              description: If set, a cursor to the next page of results.
-          required:
-            - current
-            - next
-
     commentList:
       title: Comment list
       description: A list of comments
@@ -366,72 +261,16 @@ components:
           items:
             $ref: '#/components/schemas/comment'
         metadata:
-          $ref: '#/components/schemas/listMetadata'
+          $ref: 'common.yaml#/components/schemas/listMetadata'
 
-    dateTime:
-      title: Datetime
-      description: |
-        A JSON representation of a datetime.
-        For compatibility with existing code, can be defined as either:
-        * a RFC3339 string
-        * an object, which contains a datetime in several formats
-      oneOf:
-        - type: string
-          format: date-time
-        - type: object
-          readOnly: true
-          deprecated: true
-          description: |
-            This read-only object representation will be deprecated eventually:
-            it exists only for compatibility with existing API endpoints.
-          required:
-            - json
-          properties:
-            database:
-              type: string
-              description: |
-                A database representation of the date. Please use the "json"
-                property instead.
-            unixTimestamp:
-              type: integer
-              format: int64
-              description: |
-                The date as a Unix timestamp. Please use the "json" property
-                instead.
-            local:
-              type: string
-              description: |
-                A string representation of the date, localized to the Schoolbox
-                instance's settings.
-                Please use the "json" property instead, and perform localization
-                using libraries on the client.
-            json:
-              type: string
-              format: date-time
-              description: |
-                The date as a RFC3339 string.
+  securitySchemes:
+    bearerAuth:
+      $ref: 'common.yaml#/components/securitySchemes/bearerAuth'
+
+    cookieAuth:
+      $ref: 'common.yaml#/components/securitySchemes/cookieAuth'
 
   responses:
-    problem:
-      description: RFC 7807 Problem Details
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
-          examples:
-            badRequestUpdate:
-              $ref: '#/components/examples/problemBadRequestUpdate'
-            badRequestDelete:
-              $ref: '#/components/examples/problemBadRequestDelete'
-            unauthorized:
-              $ref: '#/components/examples/problemUnauthorized'
-            forbidden:
-              $ref: '#/components/examples/problemForbidden'
-            notFound:
-              $ref: '#/components/examples/problemNotFound'
-            internalServerError:
-              $ref: '#/components/examples/problemInternalServerError'
-
     thread:
       description: A thread
       content:
@@ -463,21 +302,13 @@ components:
 
 
   parameters:
-    id:
-      name:        id
-      in:          path
-      description: ID of an item to use
-      required:    true
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
 
     contextType:
       name:        contextType
       in:          path
       description: |
         The type of item that a thread is associated with.
+
         Used in conjunction with contextId to find the item with which a thread
         is associated, and then to determine whether the authenticated user has
         permission to perform the requested action.
@@ -494,54 +325,13 @@ components:
       in:          path
       description: |
         The unique ID of the item that a thread is associated with.
+
         Used in conjunction with contextType to find the item with which a
         thread is associated, and then to determine whether the authenticated
         user has permission to perform the requested action.
       required:    true
       schema:
-        $ref: '#/components/schemas/id'
-
-    limit:
-      name:        sort
-      in:          query
-      description: Maximum number of records to return
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-        default: 20
-
-    cursor:
-      name:        cursor
-      in:          query
-      description: |
-        Alternative to offset. A generated but decodable pointer to the first
-        record to return.
-      schema:
-        type: string
-
-    token:
-      name:        token
-      in:          query
-      description: |
-        A token for user authentication.
-        This is temporary, and will be replaced with oAuth/JWT authentication.
-      schema:
-        type: string
-
-    depth:
-      name:        depth
-      in:          query
-      description: |
-        Number of levels to descend when retrieving child comments.
-      required: false
-      schema:
-        type: integer
-        format: int32
-        default: 0
-        minimum: 0
-        maximum: 3
+        $ref: 'common.yaml#/components/schemas/id'
 
   examples:
     commentListEmpty:
@@ -679,45 +469,3 @@ components:
           cursor:
             current: xxx
             next: yyy
-
-    problemBadRequestUpdate:
-      value:
-        type:   about:blank
-        title:  Bad Request
-        status: 400
-        detail: This resource may not have its created at time modified.
-
-    problemBadRequestDelete:
-      value:
-        type:   about:blank
-        title:  Bad Request
-        status: 400
-        detail: This resource may not be deleted.
-
-    problemUnauthorized:
-      value:
-        type:   about:blank
-        title:  Unauthorized Access
-        status: 401
-        detail: Authorization is required to access resource with ID=1.
-
-    problemForbidden:
-      value:
-        type:   about:blank
-        title:  Forbidden
-        status: 403
-        detail: You do not have permission to access resource with ID=1.
-
-    problemNotFound:
-      value:
-        type:   about:blank
-        title:  Not Found
-        status: 404
-        detail: The resource with ID=1 was not found.
-
-    problemInternalServerError:
-      value:
-        type:   about:blank
-        title:  Internal Server Error
-        status: 500
-        detail: An unexpected error occured when accessing resource with ID=1. This error has been logged.

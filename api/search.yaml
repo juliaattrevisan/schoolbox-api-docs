@@ -1,0 +1,489 @@
+openapi: 3.0.2
+
+
+info:
+  title:       Schoolbox Search API
+  description: |
+    Schoolbox Search API
+  x-api-id:    4514d761-b746-4f78-b69c-42fadb0763b2
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+
+servers:
+  - url: https://{hostname}.{domain}/
+    variables:
+      hostname:
+        description: The subdomain of the school's domain name on which Schoolbox is hosted.
+        default: demo
+      domain:
+        description: The school's domain name.
+        default: schoolbox.com.au
+
+
+paths:
+  /searchv2:
+    get:
+      operationId: search
+      summary: Return search results for a query
+      responses:
+        '200':
+          $ref: '#/components/responses/searchResultList'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+    parameters:
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/creator'
+      - $ref: '#/components/parameters/type'
+
+
+components:
+  schemas:
+    searchResult:
+      title: Search result
+      description: Fields for search results
+      type: object
+      properties:
+        id:
+          description: |
+            The identifier for the object in `content`. Forms a composite key
+            for a search result with `type` (`content`'s discriminator field).
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/id'
+        creator:
+          description: |
+            The creator of the content which yielded this search result
+            (if known).
+          nullable: true
+          allOf:
+            - $ref: 'user.yaml#/components/schemas/user'
+        summary:
+          description: A brief human-readable summary of the search result.
+          type: string
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultType'
+        content:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultUser'
+            - $ref: '#/components/schemas/searchResultEvent'
+            - $ref: '#/components/schemas/searchResultFolder'
+            - $ref: '#/components/schemas/searchResultComms'
+          discriminator:
+            propertyName: type
+            mapping:
+              user:   '#/components/schemas/searchResultUser'
+              event:  '#/components/schemas/searchResultEvent'
+              folder: '#/components/schemas/searchResultFolder'
+              comms:  '#/components/schemas/searchResultComms'
+        relevance:
+          description: |
+            The relevance of this result to the search query, from 0 to 1
+            (higher: more relevant).
+          type: number
+          minimum: 0
+          maximum: 1
+        date:
+          description: |
+            The date on which this content became viewable (if known).
+
+            If the content is publishable as a separate step from being created,
+            it will be a publish date: otherwise, it will be a creation date.
+
+            (Since the search API itself will support a date range, this field
+            needs to exist on all results. Different types of results may return
+            different dates.)
+
+            Note: not all search results are temporal.
+
+            * Folder, User, File, Textbox, Link, Tile, Forum:
+            ** Effect on relevance: none
+            ** Affected by filter: if either create or last modified time is in
+               date search window, include it
+
+            * Comms:
+            ** Effect on relevance:
+            *** pre-publish: irrelevant (unless I am the author?)
+            *** published: full relevance
+            *** archived: reduced relevance?
+            ** Affected by filter:
+            *** include if publish-archive window overlaps date search window
+
+            * Event:
+            ** Effect on relevance:
+            *** pre-publish: irrelevant (unless I am the author?)
+            *** yet to start: relevance depends on how close the event start is
+            *** in start-end window: full relevance
+            *** past: reduced relevance (depends on how long ago?)
+            ** Affected by filter:
+            *** include if start-end window overlaps date search window
+
+            * Assessment:
+            ** Effect on relevance:
+            *** pre-publish: irrelevant (unless I am the author?)
+            *** published until late: filter in, full relevance?
+            *** past late: filter out, less relevance?
+            ** Affected by filter:
+            *** include if publish-close window overlaps date search window?
+            ** All of these are ignored for course-level assessments: they have
+               no concept of date
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/dateTime'
+      required:
+        - id
+        - content
+
+    searchResultList:
+      title: Search result list
+      description: A list of search results
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/searchResult'
+        metadata:
+          $ref: 'common.yaml#/components/schemas/listMetadata'
+
+    searchResultType:
+      title: Search result type
+      description: A type of search result. May be used as a filter
+      readOnly: true
+      type: string
+      enum:
+        - user
+        - event
+        - folder
+        - comms
+
+    searchResultUser:
+      title: Search result - user
+      description: A search result for a user
+      readOnly: true
+      allOf:
+        - $ref: 'user.yaml#/components/schemas/user'
+
+    searchResultEvent:
+      title: Search result - event
+      description: A search result for an event
+      allOf:
+        - $ref: 'event.yaml#/components/schemas/event'
+
+    searchResultAssessment:
+      title: Search result assessment
+      description: An assessment found as part of a search.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        publish:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+        open:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+        due:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+        close:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+
+    searchResultComms:
+      title: Search result comms article
+      description: |
+        A comms article found as part of a search.
+
+        The full content is not included: the summary of what matches will be
+        included within the "summary" property of the match.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        publish:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+        archive:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+
+    searchResultTextbox:
+      title: Search result text box
+      description: |
+        A text box found as part of a search.
+
+        The full content is not included: the summary of what matches will be
+        included within the "summary" property of the match.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+
+    searchResultFile:
+      title: Search result file
+      description: A file found as part of a search.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
+          description: The file's filename
+          type: string
+        mimetype:
+          description: The file's mimetype
+          type: string
+        size:
+          description: The file's size, in bytes
+          type: integer
+          minimum: 0
+        url:
+          description: The URL from which the file may be downloaded.
+          type: string
+          format: uri-reference
+
+    searchResultLink:
+      title: Search result link
+      description: A link found as part of a search.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        url:
+          description: The URL to which this link points to.
+          type: string
+          format: uri-reference
+
+    searchResultTile:
+      title: Search result tile
+      description: A tile found as part of a search.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        url:
+          description: The URL to which this tile points to, if any.
+          type: string
+          format: uri-reference
+          nullable: true
+        backgroundImageUrl:
+          description: The URL of this tile's background image, if any.
+          type: string
+          format: uri-reference
+          nullable: true
+
+    searchResultForum:
+      title: Search result forum
+      description: A forum post found as part of a search.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        url:
+          description: |
+            The URL of the forum post. Will be an anchor link to a post within
+            the context of its thread.
+          type: string
+          format: uri-reference
+
+    searchResultFolder:
+      title: Search result folder
+      description: |
+        A folder found as part of a search.
+
+        May contain sub-results.
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        title:
+          type: string
+        subResults:
+          type: array
+          items:
+            $ref: '#/components/schemas/searchResultFolderSubResult'
+
+    searchResultFolderSubResult:
+      title: Search result folder sub-result
+      description: |
+        A result found within a folder as part of a search.
+
+        Relevance isn't included within folder contents search results: the
+        folder's relevance itself is what is considered relevant.
+      type: object
+      properties:
+        id:
+          description: |
+            The identifier for the object in `content`. Forms a composite key
+            for a sub-result with `type` (`content`'s discriminator field).
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/id'
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultFolderSubResultType'
+        summary:
+          description: A brief human-readable summary of the search result.
+          type: string
+        content:
+          oneOf:
+            - $ref: '#/components/schemas/searchResultEvent'
+            - $ref: '#/components/schemas/searchResultAssessment'
+            - $ref: '#/components/schemas/searchResultComms'
+            - $ref: '#/components/schemas/searchResultFile'
+            - $ref: '#/components/schemas/searchResultTextbox'
+            - $ref: '#/components/schemas/searchResultLink'
+            - $ref: '#/components/schemas/searchResultTile'
+            - $ref: '#/components/schemas/searchResultForum'
+          discriminator:
+            propertyName: type
+            mapping:
+              event:      '#/components/schemas/searchResultEvent'
+              assessment: '#/components/schemas/searchResultAssessment'
+              comms:      '#/components/schemas/searchResultComms'
+              file:       '#/components/schemas/searchResultFile'
+              textbox:    '#/components/schemas/searchResultTextbox'
+              link:       '#/components/schemas/searchResultLink'
+              tile:       '#/components/schemas/searchResultTile'
+              forum:      '#/components/schemas/searchResultForum'
+
+    searchResultFolderSubResultType:
+      title: Search result type
+      description: |
+        A type of search result within a folder.
+
+        May be used as a filter as well.
+      readOnly: true
+      type: string
+      enum:
+        - event
+        - assessment
+        - comms
+        - file
+        - textbox
+        - link
+        - tile
+
+  responses:
+    searchResultList:
+      description: a list of search results
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/searchResultList'
+#          examples:
+#            empty:
+#              $ref: '#/components/examples/empty'
+#            singleUser:
+#              $ref: '#/components/examples/singleUser'
+
+  parameters:
+    query:
+      name:        q
+      in:          query
+      description: The search term.
+      schema:
+        type: string
+
+    from:
+      name: from
+      in:   query
+      description: |
+        If provided, only return search results that are relevant on or after
+        this date.
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/dateTime'
+
+    to:
+      name: to
+      in:   query
+      description: |
+        If provided, only return search results that are relevant on or before
+        this date.
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/dateTime'
+
+    creator:
+      name: creator
+      in:   query
+      description: |
+        If provided, only return search results that belong to this user.
+      required: false
+      schema:
+        $ref: 'user.yaml#/components/schemas/user'
+
+    type:
+      name: type
+      in:   query
+      description: |
+        If provided, only return these types of result; otherwise, return all
+        results.
+      required: false
+      schema:
+        type: array
+        # TODO is there a better way to define this enum?
+        enum:
+          - user
+#          - user:staff
+#          - user:student
+#          - user:parent
+#          - user:guest
+          - folder
+#          - folder:homepage
+#          - folder:course
+#          - folder:class
+#          - folder:class-archive
+#          - folder:other
+          - event
+          - comms
+          - assessment
+#          - assessment:duework
+#          - assessment:quiz
+#          - assessment:task
+#          - assessment:project
+          - file
+#          - file:image
+#          - file:audio
+#          - file:video
+#          - file:document
+#          - file:other
+          - textbox
+          - link
+          - tile
+
+#  examples:
+#    empty:
+#      description: An empty search result
+#      value:
+#        data: []
+#        metadata:
+#          cursor:
+#            current: bbb
+#            next: ccc
+#
+#    singleUser:
+#      description: A single user
+#      value:
+#        data:
+#          - id: 1
+#            type: user
+#            content:
+#              externalId: U1
+#              firstName: Test
+#              lastName: User
+#        metadata:
+#          cursor:
+#            current: bbb
+#            next: ccc

@@ -1,0 +1,230 @@
+openapi: 3.0.2
+
+info:
+  title:       Schoolbox User API
+  description: |
+    Schoolbox User API
+  x-api-id:    6a3db9af-1f82-4aff-b0b7-633d7fd76a6d
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+
+# TODO reference servers to common.yaml once this is actually possible
+# See https://github.com/OAI/OpenAPI-Specification/issues/1527 for why it's not
+servers:
+  - url: https://{hostname}.{domain}/
+    variables:
+      hostname:
+        description: The subdomain of the school's domain name on which Schoolbox is hosted.
+        default: demo
+      domain:
+        description: The school's domain name.
+        default: schoolbox.com.au
+
+
+security:
+  # Authorization is handled by Schoolbox itself once a user is authenticated:
+  # therefore, no scopes are defined for any security scheme.
+  - bearerAuth:     []
+
+
+paths:
+
+  /user:
+    post:
+      operationId: createUser
+      summary: Creates a user
+      responses:
+        '201':
+          description: The user that was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+
+
+  /user/{id}:
+    put:
+      operationId: putUser
+      summary: Updates a user
+      responses:
+        '200':
+          $ref: '#/components/responses/user'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+
+    delete:
+      operationId: deleteUser
+      summary: Deletes a user
+      responses:
+        '204':
+          description: The resource was deleted successfully.
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+
+    get:
+      operationId: getUser
+      summary: Returns a user
+      responses:
+        '200':
+          $ref: '#/components/responses/user'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/token'
+
+
+#  /user/profile:
+#    post:
+#      operationId: createUserProfile
+#      summary: Creates a user profile
+
+
+#  /user/search:
+#    get:
+#      operationId: searchUser
+#      summary: Search for users
+
+components:
+  schemas:
+    externalId:
+      type: string
+
+    user:
+      title: User
+      description: Common fields for users
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        externalId:
+          $ref: '#/components/schemas/externalId'
+        title:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        parents:
+          type: array
+          items:
+            $ref: '#/components/schemas/userProfile'
+          nullable: true
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/userProfile'
+          nullable: true
+        _links:
+          type: object
+          properties:
+            profile:
+              type: string
+              format: uri-reference
+            avatar:
+              type: string
+              format: uri-reference
+              nullable: true
+      required:
+        - id
+
+    userProfile:
+      title: User Profile
+      description: Common fields for user profiles
+      type: object
+      allOf:
+        - type: object
+          properties:
+            id:
+              $ref: 'common.yaml#/components/schemas/id'
+            externalId:
+              $ref: '#/components/schemas/externalId'
+        - oneOf:
+          - $ref: '#/components/schemas/userProfileGuardian'
+          - $ref: '#/components/schemas/userProfileStaff'
+          - $ref: '#/components/schemas/userProfileStudent'
+          discriminator:
+            propertyName: type
+            mapping:
+              guardian: '#/components/schemas/userProfileGuardian'
+              staff:    '#/components/schemas/userProfileStaff'
+              student:  '#/components/schemas/userProfileStudent'
+
+    userProfileStaff:
+      title: User Profile Staff fields
+      description: Fields for user profiles (staff only)
+      type: object
+      properties:
+        category:
+          type: string
+        positionDescription:
+          type: string
+        department:
+          type: string
+        extension:
+          type: string
+        room:
+          type: string
+
+    userProfileStudent:
+      title: User Profile Student fields
+      description: Fields for user profiles (students only)
+      type: object
+      properties:
+        dateOfBirth:
+          $ref: 'common.yaml#/components/schemas/dateTime'
+        medicalAlert:
+          type: string
+        specialNeeds:
+          type: string
+        internationalBaccalaureate:
+          type: boolean
+        englishSecondLanguage:
+          type: boolean
+
+    userProfileGuardian:
+      title: User Profile Guardian fields
+      description: Fields for user profiles (guardians only)
+      type: object
+      properties:
+        phoneMobile:
+          type: string
+        phoneHome:
+          type: string
+        phoneWork:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      $ref: 'common.yaml#/components/securitySchemes/bearerAuth'
+
+    cookieAuth:
+      $ref: 'common.yaml#/components/securitySchemes/cookieAuth'
+
+  responses:
+    user:
+      description: A user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/user'
+        text/html:
+          schema:
+            type: string
+            description: The user, rendered into HTML on the server.
