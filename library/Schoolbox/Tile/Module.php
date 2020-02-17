@@ -135,6 +135,9 @@ class Module extends BaseModule
 
         // Callback for extracting homepage from route params
         $getHomepageCallback = function ($params) {
+            if($params['layout']) {
+                return $params['layout']->getFolder();
+            }
             if ($params['component']->getModule() != 'homepage') {
                 throw new \Exception('Homepage permission does not apply to dashboard tiles');
             }
