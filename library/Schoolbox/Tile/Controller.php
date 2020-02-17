@@ -245,9 +245,8 @@ class Controller extends Base
      * Form for editing a tile
      *
      * @param Model              $item
-     * @param Component_Instance $component
      */
-    public function edit(Model $item, Component_Instance $component)
+    public function edit(Model $item)
     {
         $this->getResponse()->content->set(
             [
