@@ -11,7 +11,7 @@
     {% endif %}
 
     {% if tile is not empty %}
-        <li><a href="{{ routeLookup('tile.layout', {layoutId: layout.id}) }}">Tiles</a></li>
+        <li><a href="{{ routeLookup('tile.layout', {layoutId: layout.id}) }}">{{layout.heading}}</a></li>
         <li class="active"><a href="#">{% if tile.id %}Modify Tile{% else %}Add Tile{% endif %}</a></li>
     {% else %}
         <li class="active"><a href="#">Tiles</a></li>
