@@ -10,15 +10,13 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router;
 use Custom\Tigs\Summative\StudentAttributes;
-use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use function array_key_exists;
@@ -27,33 +25,8 @@ use function array_key_exists;
  * Responsible for generating data that can be used by a template to render the
  * Academic Achievement Summary components
  */
-class AcademicAchievementSummary extends BaseComponent
+class AcademicAchievementSummary extends AbstractMatrix
 {
-
-    /** @var GenericCollection|UnitSpec\Model[] */
-    private $unitSpecs;
-
-    /** @var User */
-    private $student;
-
-    /** Folder\Model $folder */
-    private $folder;
-
-    /** @var Visibility */
-    private $visibility;
-
-    /** @var int */
-    private $aasWorkTypeId;
-
-    /** @var RubricDataSource */
-    private $rubricMapper;
-
-    /** @var Authorizer */
-    private $authorizer;
-
-    /** @var Router\Router */
-    private $router;
-
 
     /**
      * @param StudentAttributes $attributes
@@ -82,113 +55,7 @@ class AcademicAchievementSummary extends BaseComponent
         Router\Router $router,
         ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes, $viewer, $roleTypeOverride);
-
-        $this->unitSpecs     = $unitSpecs;
-        $this->student       = $student;
-        $this->folder        = $folder;
-        $this->visibility    = $visibility;
-        $this->aasWorkTypeId = $aasWorkTypeId;
-        $this->rubricMapper  = $rubricMapper;
-        $this->authorizer    = $authorizer;
-        $this->router        = $router;
-    }
-
-
-    /**
-     * @return array
-     * @throws Router\Exception\RouteNotFound
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function toContext(): array
-    {
-        $data = [];
-        foreach ($this->unitSpecs as $unitSpec) {
-            $unitData = $this->buildUnitData($unitSpec);
-            if ($unitData) {
-                $data[$unitSpec->getId()] = $unitData;
-            }
-        }
-        return ['data' => $data];
-    }
-
-
-    /**
-     * Builds AAS data for the specified unit spec.
-     *
-     * Returns an array containing one of:
-     * * an error message as to why it can't render,
-     * * display data, or
-     * * null if no AAS assessment found for unit spec
-     *
-     * @param UnitSpec\Model $unitSpec
-     * @return array|null
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws Router\Exception\RouteNotFound
-     */
-    private function buildUnitData(UnitSpec\Model $unitSpec): ?array
-    {
-        // If report is for Sem1, only get data from Sem1, otherwise no limit
-        $semester       = $this->getAttributes()->getCurriculumSemester() === 1 ? 1 : null;
-        $aasAssessables = $this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->aasWorkTypeId)
-                               ->filter(function (IAssessable $assessable) use ($semester) {
-                                   return $this->isDueWithinReportWindow($assessable, $semester) && $assessable->isParticipant($this->student);
-                               });
-
-        // Did we find 2+ AAS assessments in this unit?
-        $countAas = \count($aasAssessables);
-        if ($countAas >= 2) {
-            return ['error' => "A folder may have 0 or 1 Academic Achievement Summary assessments per unit. Found {$countAas}."];
-        }
-
-        // Did we find no data?
-        if ($countAas === 0) {
-            return null;
-        }
-
-        /** @var IAssessable $assessment */
-        $assessment = $aasAssessables->first();
-
-        // Not a Due Work?
-        if (!$assessment instanceof DueWork\Model) {
-            $requiredType = DueWork\Model::getDefaultTypeName();
-            $msg          = \sprintf('Only %ss can have rubrics.', $requiredType);
-            $routeName    = 'learningAssessment.getAssessment';
-            $routeParams  = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
-                $route      = $this->router->generate($routeName, $routeParams);
-                $actualType = $assessment::getDefaultTypeName();
-                $title      = $assessment->getTitle();
-                $msg        .= \sprintf(' Found: %s - <a href="%s">%s</a>', $actualType, $route, $title);
-            }
-            return ['error' => $msg];
-        }
-
-        // No Rubric?
-        if (!$assessment->getUseRubric()) {
-            $routeName   = 'learningAssessment.getAssessment';
-            $routeParams = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
-                $route = $this->router->generate($routeName, $routeParams);
-                $title = \sprintf('<a href="%s">%s</a>', $route, $assessment->getTitle());
-            } else {
-                $title = $assessment->getTitle();
-            }
-            return ['error' => "{$assessment::getDefaultTypeName()} {$title} has a AAS work-type but does not have a rubric grid"];
-        }
-
-        // If assessment not visible, or student is not a participant, returns NULL.
-        // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
-            return null;
-        }
-
-        // Is grade visibility off for the current viewer?
-        if (!$this->isFeedbackVisibleToUser($assessment)) {
-            return null;
-        }
-
-        return $this->buildAssessmentData($assessment);
+        parent::__construct($attributes, $unitSpecs, $student, $folder, $visibility, $viewer, $aasWorkTypeId, $rubricMapper, $authorizer, $router, $roleTypeOverride);
     }
 
 
@@ -199,10 +66,10 @@ class AcademicAchievementSummary extends BaseComponent
      *
      * @param DueWork\Model $dueWork
      * @return null|array
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws Router\Exception\RouteNotFound
      */
-    private function buildAssessmentData(DueWork\Model $dueWork): ?array
+    public function buildAssessmentData(DueWork\Model $dueWork): array
     {
         // Fetch the grid
         $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
@@ -223,7 +90,7 @@ class AcademicAchievementSummary extends BaseComponent
             $feedback = $participant->getAuthoritativeFeedback(true);
             if ($feedback) {
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
-                $data['markedGrid'] = $feedback->getRubricMarkedGrid();
+                $data['markedGrid']      = $feedback->getRubricMarkedGrid();
                 $data['capabilityMarks'] = $this->buildCapabilityMarks($data['markedGrid']);
 
                 // MYP students' comments will come from this assessment

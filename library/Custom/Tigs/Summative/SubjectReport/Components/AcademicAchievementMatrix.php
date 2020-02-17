@@ -10,49 +10,18 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router;
 use Custom\Tigs\Summative\StudentAttributes;
-use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
-use Schoolbox\Assessment\Rubric\Grid\Grid;
-use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
 /**
  * Builds a suitable data structure for rendering the AAM components
  */
-class AcademicAchievementMatrix extends BaseComponent
+class AcademicAchievementMatrix extends AbstractMatrix
 {
-
-    /** @var GenericCollection|UnitSpec\Model[] */
-    private $unitSpecs;
-
-    /** @var User */
-    private $student;
-
-    /** Folder\Model $folder */
-    private $folder;
-
-    /** @var Visibility */
-    private $visibility;
-
-    /** @var int */
-    private $aamWorkTypeId;
-
-    /** @var RubricDataSource */
-    private $rubricMapper;
-
-    /** @var Authorizer */
-    private $authorizer;
-
-    /** @var Router\Router */
-    private $router;
-
 
     /**
      * @param StudentAttributes $attributes
@@ -81,151 +50,6 @@ class AcademicAchievementMatrix extends BaseComponent
         Router\Router $router,
         ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes, $viewer, $roleTypeOverride);
-
-        $this->unitSpecs     = $unitSpecs;
-        $this->student       = $student;
-        $this->folder        = $folder;
-        $this->visibility    = $visibility;
-        $this->aamWorkTypeId = $aamWorkTypeId;
-        $this->rubricMapper  = $rubricMapper;
-        $this->authorizer    = $authorizer;
-        $this->router        = $router;
-    }
-
-
-    /**
-     * Generates and returns a data structure, suitable for passing to twig
-     *
-     * Data is indexed by unitSpec.id. For each unit:
-     * * if no data is found, returns null.
-     * * if invalid data found, returns an error message to aid resolution
-     *
-     * @return array
-     * @var string     $data ['data'][unitSpecId]['error']      Optional. If cannot build due to invalid data
-     * @var Grid       $data ['data'][unitSpecId]['grid']       Optional. If a valid AAM rubric is found for the unit
-     * @var MarkedGrid $data ['data'][unitSpecId]['markedGrid'] Optional. If student has visible marks for the rubric
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws Router\Exception\RouteNotFound
-     */
-    public function toContext(): array
-    {
-        $data = [];
-        foreach ($this->unitSpecs as $unitSpec) {
-            $unitData = $this->buildUnitData($unitSpec);
-            if ($unitData) {
-                $data[$unitSpec->getId()] = $unitData;
-            }
-        }
-
-        return ['data' => $data];
-    }
-
-
-    /**
-     * Builds AAM data for the specified unit.
-     *
-     * @param UnitSpec\Model $unitSpec
-     * @return array|null
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws Router\Exception\RouteNotFound
-     */
-    private function buildUnitData(UnitSpec\Model $unitSpec): ?array
-    {
-        // If report is for Sem1, only get data from Sem1, otherwise no limit
-        $semester = $this->getAttributes()->getCurriculumSemester() === 1 ? 1 : null;
-        $aamAssessables = $this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->aamWorkTypeId)
-                               ->filter(function (IAssessable $assessable) use ($semester) {
-                                   return $this->isDueWithinReportWindow($assessable, $semester) && $assessable->isParticipant($this->student);
-                               });
-
-        // Did we find 2+ AAM assessments in this unit?
-        $countAam = \count($aamAssessables);
-        if ($countAam >= 2) {
-            return ['error' => "A unit may have 0 or 1 Approaches to Learning assessments per unit. Found {$countAam}."];
-        }
-
-        // Did we find no data?
-        if ($countAam === 0) {
-            return null;
-        }
-
-        /** @var IAssessable $assessment */
-        $assessment = $aamAssessables->first();
-
-        // Not a Due Work?
-        if (!$assessment instanceof DueWork\Model) {
-            $requiredType = DueWork\Model::getDefaultTypeName();
-            $msg          = \sprintf('Only %ss can have rubrics.', $requiredType);
-            $routeName    = 'learningAssessment.getAssessment';
-            $routeParams  = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
-                $route      = $this->router->generate($routeName, $routeParams);
-                $actualType = $assessment::getDefaultTypeName();
-                $title      = $assessment->getTitle();
-                $msg        .= \sprintf(' Found: %s - <a href="%s">%s</a>', $actualType, $route, $title);
-            }
-            return ['error' => $msg];
-        }
-
-        // No Rubric?
-        if (!$assessment->getUseRubric()) {
-            $routeName   = 'learningAssessment.getAssessment';
-            $routeParams = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
-                $route = $this->router->generate($routeName, $routeParams);
-                $title = \sprintf('<a href="%s">%s</a>', $route, $assessment->getTitle());
-            } else {
-                $title = $assessment->getTitle();
-            }
-            return ['error' => "{$assessment::getDefaultTypeName()} {$title} has a AAM/ATL work-type but does not have a rubric grid"];
-        }
-
-        // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
-            return null;
-        }
-
-        // Is grade visibility off for the current viewer?
-        if (!$this->isFeedbackVisibleToUser($assessment)) {
-            return null;
-        }
-
-        return $this->buildAssessmentData($assessment);
-    }
-
-
-    /**
-     * Build AAM data from the specified due work
-     *
-     * @param DueWork\Model $dueWork
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function buildAssessmentData(DueWork\Model $dueWork): array
-    {
-        $data = [];
-        // Fetch the grid
-        $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
-        $data['grid'] = $dueWork->getRubricGrid();
-
-        // Load rubric marks if they exist and current user is permitted to view grades
-        $participant = $dueWork->getParticipantIfExtant($this->student);
-        if ($participant && !$participant->isExcluded()) {
-            /** @var DueWork\Feedback\Model $feedback */
-            $feedback = $participant->getAuthoritativeFeedback(true);
-            if ($feedback) {
-                $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
-                $data['markedGrid'] = $feedback->getRubricMarkedGrid();
-
-                // DP students' comments will come from this assessment
-                if ($this->getAttributes()->isDp()) {
-                    $data['comment']   = $feedback->getComment();
-                    $data['commentBy'] = $feedback->getReviewer();
-                }
-            }
-        }
-        $data['dueDate'] = $dueWork->getDueAt();
-        return $data;
+        parent::__construct($attributes, $unitSpecs, $student, $folder, $visibility, $viewer, $aamWorkTypeId, $rubricMapper, $authorizer, $router, $roleTypeOverride);
     }
 }
