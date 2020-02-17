@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
@@ -68,14 +69,60 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     /**
      * Redirect the standard assessment URL to a user specific version
-     * @api GET /learning/assessment/{assessmentId}
+     * @api   GET /learning/assessment/{assessmentId}
      * @since 165
-     *
+     * @param IAssessable $assessment
+     * @throws RouteNotFound
      */
     public function getAssessment(IAssessable $assessment)
     {
-        $url = $this->getRouter()->generate('learningAssessment.getSummary', [ 'assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId() ]);
-        $this->redirect($url);
+
+        /* Presume a default url.
+         *
+         * If you're a parent you'll end up at a dead end if you don't have
+         * any children which can unlock the summary screen but that would
+         * be an unusual scenario (what are you even doing here then?)
+         *
+         *  - you could be given read access to a class page and view its course outline
+         *    but you don't have any children associated with your session
+         *
+         *  - or you don't have any children participating in them
+         *
+         *  - the Hide Due Work Details config is activated
+         *
+         * If you're a student, you'll end up at a dead end if you've been excluded
+         * from participating in the assessment but try to get there anyway
+         */
+        $defaultUrl = $this->getRouter()->generate('learningAssessment.getSummary', [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $this->getUser()->getId()
+        ]);
+
+        /* If you're a parent,
+         * find the first child who can visit this url
+         * and pass that id into the router instead so you can witness details
+         *
+         * That Hide Due Work Details config is defined in buildAuthRuleCanViewSummary()
+         * which uses CanSeeParticipation()
+         */
+        $parentUrl = null;
+
+        if ($this->getUser()->getRole()->isParent()) {
+            foreach ($this->getUser()->getChildren() as $child) {
+                $parentUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId(),
+                    'student' => $child,
+                    'studentId' => $child->getId()
+                ]);
+
+                if ($parentUrl) {
+                    break;
+                }
+            }
+        }
+
+        $this->redirect($parentUrl ?: $defaultUrl);
     }
 
     /**

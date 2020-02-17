@@ -52,29 +52,21 @@
                     <div class="small-12 compact card wrap-down">
                         {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
 
-                        {# You can see an assessment, but not visit its summary page if you are a parent, with a child participating, but system is configured to hide due work details #}
-                        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                        {# You can see an assessment,
+                         # but not visit its summary page if you are a parent,
+                         # with a child participating,
+                         # but system is configured to hide due work details
+                         #}
+                        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getAssessment', {
                             assessmentId: assessment.id,
                             assessment: assessment,
                             studentId: USER.id,
                             student: USER
                         }) %}
 
-                        {# No route for own participation, what about children ?#}
-                        {% if not viewRoute %}
-                            {% for child in USER.children if not viewRoute %}
-                                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                                    assessmentId: assessment.id,
-                                    assessment: assessment,
-                                    studentId: child.id,
-                                    student: child
-                                }) %}
-                            {% endfor %}
-                        {% endif %}
-
                         {# Don't render a link if you are unable to view the details #}
                         {% if viewRoute %}
-                            <a title="{{ title }}" href="{{ viewRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
+                            <a title="{{ title }}" href="{{ viewRoute }}">
                                 <span class="{{ icon.renderClass(assessment) }}"></span>
                                 <p>{{ assessment.title }}</p>
                             </a>
