@@ -34,11 +34,6 @@ class Stream
         $key     = $config->get('otfs_s3_cred_key');
         $secret  = $config->get('otfs_s3_cred_secret');
         $bucket  = $config->get('otfs_s3_bucket');
-        $prefix  = $config->get('otfs_s3_prefix');
-
-        // Create the base path for the S3 storage
-
-        $basePath = "{$bucket}/{$prefix}" . INSTANCE_ID;
 
         // Connect to Amazon S3
 
@@ -59,6 +54,6 @@ class Stream
 
         // Return seekable stream
 
-        return fopen("s3://{$basePath}/{$path}", "r", false, $context);
+        return fopen("s3://{$bucket}/{$path}", "r", false, $context);
     }
 }
