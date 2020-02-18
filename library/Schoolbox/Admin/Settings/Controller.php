@@ -75,6 +75,7 @@ class Controller extends ConfigController
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      * @throws Predicate\InvalidColumnException
+     * @noinspection PhpUnused (web route)
      */
     public function postSettings(string $typeLabel): void
     {
