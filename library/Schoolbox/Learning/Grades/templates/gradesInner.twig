@@ -60,6 +60,86 @@
         <div class="small-12 island">
             <h2 class="subheader">Activities</h2>
             <section>
+                <script type="text/javascript">
+                    $(function () {
+                        $('[data-collapser]').collapsable();
+                    });
+                </script>
+                <ul class="activity-list expandable-card">
+                    <li>
+                        <div class="unit">
+                            <div class="expander" data-collapser="unit"></div>
+                            <div class="small-12 card">
+                                <a href="#" title="">
+                                    <h3>UNIT NAME</h3>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hide" data-collapse-state="collapsed" data-collapsable="unit">
+                            <ul>
+                                <li class="project">
+                                    <div class="flex-grade">
+                                        <div class="small-12 card columns">
+                                            <a href="/learning/assessments/648/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDIwLTEvODM%3D">
+                                                <h3>Project Name</h3>
+                                            </a>
+                                            <p>
+                                                <span class="meta">Project</span>
+                                            </p>
+                                        </div>
+                                        <div class="assess-status">
+                                            <span data-status="" data-assessment-status-light="" class="progress-tick no-text tiny reviewed" title="Reviewed"></span>
+                                            <span data-status-label="" data-assessment-status-text="">Reviewed</span>
+                                        </div>
+                                        <div class="grade gradient-4-bg">
+                                            <span>5.67 / 12</span>
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        <li class="assessment">
+                                            <div class="flex-grade">
+                                                <div class="small-12 card columns">
+                                                    <h3>
+                                                        <a href="/learning/assessments/648/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDIwLTEvODM%3D">
+                                                            Assessment Name
+                                                        </a>
+                                                    </h3>
+                                                    <p><span class="meta">Task</span></p>
+                                                </div>
+                                                <div class="assess-status">
+                                                    <span data-status="" data-assessment-status-light="" class="progress-tick no-text tiny reviewed" title="Reviewed"></span>
+                                                    <span data-status-label="" data-assessment-status-text="">Reviewed</span>
+                                                </div>
+                                                <div class="grade gradient-4-bg">
+                                                    <span>5.67 / 12</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="assessment">
+                                            <div class="flex-grade">
+                                                <div class="small-12 card columns">
+                                                    <a href="/learning/assessments/648/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDIwLTEvODM%3D">
+                                                        <h3>Assessment Name</h3>
+                                                    </a>
+                                                    <p><span class="meta">Task</span></p>
+                                                </div>
+                                                <div class="assess-status">
+                                                    <span data-status="" data-assessment-status-light="" class="progress-tick no-text tiny reviewed" title="Reviewed"></span>
+                                                    <span data-status-label="" data-assessment-status-text="">Reviewed</span>
+                                                </div>
+                                                <div class="grade gradient-4-bg">
+                                                    <span>5.67 / 12</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            <section>
                 <ul class="action-list">
                     {% for assessment in markbook.assessments %}
                         {% set participant = assessment.participantIfExtant(student) %}

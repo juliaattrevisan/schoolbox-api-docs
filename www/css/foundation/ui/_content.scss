@@ -1024,6 +1024,19 @@ $selector-width: 2.25rem;
             font-size: rem-calc(($base-font-size + 2));
         }
     }
+    // Grades expandable layout
+    .unit {
+        border-bottom: 1px solid $body-bg;
+
+        .card {
+            padding: 0.5rem 0 .5rem 0;
+        }
+    }
+    .project .assessment {
+        background-color: $vapor;
+        border-top: 1px solid $body-bg;
+        border-left: 1rem solid $white;
+    }
 }
 
 // Subject list
@@ -1178,7 +1191,7 @@ $selector-width: 2.25rem;
     }
     .assess-status {
         flex: 1 0 auto;
-        padding: .5rem 1rem;
+        padding: .5rem .75rem;
     }
 
     .gradient-none-bg {
@@ -1211,7 +1224,8 @@ $selector-width: 2.25rem;
             margin-bottom: 0.5rem;
         }
         .grade {
-            display: none;
+            flex: 1 100%;
+            margin-left: 0;
         }
     }
     ~ blockquote {
