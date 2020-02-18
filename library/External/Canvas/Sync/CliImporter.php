@@ -150,6 +150,11 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
+        // Check Canvas URL config
+        if (!$this->getConfig()->get(ConfigMapper::_CANVAS_URL)) {
+            $this->getLogger()->warning('Canvas URL is not set.');
+        }
+
         return new Connector(
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)

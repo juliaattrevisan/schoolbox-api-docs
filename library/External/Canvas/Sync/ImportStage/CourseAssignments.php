@@ -21,6 +21,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -37,18 +38,9 @@ use function count;
 /**
  * Responsible for importing Canvas Quiz into Schoolbox Course Quiz Specs
  */
-class CourseAssignments
+class CourseAssignments extends CourseAssessmentAbstract
 {
     use ModelSaveTrait;
-
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var IConnector */
-    private $schoolboxDb;
-
-    /** @var LoggerInterface */
-    private $log;
 
     /** @var Bridge\Account */
     private $accountBridge;
@@ -61,9 +53,6 @@ class CourseAssignments
 
     /** @var SubmissionBoxMapper */
     private $submissionBoxMapper;
-
-    /** @var Assessment\Mapper */
-    private $assessmentMapper;
 
     /** @var Folder\Mapper */
     private $folderMapper;
@@ -82,6 +71,7 @@ class CourseAssignments
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param Assessment\Mapper   $assessmentMapper
      * @param LoggerInterface     $log
+     * @param IConfigLoader       $config
      * @param Bridge\Assignment   $assignmentBridge
      * @param Bridge\Course       $courseBridge
      * @param Folder\Mapper       $folderMapper
@@ -92,16 +82,20 @@ class CourseAssignments
         SubmissionBoxMapper $submissionBoxMapper,
         Assessment\Mapper $assessmentMapper,
         LoggerInterface $log,
+        IConfigLoader $config,
         Bridge\Assignment $assignmentBridge,
         Bridge\Course $courseBridge,
         Folder\Mapper $folderMapper
     ) {
-        $this->canvasDb            = $canvasDb;
-        $this->schoolboxDb         = $schoolboxDb;
-        $this->log                 = $log;
+        parent::__construct(
+            $canvasDb,
+            $schoolboxDb,
+            $assessmentMapper,
+            $log,
+            $config
+        );
         $this->assignmentBridge    = $assignmentBridge;
         $this->submissionBoxMapper = $submissionBoxMapper;
-        $this->assessmentMapper    = $assessmentMapper;
         $this->courseBridge        = $courseBridge;
         $this->folderMapper        = $folderMapper;
     }
@@ -506,52 +500,6 @@ class CourseAssignments
         return $submissionBox;
     }
 
-
-    /**
-     * Create an assessment model, linked to the specified UnitSpec
-     *
-     * @param UnitSpec\Model      $unitSpec
-     * @param string              $title
-     * @param string|null         $description
-     * @param WorkType\Model|null $workType
-     * @param string              $createdAt
-     * @param string              $updatedAt
-     * @param int                 $position
-     * @return Assessment\Model
-     * @throws Database\Exception
-     */
-    private function createAssessment(
-        UnitSpec\Model $unitSpec,
-        string $title,
-        ?string $description,
-        ?WorkType\Model $workType,
-        string $createdAt,
-        string $updatedAt,
-        int $position
-    ): Assessment\Model {
-        $assessment = (new Assessment\Model())
-            ->setContextUnitSpecification($unitSpec)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setWorkType($workType)
-            ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
-            ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
-            ->setSequence($position);
-
-        /* Cannot use mappers here to save because:
-         * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
-         * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
-         */
-        $this->saveModel($this->assessmentMapper, $assessment, false, false);
-
-        $sql = "INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id) VALUES (:assessmentId, :unitSpecId)";
-        $this->schoolboxDb->executeQuery($sql, [
-            'assessmentId' => $assessment->getId(),
-            'unitSpecId'   => $unitSpec->getId(),
-        ]);
-
-        return $assessment;
-    }
 
 
     /**

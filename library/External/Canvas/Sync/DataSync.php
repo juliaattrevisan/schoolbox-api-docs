@@ -121,7 +121,6 @@ class DataSync
     /** @var LoggerInterface */
     private $log;
 
-
     /**
      * @param IConnector              $canvasDb
      * @param IConnector              $schoolboxDb
@@ -332,6 +331,7 @@ class DataSync
             $this->submissionBoxMapper,
             $this->assessmentMapper,
             $this->log,
+            $this->config,
             $assignmentBridge,
             $courseBridge,
             $this->folderMapper
@@ -362,6 +362,7 @@ class DataSync
             $this->assessmentMapper,
             $this->folderMapper,
             $this->log,
+            $this->config,
             $assignmentBridge,
             $courseBridge
         ))->synchronise();
