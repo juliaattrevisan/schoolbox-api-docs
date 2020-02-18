@@ -9,11 +9,15 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Byte_Format;
 use Aura\Di\Exception\ServiceNotFound;
+use Aws\S3\S3Client;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem;
+use League\Flysystem\Filesystem;
+use LogicException;
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage;
 use function array_key_exists;
@@ -26,7 +30,6 @@ use function fclose;
 use function file_exists;
 use function filesize;
 use function fopen;
-use function get_class;
 use function is_dir;
 use function is_resource;
 use function opendir;
@@ -34,8 +37,11 @@ use function readdir;
 use function rmdir;
 use function shell_exec;
 use function sprintf;
+use function str_pad;
 use function str_replace;
+use function strlen;
 use function strpos;
+use function trim;
 use function unlink;
 use const DIRECTORY_SEPARATOR;
 
@@ -95,11 +101,14 @@ class Migration extends CliTool\App
         return ['help', 'delete'];
     }
 
+    /** @var Filesystem */
+    private $fileSystemAwsS3;
 
     /**
      * @inheritDoc
      * @throws ServiceNotFound
      * @throws InvalidArgumentException
+     * @throws LogicException
      */
     public function run(): void
     {
@@ -119,22 +128,47 @@ class Migration extends CliTool\App
         $this->storageDir    = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
         $this->byteFormat    = new Alaress_Byte_Format();
 
-        $this->checkUsingS3FileSystem();
+        $this->fileSystemAwsS3 = $this->buildAwsS3FileSystem();
+
         $this->migrateFiles();
     }
 
-
     /**
-     * Ensure the system is configure to use AWS S3 as the 'storage' file system
+     * Build and return an AWS S3 file system, regardless of whether the system is configured to use Local or AWS S3.
+     *
+     * @return Filesystem
+     * @throws InvalidArgumentException
      */
-    private function checkUsingS3FileSystem(): void
+    private function buildAwsS3FileSystem(): Filesystem
     {
-        /** @var Flysystem\Filesystem $storageFileSystem */
-        $storageFileSystem = $this->storageMapper->getManager()->getFilesystem(Storage\Manager::FS_STORAGE);
-        if (!$storageFileSystem->getAdapter() instanceof AwsS3Adapter) {
-            $this->getLogger()->error("Error: Unexpected file adapter - " . get_class($storageFileSystem->getAdapter()));
+        $s3AccessKey = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
+        $s3Region    = trim($this->getConfig()->get('otfs_s3_region') ?? "");
+        $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
+        $s3Bucket    = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
+
+        $this->getLogger()->debug(sprintf("OTFS Adapter: '%s'", $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER)));
+        $this->getLogger()->debug("S3 Access Key: '$s3AccessKey'");
+        $this->getLogger()->debug(sprintf("S3 Secret Key: '%s'", str_pad("", strlen($s3SecretKey), "*")));
+        $this->getLogger()->debug("S3 Region: '$s3Region'");
+        $this->getLogger()->debug("S3 Version: '$s3Version'");
+        $this->getLogger()->debug("S3 Bucket: '$s3Bucket'");
+
+        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($s3Bucket)) {
+            $this->getLogger()->error("Error: S3 config appears invalid");
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
+
+        $client = new S3Client([
+            'credentials' => [
+                'key'    => $s3AccessKey,
+                'secret' => $s3SecretKey,
+            ],
+            'region'      => $s3Region,
+            'version'     => $s3Version,
+        ]);
+
+        return new Filesystem(new AwsS3Adapter($client, $s3Bucket));
     }
 
 
@@ -152,6 +186,8 @@ class Migration extends CliTool\App
         $files    = $this->storageMapper->findAll();
         $countAll = $files->count();
         foreach ($files as $file) {
+            // Set file to use AWS S3 filesystem, regardless of Schoolbox's currently configured file system
+            $file->setFilesystem($this->fileSystemAwsS3);
             $count++;
             $this->getLogger()->notice("Checking file $count/$countAll  {$file->getHash()}, '{$file->getBasename()}'");
             if ($this->migrateFile($file)) {
@@ -357,7 +393,7 @@ class Migration extends CliTool\App
 
             $transcodeFilePath = $dirName . DIRECTORY_SEPARATOR . $entry;
             $filepath          = str_replace($this->storageDir . DIRECTORY_SEPARATOR, '', $transcodeFilePath);
-            $transcodeFile     = new Flysystem\File($this->storageMapper->getManager()->getFilesystem(Storage\Manager::FS_STORAGE), $filepath);
+            $transcodeFile     = new Flysystem\File($this->fileSystemAwsS3, $filepath);
 
             if ($transcodeFile->exists()) {
                 $this->filesInS3[$transcodeFilePath] = true;
