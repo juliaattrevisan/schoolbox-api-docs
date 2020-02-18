@@ -200,7 +200,7 @@ class Csv extends AbstractCSV
         $capabilityMarks = [];
         foreach ($this->students as $studentId => $student) {
             if (empty($this->exclusions[$assessmentId][$studentId])) {
-                $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '-';
+                $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'];
             } else {
                 $studentMark = '(excluded)';
             }
@@ -223,7 +223,12 @@ class Csv extends AbstractCSV
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
             if (empty($this->exclusions[$assessmentId][$studentId])) {
-                $studentMark = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] ?? '-';
+                if($result = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]) {
+                    $studentMark = $result['humanReadableMark'] ?? $result['selectedDescriptorText'];
+                }
+                else {
+                    $studentMark = '';
+                }
             } else {
                 $studentMark = '(excluded)';
             }
@@ -243,7 +248,7 @@ class Csv extends AbstractCSV
     {
         $capabilityMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'] ?? '-';
+            $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'];
         }
         return $capabilityMarks;
     }
@@ -259,7 +264,7 @@ class Csv extends AbstractCSV
     {
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'] ?? '-';
+            $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'];
         }
         return $indicatorMarks;
     }
