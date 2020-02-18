@@ -34,9 +34,11 @@ INSERT INTO config (
     (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
     'local;Local:awsS3;AWS S3',
     (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
-    'true',
+    'false',
     'false',
     'true',
     'settings'
 );
 
+-- Hide all OTFS configs
+UPDATE config SET editable = 'false' WHERE name LIKE 'otfs%';
