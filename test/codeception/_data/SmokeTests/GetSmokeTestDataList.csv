@@ -1,0 +1,35 @@
+"Go admin dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
+"Go admin dashboard",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
+"Go admin dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
+"Go admin dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
+"Go admin dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
+"Go admin dashboard","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
+"Go admin dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,UNKNOWN
+"Go to user admin",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
+"Go to user admin",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
+"Go to user admin",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
+"Go to user admin",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
+"Go to user admin","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
+"Go to user admin","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
+"Go to user admin","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user,UNKNOWN
+"Create a user",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
+"Create a user",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
+"Create a user",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
+"Create a user",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
+"Create a user","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
+"Create a user","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
+"Create a user","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/create,UNKNOWN
+"Go to service permissions",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
+"Go to service permissions",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
+"Go to service permissions",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
+"Go to service permissions",Student,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
+"Go to service permissions","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
+"Go to service permissions","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
+"Go to service permissions","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions,UNKNOWN
+"Go to bulk modify",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
+"Go to bulk modify",Admin,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
+"Go to bulk modify",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
+"Go to bulk modify",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
+"Go to bulk modify","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
+"Go to bulk modify","Fixtures Administrator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
+"Go to bulk modify","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify,UNKNOWN
