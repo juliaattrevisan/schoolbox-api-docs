@@ -86,7 +86,7 @@ abstract class CourseAssessmentAbstract
      * @return Assessment\Model
      * @throws Database\Exception
      */
-    public function createAssessment(
+    protected function createAssessment(
         UnitSpec\Model $unitSpec,
         string $title,
         ?string $description,
