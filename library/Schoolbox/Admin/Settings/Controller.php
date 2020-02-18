@@ -75,6 +75,7 @@ class Controller extends ConfigController
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      * @throws Predicate\InvalidColumnException
+     * @noinspection PhpUnused (web route)
      */
     public function postSettings(string $typeLabel): void
     {
@@ -89,6 +90,9 @@ class Controller extends ConfigController
 
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
+            if (!$existingConfig->getEditable()) {
+                continue;
+            }
             $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value);
 
