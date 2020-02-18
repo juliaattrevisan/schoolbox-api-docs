@@ -105,6 +105,7 @@ class ConfigMapper extends Mapper
     public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
     public const _CANVAS_DATA_API_KEY               = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
+    public const _CANVAS_URL                        = 'canvas_url';
 
 
     /**

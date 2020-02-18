@@ -10,6 +10,7 @@ namespace External\Canvas\Sync\ImportStage;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
+use EOTC\Config;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use HTMLPurifier;
 use Psr\Log\LoggerInterface;
@@ -67,7 +68,7 @@ abstract class CourseAssessmentAbstract
         $this->assessmentMapper = $assessmentMapper;
 
         $htmlPurifierConfig = \HTMLPurifier_Config::createDefault();
-        $htmlPurifierConfig->set('URI.Base', $config->get('canvas_url'));
+        $htmlPurifierConfig->set('URI.Base', $config->get(ConfigMapper::_CANVAS_URL));
         $htmlPurifierConfig->set('URI.MakeAbsolute', true);
         $this->htmlPurifier = new HTMLPurifier($htmlPurifierConfig);
     }
