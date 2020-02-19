@@ -299,6 +299,7 @@ class ScheduleIterator implements Iterator
             }
 
             $students[] = [
+                'externalId' => trim((string)$student->SchoolId),
                 'title' => trim((string)$student->Title),
                 'firstname' => trim((string)$student->Forename),
                 'surname' => trim((string)$student->Surname),

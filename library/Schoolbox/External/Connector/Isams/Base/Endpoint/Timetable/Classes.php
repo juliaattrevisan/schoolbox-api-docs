@@ -423,7 +423,7 @@ class Classes implements IStrategy
 
         /** @var ClassInvolvement $timetableClassInvolvement */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-            ->setExternalId($student['username'])
+            ->setExternalId($student['externalId'])
             ->setClass($timetableClass);
 
         $this->log->info(sprintf(
