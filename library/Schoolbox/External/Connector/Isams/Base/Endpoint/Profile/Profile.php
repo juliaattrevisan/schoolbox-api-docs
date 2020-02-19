@@ -190,7 +190,7 @@ class Profile implements IStrategy
 
         /** @var Student $student */
         foreach ($students as $student) {
-            $externalId = trim((string)$student->SchoolCode);
+            $externalId = trim((string)$student->SchoolId);
             $username = trim((string)$student->SchoolCode);
             $firstname = trim((string)$student->Forename);
             $lastname = trim((string)$student->Surname);
