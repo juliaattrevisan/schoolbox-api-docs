@@ -643,18 +643,53 @@
                             }
                         }
 
+                        /* Combined multiline commentary to offset Excel bug
+                         */
+                        var condensed = [], preprocessed = [];
+                        var i, j, current, input, id, previous;
+
+                        /* Condense multiple tabs into one tab
+                         * Multiple tabs occurs when you split-select columns in excel
+                         * such as selecting column A and column D
+                         */
+                        for (i = 0; i < rows.length; i++) {
+                            condensed[i] = rows[i].replace(/\t\t+/g, "\t");
+                        }
+
+                        /* Look ahead to combine multiple lines into the previous row's comment field
+                         */
+                        for (i = 0, j = 0; i < condensed.length; i++) {
+                            current = condensed[i];
+                            previous = preprocessed[j];
+
+                            /* If the condensed element has more than 1 element in it
+                             * then it's an actual new row of data; therefore we can just
+                             * add it to the preprocessed stack
+                             */
+                            if (current.split("\t").length > 1) {
+                                j++;
+                                preprocessed[j] = current;
+                            }
+                            /* Otherwise the condensed element is a broken-up comment and this
+                             * row should be combined into preprocessed's current element
+                             */
+                            else {
+                                preprocessed[j] += "\n" + current;
+                            }
+                        }
+
+                        /* Clear out empty rows
+                         */
+                        preprocessed = preprocessed.filter(function (element) {
+                            return element != null;
+                        });
+
                         /* For every row, find the student id, mark and comments and
                          * assign them to #mark-12345 and #comment-12345 as required
                          */
-                        for (var i = 0; i < rows.length; i++) {
-
-                            /* Condense multiple tabs into one tab
-                             * Multiple tabs occurs when you split-select columns in excel
-                             * such as selecting column A and column D
-                             */
-                            var input = rows[i].replace(/\t\t+/g, "\t").split("\t");
-
-                            var id = $.trim(input[0]);
+                        for (i = 0; i < preprocessed.length; i++) {
+                            input = preprocessed[i].split("\t");
+                            id = $.trim(input[0]);
 
                             if (id) {
                                 assign(input, $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]'));
