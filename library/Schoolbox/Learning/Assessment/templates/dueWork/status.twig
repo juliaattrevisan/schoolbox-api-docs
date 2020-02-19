@@ -643,40 +643,57 @@
                             }
                         }
 
-                        /* Combined multiline commentary to offset Excel bug
-                         */
-                        var condensed = [], preprocessed = [];
-                        var i, j, current, input, id, previous;
-
-                        /* Condense multiple tabs into one tab
+                        /**
+                         * Condense multiple tabs into one tab
                          * Multiple tabs occurs when you split-select columns in excel
                          * such as selecting column A and column D
                          */
-                        for (i = 0; i < rows.length; i++) {
-                            condensed[i] = rows[i].replace(/\t\t+/g, "\t");
+                        function combineSplitColumns(rows) {
+                            var i, condensed = [];
+
+                            for (i = 0; i < rows.length; i++) {
+                                condensed[i] = rows[i].replace(/\t\t+/g, "\t");
+                            }
+
+                            return condensed;
                         }
 
-                        /* Look ahead to combine multiple lines into the previous row's comment field
+                        /**
+                         * Look ahead to combine multiple lines into the previous row's comment field
                          */
-                        for (i = 0, j = 0; i < condensed.length; i++) {
-                            current = condensed[i];
-                            previous = preprocessed[j];
+                        function combineMultilineComments(condensed) {
+                            var i, j, preprocessed = [];
 
-                            /* If the condensed element has more than 1 element in it
-                             * then it's an actual new row of data; therefore we can just
-                             * add it to the preprocessed stack
-                             */
-                            if (current.split("\t").length > 1) {
-                                j++;
-                                preprocessed[j] = current;
+                            for (i = 0, j = 0; i < condensed.length; i++) {
+                                current = condensed[i];
+                                previous = preprocessed[j];
+
+                                /* If the condensed element has more than 1 element in it
+                                 * then it's an actual new row of data; therefore we can just
+                                 * add it to the preprocessed stack
+                                 */
+                                if (current.split("\t").length > 1) {
+                                    j++;
+                                    preprocessed[j] = current;
+                                }
+                                /* Otherwise the condensed element is a broken-up comment and this
+                                 * row should be combined into preprocessed's current element
+                                 */
+                                else {
+                                    preprocessed[j] += "\n" + current;
+                                }
                             }
-                            /* Otherwise the condensed element is a broken-up comment and this
-                             * row should be combined into preprocessed's current element
-                             */
-                            else {
-                                preprocessed[j] += "\n" + current;
-                            }
+
+                            return preprocessed;
                         }
+
+
+                        /* Combined multiline commentary to offset Excel bug
+                         */
+                        var i, current, input, id, previous;
+
+                        var condensed = combineSplitColumns(rows);
+                        var preprocessed = combineMultilineComments(condensed);
 
                         /* Clear out empty rows
                          */
