@@ -113,54 +113,6 @@ class Course
 
 
     /**
-     * Find the Schoolbox UnitSpec Folder that aligns to the specified canvas course
-     *
-     * @param int $courseCanvasId
-     * @return Folder\Model|null
-     * @throws InvalidColumnException
-     * @throws UnexpectedValueException
-     * @throws Database\Exception
-     */
-    public function findUnitSpecFolder(int $courseCanvasId): ?Folder\Model
-    {
-        $canvasCourseFolderPb    = $this->equalsCanvasCourse($courseCanvasId, 'f');
-        $canvasCourseFolderWhere = $canvasCourseFolderPb->getWhere()[0];
-        $sql                     = "
-            SELECT
-                   f.id 'f.id',
-                   f.name 'f.name',
-                   f.parent 'f.parent',
-                   us.id 'us.id'
-            FROM folder f
-            JOIN course_unit_specification us ON f.id = us.folder_id
-            WHERE
-                  {$canvasCourseFolderWhere} AND
-                  f.deleted_at IS NULL AND
-                  us.deleted_at IS NULL
-        ";
-
-        $rows = $this->schoolboxDb->executeQuery($sql, $canvasCourseFolderPb->getParams())->fetchAll();
-
-        if (!count($rows)) {
-            return null;
-        }
-        if (count($rows) > 1) {
-            throw new UnexpectedValueException("Multiple Schoolbox course folders found for canvas course canvasId '$courseCanvasId'");
-        }
-        $row = $rows[0];
-
-        $folder   = (new Folder\Model())
-            ->setId((int)$row['f.id'])
-            ->setName($row['f.name'])
-            ->setParent((new Folder\Model())->setId((int)$row['f.parent']));
-        $unitSpec = (new UnitSpec\Model())
-            ->setId((int)$row['us.id'])
-            ->setFolder($folder);
-        return $folder->setUnitSpecification($unitSpec);
-    }
-
-
-    /**
      * Returns a predicate to match Canvas Course and CourseSections that should be synchronised
      *
      * Course must:

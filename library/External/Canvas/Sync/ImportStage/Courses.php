@@ -284,7 +284,6 @@ class Courses
      * @param int          $courseCanvasId
      * @param string       $termName
      * @return Folder\Model
-     * @throws Database\Exception
      * @throws InvalidColumnException
      * @throws Mapper\Exception
      * @throws PDOException
@@ -297,7 +296,9 @@ class Courses
     ): Folder\Model {
         $this->countCoursesSynchronised++;
 
-        $unitSpecFolder = $this->courseBridge->findUnitSpecFolder($courseCanvasId);
+        $unitSpecFolderPredicate = $this->courseBridge->equalsCanvasCourse($courseCanvasId)->isNull('us.deleted_at');
+        $unitSpecFolder          = $this->folderMapper->findByPredicates($unitSpecFolderPredicate)->first();
+
         if (!$unitSpecFolder) {
             $unitSpecFolder = $this->createUnitSpecFolder($courseSpecFolder, $courseCanvasId, $termName);
             $this->countCoursesCreated++;
