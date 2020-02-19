@@ -104,7 +104,8 @@
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folderId: folder.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+        <li><a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folderId: folder.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Rubric Points</a>
+        <li><a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folderId: folder.id} ) }}?{{ queryArgs }}&descriptorsOnly=true' class='icon-download'>Download Rubric Descriptors</a>
     </ul>
 </div>
 

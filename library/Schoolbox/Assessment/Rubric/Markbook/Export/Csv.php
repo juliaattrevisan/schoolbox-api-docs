@@ -54,6 +54,12 @@ class Csv extends AbstractCSV
      */
     private $translator;
 
+    /**
+     * Detemines if export should contain points or descriptors
+     * @var bool
+     */
+    private $descriptorsOnly;
+
 
     /**
      * Constructor
@@ -63,19 +69,22 @@ class Csv extends AbstractCSV
      * @param array      $exclusions
      * @param array      $overallMarks
      * @param Translator $translator
+     * @param bool       $descriptorsOnly
      */
     public function __construct(
         array $students,
         array $assessments,
         array $exclusions,
         array $overallMarks,
-        Translator $translator
+        Translator $translator,
+        bool $descriptorsOnly
     ) {
         $this->students     = $students;
         $this->assessments  = $assessments;
         $this->exclusions   = $exclusions;
         $this->overallMarks = $overallMarks;
         $this->translator   = $translator;
+        $this->descriptorsOnly = $descriptorsOnly;
     }
 
 
@@ -224,7 +233,7 @@ class Csv extends AbstractCSV
         foreach ($this->students as $studentId => $student) {
             if (empty($this->exclusions[$assessmentId][$studentId])) {
                 if($result = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]) {
-                    $studentMark = $result['humanReadableMark'] ?  "\xA0". $result['humanReadableMark'] : $result['selectedDescriptorText'];
+                    $studentMark = $this->descriptorsOnly && $result['humanReadableMark'] ? "\xA0" . $result['humanReadableMark'] : $result['selectedDescriptorText'];
                 }
                 else {
                     $studentMark = '';
