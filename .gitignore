@@ -49,3 +49,5 @@ v8-compile-cache-0/
 /.maintenance
 datepicker-fullcalendar.css
 .env
+# Deprecated in 19.2, Remove in 19.3
+/tools/browscap/
