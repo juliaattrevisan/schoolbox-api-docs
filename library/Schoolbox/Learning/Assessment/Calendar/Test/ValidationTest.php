@@ -12,7 +12,7 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\Calendar;
+namespace Schoolbox\Learning\Assessment\Calendar\Test;
 
 use PHPUnit\Framework\TestCase;
 

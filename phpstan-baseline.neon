@@ -1,0 +1,357 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Alaress_Cache_Abstract\\:\\:registerObserver\\(\\) should return Alaress_Cache_Abstract but return statement is missing\\.$#"
+			count: 1
+			path: library/Alaress/Cache/Abstract.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Alaress/Database/Predicate/Builder.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 9
+			path: library/Alaress/Date/Format.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: library/Alaress/Date/Interval.php
+
+		-
+			message: "#^Function tideways_enable not found\\.$#"
+			count: 1
+			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
+
+		-
+			message: "#^Function tideways_disable not found\\.$#"
+			count: 1
+			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: library/Alaress/Json/Decorator/PropertyDecorator.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Alaress/Redis.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Alaress/Routing/Trie.php
+
+		-
+			message: "#^Instantiated class TwitterOAuth not found\\.$#"
+			count: 1
+			path: library/Alaress/Twitter/Loader/OAuth.php
+
+		-
+			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\OAuthConsumer\\:\\:\\$callback_url\\.$#"
+			count: 1
+			path: library/Alaress/Twitter/Loader/oauth/OAuth.php
+
+		-
+			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$http_status\\.$#"
+			count: 1
+			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+
+		-
+			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$last_api_call\\.$#"
+			count: 1
+			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+
+		-
+			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$sha1_method\\.$#"
+			count: 2
+			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+
+		-
+			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$consumer\\.$#"
+			count: 3
+			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+
+		-
+			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$token\\.$#"
+			count: 7
+			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+
+		-
+			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$http_header\\.$#"
+			count: 1
+			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+
+		-
+			message: "#^Call to function unset\\(\\) contains undefined variable \\$e\\.$#"
+			count: 3
+			path: library/Alaress/WorkerCrew/Worker/IO/WrappedReadableResourceStream.php
+
+		-
+			message: "#^Class EOTC\\\\ListGroup\\\\Type\\\\None does not have a constructor and must be instantiated without any parameters\\.$#"
+			count: 1
+			path: library/EOTC/ListGroup/Chain.php
+
+		-
+			message: "#^Class Eportfolio constructor invoked with 1 parameter, 2 required\\.$#"
+			count: 1
+			path: library/EportfolioTemplate.php
+
+		-
+			message: "#^Cannot unset offset 'TimetableDayID' on array\\('TimetableDay' \\=\\> mixed\\)\\.$#"
+			count: 1
+			path: library/External/Schooledge/Timetable.php
+
+		-
+			message: "#^Access to an undefined property Page\\:\\:\\$arg\\.$#"
+			count: 1
+			path: library/Page.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Collection.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Column/Date.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/AbstractIdFinder.php
+
+		-
+			message: "#^Class Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\RubricUsage\\\\Definition referenced with incorrect case\\: Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\RubricUsage\\\\DEFINITION\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/GenericCollection.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/AssessmentContextType.php
+
+		-
+			message: "#^Instantiated class Schoolbox\\\\Learning\\\\UnexpectedValueException not found\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Module.php
+
+		-
+			message: "#^Instantiated class Schoolbox\\\\Learning\\\\InvalidPath not found\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Module.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Mapper.php
+
+		-
+			message: "#^Call to function unset\\(\\) contains undefined variable \\$flatList\\.$#"
+			count: 1
+			path: library/Schoolbox/Mapper.php
+
+		-
+			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\Resource\\\\My\\\\File\\\\Mapper not found\\.$#"
+			count: 1
+			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
+
+		-
+			message: "#^Class Schoolbox\\\\Mapper\\\\Component\\\\Eportfolio\\\\FileListMapper not found\\.$#"
+			count: 2
+			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
+
+		-
+			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\ResourceBooking\\\\Item\\\\Mapper not found\\.$#"
+			count: 1
+			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
+
+		-
+			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\ResourceBooking\\\\Booking\\\\Mapper not found\\.$#"
+			count: 2
+			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
+
+		-
+			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\Forum\\\\ThreadMapper not found\\.$#"
+			count: 1
+			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
+
+		-
+			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\Forum\\\\PostMapper not found\\.$#"
+			count: 2
+			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Permission/Access/Access.php
+
+		-
+			message: "#^Undefined variable\\: \\$this$#"
+			count: 2
+			path: library/Schoolbox/Profile/Test/Generator.php
+
+		-
+			message: "#^Using \\$this outside a class\\.$#"
+			count: 2
+			path: library/Schoolbox/Profile/Test/Generator.php
+
+		-
+			message: "#^Instantiated class Schoolbox\\\\Realtime\\\\Pipe\\\\ConnectionException not found\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Realtime/Routing/RouteTXRX.php
+
+		-
+			message: "#^Access to an undefined property Schoolbox\\\\Resource\\\\Attachment\\\\AbstractController\\:\\:\\$template\\.$#"
+			count: 2
+			path: library/Schoolbox/Resource/Attachment/AbstractController.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Folder/Ancestry.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Folder/NNIAN.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/TagCloud/Mapper.php
+
+		-
+			message: "#^Class Evaluation_Question_Truefalse referenced with incorrect case\\: Evaluation_Question_TrueFalse\\.$#"
+			count: 1
+			path: library/Survey/Question/TrueFalse.php
+
+		-
+			message: "#^Function getEntriesFromFolder not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/dev-tools-har-to-url-csv.php
+
+		-
+			message: "#^Function jsonHarFileToUrlRequestedArray not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/dev-tools-har-to-url-csv.php
+
+		-
+			message: "#^Function getEntriesFromFolder not found\\.$#"
+			count: 2
+			path: tools/dev-tools-har-to-url-csv.php
+
+		-
+			message: "#^Function jsonHarFileToUrlRequestedArray not found\\.$#"
+			count: 3
+			path: tools/dev-tools-har-to-url-csv.php
+
+		-
+			message: "#^Function determineMapperType not found\\.$#"
+			count: 1
+			path: tools/mapper-template.php
+
+		-
+			message: "#^Function determineModelType not found\\.$#"
+			count: 1
+			path: tools/mapper-template.php
+
+		-
+			message: "#^Function determineMapperType not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/mapper-template.php
+
+		-
+			message: "#^Function determineModelType not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/mapper-template.php
+
+		-
+			message: "#^Function traverse not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/markbook/sync.php
+
+		-
+			message: "#^Function traverse not found\\.$#"
+			count: 2
+			path: tools/markbook/sync.php
+
+		-
+			message: "#^Function help not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/markbook/sync.php
+
+		-
+			message: "#^Function help not found\\.$#"
+			count: 2
+			path: tools/markbook/sync.php
+
+		-
+			message: "#^Function interrogate not found\\.$#"
+			count: 2
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Function extractEvent not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Function verifyFrameTrigger not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Function frame2trigger not found\\.$#"
+			count: 1
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Function interrogate not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Function extractEvent not found\\.$#"
+			count: 1
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Function verifyFrameTrigger not found\\.$#"
+			count: 1
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Function frame2trigger not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
+			count: 1
+			path: tools/mq/schedule-safe-restart.php
+
+		-
+			message: "#^Access to undefined constant Schoolbox\\\\External\\\\Importer\\\\Endpoint\\\\Specification\\\\CliRenderer\\:\\:STATUS_EMPTY\\.$#"
+			count: 2
+			path: tools/synchronise/suds/kamar/specification.php
+

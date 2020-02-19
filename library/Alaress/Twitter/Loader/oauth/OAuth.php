@@ -3,7 +3,10 @@
 
 /* Generic exception class
  */
-class OAuthException extends Exception {
+
+namespace Alaress\Twitter\Loader\oauth;
+
+class OAuthException extends \Exception {
   // pass
 }
 
