@@ -1,78 +1,60 @@
 {% extends '@core/user/student.twig' %}
 
-{% block details %}
+{% set inSeniorCampus = false %}
 
-    {% set inSeniorCampus = false %}
+{% for campus in user.campusCollection %}
+    {% if campus.extTimetableCode == 'HS' %}
+        {% set inSeniorCampus = true %}
+    {% endif %}
+{% endfor %}
 
-    {% for campus in user.campusCollection %}
-        {% if campus.extTimetableCode == 'HS' %}
-            {% set inSeniorCampus = true %}
+{% block details_formTeacher %}
+    {% if showClasses %}
+        {% if formTeacher %}
+            <dt class="small-4 medium-3 columns">Head of Year:</dt>
+            <dd class="small-8 medium-9 columns">
+                {% if formTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
+                {% else %}
+                    {{ formTeacher.formatName }}
+                {% endif %}
+            </dd>
         {% endif %}
-    {% endfor %}
+    {% endif %}
+{% endblock details_formTeacher %}
 
-    {% block details_formTeacher %}
-        {% if showClasses %}
-            {% if formTeacher %}
-                <dt class="small-4 medium-3 columns">Head of Year:</dt>
-                <dd class="small-8 medium-9 columns">
-                    {% if formTeacher.id %}
-                        <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                    {% else %}
-                        {{ formTeacher.formatName }}
-                    {% endif %}
-                </dd>
-            {% endif %}
+{% block details_tutorTeacher %}
+    {% if showClasses %}
+        {% if tutorTeacher %}
+            <dt class="small-4 medium-3 columns">
+                {% if inSeniorCampus %}
+                    Mentor:
+                {% else %}
+                    Class Teacher:
+                {% endif %}
+            </dt>
+            <dd class="small-8 medium-9 columns">
+                {% if tutorTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
+                {% else %}
+                    {{ tutorTeacher.formatName }}
+                {% endif %}
+            </dd>
         {% endif %}
-    {% endblock details_formTeacher %}
+    {% endif %}
+{% endblock details_tutorTeacher %}
 
-    {% block details_tutorTeacher %}
-        {% if showClasses %}
-            {% if tutorTeacher %}
-                <dt class="small-4 medium-3 columns">
-                    {% if inSeniorCampus %}
-                        Mentor:
-                    {% else %}
-                        Class Teacher:
-                    {% endif %}
-                </dt>
-                <dd class="small-8 medium-9 columns">
-                    {% if tutorTeacher.id %}
-                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                    {% else %}
-                        {{ tutorTeacher.formatName }}
-                    {% endif %}
-                </dd>
-            {% endif %}
+{% block details_tutorGroup %}
+    {% if showClasses %}
+        {% if externalUser.StudentTutorDescription %}
+            <dt class="small-4 medium-3 columns">
+                {% if inSeniorCampus %}
+                    Mentor Group:
+                {% else %}
+                    Class:
+                {% endif %}
+            </dt>
+            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
         {% endif %}
-    {% endblock details_tutorTeacher %}
-
-    {% block details_tutorGroup %}
-        {% if showClasses %}
-            {% if externalUser.StudentTutorDescription %}
-                <dt class="small-4 medium-3 columns">
-                    {% if inSeniorCampus %}
-                        Mentor Group:
-                    {% else %}
-                        Class:
-                    {% endif %}
-                </dt>
-                <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
-            {% endif %}
-        {% endif %}
-    {% endblock details_tutorGroup %}
-
-    {% block details_hohTeacher %}
-        {% if showClasses %}
-            {% if hohTeacher %}
-                <dt class="small-4 medium-3 columns">Head of House:</dt>
-                <dd class="small-8 medium-9 columns">
-                    {% if hohTeacher.id %}
-                        <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-                    {% else %}
-                        {{ hohTeacher.formatName }}
-                    {% endif %}
-                </dd>
-            {% endif %}
-        {% endif %}
-    {% endblock details_hohTeacher %}
-{% endblock details %}
+    {% endif %}
+{% endblock details_tutorGroup %}
