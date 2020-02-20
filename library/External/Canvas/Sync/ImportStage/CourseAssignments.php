@@ -36,7 +36,7 @@ use function array_map;
 use function count;
 
 /**
- * Responsible for importing Canvas Quiz into Schoolbox Course Quiz Specs
+ * Responsible for importing Canvas Assignments into Schoolbox Course SubmissionBox Specs
  */
 class CourseAssignments extends CourseAssessmentAbstract
 {
