@@ -716,6 +716,14 @@ ul.filters {
     }
 }
 
+@media print {
+  ul.filters,
+  #applied_filters,
+  .filter-component {
+      display: none;
+  }
+}
+
 // Win7/IE11 fix for size of checkboxes
 // For now I'm just going to guess a pixel value
 html.no-pseudoelementlineheightinrems {
