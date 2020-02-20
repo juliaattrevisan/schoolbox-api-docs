@@ -437,9 +437,30 @@ class Profile implements IStrategy
                     trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
                 ));
             } else {
-                $externalId = trim((string)$student->xpath('@id')[0]) . '-' . $caregiverIndex;
+                if ('' !== $siblingLink) {
 
-                $this->siblingLinks[$siblingLink][$caregiverIndex] = $externalId;
+                    /* Derive externalId from siblinglink value
+                     *
+                     * siblingLink comes in the format "201800016039" where the first four digits
+                     * are the year the oldest sibling was spawned; the next chars supply space for
+                     * an autoincrementing primary key integer; 16039, in this case
+                     *
+                     * We only care for the "16039" part, so strip the first for digits,
+                     * then ltrim away any useless leading zeroes, then suffix the caregiver index
+                     *
+                     * Then remember this for other siblings,
+                     * for students who have siblings but their parents haven't been seen yet:
+                     */
+                    $externalId = ltrim(substr($siblingLink, 4), '0') . '-' . $caregiverIndex;
+
+                    $this->siblingLinks[$siblingLink][$caregiverIndex] = $externalId;
+                } else {
+
+                    /* Derive externalId from the student external id value
+                     * For students who don't have siblings, their siblingLink value will be empty:
+                     */
+                    $externalId = trim((string)$student->xpath('@id')[0]) . '-' . $caregiverIndex;
+                }
 
                 $this->log->info(sprintf(
                     'Creating parent external id %s for %s',
