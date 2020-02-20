@@ -16,11 +16,7 @@
     queryArgs                string              The filters used to generate this report, so we can export the exact same report
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
-
-{# Legend + Notch titles #}
-{% set labelNoPublishedMark     = 'No mark' %}
-{% set labelPubMarkDraftPending = 'Unpublished draft' %}
-{% set labelPublishedMark       = 'Mark Published' %}
+{% import '@learning/macro/markDecorator.twig' as decorator %}
 
 <div class="row">
     <div class="actions-small-1">
@@ -42,9 +38,10 @@
         {% else %}
         <nav>
             <div class="legend right">
-                <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
-                <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
-                <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
+                <p class="meta"><span class="indicator indicator-none"></span>No mark</p>
+                <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
+                <p class="meta"><span class="indicator indicator-resubmit"></span>Resubmit</p>
+                <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
                 <div class="checklist">
                     <input type="checkbox" id="show-drafts">
                     <label for="show-drafts">
@@ -200,18 +197,12 @@
                                     {# Tasks do not have drafts #}
                                     {% set style = 'style="margin-bottom:0; position:absolute; top:0px;"' %}
                                     {% if taskProgressComplete == progressStatus %}
-                                        {% set indicator = 'published' %}
                                         {% set progressClass = 'reviewed' %}
-                                        {% set notchTitle = labelPublishedMark %}
                                     {% elseif taskProgressPending == progressStatus %}
                                         {# note there is no such thing as draft task masks #}
-                                        {% set indicator = 'published' %}
                                         {% set progressClass = 'pending' %}
-                                        {% set notchTitle = labelPublishedMark %}
                                     {% else %}
-                                        {% set indicator = 'none' %}
                                         {% set progressClass = 'readonly' %}
-                                        {% set notchTitle = labelNoPublishedMark %}
                                     {% endif %}
 
                                     <div
@@ -219,7 +210,7 @@
                                         class="no-text progress-tick {{ progressClass }}"
                                         title="Incomplete"
                                         data-progress-tick-status="incomplete"></div>
-
+                                    <span class="indicator indicator-{{ decorator.taskIndicator(participant) }}" title="{{ decorator.taskNotchTitle(participant) }}"></span>
                                 {% else %}
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
                                     {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] %}
@@ -227,30 +218,12 @@
                                     {% set publishedMark      = marks.published %}
                                     {% set draftMark          = marks.draft %}
 
-                                    {% if draftMark %}
-                                        {% set indicator = 'pending' %}
-                                        {% set notchTitle = labelPubMarkDraftPending %}
-                                    {% elseif publishedMark %}
-                                        {% set indicator = 'published' %}
-                                        {% set notchTitle = labelPublishedMark %}
-                                    {% else %}
-                                        {% set indicator = 'none' %}
-                                        {% set notchTitle = labelNoPublishedMark %}
-                                    {% endif %}
-
-                                    {% if publishedMark %}
-                                        <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ publishedMark['hr'] | default('–') }}</a>
-                                    {% elseif participant.hasSubmittedResponse %}
-                                        <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %}>Pending</a>
-                                    {% else %}
-                                        <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %}>–</a>
-                                    {% endif %}
-
+                                     <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ decorator.label(participant, true) }}</a>
                                     {% if marks.draft is defined %}
-                                        <a href="{{ participationRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ draftMark['hr'] | default('–') }}</a>
+                                        <a href="{{ participationRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ decorator.label(participant, false) }}</a>
                                     {% endif %}
+                                    <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                 {% endif %}
-                                    <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
                                 </td>
                             {% else %}
                                 <td class="na"></td>

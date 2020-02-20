@@ -60,6 +60,10 @@
         border-top: .75rem solid $success-color;
         border-left: .75rem solid transparent;
     }
+    .indicator.indicator-resubmit {
+        border-top: .75rem solid $alert-color;
+        border-left: .75rem solid transparent;
+    }
 
     // Marksheet content
     .marksheet {

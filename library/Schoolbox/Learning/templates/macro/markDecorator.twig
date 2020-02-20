@@ -33,6 +33,8 @@
 {% spaceless %}
     {% if hasDraft %}
         pending
+    {% elseif participant.resubmissionRequired %}
+        resubmit
     {% elseif participant.hasPublishedFeedback %}
         published
     {% else %}
@@ -48,6 +50,8 @@
 {% spaceless %}
     {% if hasDraft %}
         Unpublished draft
+    {% elseif participant.resubmissionRequired %}
+        Resubmit
     {% elseif participant.hasPublishedFeedback %}
         Mark Published
     {% else %}
