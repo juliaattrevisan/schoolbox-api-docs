@@ -32,7 +32,7 @@ use function count;
 use function implode;
 
 /**
- * Synchronise Canvas CourseSections+Assignments+Overrides => Schoolbox CourseImpl+UnitImpl+AssessmentImpl+Plans+Participants
+ * Synchronise Canvas CourseSections => Schoolbox CourseImpl+UnitImplqq
  */
 class CourseSections
 {
