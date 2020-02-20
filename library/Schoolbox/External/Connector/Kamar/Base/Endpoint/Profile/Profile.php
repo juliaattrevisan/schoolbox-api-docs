@@ -396,7 +396,7 @@ class Profile implements IStrategy
 
             /* Add their parents + relationships too, but only if we haven't already seen them
              */
-            $this->importParentsOfStudent($student, $siblingLink, $studentBaseProfile);
+            $this->importParentsOfStudent($student, $studentBaseProfile);
 
             /* Remember this person's details
              */
