@@ -105,6 +105,26 @@
             }
         });
 
+        $(document).on('click', '#show-drafts', function () {
+            if ($(this).prop("checked")) {
+                $("[data-draft-mark]").show();
+                $("[data-actual-mark]").hide();
+                $("[data-student-average]").each(function (idx, elem) {
+                    var $elem = $(elem);
+                    $elem.removeClass($elem.attr('data-off-class'));
+                    $elem.addClass($elem.attr('data-on-class'));
+                });
+            } else {
+                $("[data-draft-mark]").hide();
+                $("[data-actual-mark]").show();
+                $("[data-student-average]").each(function (idx, elem) {
+                    var $elem = $(elem);
+                    $elem.removeClass($elem.attr('data-on-class'));
+                    $elem.addClass($elem.attr('data-off-class'));
+                });
+            }
+        });
+
     });
 </script>
 {% endautoescape %}

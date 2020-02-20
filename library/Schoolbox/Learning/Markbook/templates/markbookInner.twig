@@ -10,32 +10,47 @@
 #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/markDecorator.twig' as decorator %}
 
 {# If the markbook has more than this number of participants reduce functionality to improve browser performance#}
 {% set functionDegradeLimit = 80 %}
 {% set studentCount = markbook.students|length %}
 
-<div id="report_actions" class="actions-small-1 row">
-    {% if studentCount >= functionDegradeLimit %}
+<div class="row">
+    <div class="actions-small-1 row">
+        <nav>
+            <div class="legend">
+                <p class="meta"><span class="indicator indicator-none"></span>No mark</p>
+                <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
+                <p class="meta"><span class="indicator indicator-resubmit"></span>Resubmit</p>
+                <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
+                <div class="checklist">
+                    <input type="checkbox" id="show-drafts">
+                    <label for="show-drafts">
+                        Show Drafts
+                    </label>
+                </div>
+                <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+            </div>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+            <li class="separator">Report</li>
+            <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+        </ul>
+    </div>
+</div>
+{% if studentCount >= functionDegradeLimit %}
+<div id="report_actions" class="row">
     <div class="small-12 column list-item">
         <ul class="meta">
             <li class="icon-alert">This markbook is showing a large number of students; for performance reasons, student portraits and marking of tasks have been disabled.</li>
         </ul>
     </div>
-    {% endif %}
-    <nav>
-        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li class="separator">Report</li>
-        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
-    </ul>
 </div>
-
+{% endif %}
 <div class="row">
     <div class="small-12 island">
         {% if markbook.assessments|length > 0 %}
-        <form id="statistics" action="#">
         <table id="marksheet-styles" class="marksheet" data-mark-sheet>
             <thead>
                 <tr class="rotate-headers" data-headers data-hidable-columns>
@@ -70,8 +85,15 @@
                     </th>
                     {% for assessment in markbook.assessments %}
                         {% set stats = markbook.assessmentStatistics[assessment.id] %}
-                        <th class="{{ urgency.marks(stats.meanNormalized) }}-bg" data-assessment="{{ assessment.id }}">
+                        <th data-assessment="{{ assessment.id }}">
+                            <span {% if stats.draftMean and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                                 {{ stats.mean | default('–') }}
+                            </span>
+                            {% if stats.draftMean and (markbook.hasDraft[assessment.id] is defined) %}
+                                <span data-draft-mark class="meta" style="display:none;">
+                                    {{ stats.draftMean | default('–') }}
+                                </span>
+                            {% endif %}
                         </th>
                     {% endfor %}
                 </tr>
@@ -125,14 +147,29 @@
                         </div>
                     </td>
 
-                    {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
-                    {% set meanNormalised = markbook.studentStatistics[student.id].meanNormalised %}
-                    <td class="{{ urgency.marks(meanNormalised) }}-bg">
+                    {% set studentMean         = markbook.studentStatistics[student.id].weightedMean %}
+                    {% set draftWeightedMean   = markbook.studentStatistics[student.id].draftWeightedMean %}
+                    {% set meanNormalised      = markbook.studentStatistics[student.id].meanNormalised %}
+                    {% set meanDraftNormalised = markbook.studentStatistics[student.id].meanDraftNormalised %}
+
+                    {% set draftsOffClass      = meanNormalised is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
+                    {% set draftsOnClass       = meanDraftNormalised is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
+
+                    <td class="{{ draftsOffClass }}"
+                        {% if draftWeightedMean %}data-student-average{% endif %}
+                        data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
+                        {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
                         {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
-                        <a class="{{ urgency.marks(meanNormalised) }}-bg"
-                           href="{{ routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
-                            {{ studentMean | default('–') }}
+                        <a class="{{ draftsOffClass }}"
+                           href="{{ gradesRoute }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
+                           title="View students {{ locale.grades.plural }}"> {{ studentMean | default('–') }}
                         </a>
+                        {% if draftWeightedMean %}
+                            <a class="{{ draftsOnClass }}"
+                               href="{{ gradesRoute }}" data-draft-mark style="display: none"
+                               title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('–') }}
+                            </a>
+                        {% endif %}
                     </td>
 
                     {% for assessment in markbook.assessments %}
@@ -164,23 +201,22 @@
                                                data-progress-tick-status="teacherAssessed"></div>
                                         {% endif %}
                                     {% endif %}
+                                    <span class="indicator indicator-{{ decorator.taskIndicator(participant) }}" title="{{ decorator.taskNotchTitle(participant) }}"></span>
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(true) %}
-                                    {% set label %}
-                                        {% if participant.resubmissionRequired %}
-                                            Resubmit
-                                        {% elseif participant.hasSubmittedResponse and not participant.hasPublishedFeedback %}
-                                            Pending
-                                        {% else %}
-                                            {{ participant.humanReadableMark(true) | default('–') }}
-                                        {% endif %}
-                                    {% endset %}
-
-                                    <a class="{{ urgency.marks(normalisedMark) }}"
-                                       href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
-                                       title="{{ participant.authoritativeFeedback(true).comment }}">{{ label }}</a>
+                                    {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
+                                    {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
+                                     <a class="{{ urgency.marks(normalisedMark) }}"
+                                        href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
+                                        title="{{ participant.authoritativeFeedback(true).comment }}">{{ decorator.label(participant, true) }}</a>
+                                    {% if draftMark %}
+                                        <a href="{{ participationRoute }}" data-draft-mark style="display: none"
+                                           class="meta"
+                                           title="{{ participant.authoritativeFeedback(false).comment }}">{{ decorator.label(participant, false) }}</a>
+                                    {% endif %}
+                                    <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                     {% if not participant.plan.isDynamic %}
-                                        <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
+                                        <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
@@ -191,7 +227,6 @@
                 {% endspaceless %}
             </tbody>
             </table>
-        </form>
         {% else %}
         <div class="empty-state">
             <i class="icon-curriculum"></i>

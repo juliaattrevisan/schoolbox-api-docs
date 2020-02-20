@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Markbook;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IAssessableComparator;
 use Schoolbox\Learning\Assessment\Project;
@@ -35,6 +36,13 @@ class Markbook
      * @var Collection|IAssessable[]
      */
     protected $assessments;
+
+    /**
+     * Students that are a part of this markbook.
+     *
+     * @var Collection
+     */
+    private $students;
 
     /**
      * Assessments part of this markbook on the top level (not including assessments inside projects)
@@ -97,6 +105,14 @@ class Markbook
     protected $studentStatistics = [];
 
     /**
+     * Whether draft exists for student & assessment combination
+     *
+     * key: assessment ID, student ID
+     * @var array
+     */
+    private $hasDraft = [];
+
+    /**
      * Build a markbook out of a list of assessments.
      *
      * This assumes that all participants, responses and feedbacks have been filled out.
@@ -140,21 +156,24 @@ class Markbook
     /**
      * Retrieves all students who have participated in any of the assessments in the markbook.
      *
-     * @return Collection|User[]
+     * @return Collection
      */
-    public function getStudents()
+    public function getStudents(): Collection
     {
-        $participants = new Collection();
-        foreach ($this->getAssessments() as $assessment) {
-            foreach ($assessment->getAllParticipants() as $participant) {
-                $student = $participant->getUser();
-                if (!$participants->offsetExists($student->getId())) {
-                    $participants->setOffset($student->getId(), $student);
+        if (!isset($this->students)) {
+            $participants = new Collection();
+            foreach ($this->getAssessments() as $assessment) {
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    $student = $participant->getUser();
+                    if (!$participants->offsetExists($student->getId())) {
+                        $participants->setOffset($student->getId(), $student);
+                    }
                 }
             }
+            $participants->sortByCallback((new SortUsersByName())->getCallable(), true);
+            $this->students = $participants;
         }
-        $participants->sortByCallback((new SortUsersByName())->getCallable(), true);
-        return $participants;
+        return $this->students;
     }
 
     /**
@@ -212,13 +231,43 @@ class Markbook
             return $assessable->isFeedbackVisibleToUser($this->viewingUser);
         });
 
+        $visibleAssessmentIds = $visibleAssessments->getPropertyValues('id');
         foreach ($this->getStudents() as $student) {
+
+            // Check whether latest feedback is draft
+            $statsHasDraft = false;
+            foreach ($this->assessments as $assessment) {
+                if (!$assessment instanceof DueWork) {
+                    continue;
+                }
+                $participant = $assessment->getParticipantIfExtant($student);
+                if (!$participant || $participant->isExcluded()) {
+                    continue;
+                }
+                $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+                if ($latestFeedback && $latestFeedback->isDraft()) {
+                    $this->hasDraft[$assessment->getId()][$student->getId()] = true;
+                    if (in_array($assessment->getId(), $visibleAssessmentIds)) {
+                        $statsHasDraft = true;
+                    }
+                }
+            }
+
             $this->studentStatistics[$student->getId()]['weightedMean'] =
                 $overallMarkScheme->getHumanReadableMark(
                     $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, true)
                 );
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
                     $weightedSummator->summate($visibleAssessments, $student, true);
+
+            if ($statsHasDraft) {
+                $this->studentStatistics[$student->getId()]['draftWeightedMean'] =
+                    $overallMarkScheme->getHumanReadableMark(
+                        $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, false)
+                    );
+                $this->studentStatistics[$student->getId()]['meanDraftNormalised'] =
+                    $weightedSummator->summate($visibleAssessments, $student, false);
+            }
         }
 
         // Summate overall statistics:
@@ -232,8 +281,16 @@ class Markbook
             new Average()
         );
         $this->weightedMean = $overallMarkScheme->getHumanReadableMark($this->normalisedMean);
+
     }
 
+    /**
+     * @return array
+     */
+    public function getHasDraft(): array
+    {
+        return $this->hasDraft;
+    }
 
     /**
      * @return float
@@ -271,11 +328,13 @@ class Markbook
 
         // Just get marks for all students, and let the summators do the rest.
         $normMarks = [];
+        $draftNormMarks = [];
 
         // Only collate stats for assessments whose feedback may be viewed by this user
         if ($assessment->isFeedbackVisibleToUser($this->viewingUser)) {
             foreach ($assessment->getAllParticipants() as $participant) {
-                $normMarks[] = $participant->getNormalisedMark(true);
+                $normMarks[]      = $participant->getNormalisedMark(true);
+                $draftNormMarks[] = $participant->getNormalisedMark(false);
             }
         }
 
@@ -303,6 +362,7 @@ class Markbook
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
             $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
+            $statistics['draftMean']        = $markScheme->getHumanReadableMark($meanSummator->summateList($draftNormMarks));
             $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
         }
