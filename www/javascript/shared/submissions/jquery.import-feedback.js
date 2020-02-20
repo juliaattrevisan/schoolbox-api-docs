@@ -134,6 +134,10 @@
             let i, preprocessed = [];
 
             for (i = 0; i < rows.length; i++) {
+                if (rows[i] === undefined) {
+                    continue;
+                }
+
                 let row = rows[i].split("\t");
                 let comment = $.trim(row[row.length-1]);
 
@@ -200,6 +204,10 @@
             preprocessed = removeEncapsulatingQuotes(preprocessed);
 
             for (i = 0; i < preprocessed.length; i++) {
+                if (preprocessed[i] === undefined) {
+                    continue;
+                }
+
                 let input = preprocessed[i].split("\t");
                 let id = $.trim(input[0]);
 
