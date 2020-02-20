@@ -10,23 +10,19 @@
 #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/markDecorator.twig' as decorator %}
 
 {# If the markbook has more than this number of participants reduce functionality to improve browser performance#}
 {% set functionDegradeLimit = 80 %}
 {% set studentCount = markbook.students|length %}
 
-{# Legend + Notch titles #}
-{% set labelNoPublishedMark     = 'No mark' %}
-{% set labelPubMarkDraftPending = 'Unpublished draft' %}
-{% set labelPublishedMark       = 'Mark Published' %}
-
 <div class="row">
     <div class="actions-small-1 row">
         <nav>
             <div class="legend">
-                <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
-                <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
-                <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
+                <p class="meta"><span class="indicator indicator-none"></span>No mark</p>
+                <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
+                <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
                 <div class="checklist">
                     <input type="checkbox" id="show-drafts">
                     <label for="show-drafts">
@@ -90,10 +86,10 @@
                     {% for assessment in markbook.assessments %}
                         {% set stats = markbook.assessmentStatistics[assessment.id] %}
                         <th data-assessment="{{ assessment.id }}">
-                            <span {% if stats.draftMean and (stats.draftMean != stats.mean) %} data-actual-mark {% endif %}>
+                            <span {% if stats.draftMean and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                                 {{ stats.mean | default('–') }}
                             </span>
-                            {% if stats.draftMean and (stats.draftMean != stats.mean) %}
+                            {% if stats.draftMean and (markbook.hasDraft[assessment.id] is defined) %}
                                 <span data-draft-mark class="meta" style="display:none;">
                                     {{ stats.draftMean | default('–') }}
                                 </span>
@@ -160,17 +156,16 @@
                     {% set draftsOnClass       = meanDraftNormalised is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
 
                     <td class="{{ draftsOffClass }}"
-                        {% if draftWeightedMean is defined %}data-student-average{% endif %}
+                        {% if draftWeightedMean %}data-student-average{% endif %}
                         data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                         {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
                         {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
-                        <a class="{{ urgency.marks(meanNormalised) }}-bg"
+                        <a class="{{ draftsOffClass }}"
                            href="{{ gradesRoute }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
-                           title="View students {{ locale.grades.plural }}">
-                            {{ studentMean | default('–') }}
+                           title="View students {{ locale.grades.plural }}"> {{ studentMean | default('–') }}
                         </a>
                         {% if draftWeightedMean %}
-                            <a class="{{ urgency.marks(meanDraftNormalised) }}-bg"
+                            <a class="{{ draftsOnClass }}"
                                href="{{ gradesRoute }}" data-draft-mark style="display: none"
                                title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('–') }}
                             </a>
@@ -182,91 +177,46 @@
                         <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
                             {% if participant and not participant.isExcluded %}
                                 {% if assessment is task %}
-
-                                    {% if participant.isResponseRequired %}
-                                        {% set indicator = 'none' %}
-                                        {% set progressClass = 'readonly' %}
-                                        {% set notchTitle = 'Incomplete' %}
-                                    {% elseif participant.isFeedbackRequired %}
-                                        {# note there is no such thing as draft task marks #}
-                                        {% set indicator = 'published' %}
-                                        {% set progressClass = 'pending' %}
-                                        {% set notchTitle = 'Self-assessed' %}
-                                    {% elseif participant.isReviewComplete %}
-                                        {% set indicator = 'published' %}
-                                        {% set progressClass = 'reviewed' %}
-                                        {% set notchTitle = 'Completed' %}
-                                    {% endif %}
-
-                                   {# An icon that shows if the student has attempted the task or not #}
+                                    {# An icon that shows if the student has attempted the task or not #}
                                     {% if studentCount < functionDegradeLimit %}
-                                   {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                        assessment: assessment,
-                                        student: participant.user
-                                    } only %}
+                                        {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                            assessment: assessment,
+                                            student: participant.user
+                                        } only %}
                                     {% else %}
-                                        <div
-                                                class="no-text progress-tick {{ progressClass }}"
-                                                title="{{ notchTitle }}"></div>
+                                        {% if participant.isResponseRequired %}
+                                            <div
+                                               class="no-text progress-tick readonly"
+                                               title="Incomplete"
+                                               data-progress-tick-status="incomplete"></div>
+                                        {% elseif participant.isFeedbackRequired %}
+                                            <div
+                                               class="no-text progress-tick pending"
+                                               title="Self-assessed"
+                                               data-progress-tick-status="selfAssessed"></div>
+                                        {% elseif participant.isReviewComplete %}
+                                            <div
+                                               class="no-text progress-tick reviewed"
+                                               title="Completed"
+                                               data-progress-tick-status="teacherAssessed"></div>
+                                        {% endif %}
                                     {% endif %}
-
-                                    <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
-
-
+                                    <span class="indicator indicator-{{ decorator.taskIndicator(participant) }}" title="{{ decorator.taskNotchTitle(participant) }}"></span>
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(true) %}
-
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
-                                    {% set comment            = participant.authoritativeFeedback(true).comment %}
-                                    {% set mark               = participant.humanReadableMark(true) %}
-                                    {% set isMarkPublished    = participant.hasPublishedFeedback %}
-                                    {% set latestFeedback             = participant.findMostRecentInstructorGivenFeedback %}
-                                    {% set latestPublishedFeedback    = participant.findMostRecentInstructorGivenPublishedFeedback %}
-
-                                    {% set hasSubmittedResponse = participant.hasSubmittedResponse %}
-
-                                    {% if latestFeedback.id != latestPublishedFeedback.id and assessment.typeName != 'Quiz' %}
-                                        {% set draftMark      = true %}
-                                    {% else %}
-                                        {% set draftMark      = false %}
-                                    {% endif %}
-
-                                    {% if draftMark %}
-                                        {% set indicator = 'pending' %}
-                                        {% set notchTitle = labelPubMarkDraftPending %}
-                                    {% elseif isMarkPublished %}
-                                        {% set indicator = 'published' %}
-                                        {% set notchTitle = labelPublishedMark %}
-                                    {% else %}
-                                        {% set indicator = 'none' %}
-                                        {% set notchTitle = labelNoPublishedMark %}
-                                    {% endif %}
-
-
-                                    {% if isMarkPublished %}
-                                        <a href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
-                                           title="{{ comment }}">{{ mark | default('–') }}</a>
-                                    {% elseif (hasSubmittedResponse) %}
-                                        <a href="{{ participationRoute }}"
-                                                {% if draftMark %} data-actual-mark {% endif %}>Pending</a>
-                                    {% else %}
-                                        <a href="{{ participationRoute }}"
-                                                {% if draftMark %} data-actual-mark {% endif %}>–</a>
-                                    {% endif %}
-
-                                    <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
-
+                                    {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
+                                     <a class="{{ urgency.marks(normalisedMark) }}"
+                                        href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
+                                        title="{{ participant.authoritativeFeedback(true).comment }}">{{ decorator.label(participant, true) }}</a>
                                     {% if draftMark %}
                                         <a href="{{ participationRoute }}" data-draft-mark style="display: none"
                                            class="meta"
-                                           title="{{ participant.authoritativeFeedback(false).comment }}">{{ participant.humanReadableMark(false) | default('–') }}</a>
-                                        <span class="indicator indicator-{{ indicator }}"
-                                              title="{{ notchTitle }}"></span>
+                                           title="{{ participant.authoritativeFeedback(false).comment }}">{{ decorator.label(participant, false) }}</a>
                                     {% endif %}
-
+                                    <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                     {% if not participant.plan.isDynamic %}
-                                        <span class="individualisation has-tip tip-top" data-tooltip
-                                              title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
+                                        <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}

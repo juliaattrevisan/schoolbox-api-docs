@@ -1,0 +1,72 @@
+{##
+ # Gets classname for task mark indicator
+ #}
+{% macro taskIndicator(participant) %}
+{% spaceless %}
+    {% if participant.isResponseRequired %}
+        none
+    {% elseif participant.isFeedbackRequired or participant.isReviewComplete %}
+        published
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{##
+ # Gets title for task mark indicator
+ #}
+{% macro taskNotchTitle(participant) %}
+{% spaceless %}
+    {% if participant.isResponseRequired %}
+        Incomplete
+    {% elseif participant.isFeedbackRequired %}
+        Self-assessed
+    {% elseif participant.isReviewComplete %}
+        Completed
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{##
+ # Gets classname for due work/quiz mark indicator
+ #}
+{% macro indicator(participant, hasDraft) %}
+{% spaceless %}
+    {% if hasDraft %}
+        pending
+    {% elseif participant.hasPublishedFeedback %}
+        published
+    {% else %}
+        none
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{##
+ # Gets title for due work/quiz mark indicator
+ #}
+{% macro notchTitle(participant, hasDraft) %}
+{% spaceless %}
+    {% if hasDraft %}
+        Unpublished draft
+    {% elseif participant.hasPublishedFeedback %}
+        Mark Published
+    {% else %}
+        No mark
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{##
+ # Gets label for due work/quiz mark
+ #}
+{% macro label(participant, isPublished) %}
+{% spaceless %}
+    {% if participant.resubmissionRequired %}
+        Resubmit
+    {% elseif participant.hasSubmittedResponse and not participant.hasPublishedFeedback %}
+        Pending
+    {% else %}
+        {{ participant.humanReadableMark(isPublished) | default('–') }}
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
