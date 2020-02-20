@@ -475,7 +475,8 @@ class Profile implements IStrategy
              */
             $parentName = explode(' ', trim((string)$parent->name), 2);
 
-            $username = $email = trim((string)$parent->email);
+            $username = $externalId;
+            $email = trim((string)$parent->email);
             $firstname = $parentName[0] ?? '';
             $lastname = $parentName[1] ?? '';
             $phoneHome = '';
