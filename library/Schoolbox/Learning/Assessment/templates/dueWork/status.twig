@@ -768,12 +768,6 @@
                         preprocessed = combineMultilineComments(preprocessed);
                         preprocessed = removeEncapsulatingQuotes(preprocessed);
 
-                        /* Clear out empty rows
-                         */
-                        preprocessed = preprocessed.filter(function (element) {
-                            return element != null;
-                        });
-
                         /* Assign csv data
                          */
                         performAssignation(preprocessed);
