@@ -229,7 +229,9 @@ class CourseSections
                     throw new UnexpectedValueException("Unable to find folder for account.canvasId '$accountCanvasId' and course.code '$courseGroupCode'");
                 }
                 foreach ($courseGroupData as $courseCanvasId => $courseData) {
-                    $unitSpecFolder = $this->courseBridge->findUnitSpecFolder($courseCanvasId);
+                    $unitSpecFolderPredicate = $this->courseBridge->equalsCanvasCourse($courseCanvasId)->isNull('us.deleted_at');
+                    $unitSpecFolder          = $this->folderMapper->findByPredicates($unitSpecFolderPredicate)->first();
+
                     if ($unitSpecFolder === null) {
                         throw new UnexpectedValueException("Unable to find folder for course.canvasId '$courseCanvasId'");
                     }
@@ -472,6 +474,7 @@ class CourseSections
      * Hydrates:
      *   UnitImpl
      *   UnitImpl.UnitSpec
+     *   UnitImpl.UnitSpec.Folder
      *
      * @param CourseImpl\Model $courseImpl
      * @return CourseImpl\Model|null
@@ -485,9 +488,11 @@ class CourseSections
         $sql = "
             SELECT
                    {$this->unitImplMapper->getColumnString('ui')},
-                   {$this->unitSpecMapper->getColumnString('us')}
+                   {$this->unitSpecMapper->getColumnString('us')},
+                   {$this->folderMapper->getColumnString('usf')}
             FROM course_unit_implementation ui
             JOIN course_unit_specification us on ui.course_unit_specification_id = us.id
+            JOIN folder usf ON us.folder_id = usf.id
             WHERE
                   ui.course_implementation_id = :ciId AND
                   ui.deleted_at IS NULL
@@ -502,7 +507,7 @@ class CourseSections
             throw new UnexpectedValueException("Multiple UnitImplementations found for CourseImpl {$courseImpl->getId()}");
         }
         $unitImpl = $this->unitImplMapper->hydrate($rows[0], 'ui');
-        $unitSpec = $this->unitSpecMapper->hydrate($rows[0], 'us');
+        $unitSpec = $this->unitSpecMapper->hydrate($rows[0], 'us')->setFolder($this->folderMapper->hydrate($rows[0], 'usf'));
         $unitSpec->setUnitImplementations($this->unitImplMapper->createCollection()->setOffset($unitImpl->getId(), $unitImpl));
         return $unitImpl->setSpecification($unitSpec);
     }
