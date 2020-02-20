@@ -100,6 +100,23 @@ class Profile implements IStrategy
 
 
     /**
+     * Remember a list of siblingLinks which are vaguely synonymous with a family id
+     *
+     * Parents' external ids are derived from their students' external ids but this design
+     * is flawed when multiple children have the same parents. You can't rely on kamar
+     * xml files being processed in a particular order so one set of parents might
+     * precede another, and be associated with one student instead of another (or both)
+     *
+     * To prevent spurious spawning of what are essentially the same parents, remember
+     * the siblingLinks so we know that we've processed parents from this particular
+     * family already.
+     *
+     * @var array
+     */
+    private $siblingLinks = [];
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -199,6 +216,7 @@ class Profile implements IStrategy
         $students = $this->batchxml->fetchXml('/SMSDirectoryData/students/user');
 
         foreach ($students as $student) {
+            $siblingLink = trim((string)$student->siblinglink);
             $externalId = trim((string)$student->xpath('@id')[0]);
             $username = trim((string)$student->username);
             $title = '';
@@ -376,9 +394,9 @@ class Profile implements IStrategy
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            /* Add their parents + relationships too
+            /* Add their parents + relationships too, but only if we haven't already seen them
              */
-            $this->importParentsOfStudent($student, $studentBaseProfile);
+            $this->importParentsOfStudent($student, $siblingLink, $studentBaseProfile);
 
             /* Remember this person's details
              */
@@ -390,24 +408,46 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param SimpleXMLElement $student
+     * @param SimpleXMLElement  $student
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws PDOException
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     private function importParentsOfStudent(SimpleXMLElement $student, UserProfile\Model $studentBaseProfile): void
     {
+        $siblingLink = trim((string)$student->siblinglink);
 
         /** @var SimpleXMLElement $parent */
         foreach ($student->caregivers->caregiver as $parent) {
 
             /* Parents don't have an external unique identifier; therefore we manufacture them
              * Parents also don't have separate first/last names, just a fullname
+             * Reassign an existing parent id for a sibling if we encountered them previously
              */
-            $externalId = trim((string)$student->xpath('@id')[0]) . '-' . $parent->xpath('@index')[0];
+            $caregiverIndex = (string)$parent->xpath('@index')[0];
+
+            if (isset($this->siblingLinks[$siblingLink][$caregiverIndex])) {
+                $externalId = $this->siblingLinks[$siblingLink][$caregiverIndex];
+
+                $this->log->info(sprintf(
+                    'Reusing parent external id %s for %s',
+                    $externalId,
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                ));
+            } else {
+                $externalId = trim((string)$student->xpath('@id')[0]) . '-' . $caregiverIndex;
+
+                $this->siblingLinks[$siblingLink][$caregiverIndex] = $externalId;
+
+                $this->log->info(sprintf(
+                    'Creating parent external id %s for %s',
+                    $externalId,
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                ));
+            }
+
             $username = $email = trim((string)$parent->email);
             $firstname = trim((string)$parent->name);
             $lastname = '';
