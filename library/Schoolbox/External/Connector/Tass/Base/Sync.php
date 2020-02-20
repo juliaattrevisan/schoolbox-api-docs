@@ -82,18 +82,30 @@ class Sync extends Base implements ISync
     }
 
     /**
+     * Checks whether persondefs table is empty
+     * @return bool
+     */
+    private function hasPersonData(): bool
+    {
+        $stmt = $this->databaseExternal->executeQuery('SELECT count(*) FROM persondefs');
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function findAllParents()
     {
-        $query = $this->getParentQuery(false);
+        $hasPersonData = $this->hasPersonData();
+
+        $query = $this->getParentQuery(false, $hasPersonData);
         $params = [
             'companyCode'  => $this->companyCode,
             'companyCode2' => $this->companyCode,
         ];
 
         if ($this->config->get('external_tass_commrules')) {
-            $query .= ' UNION ALL ' . $this->getParentQuery(true);
+            $query .= ' UNION ALL ' . $this->getParentQuery(true, $hasPersonData);
             $params['companyCodeComm'] = $this->companyCode;
             $params['companyCodeComm2'] = $this->companyCode;
         }
@@ -106,9 +118,10 @@ class Sync extends Base implements ISync
     /**
      * Returns query to get parents
      * @param bool $useCommRules
+     * @param bool $joinPersonDef
      * @return string
      */
-    private function getParentQuery(bool $useCommRules) : string
+    private function getParentQuery(bool $useCommRules, bool $joinPersonDef): string
     {
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
@@ -134,6 +147,23 @@ class Sync extends Base implements ISync
             $companyCode = 'companyCode';
             $studentjoin = "LEFT JOIN student as s
                     ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
+        }
+
+        if ($joinPersonDef) {
+            $personDefJoin =
+                "   INNER JOIN family f
+                        ON f.entity_code = p.par_code AND f.entity_gender = '%s'
+                    INNER JOIN persondefs pd
+                        ON pd.person_num = f.person_num
+                        AND pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL
+            ";
+            $personDefJoinM = sprintf($personDefJoin, 'M');
+            $personDefJoinF = sprintf($personDefJoin, 'F');
+        } else {
+            $personDefJoinM = "   INNER JOIN family f
+                        ON f.entity_code = p.par_code
+                        ";
+            $personDefJoinF = $personDefJoinM;
         }
 
         // Single Tuple contains data for [P]arent and [S]pouse
@@ -171,15 +201,11 @@ class Sync extends Base implements ISync
                     ON p.par_code = sf.par_code
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
-                INNER JOIN family f
-                    ON f.entity_code = p.par_code
-                LEFT JOIN persondefs pd
-                    ON pd.person_num = f.person_num
+                {$personDefJoinM}
                 WHERE p.cmpy_code = :{$companyCode}
                 AND   p.f_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-                AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
 
@@ -218,15 +244,11 @@ class Sync extends Base implements ISync
                     ON p.par_code = sf.par_code
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
-                INNER JOIN family f
-                    ON f.entity_code = p.par_code
-                LEFT JOIN persondefs pd
-                    ON pd.person_num = f.person_num
+                {$personDefJoinF}
                 WHERE p.cmpy_code = :{$companyCode}2
                 AND   p.m_name IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-                AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
 
