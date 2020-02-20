@@ -448,9 +448,15 @@ class Profile implements IStrategy
                 ));
             }
 
+            /* Parents' names are all crammed together so arbitrarily split them
+             * Sorry to people with multiple strings in their name like Grant van der Kruk;
+             * your name might not display as intended. Blame Kamar for that.
+             */
+            $parentName = explode(' ', trim((string)$parent->name), 2);
+
             $username = $email = trim((string)$parent->email);
-            $firstname = trim((string)$parent->name);
-            $lastname = '';
+            $firstname = $parentName[0] ?? '';
+            $lastname = $parentName[1] ?? '';
             $phoneHome = '';
             $phoneWork = '';
             $phoneMobile = trim((string)$parent->mobile);
