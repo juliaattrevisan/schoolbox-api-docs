@@ -107,6 +107,8 @@ class ConfigMapper extends Mapper
     public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
     public const _CANVAS_URL                        = 'canvas_url';
 
+    public const NAME_OTFS_ADAPTER = 'otfs_adapter';
+
 
     /**
      * @throws \InvalidArgumentException
