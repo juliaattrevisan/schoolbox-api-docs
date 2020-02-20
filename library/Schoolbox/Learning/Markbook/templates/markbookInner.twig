@@ -39,16 +39,15 @@
         </ul>
     </div>
 </div>
-<div id="report_actions" class="actions-small-1 row">
-    {% if studentCount >= functionDegradeLimit %}
+{% if studentCount >= functionDegradeLimit %}
+<div id="report_actions" class="row">
     <div class="small-12 column list-item">
         <ul class="meta">
             <li class="icon-alert">This markbook is showing a large number of students; for performance reasons, student portraits and marking of tasks have been disabled.</li>
         </ul>
     </div>
-    {% endif %}
 </div>
-
+{% endif %}
 <div class="row">
     <div class="small-12 island">
         {% if markbook.assessments|length > 0 %}
