@@ -688,12 +688,38 @@
                         }
 
 
+                        /**
+                         * Excel copy-paste encapsulate multiline comments in double quotes
+                         *
+                         * Presume that if the comment starts and ends with a double quote
+                         * that it came from this place and remove them, then replace the
+                         * original comment with the new one
+                         */
+                        function removeEncapsulatingQuotes(rows) {
+                            var i, row, comment, preprocessed = [];
+
+                            for (i = 0; i < rows.length; i++) {
+                                row = rows[i].split("\t");
+                                comment = $.trim(row[row.length-1]);
+
+                                if (comment[0] === '"' && comment[comment.length-1] === '"') {
+                                    row[row.length-1] = comment.replace(/^"|"$/g, '');
+                                }
+
+                                preprocessed[i] = row.join("\t");
+                            }
+
+                            return preprocessed;
+                        }
+
+
                         /* Combined multiline commentary to offset Excel bug
                          */
                         var i, current, input, id, previous;
 
                         var condensed = combineSplitColumns(rows);
                         var preprocessed = combineMultilineComments(condensed);
+                        var preprocessed = removeEncapsulatingQuotes(preprocessed);
 
                         /* Clear out empty rows
                          */
