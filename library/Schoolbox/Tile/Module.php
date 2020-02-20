@@ -135,19 +135,21 @@ class Module extends BaseModule
 
         // Callback for extracting homepage from route params
         $getHomepageCallback = function ($params) {
-            if($params['layout']) {
-                return $params['layout']->getFolder();
+            if($params['layout'] && $params['layout']->getFolder()) {
+                return $params['layout']->getFolder()->getId();
             }
-            if ($params['component']->getModule() != 'homepage') {
+            else if ($params['component']->getModule() != 'homepage') {
                 throw new \Exception('Homepage permission does not apply to dashboard tiles');
             }
-            return $params['homepage'];
+            else if($params['component']) {
+                return $params['component']->getIdentifier();
+            }
+            return $params['homepage']->getId();
         };
 
         // Callback for extracting homepage ID from route params
         $getHomepageIdCallback = function ($params) use ($getHomepageCallback) {
-            $homepage = $getHomepageCallback($params);
-            return $homepage->getId();
+            return $getHomepageCallback($params);
         };
 
         $rule = new Rule\Any(
