@@ -752,8 +752,14 @@
                         function performAssignation(rows) {
                             let i;
 
-                            for (i = 0; i < rows.length; i++) {
-                                let input = rows[i].split("\t");
+                            /* Take the raw csv and fix all the problems with it
+                             */
+                            let preprocessed = combineSplitColumns(rows);
+                            preprocessed = combineMultilineComments(preprocessed);
+                            preprocessed = removeEncapsulatingQuotes(preprocessed);
+
+                            for (i = 0; i < preprocessed.length; i++) {
+                                let input = preprocessed[i].split("\t");
                                 let id = $.trim(input[0]);
 
                                 if (id) {
@@ -762,15 +768,9 @@
                             }
                         }
 
-                        /* Take the raw csv and fix all the problems with it
-                         */
-                        let preprocessed = combineSplitColumns(rows);
-                        preprocessed = combineMultilineComments(preprocessed);
-                        preprocessed = removeEncapsulatingQuotes(preprocessed);
-
                         /* Assign csv data
                          */
-                        performAssignation(preprocessed);
+                        performAssignation(rows);
 
                         /* Close the modal
                          */
