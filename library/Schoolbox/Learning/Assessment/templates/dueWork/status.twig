@@ -618,7 +618,6 @@
                     if ($('#importFeedbackForm').valid()) {
                         let rows = $('#importFeedbackInput').val().split("\n");
 
-
                         /**
                          * Condense multiple tabs into one tab
                          * Multiple tabs occurs when you split-select columns in excel
@@ -661,7 +660,19 @@
                                     /* Otherwise the condensed element is a broken-up comment and this
                                      * row should be combined into preprocessed's current element
                                      */
-                                    preprocessed[j] += "\n" + current;
+                                    let val = "\n" + current;
+
+                                    if (preprocessed[j] === undefined) {
+
+                                        /* First time this array element had data
+                                         */
+                                        preprocessed[j] = val;
+                                    } else {
+
+                                        /* There was something else here; append the current val
+                                         */
+                                        preprocessed[j] += val;
+                                    }
                                 }
                             }
 
