@@ -139,11 +139,10 @@ $(function() {
             if (data.callbackUrl.length) {
                 if (!data.callbackUrl.includes('#resourceBookingByCategory')) {
                     var ids = data.item.map(function(v) { return v.id; }).join();
-
                     window.location.href = data.callbackUrl + '?ids=' + ids;
+                } else {
+                    window.location.href = data.callbackUrl;
                 }
-
-                window.location.href = data.callbackUrl;
             } else {
                 // Get the time of the first booking, direct to that date
                 var dateQuery = '';
