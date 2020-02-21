@@ -27,6 +27,23 @@ class SubjectIterator implements Iterator
 {
 
     /**
+     * Slot Offset. Start parsing kamar slot data at this index. Kamar always sends us ten slots
+     * but schools (Wang) are only using eight; the first and last Kamar slot isn't used by that
+     * school, but we have no way to exclude slots (reduce the data set) accordingly.
+     *
+     * This offset is used to skip slots at the start and anything that doesn't positionally match
+     * the imported timetable definition gets silently ignored.
+     *
+     * Note that this is used in a zer-index array context; if you want the offset to start at
+     * Kamar's <subjects slot="2"> xml node, use SLOT_OFFSET 1.
+     *
+     * TODO Convert into a config var
+     *  At some point this will need to become a config var so schools can configure it individually
+     */
+    protected const SLOT_OFFSET = 1;
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -353,6 +370,6 @@ class SubjectIterator implements Iterator
      */
     public function rewind(): void
     {
-        $this->position = 0;
+        $this->position = self::SLOT_OFFSET;
     }
 }
