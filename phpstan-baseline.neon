@@ -1126,46 +1126,6 @@ parameters:
 			path: library/Alaress/Twitter/Loader/Test/ValidOAuthTest.php
 
 		-
-			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\OAuthConsumer\\:\\:\\$callback_url\\.$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/oauth/OAuth.php
-
-		-
-			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$http_status\\.$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-
-		-
-			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$last_api_call\\.$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-
-		-
-			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$sha1_method\\.$#"
-			count: 2
-			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-
-		-
-			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$consumer\\.$#"
-			count: 3
-			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-
-		-
-			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$token\\.$#"
-			count: 7
-			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-
-		-
-			message: "#^Return typehint of method Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:http\\(\\) has invalid type Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\API\\.$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-
-		-
-			message: "#^Access to an undefined property Alaress\\\\Twitter\\\\Loader\\\\oauth\\\\TwitterOAuth\\:\\:\\$http_header\\.$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$keywords\\)\\: Unexpected token \"\\$keywords\", expected type at offset 64$#"
 			count: 1
 			path: library/Alaress/Twitter/Search.php
@@ -13919,24 +13879,4 @@ parameters:
 			message: "#^Constant DB2_PARAM_IN not found\\.$#"
 			count: 2
 			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
-			message: "#^Constant LDAP_OPT_PROTOCOL_VERSION not found\\.$#"
-			count: 2
-			path: library/Schoolbox/Admin/Home/Controller.php
-
-		-
-			message: "#^Constant LDAP_OPT_REFERRALS not found\\.$#"
-			count: 2
-			path: library/Schoolbox/Admin/Home/Controller.php
-
-		-
-			message: "#^Constant LDAP_OPT_PROTOCOL_VERSION not found\\.$#"
-			count: 1
-			path: library/Session.php
-
-		-
-			message: "#^Constant LDAP_OPT_REFERRALS not found\\.$#"
-			count: 1
-			path: library/Session.php
 
