@@ -142,7 +142,7 @@ class SubjectIterator implements Iterator
          */
         $class = [
             'day' => $this->day,
-            'sequence' => $sequence,
+            'sequence' => $sequence - self::SLOT_OFFSET,
             'class' => $subject,
             'room' => $room,
             'teachers' => $teachers,
