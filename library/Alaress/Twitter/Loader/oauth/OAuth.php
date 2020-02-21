@@ -6,10 +6,6 @@
 
 namespace Alaress\Twitter\Loader\oauth;
 
-class OAuthException extends \Exception {
-  // pass
-}
-
 class OAuthConsumer {
   public $key;
   public $secret;
