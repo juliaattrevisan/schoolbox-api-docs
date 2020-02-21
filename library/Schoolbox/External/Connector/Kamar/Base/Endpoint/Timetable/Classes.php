@@ -325,15 +325,20 @@ class Classes implements IStrategy
                             $timetableClass->getName(),
                             $timetableClass->getCode()
                         ));
-                    } elseif (!isset($users[$student['username']])) {
-                        $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
-                            $student['username'],
-                            $student['externalId'],
-                            $timetableClass->getName(),
-                            $timetableClass->getCode()
-                        ));
                     } else {
+
+                        /* Nonexistent users get a warning, but assign their external ids anyway
+                         */
+                        if (!isset($users[$student['username']])) {
+                            $this->log->warning(sprintf(
+                                'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
+                                $student['username'],
+                                $student['externalId'],
+                                $timetableClass->getName(),
+                                $timetableClass->getCode()
+                            ));
+                        }
+
                         $this->createTimetableClassInvolvement($student, $timetableClass);
                     }
 
