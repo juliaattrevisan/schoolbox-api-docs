@@ -13431,11 +13431,6 @@ parameters:
 			path: library/Survey/Main.php
 
 		-
-			message: "#^Class Evaluation_Question_Truefalse referenced with incorrect case\\: Evaluation_Question_TrueFalse\\.$#"
-			count: 1
-			path: library/Survey/Question/TrueFalse.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$cid\\)\\: Unexpected token \"\\$cid\", expected type at offset 83$#"
 			count: 1
 			path: library/TextBox.php
@@ -13884,4 +13879,64 @@ parameters:
 			message: "#^Call to an undefined method League\\\\Flysystem\\\\FilesystemInterface\\:\\:getAdapter\\(\\)\\.$#"
 			count: 1
 			path: tools/video/processor.php
+
+		-
+			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ATTR_ENCODING\\.$#"
+			count: 1
+			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
+
+		-
+			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ENCODING_UTF8\\.$#"
+			count: 1
+			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
+
+		-
+			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ENCODING_BINARY\\.$#"
+			count: 1
+			path: library/Alaress/Database/Statement/Query/Sqlsrv/Query.php
+
+		-
+			message: "#^Constant DB2_AUTOCOMMIT_OFF not found\\.$#"
+			count: 1
+			path: library/Alaress/Database/Wrapper/Db2/PDO.php
+
+		-
+			message: "#^Constant DB2_SCROLLABLE not found\\.$#"
+			count: 2
+			path: library/Alaress/Database/Wrapper/Db2/PDO.php
+
+		-
+			message: "#^Constant DB2_SCROLLABLE not found\\.$#"
+			count: 1
+			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
+
+		-
+			message: "#^Constant DB2_PARAM_INOUT not found\\.$#"
+			count: 1
+			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
+
+		-
+			message: "#^Constant DB2_PARAM_IN not found\\.$#"
+			count: 2
+			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
+
+		-
+			message: "#^Constant LDAP_OPT_PROTOCOL_VERSION not found\\.$#"
+			count: 2
+			path: library/Schoolbox/Admin/Home/Controller.php
+
+		-
+			message: "#^Constant LDAP_OPT_REFERRALS not found\\.$#"
+			count: 2
+			path: library/Schoolbox/Admin/Home/Controller.php
+
+		-
+			message: "#^Constant LDAP_OPT_PROTOCOL_VERSION not found\\.$#"
+			count: 1
+			path: library/Session.php
+
+		-
+			message: "#^Constant LDAP_OPT_REFERRALS not found\\.$#"
+			count: 1
+			path: library/Session.php
 
