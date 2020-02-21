@@ -12,5 +12,8 @@ parameters:
         - library
         - tools
     inferPrivatePropertyTypeFromConstructor: true
+    excludes_analyse:
+	- library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+	- library/Alaress/Twitter/Loader/oauth/OAuth.php
 includes:
 	- phpstan-baseline.neon
