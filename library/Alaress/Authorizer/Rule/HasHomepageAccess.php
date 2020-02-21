@@ -78,6 +78,12 @@ class HasHomepageAccess extends All
                 $identifier = $this->homepageIdentifier;
             }
 
+            // If anything other than number is returned by the identifier callback, do not allow.
+            // We still need to allow 0 which is the root folder.
+            if (!is_numeric($identifier)) {
+                throw new Unauthorized();
+            }
+
             // Look for this homepage's permission
             try {
                 $permission = $this->access->getFolderAccess($user, (int)$identifier);

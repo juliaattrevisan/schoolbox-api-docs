@@ -66,8 +66,8 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params): int {
-                    return (int)$params['folderId'];
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) {
+                    return $params['folderId'];
                 }, Access::getInstance())
             )
         );

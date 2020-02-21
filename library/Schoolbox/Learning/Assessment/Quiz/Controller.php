@@ -186,6 +186,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
+
                 "@learningAssessment/quiz/summary/student.twig",
                 $twigData,
                 "Status of {$assessment->getTitle()}",

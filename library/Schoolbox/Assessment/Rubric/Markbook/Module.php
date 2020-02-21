@@ -62,8 +62,8 @@ class Module extends BaseModule
                 // Allow staff regardless of access level to the folder
                 new Rule\HasRole(Role::STAFF),
                 // Allow instructors (anyone with write+ access to folder)
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
-                    return (int)$params['folderId'];
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params) {
+                    return $params['folderId'];
                 }, Access::getInstance())
             )
         );

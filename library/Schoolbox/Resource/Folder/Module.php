@@ -43,8 +43,8 @@ class Module extends BaseModule
 
         $parentWriteAccess = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
-            static function (array $params): int {
-                return (int)$params['parentId'];
+            static function (array $params) {
+                return $params['parentId'];
             },
             Access::getInstance()
         );
@@ -62,8 +62,8 @@ class Module extends BaseModule
 
         $folderWriteAccess = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
-            static function (array $params): int {
-                return (int)$params['id'];
+            static function (array $params) {
+                return $params['id'];
             },
             Access::getInstance()
         );
