@@ -134,15 +134,15 @@ class SubjectIterator implements Iterator
         $room = $this->findRoom($subjectNode->subject);
 
         /* Period Name
-         * TODO: Unify with usage in Definition.php
+         * This is used to match elsewhere, but we're going to match on Sequence instead of name.
          */
-        $period = 'Period ' . (int)$subjectNode->xpath('@slot')[0];
+        $sequence = (int)$subjectNode->xpath('@slot')[0];
 
         /* Basic TimetableClass data
          */
         $class = [
             'day' => $this->day,
-            'period' => $period,
+            'sequence' => $sequence,
             'class' => $subject,
             'room' => $room,
             'teachers' => $teachers,
@@ -150,9 +150,9 @@ class SubjectIterator implements Iterator
         ];
 
         $this->log->info(sprintf(
-            'Processing %s/%s/%s/%s with %s teachers for student %s',
+            'Processing day %s/%s/%s/%s with %s teachers for student %s',
             $this->day,
-            $period,
+            "period with sequence {$sequence}",
             "{$subject['name']} ({$subject['code']})",
             $room['name'],
             \count($teachers),
