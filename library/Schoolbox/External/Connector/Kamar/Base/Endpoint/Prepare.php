@@ -70,24 +70,6 @@ class Prepare implements IStrategy
 
 
     /**
-     * @var TimetableCampusMapper
-     */
-    private $timetableCampusMapper;
-
-
-    /**
-     * @var TimetableCycleMapper
-     */
-    private $timetableCycleMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private $timetablePeriodMapper;
-
-
-    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -115,9 +97,6 @@ class Prepare implements IStrategy
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param TimetableCampusMapper           $timetableCampusMapper
-     * @param TimetableCycleMapper            $timetableCycleMapper
-     * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
      * @param ClassInvolvementMapper          $classInvolvementMapper
      * @param ClassPeriodMapper               $classPeriodMapper
@@ -130,9 +109,6 @@ class Prepare implements IStrategy
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-        TimetableCampusMapper $timetableCampusMapper,
-        TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -146,9 +122,6 @@ class Prepare implements IStrategy
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
 
-        $this->timetableCampusMapper = $timetableCampusMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -176,9 +149,6 @@ class Prepare implements IStrategy
             $this->classEntryMapper->truncate();
             $this->classInvolvementMapper->truncate();
             $this->classPeriodMapper->truncate();
-            $this->timetableCampusMapper->truncate();
-            $this->timetableCycleMapper->truncate();
-            $this->timetablePeriodMapper->truncate();
 
             $this->log->info('Purged existing profile relations and timetable-related data');
         }
