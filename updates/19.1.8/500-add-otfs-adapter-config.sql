@@ -53,6 +53,13 @@ BEGIN
             'true',
             'settings'
         );
+
+        -- Need to reset auto-increment, as we have manually inserted an ID in this sequence
+        SET @nextId=(SELECT MAX(configID) FROM config) + 1;
+        SET @s = CONCAT("ALTER TABLE config AUTO_INCREMENT = ",@nextId);
+        PREPARE stmt FROM @s;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
     END IF;
 END $$
 
