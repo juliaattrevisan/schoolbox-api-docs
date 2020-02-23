@@ -26,7 +26,7 @@
                     <div class="card small-12">
                         <img v-bind:src="formatPortrait(result.id)">
                         <h3 class="name">{{ result.formattedName }}</h3>
-                        <p class="meta">{{ formatMeta(result) }}</p>
+                        <p class="meta">{{ result.metadata }}</p>
                     </div>
                 </a>
             </li>
@@ -165,14 +165,6 @@
                 }).catch(function (error) {
                     console.log(error);
                 });
-            },
-
-            formatMeta: function(result) {
-                if (result.year) {
-                    return 'Year ' + result.year + ' ' + result.metadata;
-                }
-
-                return result.metadata;
             },
 
             formatPortrait: function(id) {
