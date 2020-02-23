@@ -1,7 +1,5 @@
 <?php
 
-namespace Alaress\Twitter\Loader\oauth;
-
 /*
  * Abraham Williams (abraham@abrah.am) http://abrah.am
  *

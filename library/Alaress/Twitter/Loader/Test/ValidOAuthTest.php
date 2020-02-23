@@ -7,11 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Alaress\Twitter\Loader\Test;
-
 use PHPUnit\Framework\TestCase;
 use Alaress\Twitter\Loader\ValidOAuth;
-
 
 /**
  * Class ValidationTest
