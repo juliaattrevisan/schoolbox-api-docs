@@ -37,8 +37,8 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 
         $this->parseConfig();
 
-        if ($this->getConfig('pixel') > 600) {
-            $pixel = 600;
+        if ($this->getConfig('pixel') > 2048) {
+            $pixel = 2048;
         } else {
             if ($this->getConfig('pixel') < 20) {
                 $pixel = 20;
