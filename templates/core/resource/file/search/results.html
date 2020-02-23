@@ -1,18 +1,23 @@
 <div class="row">
-	<div class="small-12 island">
-		<h2 class="subheader">Files <!-- BEGIN count -->({FILE_DISP_COUNT} / {FILE_COUNT})<!-- END count --></h2>
-		<section>
-			<ul class="action-list">
-			    <!-- BEGIN file -->
+    <div class="small-12 island">
+        <h2 class="subheader">Files <!-- BEGIN count -->({FILE_DISP_COUNT} / {FILE_COUNT})<!-- END count --></h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN file -->
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card small-12">
                             <a href='/send.php?id={FILE_ID}'>
-                                <img src="/images/mime/{FILE_ICON}" class="content" />
+                                <img src="/images/mime/{FILE_ICON}" class="content"/>
                                 <h3>{FILE_DESCRIPTION}</h3>
                             </a>
                             <p class="meta">{FILE_BREADCRUMB}</p>
-                            <p class="meta">Uploaded by <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> {FILE_CREATED}</p>
+                            <!-- BEGIN file_user -->
+                            <p class="meta">{FILE_ACTION} by <a href="/search/user/{FILE_USER}">{FILE_USER_NAME}</a> {FILE_ACTION_DATE}</p>
+                            <!-- END file_user -->
+                            <!-- BEGIN file_deleted_user -->
+                            <p class="meta">{FILE_ACTION} by {FILE_USER_NAME} {FILE_ACTION_DATE}</p>
+                            <!-- END file_deleted_user -->
                             <p class="meta">{FILE_SIZE}</p>
                         </div>
                     </div>
@@ -23,21 +28,22 @@
                     </nav>
                     <article>{FILE_COMMENT}</article>
                 </li>
-    			<!-- END file -->
-			</ul>
+                <!-- END file -->
+            </ul>
 
             <!-- BEGIN see_more -->
             <div class="component-action">
                 <section>
-                    <a id="file-more" data-more="file" class="button" href="#">See all {MORE_COUNT} results for files</a>
+                    <a id="file-more" data-more="file" class="button" href="#">See all {MORE_COUNT} results for
+                        files</a>
                 </section>
             </div>
             <!-- END see_more -->
-		</section>
-	</div>
-	<ul class="pagination" data-search-pagination>
-		<!-- BEGIN pagination -->
-		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
-		<!-- END pagination -->
-	</ul>
+        </section>
+    </div>
+    <ul class="pagination" data-search-pagination>
+        <!-- BEGIN pagination -->
+        <li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+        <!-- END pagination -->
+    </ul>
 </div>

@@ -13,6 +13,7 @@ use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\File\Model;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Schoolbox\Resource\Search\MapperResult\Base;
@@ -39,6 +40,7 @@ class Result extends Base
                 {$mapper->getJoinColumnString('hash', 's')},
                 {$mapper->getJoinMapper('hash')->getJoinColumnString('allowedFileExtension', 'e')},
                 {$mapper->getJoinColumnString('owner', 'o')},
+                {$mapper->getJoinColumnString('modified_by', 'um')},
                 {$mapper->getJoinColumnString('category', 'c')},
                 MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
             FROM
@@ -46,6 +48,7 @@ class Result extends Base
                 JOIN {$mapper->getJoinSql('hash', 'f', 's')}
                 LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
                 JOIN {$mapper->getJoinSql('owner', 'f', 'o', true)}
+                LEFT JOIN {$mapper->getJoinSql('modified_by', 'f', 'um', true)}
                 INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
             WHERE
                 f.deleted_at IS NULL
@@ -65,12 +68,13 @@ class Result extends Base
             $storage = $mapper->hydrateJoin($row, 'hash', 's');
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
             $owner = $mapper->hydrateJoin($row, 'owner', 'o');
+            $modifiedBy = $mapper->hydrateJoin($row, 'modified_by', 'um');
             $folder = $mapper->hydrateJoin($row, 'category', 'c');
 
 
             $storage->setMimetype($mime);
             $file->setStorage($storage);
-            $file->setOwner($owner)->setFolder($folder);
+            $file->setOwner($owner)->setFolder($folder)->setModifiedBy($modifiedBy);
 
             $collection->add($file);
         }
