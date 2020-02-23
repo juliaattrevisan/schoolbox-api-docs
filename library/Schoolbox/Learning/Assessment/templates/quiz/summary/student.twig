@@ -76,7 +76,7 @@
 {# If I'm here I can view attempts #}
 {% if quiz.attempts | length %}
 
-    {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete') %}
+    {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
 
     <div class="row">
         <div class="small-12 columns">
