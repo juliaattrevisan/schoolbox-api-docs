@@ -18,7 +18,6 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\TreeBuilder;
 use UnderflowException;
 use UnexpectedValueException;
-use function array_column;
 use function array_keys;
 use function count;
 use function implode;
@@ -260,8 +259,8 @@ class CourseSection
         };
         $treeBuilder  = new TreeBuilder($this->folderMapper);
 
-        $this->log->notice(sprintf('Building folder tree from root %d', $this->getClassFolder()->getId()));
-        $this->folderTree = $treeBuilder->buildTree($this->getClassFolder()->getId(), $hashFunction);
+        $this->log->notice(sprintf('Building folder tree from root %d', Folder\IFolder::ROOT_ID));
+        $this->folderTree = $treeBuilder->buildTree(Folder\IFolder::ROOT_ID, $hashFunction);
 
         // Get all folders that ARE or WERE classes
         $innerPb = $this->folderMapper->getPredicateBuilder()
@@ -389,33 +388,6 @@ class CourseSection
             }
         }
         return $reMappedFolderCodes;
-    }
-
-
-    /**
-     * Returns the root of the class folder tree
-     *
-     * @return Folder\Model
-     * @throws Database\Exception
-     * @throws Mapper\Exception
-     * @throws UnexpectedValueException
-     */
-    private function getClassFolder(): Folder\Model
-    {
-        $sql = "
-            SELECT *
-            FROM folder
-            WHERE parent = 0 AND deleted_at IS NULL AND name = 'Classes'
-        ";
-
-        $rows = $this->schoolboxDb->executeQuery($sql)->fetchAll();
-        if(!count($rows)){
-            throw new UnexpectedValueException("Unable to locate class root folder");
-        }
-        if(count($rows) > 1){
-            throw new UnexpectedValueException("Ambiguous class root folders:" . implode(',', array_column($rows, 'id')));
-        }
-        return $this->folderMapper->hydrate($rows[0]);
     }
 
 
