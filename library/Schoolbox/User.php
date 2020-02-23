@@ -390,20 +390,16 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function formatMetadata()
     {
         // For now, just show role name
-        return $this->getRole()->getName();
-//        $metadata = '';
-//        $year     = $this->getYear();
-//        $campus   = $this->getDefaultCampus()->getName();
-//        $role     = $this->getRole()->getName();
-//        if (!empty($year)) {
-//            $metadata .= 'Year ' . $year;
-//        }
-//        // If $campus isn't in $role, output campus as well as role
-//        if (stristr($role, $campus) === false) {
-//            $metadata .= ' ' . $campus;
-//        }
-//        $metadata .= ' ' . $role;
-//        return trim($metadata);
+        if (!empty($this->positionTitle)) {
+            return $this->positionTitle;
+        }
+
+        $metadata = '';
+        $role     = $this->getRole()->getName();
+        if (!empty($this->year)) {
+            $metadata .= 'Year ' . $this->year;
+        }
+        return "{$metadata} {$role}";
     }
 
     /**
