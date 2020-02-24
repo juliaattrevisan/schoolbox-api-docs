@@ -381,6 +381,16 @@ HELP;
                 ));
             }
 
+            /* Log it
+             */
+            $this->getLogger()->info(sprintf(
+                'Preparing record "%s" for student %s, owned by %s %s',
+                $row['Description'],
+                $row['ID'],
+                $owner->getFullName(),
+                $owner->getExternalId()
+            ));
+
             /* Manufacture a pastoral record
              * Assign values to pastoral record
              */
