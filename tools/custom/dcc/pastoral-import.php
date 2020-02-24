@@ -395,12 +395,12 @@ HELP;
             /* Update idiosyncractically and specifically with the provided timestamps
              */
             /** @var IQuery $updateStatement */
-            $updateStatement = $this->getDi()->get('databaseInternal')->prepareQuery('
-                UPDATE pastoral
+            $updateStatement = $this->getDi()->get('databaseInternal')->prepareQuery("
+                UPDATE {$this->pastoralMapper->getTable()}
                 SET created_at = :createdAt,
                 updated_at = :updatedAt
                 WHERE id = :recordId
-            ');
+            ");
 
             $updateStatement->execute([
                 'createdAt' => $row['DocumentCreatedDate'],
