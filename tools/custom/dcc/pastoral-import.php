@@ -10,6 +10,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
@@ -71,25 +72,31 @@ HELP;
             Pastoral\Mapper::getInstance(),
             Pastoral\Type\Mapper::getInstance(),
             Pastoral\SubType\Mapper::getInstance(),
-            Pastoral\Access\Mapper::getInstance()
+            Pastoral\Access\Mapper::getInstance(),
+            Pastoral\Attachment\Mapper::getInstance(),
+            Storage\Mapper::getInstance()
         );
     }
 
 
     /**
      * Process all the data
-     * @param UserMapper              $userMapper
-     * @param Pastoral\Mapper         $pastoralMapper
-     * @param Pastoral\Type\Mapper    $pastoralTypeMapper
-     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
-     * @param Pastoral\Access\Mapper  $pastoralAccessMapper
+     * @param UserMapper                 $userMapper
+     * @param Pastoral\Mapper            $pastoralMapper
+     * @param Pastoral\Type\Mapper       $pastoralTypeMapper
+     * @param Pastoral\SubType\Mapper    $pastoralSubTypeMapper
+     * @param Pastoral\Access\Mapper     $pastoralAccessMapper
+     * @param Pastoral\Attachment\Mapper $pastoralAttachmentMapper
+     * @param Storage\Mapper             $storageMapper
      */
     private function processData(
         UserMapper $userMapper,
         Pastoral\Mapper $pastoralMapper,
         Pastoral\Type\Mapper $pastoralTypeMapper,
         Pastoral\SubType\Mapper $pastoralSubTypeMapper,
-        Pastoral\Access\Mapper $pastoralAccessMapper
+        Pastoral\Access\Mapper $pastoralAccessMapper,
+        Pastoral\Attachment\Mapper $pastoralAttachmentMapper,
+        Storage\Mapper $storageMapper
     ) {
         $externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
 
@@ -219,15 +226,22 @@ HELP;
                 ->setSubType($pastoralSubType)
             ;
 
-            /* Accept raw data into storage->accept()
-             */
-
-            /* Assign the storage file to the pastoral record
-             */
-
             /* Save it
              */
             $pastoralMapper->save($record);
+
+            /* Accept raw data into storage->accept()
+             */
+            $attachment = $storageMapper->acceptStream($student->getExternalId() . '.pdf', $row['Document'], false);
+
+            /* Assign the storage file to the pastoral record
+             */
+            $pastoralAttachmentMapper->createModel()
+                ->setPastoral($record)
+                ->setStorage($attachment)
+                ->setPrivate(true);
+
+            $pastoralAttachmentMapper->save($attachment);
 
             /* Apply permissions; all staff-level Role Ids can see all pastoral records
              */
