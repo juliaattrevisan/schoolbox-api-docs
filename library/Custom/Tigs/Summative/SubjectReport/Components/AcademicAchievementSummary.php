@@ -7,18 +7,10 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
-use Alaress\Authorizer\Authorizer;
 use Aura\Router;
-use Custom\Tigs\Summative\StudentAttributes;
-use InvalidArgumentException;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder;
-use Schoolbox\User;
 use function array_key_exists;
 
 /**
@@ -27,38 +19,6 @@ use function array_key_exists;
  */
 class AcademicAchievementSummary extends AbstractMatrix
 {
-
-    /**
-     * @param StudentAttributes $attributes
-     * @param GenericCollection $unitSpecs
-     * @param User              $student
-     * @param Folder\Model      $folder
-     * @param Visibility        $visibility
-     * @param User              $viewer
-     * @param int               $aasWorkTypeId
-     * @param RubricDataSource  $rubricMapper
-     * @param Authorizer        $authorizer
-     * @param Router\Router     $router
-     * @param string|null       $roleTypeOverride
-     * @throws InvalidArgumentException
-     */
-    public function __construct(
-        StudentAttributes $attributes,
-        GenericCollection $unitSpecs,
-        User $student,
-        Folder\Model $folder,
-        Visibility $visibility,
-        User $viewer,
-        int $aasWorkTypeId,
-        RubricDataSource $rubricMapper,
-        Authorizer $authorizer,
-        Router\Router $router,
-        ?string $roleTypeOverride
-    ) {
-        parent::__construct($attributes, $unitSpecs, $student, $folder, $visibility, $viewer, $aasWorkTypeId, $rubricMapper, $authorizer, $router, $roleTypeOverride);
-    }
-
-
     /**
      * Build AAS data from the specified due work
      *
