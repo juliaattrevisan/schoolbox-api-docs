@@ -5,18 +5,18 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
-
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
+use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as assessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -34,9 +34,11 @@ use Schoolbox\UserMapper;
 class ReturnedWorkNotifier extends AbstractModuleNotifier
 {
 
-    const TRIGGER_RETURNED = 'returned';
-    const PATTERN_MARKED_STUDENT_TITLE = ':teacher has marked your work for :boxname in :catname';
-    const PATTERN_MARKED_PARENT_TITLE = ':teacher has marked :student\'s work for :boxname in :catname';
+    const TRIGGER_RETURNED               = 'returned';
+    const PATTERN_MARKED_STUDENT_TITLE   = ':teacher has marked your work for :boxname in :catname';
+    const PATTERN_MARKED_PARENT_TITLE    = ':teacher has marked :student\'s work for :boxname in :catname';
+    const PATTERN_RESUBMIT_STUDENT_TITLE = ':teacher has requested you resubmit to :boxname';
+    const PATTERN_RESUBMIT_PARENT_TITLE  = ':teacher has requested :student resubmit to :boxname';
 
     /** @var UserMapper */
     protected $userMapper;
@@ -47,21 +49,21 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     /** @var Term\Mapper */
     protected $termMapper;
 
-    /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
+    /** @var assessmentDataSource $assessmentDataSource */
     protected $assessmentDataSource;
 
     /**
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
-     * @throws \Aura\Di\Exception\ServiceNotFound if somehow my assessment data source wasn't found
+     * @throws ServiceNotFound if somehow my assessment data source wasn't found
      * @return void
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->userMapper = UserMapper::getInstance();
-        $this->boxMapper = SubmissionBoxMapper::getInstance();
-        $this->termMapper = Term\Mapper::getInstance();
+        $this->userMapper           = UserMapper::getInstance();
+        $this->boxMapper            = SubmissionBoxMapper::getInstance();
+        $this->termMapper           = Term\Mapper::getInstance();
         $this->assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
         parent::loadDependencies($dependencies);
     }
@@ -91,17 +93,15 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             return;
         }
 
+        if ($mark->getResubmissionRequired() && $bundle->getMethod() === Mapper::METHOD_UPDATE) {
+            $bundle->attach(self::TRIGGER_RETURNED, self::IMMEDIATELY);
+            return;
+        }
+
         if ($box->getId() === null) {
             // don't. even. bother.
             return;
         }
-
-        /*
-         * This now on the assessment, will need to be updated to get from the assessment
-        if ($box->isDeleted()) {
-            // don't. even. bother.
-            return;
-        }*/
 
         if ($box->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PRIVATE) {
             // don't. even. bother.
@@ -132,115 +132,6 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         }
     }
 
-    /**
-     * Notify system that the work has been deleted.
-     * @param ReturnedWork $returnedWork
-     * @return Envelope
-     */
-    public function notifySystemDeleted(ReturnedWork $returnedWork): Envelope
-    {
-        $envelope  = new Envelope();
-        return $this->retractEventObject($envelope, $returnedWork);
-    }
-
-    /**
-     * Notify a student that their work has been marked.
-     *
-     * @param ReturnedWork $returnedWork
-     * @param User         $user
-     * @param array|null   $diff
-     * @return Envelope
-     */
-    public function notifyStudentReturned(ReturnedWork $returnedWork, User $user, $diff = null): Envelope
-    {
-        return $this->generateMessage(Role::STUDENT, $returnedWork, $user, $diff);
-    }
-
-    /**
-     * @param string       $target
-     * @param ReturnedWork $returnedWork
-     * @param User         $effector
-     * @param array|null   $diff
-     * @return Envelope
-     */
-    protected function generateMessage(string $target, ReturnedWork $returnedWork, User $effector, $diff = null): Envelope
-    {
-        $envelope = new Envelope();
-
-        $student = $returnedWork->getOwner();
-        /** @var SubmissionBox $box */
-        try {
-            $box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
-            $assessment = $this->assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
-        } catch (Mapper\Exception $e) {
-            return $envelope;
-        }
-
-        $participant = $assessment->getParticipantIfExtant($student);
-
-        //Don't send a notification for an item that the user cannot see
-        if (!$participant || $participant->getPublishDate()->isFuture()) {
-            return $envelope;
-        }
-
-        /** @var Folder $cat */
-        $cat = $assessment->getBaseContext()->getFolder();
-
-        $teacherExtId = $effector->getExternalId();
-
-        $studentId = $student->getId();
-
-        $boxId = $box->getId();
-        $boxName = $box->getName();
-
-        $catId = $cat->getId();
-        $catName = $cat->getName();
-
-        $icon = "/portrait.php?userId=$teacherExtId&size={$this->iconSize}";
-        $href = "/learning/assessments/{$box->getAssessmentId()}/$studentId";
-
-        // if student, 2nd-person language
-        if ($target === Role::STUDENT && $box->getMarkVisibility() >= IAssessable::MARK_VISIBILITY_STUDENT) {
-            $bob = new Builder();
-            $bob->setIcon($icon)
-                ->setNamespace($this->getSlug())
-                ->addTopic("duework.$boxId.returned")
-                ->setSeverity(Logger::NOTICE)
-                ->setTitle(self::PATTERN_MARKED_STUDENT_TITLE)
-                ->setHref($href)
-                ->setParam('teacher', new UserParam($effector))
-                ->setParam('boxname', new Param($boxName, "/learning/assessments/{$box->getAssessmentId()}/$studentId"))
-                ->setParam('catname', new CategoryParam($cat))
-                ->addFilter('roletype', [Role::STUDENT]);
-            $envelope->targetToUser($studentId, $bob->build());
-        } // if parent, 3rd-person language
-        elseif ($target === Role::PARENT && $this->parentCanView($box)) {
-            // hydrate student to display name properly.
-            $student = $this->userMapper->findById($studentId);
-            // If parent can't view results for this grade:
-            // target to student's grades page
-            if (!$box->isMarkShownToParents()) {
-                $href = "/learning/grades/$studentId";
-            }
-            $term = $this->termMapper->findForDate($box->getDueDate());
-            $bob = new Builder();
-            $bob->setIcon($icon)
-                ->setNamespace($this->getSlug())
-                ->addTopic("duework.$boxId.returned")
-                ->setSeverity(Logger::NOTICE)
-                ->setTitle(self::PATTERN_MARKED_PARENT_TITLE)
-                ->setHref($href)
-                ->setParam('teacher', new UserParam($effector))
-                ->setParam('student', new UserParam($student))
-                ->setParam('boxname', new Param($boxName, "/learning/assessments/{$box->getAssessmentId()}/$studentId"))
-                ->setParam('catname', new Param($catName, "/learning/grades/$studentId/{$term->getCode()}/$catId"))
-                ->addFilter('roletype', [Role::PARENT]);
-            $envelope->targetToParent($studentId, $bob->build());
-        }
-
-        return $envelope;
-    }
-
     /* ----------------------------------------------------------------------------------------------------------
      *  ASYNC WORKER METHODS
      * ---------------------------------------------------------------------------------------------------------- */
@@ -254,25 +145,138 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param SubmissionBox $box
-     * @return bool
+     * Notify system that the work has been deleted.
+     * @param ReturnedWork $returnedWork
+     * @return Envelope
      */
-    protected function parentCanView(SubmissionBox $box): bool
+    public function notifySystemDeleted(ReturnedWork $returnedWork): Envelope
     {
-        return $box->getMarkVisibility() >= IAssessable::MARK_VISIBILITY_PARENT_STUDENT && !$this->conf->get('restrict_parent_duework_access');
+        $envelope = new Envelope();
+        return $this->retractEventObject($envelope, $returnedWork);
+    }
+
+    /**
+     * Notify a student that their work has been marked.
+     *
+     * @param ReturnedWork $returnedWork
+     * @param User         $effector
+     * @param array|null   $diff
+     * @return Envelope
+     */
+    public function notifyStudentReturned(ReturnedWork $returnedWork, User $effector, $diff = null): Envelope
+    {
+        $envelope = new Envelope();
+
+        $student    = $returnedWork->getOwner();
+        $box        = $returnedWork->getSubmissionBox();
+        $assessment = $this->getAssessment($box, $student);
+
+        // Request re-submission, even when mark is not visible.
+        $requestResubmission = $returnedWork->getResubmissionRequired();
+        if (!$assessment || !($assessment->isFeedbackVisibleToRoleType(Role::STUDENT) || $requestResubmission)) {
+            return $envelope;
+        }
+        $href = "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
+
+        $bob = new Builder();
+        $bob->setIcon($this->getUserIcon($effector))
+            ->setNamespace($this->getSlug())
+            ->addTopic("duework.{$box->getId()}.returned")
+            ->setSeverity(Logger::NOTICE)
+            ->setHref($href)
+            ->setParam('teacher', new UserParam($effector))
+            ->setParam('boxname', new Param($assessment->getTitle(), $href))
+            ->addFilter('roletype', [Role::STUDENT]);
+
+        if ($requestResubmission) {
+            $bob->setTitle(self::PATTERN_RESUBMIT_STUDENT_TITLE);
+        } else {
+            $bob->setTitle(self::PATTERN_MARKED_STUDENT_TITLE)
+                ->setParam('catname', new CategoryParam($assessment->getBaseContext()->getFolder()));
+        }
+
+        $envelope->targetToUser($student->getId(), $bob->build());
+        return $envelope;
     }
 
     /**
      * Notify a parent that their child's work has been marked.
      *
      * @param ReturnedWork $returnedWork
-     * @param User         $user
+     * @param User         $effector
      * @param array|null   $diff
      * @return Envelope
      */
-    public function notifyParentReturned(ReturnedWork $returnedWork, User $user, $diff = null)
+    public function notifyParentReturned(ReturnedWork $returnedWork, User $effector, $diff = null): Envelope
     {
-        return $this->generateMessage(Role::PARENT, $returnedWork, $user, $diff);
+        $envelope = new Envelope();
+
+        $student = $returnedWork->getOwner();
+        // hydrate student to display name properly.
+        try {
+            $student = $this->userMapper->findById($student->getId());
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
+
+        $box        = $returnedWork->getSubmissionBox();
+        $assessment = $this->getAssessment($box, $student);
+
+        // Request re-submission, even when mark is not visible.
+        $requestResubmission = $returnedWork->getResubmissionRequired();
+        if (!$assessment
+            || $this->conf->get('restrict_parent_duework_access')
+            || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT) || $requestResubmission)) {
+            return $envelope;
+        }
+
+        /** @var Folder $cat */
+        $cat  = $assessment->getBaseContext()->getFolder();
+        $href = "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
+
+        $term = $this->termMapper->findForDate($assessment->getDueAt());
+        $bob  = new Builder();
+        $bob->setIcon($this->getUserIcon($effector))
+            ->setNamespace($this->getSlug())
+            ->addTopic("duework.{$box->getId()}.returned")
+            ->setSeverity(Logger::NOTICE)
+            ->setHref($href)
+            ->setParam('teacher', new UserParam($effector))
+            ->setParam('student', new UserParam($student))
+            ->setParam('boxname', new Param($assessment->getTitle(), $href))
+            ->addFilter('roletype', [Role::PARENT]);
+        if ($requestResubmission) {
+            $bob->setTitle(self::PATTERN_RESUBMIT_PARENT_TITLE);
+        } else {
+            $bob->setTitle(self::PATTERN_MARKED_PARENT_TITLE)
+                ->setParam('catname', new Param($cat->getName(), "/learning/grades/{$student->getId()}/{$term->getCode()}/{$cat->getId()}"));
+        }
+        $envelope->targetToParent($student->getId(), $bob->build());
+
+        return $envelope;
     }
 
-} 
+    /**
+     * Gets assessable from submission box
+     * @param SubmissionBox $box
+     * @param User          $student
+     * @return IAssessable|null
+     */
+    private function getAssessment(SubmissionBox $box, User $student): ?IAssessable
+    {
+        try {
+            $box        = $this->boxMapper->findById($box->getId());
+            $assessment = $this->assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
+        } catch (Mapper\Exception $e) {
+            return null;
+        }
+
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        //Don't send a notification for an item that the user cannot see
+        if (!$participant || $participant->getPublishDate()->isFuture()) {
+            return null;
+        }
+        return $assessment;
+    }
+}

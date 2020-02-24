@@ -411,4 +411,14 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
         return $envelope;
     }
 
+    /**
+     * Generates url string for user icon
+     * @param User $user
+     * @return string
+     */
+    protected function getUserIcon(User $user): string
+    {
+        return "/portrait.php?id={$user->getId()}&size={$this->iconSize}";
+    }
+
 }
