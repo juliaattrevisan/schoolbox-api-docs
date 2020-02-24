@@ -409,8 +409,9 @@ HELP;
             ]);
 
             /* Accept raw data into storage->accept()
+             * FIXME What is the mimetype/extension of these files?
              */
-            $attachment = $this->storageMapper->acceptStream($student->getExternalId() . '.pdf', $row['Document'], true);
+            $attachment = $this->storageMapper->acceptStream($student->getExternalId() . '.txt', $row['Document'], true);
 
             /* Assign the storage file to the pastoral record
              */
