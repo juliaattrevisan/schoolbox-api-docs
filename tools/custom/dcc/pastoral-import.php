@@ -410,7 +410,7 @@ HELP;
 
             /* Accept raw data into storage->accept()
              */
-            $attachment = $this->storageMapper->acceptStream($student->getExternalId() . '.pdf', $row['Document'], false);
+            $attachment = $this->storageMapper->acceptStream($student->getExternalId() . '.pdf', $row['Document'], true);
 
             /* Assign the storage file to the pastoral record
              */
