@@ -88,6 +88,24 @@ HELP;
             'failure' => 0
         ];
 
+        /* Find out if someone set the Pastoral Fallback User ID
+         * If it's not set, that'll be a problem
+         */
+        $fallbackOwnerId = (int)$this->getConfig()->get('pastoral_fallback_owner');
+
+        try {
+            $fallbackOwner = $userMapper->findById($fallbackOwnerId);
+        } catch (Mapper\Exception $e) {
+            $this->getLogger()->critical(sprintf(
+                'Pastoral Fallback User ID %s does not exist in schoolbox',
+                $fallbackOwnerId
+            ));
+
+            exit();
+        }
+
+        /* Otherwise continue assigning details per pastoral record
+         */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
             /* If the student of the record doesn't exist, skip them with a warning
@@ -106,19 +124,30 @@ HELP;
                 continue;
             }
 
+            /* If the assigned user(s) couldn't be found, use a fallback user
+             * FIXME The owner of the pastoral records is currently not defined
+             *  The school needs to tell me where to find their pastoral record owners
+             *  Their query doesn't include it
+             */
+            $owner = $fallbackOwner;
+
+            try {
+                $owner = $userMapper->findByExternalId($row['Owner'], Role::STAFF);
+            } catch (Mapper\Exception $e) {
+                $this->getLogger()->warning(sprintf(
+                    'Owner external id %s was not found in schoolbox; attempting to assign fallback user id "%s"',
+                    $row['Owner'],
+                    $this->getConfig()->get('pastoral_fallback_owner')
+                ));
+            }
 
             /* Manufacture a pastoral record
+             * Assign values to pastoral record
              */
             $record = $pastoralMapper->createModel()
                 ->setHeading($row['Description'])
+                ->setOwner($owner)
             ;
-
-            /* Assign values to pastoral record
-             */
-
-            /* If the assigned user(s) couldn't be found, use a fallback user
-             * I guess that should be a config var if it isn't already one
-             */
 
             /* Accept raw data into storage->accept()
              */
