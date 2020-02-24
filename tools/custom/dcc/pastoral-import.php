@@ -447,7 +447,7 @@ HELP;
             /* Apply permissions; all staff-level Role Ids can see all pastoral records
              */
             foreach ($this->allRoles as $role) {
-                $this->getLogger()->warning(sprintf(
+                $this->getLogger()->info(sprintf(
                     'Assigning permission to role %s for record "%s"',
                     $role->getName(),
                     $row['Description']
@@ -465,7 +465,7 @@ HELP;
 
             /* Log it
              */
-            $this->getLogger()->warning(sprintf(
+            $this->getLogger()->info(sprintf(
                 'Imported record "%s" for student %s, owned by %s %s',
                 $row['Description'],
                 $row['ID'],
