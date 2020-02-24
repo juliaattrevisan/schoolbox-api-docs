@@ -11,6 +11,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -69,7 +70,8 @@ HELP;
             UserMapper::getInstance(),
             Pastoral\Mapper::getInstance(),
             Pastoral\Type\Mapper::getInstance(),
-            Pastoral\SubType\Mapper::getInstance()
+            Pastoral\SubType\Mapper::getInstance(),
+            Pastoral\Access\Mapper::getInstance()
         );
     }
 
@@ -80,12 +82,14 @@ HELP;
      * @param Pastoral\Mapper         $pastoralMapper
      * @param Pastoral\Type\Mapper    $pastoralTypeMapper
      * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
+     * @param Pastoral\Access\Mapper  $pastoralAccessMapper
      */
     private function processData(
         UserMapper $userMapper,
         Pastoral\Mapper $pastoralMapper,
         Pastoral\Type\Mapper $pastoralTypeMapper,
-        Pastoral\SubType\Mapper $pastoralSubTypeMapper
+        Pastoral\SubType\Mapper $pastoralSubTypeMapper,
+        Pastoral\Access\Mapper $pastoralAccessMapper
     ) {
         $externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
 
@@ -154,6 +158,19 @@ HELP;
             exit();
         }
 
+        /* Find all the Staff roles; if none exist, don't import anything
+         * (nobody can see them?)
+         */
+        $allRoles = RoleMapper::getInstance()->findByColumn('group_type', Role::STAFF);
+
+        if (!$allRoles->count()) {
+            $this->getLogger()->critical(sprintf(
+                'No Staff roles found in schoolbox'
+            ));
+
+            exit();
+        }
+
         /* Otherwise continue assigning details per pastoral record
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -210,6 +227,18 @@ HELP;
 
             /* Save it
              */
+            $pastoralMapper->save($record);
+
+            /* Apply permissions; all staff-level Role Ids can see all pastoral records
+             */
+            foreach ($allRoles as $role) {
+                $accessRecord = $pastoralAccessMapper->createModel()
+                    ->setPastoral($record)
+                    ->setAccess(Pastoral\Access\Mapper::ACCESS_PUBLIC)
+                    ->setRole($role);
+
+                $pastoralAccessMapper->save($accessRecord);
+            }
 
             /* Log it
              */
