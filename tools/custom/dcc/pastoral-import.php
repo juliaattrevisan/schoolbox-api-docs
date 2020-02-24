@@ -195,27 +195,27 @@ HELP;
 
         /* Set up external db connection
          */
-        $this->assignExternalDb();
+        $this->setExternalDb();
 
         /* Find out if someone set the Pastoral Fallback User ID
          * If it's not set, that'll be a problem
          */
-        $this->assignFallbackOwner((int)$fallbackId);
+        $this->setFallbackOwner((int)$fallbackId);
 
         /* Find the Pastoral Type "Learning Support" - it has to be called that exactly
          * If that isn't set, that'll be a problem
          */
-        $this->assignPastoralType();
+        $this->setPastoralType();
 
         /* Find the Pastoral SubType "Reports and Files" - it has to be called that exactly
          * If that isn't set, that'll be a problem
          */
-        $this->assignPastoralSubType();
+        $this->setPastoralSubType();
 
         /* Find all the Staff roles; if none exist, don't import anything
          * (nobody can see them?)
          */
-        $this->assignStaffRoles();
+        $this->setStaffRoles();
 
         /* Process the resultset
          */
@@ -228,7 +228,7 @@ HELP;
      *
      * @return void
      */
-    private function assignExternalDb(): void
+    private function setExternalDb(): void
     {
         $this->externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
 
@@ -247,7 +247,7 @@ HELP;
      * @param int $fallbackOwnerId
      * @return void
      */
-    private function assignFallbackOwner(int $fallbackOwnerId): void
+    private function setFallbackOwner(int $fallbackOwnerId): void
     {
         try {
             $this->fallbackOwner = $this->userMapper->findById($fallbackOwnerId);
@@ -268,7 +268,7 @@ HELP;
      *
      * @return void
      */
-    private function assignPastoralType(): void
+    private function setPastoralType(): void
     {
         try {
             $this->pastoralType = $this->pastoralTypeMapper->findOneByColumn('name', self::PASTORAL_TYPE);
@@ -289,7 +289,7 @@ HELP;
      *
      * @return void
      */
-    private function assignPastoralSubType(): void
+    private function setPastoralSubType(): void
     {
         try {
             $this->pastoralSubType = $this->pastoralSubTypeMapper->findOneByColumn('name', self::PASTORAL_SUBTYPE);
@@ -310,7 +310,7 @@ HELP;
      *
      * @return void
      */
-    private function assignStaffRoles(): void
+    private function setStaffRoles(): void
     {
         $this->allRoles = $this->roleMapper->findByColumn('group_type', Role::STAFF);
 
