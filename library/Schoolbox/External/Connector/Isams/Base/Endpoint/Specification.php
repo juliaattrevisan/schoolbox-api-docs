@@ -58,12 +58,14 @@ class Specification implements ISpecification
 
             /* There is at least one current student
              *
-             * SchoolCode is their externalId and also their username
+             * SchoolId is their externalId
+             * SchoolCode is their username
              * Id is an isams internal id which joins elsewhere in isams' db
              */
             '/iSAMS/PupilManager/CurrentPupils/Pupil',
             '/iSAMS/PupilManager/CurrentPupils/Pupil[@Id]',
             '/iSAMS/PupilManager/CurrentPupils/Pupil/SchoolCode',
+            '/iSAMS/PupilManager/CurrentPupils/Pupil/SchoolId',
 
             /* Profile info
              */

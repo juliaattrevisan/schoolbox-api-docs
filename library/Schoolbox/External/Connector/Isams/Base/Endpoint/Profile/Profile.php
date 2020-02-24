@@ -190,7 +190,7 @@ class Profile implements IStrategy
 
         /** @var Student $student */
         foreach ($students as $student) {
-            $externalId = trim((string)$student->SchoolCode);
+            $externalId = trim((string)$student->SchoolId);
             $username = trim((string)$student->SchoolCode);
             $firstname = trim((string)$student->Forename);
             $lastname = trim((string)$student->Surname);
@@ -612,7 +612,7 @@ class Profile implements IStrategy
          * To do it, we need a specific id value for $student
          * ($student contains multiple ids, some of which seem internal to isams)
          */
-        $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$studentExternalId}')]";
+        $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolId, '{$studentExternalId}')]";
         $node = $this->batchxml->fetchXml($path)[0];
 
         /* This isn't the primary identifier that we use in $student
