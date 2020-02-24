@@ -238,10 +238,25 @@ HELP;
                     ->setRole($role);
 
                 $pastoralAccessMapper->save($accessRecord);
+
+                $this->getLogger()->warning(sprintf(
+                    'Assigning permission to role %s for record "%s"',
+                        $role->getName(),
+                    $row['Description'],
+                ));
             }
 
             /* Log it
              */
+            $this->getLogger()->warning(sprintf(
+                'Imported record "%s" for student %s, owned by %s %s',
+                $row['Description'],
+                $row['ID'],
+                $owner->getFullName(),
+                $owner->getExternalId()
+            ));
+
+            $summary['success']++;
         }
     }
 };
