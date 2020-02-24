@@ -1,92 +1,88 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    <!-- Custom javascript -->
-
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <div class="content">
-                    <div class="dz-wrap">
-                        <!-- BEGIN dropzone -->
-                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
-                            <input type="hidden" name="user" value="{EPORTFOLIO_PAGE_USER_ID}" />
-                        </form>
-                        <ul data-dz-template class="hide">
-                            <li class="full-width">
-                                <div style="text-align:{IMAGE_ALIGN};">
-                                    <img data-dz-thumbnail width="16" height="16" src="/images/foundation/preloader.gif" />
-                                </div>
-                                <div class="progress dz-progress">
-                                    <span class="meter dz-upload" style="width:0;"></span>
-                                </div>
-                            </li>
-                        </ul>
-                        <!-- END dropzone -->
-                        <div data-dz-container>
-                            <!-- BEGIN image -->
-                            <ul class="inline-list">
-                                <!-- for padding and synonymity with imageList -->
-                                <li class="full-width">
+                <div class="dropzone-wrap">
+                    <!-- BEGIN dropzone -->
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
+                        <input type="hidden" name="user" value="{EPORTFOLIO_PAGE_USER_ID}" />
+                    </form>
+                    <ul class="hide" data-dz-template>
+                        <li>
+                            <div class="card small-12">
+                                <img data-dz-thumbnail width="64" height="64" src="/images/foundation/preloader.gif" />
+                                <h3 data-dz-name></h3>
+                                <p class="meta" data-dz-status>Uploading...</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- END dropzone -->
+                    <ul class="information-list" data-dz-container>
+                        <!-- BEGIN image -->
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12">
                                     <div style="text-align:{IMAGE_ALIGN};">
                                         <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" title="{PREVIEW_IMAGE_DESC}" />
                                     </div>
-                                </li>
-                            </ul>
-                            <!-- END image -->
-                        </div>
-                    </div>
-
-                    <!-- BEGIN modify_button -->
-                    <a href="/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}" class="button icon-upload">Post Image</a>
-
-                    <script type="text/javascript">
-                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                            wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                            createImageThumbnails: true,
-                            thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
-                            thumbnailWidth: null,
-                            dictDefaultMessage: 'You can drag images into this space',
-                            refreshUrl: '/eportfolio/configForm.php',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                            refreshData: {
-                                page_id: '{PAGE_ID}',
-                                reload: '{COMPONENT_INSTANCE_ID}'
-                            },
-                            tplWrap: '<li class="dz-preview" />',
-                            addedfile: function (file) {
-                            },
-                            sending: function (file, xhr, formData) {
-                                $(file.previewElement)
-                                        .closest('.dz-container')
-                                        .find('div.text:not(.dz-preview)').remove();
-
-                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('parent', 0);
-                                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
-                            },
-                            error: function(file) {
-                                $(file.previewElement)
-                                        .closest('.dz-container')
-                                        .find('.dz-preview').remove();
-                            },
-                            success: function (file, response) {
-                                var frm = $('#'+this.element.id.replace('dropzone','component')+' > [data-component-panel=settings] > form');
-
-                                frm.find('select[name=eportfolioImage]').remove();
-                                frm.append($('<input/>').attr('name', 'eportfolioImage').val(response.id));
-                                $.ajax({
-                                    type: frm.attr('method'),
-                                    url: frm.attr('action'),
-                                    data: frm.serialize()
-                                });
-                            }
-                        });
-                    </script>
-                    <!-- END modify_button -->
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                        <!-- END image -->
                 </div>
+                <!-- BEGIN modify_button -->
+                <div class="component-action">
+                    <section>
+                        <a href="/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}" class="button">Post Image</a>
+                    </section>
+                </div>
+                <script type="text/javascript">
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                        createImageThumbnails: true,
+                        thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
+                        thumbnailWidth: null,
+                        dictDefaultMessage: 'You can drag images into this space',
+                        refreshUrl: '/eportfolio/configForm.php',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: {
+                            page_id: '{PAGE_ID}',
+                            reload: '{COMPONENT_INSTANCE_ID}'
+                        },
+                        tplWrap: '<li class="dz-preview" />',
+                        sending: function (file, xhr, formData) {
+                            $(file.previewElement)
+                                    .closest('.dz-container')
+                                    .find('div.text:not(.dz-preview)').remove();
+
+                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                            formData.append('parent', 0);
+                            formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
+                        },
+                        error: function(file) {
+                            $(file.previewElement)
+                                    .closest('.dz-container')
+                                    .find('.dz-preview').remove();
+                        },
+                        success: function (file, response) {
+                            var frm = $('#component{COMPONENT_INSTANCE_ID}').find('form[action="/eportfolio/configForm.php"]');
+
+                            frm.find('select[name=eportfolioImage]').remove();
+                            frm.append($('<input/>').attr('name', 'eportfolioImage').val(response.id));
+                            $.ajax({
+                                type: frm.attr('method'),
+                                url: frm.attr('action'),
+                                data: frm.serialize()
+                            });
+                        }
+                    });
+                </script>
+                <!-- END modify_button -->
             </section>
         </div>
     </div>
