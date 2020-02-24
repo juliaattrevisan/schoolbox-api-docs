@@ -176,7 +176,7 @@ You need to configure the following:
   - the Pastoral Type "Learning Support" in /adminv2/lists/pastoral-category
   - the Pastoral SubType "Reports and Files" in /adminv2/lists/pastoral-category
 
-Usage: pastoral-import.php --fallback 1234
+Usage: pastoral-import.php --fallback {id} [--perform]
 
 HELP;
             exit;
