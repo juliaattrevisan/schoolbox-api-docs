@@ -390,23 +390,32 @@ HELP;
 
             /* Save it
              */
-            $this->pastoralMapper->save($record);
+            if ($this->perform()) {
+                $this->pastoralMapper->save($record);
+            }
 
             /* Update idiosyncractically and specifically with the provided timestamps
              */
-            /** @var IQuery $updateStatement */
-            $updateStatement = $this->getDi()->get('databaseInternal')->prepareQuery("
-                UPDATE {$this->pastoralMapper->getTable()}
-                SET created_at = :createdAt,
-                updated_at = :updatedAt
-                WHERE id = :recordId
-            ");
+            $this->getLogger()->info(sprintf(
+                'Assigning %s to pastoral record created_at and updated_at fields',
+                $row['DocumentCreatedDate']
+            ));
 
-            $updateStatement->execute([
-                'createdAt' => $row['DocumentCreatedDate'],
-                'updatedAt' => $row['DocumentCreatedDate'],
-                'recordId' => $record->getId()
-            ]);
+            if ($this->perform()) {
+                /** @var IQuery $updateStatement */
+                $updateStatement = $this->getDi()->get('databaseInternal')->prepareQuery("
+                    UPDATE {$this->pastoralMapper->getTable()}
+                    SET created_at = :createdAt,
+                    updated_at = :updatedAt
+                    WHERE id = :recordId
+                ");
+
+                $updateStatement->execute([
+                    'createdAt' => $row['DocumentCreatedDate'],
+                    'updatedAt' => $row['DocumentCreatedDate'],
+                    'recordId'  => $record->getId()
+                ]);
+            }
 
             /* Accept raw data into storage->accept()
              * FIXME What is the mimetype/extension of these files?
@@ -420,23 +429,27 @@ HELP;
                 ->setStorage($attachment)
                 ->setPrivate(true);
 
-            $this->pastoralAttachmentMapper->save($recordAttachment);
+            if ($this->perform()) {
+                $this->pastoralAttachmentMapper->save($recordAttachment);
+            }
 
             /* Apply permissions; all staff-level Role Ids can see all pastoral records
              */
             foreach ($this->allRoles as $role) {
+                $this->getLogger()->warning(sprintf(
+                    'Assigning permission to role %s for record "%s"',
+                    $role->getName(),
+                    $row['Description']
+                ));
+
                 $accessRecord = $this->pastoralAccessMapper->createModel()
                     ->setPastoral($record)
                     ->setAccess(Pastoral\Access\Mapper::ACCESS_PUBLIC)
                     ->setRole($role);
 
-                $this->pastoralAccessMapper->save($accessRecord);
-
-                $this->getLogger()->warning(sprintf(
-                    'Assigning permission to role %s for record "%s"',
-                        $role->getName(),
-                    $row['Description']
-                ));
+                if ($this->perform()) {
+                    $this->pastoralAccessMapper->save($accessRecord);
+                }
             }
 
             /* Log it
@@ -459,6 +472,10 @@ HELP;
             $summary['success'],
             $summary['failure']
         ));
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
     }
 };
 
