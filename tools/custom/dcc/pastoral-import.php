@@ -24,6 +24,12 @@ $app = new class extends CliTool\App
     private const OPT_LONG_HELP = 'help';
 
 
+    /**
+     * All imported pastoral records will have this type
+     */
+    private const PASTORAL_TYPE = 'Learning Support';
+
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -50,7 +56,8 @@ HELP;
 
         $this->processData(
             UserMapper::getInstance(),
-            Pastoral\Mapper::getInstance()
+            Pastoral\Mapper::getInstance(),
+            Pastoral\Type\Mapper::getInstance()
         );
     }
 
@@ -58,13 +65,14 @@ HELP;
     /**
      * Process all the data
      * @param UserMapper      $userMapper
-     * @param Pastoral\Mapper $pastoralMapper
+    *  @param Pastoral\Mapper $pastoralMapper
+     * @param Pastoral\Type\Mapper $pastoralTypeMapper
      */
     private function processData(
         UserMapper $userMapper,
-        Pastoral\Mapper $pastoralMapper
-    )
-    {
+        Pastoral\Mapper $pastoralMapper,
+        Pastoral\Type\Mapper $pastoralTypeMapper
+    ) {
         $externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
 
         if (!$externalDatabase) {
@@ -103,6 +111,21 @@ HELP;
 
             exit();
         }
+
+        /* Find the Pastoral Type "Learning Support" - it has to be called that exactly
+         * If that isn't set, that'll be a problem
+         */
+        try {
+            $pastoralType = $pastoralTypeMapper->findOneByColumn('name', self::PASTORAL_TYPE);
+        } catch (Mapper\Exception $e) {
+            $this->getLogger()->critical(sprintf(
+                'Pastoral Type "%s" does not exist in schoolbox',
+                self::PASTORAL_TYPE
+            ));
+
+            exit();
+        }
+
 
         /* Otherwise continue assigning details per pastoral record
          */
@@ -148,6 +171,7 @@ HELP;
                 ->setStudent($student)
                 ->setHeading($row['Description'])
                 ->setOwner($owner)
+                ->setType($pastoralType)
             ;
 
             /* Accept raw data into storage->accept()
