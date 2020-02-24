@@ -43,6 +43,17 @@ $app = new class extends CliTool\App
     ";
 
 
+    private const QUERY_TEST = "
+        SELECT DISTINCT
+            135 AS ID,
+            8 AS Owner,
+            'This is a test heading' AS Description,
+            '2020-01-01 01:23:45' AS DocumentCreatedDate,
+            'test type' AS DocumentType,
+            'cat' AS Document
+    ";
+
+
     /**
      * All imported pastoral records will have this type
      */
@@ -320,7 +331,7 @@ HELP;
      */
     private function processData(): void
     {
-        $statement = $this->externalDatabase->prepareQuery(self::QUERY);
+        $statement = $this->externalDatabase->prepareQuery(self::QUERY_TEST);
         $statement->execute();
 
         $summary = [
@@ -361,7 +372,7 @@ HELP;
                 $this->getLogger()->warning(sprintf(
                     'Owner external id %s was not found in schoolbox; attempting to assign fallback user id "%s"',
                     $row['Owner'],
-                    $this->getConfig()->get('pastoral_fallback_owner')
+                    $this->fallbackOwner->getId()
                 ));
             }
 
@@ -371,6 +382,8 @@ HELP;
             $record = $this->pastoralMapper->createModel()
                 ->setStudent($student)
                 ->setHeading($row['Description'])
+                ->setBodyPublic('')
+                ->setBodyPrivate('')
                 ->setOwner($owner)
                 ->setType($this->pastoralType)
                 ->setSubType($this->pastoralSubType);
