@@ -258,6 +258,14 @@ HELP;
 
             $summary['success']++;
         }
+
+        /* I guess this is the upshot
+         */
+        $this->getLogger()->info(sprintf(
+            'Saved %s records successfully. There were %s failures.',
+            $summary['success'],
+            $summary['failure']
+        ));
     }
 };
 
