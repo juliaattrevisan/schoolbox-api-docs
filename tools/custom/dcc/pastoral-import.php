@@ -30,6 +30,12 @@ $app = new class extends CliTool\App
     private const PASTORAL_TYPE = 'Learning Support';
 
 
+    /**
+     * All imported pastoral records will have this subtype
+     */
+    private const PASTORAL_SUBTYPE = 'Reports and Files';
+
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -46,7 +52,12 @@ $app = new class extends CliTool\App
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
-DCC Import pastoral records with attachments
+DCC Import pastoral records with attachments.
+
+You need to configure the following:
+  - pastoral fallback user id in /adminv2/setting/Pastoral+Care
+  - the Pastoral Type "Learning Support" in /adminv2/lists/pastoral-category
+  - the Pastoral SubType "Reports and Files" in /adminv2/lists/pastoral-category
 
 Usage: pastoral-import.php
 
@@ -57,21 +68,24 @@ HELP;
         $this->processData(
             UserMapper::getInstance(),
             Pastoral\Mapper::getInstance(),
-            Pastoral\Type\Mapper::getInstance()
+            Pastoral\Type\Mapper::getInstance(),
+            Pastoral\SubType\Mapper::getInstance()
         );
     }
 
 
     /**
      * Process all the data
-     * @param UserMapper      $userMapper
-    *  @param Pastoral\Mapper $pastoralMapper
-     * @param Pastoral\Type\Mapper $pastoralTypeMapper
+     * @param UserMapper              $userMapper
+     * @param Pastoral\Mapper         $pastoralMapper
+     * @param Pastoral\Type\Mapper    $pastoralTypeMapper
+     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
      */
     private function processData(
         UserMapper $userMapper,
         Pastoral\Mapper $pastoralMapper,
-        Pastoral\Type\Mapper $pastoralTypeMapper
+        Pastoral\Type\Mapper $pastoralTypeMapper,
+        Pastoral\SubType\Mapper $pastoralSubTypeMapper
     ) {
         $externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
 
@@ -126,6 +140,19 @@ HELP;
             exit();
         }
 
+        /* Find the Pastoral SubType "Reports and Files" - it has to be called that exactly
+         * If that isn't set, that'll be a problem
+         */
+        try {
+            $pastoralSubType = $pastoralSubTypeMapper->findOneByColumn('name', self::PASTORAL_SUBTYPE);
+        } catch (Mapper\Exception $e) {
+            $this->getLogger()->critical(sprintf(
+                'Pastoral SubType "%s" does not exist in schoolbox',
+                self::PASTORAL_SUBTYPE
+            ));
+
+            exit();
+        }
 
         /* Otherwise continue assigning details per pastoral record
          */
@@ -172,6 +199,7 @@ HELP;
                 ->setHeading($row['Description'])
                 ->setOwner($owner)
                 ->setType($pastoralType)
+                ->setSubType($pastoralSubType)
             ;
 
             /* Accept raw data into storage->accept()
