@@ -7,12 +7,15 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -27,6 +30,19 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Result set query
+     */
+    private const QUERY = "
+        SELECT DISTINCT
+            vd.ID, vd.Description, vd.DocumentCreatedDate, vd.DocumentType, vd.Document
+        FROM dbo.media.vDocuments vd
+        INNER JOIN dbo.vStudents vs ON vd.ID = vs.ID
+        WHERE ClassificationCode = 'LearningSupport'
+        AND vs.StudentCampus = 'P'
+    ";
+
+
+    /**
      * All imported pastoral records will have this type
      */
     private const PASTORAL_TYPE = 'Learning Support';
@@ -36,6 +52,84 @@ $app = new class extends CliTool\App
      * All imported pastoral records will have this subtype
      */
     private const PASTORAL_SUBTYPE = 'Reports and Files';
+
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+
+    /**
+     * @var Pastoral\Mapper
+     */
+    private $pastoralMapper;
+
+
+    /**
+     * @var Pastoral\Access\Mapper
+     */
+    private $pastoralAccessMapper;
+
+
+    /**
+     * @var Pastoral\Type\Mapper
+     */
+    private $pastoralTypeMapper;
+
+
+    /**
+     * @var Pastoral\SubType\Mapper
+     */
+    private $pastoralSubTypeMapper;
+
+
+    /**
+     * @var Pastoral\Attachment\Mapper
+     */
+    private $pastoralAttachmentMapper;
+
+
+    /**
+     * @var RoleMapper
+     */
+    private $roleMapper;
+
+
+    /**
+     * @var Storage\Mapper
+     */
+    private $storageMapper;
+
+
+    /**
+     * @var IConnector|null
+     */
+    private $externalDatabase;
+
+
+    /**
+     * @var User
+     */
+    private $fallbackOwner;
+
+
+    /**
+     * @var Pastoral\Type\Model
+     */
+    private $pastoralType;
+
+
+    /**
+     * @var Pastoral\SubType\Model
+     */
+    private $pastoralSubType;
+
+
+    /**
+     * @var Collection
+     */
+    private $allRoles;
 
 
     /** @inheritdoc */
@@ -67,67 +161,75 @@ HELP;
             exit;
         }
 
-        $this->processData(
-            UserMapper::getInstance(),
-            Pastoral\Mapper::getInstance(),
-            Pastoral\Type\Mapper::getInstance(),
-            Pastoral\SubType\Mapper::getInstance(),
-            Pastoral\Access\Mapper::getInstance(),
-            Pastoral\Attachment\Mapper::getInstance(),
-            Storage\Mapper::getInstance()
-        );
-    }
+        /* Mappers
+         */
+        $this->userMapper = UserMapper::getInstance();
+        $this->pastoralMapper = Pastoral\Mapper::getInstance();
+        $this->pastoralAccessMapper = Pastoral\Access\Mapper::getInstance();
+        $this->pastoralTypeMapper = Pastoral\Type\Mapper::getInstance();
+        $this->pastoralSubTypeMapper = Pastoral\SubType\Mapper::getInstance();
+        $this->pastoralAttachmentMapper = Pastoral\Attachment\Mapper::getInstance();
+        $this->roleMapper = RoleMapper::getInstance();
+        $this->storageMapper = Storage\Mapper::getInstance();
 
-
-    /**
-     * Process all the data
-     * @param UserMapper                 $userMapper
-     * @param Pastoral\Mapper            $pastoralMapper
-     * @param Pastoral\Type\Mapper       $pastoralTypeMapper
-     * @param Pastoral\SubType\Mapper    $pastoralSubTypeMapper
-     * @param Pastoral\Access\Mapper     $pastoralAccessMapper
-     * @param Pastoral\Attachment\Mapper $pastoralAttachmentMapper
-     * @param Storage\Mapper             $storageMapper
-     */
-    private function processData(
-        UserMapper $userMapper,
-        Pastoral\Mapper $pastoralMapper,
-        Pastoral\Type\Mapper $pastoralTypeMapper,
-        Pastoral\SubType\Mapper $pastoralSubTypeMapper,
-        Pastoral\Access\Mapper $pastoralAccessMapper,
-        Pastoral\Attachment\Mapper $pastoralAttachmentMapper,
-        Storage\Mapper $storageMapper
-    ) {
-        $externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
-
-        if (!$externalDatabase) {
-            $this->getLogger()->critical('Null external database for DCC Pastoral Importer; exiting');
-
-            return;
-        }
-
-        $statement = $externalDatabase->prepareQuery("
-            SELECT DISTINCT
-                vd.ID, vd.Description, vd.DocumentCreatedDate, vd.DocumentType, vd.Document
-            FROM dbo.media.vDocuments vd
-            INNER JOIN dbo.vStudents vs ON vd.ID = vs.ID
-            WHERE ClassificationCode = 'LearningSupport' and vs.StudentCampus = 'P'
-        ");
-
-        $statement->execute();
-
-        $summary = [
-            'success' => 0,
-            'failure' => 0
-        ];
+        /* Set up external db connection
+         */
+        $this->assignExternalDb();
 
         /* Find out if someone set the Pastoral Fallback User ID
          * If it's not set, that'll be a problem
          */
-        $fallbackOwnerId = (int)$this->getConfig()->get('pastoral_fallback_owner');
+        $this->assignFallbackOwner((int)$this->getConfig()->get('pastoral_fallback_owner'));
 
+        /* Find the Pastoral Type "Learning Support" - it has to be called that exactly
+         * If that isn't set, that'll be a problem
+         */
+        $this->assignPastoralType();
+
+        /* Find the Pastoral SubType "Reports and Files" - it has to be called that exactly
+         * If that isn't set, that'll be a problem
+         */
+        $this->assignPastoralSubType();
+
+        /* Find all the Staff roles; if none exist, don't import anything
+         * (nobody can see them?)
+         */
+        $this->assignStaffRoles();
+
+        /* Process the resultset
+         */
+        $this->processData();
+    }
+
+
+    /**
+     * Set up external db connection
+     *
+     * @return void
+     */
+    private function assignExternalDb(): void
+    {
+        $this->externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
+
+        if (!$this->externalDatabase) {
+            $this->getLogger()->critical('Null external database for DCC Pastoral Importer; exiting');
+
+            exit();
+        }
+    }
+
+
+    /**
+     * Find out if someone set the Pastoral Fallback User ID
+     * If it's not set, that'll be a problem
+     *
+     * @param int $fallbackOwnerId
+     * @return void
+     */
+    private function assignFallbackOwner(int $fallbackOwnerId): void
+    {
         try {
-            $fallbackOwner = $userMapper->findById($fallbackOwnerId);
+            $this->fallbackOwner = $this->userMapper->findById($fallbackOwnerId);
         } catch (Mapper\Exception $e) {
             $this->getLogger()->critical(sprintf(
                 'Pastoral Fallback User ID %s does not exist in schoolbox',
@@ -136,12 +238,19 @@ HELP;
 
             exit();
         }
+    }
 
-        /* Find the Pastoral Type "Learning Support" - it has to be called that exactly
-         * If that isn't set, that'll be a problem
-         */
+
+    /**
+     * Find the Pastoral Type "Learning Support" - it has to be called that exactly
+     * If that isn't set, that'll be a problem
+     *
+     * @return void
+     */
+    private function assignPastoralType(): void
+    {
         try {
-            $pastoralType = $pastoralTypeMapper->findOneByColumn('name', self::PASTORAL_TYPE);
+            $this->pastoralType = $this->pastoralTypeMapper->findOneByColumn('name', self::PASTORAL_TYPE);
         } catch (Mapper\Exception $e) {
             $this->getLogger()->critical(sprintf(
                 'Pastoral Type "%s" does not exist in schoolbox',
@@ -150,12 +259,19 @@ HELP;
 
             exit();
         }
+    }
 
-        /* Find the Pastoral SubType "Reports and Files" - it has to be called that exactly
-         * If that isn't set, that'll be a problem
-         */
+
+    /**
+     * Find the Pastoral SubType "Reports and Files" - it has to be called that exactly
+     * If that isn't set, that'll be a problem
+     *
+     * @return void
+     */
+    private function assignPastoralSubType(): void
+    {
         try {
-            $pastoralSubType = $pastoralSubTypeMapper->findOneByColumn('name', self::PASTORAL_SUBTYPE);
+            $this->pastoralSubType = $this->pastoralSubTypeMapper->findOneByColumn('name', self::PASTORAL_SUBTYPE);
         } catch (Mapper\Exception $e) {
             $this->getLogger()->critical(sprintf(
                 'Pastoral SubType "%s" does not exist in schoolbox',
@@ -164,19 +280,44 @@ HELP;
 
             exit();
         }
+    }
 
-        /* Find all the Staff roles; if none exist, don't import anything
-         * (nobody can see them?)
-         */
-        $allRoles = RoleMapper::getInstance()->findByColumn('group_type', Role::STAFF);
 
-        if (!$allRoles->count()) {
+    /**
+     * Find all the Staff roles; if none exist, don't import anything
+     * (nobody can see them?)
+     *
+     * @return void
+     */
+    private function assignStaffRoles(): void
+    {
+        $this->allRoles = $this->roleMapper->findByColumn('group_type', Role::STAFF);
+
+        if (!$this->allRoles->count()) {
             $this->getLogger()->critical(sprintf(
                 'No Staff roles found in schoolbox'
             ));
 
             exit();
         }
+    }
+
+
+    /**
+     * Process all the data
+     *
+     * @return void
+     */
+    private function processData(): void
+    {
+        $statement = $this->externalDatabase->prepareQuery(self::QUERY);
+
+        $statement->execute();
+
+        $summary = [
+            'success' => 0,
+            'failure' => 0
+        ];
 
         /* Otherwise continue assigning details per pastoral record
          */
@@ -185,7 +326,7 @@ HELP;
             /* If the student of the record doesn't exist, skip them with a warning
              */
             try {
-                $student = $userMapper->findByExternalId($row['ID'], Role::STUDENT);
+                $student = $this->userMapper->findByExternalId($row['ID'], Role::STUDENT);
             } catch (Mapper\Exception $e) {
                 $this->getLogger()->warning(sprintf(
                     'Student %s was not found in schoolbox; skipping their pastoral record "%s"',
@@ -203,10 +344,10 @@ HELP;
              *  The school needs to tell me where to find their pastoral record owners
              *  Their query doesn't include it
              */
-            $owner = $fallbackOwner;
+            $owner = $this->fallbackOwner;
 
             try {
-                $owner = $userMapper->findByExternalId($row['Owner'], Role::STAFF);
+                $owner = $this->userMapper->findByExternalId($row['Owner'], Role::STAFF);
             } catch (Mapper\Exception $e) {
                 $this->getLogger()->warning(sprintf(
                     'Owner external id %s was not found in schoolbox; attempting to assign fallback user id "%s"',
@@ -218,40 +359,39 @@ HELP;
             /* Manufacture a pastoral record
              * Assign values to pastoral record
              */
-            $record = $pastoralMapper->createModel()
+            $record = $this->pastoralMapper->createModel()
                 ->setStudent($student)
                 ->setHeading($row['Description'])
                 ->setOwner($owner)
-                ->setType($pastoralType)
-                ->setSubType($pastoralSubType)
-            ;
+                ->setType($this->pastoralType)
+                ->setSubType($this->pastoralSubType);
 
             /* Save it
              */
-            $pastoralMapper->save($record);
+            $this->pastoralMapper->save($record);
 
             /* Accept raw data into storage->accept()
              */
-            $attachment = $storageMapper->acceptStream($student->getExternalId() . '.pdf', $row['Document'], false);
+            $attachment = $this->storageMapper->acceptStream($student->getExternalId() . '.pdf', $row['Document'], false);
 
             /* Assign the storage file to the pastoral record
              */
-            $pastoralAttachmentMapper->createModel()
+            $recordAttachment = $this->pastoralAttachmentMapper->createModel()
                 ->setPastoral($record)
                 ->setStorage($attachment)
                 ->setPrivate(true);
 
-            $pastoralAttachmentMapper->save($attachment);
+            $this->pastoralAttachmentMapper->save($recordAttachment);
 
             /* Apply permissions; all staff-level Role Ids can see all pastoral records
              */
-            foreach ($allRoles as $role) {
-                $accessRecord = $pastoralAccessMapper->createModel()
+            foreach ($this->allRoles as $role) {
+                $accessRecord = $this->pastoralAccessMapper->createModel()
                     ->setPastoral($record)
                     ->setAccess(Pastoral\Access\Mapper::ACCESS_PUBLIC)
                     ->setRole($role);
 
-                $pastoralAccessMapper->save($accessRecord);
+                $this->pastoralAccessMapper->save($accessRecord);
 
                 $this->getLogger()->warning(sprintf(
                     'Assigning permission to role %s for record "%s"',
