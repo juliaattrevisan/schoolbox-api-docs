@@ -331,6 +331,11 @@ HELP;
      */
     private function processData(): void
     {
+
+        /* Remember where we started this import; the timestamps will not be truthful in this import
+         */
+        $firstId = null;
+
         $statement = $this->externalDatabase->prepareQuery(self::QUERY_TEST);
         $statement->execute();
 
@@ -392,6 +397,12 @@ HELP;
              */
             if ($this->perform()) {
                 $this->pastoralMapper->save($record);
+
+                /* Remember where we started, in case we manually need to undo all this
+                 */
+                if (null === $firstId) {
+                    $firstId = $record->getId();
+                }
             }
 
             /* Update idiosyncractically and specifically with the provided timestamps
@@ -472,6 +483,13 @@ HELP;
             $summary['success'],
             $summary['failure']
         ));
+
+        if ($this->perform()) {
+            $this->getLogger()->info(sprintf(
+                'First record in this import batch has pastoral id %s',
+                $firstId
+            ));
+        }
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
