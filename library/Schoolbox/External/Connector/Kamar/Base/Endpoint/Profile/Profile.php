@@ -100,6 +100,23 @@ class Profile implements IStrategy
 
 
     /**
+     * Remember a list of siblingLinks which are vaguely synonymous with a family id
+     *
+     * Parents' external ids are derived from their students' external ids but this design
+     * is flawed when multiple children have the same parents. You can't rely on kamar
+     * xml files being processed in a particular order so one set of parents might
+     * precede another, and be associated with one student instead of another (or both)
+     *
+     * To prevent spurious spawning of what are essentially the same parents, remember
+     * the siblingLinks so we know that we've processed parents from this particular
+     * family already.
+     *
+     * @var array
+     */
+    private $siblingLinks = [];
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -199,6 +216,7 @@ class Profile implements IStrategy
         $students = $this->batchxml->fetchXml('/SMSDirectoryData/students/user');
 
         foreach ($students as $student) {
+            $siblingLink = trim((string)$student->siblinglink);
             $externalId = trim((string)$student->xpath('@id')[0]);
             $username = trim((string)$student->username);
             $title = '';
@@ -376,7 +394,7 @@ class Profile implements IStrategy
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            /* Add their parents + relationships too
+            /* Add their parents + relationships too, but only if we haven't already seen them
              */
             $this->importParentsOfStudent($student, $studentBaseProfile);
 
@@ -390,27 +408,77 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param SimpleXMLElement $student
+     * @param SimpleXMLElement  $student
      * @param UserProfile\Model $studentBaseProfile
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws PDOException
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     private function importParentsOfStudent(SimpleXMLElement $student, UserProfile\Model $studentBaseProfile): void
     {
+        $siblingLink = trim((string)$student->siblinglink);
 
         /** @var SimpleXMLElement $parent */
         foreach ($student->caregivers->caregiver as $parent) {
 
             /* Parents don't have an external unique identifier; therefore we manufacture them
              * Parents also don't have separate first/last names, just a fullname
+             * Reassign an existing parent id for a sibling if we encountered them previously
              */
-            $externalId = trim((string)$student->xpath('@id')[0]) . '-' . $parent->xpath('@index')[0];
-            $username = $email = trim((string)$parent->email);
-            $firstname = trim((string)$parent->name);
-            $lastname = '';
+            $caregiverIndex = (string)$parent->xpath('@index')[0];
+
+            if (isset($this->siblingLinks[$siblingLink][$caregiverIndex])) {
+                $externalId = $this->siblingLinks[$siblingLink][$caregiverIndex];
+
+                $this->log->info(sprintf(
+                    'Reusing parent external id %s for %s',
+                    $externalId,
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                ));
+            } else {
+                if ('' !== $siblingLink) {
+
+                    /* Derive externalId from siblinglink value
+                     *
+                     * siblingLink comes in the format "201800016039" where the first four digits
+                     * are the year the oldest sibling was spawned; the next chars supply space for
+                     * an autoincrementing primary key integer; 16039, in this case
+                     *
+                     * We only care for the "16039" part, so strip the first for digits,
+                     * then ltrim away any useless leading zeroes, then suffix the caregiver index
+                     *
+                     * Then remember this for other siblings,
+                     * for students who have siblings but their parents haven't been seen yet:
+                     */
+                    $externalId = ltrim(substr($siblingLink, 4), '0') . '-' . $caregiverIndex;
+
+                    $this->siblingLinks[$siblingLink][$caregiverIndex] = $externalId;
+                } else {
+
+                    /* Derive externalId from the student external id value
+                     * For students who don't have siblings, their siblingLink value will be empty:
+                     */
+                    $externalId = trim((string)$student->xpath('@id')[0]) . '-' . $caregiverIndex;
+                }
+
+                $this->log->info(sprintf(
+                    'Creating parent external id %s for %s',
+                    $externalId,
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                ));
+            }
+
+            /* Parents' names are all crammed together so arbitrarily split them
+             * Sorry to people with multiple strings in their name like Grant van der Kruk;
+             * your name might not display as intended. Blame Kamar for that.
+             */
+            $parentName = explode(' ', trim((string)$parent->name), 2);
+
+            $username = $externalId;
+            $email = trim((string)$parent->email);
+            $firstname = $parentName[0] ?? '';
+            $lastname = $parentName[1] ?? '';
             $phoneHome = '';
             $phoneWork = '';
             $phoneMobile = trim((string)$parent->mobile);
