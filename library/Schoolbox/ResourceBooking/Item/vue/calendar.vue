@@ -14,6 +14,7 @@
     import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/createBookingModal';
     import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/exportBookingModal';
     import FilterModal                from '@schoolbox/fullcalendar/resourceBooking/filterModal';
+    import FlatPickr                  from '@schoolbox/fullcalendar/flatPickr';
     import axios                      from 'axios'
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 
@@ -42,6 +43,7 @@
             MetaList,
             FullCalendar,
             RevealModal,
+            FlatPickr,
         },
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
@@ -239,6 +241,49 @@
                 // (for the same reason as `onLoading`)
                 return this.helper.dayTitleFormat(dateObject);
             },
+
+            /**
+             * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickPrev() {
+                let api = this.$refs.fullCalendar.getApi();
+                api.prev();
+                this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickNext() {
+                let api = this.$refs.fullCalendar.getApi();
+                api.next();
+                this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
+             */
+            clickToday() {
+                let api = this.$refs.fullCalendar.getApi();
+                api.today();
+                this.$refs.flatPickr.updateActiveDate(api.getDate());
+            },
+
+            /**
+             * Additional customisation for quick month switch button.
+             * When the user clicks on the flatpickr's date, we'll trigger fullcalendar's gotoDate.
+             */
+            onQuickSwitch(value) {
+                this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
+            },
+        },
+        mounted() {
+            // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
+            let quickSwitchIcon = document.createElement('a');
+            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
+
+            document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
         }
     }
 
@@ -301,6 +346,21 @@
                         text: 'Filters',
                         click: onFilterClick
                     },
+                    quickSwitchButton: {
+                        text: ' ',
+                    },
+                    customPrev: {
+                        icon: 'chevron-left',
+                        click: this.clickPrev.bind(this),
+                    },
+                    customNext: {
+                        icon: 'chevron-right',
+                        click: this.clickNext.bind(this),
+                    },
+                    customToday: {
+                        text: 'Today',
+                        click: this.clickToday.bind(this),
+                    },
                 }"
                 :buttonText="{
                     today:    'Today',
@@ -309,7 +369,7 @@
                     day:      'Day'
                 }"
                 :header="{
-                    left: 'prev,today,next',
+                    left: 'quickSwitchButton,customToday,customPrev,customNext',
                     center: 'title',
                     right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
                 }"
@@ -323,6 +383,15 @@
                 @loading="onLoading"
                 @dateClick="onDateClick"
                 @eventClick="onEventClick"
+        />
+
+        <flat-pickr
+                ref="flatPickr"
+                :config="{
+                    defaultDate: config.defaultDate,
+                    selector: '.fc-quickSwitchButton-button'
+                }"
+                @dateSelected="onQuickSwitch"
         />
 
         <toast ref="toast"></toast>
