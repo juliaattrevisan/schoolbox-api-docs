@@ -129,8 +129,8 @@ class Storage extends BaseTransformation
             [
                 'method' => BaseTransformation::METHOD_CONSTRAIN,
                 'args'   => [
-                    'width'  => 800,
-                    'height' => 800,
+                    'width'  => 2048,
+                    'height' => 2048,
                 ],
             ],
         ],
