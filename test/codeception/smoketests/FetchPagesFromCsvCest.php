@@ -21,6 +21,8 @@ class FetchPagesFromCsvCest
         'News Moderator'         => ['username' => 'rwhite', 'password' => 'password'],
     ];
 
+    protected $users = [];
+
     /**
      * @param IntegrationTester $i
      */
@@ -92,50 +94,6 @@ class FetchPagesFromCsvCest
         $i->seeResponseCodeIs(401);
     }
 
-    /** Get all the pages, uses the url provider, data that is read from a csv to fetch all the pages stated and
-     * checks that all pages come back with a 200 ok response.
-     *
-     * @dataProvider urlProvider
-     */
-    public function getAllThePages(IntegrationTester $i, \Codeception\Example $example)
-    {
-        #GIVEN
-        $persona      = $example[1];
-        $url          = $example[3];
-        $user_details = $this->personas[$persona];
-
-        #Need to login to the right user
-        $this->loginUser($i, $user_details['username'], $user_details['password']);
-
-        #proceed to test the url which is below.
-        $getPayload = new Payload\Base('GET', '/', $url);
-
-        #WHEN
-        $i->sendRequest($getPayload);
-
-        #THEN
-        $i->seeResponseCodeIs(200);
-    }
-
-    /** Url Provider - reads a csv file to provide an array of data for the fetch all pages test.
-     *
-     * GetSmokeTestList csv is formatted a specific way for the test.
-     * Module, Persona, Action, URL
-     *
-     * Module is not used, just for file readability.
-     * Persona selects the user to login with
-     * Action not used in the test, gives context as to the action on the csv.
-     * URL is what we fetch.
-     *
-     * @return array - [string Module, string Persona, string Action, string URL]
-     */
-    protected function urlProvider()
-    {
-        $csvData = array_map('str_getcsv', file(codecept_data_dir('/SmokeTests/GetSmokeTestList.csv')));
-
-        return $csvData;
-    }
-
     /**
      * login the specific user. Used during the test for fetching URLs on the csv
      *
@@ -151,4 +109,66 @@ class FetchPagesFromCsvCest
 
         $i->sendRequest($loginPayload);
     }
+    
+    /** Get all the pages, uses the url provider, data that is read from a csv to fetch all the pages stated and
+     * checks that all pages come back with a 200 ok response.
+     *
+     * @dataProvider urlProvider
+     * 
+     */
+    public function getAllThePages(IntegrationTester $i, $senario, \Codeception\Example $example)
+    {
+        #GIVEN
+        $persona      = $example[2];
+        $url          = $example[3];
+        $expected_result = $example[4];
+        
+        if($expected_result=='IGNORE')
+        {
+            $senario->skip('Test ignored');
+        }
+
+        if(!isset($this->users[$persona]))
+        {
+            $session = $i->getSessionCookie();
+            $this->users[$persona]=[$session];
+            $user_details = $this->personas[$persona];
+            $this->loginUser($i, $user_details['username'], $user_details['password']);
+
+        } else {
+            $i->getSessionCookie($this->users[$persona]);
+        }
+        
+        #Need to login to the right user
+        #proceed to test the url which is below.
+        $getPayload = new Payload\Base('GET', '/', $url);
+        
+        #WHEN
+        $i->sendRequest($getPayload);
+        
+        #THEN
+        $i->seeResponseCodeIs($expected_result);
+    }
+    
+    /** New Url Provider - reads a csv file to provide an array of data for the fetch all pages test.
+     *
+     * GetSmokeTestList csv is formatted a specific way for the test.
+     * Module, Persona, Action, URL
+     *
+     * Module is not used, just for file readability.
+     * Persona selects the user to login with
+     * Action not used in the test, gives context as to the action on the csv.
+     * URL is what we fetch.
+     *
+     * @return array - [string Module, string Persona, string Action, string URL]
+     */
+    protected function urlProvider()
+    {
+        $csvData = array_map('str_getcsv', file(codecept_data_dir('/SmokeTests/GetSmokeTestDataList.csv')));
+        
+        return $csvData;
+    }
+    
 }
+
+

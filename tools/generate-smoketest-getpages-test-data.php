@@ -1,10 +1,15 @@
-<?php 
+<?php
 $codeception_data_folder='./test/codeception/_data/';
 $codeception_testdata_path=$codeception_data_folder.'SmokeTests/GetSmokeTestDataList.csv';
 $codeception_temptestdata_path=$codeception_data_folder.'SmokeTests/newGetSmokeTestDataList.csv';
 
 $url_pages_csv = array_map('str_getcsv', file($codeception_data_folder.'SmokeTests/GetSmokeTestUrlList.csv'));
 $persona_csv = array_map('str_getcsv', file($codeception_data_folder.'SmokeTests/GetSmokeTestPersonaList.csv'));
+
+$directory=$codeception_data_folder.'SmokeTests/temp';
+if (! is_dir($directory) && ! mkdir($directory) && ! is_dir($directory)) {
+    throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
+}
 if(file_exists($codeception_testdata_path))
 {
     $old_fetchdata_file=array_map('str_getcsv', file($codeception_testdata_path));
@@ -14,6 +19,8 @@ if(file_exists($codeception_testdata_path))
 
 $csv_output_location=$codeception_data_folder.'SmokeTests/newGetSmokeTestDataList.csv';
 
+$entriesInserted=[];
+
 //Open file pointer.
 $fetchpages_data_file = fopen($csv_output_location, 'w');
 
@@ -21,20 +28,24 @@ if(isset($old_fetchdata_file))
 {
     foreach($old_fetchdata_file as $key => $old_entry)
     {
-        $old_fetchdata_file[$old_entry[2].$old_entry[1]]=$old_entry;
+        $old_fetchdata_file[$old_entry[3].$old_entry[2]]=$old_entry;
         unset($old_fetchdata_file[$key]);
     }
     
     foreach($url_pages_csv as $url_entry){
         foreach($persona_csv as $persona){
-            if (key_exists($url_entry[1].$persona[0], $old_fetchdata_file))
+            if (!array_key_exists($url_entry[2].$persona[0], $entriesInserted) && ($persona[3] === 'ALL' || $persona[3] === $url_entry[0]))
             {
-                // If entry exists, copy it and remove it from old list. All left over items will be not created in effect deleting them.
-                fputcsv($fetchpages_data_file, $old_fetchdata_file[$url_entry[1].$persona[0]]);
-                unset($old_fetchdata_file[$url_entry[1].$persona[0]]);
-            } else {
-                // For each new entry that we have not seen before.
-                fputcsv($fetchpages_data_file, [$url_entry[0], $persona[0], $url_entry[1], 'UNKNOWN']);
+                if (array_key_exists($url_entry[2].$persona[0], $old_fetchdata_file))
+                {
+                    // If entry exists, copy it and remove it from old list. All left over items will be not created in effect deleting them.
+                    fputcsv($fetchpages_data_file, $old_fetchdata_file[$url_entry[2].$persona[0]]);
+                    unset($old_fetchdata_file[$url_entry[2].$persona[0]]);
+                } else {
+                    // For each new entry that we have not seen before.
+                    fputcsv($fetchpages_data_file, [$url_entry[0], $url_entry[1], $persona[0], $url_entry[2], 'UNKNOWN']);
+                }
+                $entriesInserted[$url_entry[2].$persona[0]]=0;
             }
         }
     }
@@ -53,7 +64,7 @@ if(isset($old_fetchdata_file))
 } else {
     foreach($url_pages_csv as $url_entry){
         foreach($persona_csv as $persona){
-            fputcsv($fetchpages_data_file, [$url_entry[0], $persona[0], $url_entry[1], 'UNKNOWN']);
+            fputcsv($fetchpages_data_file, [$url_entry[0], $url_entry[1], $persona[0], $url_entry[2], 'UNKNOWN']);
         }
     }
 }

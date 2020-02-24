@@ -9,6 +9,7 @@ use Codeception\Module\REST;
 use Codeception\TestInterface;
 use Payload\Request;
 use Symfony\Component\BrowserKit\Cookie;
+use phpDocumentor\Reflection\Types\Mixed_;
 
 /**
  * This Helper provides custom extensions to the REST module
@@ -42,6 +43,24 @@ class Integration extends REST
         }
     }
 
+    /**
+     * @param string $sessionID
+     */
+    public function setSessionCookie(string $sessionID){
+        $this->client->getCookieJar()->set(new Cookie('PHPSESSID', $sessionID));
+    }
+
+    /**
+     * @return string|NULL
+     */
+    public function getSessionCookie(){
+        $sessionCookie = $this->client->getCookieJar()->get('PHPSESSID');
+        if($sessionCookie !== NULL)
+        {
+            return $this->client->getCookieJar()->get('PHPSESSID')->getValue();
+        }
+        return NULL;
+    }
 
     /**
      * @param \Payload\Request $request
@@ -62,5 +81,11 @@ class Integration extends REST
         foreach ($request->getHeaders() as $name => $value) {
             $this->deleteHeader($name);
         }
+    }
+    
+    
+    public function grabResponseCode(): string
+    {
+        return $this->connectionModule->_getResponseStatusCode();
     }
 }

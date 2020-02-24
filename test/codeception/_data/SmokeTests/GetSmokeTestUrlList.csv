@@ -1,5 +1,167 @@
-Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/home
-Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
-Create a user,https://vagrant.dev.schoolbox.cloud/adminv2/user/create
-Go to service permissions,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions
-Go to bulk modify,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify
+Admin,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/home
+Admin,Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
+Admin,Create a user,https://vagrant.dev.schoolbox.cloud/adminv2/user/create
+Admin,Go to service permissions,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions
+Admin,Go to bulk modify,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify
+Admin,Go to side menu,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side
+Admin,Create a sidemenu item,https://vagrant.dev.schoolbox.cloud/adminv2/menu-side/insert
+Admin,Go to top menu,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top
+Admin,Create top menu,https://vagrant.dev.schoolbox.cloud/adminv2/menu-top/create
+Admin,Go to profile button,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button
+Admin,Create profile button,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create
+Admin,Setup dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard
+Admin,Setup homepage templates,https://vagrant.dev.schoolbox.cloud/adminv2/homepage
+Admin,Setup ePortfolio template ,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio
+Admin,Deploy ePortfolio,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy
+Admin,Config News,https://vagrant.dev.schoolbox.cloud/adminv2/news
+Admin,Setup allowed files,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file
+Admin,Configure settings,https://vagrant.dev.schoolbox.cloud/adminv2/setting
+Admin,Configure security,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security
+Admin,Configure skin,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config
+Admin,Configure Terminology,https://vagrant.dev.schoolbox.cloud/adminv2/terminology
+Admin,Import a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar
+Admin,Subscibe to a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe
+Admin,Cleanup calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup
+Admin,Bulk add folders,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder
+Admin,Rollover folders,https://vagrant.dev.schoolbox.cloud/adminv2/rollover
+Admin,Setup grades,https://vagrant.dev.schoolbox.cloud/adminv2/grades
+Admin,Setup rubric resultset,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results
+Admin,Configure terms,https://vagrant.dev.schoolbox.cloud/adminv2/terms
+Admin,Configure course builder,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder
+Admin,Setup notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages
+Admin,Configure notification delivery,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure
+Admin,Configure student notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student
+Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps
+Admin,Configure oAuth providers,https://vagrant.dev.schoolbox.cloud/adminv2/oauth
+Admin,Review registered push apps,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush
+Admin,Review role list,https://vagrant.dev.schoolbox.cloud/adminv2/lists
+Admin,Review news topics,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic
+Admin,Review timetable colours,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour
+Admin,Review pastoral types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type
+Admin,Setup LTI provider,https://vagrant.dev.schoolbox.cloud/adminv2/lti
+Admin,View storage usage,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all
+Admin,Review engagement,https://vagrant.dev.schoolbox.cloud/adminv2/engagement
+Admin,Setup UPS rules,https://vagrant.dev.schoolbox.cloud/adminv2/ups
+Admin,Setup UPS rules for students,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student
+Admin,View Media Queue,https://vagrant.dev.schoolbox.cloud/adminv2/video
+Admin,Import users,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount
+Admin,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload
+Admin,Config filters,https://vagrant.dev.schoolbox.cloud/adminv2/filters
+Admin,Configure filters on pending assessment,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending
+Admin,Configre feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
+Calendar,View calendar,https://vagrant.dev.schoolbox.cloud/calendar
+Calendar,Export calendar,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809
+Calendar,Create event,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1
+CMS,View all folders,https://vagrant.dev.schoolbox.cloud/resources/
+CMS,Add folder,https://vagrant.dev.schoolbox.cloud/resource/folder/57/create
+CMS,Modify folder,https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify
+CMS,Post file,https://vagrant.dev.schoolbox.cloud/cms/file/new/57
+CMS,Post link,https://vagrant.dev.schoolbox.cloud/cms/link/new/57
+CMS,Add tile,https://vagrant.dev.schoolbox.cloud/tile/add/25
+CMS,Post blog,https://vagrant.dev.schoolbox.cloud/blog/modify/new/83
+CMS,View blog archive,https://vagrant.dev.schoolbox.cloud/blog/archive/83
+CMS,Manage groups,https://vagrant.dev.schoolbox.cloud/group/join
+CMS,Manage my links,https://vagrant.dev.schoolbox.cloud/cms/myLinks
+CMS,Manage my message settings,https://vagrant.dev.schoolbox.cloud/settings/messages
+CMS,View user profile,https://vagrant.dev.schoolbox.cloud/search/user/1
+CMS,View homepage statistics,https://vagrant.dev.schoolbox.cloud/homepage/153
+CMS,Get homepage RSS feed,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158
+CMS,Manage homepage group,https://vagrant.dev.schoolbox.cloud/group/modify/153
+LMS,Visit pending asses,https://vagrant.dev.schoolbox.cloud/learning/pending/
+LMS,Visit classes,https://vagrant.dev.schoolbox.cloud/learning/classes
+LMS,Visit Class List,https://vagrant.dev.schoolbox.cloud/learning/class/106
+LMS,Visit class markbook,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=
+LMS,Visit rubric markbook,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=
+LMS,Visit class,https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA
+LMS,View course list,https://vagrant.dev.schoolbox.cloud/course/list
+LMS,Import course into classes,https://vagrant.dev.schoolbox.cloud/course/import/2/folder/0/0?returnUrl=L2NvdXJzZS9saXN0
+LMS,Manage rubric capabilities on a course,https://vagrant.dev.schoolbox.cloud/rubric/manager/16
+LMS,View course markbook,https://vagrant.dev.schoolbox.cloud/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0
+LMS,View learning analytics,https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2
+LMS,View assessment calendar,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=
+LMS,Modify course,https://vagrant.dev.schoolbox.cloud/course/modify/2
+LMS,Create project,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1
+LMS,Create task,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1
+LMS,Create due work,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1
+LMS,Create quiz,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1
+LMS,View due work,https://vagrant.dev.schoolbox.cloud/learning/due
+LMS,View grades summary,https://vagrant.dev.schoolbox.cloud/learning/grades/25
+LMS,View grades for class,https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=
+LMS,View assessment with rubric and feedback history,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D
+Resource Booking,View all resources,https://vagrant.dev.schoolbox.cloud/resource-booking/item
+Resource Booking,View resource booking category,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5
+Resource Booking,View resource item,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5
+Resource Booking,Add new resource,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add
+Resource Booking,Book a resource,https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/1
+Resource Booking,View booking report,https://vagrant.dev.schoolbox.cloud/resource-booking/report
+Pastoral,View pastoral dashboard,https://vagrant.dev.schoolbox.cloud/pastoral
+Pastoral,View all reports,https://vagrant.dev.schoolbox.cloud/pastoral/report
+Pastoral,Create a report,https://vagrant.dev.schoolbox.cloud/pastoral/report/insert
+Pastoral,View a report,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1
+Pastoral,Group management,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups
+Pastoral,Create a group,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify
+Pastoral,Modify a group,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1
+Pastoral,Manage visibility,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience
+Pastoral,Create a record for student,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert
+Pastoral,View a record,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2
+News,Get an RSS feed,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all
+News,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
+News,View created by me,https://vagrant.dev.schoolbox.cloud/news/me
+News,View require moderation,https://vagrant.dev.schoolbox.cloud/news/moderation
+News,Create news,https://vagrant.dev.schoolbox.cloud/news/create
+News,Read news,https://vagrant.dev.schoolbox.cloud/news
+News,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
+News,View an individual news item,https://vagrant.dev.schoolbox.cloud/news/34
+News,View saved news,https://vagrant.dev.schoolbox.cloud/news/saved
+News,View news archive,https://vagrant.dev.schoolbox.cloud/news/archive
+News,Read news,https://vagrant.dev.schoolbox.cloud/news
+News,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
+Fixtures,Go to fixtures,https://vagrant.dev.schoolbox.cloud/fixtures
+Fixtures,See all seasons,https://vagrant.dev.schoolbox.cloud/fixtures/seasons
+Fixtures,Change a seacon,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit
+Fixtures,Add external schools if needed,https://vagrant.dev.schoolbox.cloud/fixtures/school
+Fixtures,Update match status,https://vagrant.dev.schoolbox.cloud/fixtures/statuses
+Fixtures,View all sports.,https://vagrant.dev.schoolbox.cloud/fixtures/sports
+Fixtures,See all sport types sport teams.,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2
+Fixtures,Check all venues.,https://vagrant.dev.schoolbox.cloud/fixtures/venues
+Fixtures,Add remove positions to sports team template,https://vagrant.dev.schoolbox.cloud/fixtures/sports/1/edit
+Fixtures,Assign players to team,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/lobby
+Fixtures,Edit venue,https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit
+Fixtures,Create a new season,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new
+Fixtures,Create a new venue,https://vagrant.dev.schoolbox.cloud/fixtures/venues/new
+Fixtures,Create new sport,https://vagrant.dev.schoolbox.cloud/fixtures/sports/new
+Fixtures,Add new division,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new
+Fixtures,Add new team,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new
+Fixtures,View all matches in a division,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches
+Fixtures,Add a new match to the division,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches/new?season=1
+Fixtures,Fixture match details,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1
+Fixtures,View team matches,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/1/matches
+Fixtures,Fixture match details,https://vagrant.dev.schoolbox.cloud/fixtures/matches/5/results/1
+ePortfolio,View their ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio
+ePortfolio,View their ePortfolio via home button nav,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+ePortfolio,View one of my pages.,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+ePortfolio,Add a new page,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+ePortfolio,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+ePortfolio,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+ePortfolio,Create a page on their students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+ePortfolio,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+ePortfolio,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+ePortfolio,Create a page on the students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+ePortfolio,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
+ePortfolio,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
+ePortfolio,Create a page on the students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+Search,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all"
+Search,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user"
+Search,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox"
+Search,View only news results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news"
+Search,Search and resieve no results.,"https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash"
+Search,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all"
+Search,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user"
+Search,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox"
+Search,View only news results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news"
+Search,Search and resieve no results.,"https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash"
+Search,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all"
+Search,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user"
+Search,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox"
+Search,View only news results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#news"
+Search,Search and resieve no results.,"https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash"
