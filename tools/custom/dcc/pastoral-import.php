@@ -172,7 +172,7 @@ $app = new class extends CliTool\App
 DCC Import pastoral records with attachments.
 
 You need to configure the following:
-  - pastoral fallback user id in /adminv2/setting/Pastoral+Care
+  - pastoral fallback user id
   - the Pastoral Type "Learning Support" in /adminv2/lists/pastoral-category
   - the Pastoral SubType "Reports and Files" in /adminv2/lists/pastoral-category
 
