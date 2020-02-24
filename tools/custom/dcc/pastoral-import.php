@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Query\IQuery;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -311,7 +312,6 @@ HELP;
     private function processData(): void
     {
         $statement = $this->externalDatabase->prepareQuery(self::QUERY);
-
         $statement->execute();
 
         $summary = [
@@ -369,6 +369,22 @@ HELP;
             /* Save it
              */
             $this->pastoralMapper->save($record);
+
+            /* Update idiosyncractically and specifically with the provided timestamps
+             */
+            /** @var IQuery $updateStatement */
+            $updateStatement = $this->getDi()->get('databaseInternal')->prepareQuery('
+                UPDATE pastoral
+                SET created_at = :createdAt,
+                updated_at = :updatedAt
+                WHERE id = :recordId
+            ');
+
+            $updateStatement->execute([
+                'createdAt' => $row['DocumentCreatedDate'],
+                'updatedAt' => $row['DocumentCreatedDate'],
+                'recordId' => $record->getId()
+            ]);
 
             /* Accept raw data into storage->accept()
              */
