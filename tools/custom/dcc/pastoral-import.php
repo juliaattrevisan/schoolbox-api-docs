@@ -145,6 +145,7 @@ HELP;
              * Assign values to pastoral record
              */
             $record = $pastoralMapper->createModel()
+                ->setStudent($student)
                 ->setHeading($row['Description'])
                 ->setOwner($owner)
             ;
