@@ -8,6 +8,10 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Mapper;
+use Schoolbox\Pastoral;
+use Schoolbox\Role;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -44,14 +48,22 @@ HELP;
             exit;
         }
 
-        $this->processData();
+        $this->processData(
+            UserMapper::getInstance(),
+            Pastoral\Mapper::getInstance()
+        );
     }
 
 
     /**
      * Process all the data
+     * @param UserMapper      $userMapper
+     * @param Pastoral\Mapper $pastoralMapper
      */
-    private function processData()
+    private function processData(
+        UserMapper $userMapper,
+        Pastoral\Mapper $pastoralMapper
+    )
     {
         $externalDatabase = Schoolbox\Database\Factory::getInstanceExternal();
 
@@ -78,8 +90,28 @@ HELP;
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
+            /* If the student of the record doesn't exist, skip them with a warning
+             */
+            try {
+                $student = $userMapper->findByExternalId($row['ID'], Role::STUDENT);
+            } catch (Mapper\Exception $e) {
+                $this->getLogger()->warning(sprintf(
+                    'Student %s was not found in schoolbox; skipping their pastoral record "%s"',
+                    $row['ID'],
+                    $row['Description']
+                ));
+
+                $summary['failure']++;
+
+                continue;
+            }
+
+
             /* Manufacture a pastoral record
              */
+            $record = $pastoralMapper->createModel()
+                ->setHeading($row['Description'])
+            ;
 
             /* Assign values to pastoral record
              */
