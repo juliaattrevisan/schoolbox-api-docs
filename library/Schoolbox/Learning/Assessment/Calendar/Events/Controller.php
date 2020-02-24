@@ -283,6 +283,7 @@ class Controller extends Base
                             'folderName'    => $event['data']['meta']['folderName']  ?? null,
                             'eventTypeId'   => $event['data']['meta']['eventTypeId'] ?? null,
                             'eventTypeName' => $event['data']['meta']['type']        ?? null,
+                            'colour'        => $event['data']['meta']['colour']      ?? null,
                         ],
                         'subEvents' => [],
                     ],
