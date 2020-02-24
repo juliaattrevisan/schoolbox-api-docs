@@ -56,6 +56,12 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Fallback id, and integer
+     */
+    private const OPT_LONG_FALLBACK_USER_ID = 'fallback:';
+
+
+    /**
      * @var UserMapper
      */
     private $userMapper;
@@ -138,6 +144,7 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_FALLBACK_USER_ID
         ];
     }
 
@@ -147,7 +154,9 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
+        $fallbackId = $this->getOpt(self::OPT_LONG_FALLBACK_USER_ID);
+
+        if ($this->getOpt(self::OPT_LONG_HELP) || !(bool)$fallbackId) {
             echo <<<HELP
 DCC Import pastoral records with attachments.
 
@@ -156,7 +165,7 @@ You need to configure the following:
   - the Pastoral Type "Learning Support" in /adminv2/lists/pastoral-category
   - the Pastoral SubType "Reports and Files" in /adminv2/lists/pastoral-category
 
-Usage: pastoral-import.php
+Usage: pastoral-import.php --fallback 1234
 
 HELP;
             exit;
@@ -180,7 +189,7 @@ HELP;
         /* Find out if someone set the Pastoral Fallback User ID
          * If it's not set, that'll be a problem
          */
-        $this->assignFallbackOwner((int)$this->getConfig()->get('pastoral_fallback_owner'));
+        $this->assignFallbackOwner((int)$fallbackId);
 
         /* Find the Pastoral Type "Learning Support" - it has to be called that exactly
          * If that isn't set, that'll be a problem
@@ -412,7 +421,7 @@ HELP;
                 $this->getLogger()->warning(sprintf(
                     'Assigning permission to role %s for record "%s"',
                         $role->getName(),
-                    $row['Description'],
+                    $row['Description']
                 ));
             }
 

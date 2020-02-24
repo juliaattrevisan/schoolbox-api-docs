@@ -1,2 +1,0 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`)
-VALUES ('pastoral_fallback_owner', '1', 'Fallback User ID', 'Fallback user account id for pastoral imports whose owner doesn\'t have a schoolbox account.', (SELECT id FROM lu_config_field WHERE field='input'), '', (SELECT id FROM lu_config_type WHERE type='Pastoral Care'), 'true', 'false', 'true', 'settings');
