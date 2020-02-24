@@ -172,6 +172,10 @@ Data:
                     {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId]|merge(extraComponentData) only %}
                 {% endif %}
 
+                {# Were we given HSC Task Marks data for this unit? This mark shares the same twig as AAM #}
+                {% if hscTaskMatrix.data is defined and hscTaskMatrix.data[unitSpecId] is defined %}
+                    {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with hscTaskMatrix.data[unitSpecId]|merge(extraComponentData) only %}
+                {% endif %}
                 {# Were we given HSC Task Marks data for this unit? #}
                 {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
                     {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
