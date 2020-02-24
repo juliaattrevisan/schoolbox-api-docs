@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
+use Alaress\Color\Color;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Calendar\Event\Collection;
@@ -162,7 +163,10 @@ class Api implements Calendar_Api_EventType_Interface
         $event->setDetail($assessment->getDescription());
         $event->setPublishDate($assessment->getPublishAt());
         $event->setResourceId($assessment->getId());
-
+        $folderColour = $assessment->getContext()->getFolder()->getColour();
+        if ($folderColour instanceof Color) {
+            $event->setColour($folderColour->getAsRgba());
+        }
         return $event;
     }
 }
