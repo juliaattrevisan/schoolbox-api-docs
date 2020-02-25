@@ -22,6 +22,9 @@ if (is_numeric($_REQUEST['cid'])) {
     $componentInstanceMapper       = Component_InstanceMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
+    //This is a hack to trick twig into thinking the component is on a homepage
+    $_GET['page'] = '/homepage/' . $_REQUEST['cid'];
+
 
     // AJAX request for drag and drop of components
     if ($_POST['cid'] && $_POST['type'] == 'components') {
@@ -181,8 +184,10 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             if (SitePage::detectAjax()) {
+
                 // Just refetch the instance
                 $instance   = $componentInstanceMapper->findByInstanceId($instance->getId());
+
                 $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
                 $renderer->renderHomepageComponent($folder, $controller);
