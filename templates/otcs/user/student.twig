@@ -1,0 +1,8 @@
+{% extends '@core/user/student.twig' %}
+
+{% block details_house %}
+    {% if externalUser.StudentHouseDescription %}
+        <dt class="small-4 medium-3 columns">Service:</dt>
+        <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
+    {% endif %}
+{% endblock details_house %}
