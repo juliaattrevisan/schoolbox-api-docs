@@ -51,7 +51,7 @@ table.rb {
                 }
 
                 &:hover {
-                    color: calc-text-color($content-ui-hover);
+                    background-color: lighten($content-ui-selected, 3%);
                     cursor: pointer;
                 }
             }
