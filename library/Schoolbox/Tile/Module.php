@@ -134,7 +134,7 @@ class Module extends BaseModule
         // superusers may edit dashboard tiles
 
         // Callback for extracting homepage from route params
-        $getHomepageCallback = function ($params) {
+        $getHomepageIdCallback = function ($params) {
             if($params['layout'] && $params['layout']->getFolder()) {
                 return $params['layout']->getFolder()->getId();
             }
@@ -145,11 +145,6 @@ class Module extends BaseModule
                 return $params['component']->getIdentifier();
             }
             return $params['homepage']->getId();
-        };
-
-        // Callback for extracting homepage ID from route params
-        $getHomepageIdCallback = function ($params) use ($getHomepageCallback) {
-            return $getHomepageCallback($params);
         };
 
         $rule = new Rule\Any(
