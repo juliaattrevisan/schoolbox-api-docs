@@ -1,0 +1,17 @@
+{% extends '@learning/coreClassLists.twig' %}
+
+
+            {% block table_header %}
+            <tr>
+                <th v-if="mailEnabled">
+                    <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="isAllSelected"/>
+                    <label for="select-all" class="checkbox-label"></label>
+                </th>
+                <th></th>
+                <th>Name</th>
+                <th class="show-for-large-up">Year Level</th>
+                <th class="show-for-medium-up">Service</th>
+                <th class="show-for-medium-up">Last Visited</th>
+                <th></th>
+            </tr>
+            {% endblock %}
