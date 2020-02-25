@@ -151,7 +151,7 @@ class Controller extends Base
 
         // Otherwise: redirect back to a return URL if there is one
         $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-        if (isset($returnUrl)) {
+        if (!empty($returnUrl)) {
             $href = Redirect::decode($returnUrl);
         } elseif ($layout->getHomepageTemplate()) {
             $href = '/adminv2/dashboard#' . $layout->getHomepageTemplate()->getId();
