@@ -528,12 +528,25 @@ class Controller extends Base
          */
         $selectedTab = array_shift(array_keys($tabs));
 
+        // Layout assessments in a tree for twig to render
+        foreach($filteredMarkbook->getAssessments() as $assessment) {
+            if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId()) {
+                $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['context'] = $assessment->getContext();
+                $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['assessments'][$assessment->getId()] = $assessment;
+            }
+            else {
+                $tree[$assessment->getContext()->getId()]['context'] = $assessment->getContext();
+                $tree[$assessment->getContext()->getId()]['assessments'][$assessment->getId()]['assessment'] = $assessment;
+            }
+        }
+
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
                 'student'               => $viewee,
                 'markbook'              => $filteredMarkbook,
+                'tree'                  => $tree,
                 'tabs'                  => $tabs,
                 'selectedTab'           => $selectedTab,
                 'canSeeShowcaseButton'  => $canSeeShowcaseButton,

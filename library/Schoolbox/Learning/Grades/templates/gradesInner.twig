@@ -14,9 +14,6 @@
         'longitudinalRubric'     array TODO either define array structure, or upgrade to object
 #}
 
-{% import '@learning/macro/urgency.twig' as urgency %}
-{% import '@learning/macro/dueDate.twig' as dueDate %}
-
 <script type="text/javascript">
     $(function () {
         $('[data-collapser="true"]').collapsable({
@@ -55,203 +52,64 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Activities</h2>
+        <section>
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-collapser]').collapsable();
+                });
+            </script>
 
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">Activities</h2>
-            <section>
-                <script type="text/javascript">
-                    $(function () {
-                        $('[data-collapser]').collapsable();
-                    });
-                </script>
-                <ul class="activity-list expandable-card">
-                    <li>
-                        <div class="unit">
-                            <div class="expander" data-collapser="unit"></div>
-                            <div class="small-12 card">
-                                <a href="#" title="">
-                                    <h3>UNIT NAME</h3>
-                                </a>
-                            </div>
+            {% for unit in tree %}
+            <ul class="activity-list expandable-card">
+                <li>
+                    <div class="unit">
+                        <div class="expander" data-collapser="unit"></div>
+                        <div class="small-12 card">
+                            <a href="#" title="{{ unit.context.title }}">
+                                <h3>{{ unit.context.title }}</h3>
+                            </a>
                         </div>
-                        <div class="hide" data-collapse-state="collapsed" data-collapsable="unit">
-                            <ul>
-                                <li class="project">
-                                    <div class="flex-grade">
-                                        <div class="small-12 card columns">
-                                            <a href="/learning/assessments/648/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDIwLTEvODM%3D">
-                                                <h3>Project Name</h3>
-                                            </a>
-                                            <p>
-                                                <span class="meta">Project</span>
-                                            </p>
-                                        </div>
-                                        <div class="assess-status">
-                                            <span data-status="" data-assessment-status-light="" class="progress-tick no-text tiny reviewed" title="Reviewed"></span>
-                                            <span data-status-label="" data-assessment-status-text="">Reviewed</span>
-                                        </div>
-                                        <div class="grade gradient-4-bg">
-                                            <span>5.67 / 12</span>
-                                        </div>
-                                    </div>
-                                    <ul>
-                                        <li class="assessment">
-                                            <div class="flex-grade">
-                                                <div class="small-12 card columns">
-                                                    <h3>
-                                                        <a href="/learning/assessments/648/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDIwLTEvODM%3D">
-                                                            Assessment Name
-                                                        </a>
-                                                    </h3>
-                                                    <p><span class="meta">Task</span></p>
-                                                </div>
-                                                <div class="assess-status">
-                                                    <span data-status="" data-assessment-status-light="" class="progress-tick no-text tiny reviewed" title="Reviewed"></span>
-                                                    <span data-status-label="" data-assessment-status-text="">Reviewed</span>
-                                                </div>
-                                                <div class="grade gradient-4-bg">
-                                                    <span>5.67 / 12</span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="assessment">
-                                            <div class="flex-grade">
-                                                <div class="small-12 card columns">
-                                                    <a href="/learning/assessments/648/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDIwLTEvODM%3D">
-                                                        <h3>Assessment Name</h3>
-                                                    </a>
-                                                    <p><span class="meta">Task</span></p>
-                                                </div>
-                                                <div class="assess-status">
-                                                    <span data-status="" data-assessment-status-light="" class="progress-tick no-text tiny reviewed" title="Reviewed"></span>
-                                                    <span data-status-label="" data-assessment-status-text="">Reviewed</span>
-                                                </div>
-                                                <div class="grade gradient-4-bg">
-                                                    <span>5.67 / 12</span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </section>
-            <section>
-                <ul class="action-list">
-                    {% for assessment in markbook.assessments %}
-                        {% set participant = assessment.participantIfExtant(student) %}
-                        {% if participant %}
-                            {% set folder = assessment.baseContext.folder %}
+                    </div>
+                    <div class="" data-collapse-state="" data-collapsable="unit">
+                        <ul>
+                            {% for assessment in unit.assessments %}
+                            {% if assessment.assessments | length %}
+                            <li class="project">
+                                {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment.assessment, participant: assessment.assessment.participantIfExtant(student)} only %}
+                                <ul>
+                                    {% for projectAssessment in assessment.assessments %}
+                                    <li class="assessment">
+                                        {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: projectAssessment, participant: projectAssessment.participantIfExtant(student)} only %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% else %}
                             <li>
-                                <div class="flex-grade">
-                                    <div class="small-12 card columns">
-                                        {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessment.id, assessment: assessment, studentId: student.id, student: student}) %}
-
-                                        {% if summaryRoute %}
-                                        <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
-                                            <h3>{{ assessment.title }}</h3>
-                                        </a>
-                                        {% else %}
-                                            <h3>{{ assessment.title }}</h3>
-                                        {% endif %}
-
-                                        <p>
-                                            <span class="meta">{{ assessment.typeName }}</span>
-                                            <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
-
-                                            {% if assessment is quiz and participant.allResponses | length %}
-                                            <span class="pipe meta">
-                                                <a href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, userId: student.id}) }}"
-                                                   title="View Attempts">View Attempts</a>
-                                            </span>
-                                            {% endif %}
-                                        </p>
-                                    </div>
-                                    {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
-                                    {% if assessment.isFeedbackVisibleToUser(USER) %}
-                                        {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
-
-                                        {% if assessment is task %}
-                                            {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                            assessment: assessable,
-                                            student: participant.user
-                                            } only %}
-                                        {% else %}
-                                            <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
-                                                <span>{{ assessment.humanReadableMark(participant, true) }}</span>
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                </div>
-
-{#                                <nav>#}
-{#                                    {% if assessment is dueWork and feedback and student.eportfolioEnable %}#}
-{#                                        {% if canSeeShowcaseButton %}#}
-{#                                            <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"#}
-{#                                               title="Publish to ePortfolio"></a>#}
-{#                                            <form action="/eportfolio/showcase/modifyForm.php" method="post"#}
-{#                                                  data-publish-to-eportfolio-form="{{ assessment.id }}">#}
-{#                                                <input type="hidden" name="action" value="publish">#}
-{#                                                <input type="hidden" name="userId" value="{{ student.id }}">#}
-{#                                                <input type="hidden" name="assessmentId" value="{{ assessment.id }}">#}
-{#                                            </form>#}
-{#                                            <script type="text/javascript">#}
-{#                                                $(function () {#}
-{#                                                    #}{# Publish to ePortfolio #}
-{#                                                    $('[data-publish-to-eportfolio]').click(function (event) {#}
-{#                                                        event.preventDefault();#}
-
-{#                                                        var assessmentId = $(this).data('publishToEportfolio');#}
-
-{#                                                        $(this).confirmDialog({#}
-{#                                                            header: "Publish to ePortfolio Showcase",#}
-{#                                                            text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',#}
-{#                                                            confirmEvent: function () {#}
-{#                                                                $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({#}
-{#                                                                    activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'#}
-{#                                                                });#}
-{#                                                            }#}
-{#                                                        });#}
-{#                                                    });#}
-{#                                                });#}
-{#                                            </script>#}
-{#                                        {% endif %}#}
-{#                                    {% endif %}#}
-{#                                </nav>#}
-
-                                {% if assessment.isFeedbackVisibleToUser(USER) %}
-                                    {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
-                                    {% if feedback %}
-                                    <div class="content">
-                                        <p class="comment">{{ feedback.comment | nl2br }}</p>
-                                        {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
-                                            <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
-                                                View assessment details</a>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-                                {% endif %}
+                                {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment.assessment, participant: assessment.assessment.participantIfExtant(student)} only %}
                             </li>
                         {% endif %}
-                    {% endfor %}
-                </ul>
-                <div class="toast" data-alert="" id="publish-to-eportfolio-label"></div>
-            </section>
-        </div>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            {% endfor %}
+            <div class="toast" data-alert="" id="publish-to-eportfolio-label"></div>
+        </section>
     </div>
+</div>
 {% else %}
-
-    <div class="row">
-        <div class="small-12 island">
-            <div class="empty-state">
-                <i class="icon-due-work"></i>
-                <p>No activities match your filter selections.</p>
-            </div>
+<div class="row">
+    <div class="small-12 island">
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>No activities match your filter selections.</p>
         </div>
     </div>
-
+</div>
 {% endif %}
 
