@@ -1,0 +1,21 @@
+-- Add caching time for travelLog api
+INSERT INTO config (name,
+                    value,
+                    title,
+                    description,
+                    field_id,
+                    options,
+                    type_id,
+                    editable,
+                    hidden,
+                    required)
+VALUES ('travelLog_api_caching',
+        '300',
+        'Travel Log API Update Frequency',
+        'How long Travel Log data should be cached for before being re-queried',
+        (SELECT id FROM lu_config_field WHERE field = 'input'),
+        '',
+        (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
+        'false',
+        'true',
+        'true');
