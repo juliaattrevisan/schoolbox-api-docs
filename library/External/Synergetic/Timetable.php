@@ -288,7 +288,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         return 'Day ' . $dayNumber;
     }
 
-
     /**
      * @inheritDoc
      */
