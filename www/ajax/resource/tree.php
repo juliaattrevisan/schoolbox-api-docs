@@ -33,7 +33,7 @@ if (count($this->arg) != 1) {
 }
 
 $source     = $this->arg[0];
-$resourceId = isset($_REQUEST['relationID']) ? $_REQUEST['relationID'] : 0;
+$resourceId = isset($_REQUEST['relationID']) && is_numeric($_REQUEST['relationID']) ? $_REQUEST['relationID'] : 0;
 $useFolders = true;            // allow folder selection
 $mimeFilter = Node::ALL_FILES; // show all files by default
 
