@@ -1,6 +1,5 @@
 {% set participant = assessable.getParticipantIfExtant(student) %}
 {% if participant %}
-<div class="assess-status">
     {% set pStatusText %}
         {%- spaceless %}
             {% if participant.responseRequired %}
@@ -62,5 +61,5 @@
           class="progress-tick no-text tiny {{ pStatusClass }}" title="{{ pTooltip }}"></span>
     <span data-status-label
           data-assessment-status-text>{{ pStatusText }}</span>
-</div>
+</span>
 {% endif %}

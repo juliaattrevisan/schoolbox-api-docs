@@ -7,19 +7,23 @@
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
+
 
 <div class="flex-grade">
     <div class="small-12 card columns">
         {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessment.id, assessment: assessment, studentId: participant.user.id, student: participant.user}) %}
         {% if summaryRoute %}
             <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
-                <h3>{{ assessment.title }}</h3>
+                <span class="{{ icon.renderClass(assessment) }}"></span>
+                <p>{{ assessment.title }}</p>
             </a>
         {% else %}
-            <h3>{{ assessment.title }}</h3>
+            <p>{{ assessment.title }}</p>
         {% endif %}
         <p>
-            <span class="meta">{{ assessment.typeName }}</span>
+            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: participant.user} only %}
+            <span class="pipe meta">{{ assessment.typeName }}</span>
             <span class="pipe meta">{{ dueDate.dueDate(assessment, participant.user) }}</span>
             {% if assessment is quiz and participant.allResponses | length %}
             <span class="pipe meta">
@@ -29,7 +33,7 @@
             {% endif %}
         </p>
     </div>
-    {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: participant.user} only %}
+
     {% if assessment.isFeedbackVisibleToUser(USER) %}
         {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
         {% if assessment is task %}
@@ -45,7 +49,7 @@
     {% endif %}
 </div>
 {% if assessment.isFeedbackVisibleToUser(USER) %}
-    {% if feedback %}
+    {% if feedback.comment   %}
         <div class="content">
             <p class="comment">{{ feedback.comment | nl2br }}</p>
             {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}

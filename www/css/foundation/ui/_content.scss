@@ -1026,16 +1026,30 @@ $selector-width: 2.25rem;
     }
     // Grades expandable layout
     .unit {
-        border-bottom: 1px solid $body-bg;
+        border-top: 2px solid $body-bg;
 
         .card {
             padding: 0.5rem 0 .5rem 0;
         }
     }
+    .unit ~ [data-collapsable] ul li:first-child {
+        border-top: 0;
+    }
+    .assessment {
+        border-top: 1px solid $body-bg;
+
+        .progress-tick.tiny {
+            margin-left: 0;
+        }
+    }
     .project .assessment {
         background-color: $vapor;
         border-top: 1px solid $body-bg;
-        border-left: 1rem solid $white;
+        border-left: 3rem solid $white;
+
+        @media #{$small-only} {
+            border-left: 1rem solid $white;
+        }
     }
 }
 
