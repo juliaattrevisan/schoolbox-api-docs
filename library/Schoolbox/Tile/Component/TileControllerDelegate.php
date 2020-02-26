@@ -16,23 +16,11 @@ namespace Schoolbox\Tile\Component;
 use Component_ControllerAbstract;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Tile\Layout;
-use Twig_Environment;
 
 class TileControllerDelegate
 {
-
     /**
-     * @var Layout\Model
-     */
-    protected $layout;
-
-    /**
-     * @var Twig_Environment
-     */
-    protected $templateEngine;
-
-    /**
-     * Loads the grid component into its set configuration.
+     * Fetches the tile layout that is referenced by the component.
      *
      * @param Component_ControllerAbstract $controller
      *

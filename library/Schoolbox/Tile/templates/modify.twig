@@ -53,19 +53,7 @@
 })(jQuery);
 </script>
 
-<ul class="breadcrumb">
-    {% if component.module == 'dashboard' %}
-        <li><a href="/adminv2/home">Admin</a></li>
-        <li><a href="/adminv2/dashboard#{{ component.identifier }}">Dashboard</a></li>
-    {% elseif component.module == 'homepage_template' %}
-        <li><a href="/adminv2/home">Admin</a></li>
-        <li><a href="/adminv2/homepage#{{ component.identifier }}">Homepages</a></li>
-    {% else %}
-        <li><a href="/homepage/{{ folder.id }}#component{{ component.id }}">{{ folder.title }}</a></li>
-    {% endif %}
-    <li><a href="{{ layout ? routeLookup('tile.layout', {layoutId: layout.id}) : '#' }}">Tiles</a></li>
-    <li class="active"><a href="#">{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</a></li>
-</ul>
+{% include '@tile/sub/breadcrumbs.twig' with {layout: layout, tile: item} only %}
 
 <div class="row">
     <div class="list-item">
@@ -77,7 +65,13 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="tile-modify-form" name='form' action="{{ formAction }}" method="post" enctype="multipart/form-data">
+        <form id="tile-modify-form"
+              name='form'
+              action="{{ item.id
+                  ? routeLookup('tile.update:post', {id: item.id})
+                  : routeLookup('tile.create', {layoutId: layout.id})
+              }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
+              method="post">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
 
             <h2 class="subheader">Title</h2>
@@ -250,7 +244,7 @@
                             <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
                         </label>
                         <div class="input-group">
-                            <input name="link" id="link" type="text" value="{{ item.link|e('html_attr') }}" placeholder="http://" />
+                            <input name="link" id="link" type="text" value="{{ item.link|e('html_attr') }}" placeholder="https://" />
                             <a href="#" class="button icon-folder" data-function="browse">Browse Resources</a>
                             {# Dialog for resource browser #}
                             <div class="hide" data-resource-browser></div>

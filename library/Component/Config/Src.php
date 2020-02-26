@@ -36,7 +36,7 @@ class Component_Config_Src extends Component_Config_Abstract
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
         $vars = array(
-            'COMPONENT_CONFIG_SRC_ID'   => '#',
+            'COMPONENT_CONFIG_SRC_ID'   => '',
             'COMPONENT_CONFIG_SRC_NAME' => 'Local',
             'COMPONENT_CONFIG_SRC_CID'  => '0'
         );

@@ -11,9 +11,7 @@ namespace Schoolbox\Tile\Component;
 
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Tile\Layout;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
 
@@ -23,12 +21,12 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     /**
      * @var Layout\Model
      */
-    protected $layout;
+    private $layout;
 
     /**
      * @var TileControllerDelegate
      */
-    protected $delegate;
+    private $delegate;
 
     /**
      * Injectable constructor
@@ -53,11 +51,11 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function execute()
     {
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+        if ($this->isUsingAltSource() && $this->getSource()->isDeleted()) {
             return false;
         }
 
-        $this->setLayout($this->delegate->fetchLayout($this));
+        $this->layout = $this->delegate->fetchLayout($this);
         return true;
     }
 
@@ -68,15 +66,15 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->getLayout()->getTileList()->count()) {
+        if ($this->layout->getTileList()->count()) {
             return $this->renderTwigTemplate(
                 $templateHandle,
                 '@tile/component/tile.twig',
-                array(
+                [
                     'component'   => $this,
                     'showButtons' => false,
                     'writeAccess' => false,
-                ),
+                ],
                 !$this->getConfig('compactMode'),
                 false
             );
@@ -86,20 +84,12 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     }
 
     /**
+     * Required so that Twig may access this component's layout.
+     *
      * @return Layout\Model
      */
     public function getLayout()
     {
         return $this->layout;
-    }
-
-    /**
-     * @param  Layout\Model $layout
-     * @return $this
-     */
-    public function setLayout($layout)
-    {
-        $this->layout = $layout;
-        return $this;
     }
 }

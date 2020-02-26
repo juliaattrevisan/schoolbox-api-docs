@@ -40,7 +40,7 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'layout', $basePath, '/layout/{layoutId}');
-        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{layoutId}');
+        $this->addPostRoute($router, 'layoutForm', $basePath, '/layout/{layoutId}');
 
         // Attach standard REST routes...
         $this->attachResourceRoutes($router, $basePath);
@@ -51,10 +51,6 @@ class Module extends BaseModule
 
         // also have separate paths for adding a tile to a component (will create a new layout)
         $this->addGetRoute($router, 'addToComponent', $basePath, '/add/component/{componentId}');
-        $this->addPostRoute($router, 'createForComponent', $basePath , '/add/component/{componentId}');
-
-        // also have separate paths for layouts for component
-        $this->addGetRoute($router, 'layoutForComponent', $basePath , '/layout/component/{componentId}');
     }
 
     /**
@@ -101,34 +97,21 @@ class Module extends BaseModule
             }
         );
 
-        // All routes: look up homepage from component
-        // (if this component belongs to the homepage!)
+        // Component-related routes only: look up homepage from component
         $this->addRoutePreload(
             $matcher,
-            '.*',
+            '(?:addToComponent)',
             function ($params) {
                 // Load component first
                 $component = null;
                 if ($params['componentId']) {
                     $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
-
-                } elseif ($params['layout'] instanceof Layout\Model) {
-                    $layoutId  = $params['layout']->getId();
-                    $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
-                        'layoutId',
-                        $layoutId
-                    )->first();
                 }
 
                 // Load homepage from component
                 $extraParams = [];
                 if ($component instanceof Component_Instance) {
                     $extraParams['component'] = $component;
-                    if ($component->isHomepage()) {
-                        $extraParams['homepage'] = $this->getFolderMapper()->findByIdWithFallback(
-                            $component->getIdentifier()
-                        );
-                    }
                 }
                 return $extraParams;
             }
@@ -151,17 +134,17 @@ class Module extends BaseModule
         // superusers may edit dashboard tiles
 
         // Callback for extracting homepage from route params
-        $getHomepageCallback = function ($params) {
-            if ($params['component']->getModule() != 'homepage') {
+        $getHomepageIdCallback = function ($params) {
+            if($params['layout'] && $params['layout']->getFolder()) {
+                return $params['layout']->getFolder()->getId();
+            }
+            else if ($params['component']->getModule() != 'homepage') {
                 throw new \Exception('Homepage permission does not apply to dashboard tiles');
             }
-            return $params['homepage'];
-        };
-
-        // Callback for extracting homepage ID from route params
-        $getHomepageIdCallback = function ($params) use ($getHomepageCallback) {
-            $homepage = $getHomepageCallback($params);
-            return $homepage->getId();
+            else if($params['component']) {
+                return $params['component']->getIdentifier();
+            }
+            return $params['homepage']->getId();
         };
 
         $rule = new Rule\Any(
@@ -186,7 +169,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 TileController::class,
                 [

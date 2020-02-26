@@ -324,7 +324,12 @@ class Kernel extends WebKernelAbstract
                         [
                             'name'     => Redirect::RETURN_URL,
                             'current'  => $encodedUrl,
-                            'previous' => $_REQUEST[Redirect::RETURN_URL] ?? $encodedUrl,
+                            'previous' => [
+                                'encoded' => $_REQUEST[Redirect::RETURN_URL] ?? null,
+                                'decoded' => isset($_REQUEST[Redirect::RETURN_URL])
+                                    ? Redirect::decode($_REQUEST[Redirect::RETURN_URL])
+                                    : null,
+                            ]
                         ]
                     );
 

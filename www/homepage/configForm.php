@@ -22,6 +22,15 @@ if (is_numeric($_REQUEST['cid'])) {
     $componentInstanceMapper       = Component_InstanceMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
+    /* The RETURN_URL twig global presumes that the encoded portion comes from $_GET['page']
+     * without it, returnUrl will be an empty string which, when clicked, sends users to a
+     * completely blank screen. This hack fulfils the expected requirements in
+     * library/Alaress/Application/Kernel.php:876
+     */
+
+    //This is a hack to trick twig into thinking the component is on a homepage
+    $_GET['page'] = '/homepage/' . $_REQUEST['cid'];
+
 
     // AJAX request for drag and drop of components
     if ($_POST['cid'] && $_POST['type'] == 'components') {
@@ -181,8 +190,10 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             if (SitePage::detectAjax()) {
+
                 // Just refetch the instance
                 $instance   = $componentInstanceMapper->findByInstanceId($instance->getId());
+
                 $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
                 $renderer->renderHomepageComponent($folder, $controller);
