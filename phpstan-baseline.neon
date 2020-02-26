@@ -3401,6 +3401,11 @@ parameters:
 			path: library/Eportfolio/Page/Instance.php
 
 		-
+			message: "#^PHPDoc tag @return with type array\\|null is not subtype of native type array.#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
+
+		-
 			message: "#^Variable \\$allImages in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentImage$#"
 			count: 1
 			path: library/Eportfolio/Page/Profile.php
@@ -8606,8 +8611,13 @@ parameters:
 			path: library/Schoolbox/External/Connector/IDocument.php
 
 		-
+			message: "#^Access to an undefined property Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\:\\:\\$SchoolId\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Profile/Profile.php
+
+		-
 			message: "#^Access to an undefined property Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\:\\:\\$SchoolCode\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Profile/Profile.php
 
 		-
