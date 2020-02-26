@@ -122,8 +122,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         }
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
         return $this->interactionChecker->assertCanReceiveInteractions($object->getOwner(), $assessment);
-
-
     }
 
 
