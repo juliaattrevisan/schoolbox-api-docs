@@ -155,9 +155,9 @@ $(function() {
 
         fy = $('#footer').height();
 
-        $(window).on('resize', function () {
+        $(window).on('load resize', function () {
             l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
-        }).trigger('resize');
+        });
 
         // Validation of terms and conditions
         l.alaressValidate({
