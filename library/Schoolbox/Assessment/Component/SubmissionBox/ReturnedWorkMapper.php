@@ -44,7 +44,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         parent::__construct();
         $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
             Participant\Plan\Mapper::getInstance(),
-            Participant\Mapper::getInstance()
+            Participant\Mapper::getInstance(),
+            $this->getConfigLoader()
         );
     }
 
@@ -121,6 +122,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         }
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
         return $this->interactionChecker->assertCanReceiveInteractions($object->getOwner(), $assessment);
+
+
     }
 
 
@@ -137,12 +140,15 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     public function insertParticipation(ReturnedWork $object, ReturnedWork $previous = null): bool
     {
-        if($previous){
-            // If an update, assume the participation record already exists
-            return true;
-        }
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
-        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
+        if (!$previous) {
+            $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
+        }
+        if ($object->isPublished() && $object->getResubmissionRequired() && !$previous->isPublished()) {
+            $this->interactionChecker->createPlanForResubmission($object->getOwner(), $assessment);
+        }
+
+        return true;
     }
 
 

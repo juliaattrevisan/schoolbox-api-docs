@@ -8,7 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Participant\Plan;
 
+use Schoolbox\Comms\News\ValidDateOffset;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\User;
@@ -34,15 +37,22 @@ class InteractionIntegrityChecker
      */
     private $participantMapper;
 
+    /**
+     * @var IConfigLoader
+     */
+    private $config;
+
 
     /**
      * @param Mapper             $planMapper
      * @param Participant\Mapper $participantMapper
+     * @param IConfigLoader      $config
      */
-    public function __construct(Mapper $planMapper, Participant\Mapper $participantMapper)
+    public function __construct(Mapper $planMapper, Participant\Mapper $participantMapper, IConfigLoader $config)
     {
         $this->planMapper        = $planMapper;
         $this->participantMapper = $participantMapper;
+        $this->config            = $config;
     }
 
 
@@ -62,6 +72,7 @@ class InteractionIntegrityChecker
      * @throws SchoolboxMapper\DefinitionException
      * @throws InvalidState If inserting an interaction would cause the system to enter an invalid state
      * @throws InvalidArgumentException If assessment not sufficiently hydrated
+     * @throws SchoolboxMapper\Exception
      */
     public function assertCanReceiveInteractions(User $student, Assessment\Model $assessment): bool
     {
@@ -81,6 +92,62 @@ class InteractionIntegrityChecker
             }
         }
         return true;
+    }
+
+
+    /**
+     * Creates or updates a plan when resubmission is requested, to allow submission after the original close date
+     * @param User             $student
+     * @param Assessment\Model $assessment
+     * @throws SchoolboxMapper\Exception
+     */
+    public function createPlanForResubmission(User $student, Assessment\Model $assessment): void
+    {
+        $this->loadPlansAndParticipants($assessment);
+        $participant = $this->findParticipation($student, $assessment);
+        $currentPlan = $participant->getPlan();
+
+        $expireDateOffset = (string)$this->config->get(ConfigMapper::NAME_LMS_RESUBMIT_WINDOW);
+        if (!(new ValidDateOffset())->isSatisfiedBy($expireDateOffset)) {
+            // the config is not set properly, don't bother amending the close date
+            return;
+        }
+
+        $possibleCloseDate = \Alaress_Date_Format::now()->modify($expireDateOffset);
+        $currentCloseDate  = $currentPlan->getIsDynamic() ? $assessment->getCloseDate() : $currentPlan->getCloseDate();
+        if ($possibleCloseDate->lte($currentCloseDate)) {
+            return;
+        }
+
+        if ($currentPlan->isDynamic()) {
+            // Default plan - Create a new plan
+            $newPlan = $this->planMapper->createModel()
+                                        ->setIsDynamic(false)
+                                        ->setAssessment($assessment)
+                                        ->setName('ReSubmit')
+                                        ->setPublishDate($assessment->getPublishDate())
+                                        ->setOpenDate($assessment->getOpenDate())
+                                        ->setDueDate($assessment->getDueDate())
+                                        ->setCloseDate($possibleCloseDate);
+            $this->planMapper->save($newPlan);
+
+            $participant->setPlan($newPlan);
+            $this->participantMapper->save($participant);
+        } elseif ($currentPlan->getParticipants()->count() > 1) {
+            // Custom plan shared with another student
+            $newPlan = clone $currentPlan;
+            $newPlan->setId(null)
+                ->setName($currentPlan->getName() . ' ReSubmit')
+                ->setCloseDate($possibleCloseDate);
+            $this->planMapper->save($newPlan);
+
+            $participant->setPlan($newPlan);
+            $this->participantMapper->save($participant);
+        } else {
+            // Custom plan with this user only - Amending the close date
+            $participant->getPlan()->setCloseDate($possibleCloseDate);
+            $this->planMapper->save($participant->getPlan());
+        }
     }
 
 
@@ -130,6 +197,7 @@ class InteractionIntegrityChecker
      * @param Assessment\Model $assessment
      * @throws SchoolboxMapper\DefinitionException
      * @throws InvalidArgumentException If assessment is not sufficiently hydrated
+     * @throws SchoolboxMapper\Exception
      */
     private function loadPlansAndParticipants(Assessment\Model $assessment): void
     {
