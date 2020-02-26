@@ -595,84 +595,15 @@
             </script>
         {% endautoescape %}
 
+        {# Import Feedback
+         #
+         # Copy directly from a spreadsheet into this textarea. The plugin busts its contents
+         # into the quickmark (status) screen's input fields accordingly.
+         #}
+        <script type="text/javascript" src='/javascript/shared/submissions/jquery.import-feedback.js'></script>
         <script>
             $(function() {
-                /* Validation
-                 */
-                $('#importFeedbackForm').alaressValidate({
-                    rules: {
-                        importFeedbackType: "required",
-                        importFeedbackInput: "required"
-                    },
-                    onfocusout: false,
-                    onkeyup: false
-                });
-
-                /* Try to process data
-                 */
-                $('#importFeedbackForm [data-submit]').on('click', function(event) {
-                    event.preventDefault();
-
-                    /* If valid, start processing data
-                     */
-                    if ($('#importFeedbackForm').valid()) {
-                        var rows = $('#importFeedbackInput').val().split("\n");
-
-                        /* Find out which prototype to use
-                         */
-                        var dataFormat = $('#importFeedbackForm input[name="importFeedbackType"]:checked').val();
-
-                        /* Ignore any rows without a student identifier
-                         * Trigger autosave upon change for instant feedback on your feedback
-                         * Assign data in one of three slightly-different ways
-                         */
-                        var assign;
-
-                        if (dataFormat === 'mark-only') {
-                            assign = function(input, form) {
-                                $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
-                            }
-                        } else if (dataFormat === 'comment-only') {
-                            assign = function(input, form) {
-                                $(form).find('textarea[name="comment"]').val(input[1]).change();
-                            }
-                        } else {
-                            assign = function(input, form) {
-                                $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
-                                $(form).find('textarea[name="comment"]').val(input[2]).change();
-                            }
-                        }
-
-                        /* For every row, find the student id, mark and comments and
-                         * assign them to #mark-12345 and #comment-12345 as required
-                         */
-                        for (var i = 0; i < rows.length; i++) {
-
-                            /* Condense multiple tabs into one tab
-                             * Multiple tabs occurs when you split-select columns in excel
-                             * such as selecting column A and column D
-                             */
-                            var input = rows[i].replace(/\t\t+/g, "\t").split("\t");
-
-                            var id = $.trim(input[0]);
-
-                            if (id) {
-                                assign(input, $('#assessment-status [data-participant-external-id="'+id+'"] [data-feedback-form]'));
-                            }
-                        }
-
-                        /* Close the modal
-                         */
-                        $('#importFeedbackModal').foundation('reveal', 'close');
-                    }
-                });
-
-                /* Close modal via Cancel button
-                 */
-                $('#importFeedbackForm [data-cancel]').on('click', function(event) {
-                    event.preventDefault();
-                    $('#importFeedbackModal').foundation('reveal', 'close');
-                });
+                $('#importFeedbackForm').importFeedback();
             });
         </script>
         <div id="importFeedbackModal" class="reveal-modal" data-reveal>
