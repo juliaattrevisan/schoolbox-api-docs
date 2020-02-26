@@ -137,12 +137,12 @@ class Classes implements IStrategy
      * @param string $ext
      * @param array  $periods
      * @param string $day
-     * @param string|null $periodName
+     * @param int $sequence
      * @return TimetablePeriod|null
      */
-    private function findPeriod(string $ext, array $periods, string $day, ?string $periodName): ?TimetablePeriod
+    private function findPeriod(string $ext, array $periods, string $day, int $sequence): ?TimetablePeriod
     {
-        return $periods['ext'][$ext]['day'][$day]['period'][$periodName] ?? null;
+        return $periods['ext'][$ext]['day'][$day]['period'][$sequence] ?? null;
     }
 
 
@@ -279,18 +279,18 @@ class Classes implements IStrategy
                      * If the period doesn't correspond to something in our timetable definition,
                      * we can't process it anyway, so skip it
                      */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['period']);
+                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['sequence']);
 
                     if (null === $timetablePeriod) {
                         continue;
                     }
 
                     $this->log->info(sprintf(
-                        'Looking for ext_timetable_code %s, week %s, day %s, period %s',
+                        'Looking for ext_timetable_code %s, week %s, day %s, period with sequence %s',
                         $ext,
                         $currentWeekOffset,
                         $dayNum,
-                        $subject['period']
+                        $subject['sequence']
                     ));
 
                     /* Assemble the pieces
@@ -299,10 +299,10 @@ class Classes implements IStrategy
                         $timetableClass = $this->createTimetableClass($subject);
                     } catch(UnexpectedValueException $e) {
                         $this->log->info(sprintf(
-                            'No classes found for student %s, day %s, period %s',
+                            'No classes found for student %s, day %s, period with sequence %s',
                             $studentId,
                             $dayNum,
-                            $subject['period']
+                            $subject['sequence']
                         ));
 
                         continue;
@@ -325,15 +325,20 @@ class Classes implements IStrategy
                             $timetableClass->getName(),
                             $timetableClass->getCode()
                         ));
-                    } elseif (!isset($users[$student['username']])) {
-                        $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
-                            $student['username'],
-                            $student['externalId'],
-                            $timetableClass->getName(),
-                            $timetableClass->getCode()
-                        ));
                     } else {
+
+                        /* Nonexistent users get a warning, but assign their external ids anyway
+                         */
+                        if (!isset($users[$student['username']])) {
+                            $this->log->warning(sprintf(
+                                'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
+                                $student['username'],
+                                $student['externalId'],
+                                $timetableClass->getName(),
+                                $timetableClass->getCode()
+                            ));
+                        }
+
                         $this->createTimetableClassInvolvement($student, $timetableClass);
                     }
 

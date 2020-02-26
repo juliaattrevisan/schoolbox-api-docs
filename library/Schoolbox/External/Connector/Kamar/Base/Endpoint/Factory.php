@@ -289,9 +289,6 @@ class Factory
             $this->parentProfileMapper,
             $this->staffProfileMapper,
             $this->relationshipMapper,
-            $this->timetableCampusMapper,
-            $this->timetableCycleMapper,
-            $this->timetablePeriodMapper,
             $this->classEntryMapper,
             $this->classInvolvementMapper,
             $this->classPeriodMapper
@@ -316,15 +313,8 @@ class Factory
         }
 
         /* Set up the Timetable definition separately from the masses of timetable-related xml files
+         * Schools must do this via a timetableStructure import csv
          */
-        $bus->add(new Timetable\Definition(
-            $this->log,
-            $this->perform,
-            $this->campusMapper,
-            $this->timetableCampusMapper,
-            $this->timetableCycleMapper,
-            $this->timetablePeriodMapper
-        ));
 
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
