@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporter\Test;
+namespace Schoolbox\Assessment\Rubric\Grid\Importer\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;

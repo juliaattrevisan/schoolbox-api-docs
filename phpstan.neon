@@ -5,9 +5,16 @@ parameters:
         - %rootDir%/../../../test/behavior/bootstrap
         - %rootDir%/../../../test/notif/tests
     bootstrap: %rootDir%/../../../conf/core/require.php
-    level: 0
+    level: 2
     paths:
         - conf
         - dav
         - library
         - tools
+    inferPrivatePropertyTypeFromConstructor: true
+    excludes_analyse:
+        - library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
+        - library/Alaress/Twitter/Loader/oauth/OAuth.php
+        - library/Alaress/Twitter/Loader/Test/ValidOAuthTest.php
+includes:
+	- phpstan-baseline.neon

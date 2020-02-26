@@ -1,3 +1,3 @@
 <?php
-abstract class Evaluation_Question_Truefalse extends Evaluation_Question {
+abstract class Evaluation_Question_TrueFalse extends Evaluation_Question {
 }
