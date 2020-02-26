@@ -10,7 +10,6 @@ use Alaress\Redis;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use Schoolbox\IConfigLoader;
 
 /**
  *
@@ -42,10 +41,6 @@ class TravelLog
      */
     private $cache;
 
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
 
     /**
      * TravelLog constructor.
@@ -53,9 +48,8 @@ class TravelLog
      * @param string        $clientId
      * @param string        $clientSecret
      * @param Redis         $cache
-     * @param IConfigLoader $config
      */
-    public function __construct(string $clientId, string $clientSecret, Redis $cache, IConfigLoader $config)
+    public function __construct(string $clientId, string $clientSecret, Redis $cache)
     {
         // Initiate provider for Verso Gateway OAuth authentication
         $this->provider = new GenericProvider([
@@ -67,7 +61,6 @@ class TravelLog
             'urlResourceOwnerDetails' => self::API_URL,
         ]);
 
-        $this->config = $config;
         $this->cache  = $cache;
     }
 
@@ -105,15 +98,16 @@ class TravelLog
      * Caches the student travel logs
      *
      * @param int $external_id
+     * @param int $timeout
      * @return mixed
      */
-    public function getForStudentCached(int $external_id)
+    public function getForStudentCached(int $external_id, int $timeout)
     {
         $callback = function ($params) {
             return $this->getForStudent($params);
         };
 
-        return $this->cache->cacheFunctionCall('verso_api', $callback, $external_id, $this->config->get('travelLog_api_caching'));
+        return $this->cache->cacheFunctionCall('verso_api', $callback, $external_id, $timeout);
     }
 
 }

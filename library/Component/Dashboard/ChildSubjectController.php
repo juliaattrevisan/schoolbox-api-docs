@@ -90,7 +90,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             if ($isVerso) {
 
                 // Get the data from Verso API.
-                $travelLogs = (new TravelLog($versoClientId, $versoClientSecret, \Alaress\Redis::getInstance(), $this->getConfigLoader()))->getForStudentCached($userChild->getExternalId());
+                $travelLogs = (new TravelLog($versoClientId, $versoClientSecret, \Alaress\Redis::getInstance()))->getForStudentCached($userChild->getExternalId(), $this->getConfigLoader()->get('travelLog_api_caching'));
 
                 if (isset($travelLogs['data']) && !empty($travelLogs['data'])) {
                     $this->parse('travel_log_block', 'travel_log');
