@@ -39,7 +39,7 @@ abstract class CourseAssessmentAbstract
     protected $log;
 
     /** @var HTMLPurifier */
-    private $htmlPurifier;
+    protected $htmlPurifier;
 
     /** @var IConfigLoader */
     protected $config;
@@ -64,7 +64,6 @@ abstract class CourseAssessmentAbstract
         $this->canvasDb         = $canvasDb;
         $this->schoolboxDb      = $schoolboxDb;
         $this->log              = $log;
-        $this->htmlPurifier     = $config;
         $this->assessmentMapper = $assessmentMapper;
 
         $htmlPurifierConfig = \HTMLPurifier_Config::createDefault();
@@ -99,7 +98,7 @@ abstract class CourseAssessmentAbstract
         $assessment = (new Assessment\Model())
             ->setContextUnitSpecification($unitSpec)
             ->setTitle($title)
-            ->setDescription($description ? $this->htmlPurifier->purify($description) : '')
+            ->setDescription($description)
             ->setWorkType($workType)
             ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
             ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
