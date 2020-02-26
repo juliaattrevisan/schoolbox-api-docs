@@ -1106,26 +1106,6 @@ parameters:
 			path: library/Alaress/Twitter/Loader/OAuth.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$consumerKey\\)\\: Unexpected token \"\\$consumerKey\", expected type at offset 63$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/Test/ValidOAuthTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$consumerSecret\\)\\: Unexpected token \"\\$consumerSecret\", expected type at offset 94$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/Test/ValidOAuthTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$oauthSecret\\)\\: Unexpected token \"\\$oauthSecret\", expected type at offset 158$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/Test/ValidOAuthTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$oauthToken\\)\\: Unexpected token \"\\$oauthToken\", expected type at offset 128$#"
-			count: 1
-			path: library/Alaress/Twitter/Loader/Test/ValidOAuthTest.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$keywords\\)\\: Unexpected token \"\\$keywords\", expected type at offset 64$#"
 			count: 1
 			path: library/Alaress/Twitter/Search.php
