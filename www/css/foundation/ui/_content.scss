@@ -1041,6 +1041,12 @@ $selector-width: 2.25rem;
         .progress-tick.tiny {
             margin-left: 0;
         }
+
+        @media #{$medium-up} {
+            .content {
+                padding-left: 3rem;
+            }
+        }
     }
     .project .assessment {
         background-color: $vapor;
