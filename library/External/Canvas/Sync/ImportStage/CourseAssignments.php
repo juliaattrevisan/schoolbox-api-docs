@@ -202,7 +202,7 @@ class CourseAssignments extends CourseAssessmentAbstract
                     $assignmentCanvasId,
                     $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
                     $assignmentData['title'],
-                    $assignmentData['description'],
+                    $assignmentData['description'] ? $this->htmlPurifier->purify($assignmentData['description']) : '',
                     $assignmentData['points_possible'],
                     $assignmentData['grading_type'],
                     $assignmentData['submission_types'],

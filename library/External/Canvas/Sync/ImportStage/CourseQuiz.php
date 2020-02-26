@@ -223,7 +223,7 @@ class CourseQuiz extends CourseAssessmentAbstract
                     $quizCanvasId,
                     $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
                     $quizData['name'],
-                    $quizData['description'],
+                    $quizData['description'] ? $this->htmlPurifier->purify($quizData['description']) : '',
                     $quizData['points_possible'],
                     $quizData['created_at'],
                     $quizData['updated_at'] ?? $quizData['created_at'],
