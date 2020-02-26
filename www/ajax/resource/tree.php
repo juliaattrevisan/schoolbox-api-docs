@@ -3,6 +3,7 @@ use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Resource\Browser\Office365\Tenant;
 use Schoolbox\Resource\Browser\Resources\Node;
+use Schoolbox\Resource\Folder\IFolder;
 
 /**
  *
@@ -33,7 +34,7 @@ if (count($this->arg) != 1) {
 }
 
 $source     = $this->arg[0];
-$resourceId = isset($_REQUEST['relationID']) && is_numeric($_REQUEST['relationID']) ? $_REQUEST['relationID'] : 0;
+$resourceId = isset($_REQUEST['relationID']) && is_numeric($_REQUEST['relationID']) ? $_REQUEST['relationID'] : IFolder::ROOT_ID;
 $useFolders = true;            // allow folder selection
 $mimeFilter = Node::ALL_FILES; // show all files by default
 
