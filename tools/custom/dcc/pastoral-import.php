@@ -34,23 +34,15 @@ $app = new class extends CliTool\App
      * Result set query
      */
     private const QUERY = "
-        SELECT DISTINCT
-            vd.ID, vd.Description, vd.DocumentCreatedDate, vd.DocumentType, vd.Document
-        FROM dbo.media.vDocuments vd
-        INNER JOIN dbo.vStudents vs ON vd.ID = vs.ID
-        WHERE ClassificationCode = 'LearningSupport'
-        AND vs.StudentCampus = 'P'
-    ";
-
-
-    private const QUERY_TEST = "
-        SELECT DISTINCT
-            135 AS ID,
-            8 AS Owner,
-            'This is a test heading' AS Description,
-            '2020-01-01 01:23:45' AS DocumentCreatedDate,
-            'test type' AS DocumentType,
-            'cat' AS Document
+        SELECT
+            dr.ID,
+            t.tDocumentsSeq, t.Description, t.DocumentCreatedByID, t.DocumentCreatedDate, t.DocumentModifiedByID,
+            t.DocumentModifiedDate, t.SourceCode, t.SourceDate, t.SourceRef, t.SourcePath, t.[Document], t.DocumentType,
+            t.DocumentThumbnail, t.ClassificationCode, t.MastertDocumentsSeq, t.Description AS ClassificationDescription,
+            dr.Module, dr.SourceTable, dr.CommunityID, dr.SynDatabaseCode
+        FROM media.pvDocumentReferences AS dr INNER JOIN
+        media.tDocuments AS t ON t.tDocumentsSeq = dr.tDocumentsSeq
+        WHERE (dr.tDocumentsSeq IS NOT NULL) AND t.ClassificationCode = 'LearningSupport'
     ";
 
 
@@ -336,7 +328,7 @@ HELP;
          */
         $firstId = null;
 
-        $statement = $this->externalDatabase->prepareQuery(self::QUERY_TEST);
+        $statement = $this->externalDatabase->prepareQuery(self::QUERY);
         $statement->execute();
 
         $summary = [
