@@ -522,7 +522,7 @@ HELP;
 
         /* I guess this is the upshot; show counts of failures and details of failures
          */
-        $this->getLogger()->info(sprintf(
+        $this->getLogger()->notice(sprintf(
             'Saved %s records successfully. There were %s failures. There were %s fallbacks.',
             $summary['success'],
             \count($summary['failure']),
