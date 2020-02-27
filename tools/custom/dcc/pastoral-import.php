@@ -334,7 +334,6 @@ HELP;
     }
 
 
-
     /**
      * Process all the data
      *
@@ -352,6 +351,7 @@ HELP;
 
         $summary = [
             'success' => 0,
+            'fallbacks' => [],
             'failure' => []
         ];
 
@@ -387,11 +387,17 @@ HELP;
             try {
                 $owner = $this->userMapper->findByExternalId($row['ownerId'], Role::STAFF);
             } catch (Mapper\Exception $e) {
-                $this->getLogger()->warning(sprintf(
-                    'Owner external id %s was not found in schoolbox; attempting to assign fallback user id "%s"',
+                $warning = sprintf(
+                    'Owner external id %s was not found in schoolbox; attempting to assign fallback user id "%s" for pastoral record: %s "%s"',
                     $row['ownerId'],
-                    $this->fallbackOwner->getId()
-                ));
+                    $this->fallbackOwner->getId(),
+                    $row['studentId'],
+                    $row['title']
+                );
+
+                $this->getLogger()->warning($warning);
+
+                $summary['fallbacks'][] = $warning;
             }
 
             /* Log it
@@ -517,13 +523,20 @@ HELP;
         /* I guess this is the upshot; show counts of failures and details of failures
          */
         $this->getLogger()->info(sprintf(
-            'Saved %s records successfully. There were %s failures.',
+            'Saved %s records successfully. There were %s failures. There were %s fallbacks.',
             $summary['success'],
-            \count($summary['failure'])
+            \count($summary['failure']),
+            \count($summary['fallbacks'])
         ));
 
         if (\count($summary['failure'])) {
             foreach ($summary['failure'] as $message) {
+                $this->getLogger()->warning($message);
+            }
+        }
+
+        if (\count($summary['fallbacks'])) {
+            foreach ($summary['fallbacks'] as $message) {
                 $this->getLogger()->warning($message);
             }
         }
