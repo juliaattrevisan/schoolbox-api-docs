@@ -19,10 +19,10 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 class TravelLog
 {
 
-    // The Verso Gateway API for SchoolBox
+    // The Verso Gateway API URL for SchoolBox
     private const API_URL = 'https://gateway-staging.verso.school/';
 
-    // Verso Gateway API to get token
+    // Verso Gateway API URL to get token
     private const VERSO_TOKEN_URL = 'https://verso-gateway-staging.auth.ap-southeast-1.amazoncognito.com/oauth2/token';
 
     // Path for student's locations
@@ -45,9 +45,9 @@ class TravelLog
     /**
      * TravelLog constructor.
      *
-     * @param string        $clientId
-     * @param string        $clientSecret
-     * @param Redis         $cache
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param Redis  $cache
      */
     public function __construct(string $clientId, string $clientSecret, Redis $cache)
     {
@@ -61,7 +61,7 @@ class TravelLog
             'urlResourceOwnerDetails' => self::API_URL,
         ]);
 
-        $this->cache  = $cache;
+        $this->cache = $cache;
     }
 
     /**
@@ -77,37 +77,36 @@ class TravelLog
 
 
     /**
-     * Gets the record of card taps for student
-     * using student external id
+     * Gets the travel log details of the student
      *
-     * @param int $external_id
+     * @param string $externalId
      * @return false|string
      * @throws IdentityProviderException
      */
-    public function getForStudent(int $external_id)
+    public function getForStudent($externalId)
     {
         $request = $this->provider->getAuthenticatedRequest(
             'GET',
-            self::API_URL . self::LOCATION_LOG_PATH . $external_id,
+            self::API_URL . self::LOCATION_LOG_PATH . $externalId,
             $this->getToken()
         );
         return $this->provider->getParsedResponse($request);
     }
 
     /**
-     * Caches the student travel logs
+     * Caches the student travel logs details
      *
-     * @param int $external_id
-     * @param int $timeout
+     * @param string $externalId
+     * @param int    $timeout
      * @return mixed
      */
-    public function getForStudentCached(int $external_id, int $timeout)
+    public function getForStudentCached(string $externalId, int $timeout)
     {
         $callback = function ($params) {
             return $this->getForStudent($params);
         };
 
-        return $this->cache->cacheFunctionCall('verso_api', $callback, $external_id, $timeout);
+        return $this->cache->cacheFunctionCall('verso_api', $callback, $externalId, $timeout);
     }
 
 }

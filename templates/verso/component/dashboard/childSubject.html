@@ -17,12 +17,7 @@
                     <p class="meta">Year {STUDENT_YEAR}</p>
                 </div>
                 <!-- BEGIN travel_log -->
-                <table>
-                    <tr>
-                        <th>TYPE</th>
-                        <th>ACTION & LOCATION</th>
-                        <th>TIME</th>
-                    </tr>
+                {OPEN_TABLE}
                     <!-- BEGIN log -->
                     <tr>
                         <td>{TYPE}</td>
@@ -30,7 +25,7 @@
                         <td>{TIME}</td>
                     </tr>
                     <!-- END log -->
-                </table>
+                {CLOSE_TABLE}
                 <!-- END travel_log -->
 
                 <ul class="action-list">

@@ -9,12 +9,10 @@ use Schoolbox\Permission\Access\UserAccess;
 use Custom\Diocesan\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
-use Schoolbox\TravelLog\TravelLog;
+use Schoolbox\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
-    // Student's Travel Log should be requested and displayed only for verso school;
-    private const VERSO_SCHOOL = 'verso';
 
     private $children;
 
@@ -49,21 +47,19 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
         $this->setBlock('student_block', 'timetable', 'timetable_block');
         $this->setBlock('student_block', 'custom_buttons', 'custom_buttons_block');
-        $this->setBlock('student_block', 'travel_log', 'travel_log_block');
-        $this->setBlock('travel_log', 'log', 'log_block');
-
 
         $isParent = $this->getUser()->getRole()->isParent();
 
-        // Check whether this is Verso school
-        $isVerso = $this->getConfigLoader()->get('site_school_code') === self::VERSO_SCHOOL;
-
-        if ($isVerso) {
-            $versoClientId     = $this->getConfigLoader()->get('verso_client_id');
-            $versoClientSecret = $this->getConfigLoader()->get('verso_client_secret');
-        }
-
         $i = 0;
+
+        // Get the Verso school's Travel Log data
+        $travelLogRenderer = new Renderer(
+            $this->getConfigLoader()->get('site_school_code'),
+            $this->getConfigLoader()->get('verso_client_id'),
+            $this->getConfigLoader()->get('verso_client_secret'),
+            $this->getConfigLoader()->get('travelLog_api_caching'),
+            $this
+        );
 
         foreach ($this->children as $child) {
 
@@ -86,33 +82,9 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar("STUDENT_NAME", $child['name']);
             $this->setVar("STUDENT_YEAR", $userChild->getYear());
 
+            // Render the Verso school's Travel Log data
+            $travelLogRenderer->render($userChild->getExternalId());
 
-            if ($isVerso) {
-
-                // Get the data from Verso API.
-                $travelLogs = (new TravelLog($versoClientId, $versoClientSecret, \Alaress\Redis::getInstance()))->getForStudentCached($userChild->getExternalId(), $this->getConfigLoader()->get('travelLog_api_caching'));
-
-                if (isset($travelLogs['data']) && !empty($travelLogs['data'])) {
-                    $this->parse('travel_log_block', 'travel_log');
-                    $this->setVar('log_block', '');
-
-                    foreach ($travelLogs['data'] as $log) {
-                        $this->setVar([
-                            'TYPE'                => ucfirst($log['event_type']),
-                            'ACTION_AND_LOCATION' => $log['location_tag'],
-                            'DIRECTION'           => $log['direction'] === 'in' ? 'enter' : 'exit',
-                            'DIRECTION_CLASS'     => $log['direction'] === 'in' ? 'reviewed' : 'submitted-late',
-                            'TIME'                => Alaress_Date_Format::newFromTimestamp($log['timestamp'])->getTimeOnly(),
-                        ]);
-                        $this->parse('log_block', 'log', true);
-                    }
-                } else {
-                    $this->setVar("travel_log_block", '');
-                }
-
-            } else {
-                $this->setVar("travel_log_block", '');
-            }
 
             if ($this->getConfigLoader()->get('pastoral_enabled') &&
                 $this->getUser()->isParentOf($userChild) &&
