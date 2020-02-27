@@ -320,6 +320,22 @@ HELP;
 
 
     /**
+     * Derive a filename from the file path specified in the result set
+     * This seems to be a windows machine to use the other slash instead
+     *
+     * @param string $filepath
+     * @return false|string
+     */
+    private function getFilename(string $filepath)
+    {
+        $slashPos = strrpos($filepath, '\\');
+
+        return substr($filepath, $slashPos+1);
+    }
+
+
+
+    /**
      * Process all the data
      *
      * @return void
@@ -436,9 +452,20 @@ HELP;
 
             /* Accept raw data into storage->accept()
              */
-            /* TODO Work out filename from $row['filepath'] and mime details from $row['ext']
-             */
-            $attachment = $this->storageMapper->acceptStream($student->getExternalId() . '.txt', $row['Document'], true);
+            $filename = $this->getFilename($row['filepath']);
+
+            if (!$filename) {
+                $this->getLogger()->warning(sprintf(
+                    'Cannot determine filename for path; skipping: %s',
+                    $row['filepath']
+                ));
+
+                $summary['failure']++;
+
+                continue;
+            }
+
+            $attachment = $this->storageMapper->acceptStream($filename, $row['Document'], true);
 
             /* Assign the storage file to the pastoral record
              */
@@ -504,7 +531,7 @@ HELP;
     }
 };
 
- $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
