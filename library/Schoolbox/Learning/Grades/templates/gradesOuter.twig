@@ -45,7 +45,7 @@
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
         <p class="meta">
-            Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% endfor %}
+            Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
         </p>
     </div>
 </div>

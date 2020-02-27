@@ -41,7 +41,7 @@
                 assessment: assessable,
                 student: participant.user
             } only %}
-        {% elseif feedback %}
+        {% elseif feedback.humanReadableMark() %}
             <div class="grade {{ urgency.marks(feedback.normalisedMark()) }}-bg">
                 <span>{{ feedback.humanReadableMark() }}</span>
             </div>

@@ -66,14 +66,14 @@
             <ul class="activity-list expandable-card">
                 <li>
                     <div class="unit">
-                        <div class="expander" data-collapser="unit"></div>
+                        <div class="expander" data-collapser="unit-{{ unit.context.id }}"></div>
                         <div class="small-12 card">
-                            <a href="#" title="{{ unit.context.title }} | Unit">
+                            <a href="/homepage/{{ unit.context.specification.folder.id ?? unit.context.folder.id }}" title="{{ unit.context.title }}">
                                 <h3>{{ unit.context.title }}</h3>
                             </a>
                         </div>
                     </div>
-                    <div class="" data-collapse-state="" data-collapsable="unit">
+                    <div data-collapse-state="" data-collapsable="unit-{{ unit.context.id }}">
                         <ul>
                             {% for assessment in unit.assessments %}
                             {% if assessment.assessments | length %}
