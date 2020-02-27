@@ -528,6 +528,7 @@ class Controller extends Base
          */
         $selectedTab = array_shift(array_keys($tabs));
 
+        $tree = [];
         // Layout assessments in a tree for twig to render
         foreach($filteredMarkbook->getAssessments() as $assessment) {
             if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId()) {
