@@ -396,7 +396,7 @@ HELP;
 
             /* Log it
              */
-            $this->getLogger()->info(sprintf(
+            $this->getLogger()->debug(sprintf(
                 'Preparing record "%s" for student %s, owned by %s %s',
                 $row['title'],
                 $row['studentId'],
@@ -430,7 +430,7 @@ HELP;
 
             /* Update idiosyncractically and specifically with the provided timestamps
              */
-            $this->getLogger()->info(sprintf(
+            $this->getLogger()->debug(sprintf(
                 'Assigning dates to pastoral record: created_at %s, updated_at %s',
                 $row['createdAt'],
                 $row['updatedAt']
@@ -485,7 +485,7 @@ HELP;
             /* Apply permissions; all staff-level Role Ids can see all pastoral records
              */
             foreach ($this->allRoles as $role) {
-                $this->getLogger()->info(sprintf(
+                $this->getLogger()->debug(sprintf(
                     'Assigning permission to role %s for record "%s"',
                     $role->getName(),
                     $row['title']
@@ -541,7 +541,7 @@ HELP;
     }
 };
 
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
