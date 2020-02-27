@@ -356,8 +356,12 @@ HELP;
         ];
 
         /* Otherwise continue assigning details per pastoral record
+         *
+         * This is a particular usage of fetchAll() which gets the entire data set before iterating
+         * The pastoralMapper->save() is exiting early with the usual $row = statement->fetch(\PDO::FETCH_ASSOC)
+         * so there's something funky going on in there, especially.
          */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        foreach ($statement->fetchAll() as $row) {
 
             /* If the student of the record doesn't exist, skip them with a warning
              */
