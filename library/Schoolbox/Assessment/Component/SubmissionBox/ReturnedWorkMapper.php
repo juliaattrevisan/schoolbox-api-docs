@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
+use Aura\Di\Exception\ServiceNotFound;
+use InvalidArgumentException;
+use PDOException;
 use PDOStatement;
 use RangeException;
 use Schoolbox;
@@ -16,10 +19,12 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * Class ReturnedWorkMapper
@@ -44,8 +49,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         parent::__construct();
         $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
             Participant\Plan\Mapper::getInstance(),
-            Participant\Mapper::getInstance(),
-            $this->getConfigLoader()
+            Participant\Mapper::getInstance()
         );
     }
 
@@ -112,11 +116,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * @return bool
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
-     * @throws \InvalidArgumentException If assessment not sufficiently hydrated
+     * @throws InvalidArgumentException If assessment not sufficiently hydrated
+     * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
      */
     public function canParticipate(ReturnedWork $object, ReturnedWork $previous = null): bool
     {
-        if($previous){
+        if ($previous) {
             // If an update, assume the system is still valid
             return true;
         }
@@ -132,9 +138,9 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException If assessment not sufficiently hydrated
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException If assessment not sufficiently hydrated
      */
     public function insertParticipation(ReturnedWork $object, ReturnedWork $previous = null): bool
     {
@@ -143,7 +149,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
         }
         if ($object->isPublished() && $object->getResubmissionRequired() && !$previous->isPublished()) {
-            $this->interactionChecker->createPlanForResubmission($object->getOwner(), $assessment);
+            $expireDateOffset = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_LMS_RESUBMIT_WINDOW);
+            $this->interactionChecker->createPlanForResubmission($object->getOwner(), $assessment, $expireDateOffset);
         }
 
         return true;
@@ -154,12 +161,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * Soft deletes all Files for the specified Return
      *
      * @param ReturnedWork $return
+     * @throws Schoolbox\Mapper\Exception
      */
     public function softDeleteReturnedWorkFiles(ReturnedWork $return)
     {
         /** @var ReturnedWork\SingleFile\Mapper $returnedWorkFileMapper */
         $returnedWorkFileMapper = $this->getJoinMapper('files');
-        $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
+        $files                  = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
         $returnedWorkFileMapper->delete($files);
     }
 
@@ -213,8 +221,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             $return = $this->hydrate($row);
             $ids[]  = $return->getId();
             $return->setSubmission($this->hydrateJoin($row, 'submission', 's'));
-            $return->setMarker($this->hydrateJoin($row, 'marker','m'));
-            $return->setOwner($this->hydrateJoin($row, 'owner','o'));
+            $return->setMarker($this->hydrateJoin($row, 'marker', 'm'));
+            $return->setOwner($this->hydrateJoin($row, 'owner', 'o'));
 
             // Try to streamline duework+assessment creation
             /** @var SubmissionBox $dueWork */
@@ -228,7 +236,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         // Fetch and hydrate files
         $files = $this->getJoinMapper('files')
                       ->findByColumn('submission_return_id', $ids)
-                      ->groupByCallback(function($f) {
+                      ->groupByCallback(function ($f) {
                           /** @var ReturnedWork\SingleFile\Model $f */
                           return $f->getReturn()->getId();
                       });
@@ -247,7 +255,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * list.
      *
      * @param array $box_ids
-     * @param int $user_id
+     * @param int   $user_id
      *
      * @return array The submission box ID as the key, the count as the value.
      */
@@ -255,21 +263,21 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
     {
         // Retrieve count of submission IDs from a list of IDs for a user
         if (empty($box_ids)) {
-            return array();
+            return [];
         }
-        $query = "
+        $query             = "
 			SELECT sr.box_id, COUNT(*) as submission_count
 			FROM {$this->getTable()} sr
 			WHERE sr.owner = :user_id
 			AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
 			GROUP BY sr.box_id
 		";
-        $statement = $this->database->prepare($query);
-        $params = $this->getArrayParameters($box_ids, 'sb');
+        $statement         = $this->database->prepare($query);
+        $params            = $this->getArrayParameters($box_ids, 'sb');
         $params['user_id'] = $user_id;
         $statement->execute($params);
 
-        $return = array();
+        $return = [];
         foreach ($statement as $row) {
             $return[$row['box_id']] = $row['submission_count'];
         }
@@ -283,6 +291,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * * Saves the data to the remote data connector
      *
      * @param ReturnedWork $object
+     * @throws ServiceNotFound
      */
     public function syncToExternalMarkbook(ReturnedWork $object): void
     {
@@ -301,6 +310,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      *
      * @param ReturnedWork $object
      * @param ReturnedWork $previous
+     * @throws Schoolbox\Mapper\Exception
      */
     public function persistFiles(ReturnedWork $object, ReturnedWork $previous = null)
     {

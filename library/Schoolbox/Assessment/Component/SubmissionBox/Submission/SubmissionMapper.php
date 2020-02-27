@@ -39,8 +39,7 @@ class SubmissionMapper extends BaseMapper
         parent::__construct();
         $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
             Participant\Plan\Mapper::getInstance(),
-            Participant\Mapper::getInstance(),
-            $this->getConfigLoader()
+            Participant\Mapper::getInstance()
         );
     }
 

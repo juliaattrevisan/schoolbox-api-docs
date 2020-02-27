@@ -8,10 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Participant\Plan;
 
-use Schoolbox\Comms\News\ValidDateOffset;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\User;
@@ -37,22 +34,15 @@ class InteractionIntegrityChecker
      */
     private $participantMapper;
 
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
-
 
     /**
      * @param Mapper             $planMapper
      * @param Participant\Mapper $participantMapper
-     * @param IConfigLoader      $config
      */
-    public function __construct(Mapper $planMapper, Participant\Mapper $participantMapper, IConfigLoader $config)
+    public function __construct(Mapper $planMapper, Participant\Mapper $participantMapper)
     {
         $this->planMapper        = $planMapper;
         $this->participantMapper = $participantMapper;
-        $this->config            = $config;
     }
 
 
@@ -99,20 +89,22 @@ class InteractionIntegrityChecker
      * Creates or updates a plan when resubmission is requested, to allow submission after the original close date
      * @param User             $student
      * @param Assessment\Model $assessment
+     * @param string           $expireDateOffset
      * @throws SchoolboxMapper\Exception
      */
-    public function createPlanForResubmission(User $student, Assessment\Model $assessment): void
+    public function createPlanForResubmission(User $student, Assessment\Model $assessment, string $expireDateOffset): void
     {
-        $this->loadPlansAndParticipants($assessment);
-        $participant = $this->findParticipation($student, $assessment);
-        $currentPlan = $participant->getPlan();
-
-        $expireDateOffset = (string)$this->config->get(ConfigMapper::NAME_LMS_RESUBMIT_WINDOW);
-        if (!(new ValidDateOffset())->isSatisfiedBy($expireDateOffset)) {
-            // the config is not set properly, don't bother amending the close date
+        if (!strtotime(trim($expireDateOffset))) {
             return;
         }
 
+        $this->loadPlansAndParticipants($assessment);
+        $participant = $this->findParticipation($student, $assessment);
+        if (!$participant) {
+            return;
+        }
+
+        $currentPlan = $participant->getPlan();
         $possibleCloseDate = \Alaress_Date_Format::now()->modify($expireDateOffset);
         $currentCloseDate  = $currentPlan->getIsDynamic() ? $assessment->getCloseDate() : $currentPlan->getCloseDate();
         if ($possibleCloseDate->lte($currentCloseDate)) {
@@ -124,7 +116,7 @@ class InteractionIntegrityChecker
             $newPlan = $this->planMapper->createModel()
                                         ->setIsDynamic(false)
                                         ->setAssessment($assessment)
-                                        ->setName('ReSubmit')
+                                        ->setName('Resubmit')
                                         ->setPublishDate($assessment->getPublishDate())
                                         ->setOpenDate($assessment->getOpenDate())
                                         ->setDueDate($assessment->getDueDate())
@@ -137,8 +129,8 @@ class InteractionIntegrityChecker
             // Custom plan shared with another student
             $newPlan = clone $currentPlan;
             $newPlan->setId(null)
-                ->setName($currentPlan->getName() . ' ReSubmit')
-                ->setCloseDate($possibleCloseDate);
+                    ->setName($currentPlan->getName() . ' Resubmit')
+                    ->setCloseDate($possibleCloseDate);
             $this->planMapper->save($newPlan);
 
             $participant->setPlan($newPlan);
