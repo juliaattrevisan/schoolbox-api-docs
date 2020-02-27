@@ -47,9 +47,11 @@ class Mapper extends \Schoolbox\Mapper
     protected function getSelectString()
     {
         return "
-            SELECT DISTINCT {$this->getColumnString('', ['article_id'])}
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('article', 'a')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('article', '', 'a', true)} 
+            LEFT JOIN {$this->getJoinSql('article', '', 'a', true)}
         ";
     }
 
@@ -78,7 +80,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($pb->getParams());
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+        $res = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        return array_column($res, 'article_id');
     }
 }
