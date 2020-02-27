@@ -352,7 +352,7 @@ HELP;
 
         $summary = [
             'success' => 0,
-            'failure' => 0
+            'failure' => []
         ];
 
         /* Otherwise continue assigning details per pastoral record
@@ -364,13 +364,15 @@ HELP;
             try {
                 $student = $this->userMapper->findByExternalId($row['studentId'], Role::STUDENT);
             } catch (Mapper\Exception $e) {
-                $this->getLogger()->warning(sprintf(
+                $error = sprintf(
                     'Student %s was not found in schoolbox; skipping their pastoral record "%s"',
                     $row['studentId'],
                     $row['title']
-                ));
+                );
 
-                $summary['failure']++;
+                $this->getLogger()->warning($error);
+
+                $summary['failure'][] = $error;
 
                 continue;
             }
@@ -455,12 +457,14 @@ HELP;
             $filename = $this->getFilename($row['filepath']);
 
             if (!$filename) {
-                $this->getLogger()->warning(sprintf(
+                $error = sprintf(
                     'Cannot determine filename for path; skipping: %s',
                     $row['filepath']
-                ));
+                );
 
-                $summary['failure']++;
+                $this->getLogger()->warning($error);
+
+                $summary['failure'][] = $error;
 
                 continue;
             }
@@ -510,13 +514,19 @@ HELP;
             $summary['success']++;
         }
 
-        /* I guess this is the upshot
+        /* I guess this is the upshot; show counts of failures and details of failures
          */
         $this->getLogger()->info(sprintf(
             'Saved %s records successfully. There were %s failures.',
             $summary['success'],
-            $summary['failure']
+            \count($summary['failure'])
         ));
+
+        if (\count($summary['failure'])) {
+            foreach ($summary['failure'] as $message) {
+                $this->getLogger()->warning($message);
+            }
+        }
 
         if ($this->perform()) {
             $this->getLogger()->info(sprintf(
