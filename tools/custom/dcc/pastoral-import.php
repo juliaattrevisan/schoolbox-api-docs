@@ -35,13 +35,16 @@ $app = new class extends CliTool\App
      */
     private const QUERY = "
         SELECT
-            dr.ID,
-            t.tDocumentsSeq, t.Description, t.DocumentCreatedByID, t.DocumentCreatedDate, t.DocumentModifiedByID,
-            t.DocumentModifiedDate, t.SourceCode, t.SourceDate, t.SourceRef, t.SourcePath, t.[Document], t.DocumentType,
-            t.DocumentThumbnail, t.ClassificationCode, t.MastertDocumentsSeq, t.Description AS ClassificationDescription,
-            dr.Module, dr.SourceTable, dr.CommunityID, dr.SynDatabaseCode
-        FROM media.pvDocumentReferences AS dr INNER JOIN
-        media.tDocuments AS t ON t.tDocumentsSeq = dr.tDocumentsSeq
+            dr.ID AS studentId,
+            t.Description AS title,
+            t.DocumentCreatedByID AS ownerId,
+            t.DocumentCreatedDate AS createdAt,
+            t.DocumentModifiedDate AS updatedAt,
+            t.SourcePath,
+            t.[Document],
+            LOWER(t.DocumentType) AS ext
+        FROM media.pvDocumentReferences AS dr
+        INNER JOIN media.tDocuments AS t ON t.tDocumentsSeq = dr.tDocumentsSeq
         WHERE (dr.tDocumentsSeq IS NOT NULL) AND t.ClassificationCode = 'LearningSupport'
     ";
 
