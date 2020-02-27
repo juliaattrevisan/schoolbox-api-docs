@@ -300,6 +300,7 @@ class Mapper extends BaseMapper implements Receiver
      *
      * @return Model
      * @throws MapperException
+     * @throws FileException
      */
     public function acceptStream($filename, $fp, $public = false)
     {
@@ -307,6 +308,17 @@ class Mapper extends BaseMapper implements Receiver
         // (just like an upload)
 
         $tempLocation = sb_tempnam('otfs');
+
+        /* Temporary location didn't get created. There might be a number of reasons why that might
+         * be the case; no write access to the specified location, disk full, etc.
+         *
+         * CLI Tools:
+         * If you ended up following a fatal from a cli tool, you should try running it with sudo
+         * Otherwise your logged-in account might not have write access to $tempLocation
+         */
+        if ('' === (string)$tempLocation) {
+            throw new FileException("Temporary location couldn't be created; check sudo, perms, disk usage");
+        }
 
         // Dump the stream into our tempfile
 
