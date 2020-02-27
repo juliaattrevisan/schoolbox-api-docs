@@ -40,7 +40,7 @@ $app = new class extends CliTool\App
             t.DocumentCreatedByID AS ownerId,
             t.DocumentCreatedDate AS createdAt,
             t.DocumentModifiedDate AS updatedAt,
-            t.SourcePath,
+            t.SourcePath AS filepath,
             t.[Document],
             LOWER(t.DocumentType) AS ext
         FROM media.pvDocumentReferences AS dr
@@ -346,12 +346,12 @@ HELP;
             /* If the student of the record doesn't exist, skip them with a warning
              */
             try {
-                $student = $this->userMapper->findByExternalId($row['ID'], Role::STUDENT);
+                $student = $this->userMapper->findByExternalId($row['studentId'], Role::STUDENT);
             } catch (Mapper\Exception $e) {
                 $this->getLogger()->warning(sprintf(
                     'Student %s was not found in schoolbox; skipping their pastoral record "%s"',
-                    $row['ID'],
-                    $row['Description']
+                    $row['studentId'],
+                    $row['title']
                 ));
 
                 $summary['failure']++;
@@ -367,11 +367,11 @@ HELP;
             $owner = $this->fallbackOwner;
 
             try {
-                $owner = $this->userMapper->findByExternalId($row['Owner'], Role::STAFF);
+                $owner = $this->userMapper->findByExternalId($row['ownerId'], Role::STAFF);
             } catch (Mapper\Exception $e) {
                 $this->getLogger()->warning(sprintf(
                     'Owner external id %s was not found in schoolbox; attempting to assign fallback user id "%s"',
-                    $row['Owner'],
+                    $row['ownerId'],
                     $this->fallbackOwner->getId()
                 ));
             }
@@ -380,8 +380,8 @@ HELP;
              */
             $this->getLogger()->info(sprintf(
                 'Preparing record "%s" for student %s, owned by %s %s',
-                $row['Description'],
-                $row['ID'],
+                $row['title'],
+                $row['studentId'],
                 $owner->getFullName(),
                 $owner->getExternalId()
             ));
@@ -391,7 +391,7 @@ HELP;
              */
             $record = $this->pastoralMapper->createModel()
                 ->setStudent($student)
-                ->setHeading($row['Description'])
+                ->setHeading($row['title'])
                 ->setBodyPublic('')
                 ->setBodyPrivate('')
                 ->setOwner($owner)
@@ -413,8 +413,9 @@ HELP;
             /* Update idiosyncractically and specifically with the provided timestamps
              */
             $this->getLogger()->info(sprintf(
-                'Assigning %s to pastoral record created_at and updated_at fields',
-                $row['DocumentCreatedDate']
+                'Assigning dates to pastoral record: created_at %s, updated_at %s',
+                $row['createdAt'],
+                $row['updatedAt']
             ));
 
             if ($this->perform()) {
@@ -427,14 +428,15 @@ HELP;
                 ");
 
                 $updateStatement->execute([
-                    'createdAt' => $row['DocumentCreatedDate'],
-                    'updatedAt' => $row['DocumentCreatedDate'],
+                    'createdAt' => $row['createdAt'],
+                    'updatedAt' => $row['updatedAt'],
                     'recordId'  => $record->getId()
                 ]);
             }
 
             /* Accept raw data into storage->accept()
-             * FIXME What is the mimetype/extension of these files?
+             */
+            /* TODO Work out filename from $row['filepath'] and mime details from $row['ext']
              */
             $attachment = $this->storageMapper->acceptStream($student->getExternalId() . '.txt', $row['Document'], true);
 
@@ -455,7 +457,7 @@ HELP;
                 $this->getLogger()->info(sprintf(
                     'Assigning permission to role %s for record "%s"',
                     $role->getName(),
-                    $row['Description']
+                    $row['title']
                 ));
 
                 $accessRecord = $this->pastoralAccessMapper->createModel()
@@ -472,8 +474,8 @@ HELP;
              */
             $this->getLogger()->info(sprintf(
                 'Imported record "%s" for student %s, owned by %s %s',
-                $row['Description'],
-                $row['ID'],
+                $row['title'],
+                $row['studentId'],
                 $owner->getFullName(),
                 $owner->getExternalId()
             ));
