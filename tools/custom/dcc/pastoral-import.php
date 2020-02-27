@@ -217,6 +217,14 @@ HELP;
         $this->processData();
     }
 
+    /**
+     * Must run as root for file access
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return true;
+    }
 
     /**
      * Set up external db connection
