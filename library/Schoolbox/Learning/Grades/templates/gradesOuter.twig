@@ -41,34 +41,18 @@
 
 {{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
 
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{{ locale.grades.properPlural }} for {{ subject.name }}</h1>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
+        <p class="meta">
+            Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
     </div>
-    <nav>
-        <!-- <a href="#" data-print class="icon-print" title="Print Report"></a> -->
-    </nav>
 </div>
 
 <div class="row">
-    <div class="small-12 medium-6 island">
-        <section>
-            <ul class="action-list">
-                <li>
-                    <div class="small-12 card">
-                        <a href="/search/user/{{ student.id }}" title="View Profile">
-                            <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="{{ student.fullName }}"/>
-                            <p>{{ student.fullName }}</p>
-                            <p class="meta">Year {{ student.year }} Student</p>
-                        </a>
-                    </div>
-                </li>
-            </ul>
-        </section>
-    </div>
     <div class="small-12 medium-6 columns">
+        <h2 class="subheader">Time Period</h2>
         <div class="content">
             <div class="context-switch clearfix">
                 {% include '@learningGrades/semesterSelector.twig' with {
@@ -88,41 +72,18 @@
             </div>
         </div>
     </div>
+    {% if canSeeGradeAverage %}
+    <div class="small-12 medium-3 xlarge-2 right">
+        <h2 class="subheader">{{ locale.grades.proper }} Average</h2>
+        <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}-bg text-center">
+            {% set weightedMean = markbook.studentStatistics[student.id].weightedMean %}
+            <span>{% if weightedMean is null %}<span class="meta">-</span>{% else %}{{ weightedMean }}{% endif %}</span>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 {% if markbook.assessments | length %}
-    <div class="row">
-        <div class="small-12 medium-6 island">
-            <h2 class="subheader">Teachers</h2>
-            <section>
-                <ul class="action-list">
-                    {% for teacher in subject.teachers %}
-                        <li>
-                            <div class="small-12 card">
-                                <a href="/search/user/{{ teacher.id }}" title="View Profile">
-                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
-                                         alt="{{ teacher.fullName }}">
-                                    <p>{{ teacher.fullName }}</p>
-                                </a>
-                                <p class="meta">Teacher</p>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </div>
-        {% if canSeeGradeAverage %}
-            <div class="small-12 medium-6 island">
-                <h2 class="subheader">Current {{ locale.grades.proper }} Average</h2>
-                <section class="content">
-                    <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}">
-                        {% set weightedMean = markbook.studentStatistics[student.id].weightedMean %}
-                        <span>{% if weightedMean is null %}<span class="meta">-</span>{% else %}{{ weightedMean }}{% endif %}</span>
-                    </div>
-                </section>
-            </div>
-        {% endif %}
-    </div>
 
     {% set reportContentId = 'report_content' %}
 
@@ -140,19 +101,20 @@
 
     {% if comments|length or canComment %}
         <div class="row">
-            <div class="small-12 island">
+            <div class="small-12 columns">
                 <h2 class="subheader">Comments</h2>
             </div>
 
             {% if canComment %}
-                <div class="small-12 columns">
-                    <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
+            <div class="small-12 island">
+                <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
+                    <section class="content">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
                         <textarea name="comment" rows="3"></textarea>
                         <div class="row">
                             {% if USER.role.isStaff %}
-                                <div class="small-offset-6 small-3 medium-offset-6 medium-3 column">
+                                <div class="small-3 medium-3 column">
                                     <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
@@ -161,20 +123,21 @@
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
                             {% elseif USER.role.isStudent %}
-                                <div class="small-offset-9 small-3 medium-offset-9 medium-3 column">
+                                <div class="small-3 medium-3 column">
                                     <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
                             {% elseif USER.role.isParent %}
-                                <div class="small-offset-9 small-3 medium-offset-9 medium-3 column">
+                                <div class="small-3 medium-3 column">
                                     <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                             {% endif %}
                         </div>
-                        <a class="button expand submit" data-comment-post="new">Post</a>
-                    </form>
-                </div>
+                    </section>
+                    <a class="button expand submit" data-comment-post="new">Post Comment</a>
+                </form>
+            </div>
             {% endif %}
             <div class="small-12 island">
                 <section>

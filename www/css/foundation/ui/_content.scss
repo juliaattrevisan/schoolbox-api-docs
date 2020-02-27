@@ -1024,6 +1024,39 @@ $selector-width: 2.25rem;
             font-size: rem-calc(($base-font-size + 2));
         }
     }
+    // Grades expandable layout
+    .unit {
+        border-top: 2px solid $body-bg;
+
+        .card {
+            padding: 0.5rem 0 .5rem 0;
+        }
+    }
+    .unit ~ [data-collapsable] ul li:first-child {
+        border-top: 0;
+    }
+    .assessment {
+        border-top: 1px solid $body-bg;
+
+        .progress-tick.tiny {
+            margin-left: 0;
+        }
+
+        @media #{$medium-up} {
+            .content {
+                padding-left: 3rem;
+            }
+        }
+    }
+    .project .assessment {
+        background-color: $vapor;
+        border-top: 1px solid $body-bg;
+        border-left: 3rem solid $white;
+
+        @media #{$small-only} {
+            border-left: 1rem solid $white;
+        }
+    }
 }
 
 // Subject list
@@ -1169,12 +1202,16 @@ $selector-width: 2.25rem;
         flex: 1;
     }
     .txt {
-      flex: 0 auto;
-      padding: 0 1rem;
+        flex: 0 auto;
+        padding: 0 1rem;
 
-      p {
-        margin-bottom: 0;
-      }
+        p {
+            margin-bottom: 0;
+        }
+    }
+    .assess-status {
+        flex: 1 0 auto;
+        padding: .5rem .75rem;
     }
 
     .gradient-none-bg {
@@ -1207,7 +1244,8 @@ $selector-width: 2.25rem;
             margin-bottom: 0.5rem;
         }
         .grade {
-            display: none;
+            flex: 1 100%;
+            margin-left: 0;
         }
     }
     ~ blockquote {
