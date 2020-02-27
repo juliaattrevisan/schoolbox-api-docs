@@ -9,8 +9,8 @@ VALUES
     (SELECT id FROM lu_config_field WHERE `field` = 'input'),
     null,
     (SELECT id FROM lu_config_type WHERE `type` = 'LMS Policy'),
-    true,
-    false,
-    false,
+    'true',
+    'false',
+    'false',
     'settings'
 );
