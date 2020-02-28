@@ -108,7 +108,7 @@ Class Renderer
                         'ACTION_AND_LOCATION' => $log['location_tag'],
                         'DIRECTION'           => $log['direction'] === 'in' ? 'enter' : 'exit',
                         'DIRECTION_CLASS'     => $log['direction'] === 'in' ? 'reviewed' : 'submitted-late',
-                        'TIME'                => Alaress_Date_Format::newNaturalDate($log['timestamp'])->getTimeOnly(),
+                        'TIME'                => Alaress_Date_Format::newFromTimestamp(strtotime($log['timestamp']))->getUsingFormat('h:i a'),
                     ]);
 
                     $this->childSubjectController->parse('log_block', 'log', true);
