@@ -1,0 +1,7 @@
+{% extends '@core/user/student.twig' %}
+
+{% block travel_logs %}
+    {% if showDetails %}
+        {% include 'versoTravelLog.twig' %}
+    {% endif %}
+{% endblock travel_logs %}

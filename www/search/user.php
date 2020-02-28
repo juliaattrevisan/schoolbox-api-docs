@@ -453,6 +453,17 @@ function renderStudent(
     $showDetails = (new ValidDetailsVisible($synUserHandler, $config))->isSatisfiedBy($user, $sessionUser);
     $showEmails = (new ValidEmailVisible($synUserHandler, $config))->isSatisfiedBy($user, $sessionUser);
 
+    // Get the Verso school's Travel Log data
+    $travelLogRenderer = new Schoolbox\TravelLog\Renderer(
+        $config->get('site_school_code'),
+        $config->get('verso_client_id'),
+        $config->get('verso_client_secret'),
+        $config->get('travelLog_api_caching')
+    );
+
+    // Get the data from Verso API.
+    $travelLogs = $travelLogRenderer->getTravelLog($user->getExternalId());
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -484,6 +495,7 @@ function renderStudent(
                 'emailSeparator'     => AbstractMailer::implodeGlue(),
                 'showDetails'        => $showDetails,
                 'showEmail'          => $showEmails,
+                'travelLogs'         => $travelLogs,
             ]
         )
     );
