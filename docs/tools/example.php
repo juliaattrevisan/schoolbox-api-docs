@@ -81,12 +81,35 @@ HELP;
             exit;
         }
 
-        /* Main algorithm goes here
+        /* FIXME Main algorithm goes here
          */
         $this->getLogger()->info('Script commencing.');
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
+    }
+
+
+    /**
+     * FIXME Decide whether this script must be run as root
+     *  By default, this returns false (see CliTool\App) but if you're using methods that require
+     *  access to special folders (such as when you're creating files) you need to run this as root.
+     *  Otherwise it'll fail with a generic error that might mislead you
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return parent::runAsRoot();
     }
 };
 
+/* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
+ *
+ * You should generally try to fix those, even though in some special cases php will throw notices
+ * for its own expected behaviours which will inadvertently cause this to fail
+ */
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
