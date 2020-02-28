@@ -41,6 +41,8 @@ else
 	else
 		echo "Updating site_location to \"$1\""
 		mysql -u$sqluser -p$sqlpasswd -h $sqlhost -e "UPDATE config SET value='$1' WHERE name='site_location' LIMIT 1" $sqldb
+		mysql -u$sqluser -p$sqlpasswd -h $sqlhost -e "UPDATE config SET value='$1' WHERE name='site_school_code' LIMIT 1" $sqldb
+
 	fi
 fi
 

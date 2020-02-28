@@ -9,6 +9,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Custom\Diocesan\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
+use Custom\Verso\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
@@ -51,6 +52,14 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
         $i = 0;
 
+        // Get the Verso school's Travel Log data
+        $travelLogRenderer = new Renderer(
+            $this->getConfigLoader()->get('site_school_code'),
+            $this->getConfigLoader()->get('verso_client_id'),
+            $this->getConfigLoader()->get('verso_client_secret'),
+            $this->getConfigLoader()->get('travelLog_api_caching')
+        );
+
         foreach ($this->children as $child) {
 
             // Check if the current child's timetable is viewable and hide if necessary
@@ -71,6 +80,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar("STUDENT_EXTERNAL_ID", $userChild->getExternalId());
             $this->setVar("STUDENT_NAME", $child['name']);
             $this->setVar("STUDENT_YEAR", $userChild->getYear());
+
+            // Render the Verso school's Travel Log data
+            $this->setVar('TRAVEL_LOG', $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId()));
+
 
 
             if ($this->getConfigLoader()->get('pastoral_enabled') &&

@@ -1,0 +1,22 @@
+{% if travelLogs.data is not empty %}
+    <table>
+        <thead>
+        <tr>
+            <th>TYPE</th>
+            <th>ACTION & LOCATION</th>
+            <th>TIME</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in travelLogs.data %}
+            <tr>
+                <td>{{ log.event_type|capitalize }}</td>
+                <td>
+                    <span class="{{ log.direction == 'in' ? 'reviewed' : 'submitted-late' }} label">{{ log.direction ==  'in' ? 'enter' : 'exit' }} </span> {{ log.location_tag }}
+                </td>
+                <td>{{ log.timestamp|date('h:i a') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
