@@ -9,7 +9,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Custom\Diocesan\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
-use Schoolbox\TravelLog\Renderer;
+use Custom\Verso\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {

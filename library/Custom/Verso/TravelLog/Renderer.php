@@ -4,7 +4,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\TravelLog;
+namespace Custom\Verso\TravelLog;
 
 use Alaress\Redis;
 use Twig\Environment;
@@ -18,6 +18,7 @@ Class Renderer
     // Student's Travel Log should be requested and displayed only for verso school;
     private const VERSO_SCHOOL_CODE = 'verso';
 
+    private const DEFAULT_API_TIMEOUT = 300;
 
     /**
      * @var string
@@ -47,12 +48,12 @@ Class Renderer
      * @param string|null                                 $clientSecret
      * @param string                                      $cachingTimeout
      */
-    public function __construct(string $schoolCode, ?string $clientId, ?string $clientSecret, string $cachingTimeout)
+    public function __construct(string $schoolCode, ?string $clientId, ?string $clientSecret, ?string $cachingTimeout)
     {
         $this->schoolCode             = $schoolCode;
         $this->clientId               = (string)$clientId;
         $this->clientSecret           = (string)$clientSecret;
-        $this->cachingTimeout         = $cachingTimeout;
+        $this->cachingTimeout         = $cachingTimeout ?? self::DEFAULT_API_TIMEOUT;
     }
 
 

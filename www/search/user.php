@@ -454,7 +454,7 @@ function renderStudent(
     $showEmails = (new ValidEmailVisible($synUserHandler, $config))->isSatisfiedBy($user, $sessionUser);
 
     // Get the Verso school's Travel Log data
-    $travelLogRenderer = new Schoolbox\TravelLog\Renderer(
+    $travelLogRenderer = new Custom\Verso\TravelLog\Renderer(
         $config->get('site_school_code'),
         $config->get('verso_client_id'),
         $config->get('verso_client_secret'),

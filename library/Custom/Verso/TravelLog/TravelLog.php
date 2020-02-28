@@ -4,7 +4,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\TravelLog;
+namespace Custom\Verso\TravelLog;
 
 use Alaress\Redis;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
