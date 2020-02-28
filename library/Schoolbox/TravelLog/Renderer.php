@@ -79,6 +79,20 @@ Class Renderer
     }
 
     /**
+     * Returns array of student travel logs for verso school
+     *
+     * @param string $childId
+     * @return array
+     */
+    public function getTravelLog(string $childId): array
+    {
+        if ($this->isVerso() && $this->isCredentialValid()) {
+            return (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($childId, $this->cachingTimeout);
+        }
+        return [];
+    }
+
+    /**
      *
      * @return bool
      */
