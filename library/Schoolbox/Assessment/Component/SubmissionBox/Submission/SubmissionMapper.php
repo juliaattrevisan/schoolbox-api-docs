@@ -299,7 +299,7 @@ class SubmissionMapper extends BaseMapper
             WHERE ss.owner = :user_id
             AND ss.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
             AND ss.submitted_at IS NOT NULL
-            GROUP BY ss.box_id 
+            GROUP BY ss.box_id
         ";
         $statement = $this->database->prepare($query);
         $params = $this->getArrayParameters($box_ids, 'sb');

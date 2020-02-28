@@ -98,6 +98,7 @@ class ConfigMapper extends Mapper
     public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';
     public const NAME_EXTERNAL_TYPE              = 'external_type';
     public const NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
+    public const NAME_LMS_RESUBMIT_WINDOW        = 'lms_resubmit_window';
 
     public const PREFIX_CLOUDWORK_OAUTH             = 'cloudwork_oauth_';
     public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
