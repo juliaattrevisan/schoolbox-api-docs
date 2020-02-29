@@ -10,11 +10,13 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
+use InvalidArgumentException;
+use Twig_Error_Loader;
+use UnexpectedValueException;
 use function array_key_exists;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
@@ -28,8 +30,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
 use Schoolbox\Filter\Selection as FilterSelection;
-use Schoolbox\Filter;
-use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
@@ -97,7 +97,7 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -132,7 +132,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      * @throws ApplicationException\Exception If Invalid user id specified
-     * @throws \InvalidArgumentException If mapper definition not found
+     * @throws InvalidArgumentException If mapper definition not found
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
@@ -190,7 +190,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
-     * @throws \Twig_Error_Loader If template directory not found
+     * @throws Twig_Error_Loader If template directory not found
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
@@ -199,7 +199,7 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
-     * @throws \InvalidArgumentException If mapper class not found
+     * @throws InvalidArgumentException If mapper class not found
      * @throws ServiceNotFound If cannot fetch service from DI
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
@@ -237,7 +237,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()
     {
@@ -246,7 +246,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getFolderMapper()
     {
@@ -255,7 +255,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|TermMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getTermMapper()
     {
@@ -264,7 +264,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|ErrorMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getErrorMapper()
     {
@@ -277,8 +277,8 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws InvalidPath
      * @throws UnexpectedValueException
+     * @throws MapperException
      */
     private function preloadFolder(array $params): array
     {
@@ -290,11 +290,7 @@ class Module extends BaseModule
         } elseif (!array_key_exists($folderId, $params)) {
             throw new UnexpectedValueException("No 'folderId' found in route params");
         } else {
-            try {
-                $preload[$folder] = $this->getFolderMapper()->findById($params[$folderId]);
-            } catch (Mapper\Exception $e) {
-                throw new InvalidPath('Folder Not Found', 0, $e);
-            }
+            $preload[$folder] = $this->getFolderMapper()->findById($params[$folderId]);
         }
 
         return $preload;
