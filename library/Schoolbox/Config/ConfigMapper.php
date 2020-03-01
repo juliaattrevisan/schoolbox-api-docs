@@ -170,6 +170,8 @@ class ConfigMapper extends Mapper
             SELECT DISTINCT lu_config_type.type
             FROM {$this->getTable()}
             INNER JOIN lu_config_type ON config.type_id  = lu_config_type.id
+            WHERE hidden = 'false'
+            ORDER BY lu_config_type.sequence
         ";
         $statement = $this->getDatabase()->query($query);
         $result    = [];
