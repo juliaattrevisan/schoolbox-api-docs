@@ -220,8 +220,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         );
 
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT P.CARER_NUMBER AS STUDENTCONTACTID, P.FULL_NAME, P.EMAIL AS STUDENTCONTACTDEFAULTEMAIL,
-              P.MOBILE AS STUDENTCONTACTMOBILEPHONE
+            SELECT
+                   P.CARER_NUMBER AS STUDENTCONTACTID,
+                   P.FULL_NAME,
+                   P.EMAIL AS STUDENTCONTACTDEFAULTEMAIL,
+                   P.MOBILE AS STUDENTCONTACTMOBILEPHONE,
+                   '' AS STUDENTCONTACTSPOUSEID,
+                   '' AS STUDENTCONTACTSPOUSEDEFAULTEMAIL,
+                   '' AS STUDENTCONTACTSPOUSEMOBILEPHONE
             FROM SCHOOLBOX_PARENTS P
             INNER JOIN SCHOOLBOX_PARENT_STUDENT PS ON P.CARER_NUMBER = PS.CARER_NUMBER
             WHERE PS.STUDENT_NUMBER IN ({$predicate['placeholders']})
@@ -238,10 +244,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 unset($row['FULL_NAME']);
             }
 
-            if ($spouseName = $this->guessNamePartsFromFull($row['SPOUSE_FULL_NAME'], 'StudentContactSpouse')) {
-                $row = array_merge($row, $spouseName);
-                unset($row['SPOUSE_FULL_NAME']);
-            }
             $parents[] = $this->normaliseFields($row, $caseSensitiveFields);
         }
 
