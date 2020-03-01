@@ -148,9 +148,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             return [];
         }
 
-        // turn 'Year 08' into 8
-        $student['STUDENTYEARLEVEL'] = preg_replace('/[^0-9]/', '', $student['STUDENTYEARLEVEL']) + 0;
-
         // sometimes Edumate will return blank emergency contact on the first record...
         if (empty($student['STUDENTEMERGENCYNAME'])) {
             $start = 2;
