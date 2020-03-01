@@ -322,3 +322,4 @@ DELETE FROM config WHERE name like 'weather_enable';
 DELETE FROM config WHERE name like 'due_work_notifications_enabled';
 DELETE FROM config WHERE name like 'edumate_auth_enabled';
 DELETE FROM config WHERE name like 'edumate_auth_url';
+DELETE FROM config WHERE name like 'kerb_enable';

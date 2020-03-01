@@ -357,13 +357,6 @@ class SitePage extends Page
                     // For safety's sake regenerate their session ID
                     session_regenerate_id(true);
                 }
-            } //Catch already logged in users via kerberos or other means
-            elseif ($this->config->get('kerb_enable') && $_SERVER['REMOTE_USER']) {
-                list($username) = explode('@', $_SERVER['REMOTE_USER']);
-                if (!$sessionHandler->create($username)) {
-                    $sessionHandler->destroy();
-                    $this->goLoginPage();
-                }
             } else {
                 $sessionHandler->destroy();
                 $this->goLoginPage();
