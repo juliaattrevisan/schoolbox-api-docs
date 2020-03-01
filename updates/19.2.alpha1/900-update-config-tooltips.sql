@@ -96,7 +96,6 @@ UPDATE config SET title = 'TASS Staff Directory \'position_title\' To Exclude', 
 UPDATE config SET title = 'Enable Online Attendance', description = 'If toggled to \'ON\' and using a compatible SIS, teachers can mark attendance online.',  hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'External DB') WHERE name like 'external_attendance';
 UPDATE config SET title = 'Show Attendance in Calendar', description = 'Select the number of days that staff are able to mark attendance retrospectively in the calendar.',  hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'External DB') WHERE name like 'external_attendance_days';
 UPDATE config SET title = 'Enable Feature Tours', description = 'If toggled to \'ON\', Homepage and Dashboard tours can be provided.',  hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Feature Tours') WHERE name like 'tours_enabled';
-
 UPDATE config SET title = 'Course Folder Location', description = 'Select the top level course folder where new courses will be created.', sequence='1', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'LMS Policy') WHERE name like 'course_homepage';
 UPDATE config SET title = 'Enable Curriculum Code Tagging', description = 'If toggled to \'ON\', curriculum codes can be applied to folders, pages, due work and quizzes for the purpose of curriculum mapping.', sequence='2', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'LMS Policy') WHERE name like 'curriculum_tagging_enabled';
 UPDATE config SET hidden='true' WHERE name like 'weather_api_key';
@@ -144,37 +143,6 @@ UPDATE config SET title = 'Enable EOTC Module', description = 'If toggled to \'O
 UPDATE config SET title = 'Enable Fixtures Module', description = 'If toggled to \'ON\', the Fixtures module that can be used to organise sporting fixtures is enabled.', sequence='3', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Modules') WHERE name like 'fixtures_enabled';
 UPDATE config SET title = 'Enable Staff to Post to Global Audiences', description = 'If toggled to \'ON\', staff can post news to a global audience. If \'Global Moderation\' is toggled to \'ON\', news will require approval before being published.', sequence='1', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'News') WHERE name like 'news_staff_post_enabled';
 UPDATE config SET title = 'Enable Moderation of Global News Articles', description = 'If toggled to \'ON\', articles posted to a global audience will require moderation by a user with \'News Moderator\' permissions.', sequence='2', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'News') WHERE name like 'global_moderation';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 UPDATE config SET title = 'Enable Comments on News Articles', description = 'If toggled to \'ON\', the author of the article can choose to enable comments.', sequence='3', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'News') WHERE name like 'comms_comments_enabled';
 UPDATE config SET title = 'Enable Modification of News on Homepages', description = 'If toggled to \'ON\', allows users with write access to a homepage to modify articles written by others.', sequence='4', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'News') WHERE name like 'news_edit_other';
 UPDATE config SET title = 'Default News Archiving Period', description = 'Insert the default length of time from when news is published to when it is archived.', sequence='5', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'News') WHERE name like 'news_default_expiry';
@@ -269,10 +237,6 @@ UPDATE config SET title = 'Enable Only Staff to be Group Admins', description = 
 UPDATE config SET title = 'Allow Student Search', description = 'If toggled to \'ON\', student profiles will appear in search results conducted by students and parents.', sequence='31', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Policy') WHERE name like 'student_search_enable';
 UPDATE config SET title = 'Student Contact Visibility', description = 'Select the roles that can view student contact details.', sequence='32', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Policy') WHERE name like 'protect_student_contacts';
 UPDATE config SET title = 'Show All Subjects on Profile', description = 'If toggled to \'ON\', all enrolled subjects will be shown on a Student Profile page, regardless of its existence in Schoolbox.', sequence='33', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Policy') WHERE name like 'show_all_subjects';
-
-
-
-
 UPDATE config SET title = 'Calendar Export (Months To Go Back)', description = 'Insert the number of months, prior to today, that will be included in calendar exports.', sequence='34', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Policy') WHERE name like 'calendar_export_start';
 UPDATE config SET title = 'Calendar Export (Months To Go Forward)', description = 'Insert the number of months, after today, that will be included in calendar exports.', sequence='35', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Policy') WHERE name like 'calendar_export_end';
 UPDATE config SET title = 'Timetable Calendar Export (Months To Go Forward)', description = 'Insert the number of months, after today, that will be included in timetable calendar exports.', sequence='36', hidden='false', type_id=(SELECT id FROM lu_config_type WHERE type like 'Policy') WHERE name like 'timetable_export_end';
