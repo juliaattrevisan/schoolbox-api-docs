@@ -29,12 +29,7 @@ class Html extends Base {
             $returnStr .= "homepage&homepageId=".$path[2];
         }
         elseif ($path[1] == "calendar") {
-            if($path[2] == "full") {
-                $returnStr .= "calendar";
-            }
-            elseif($path[2] == "list") {
-                $returnStr .= "list&userId=".$path[3]."&returnDate=".$path[4];
-            }
+            $returnStr .= "calendar";
         }
         elseif (isset($this->returnStr)) {
             $returnStr .= $this->returnStr;
