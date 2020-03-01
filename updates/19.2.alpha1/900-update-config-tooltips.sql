@@ -318,9 +318,7 @@ UPDATE config SET title = 'Search Items Per Page', description = 'Insert the num
 
 
 DELETE FROM config WHERE name like 'skin_button_input_scale';
-DELETE FROM config WHERE name like 'site_detect';
 DELETE FROM config WHERE name like 'weather_enable';
 DELETE FROM config WHERE name like 'due_work_notifications_enabled';
-DELETE FROM config WHERE name like 'external_sync_data';
 DELETE FROM config WHERE name like 'edumate_auth_enabled';
 DELETE FROM config WHERE name like 'edumate_auth_url';
