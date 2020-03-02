@@ -76,23 +76,23 @@
                     <div data-collapse-state="" data-collapsable="unit-{{ unit.context.id }}">
                         <ul>
                             {% for assessment in unit.assessments %}
-                            {% if assessment.assessments | length %}
-                            <li class="project">
-                                {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment.assessment, participant: assessment.assessment.participantIfExtant(student)} only %}
-                                <ul>
-                                    {% for projectAssessment in assessment.assessments %}
-                                    <li class="assessment">
-                                        {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: projectAssessment, participant: projectAssessment.participantIfExtant(student)} only %}
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                        {% else %}
-                            <li class="assessment">
-                                {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment.assessment, participant: assessment.assessment.participantIfExtant(student)} only %}
-                            </li>
-                        {% endif %}
-                        {% endfor %}
+                                {% if assessment.assessments | length %}
+                                <li class="project">
+                                    {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment.assessment, participant: assessment.assessment.participantIfExtant(student)} only %}
+                                    <ul>
+                                        {% for projectAssessment in assessment.assessments %}
+                                        <li class="assessment">
+                                            {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: projectAssessment, participant: projectAssessment.participantIfExtant(student)} only %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% else %}
+                                <li class="assessment">
+                                    {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment.assessment, participant: assessment.assessment.participantIfExtant(student)} only %}
+                                </li>
+                                {% endif %}
+                            {% endfor %}
                         </ul>
                     </div>
                 </li>

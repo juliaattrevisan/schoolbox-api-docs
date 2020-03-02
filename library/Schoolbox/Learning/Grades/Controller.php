@@ -531,7 +531,7 @@ class Controller extends Base
         $tree = [];
         // Layout assessments in a tree for twig to render
         foreach($filteredMarkbook->getAssessments() as $assessment) {
-            if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId()) {
+            if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId() && $tree[$assessment->getBaseContext()->getId()]['context'] ) {
                 $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['context'] = $assessment->getContext();
                 $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['assessments'][$assessment->getId()] = $assessment;
             }
