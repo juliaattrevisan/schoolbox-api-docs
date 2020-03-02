@@ -632,7 +632,7 @@ class Controller extends Base
                         $graphInfoValue = [
                             'displayMark'  => $humanReadableMark,
                             'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($normalisedMark / 10) : 'none',
-                            'info'         => $comment,
+                            'info'         => $comment ?? '',
                         ];
                     }
                 }
