@@ -318,9 +318,10 @@ class Profile implements IStrategy
 
                 /* Log it
                  */
-                $this->log->info(sprintf(
-                    'Adding base profile for %s',
-                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                $this->log->debug(sprintf(
+                    'Preparing base profile for student %s (%s)',
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                    $externalId
                 ));
 
                 /* Then save it
@@ -328,6 +329,13 @@ class Profile implements IStrategy
                 if ($this->perform) {
                     $this->baseProfileMapper->save($studentBaseProfile);
                 }
+
+                $this->log->debug(sprintf(
+                    'Added base profile for student %s (%s) with sis_user_profile_id %s',
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                    $externalId,
+                    $studentBaseProfile->getId()
+                ));
 
                 /* Fish out alert comments
                  */
@@ -444,9 +452,11 @@ class Profile implements IStrategy
 
                 /* Log it
                  */
-                $this->log->info(sprintf(
-                    'Adding student profile for %s',
-                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                $this->log->debug(sprintf(
+                    'Preparing roletype-specific profile for student %s (%s) with sis_user_profile_id %s',
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                    $externalId,
+                    $studentBaseProfile->getId()
                 ));
 
                 /* Then save it
@@ -454,6 +464,13 @@ class Profile implements IStrategy
                 if ($this->perform) {
                     $this->studentProfileMapper->save($studentProfile);
                 }
+
+                $this->log->info(sprintf(
+                    'Added roletype-specific profile for student %s (%s) with sis_user_profile_id %s',
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                    $externalId,
+                    $studentBaseProfile->getId()
+                ));
 
                 /* Add their parents' profile data
                  */
@@ -731,9 +748,10 @@ class Profile implements IStrategy
 
             /* Log it
              */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            $this->log->debug(sprintf(
+                'Preparing base profile for parent %s (%s)',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                $externalId
             ));
 
             /* Then save it
@@ -741,6 +759,13 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->baseProfileMapper->save($parentBaseProfile);
             }
+
+            $this->log->debug(sprintf(
+                'Added base profile for parent %s (%s) with sis_user_profile_id %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                $externalId,
+                $parentBaseProfile->getId()
+            ));
 
             $parentProfile
                 ->setPhoneHome($phoneHome)
@@ -751,9 +776,10 @@ class Profile implements IStrategy
 
             /* Log it
              */
-            $this->log->info(sprintf(
-                'Adding parent profile for %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            $this->log->debug(sprintf(
+                'Preparing roletype-profile for parent %s (%s)',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                $externalId
             ));
 
             /* Then save it
@@ -761,6 +787,13 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->parentProfileMapper->save($parentProfile);
             }
+
+            $this->log->info(sprintf(
+                'Added roletype-profile for parent %s (%s) with sis_user_profile_id %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $externalId,
+                $parentBaseProfile->getId()
+            ));
 
             /* Manufacture relations
              */
