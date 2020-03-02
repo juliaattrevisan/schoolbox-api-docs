@@ -45,56 +45,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      */
     public function setConfig(IConfigLoader $loader): self
     {
-        $this->config = new class($loader) implements IConfigLoader
-        {
-
-            private const KEYS = [
-                'date_local',
-                'date_time',
-                'date_long',
-                'date_short',
-                'date_time',
-                'date_only',
-                'locale_weekend',
-            ];
-
-            /** @var string[] */
-            private $formats = [];
-
-
-            /**
-             * @param IConfigLoader $conf
-             */
-            public function __construct(IConfigLoader $conf)
-            {
-                // cache this
-                foreach (self::KEYS as $key) {
-                    $this->formats[$key] = $conf->get($key);
-                }
-            }
-
-
-            /**
-             * Return the value of the given config var
-             *
-             * @param string $var
-             * @return mixed
-             */
-            public function get($var)
-            {
-                return $this->formats[$var];
-            }
-
-
-            /**
-             * @return void
-             */
-            public function dropCache()
-            {
-                // noop
-            }
-
-        };
+        $this->config = $loader;
         return $this;
     }
 
