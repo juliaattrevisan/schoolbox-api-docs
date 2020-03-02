@@ -1015,7 +1015,7 @@ $selector-width: 2.25rem;
 }
 
 // Activity list
-.activity-list{
+.activity-list {
     @include information-list;
     li{
         .grade{
@@ -1067,6 +1067,12 @@ $selector-width: 2.25rem;
         border-bottom: 0;
     }
     li{
+        .grade{
+          text-align: center;
+          font-weight: $font-weight-bold;
+          font-size: rem-calc(($base-font-size + 2));
+          min-width: 6rem;
+        }
         a:hover{
             background-color: $row-hover-background;
         }
