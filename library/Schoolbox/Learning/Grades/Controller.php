@@ -622,13 +622,13 @@ class Controller extends Base
                     }
 
                     // Set graph info value for modal
-                    $comment  = '';
+                    $comment  = null;
                     $feedback = $participant->findAuthoritativeVisibleFeedback($this->getUser());
                     if ($feedback) {
                         $comment = $feedback->getComment();
                     }
                     $humanReadableMark = $participant->getHumanReadableMark(true);
-                    if (!empty($humanReadableMark) || !empty($comment)) {
+                    if (isset($humanReadableMark) || isset($comment)) {
                         $graphInfoValue = [
                             'displayMark'  => $humanReadableMark,
                             'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($normalisedMark / 10) : 'none',
