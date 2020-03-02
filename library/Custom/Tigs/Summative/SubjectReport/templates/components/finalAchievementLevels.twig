@@ -23,7 +23,7 @@ Data:
             </tr>
             </thead>
             <tbody>
-            {% for criterion, mark in data %}
+            {% for criterion, mark in data.marks %}
                 <tr>
                     <td>{{ criterion | nl2br }}</td>
                     <td>{{ mark|default('-') }}</td>

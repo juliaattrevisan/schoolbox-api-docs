@@ -10,7 +10,7 @@ Data:
     data[folderId].folder                                        Folder\Model
     data[folderId].teachers                                      User[]
     data[folderId]['falData']                                    array
-    data[folderId]['falData']['data']                            float[]    eg, ['Criterion A' => 6.0, ...]
+    data[folderId]['falData']['data']['marks']                   float[]    eg, ['Criterion A' => 6.0, ...]
     data[folderId]['aasData']                                    array
     data[folderId]['aasData']['data']                            array
     data[folderId]['aasData']['data'][unitSpecId]                array
@@ -108,9 +108,9 @@ Data:
                         <div class="column small-12 medium-6 results">
                             <div class="result-group fal">
                                 {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
-                                {% if folderData.falData.data %}
+                                {% if folderData.falData.data.marks %}
                                     {# Explicit FAL data found, use that #}
-                                    {% for label, value in folderData.falData.data %}
+                                    {% for label, value in folderData.falData.data.marks %}
                                         <div class="result-item">
                                             <span class="result-heading">{{ label | last }}</span><br>
                                             <span class="result-value">{{ value|default('-') }}</span>
@@ -223,9 +223,9 @@ Data:
                                 {% elseif attributes.isHsc %}
                                     {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
                                 {% elseif attributes.isMyp %}
-                                    {% set commentData = folderData.aasData.data[unitSpec.id] %}
+                                    {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
+                                    {% set commentData = folderData.nesaGraphData.data.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
                                 {% endif %}
-
                                 {% if commentData.comment %}
                                     {% set commentFound = true %}
                                     {{ commentData.comment | nl2br }}

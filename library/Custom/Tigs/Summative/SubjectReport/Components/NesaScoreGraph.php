@@ -93,12 +93,13 @@ class NesaScoreGraph extends BaseComponent
     public function toContext(int $semester): ?array
     {
         try {
-            [$markData, $studentMark, $showComponent] = $this->collateMarks($this->collateAssessables($semester));
+            [$markData, $studentMark, $showComponent, $comment] = $this->collateMarks($this->collateAssessables($semester));
             return $showComponent
                 ? [
                     'cohortMarks'   => $markData,
                     'studentMark'   => $studentMark,
                     'semester'      => $semester,
+                    'comment'       => $comment,
                 ]
                 : null;
         } catch (UnexpectedValueException $e) {
@@ -207,6 +208,7 @@ class NesaScoreGraph extends BaseComponent
     {
         $markData    = self::BASE_MARKS;
         $studentMark = null;
+        $comment = [];
 
         $this->validateAssessments($assessmentData);
         $showComponent = $this->deriveComponentVisibility($assessmentData);
@@ -237,6 +239,12 @@ class NesaScoreGraph extends BaseComponent
                     // has participation record in a different class in this cohort.
                     if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
                         $studentMark = $humanReadableMark;
+
+                        // MYP students' comments will come from this assessment
+                        if ($this->getAttributes()->isMyp()) {
+                            $comment['comment']   = $feedback->getComment();
+                            $comment['commentBy'] = $feedback->getReviewer();
+                        }
                     }
 
                     // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
@@ -251,7 +259,7 @@ class NesaScoreGraph extends BaseComponent
             }
         }
 
-        return [$markData, $studentMark, $showComponent];
+        return [$markData, $studentMark, $showComponent, $comment];
     }
 
 
