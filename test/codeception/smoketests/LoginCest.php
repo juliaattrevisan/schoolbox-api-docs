@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace SmokeTests;
 
+use Alaress\Database\Wrapper\Db2\PDO;
 use IntegrationTester;
 use Payload;
 
@@ -88,5 +89,109 @@ class LoginCest
         #THEN
         $i->seeResponseCodeIs(302);
         $i->seeHttpHeader('location', '/passwordReset');
+    }
+
+    public function ApiLogin(IntegrationTester $i):void
+    {
+        #GIVEN
+        $user     = 'alaress';
+        $password = 'alaress';
+
+        /** @var \Codeception\Module\Db $db */
+        $db=$i->grabDBModule();
+        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
+        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
+
+        #WHEN
+        $loginPayload = new Payload\Authentication\ApiLogin('auto_test');
+        $loginPayload->setUsername($user);
+        $loginPayload->setPassword($password);
+
+        $i->sendRequest($loginPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
+
+        #WHEN
+        $i->startFollowingRedirects();
+        $i->sendRequest($loginPayload);
+        $i->seeResponseCodeIs(200);
+
+    }
+
+    public function ApiLoginFailBadPass(IntegrationTester $i):void
+    {
+        #GIVEN
+        $user     = 'alaress';
+        $password = 'alar99';
+
+        /** @var \Codeception\Module\Db $db */
+        $db=$i->grabDBModule();
+        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
+        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
+
+        #WHEN
+        $loginPayload = new Payload\Authentication\ApiLogin('auto_test');
+        $loginPayload->setUsername($user);
+        $loginPayload->setPassword($password);
+
+        $i->sendRequest($loginPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
+
+    public function ApiLoginFailWrongApp(IntegrationTester $i):void
+    {
+        #GIVEN
+        $user     = 'alaress';
+        $password = 'alaress';
+
+        /** @var \Codeception\Module\Db $db */
+        $db=$i->grabDBModule();
+        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
+        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
+
+        #WHEN
+        $loginPayload = new Payload\Authentication\ApiLogin('auto_app_fail');
+        $loginPayload->setUsername($user);
+        $loginPayload->setPassword($password);
+
+        $i->sendRequest($loginPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
+
+    public function RedirectApiLogin(IntegrationTester $i):void
+    {
+        #GIVEN
+        $user     = 'alaress';
+        $password = 'alaress';
+        $page     = '/course/list';
+
+        /** @var \Codeception\Module\Db $db */
+        $db=$i->grabDBModule();
+        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
+        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
+
+        #WHEN
+        $loginPayload = new Payload\Authentication\ApiLogin('auto_test');
+        $loginPayload->setUsername($user);
+        $loginPayload->setPassword($password);
+        $loginPayload->setRedirectPageQueryParam($page);
+
+        $i->sendRequest($loginPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', $page);
+
+        #WHEN
+        $i->startFollowingRedirects();
+        $i->sendRequest($loginPayload);
+        $i->seeResponseCodeIs(200);
+
     }
 }
