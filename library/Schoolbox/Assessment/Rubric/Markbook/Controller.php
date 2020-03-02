@@ -817,9 +817,9 @@ class Controller extends Base
     {
         $overallMarks = $this->aggregateMarks($assessments, $linkedMarks);
 
-        $summated =  $this->summateAggregatedMarks($overallMarks);
+        $summated = $this->summateAggregatedMarks($overallMarks);
 
-        foreach($summated as &$capability) {
+        foreach ($summated as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
         }
         uasort($summated, [$this, 'sortByName']);
