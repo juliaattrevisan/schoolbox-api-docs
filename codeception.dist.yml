@@ -51,6 +51,10 @@ suites:
                     depends: PhpBrowser
                     url: 'https://vagrant.dev.schoolbox.cloud'
                     xdebug: false
+                - Db:
+                    dsn: "mysql:host=localhost;dbname=schoolbox"
+                    user: "root"
+                    password: "tnp879"
                 - \Helper\SchoolboxCli:
                 - Asserts:
 

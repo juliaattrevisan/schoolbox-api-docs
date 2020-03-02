@@ -100,6 +100,20 @@ abstract class Request
     }
 
     /**
+     * Get a query param
+     *
+     * @param string $name
+     * @return string|null
+     */
+    protected function getQueryParam(string $name)
+    {
+        if (isset($this->queryParams[$name])) {
+            return $this->queryParams[$name];
+        }
+        return null;
+    }
+
+    /**
      * Unsets a query param
      *
      * @param string $name

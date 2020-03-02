@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace Helper;
 
+use Codeception\Module\Db;
 use Codeception\Module\REST;
 use Codeception\TestInterface;
 use Payload\Request;
@@ -82,10 +83,21 @@ class Integration extends REST
             $this->deleteHeader($name);
         }
     }
-    
-    
+
+    /**
+     * @return string
+     */
     public function grabResponseCode(): string
     {
         return $this->connectionModule->_getResponseStatusCode();
+    }
+
+    /**
+     * @return Db
+     */
+    public function grabDBModule(): Db
+    {
+        $db = $this->getModule('Db');
+        return $db;
     }
 }

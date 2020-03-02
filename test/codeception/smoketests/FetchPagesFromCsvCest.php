@@ -109,20 +109,22 @@ class FetchPagesFromCsvCest
 
         $i->sendRequest($loginPayload);
     }
-    
+
     /** Get all the pages, uses the url provider, data that is read from a csv to fetch all the pages stated and
      * checks that all pages come back with a 200 ok response.
      *
      * @dataProvider urlProvider
-     * 
+     *
      */
+
     public function getAllThePages(IntegrationTester $i, $senario, \Codeception\Example $example)
     {
+        # TODO split out tests into one per persona, each test sends a parameter to the url provider which determines the dataset.
         #GIVEN
         $persona      = $example[2];
         $url          = $example[3];
         $expected_result = $example[4];
-        
+
         if($expected_result=='IGNORE')
         {
             $senario->skip('Test ignored');
@@ -138,18 +140,18 @@ class FetchPagesFromCsvCest
         } else {
             $i->getSessionCookie($this->users[$persona]);
         }
-        
+
         #Need to login to the right user
         #proceed to test the url which is below.
         $getPayload = new Payload\Base('GET', '/', $url);
-        
+
         #WHEN
         $i->sendRequest($getPayload);
-        
+
         #THEN
         $i->seeResponseCodeIs($expected_result);
     }
-    
+
     /** New Url Provider - reads a csv file to provide an array of data for the fetch all pages test.
      *
      * GetSmokeTestList csv is formatted a specific way for the test.
@@ -165,10 +167,10 @@ class FetchPagesFromCsvCest
     protected function urlProvider()
     {
         $csvData = array_map('str_getcsv', file(codecept_data_dir('/SmokeTests/GetSmokeTestDataList.csv')));
-        
+
         return $csvData;
     }
-    
+
 }
 
 
