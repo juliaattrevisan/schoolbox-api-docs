@@ -199,8 +199,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             throw $e;
 
         } catch (RuntimeException $e) {
-            $truncated = substr($trigger, 0, 64);
-            $this->log->critical("Could not decode '$truncated...' to schedule event", [ 'exception'=>$e ]);
+            $this->log->critical('There was a runtime issue: ' . $e->getMessage(), ['exception' => $e]);
             // this message is can't be parsed, so we ACK it to make it go away
 
         } catch (CompressionException $e) {
