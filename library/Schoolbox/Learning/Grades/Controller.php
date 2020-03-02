@@ -640,7 +640,7 @@ class Controller extends Base
                             // Handle project mark, not available through feedback
                             $graphInfoValue = [
                                 'displayMark'  => $humanReadableMark,
-                                'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($feedback->getNormalisedMark() / 10) : 'none',
+                                'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($participant->getNormalisedMark(true) / 10) : 'none',
                                 'info'         => '',
                             ];
                         }
