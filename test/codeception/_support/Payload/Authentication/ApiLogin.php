@@ -42,13 +42,13 @@ class ApiLogin extends Request
     {
         if ($page != '' && isset($page))
         {
-            $this->setQueryParam('page', $page);
+            $this->setQueryParam('redirect', $page);
         }
         else
         {
-            if ($this->getQueryParam('page') != null)
+            if ($this->getQueryParam('redirect') != null)
             {
-                $this->unsetQueryParam('page');
+                $this->unsetQueryParam('redirect');
             }
         }
 
