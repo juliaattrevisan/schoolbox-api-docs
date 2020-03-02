@@ -817,9 +817,25 @@ class Controller extends Base
     {
         $overallMarks = $this->aggregateMarks($assessments, $linkedMarks);
 
-        return $this->summateAggregatedMarks($overallMarks);
+        $summated = $this->summateAggregatedMarks($overallMarks);
+
+        foreach ($summated as &$capability) {
+            uasort($capability['indicators'], [$this, 'sortByName']);
+        }
+        uasort($summated, [$this, 'sortByName']);
+
+        return $summated;
     }
 
+    /**
+     * Quick alpha sort function for indicators and capabilities summary section
+     * @param $a
+     * @param $b
+     * @return int
+     */
+    private function sortByName($a, $b) {
+        return strnatcasecmp($a['name'], $b['name']);
+    }
 
     /**
      * Resolves the aggregated counts to summate final capability/indicator marks
