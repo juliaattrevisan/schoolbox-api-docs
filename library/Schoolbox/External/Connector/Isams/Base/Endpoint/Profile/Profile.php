@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
+use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -21,7 +22,6 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
@@ -127,6 +127,7 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws InvalidUriPartException
      */
     public function import(): void
@@ -175,6 +176,7 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws InvalidUriPartException
      */
     private function importStudents(): void
@@ -202,7 +204,7 @@ class Profile implements IStrategy
 
             /* Students without usernames are skipped
              */
-            if (!\strlen($username)) {
+            if ('' === $username) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for student %s - no username detected',
                     trim("{$firstname} {$lastname}")
@@ -267,6 +269,7 @@ class Profile implements IStrategy
 
             /* Smoosh it all together
              */
+            /** @var Profile $studentProfile */
             $studentProfile
                 ->setUsername($username)
                 ->setAlertComment($this->findComments($studentId))
@@ -378,7 +381,7 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return string
      * @throws RuntimeException
-     * @throws InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws InvalidUriPartException
      */
     private function findComments(string $studentId): string
@@ -404,9 +407,9 @@ class Profile implements IStrategy
      *
      * @param string $id
      * @return array
-     * @throws RuntimeException
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
+     * @throws RuntimeException
      */
     private function findTutor(string $id): array
     {
@@ -419,9 +422,10 @@ class Profile implements IStrategy
      *
      * @param string $houseName
      * @return array
-     * @throws RuntimeException
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
      */
     private function findHousemaster(string $houseName): array
     {
@@ -444,9 +448,10 @@ class Profile implements IStrategy
      *
      * @param string $form
      * @return array
-     * @throws RuntimeException
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
      */
     private function findFormTeacher(string $form): array
     {
@@ -760,7 +765,7 @@ class Profile implements IStrategy
 
             /* Staff without usernames are skipped
              */
-            if (!\strlen($username)) {
+            if ('' === $username) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for staff %s - no username detected',
                     trim("{$firstname} {$lastname}")
