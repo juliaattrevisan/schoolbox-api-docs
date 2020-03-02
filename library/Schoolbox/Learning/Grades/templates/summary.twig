@@ -101,42 +101,13 @@
                             </nav>
                         </li>
                     {% endfor %}
-
                     {% if assessmentTasks[folder.id] | length %}
                         <li>
-                            <ul class="information-list">
+                            <ul class="activity-list">
                                 {% for assessment in assessmentTasks[folder.id] %}
                                     {% set participant = assessment.participantIfExtant(student) %}
-                                    <li class="actions-small-2">
-                                        <div class="list-item clearfix content">
-                                            <div class="row">
-                                                <div class="small-12 large-6 card column xl">
-                                                    <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
-                                                        {{ assessment.title }}
-                                                    </a>
-                                                    <p class="meta">
-                                                        <a href="/homepage/{{ subject.id }}">{{ subject.name }}</a> {{ assessment.typeName }}
-                                                    </p>
-                                                </div>
-
-                                                <div class="small-12 large-6 columns grade">
-                                                    {% set feedback = participant.findAuthoritativeVisibleFeedback(currentUser) %}
-                                                    {% if feedback %}
-                                                        <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
-                                                        <p class="comment">{{ feedback.comment | nl2br }}</p>
-                                                        {% if assessment.useRubric or feedback.allFiles | length  %}
-                                                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
-                                                                View more feedback</a>
-                                                        {% endif %}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <nav>
-                                            {% if quizzes[assessment.id] is not empty %}
-                                                <a class="icon-view" href="/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
-                                            {% endif %}
-                                        </nav>
+                                    <li class="assessment">
+                                        {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment, participant: participant} only %}
                                     </li>
                                 {% endfor %}
                             </ul>

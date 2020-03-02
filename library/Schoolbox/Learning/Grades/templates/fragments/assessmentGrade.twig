@@ -35,20 +35,21 @@
     </div>
 
     {% if assessment.isFeedbackVisibleToUser(USER) %}
-        {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+        {% set grade = assessment.humanReadableMark(participant, true) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessable,
                 student: participant.user
             } only %}
-        {% elseif feedback.humanReadableMark() %}
-            <div class="grade {{ urgency.marks(feedback.normalisedMark()) }}-bg">
-                <span>{{ feedback.humanReadableMark() }}</span>
+        {% elseif grade %}
+            <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
+                <span>{{ grade }}</span>
             </div>
         {% endif %}
     {% endif %}
 </div>
 {% if assessment.isFeedbackVisibleToUser(USER) %}
+    {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
     {% if feedback.comment   %}
         <div class="content">
             <p class="comment">{{ feedback.comment | nl2br }}</p>

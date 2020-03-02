@@ -65,9 +65,7 @@
  #}
 {% macro label(participant, isPublished) %}
 {% spaceless %}
-    {% if participant.resubmissionRequired %}
-        Resubmit
-    {% elseif participant.hasSubmittedResponse and not participant.hasPublishedFeedback %}
+    {% if participant.hasSubmittedResponse and not participant.hasPublishedFeedback %}
         Pending
     {% else %}
         {{ participant.humanReadableMark(isPublished) | default('–') }}

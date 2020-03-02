@@ -531,7 +531,7 @@ class Controller extends Base
         $tree = [];
         // Layout assessments in a tree for twig to render
         foreach($filteredMarkbook->getAssessments() as $assessment) {
-            if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId()) {
+            if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId() && $tree[$assessment->getBaseContext()->getId()]['context'] ) {
                 $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['context'] = $assessment->getContext();
                 $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['assessments'][$assessment->getId()] = $assessment;
             }
@@ -622,28 +622,18 @@ class Controller extends Base
                     }
 
                     // Set graph info value for modal
-                    $feedback       = $participant->findAuthoritativeVisibleFeedback($this->getUser());
+                    $comment  = null;
+                    $feedback = $participant->findAuthoritativeVisibleFeedback($this->getUser());
                     if ($feedback) {
-                        $humanReadableMark = $feedback->getHumanReadableMark();
-                        $comment           = $feedback->getComment();
-                        if (!empty($humanReadableMark) || !empty($comment)) {
-                            $graphInfoValue = [
-                                'displayMark'  => $humanReadableMark,
-                                'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($feedback->getNormalisedMark() / 10) : 'none',
-                                'info'         => $comment ?? '',
-                            ];
-                        }
-                    } else {
-                        //Projects don't have feedback so just get from participant record
-                        $humanReadableMark = $participant->getHumanReadableMark(true);
-                        if ($humanReadableMark) {
-                            // Handle project mark, not available through feedback
-                            $graphInfoValue = [
-                                'displayMark'  => $humanReadableMark,
-                                'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($feedback->getNormalisedMark() / 10) : 'none',
-                                'info'         => '',
-                            ];
-                        }
+                        $comment = $feedback->getComment();
+                    }
+                    $humanReadableMark = $participant->getHumanReadableMark(true);
+                    if (isset($humanReadableMark) || isset($comment)) {
+                        $graphInfoValue = [
+                            'displayMark'  => $humanReadableMark,
+                            'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($normalisedMark / 10) : 'none',
+                            'info'         => $comment ?? '',
+                        ];
                     }
                 }
                 $graphScatter[] = $graphScatterValue;
