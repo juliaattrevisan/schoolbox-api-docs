@@ -435,7 +435,7 @@ class Controller extends Base
                 'title'             => 'Campus',
                 'mapper'            => CampusMapper::class,
                 'delete'            => true,
-                'deleteFailMsg'     => 'You cannot delete a campus that still has non-deleted users in that campus',
+                'deleteFailMsg'     => 'This campus cannot be deleted as it has users assigned to it.',
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',

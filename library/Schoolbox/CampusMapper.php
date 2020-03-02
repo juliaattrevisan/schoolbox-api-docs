@@ -50,7 +50,7 @@ class CampusMapper extends Mapper {
     public function campusHasUsers(Campus $campus): bool
     {
         if ($this->findUsersInCampus($campus)->count() > 0) {
-            throw new UnexpectedValueException('This campus cannot be deleted as it has users assigned to it.');
+            return false;
         }
         return true;
     }
